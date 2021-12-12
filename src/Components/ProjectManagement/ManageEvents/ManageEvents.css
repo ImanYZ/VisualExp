@@ -1,0 +1,12 @@
+#ManageEventsContainer {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+#ManageEventsContent {
+  height: 1900px;
+}
+
+button.NotificationBtn {
+  margin-right: -10px;
+}

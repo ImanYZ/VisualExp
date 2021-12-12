@@ -1,0 +1,39 @@
+#ConsentContainer,
+#Auth {
+  margin: 10px;
+  padding: 9px;
+  padding-bottom: 100px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#ConsentContainer h2 {
+  text-align: center;
+}
+
+#FullnameForm,
+#EmailForm {
+  width: 100%;
+}
+
+#SignButtonContainer {
+  margin: auto;
+  text-align: center;
+  margin-top: 10px;
+}
+
+#SignButton {
+  background-color: rgb(112, 187, 0);
+}
+
+#SignButton.Disabled {
+  background-color: rgb(163, 163, 163);
+}
+
+#App70 {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-template-rows: 100%;
+  width: 100%;
+  height: 100vh;
+}
