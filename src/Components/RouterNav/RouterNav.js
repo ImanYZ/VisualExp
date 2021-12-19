@@ -99,9 +99,9 @@ const RouterNav = (props) => {
   const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
+  const [all1CademyPoints, setAll1CademyPoints] = useState({});
   const [proposalsLoaded, setProposalsLoaded] = useState(false);
   const [userVersionsChanges, setUserVersionsChanges] = useState([]);
-  const [points1Cademy, setPoints1Cademy] = useState({});
   const [oneCademyPoints, setOneCademyPoints] = useState(0);
 
   useEffect(() => {
@@ -267,9 +267,9 @@ const RouterNav = (props) => {
   }, [firebaseOnecademy, username]);
 
   useEffect(() => {
-    const setProposalsVotes = async () => {
+    if (proposalsChanges.length > 0) {
       let propos = { ...proposals };
-      let netVotes = { ...points1Cademy };
+      let netVotes = { ...all1CademyPoints };
       for (let change of proposalsChanges) {
         const proposalData = change.doc.data();
         if (proposalData.proposer in propos) {
@@ -326,33 +326,14 @@ const RouterNav = (props) => {
       }
       setProposalsChanges([]);
       setProposals(propos);
+      setAll1CademyPoints(netVotes);
       setProposalsLoaded(true);
-      setPoints1Cademy(netVotes);
-
-      const researcherRef = firebase.db.collection("researchers").doc(fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
-      await researcherRef.update({
-        projects: {
-          ...researcherData.projects,
-          [project]: {
-            ...researcherData.projects[project],
-            onePoints: netVotes[username],
-          },
-        },
-      });
-    };
-    if (proposalsChanges.length > 0) {
-      setProposalsVotes();
     }
   }, [
     proposalsChanges,
     proposals,
-    points1Cademy,
+    all1CademyPoints,
     username,
-    firebase,
-    fullname,
-    project,
   ]);
 
   useEffect(() => {
@@ -391,6 +372,32 @@ const RouterNav = (props) => {
     }
   }, [firebaseOnecademy, username, proposalsLoaded]);
 
+  useEffect(() => {
+    const setProposalsVotes = async () => {
+      const researcherRef = firebase.db.collection("researchers").doc(fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      await researcherRef.update({
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project],
+            onePoints: all1CademyPoints[username],
+          },
+        },
+      });
+    };
+    if (username in all1CademyPoints) {
+      setProposalsVotes();
+    }
+  }, [
+    all1CademyPoints,
+    username,
+    firebase,
+    fullname,
+    project,
+  ]);
+
   const signOut = async (event) => {
     setEmail("");
     setUsername("");
@@ -414,7 +421,7 @@ const RouterNav = (props) => {
     setNotTakenSessionsNum(0);
     setProposalsChanges([]);
     setProposals({});
-    setPoints1Cademy({});
+    setAll1CademyPoints({});
     await firebase.logout();
   };
 
@@ -575,8 +582,8 @@ const RouterNav = (props) => {
                       {username ? (
                         <div>
                           <img src={favicon} width="15.1" />{" "}
-                          {username && username in points1Cademy
-                            ? points1Cademy[username]
+                          {username && username in all1CademyPoints
+                            ? all1CademyPoints[username]
                             : 0}
                           <br />✅ {upVotedDays}
                           <br />
