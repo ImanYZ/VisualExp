@@ -4,6 +4,7 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
 
 import {
   firebaseState,
@@ -20,6 +21,9 @@ import {
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
+import OneCademy from "../OneCademy/OneCademy";
+
+import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
 
@@ -34,6 +38,7 @@ const Activities = (props) => {
 
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (props.activityName && activePage !== props.activityName) {
@@ -52,30 +57,34 @@ const Activities = (props) => {
           if (project in researData.projects) {
             const projectData = researData.projects[project];
             let totalPoints = 0;
+            let oneCademyPoints = 0;
             let intellectualPoints = 0;
-            let autogradedPoints = 0;
+            let instructorsPoints = 0;
+            let expPoints = 0;
             if (projectData.points) {
               totalPoints += projectData.points;
               intellectualPoints += projectData.points;
             }
             if (projectData.dayUpVotePoints) {
               totalPoints += projectData.dayUpVotePoints;
-              autogradedPoints += projectData.dayUpVotePoints;
+              intellectualPoints += projectData.dayUpVotePoints;
             }
             if (projectData.expPoints) {
               totalPoints += projectData.expPoints;
-              autogradedPoints += projectData.expPoints;
+              expPoints = projectData.expPoints;
             }
             if (projectData.instructors) {
               totalPoints += projectData.instructors;
-              autogradedPoints += projectData.instructors;
+              instructorsPoints = projectData.instructors;
             }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
               if (resears[reIdx].id === change.doc.id) {
                 resears[reIdx].totalPoints = totalPoints;
+                resears[reIdx].oneCademyPoints = oneCademyPoints;
                 resears[reIdx].intellectualPoints = intellectualPoints;
-                resears[reIdx].autogradedPoints = autogradedPoints;
+                resears[reIdx].instructorsPoints = instructorsPoints;
+                resears[reIdx].expPoints = expPoints;
                 foundResear = true;
                 break;
               }
@@ -84,8 +93,10 @@ const Activities = (props) => {
               resears.push({
                 id: change.doc.id,
                 totalPoints,
+                oneCademyPoints,
                 intellectualPoints,
-                autogradedPoints,
+                instructorsPoints,
+                expPoints,
               });
             }
           }
@@ -113,6 +124,10 @@ const Activities = (props) => {
     }
   }, [project, fullname]);
 
+  const expandLeaderboard = (event) => {
+    setExpanded(!expanded);
+  };
+
   return (
     <div id="ActivitiesContainer">
       {notAResearcher ? (
@@ -122,74 +137,107 @@ const Activities = (props) => {
         </h1>
       ) : (
         <>
-          <h2>Interns Leaderboard:</h2>
-          <div id="Leaderboard">
-            <Paper
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                flexWrap: "wrap",
-                listStyle: "none",
-                p: 0.5,
-                m: 0,
-              }}
-              component="ul"
-            >
-              {researchers.map((resear) => {
-                return (
-                  <li key={resear.id} className="LeaderboardItem">
-                    <Chip
-                      icon={
-                        resear.intellectualPoints >= 100 &&
-                        resear.autogradedPoints >= 100 ? (
-                          <span className="ChipContent">😊</span>
-                        ) : (
-                          <span className="ChipContent">😔</span>
-                        )
-                      }
-                      variant={resear.id === fullname ? "" : "outlined"}
-                      color={
-                        resear.intellectualPoints >= 100 &&
-                        resear.autogradedPoints >= 100
-                          ? "success"
-                          : "error"
-                      }
-                      label={
-                        <span className="ChipContent">
-                          {resear.id === fullname
-                            ? fullname +
-                              " - 🎓 " +
-                              resear.intellectualPoints +
-                              " - ✔️ " +
-                              resear.autogradedPoints
-                            : "🎓 " +
-                              resear.intellectualPoints +
-                              " - ✔️ " +
-                              resear.autogradedPoints}
-                        </span>
-                      }
-                    />
-                  </li>
-                );
-              })}
-            </Paper>
+          <div className="Columns40_60">
+            <Alert severity="warning">
+              <h2>Inclusion and Order of Authors Criteria:</h2>
+              <strong>Inclusion:</strong> To be an author,{" "}
+              <span id="GreenText">in green</span>, one needs to earn at least:
+              <ul>
+                <li>
+                  <strong>100</strong> 1Cademy points{" "}
+                  <img src={favicon} width="15.1" /> and{" "}
+                </li>
+                <li>
+                  <strong>100</strong> Intellectual points 🎓 and
+                </li>
+                <li>
+                  <strong>100</strong> Experiment points 👨‍🔬 and
+                </li>
+                <li>
+                  <strong>100</strong> Collecting instructor/administrator
+                  contact points 🧑‍🏫 and
+                </li>
+                <li>
+                  <strong>100</strong> Coding participants' free recall
+                  responses and
+                </li>
+                <li>
+                  <strong>100</strong> Coding participants' free recall
+                  responses
+                </li>
+              </ul>
+              <strong>Order:</strong> The intern with higher total of all the
+              above categories gets a higher position.
+              <Button
+                onClick={expandLeaderboard}
+                className={expanded ? "Button Red" : "Button Green"}
+                variant="contained"
+              >
+                {expanded ? "Collapse" : "Expand"} leaderboard details
+              </Button>
+            </Alert>
+            <div id="Leaderboard">
+              <h2 id="InternsLeaderboardHeader">Interns Leaderboard:</h2>
+              <Paper
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                  listStyle: "none",
+                  p: 0.5,
+                  m: 0,
+                }}
+                component="ul"
+              >
+                {researchers.map((resear) => {
+                  return (
+                    <li key={resear.id} className="LeaderboardItem">
+                      <Chip
+                        icon={
+                          resear.intellectualPoints >= 100 &&
+                          resear.autogradedPoints >= 100 ? (
+                            <span className="ChipContent">😊</span>
+                          ) : (
+                            <span className="ChipContent">😔</span>
+                          )
+                        }
+                        variant={resear.id === fullname ? "" : "outlined"}
+                        color={
+                          resear.intellectualPoints >= 100 &&
+                          resear.autogradedPoints >= 100
+                            ? "success"
+                            : "error"
+                        }
+                        label={
+                          <span className="ChipContent">
+                            {resear.id === fullname && fullname + " - "}
+                            {expanded ? (
+                              <>
+                                {resear.oneCademyPoints}{" "}
+                                <img src={favicon} width="15.1" />
+                                {" - 🎓 " +
+                                  resear.intellectualPoints +
+                                  " - 🧑‍🏫 " +
+                                  resear.instructorsPoints +
+                                  " - 👨‍🔬 " +
+                                  resear.expPoints +
+                                  " - 👨‍🔬 " +
+                                  resear.expPoints +
+                                  " - 👨‍🔬 " +
+                                  resear.expPoints}
+                              </>
+                            ) : (
+                              resear.totalPoints
+                            )}
+                          </span>
+                        }
+                      />
+                    </li>
+                  );
+                })}
+              </Paper>
+            </div>
           </div>
-          <Alert severity="warning">
-            <h2>Inclusion and Order of Authors Criteria:</h2>
-            <ul>
-              <li>
-                <strong>Inclusion:</strong> To be an author,{" "}
-                <span id="GreenText">in green</span>, one needs to earn at least{" "}
-                <strong>100</strong> autograded points ✔️ and{" "}
-                <strong>100</strong> intellectual points 🎓.
-              </li>
-              <li>
-                <strong>Order:</strong> The intern with higher total of
-                intellectual and autograded points (🎓 + ✔️) gets a higher
-                position.
-              </li>
-            </ul>
-          </Alert>
           {/* <div id="InternsNumFormControl">
         <span id="InternsNumQuestion">
           How many interns should be in the authors list?
@@ -224,6 +272,8 @@ const Activities = (props) => {
             <ExperimentPoints />
           ) : activePage === "AddInstructor" ? (
             <AddInstructor />
+          ) : activePage === "1Cademy" ? (
+            <OneCademy />
           ) : (
             <IntellectualPoints />
           )}

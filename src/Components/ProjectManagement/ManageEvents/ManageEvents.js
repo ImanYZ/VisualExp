@@ -4,7 +4,6 @@ import { useRecoilValue } from "recoil";
 import axios from "axios";
 
 import Button from "@mui/material/Button";
-import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 
 import { DataGrid } from "@mui/x-data-grid";
@@ -17,6 +16,13 @@ import { firebaseState } from "../../../store/AuthAtoms";
 
 const sendEventNotificationEmail = (params) => async (event) => {
   let responseObj = await axios.post("/sendEventNotificationEmail", params);
+};
+
+const rescheduleEventNotificationEmail = (params) => async (event) => {
+  let responseObj = await axios.post(
+    "/rescheduleEventNotificationEmail",
+    params
+  );
 };
 
 const expSessionsColumns = [
@@ -129,7 +135,23 @@ const expSessionsColumns = [
     type: "number",
     width: 70,
     renderCell: (cellValues) => {
-      return cellValues.value + " D";
+      return cellValues.value > 0 && cellValues.row.order === "1st" ? (
+        <Button
+          onClick={rescheduleEventNotificationEmail({
+            id: cellValues.row.id,
+            email: cellValues.row.participant,
+            firstname: cellValues.row.firstname,
+            hoursLeft: cellValues.row.hoursLeft,
+            courseName: cellValues.row.courseName,
+          })}
+          className="Button Red NotificationBtn"
+          variant="contained"
+        >
+          {cellValues.value + " D"}
+        </Button>
+      ) : (
+        cellValues.value + " D"
+      );
     },
   },
   {

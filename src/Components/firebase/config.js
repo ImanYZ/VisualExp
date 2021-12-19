@@ -10,12 +10,11 @@ export const firebaseConfig = {
 };
 
 export const firebaseOnecademyConfig = {
-  apiKey: "AIzaSyAyfoXvWQIsK1_BTzoTaPMPnBhjr6ZtZpY",
-  authDomain: "onecademy-dev.firebaseapp.com",
-  databaseURL: "https://onecademy-dev-default-rtdb.firebaseio.com",
-  projectId: "onecademy-dev",
-  storageBucket: "onecademy-dev.appspot.com",
-  messagingSenderId: "735079871954",
-  appId: "1:735079871954:web:d7de111435f188126e840b",
-  measurementId: "G-0CNKQJY7Y2",
+  apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",
+  authDomain: "onecademy-1.firebaseapp.com",
+  databaseURL: "https://onecademy-1.firebaseio.com",
+  projectId: "onecademy-1",
+  storageBucket: "onecademy-1.appspot.com",
+  messagingSenderId: "731671946677",
+  appId: "1:731671946677:web:75dc8935cee89bd4",
 };

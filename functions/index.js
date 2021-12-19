@@ -21,6 +21,7 @@ const {
 const {
   loadImage,
   sendEventNotificationEmail,
+  rescheduleEventNotificationEmail,
   sendPersonalInvitations,
 } = require("./emailing");
 const { schedule, allEvents, deleteEvent } = require("./scheduling");
@@ -49,6 +50,7 @@ app.post("/deleteActivity", deleteActivity);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
+app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);

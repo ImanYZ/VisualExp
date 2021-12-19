@@ -1216,8 +1216,8 @@ const AddInstructor = (props) => {
         {Object.keys(otherInstructor).length > 0 ? (
           <Paper className="VoteActivityPaper">
             <h3>
-              You've not evaluated {unvotedNum} instructor
-              {unvotedNum === 1 ? "'s" : "s'"} info yet.
+              You've not evaluated {unvotedNum.toLocaleString()} instructor
+              {unvotedNum === 1 ? "'s" : "s'"} info yet!
             </h3>
             <h3>This is one of them:</h3>
             <p>

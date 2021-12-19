@@ -23,7 +23,7 @@ import FreeRecallPage from "./Components/Passage/FreeRecallPage";
 import PersonalInfo from "./Components/PersonalInfo/PersonalInfo";
 
 import { tokenize, textCosineSimilarity } from "./utils/CosineSimilarity";
-import Array2CSV from "./urils/Array2CSV";
+import Array2CSV from "./utils/Array2CSV";
 
 import "./App.css";
 

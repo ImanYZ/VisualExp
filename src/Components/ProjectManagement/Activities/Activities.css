@@ -35,6 +35,10 @@
   background-color: rgb(163, 163, 163);
 }
 
+#InternsLeaderboardHeader {
+  padding-left: 10px;
+}
+
 #Leaderboard .LeaderboardItem {
   margin: 4px;
 }

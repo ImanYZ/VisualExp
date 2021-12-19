@@ -12,7 +12,7 @@ export const usernameState = atom({
   default: "",
 });
 
-export const proposalsTodayState = atom({
-  key: "proposalsTodayState",
+export const proposalUpvotesTodayState = atom({
+  key: "proposalUpvotesTodayState",
   default: 0,
 });

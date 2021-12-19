@@ -25,7 +25,7 @@ import {
 import {
   firebaseOnecademyState,
   usernameState,
-  proposalsTodayState,
+  proposalUpvotesTodayState,
 } from "../../store/OneCademyAtoms";
 
 import {
@@ -82,47 +82,27 @@ const RouterNav = (props) => {
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
     upvotedInstructorsTodayState
   );
-  const [proposalsToday, setProposalsToday] =
-    useRecoilState(proposalsTodayState);
+  const [proposalUpvotesToday, setProposalUpvotesToday] = useRecoilState(
+    proposalUpvotesTodayState
+  );
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [projectIndex, setProjectIndex] = useState(0);
   const [projectMenuOpen, setProjectMenuOpen] = useState(null);
   const isProjectMenuOpen = Boolean(projectMenuOpen);
-  const [upVotedDays, setUpVotedDays] = useState(0);
   const [intellectualPoints, setIntellectualPoints] = useState(0);
-  const [oneCademyPoints, setOneCademyPoints] = useState(0);
+  const [upVotedDays, setUpVotedDays] = useState(0);
   const [expPoints, setExpPoints] = useState(0);
   const [instructorPoints, setInstructorPoints] = useState(0);
   const [notTakenSessionsChanges, setNotTakenSessionsChanges] = useState([]);
   const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
-  const [proposalsTodayChanges, setProposalsTodayChanges] = useState([]);
-  const [proposalsTodayNum, setProposalsTodayNum] = useState(0);
-
-  useEffect(() => {
-    if (notTakenSessionsChanges.length > 0) {
-      let nTSessions = [...notTakenSessions];
-      let nTSessionsNum = notTakenSessionsNum;
-      for (let change of notTakenSessionsChanges) {
-        if (change.type === "removed") {
-          nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
-          nTSessionsNum -= 1;
-        } else {
-          nTSessions.push(change.doc.data());
-          nTSessionsNum += 1;
-        }
-      }
-      setNotTakenSessionsChanges([]);
-      setNotTakenSessions(nTSessions);
-      setNotTakenSessionsNum(nTSessionsNum);
-    }
-  }, [
-    firebase,
-    notTakenSessionsChanges,
-    notTakenSessions,
-    notTakenSessionsNum,
-  ]);
+  const [proposalsChanges, setProposalsChanges] = useState([]);
+  const [proposals, setProposals] = useState({});
+  const [proposalsLoaded, setProposalsLoaded] = useState(false);
+  const [userVersionsChanges, setUserVersionsChanges] = useState([]);
+  const [points1Cademy, setPoints1Cademy] = useState({});
+  const [oneCademyPoints, setOneCademyPoints] = useState(0);
 
   useEffect(() => {
     const checkResearcher = async () => {
@@ -161,88 +141,23 @@ const RouterNav = (props) => {
       };
     };
     if (firebase && fullname) {
-      checkResearcher();
+      return checkResearcher();
     }
   }, [firebase, fullname]);
 
   useEffect(() => {
-    const onAuthStateChangedUnsubscribe =
-      firebaseOnecademy.auth.onAuthStateChanged(async (user) => {
-        if (user) {
-          const userDocs = await firebaseOnecademy.db
-            .collection("users")
-            .where("userId", "==", user.uid)
-            .limit(1)
-            .get();
-          if (userDocs.docs.length !== 0) {
-            setUsername(userDocs.docs[0].id);
-          }
-        } else {
-          setUsername("");
-        }
-      });
-    return onAuthStateChangedUnsubscribe;
-  }, [firebaseOnecademy, fullname]);
-
-  useEffect(() => {
-    if (firebaseOnecademy && username) {
-      const versionsSnapshots = [];
-      const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
-      let nodeTypeIdx = 0;
-      let nodeType;
-      let today = new Date();
-      today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      const { versionsColl, userVersionsColl } = getTypedCollections(
-        firebaseOnecademy.db,
-        nodeType
-      );
-      setInterval(() => {
-        nodeType = nodeTypes[nodeTypeIdx];
-        const versionsQuery = versionsColl.where("proposer", "==", username);
-        versionsSnapshots.push(
-          versionsQuery.onSnapshot((snapshot) => {
-            setProposalsTodayChanges(snapshot.docChanges());
-          })
-        );
-      }, 400);
-      return () => {
-        setProposalsTodayChanges([]);
-        for (let vSnapshot of versionsSnapshots) {
-          vSnapshot();
-        }
-      };
-    }
-  }, [firebaseOnecademy, username]);
-
-  useEffect(() => {
-    if (proposalsTodayChanges.length > 0) {
-      let pToday = [...proposalsToday];
-      let pTodayNum = proposalsTodayNum;
-      for (let change of proposalsTodayChanges) {
-        const proposalData = change.doc.data();
-        if (change.type === "removed" || proposalData.deleted) {
-          if ()
-          pToday = pToday.filter((pT) => pT.id !== change.doc.id);
-          pTodayNum -= 1;
-        } else {
-          pToday.push(proposalData);
-          pTodayNum += 1;
-        }
-      }
-      setProposalsTodayChanges([]);
-      setProposalsToday(pToday);
-      setProposalsTodayNum(pTodayNum);
-    }
-  }, [firebase, proposalsTodayChanges, proposalsToday, proposalsTodayNum]);
-
-  useEffect(() => {
-    if (firebase && project && fullname) {
+    if (firebase && fullname && project) {
       const researcherQuery = firebase.db
         .collection("researchers")
         .doc(fullname);
       const researcherSnapshot = researcherQuery.onSnapshot(function (doc) {
         const researcherData = doc.data();
         const theProject = researcherData.projects[project];
+        if (theProject.points) {
+          setIntellectualPoints(theProject.points);
+        } else {
+          setIntellectualPoints(0);
+        }
         if (theProject.dayUpVotePoints) {
           setUpVotedDays(theProject.dayUpVotePoints);
         } else {
@@ -258,15 +173,10 @@ const RouterNav = (props) => {
         } else {
           setInstructorPoints(0);
         }
-        if (theProject.points) {
-          setIntellectualPoints(theProject.points);
-        } else {
-          setIntellectualPoints(0);
-        }
       });
       return () => {
-        setUpVotedDays(0);
         setIntellectualPoints(0);
+        setUpVotedDays(0);
         setExpPoints(0);
         setInstructorPoints(0);
         researcherSnapshot();
@@ -274,14 +184,237 @@ const RouterNav = (props) => {
     }
   }, [firebase, fullname, project]);
 
+  useEffect(() => {
+    if (notTakenSessionsChanges.length > 0) {
+      let nTSessions = [...notTakenSessions];
+      let nTSessionsNum = notTakenSessionsNum;
+      for (let change of notTakenSessionsChanges) {
+        if (change.type === "removed") {
+          nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
+          nTSessionsNum -= 1;
+        } else {
+          nTSessions.push(change.doc.data());
+          nTSessionsNum += 1;
+        }
+      }
+      setNotTakenSessionsChanges([]);
+      setNotTakenSessions(nTSessions);
+      setNotTakenSessionsNum(nTSessionsNum);
+    }
+  }, [
+    firebase,
+    notTakenSessionsChanges,
+    notTakenSessions,
+    notTakenSessionsNum,
+  ]);
+
+  useEffect(() => {
+    return firebaseOnecademy.auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const uid = user.uid;
+        const userDocs = await firebaseOnecademy.db
+          .collection("users")
+          .where("userId", "==", uid)
+          .get();
+        if (userDocs.docs.length > 0) {
+          // Sign in and signed up:
+          console.log("Signing in!");
+          setUsername(userDocs.docs[0].id);
+        } else {
+          console.log("User not found!");
+          setUsername("");
+        }
+      } else {
+        console.log("Signing out!");
+        setUsername("");
+      }
+    });
+  }, [firebaseOnecademy, email]);
+
+  useEffect(() => {
+    if (firebaseOnecademy && username) {
+      const versionsSnapshots = [];
+      const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
+      let nodeTypeIdx = 0;
+      let nodeType;
+      const nodeTypesInterval = setInterval(() => {
+        nodeType = nodeTypes[nodeTypeIdx];
+        const { versionsColl } = getTypedCollections(
+          firebaseOnecademy.db,
+          nodeType
+        );
+        const versionsQuery = versionsColl.where("tags", "array-contains", {
+          node: "WgF7yr5q7tJc54apVQSr",
+          title: "Knowledge Visualization",
+        });
+        versionsSnapshots.push(
+          versionsQuery.onSnapshot((snapshot) => {
+            setProposalsChanges(snapshot.docChanges());
+          })
+        );
+        nodeTypeIdx += 1;
+        if (nodeTypeIdx === nodeTypes.length) {
+          clearInterval(nodeTypesInterval);
+        }
+      }, 400);
+      return () => {
+        setProposalsChanges([]);
+        for (let vSnapshot of versionsSnapshots) {
+          vSnapshot();
+        }
+      };
+    }
+  }, [firebaseOnecademy, username]);
+
+  useEffect(() => {
+    const setProposalsVotes = async () => {
+      let propos = { ...proposals };
+      let netVotes = { ...points1Cademy };
+      for (let change of proposalsChanges) {
+        const proposalData = change.doc.data();
+        if (proposalData.proposer in propos) {
+          const propIdx = propos[proposalData.proposer].findIndex(
+            (pr) => pr.id === change.doc.id
+          );
+          if (change.type === "removed" || proposalData.deleted) {
+            if (propIdx !== -1) {
+              propos[proposalData.proposer] = propos[
+                proposalData.proposer
+              ].filter((pr) => pr.id !== change.doc.id);
+              netVotes[proposalData.proposer] -=
+                proposalData.corrects - proposalData.wrongs - 1;
+            }
+          } else {
+            if (propIdx === -1) {
+              propos[proposalData.proposer] = [
+                ...propos[proposalData.proposer],
+              ];
+              propos[proposalData.proposer].push({
+                id: change.doc.id,
+                corrects: proposalData.corrects,
+                wrongs: proposalData.wrongs,
+              });
+              netVotes[proposalData.proposer] +=
+                proposalData.corrects - proposalData.wrongs - 1;
+            } else {
+              netVotes[proposalData.proposer] +=
+                proposalData.corrects -
+                propos[proposalData.proposer][propIdx].corrects -
+                (proposalData.wrongs -
+                  propos[proposalData.proposer][propIdx].wrongs);
+              propos[proposalData.proposer] = [
+                ...propos[proposalData.proposer],
+              ];
+              propos[proposalData.proposer][propIdx] = {
+                ...propos[proposalData.proposer][propIdx],
+                corrects: proposalData.corrects,
+                wrongs: proposalData.wrongs,
+              };
+            }
+          }
+        } else if (change.type !== "removed" && !proposalData.deleted) {
+          propos[proposalData.proposer] = [
+            {
+              id: change.doc.id,
+              corrects: proposalData.corrects,
+              wrongs: proposalData.wrongs,
+            },
+          ];
+          netVotes[proposalData.proposer] =
+            proposalData.corrects - proposalData.wrongs - 1;
+        }
+      }
+      setProposalsChanges([]);
+      setProposals(propos);
+      setProposalsLoaded(true);
+      setPoints1Cademy(netVotes);
+
+      const researcherRef = firebase.db.collection("researchers").doc(fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      await researcherRef.update({
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project],
+            onePoints: netVotes[username],
+          },
+        },
+      });
+    };
+    if (proposalsChanges.length > 0) {
+      setProposalsVotes();
+    }
+  }, [
+    proposalsChanges,
+    proposals,
+    points1Cademy,
+    username,
+    firebase,
+    fullname,
+    project,
+  ]);
+
+  useEffect(() => {
+    if (firebaseOnecademy && username && proposalsLoaded) {
+      const versionsSnapshots = [];
+      const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
+      let nodeTypeIdx = 0;
+      let nodeType;
+      const nodeTypesInterval = setInterval(() => {
+        nodeType = nodeTypes[nodeTypeIdx];
+        const { userVersionsColl } = getTypedCollections(
+          firebaseOnecademy.db,
+          nodeType
+        );
+        const userVersionsQuery = userVersionsColl.where(
+          "user",
+          "==",
+          username
+        );
+        userVersionsSnapshots.push(
+          userVersionsQuery.onSnapshot((snapshot) => {
+            setProposalsChanges(snapshot.docChanges());
+          })
+        );
+        nodeTypeIdx += 1;
+        if (nodeTypeIdx === nodeTypes.length) {
+          clearInterval(nodeTypesInterval);
+        }
+      }, 400);
+      return () => {
+        setProposalsChanges([]);
+        for (let vSnapshot of userVersionsSnapshots) {
+          vSnapshot();
+        }
+      };
+    }
+  }, [firebaseOnecademy, username, proposalsLoaded]);
+
   const signOut = async (event) => {
     setEmail("");
+    setUsername("");
     setFullname("");
+    setIsAdmin(false);
     setProjects([]);
     setProject("");
+    setNotAResearcher(true);
+    setNotTakenSessions([]);
+    setNotTakenSessionsLoaded(false);
     setUpVotedToday(0);
     setInstructorsToday(0);
     setUpvotedInstructorsToday(0);
+    setProposalUpvotesToday(0);
+    setUpVotedDays(0);
+    setIntellectualPoints(0);
+    setOneCademyPoints(0);
+    setExpPoints(0);
+    setInstructorPoints(0);
+    setNotTakenSessionsChanges([]);
+    setNotTakenSessionsNum(0);
+    setProposalsChanges([]);
+    setProposals({});
+    setPoints1Cademy({});
     await firebase.logout();
   };
 
@@ -435,23 +568,25 @@ const RouterNav = (props) => {
                     <Button
                       id="OneCademyPoints"
                       className={
-                        activePage === "Intellectual"
-                          ? "ActiveNavLink"
-                          : "NavLink"
+                        activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"
                       }
-                      onClick={(event) => navigate("/Activities/Intellectual")}
+                      onClick={(event) => navigate("/Activities/1Cademy")}
                     >
                       {username ? (
                         <div>
                           <img src={favicon} width="15.1" />{" "}
-                          {intellectualPoints}
+                          {username && username in points1Cademy
+                            ? points1Cademy[username]
+                            : 0}
                           <br />✅ {upVotedDays}
                           <br />
                           <span>🌞 {upVotedToday} / 25</span>
                         </div>
                       ) : (
                         <div>
-                          Click here to log into 1Cademy to show your points.
+                          Click here to log <br />
+                          in to 1Cademy to <br />
+                          show your points.
                         </div>
                       )}
                     </Button>

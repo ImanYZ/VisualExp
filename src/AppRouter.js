@@ -20,6 +20,8 @@ import Activities from "./Components/ProjectManagement/Activities/Activities";
 import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
 import Homepage from "./Components/Homepage/Homepage";
 
+import { isToday } from "./utils/DateFunctions";
+
 import "./App.css";
 
 const AppRouter = (props) => {
@@ -88,6 +90,27 @@ const AppRouter = (props) => {
   }, []);
 
   useEffect(() => {
+    const reloadIfNotLoadedToday = async () => {
+      const userRef = firebase.db.collection("user").doc(fullname);
+      const userDoc = await userRef.get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (!isToday(userData.lastLoad)) {
+          await userRef.update({
+            lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+          window.location.reload(true);
+        }
+      }
+    };
+    if (firebase && fullname) {
+      setInterval(() => {
+        reloadIfNotLoadedToday();
+      }, 3600000);
+    }
+  }, [firebase, fullname]);
+
+  useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {
       const currentTime = new Date().getTime();
       const scheduleDocs = await firebase.db
@@ -152,6 +175,10 @@ const AppRouter = (props) => {
                 <Route
                   path="Activities/AddInstructor"
                   element={<Activities activityName="AddInstructor" />}
+                />
+                <Route
+                  path="Activities/1Cademy"
+                  element={<Activities activityName="1Cademy" />}
                 />
                 <Route
                   path="Activities/*"

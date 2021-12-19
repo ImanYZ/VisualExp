@@ -780,8 +780,8 @@ const IntellectualPoints = (props) => {
         {Object.keys(otherActivity).length > 0 ? (
           <Paper className="VoteActivityPaper">
             <h3>
-              You've not evaluated {unvotedNum} activit
-              {unvotedNum === 1 ? "y" : "ies"} yet.
+              You've not evaluated {unvotedNum.toLocaleString()} activit
+              {unvotedNum === 1 ? "y" : "ies"} yet!
             </h3>
             <h3>This is one of them:</h3>
             <p>

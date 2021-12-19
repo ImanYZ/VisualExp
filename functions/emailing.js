@@ -2,6 +2,8 @@ const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
 
 const nodemailer = require("nodemailer");
 
+const { deleteEvent } = require("./GoogleCalendar");
+
 const { getFullname, generateUID } = require("./utils");
 
 require("dotenv").config();
@@ -94,7 +96,6 @@ exports.sendPersonalInvitations = async (req, res) => {
   }
   <p></p>
   <p>Best regards,</p>
-  <p>1Cademy UX Research Team</p>
   <div><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" data-lt-sig="1"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">
   <a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank">
   <img src="https://us-central1-visualexp-a7d2c.cloudfunctions.net/api/loadImage/${
@@ -165,7 +166,6 @@ ${
 <p>Please fill out your availability in our scheduling website: <a href="https://visualexp1.web.app/schedule">https://visualexp1.web.app/schedule</a></p>
 <p></p>
 <p>Best regards,</p>
-<p>1Cademy UX Research Team</p>
 <div><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" data-lt-sig="1"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a>&nbsp; &nbsp;&nbsp;<a href="https://stackoverflow.com/users/2521204/1man" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1tSnswSYHWxRGGh-u54uNxPWKWqqHhvdM&amp;revid=0B8-wWhGFpGYCdlRmU2xPVkxjTS9HWU9lbHJGdC92OGgxeTFzPQ"></a>&nbsp;&nbsp;<a href="https://github.com/ImanYZ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1ftgv8rj-ihFuA4ZE5mf9faXeNvz-F3vQ&amp;revid=0B8-wWhGFpGYCRVFGYjFDNGZRYnhMQ1dLU1lkNGZwT283UnFnPQ"></a>&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; </span><a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a>&nbsp;</span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; <a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a></span></div></div></div></div></div></div></div></div></div></div></div></div>
 `,
       };
@@ -251,7 +251,83 @@ ${
 </p>
 <p></p>
 <p>Best regards,</p>
-<p>1Cademy UX Research Team</p>
+<div><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" data-lt-sig="1"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a>&nbsp; &nbsp;&nbsp;<a href="https://stackoverflow.com/users/2521204/1man" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1tSnswSYHWxRGGh-u54uNxPWKWqqHhvdM&amp;revid=0B8-wWhGFpGYCdlRmU2xPVkxjTS9HWU9lbHJGdC92OGgxeTFzPQ"></a>&nbsp;&nbsp;<a href="https://github.com/ImanYZ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1ftgv8rj-ihFuA4ZE5mf9faXeNvz-F3vQ&amp;revid=0B8-wWhGFpGYCRVFGYjFDNGZRYnhMQ1dLU1lkNGZwT283UnFnPQ"></a>&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; </span><a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a>&nbsp;</span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; <a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a></span></div></div></div></div></div></div></div></div></div></div></div></div>
+`,
+      };
+      return transporter.sendMail(mailOptions, (error, data) => {
+        if (error) {
+          console.log({ error });
+          return res.status(500).json({ error });
+        }
+        return res.status(200).json({ done: true });
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.rescheduleEventNotificationEmail = async (req, res) => {
+  try {
+    if ("email" in req.body && "firstname" in req.body) {
+      const email = req.body.email;
+      const scheduleDocs = await db
+        .collection("schedule")
+        .where("email", "==", email)
+        .get();
+      for (let scheduleDoc of scheduleDocs.docs) {
+        const scheduleData = scheduleDoc.data();
+        if (scheduleData.id) {
+          await deleteEvent(scheduleData.id);
+          const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
+          await scheduleRef.update({
+            id: admin.firestore.FieldValue.delete(),
+            order: admin.firestore.FieldValue.delete(),
+          });
+        }
+      }
+      const firstname = req.body.firstname;
+      let from1Cademy = false;
+      if ("from1Cademy" in req.body) {
+        from1Cademy = req.body.from1Cademy;
+      }
+      let courseName = "";
+      if ("courseName" in req.body) {
+        courseName = req.body.courseName;
+      }
+      let hoursLeft = 0;
+      if ("hoursLeft" in req.body) {
+        hoursLeft = Math.floor(req.body.hoursLeft);
+        if (hoursLeft < 1) {
+          hoursLeft = "less than an hour";
+        } else if (hoursLeft === 1) {
+          hoursLeft = "an hour";
+        } else {
+          hoursLeft = hoursLeft + "  hours";
+        }
+      }
+      const mailOptions = {
+        from: "onecademy@umich.edu",
+        to: email,
+        subject:
+          (from1Cademy ? "[1Cademy] " : "") +
+          (courseName ? "[" + courseName + "] " : "") +
+          ("You declined our invitation to the UX Research Experiment Session that will begin in " +
+            hoursLeft +
+            "!"),
+        html: `<p>Hi ${firstname},</p>
+<p></p>
+${
+  "<p>You declined our invitation to the UX Research Experiment Session that will begin in " +
+  hoursLeft +
+  "!</p><p>We deleted this session and the following sessions for you.</p>" +
+  "<p>Please reschedule your experiment sessions on <a href='https://visualexp1.web.app/'>our research website</a> ASAP.</p>" +
+  "<p>Please reply to this email if you have any questions or experience any difficulties scheduling your sessions."
+}
+</p>
+<p></p>
+<p>Best regards,</p>
 <div><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature" data-lt-sig="1"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size:12.8px">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a>&nbsp; &nbsp;&nbsp;<a href="https://stackoverflow.com/users/2521204/1man" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1tSnswSYHWxRGGh-u54uNxPWKWqqHhvdM&amp;revid=0B8-wWhGFpGYCdlRmU2xPVkxjTS9HWU9lbHJGdC92OGgxeTFzPQ"></a>&nbsp;&nbsp;<a href="https://github.com/ImanYZ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1ftgv8rj-ihFuA4ZE5mf9faXeNvz-F3vQ&amp;revid=0B8-wWhGFpGYCRVFGYjFDNGZRYnhMQ1dLU1lkNGZwT283UnFnPQ"></a>&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; </span><a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a>&nbsp;</span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; <a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a></span></div></div></div></div></div></div></div></div></div></div></div></div>
 `,
       };
