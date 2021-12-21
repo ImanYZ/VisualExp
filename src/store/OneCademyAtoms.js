@@ -11,8 +11,3 @@ export const usernameState = atom({
   key: "usernameState",
   default: "",
 });
-
-export const proposalUpvotesTodayState = atom({
-  key: "proposalUpvotesTodayState",
-  default: 0,
-});

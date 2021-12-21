@@ -22,9 +22,11 @@ const AdminIntellectualPoints = (props) => {
       const votesQuery = firebase.db
         .collection("votes")
         .where("project", "==", project);
-      const votesSnapshot = votesQuery.onSnapshot(function (snapshot) {
+      const votesSnapshot = votesQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setAllVotesChanges(docChanges);
+        setAllVotesChanges((oldAllVotesChanges) => {
+          return [...oldAllVotesChanges, ...docChanges];
+        });
       });
       return () => {
         setAllVotes({ nodes: [], links: [] });

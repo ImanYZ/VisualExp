@@ -1002,3 +1002,27 @@ exports.updateNotTakenSessions = async (context) => {
   }
   return null;
 };
+
+exports.incrementMonths = async (req, res) => {
+  try {
+    const dayUpVoteDocs = await db.collection("dayUpVotes").get();
+    for (let dayUpVoteDoc of dayUpVoteDocs.docs) {
+      const dayUpVoteData = dayUpVoteDoc.data();
+      const dayUpVoteRef = db.collection("dayUpVotes").doc(dayUpVoteDoc.id);
+      const dateSplit = dayUpVoteData.date.split("-");
+      console.log({
+        data: dayUpVoteData.date,
+        month:
+          dateSplit[0] +
+          "-" +
+          (parseInt(dateSplit[1]) + 1) +
+          "-" +
+          dateSplit[2],
+      });
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};

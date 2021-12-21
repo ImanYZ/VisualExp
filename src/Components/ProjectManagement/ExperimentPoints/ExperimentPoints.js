@@ -107,11 +107,11 @@ const ExperimentPoints = (props) => {
       const expSessionsQuery = firebase.db
         .collection("expSessions")
         .where("project", "==", project);
-      const expSessionsSnapshot = expSessionsQuery.onSnapshot(function (
-        snapshot
-      ) {
+      const expSessionsSnapshot = expSessionsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setExpSessionsChanges(docChanges);
+        setExpSessionsChanges((oldExpSessionsChanges) => {
+          return [...oldExpSessionsChanges, ...docChanges];
+        });
       });
       return () => {
         setExpSessionsChanges([]);

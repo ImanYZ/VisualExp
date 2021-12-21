@@ -47,6 +47,22 @@ const Activities = (props) => {
   }, [props.activityName, activePage]);
 
   useEffect(() => {
+    if (project && fullname) {
+      const researchersQuery = firebase.db.collection("researchers");
+      const researchersSnapshot = researchersQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        setResearchersChanges((oldResearchersChanges) => {
+          return [...oldResearchersChanges, ...docChanges];
+        });
+      });
+      return () => {
+        setResearchers([]);
+        researchersSnapshot();
+      };
+    }
+  }, [project, fullname]);
+
+  useEffect(() => {
     if (researchersChanges.length > 0) {
       let resears = [...researchers];
       for (let change of researchersChanges) {
@@ -75,7 +91,11 @@ const Activities = (props) => {
             }
             if (projectData.instructors) {
               totalPoints += projectData.instructors;
-              instructorsPoints = projectData.instructors;
+              instructorsPoints += projectData.instructors;
+            }
+            if (projectData.dayInstructorUpVotes) {
+              totalPoints += projectData.dayInstructorUpVotes;
+              instructorsPoints += projectData.dayInstructorUpVotes;
             }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
@@ -107,22 +127,6 @@ const Activities = (props) => {
       setResearchers(resears);
     }
   }, [project, researchers, researchersChanges]);
-
-  useEffect(() => {
-    if (project && fullname) {
-      const researchersQuery = firebase.db.collection("researchers");
-      const researchersSnapshot = researchersQuery.onSnapshot(function (
-        snapshot
-      ) {
-        const docChanges = snapshot.docChanges();
-        setResearchersChanges(docChanges);
-      });
-      return () => {
-        setResearchers([]);
-        researchersSnapshot();
-      };
-    }
-  }, [project, fullname]);
 
   const expandLeaderboard = (event) => {
     setExpanded(!expanded);

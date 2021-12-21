@@ -25,7 +25,6 @@ import {
 import {
   firebaseOnecademyState,
   usernameState,
-  proposalUpvotesTodayState,
 } from "../../store/OneCademyAtoms";
 
 import {
@@ -41,7 +40,7 @@ import {
 } from "../../store/ProjectAtoms";
 
 import { getTypedCollections } from "./getTypedCollections";
-import { isToday } from "../../utils/DateFunctions";
+import { isToday, getDateString } from "../../utils/DateFunctions";
 
 import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
@@ -82,9 +81,6 @@ const RouterNav = (props) => {
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
     upvotedInstructorsTodayState
   );
-  const [proposalUpvotesToday, setProposalUpvotesToday] = useRecoilState(
-    proposalUpvotesTodayState
-  );
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -95,15 +91,19 @@ const RouterNav = (props) => {
   const [upVotedDays, setUpVotedDays] = useState(0);
   const [expPoints, setExpPoints] = useState(0);
   const [instructorPoints, setInstructorPoints] = useState(0);
+  const [dayInstructorUpVotes, setDayInstructorUpVotes] = useState(0);
   const [notTakenSessionsChanges, setNotTakenSessionsChanges] = useState([]);
   const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
+  const [othersProposals, setOthersProposals] = useState([]);
   const [oneCademyPoints, setOneCademyPoints] = useState(0);
   const [proposalsLoaded, setProposalsLoaded] = useState(false);
   const [userVersionsChanges, setUserVersionsChanges] = useState([]);
   const [userVersions, setUserVersions] = useState({});
   const [oneCademyUpvotes, setOneCademyUpvotes] = useState({});
+  const [proposalUpvotesToday, setProposalUpvotesToday] = useState(0);
+  const [dayOneUpVotes, setDayOneUpVotes] = useState(0);
 
   useEffect(() => {
     const checkResearcher = async () => {
@@ -130,7 +130,9 @@ const RouterNav = (props) => {
       const notTakenSessionsSnapshot = notTakenSessionsQuery.onSnapshot(
         (snapshot) => {
           const docChanges = snapshot.docChanges();
-          setNotTakenSessionsChanges(docChanges);
+          setNotTakenSessionsChanges((oldNotTakenSessionsChanges) => {
+            return [...oldNotTakenSessionsChanges, ...docChanges];
+          });
           setNotTakenSessionsLoaded(true);
         }
       );
@@ -151,7 +153,7 @@ const RouterNav = (props) => {
       const researcherQuery = firebase.db
         .collection("researchers")
         .doc(fullname);
-      const researcherSnapshot = researcherQuery.onSnapshot(function (doc) {
+      const researcherSnapshot = researcherQuery.onSnapshot((doc) => {
         const researcherData = doc.data();
         const theProject = researcherData.projects[project];
         if (theProject.points) {
@@ -174,12 +176,18 @@ const RouterNav = (props) => {
         } else {
           setInstructorPoints(0);
         }
+        if (theProject.dayInstructorUpVotes) {
+          setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
+        } else {
+          setDayInstructorUpVotes(0);
+        }
       });
       return () => {
         setIntellectualPoints(0);
         setUpVotedDays(0);
         setExpPoints(0);
         setInstructorPoints(0);
+        setDayInstructorUpVotes(0);
         researcherSnapshot();
       };
     }
@@ -233,7 +241,7 @@ const RouterNav = (props) => {
   }, [firebaseOnecademy, email]);
 
   useEffect(() => {
-    if (firebaseOnecademy && username) {
+    if (firebaseOnecademy) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -244,15 +252,16 @@ const RouterNav = (props) => {
           firebaseOnecademy.db,
           nodeType
         );
-        const versionsQuery = versionsColl
-          .where("tags", "array-contains", {
-            node: "WgF7yr5q7tJc54apVQSr",
-            title: "Knowledge Visualization",
-          })
-          .where("proposer", "==", username);
+        const versionsQuery = versionsColl.where("tags", "array-contains", {
+          node: "WgF7yr5q7tJc54apVQSr",
+          title: "Knowledge Visualization",
+        });
         versionsSnapshots.push(
           versionsQuery.onSnapshot((snapshot) => {
-            setProposalsChanges(snapshot.docChanges());
+            const docChanges = snapshot.docChanges();
+            setProposalsChanges((oldProposalsChanges) => {
+              return [...oldProposalsChanges, ...docChanges];
+            });
           })
         );
         nodeTypeIdx += 1;
@@ -267,50 +276,60 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOnecademy, username]);
+  }, [firebaseOnecademy]);
 
   useEffect(() => {
-    if (proposalsChanges.length > 0) {
-      let propos = [...proposals];
+    if (proposalsChanges.length > 0 && username) {
+      let propos = { ...proposals };
+      let oPropos = [...othersProposals];
       let netVotes = oneCademyPoints;
       for (let change of proposalsChanges) {
         const proposalData = change.doc.data();
-        const propIdx = propos.findIndex((pr) => pr.id === change.doc.id);
+        // console.log({ id: change.doc.id, proposalData });
         if (change.type === "removed" || proposalData.deleted) {
-          if (propIdx !== -1) {
-            propos = propos.filter((pr) => pr.id !== change.doc.id);
-            netVotes -= proposalData.corrects - proposalData.wrongs - 1;
+          if (proposalData.proposer === username) {
+            if (change.doc.id in propos) {
+              delete propos[change.doc.id];
+              netVotes -= proposalData.corrects - proposalData.wrongs - 1;
+            }
+          } else {
+            if (oPropos.includes(change.doc.id)) {
+              oPropos = oPropos.filter((oPrId) => oPrId !== change.doc.id);
+            }
           }
         } else {
-          if (propIdx === -1) {
-            propos = [
-              ...propos,
-              {
-                id: change.doc.id,
+          if (proposalData.proposer === username) {
+            if (!(change.doc.id in propos)) {
+              propos[change.doc.id] = {
                 corrects: proposalData.corrects,
                 wrongs: proposalData.wrongs,
-              },
-            ];
-            netVotes += proposalData.corrects - proposalData.wrongs - 1;
+              };
+              netVotes += proposalData.corrects - proposalData.wrongs - 1;
+            } else {
+              netVotes +=
+                proposalData.corrects -
+                propos[change.doc.id].corrects -
+                (proposalData.wrongs - propos[change.doc.id].wrongs);
+              propos[change.doc.id] = {
+                corrects: proposalData.corrects,
+                wrongs: proposalData.wrongs,
+              };
+            }
           } else {
-            netVotes +=
-              proposalData.corrects -
-              propos[propIdx].corrects -
-              (proposalData.wrongs - propos[propIdx].wrongs);
-            propos[propIdx] = {
-              ...propos[propIdx],
-              corrects: proposalData.corrects,
-              wrongs: proposalData.wrongs,
-            };
+            if (!oPropos.includes(change.doc.id)) {
+              oPropos.push(change.doc.id);
+            }
           }
         }
       }
+      console.log({ propos, oPropos, netVotes });
       setProposalsChanges([]);
       setProposals(propos);
+      setOthersProposals(oPropos);
       setOneCademyPoints(netVotes);
       setProposalsLoaded(true);
     }
-  }, [proposalsChanges, proposals, oneCademyPoints, username]);
+  }, [proposalsChanges, proposals, othersProposals, oneCademyPoints, username]);
 
   useEffect(() => {
     if (firebaseOnecademy && username && proposalsLoaded) {
@@ -331,7 +350,10 @@ const RouterNav = (props) => {
         );
         userVersionsSnapshots.push(
           userVersionsQuery.onSnapshot((snapshot) => {
-            setUserVersionsChanges(snapshot.docChanges());
+            const docChanges = snapshot.docChanges();
+            setUserVersionsChanges((oldUserVersionsChanges) => {
+              return [...oldUserVersionsChanges, ...docChanges];
+            });
           })
         );
         nodeTypeIdx += 1;
@@ -354,82 +376,74 @@ const RouterNav = (props) => {
       let upVotes = { ...oneCademyUpvotes };
       for (let change of userVersionsChanges) {
         const userVersionData = change.doc.data();
-        let voteDate = userVersionData.updatedAt.toDate();
-        voteDate =
-          voteDate.getDate() +
-          "-" +
-          (voteDate.getMonth() + 1) +
-          "-" +
-          voteDate.getFullYear();
-        if (userVersionData.user in uVersions) {
-          const propIdx = uVersions[userVersionData.user].findIndex(
-            (uV) => uV.id === change.doc.id
-          );
+        if (userVersionData.version === "vRuvDZXusZAuVSQEzRRa") {
+          console.log({ userVersionData, othersProposals });
+        }
+        if (othersProposals.includes(userVersionData.version)) {
+          console.log({ userVersionData });
+          const voteDate = getDateString(userVersionData.updatedAt.toDate());
           if (change.type === "removed" || userVersionData.deleted) {
-            if (propIdx !== -1) {
-              uVersions[userVersionData.user] = uVersions[
-                userVersionData.user
-              ].filter((uV) => uV.id !== change.doc.id);
-              if (voteDate in upVotes[userVersionData.user]) {
-                upVotes[userVersionData.user] = {
-                  ...upVotes[userVersionData.user],
-                  [voteDate]:
-                    upVotes[userVersionData.user][voteDate] -
-                    userVersionData.correct,
-                };
+            if (change.doc.id in uVersions) {
+              delete uVersions[change.doc.id];
+              if (voteDate in upVotes) {
+                upVotes[voteDate] = upVotes[voteDate] - userVersionData.correct;
               }
             }
           } else {
-            if (propIdx === -1) {
-              uVersions[userVersionData.user] = [
-                ...uVersions[userVersionData.user],
-                {
-                  id: change.doc.id,
-                  correct: userVersionData.correct,
-                  voteDate,
-                },
-              ];
-              if (!(voteDate in upVotes[userVersionData.user])) {
-                upVotes[userVersionData.user][voteDate] = 0;
+            if (!(change.doc.id in uVersions)) {
+              uVersions[change.doc.id] = userVersionData.correct;
+              if (!(voteDate in upVotes)) {
+                upVotes[voteDate] = 0;
               }
-              upVotes[userVersionData.user][voteDate] +=
-                userVersionData.correct;
+              upVotes[voteDate] += userVersionData.correct;
             } else {
-              if (!(voteDate in upVotes[userVersionData.user])) {
-                upVotes[userVersionData.user][voteDate] = 0;
+              if (!(voteDate in upVotes)) {
+                upVotes[voteDate] = 0;
               }
-              upVotes[userVersionData.user][voteDate] +=
-                userVersionData.correct -
-                uVersions[userVersionData.user][propIdx].correct;
-              uVersions[userVersionData.user] = [
-                ...uVersions[userVersionData.user],
-              ];
-              uVersions[userVersionData.user][propIdx] = {
-                ...uVersions[userVersionData.user][propIdx],
-                correct: userVersionData.correct,
-              };
+              upVotes[voteDate] +=
+                userVersionData.correct - uVersions[change.doc.id];
+              uVersions[change.doc.id] = userVersionData.correct;
             }
           }
-        } else if (change.type !== "removed" && !userVersionData.deleted) {
-          uVersions[userVersionData.user] = [
-            {
-              id: change.doc.id,
-              correct: userVersionData.correct,
-            },
-          ];
-          upVotes[userVersionData.user] = {
-            [voteDate]: userVersionData.correct ? 1 : 0,
-          };
         }
       }
       setUserVersionsChanges([]);
       setUserVersions(uVersions);
       setOneCademyUpvotes(upVotes);
+      let today = getDateString(new Date());
+      console.log({ uVersions, upVotes });
+      if (today in upVotes) {
+        setProposalUpvotesToday(upVotes[today]);
+      } else {
+        setProposalUpvotesToday(0);
+      }
     }
-  }, [userVersionsChanges, userVersions, oneCademyUpvotes, username]);
+  }, [userVersionsChanges, userVersions, oneCademyUpvotes, othersProposals]);
 
   useEffect(() => {
     const setProposalsVotes = async () => {
+      let totalDayPoints = 0;
+      for (let voteDate in oneCademyUpvotes) {
+        if (oneCademyUpvotes[voteDate] >= 25) {
+          totalDayPoints += 1;
+          const dayOneUpVoteDocs = await firebase.db
+            .collection("dayOneUpVotes")
+            .where("date", "==", voteDate)
+            .where("voter", "==", fullname)
+            .get();
+          if (dayOneUpVoteDocs.docs.length === 0) {
+            const dayOneUpVoteRef = firebase.db
+              .collection("dayOneUpVotes")
+              .doc();
+            await dayOneUpVoteRef.set({
+              date: voteDate,
+              voter: fullname,
+              project: project,
+            });
+          }
+        }
+      }
+      setDayOneUpVotes(totalDayPoints);
       const researcherRef = firebase.db.collection("researchers").doc(fullname);
       const researcherDoc = await researcherRef.get();
       const researcherData = researcherDoc.data();
@@ -439,6 +453,7 @@ const RouterNav = (props) => {
           [project]: {
             ...researcherData.projects[project],
             onePoints: oneCademyPoints,
+            dayOneUpVotePoints: totalDayPoints,
           },
         },
       });
@@ -446,9 +461,10 @@ const RouterNav = (props) => {
     if (oneCademyPoints) {
       setProposalsVotes();
     }
-  }, [oneCademyPoints, username, firebase, fullname, project]);
+  }, [oneCademyPoints, oneCademyUpvotes, firebase, fullname, project]);
 
   const signOut = async (event) => {
+    console.log("Signing out!");
     setEmail("");
     setUsername("");
     setFullname("");
@@ -466,14 +482,17 @@ const RouterNav = (props) => {
     setIntellectualPoints(0);
     setExpPoints(0);
     setInstructorPoints(0);
+    setDayInstructorUpVotes(0);
     setNotTakenSessionsChanges([]);
     setNotTakenSessionsNum(0);
     setProposalsChanges([]);
     setProposals({});
+    setOthersProposals([]);
     setOneCademyPoints(0);
     setUserVersionsChanges([]);
     setUserVersions({});
     setOneCademyUpvotes({});
+    setDayOneUpVotes(0);
     await firebase.logout();
   };
 
@@ -613,14 +632,14 @@ const RouterNav = (props) => {
                     title={
                       <div>
                         <div>
-                          You've earned {oneCademyPoints} total 1Cademy points,
-                          including {oneCademyPoints} from others' votes and{" "}
-                          {upVotedDays} points for casting 25 upvotes per day on
-                          others' proposals.
+                          You've earned {oneCademyPoints + dayOneUpVotes} total
+                          1Cademy points, including {oneCademyPoints} from
+                          others' votes and {dayOneUpVotes} points for casting
+                          25 upvotes per day on others' proposals.
                         </div>
                         <div>
-                          You cast {upVotedToday} / 25 up-votes today on others'
-                          1Cademy proposals.
+                          You cast {proposalUpvotesToday} / 25 up-votes today on
+                          others' 1Cademy proposals.
                         </div>
                       </div>
                     }
@@ -634,10 +653,11 @@ const RouterNav = (props) => {
                     >
                       {username ? (
                         <div>
-                          <img src={favicon} width="15.1" /> {oneCademyPoints}
-                          <br />✅ {oneCademyPoints}
+                          <img src={favicon} width="15.1" />{" "}
+                          {oneCademyPoints + dayOneUpVotes}
+                          <br />✔ {oneCademyPoints}
                           <br />
-                          <span>🌞 {upVotedToday} / 25</span>
+                          <span>🌞 {proposalUpvotesToday} / 25</span>
                         </div>
                       ) : (
                         <div>
@@ -675,7 +695,7 @@ const RouterNav = (props) => {
                       <div>
                         <span>
                           🎓 {intellectualPoints}
-                          <br />✅ {upVotedDays}
+                          <br />✔ {upVotedDays}
                         </span>
                         <br />
                         <span>🌞 {upVotedToday} / 25</span>
@@ -686,8 +706,12 @@ const RouterNav = (props) => {
                     title={
                       <div>
                         <div>
-                          You've earned {instructorPoints} points for collecting
-                          instructors/administrators' contact.
+                          You've earned{" "}
+                          {instructorPoints + dayInstructorUpVotes} total
+                          points, including {instructorPoints} points for
+                          collecting instructors/administrators' contact info
+                          and {dayInstructorUpVotes} points for casting 25
+                          up-voting per day on other's collected data.
                         </div>
                         <div>
                           You collected {instructorsToday} / 10
@@ -709,11 +733,12 @@ const RouterNav = (props) => {
                       }
                       onClick={(event) => navigate("/Activities/AddInstructor")}
                     >
-                      🧑‍🏫 {instructorPoints} <br /> 🌞 {instructorsToday} / 10
+                      🧑‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
+                      {instructorsToday} / 10
                       <br /> ✅ {upvotedInstructorsToday} / 25
                     </Button>
                   </Tooltip>
-                  <Box sx={{ minWidth: "130px", textAlign: "center" }}>
+                  {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
                       <Button
@@ -729,7 +754,7 @@ const RouterNav = (props) => {
                         {project} <ArrowDropDownIcon />
                       </Button>
                     </Tooltip>
-                  </Box>
+                  </Box> */}
                 </>
               )}
               <Box>
@@ -751,7 +776,7 @@ const RouterNav = (props) => {
               </Box>
             </Toolbar>
           </AppBar>
-          {projects.length > 0 && renderProjectsMenu}
+          {/* {projects.length > 0 && renderProjectsMenu} */}
           {renderProfileMenu}
         </Box>
       )}

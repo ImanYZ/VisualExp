@@ -31,7 +31,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import CSCObjLoader from "./CSCObjLoader";
-import { isToday } from "../../../utils/DateFunctions";
+import { isToday, getDateString } from "../../../utils/DateFunctions";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
@@ -591,11 +591,11 @@ const AddInstructor = (props) => {
   useEffect(() => {
     if (firebase) {
       const instructorsQuery = firebase.db.collection("instructors");
-      const instructorsSnapshot = instructorsQuery.onSnapshot(function (
-        snapshot
-      ) {
+      const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setInstructorsChanges(docChanges);
+        setInstructorsChanges((oldInstructorsChanges) => {
+          return [...oldInstructorsChanges, ...docChanges];
+        });
         setInstructorsLoaded(true);
       });
       return () => {
@@ -615,12 +615,14 @@ const AddInstructor = (props) => {
         .collection("instructorVotes")
         .where("voter", "==", fullname)
         .where("project", "==", project);
-      const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(function (
-        snapshot
-      ) {
-        const docChanges = snapshot.docChanges();
-        setVotesChanges(docChanges);
-      });
+      const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(
+        (snapshot) => {
+          const docChanges = snapshot.docChanges();
+          setVotesChanges((oldVotesChanges) => {
+            return [...oldVotesChanges, ...docChanges];
+          });
+        }
+      );
       return () => {
         setVotesChanges([]);
         setUpvotedInstructorsToday(0);
@@ -631,9 +633,7 @@ const AddInstructor = (props) => {
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 25) {
-      const now = new Date();
-      const today =
-        now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+      const today = getDateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayInstructorUpVotes")
         .where("project", "==", project)
@@ -1021,9 +1021,7 @@ const AddInstructor = (props) => {
               .doc(fullname);
             const researcherDoc = await researcherRef.get();
             const researcherData = researcherDoc.data();
-            const now = new Date();
-            const today =
-              now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+            const today = getDateString(new Date());
             const dayInstructorsDocs = await firebase.db
               .collection("dayInstructors")
               .where("project", "==", project)

@@ -73,6 +73,11 @@ service cloud.firestore {
       allow write: if request.auth != null
                     && request.resource.data.voter == request.auth.token.name;
     }
+    match /dayOneUpVotes/{dayOneUpVoteId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+                    && request.resource.data.voter == request.auth.token.name;
+    }
     match /expSessions/{expSessionId} {
       allow read: if request.auth != null;
       allow write: if false;

@@ -6,3 +6,13 @@ export const isToday = (theDate) => {
     theDate.getDate() === now.getDate()
   );
 };
+
+export const getDateString = (dateObj) => {
+  return (
+    dateObj.getFullYear() +
+    "-" +
+    (dateObj.getMonth() + 1) +
+    "-" +
+    dateObj.getDate()
+  );
+};

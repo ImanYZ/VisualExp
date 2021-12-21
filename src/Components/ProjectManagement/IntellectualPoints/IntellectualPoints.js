@@ -28,7 +28,7 @@ import {
 import { projectState, upVotedTodayState } from "../../../store/ProjectAtoms";
 
 import AdminIntellectualPoints from "./AdminIntellectualPoints";
-import { isToday } from "../../../utils/DateFunctions";
+import { isToday, getDateString } from "../../../utils/DateFunctions";
 
 import "./IntellectualPoints.css";
 
@@ -263,11 +263,11 @@ const IntellectualPoints = (props) => {
       const activitiesQuery = firebase.db
         .collection("activities")
         .where("project", "==", project);
-      const activitiesSnapshot = activitiesQuery.onSnapshot(function (
-        snapshot
-      ) {
+      const activitiesSnapshot = activitiesQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setActivitiesChanges(docChanges);
+        setActivitiesChanges((oldActivitiesChanges) => {
+          return [...oldActivitiesChanges, ...docChanges];
+        });
         setActivitiesLoaded(true);
       });
       return () => {
@@ -285,9 +285,11 @@ const IntellectualPoints = (props) => {
         .collection("votes")
         .where("voter", "==", fullname)
         .where("project", "==", project);
-      const votesSnapshot = votesQuery.onSnapshot(function (snapshot) {
+      const votesSnapshot = votesQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setVotesChanges(docChanges);
+        setVotesChanges((oldVotesChanges) => {
+          return [...oldVotesChanges, ...docChanges];
+        });
       });
       return () => {
         setVotesChanges([]);
@@ -300,9 +302,7 @@ const IntellectualPoints = (props) => {
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 25) {
-      const now = new Date();
-      const today =
-        now.getFullYear() + "-" + now.getMonth() + "-" + now.getDate();
+      const today = getDateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayUpVotes")
         .where("project", "==", project)

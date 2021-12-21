@@ -122,7 +122,7 @@ const OneCademy = (props) => {
         </>
       )}
       <Alert severity="error">
-        <h2>Set 1Cademy Tag:</h2>
+        <h2>Set 1Cademy Tag to "Knowledge Visualization":</h2>
         <p>
           Before proposing any new nodes or improvements on 1Cademy, you should
           do one of the followings, otherwise, you'll not earn any points for

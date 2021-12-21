@@ -17,6 +17,7 @@ const {
   deleteActivity,
   assignExperimentSessionsPoints,
   updateNotTakenSessions,
+  incrementMonths,
 } = require("./projectManagement");
 const {
   loadImage,
@@ -41,6 +42,7 @@ app.get("/loadImage/:contactId/:randNum", loadImage);
 app.get("/assignExperimentSessionsPoints", assignExperimentSessionsPoints);
 app.get("/loadContacts", loadContacts);
 app.get("/sendPersonalInvitations", sendPersonalInvitations);
+app.get("/incrementMonths", incrementMonths);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
