@@ -353,7 +353,7 @@ const RouterNav = (props) => {
   ]);
 
   useEffect(() => {
-    if (firebaseOnecademy && notAResearcher && username && proposalsLoaded) {
+    if (firebaseOnecademy && !notAResearcher && username && proposalsLoaded) {
       const userVersionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -434,7 +434,6 @@ const RouterNav = (props) => {
       setUserVersions(uVersions);
       setOneCademyUpvotes(upVotes);
       let today = getDateString(new Date());
-      console.log({ uVersions, upVotes });
       if (today in upVotes) {
         setProposalUpvotesToday(upVotes[today]);
       } else {
@@ -451,8 +450,13 @@ const RouterNav = (props) => {
   ]);
 
   useEffect(() => {
-    if (firebaseOnecademy && notAResearcher && username && userVersionsLoaded) {
-      const nodesQuery = firebase.db
+    if (
+      firebaseOnecademy &&
+      !notAResearcher &&
+      username &&
+      userVersionsLoaded
+    ) {
+      const nodesQuery = firebaseOnecademy.db
         .collection("nodes")
         .where("tags", "array-contains", {
           node: "WgF7yr5q7tJc54apVQSr",
@@ -478,7 +482,9 @@ const RouterNav = (props) => {
         const nodeData = change.doc.data();
         if (
           Object.keys(othersProposals).findIndex(
-            (oPr) => oPr.node === change.doc.id && oPr.accepted
+            (oPrId) =>
+              othersProposals[oPrId].node === change.doc.id &&
+              othersProposals[oPrId].accepted
           ) !== -1
         ) {
           if (change.type === "removed" || nodeData.deleted) {
@@ -500,8 +506,8 @@ const RouterNav = (props) => {
   }, [notAResearcher, nodesChanges, othersProposals]);
 
   useEffect(() => {
-    if (firebaseOnecademy && notAResearcher && username && nodesLoaded) {
-      const userNodesQuery = firebase.db
+    if (firebaseOnecademy && !notAResearcher && username && nodesLoaded) {
+      const userNodesQuery = firebaseOnecademy.db
         .collection("userNodes")
         .where("user", "==", username);
       const userNodesSnapshot = userNodesQuery.onSnapshot((snapshot) => {

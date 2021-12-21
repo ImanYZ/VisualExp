@@ -73,10 +73,24 @@ const Activities = (props) => {
           if (project in researData.projects) {
             const projectData = researData.projects[project];
             let totalPoints = 0;
-            let oneCademyPoints = 0;
+            let expPoints = 0;
+            let onePoints = 0;
             let intellectualPoints = 0;
             let instructorsPoints = 0;
-            let expPoints = 0;
+            let commentsPoints = 0;
+            let recallPoints = 0;
+            if (projectData.expPoints) {
+              totalPoints += projectData.expPoints;
+              expPoints = projectData.expPoints;
+            }
+            if (projectData.onePoints) {
+              totalPoints += projectData.onePoints;
+              onePoints += projectData.onePoints;
+            }
+            if (projectData.dayOneUpVotePoints) {
+              totalPoints += projectData.dayOneUpVotePoints;
+              onePoints += projectData.dayOneUpVotePoints;
+            }
             if (projectData.points) {
               totalPoints += projectData.points;
               intellectualPoints += projectData.points;
@@ -84,10 +98,6 @@ const Activities = (props) => {
             if (projectData.dayUpVotePoints) {
               totalPoints += projectData.dayUpVotePoints;
               intellectualPoints += projectData.dayUpVotePoints;
-            }
-            if (projectData.expPoints) {
-              totalPoints += projectData.expPoints;
-              expPoints = projectData.expPoints;
             }
             if (projectData.instructors) {
               totalPoints += projectData.instructors;
@@ -101,10 +111,12 @@ const Activities = (props) => {
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
               if (resears[reIdx].id === change.doc.id) {
                 resears[reIdx].totalPoints = totalPoints;
-                resears[reIdx].oneCademyPoints = oneCademyPoints;
+                resears[reIdx].expPoints = expPoints;
+                resears[reIdx].onePoints = onePoints;
                 resears[reIdx].intellectualPoints = intellectualPoints;
                 resears[reIdx].instructorsPoints = instructorsPoints;
-                resears[reIdx].expPoints = expPoints;
+                resears[reIdx].commentsPoints = commentsPoints;
+                resears[reIdx].recallPoints = recallPoints;
                 foundResear = true;
                 break;
               }
@@ -113,10 +125,12 @@ const Activities = (props) => {
               resears.push({
                 id: change.doc.id,
                 totalPoints,
-                oneCademyPoints,
+                expPoints,
+                onePoints,
                 intellectualPoints,
                 instructorsPoints,
-                expPoints,
+                commentsPoints,
+                recallPoints,
               });
             }
           }
@@ -162,12 +176,12 @@ const Activities = (props) => {
                   contact points 🧑‍🏫 and
                 </li>
                 <li>
-                  <strong>100</strong> Coding participants' free recall
-                  responses and
+                  <strong>100</strong> Coding participants' comments points 💬
+                  and
                 </li>
                 <li>
-                  <strong>100</strong> Coding participants' free recall
-                  responses
+                  <strong>100</strong> Coding participants' recall responses
+                  points 🧠
                 </li>
               </ul>
               <strong>Order:</strong> The intern with higher total of all the
@@ -225,10 +239,10 @@ const Activities = (props) => {
                                   resear.instructorsPoints +
                                   " - 👨‍🔬 " +
                                   resear.expPoints +
-                                  " - 👨‍🔬 " +
-                                  resear.expPoints +
-                                  " - 👨‍🔬 " +
-                                  resear.expPoints}
+                                  " - 💬 " +
+                                  resear.commentsPoints +
+                                  " - 🧠 " +
+                                  resear.recallPoints}
                               </>
                             ) : (
                               resear.totalPoints
