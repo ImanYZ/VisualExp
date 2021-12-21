@@ -96,7 +96,7 @@ const RouterNav = (props) => {
   const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
-  const [othersProposals, setOthersProposals] = useState([]);
+  const [othersProposals, setOthersProposals] = useState({});
   const [oneCademyPoints, setOneCademyPoints] = useState(0);
   const [proposalsLoaded, setProposalsLoaded] = useState(false);
   const [userVersionsChanges, setUserVersionsChanges] = useState([]);
@@ -126,6 +126,14 @@ const RouterNav = (props) => {
       } else {
         setNotAResearcher(true);
       }
+    };
+    if (firebase && fullname) {
+      return checkResearcher();
+    }
+  }, [firebase, fullname]);
+
+  useEffect(() => {
+    if (firebase && fullname && !notAResearcher && project) {
       const notTakenSessionsQuery = firebase.db.collection("notTakenSessions");
       const notTakenSessionsSnapshot = notTakenSessionsQuery.onSnapshot(
         (snapshot) => {
@@ -136,20 +144,6 @@ const RouterNav = (props) => {
           setNotTakenSessionsLoaded(true);
         }
       );
-      return () => {
-        setNotTakenSessionsChanges([]);
-        setNotTakenSessions([]);
-        setNotTakenSessionsNum(0);
-        notTakenSessionsSnapshot();
-      };
-    };
-    if (firebase && fullname) {
-      return checkResearcher();
-    }
-  }, [firebase, fullname]);
-
-  useEffect(() => {
-    if (firebase && fullname && project) {
       const researcherQuery = firebase.db
         .collection("researchers")
         .doc(fullname);
@@ -183,6 +177,10 @@ const RouterNav = (props) => {
         }
       });
       return () => {
+        setNotTakenSessionsChanges([]);
+        setNotTakenSessions([]);
+        setNotTakenSessionsNum(0);
+        notTakenSessionsSnapshot();
         setIntellectualPoints(0);
         setUpVotedDays(0);
         setExpPoints(0);
@@ -191,10 +189,10 @@ const RouterNav = (props) => {
         researcherSnapshot();
       };
     }
-  }, [firebase, fullname, project]);
+  }, [firebase, fullname, notAResearcher, project]);
 
   useEffect(() => {
-    if (notTakenSessionsChanges.length > 0) {
+    if (!notAResearcher && notTakenSessionsChanges.length > 0) {
       let nTSessions = [...notTakenSessions];
       let nTSessionsNum = notTakenSessionsNum;
       for (let change of notTakenSessionsChanges) {
@@ -212,36 +210,39 @@ const RouterNav = (props) => {
     }
   }, [
     firebase,
+    notAResearcher,
     notTakenSessionsChanges,
     notTakenSessions,
     notTakenSessionsNum,
   ]);
 
   useEffect(() => {
-    return firebaseOnecademy.auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const uid = user.uid;
-        const userDocs = await firebaseOnecademy.db
-          .collection("users")
-          .where("userId", "==", uid)
-          .get();
-        if (userDocs.docs.length > 0) {
-          // Sign in and signed up:
-          console.log("Signing in!");
-          setUsername(userDocs.docs[0].id);
+    if (!notAResearcher) {
+      return firebaseOnecademy.auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          const uid = user.uid;
+          const userDocs = await firebaseOnecademy.db
+            .collection("users")
+            .where("userId", "==", uid)
+            .get();
+          if (userDocs.docs.length > 0) {
+            // Sign in and signed up:
+            console.log("Signing in!");
+            setUsername(userDocs.docs[0].id);
+          } else {
+            console.log("User not found!");
+            setUsername("");
+          }
         } else {
-          console.log("User not found!");
+          console.log("Signing out!");
           setUsername("");
         }
-      } else {
-        console.log("Signing out!");
-        setUsername("");
-      }
-    });
-  }, [firebaseOnecademy, email]);
+      });
+    }
+  }, [firebaseOnecademy, notAResearcher, email]);
 
   useEffect(() => {
-    if (firebaseOnecademy) {
+    if (firebaseOnecademy && !notAResearcher) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -276,12 +277,12 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOnecademy]);
+  }, [firebaseOnecademy, notAResearcher]);
 
   useEffect(() => {
-    if (proposalsChanges.length > 0 && username) {
+    if (!notAResearcher && proposalsChanges.length > 0 && username) {
       let propos = { ...proposals };
-      let oPropos = [...othersProposals];
+      let oPropos = { ...othersProposals };
       let netVotes = oneCademyPoints;
       for (let change of proposalsChanges) {
         const proposalData = change.doc.data();
@@ -293,8 +294,8 @@ const RouterNav = (props) => {
               netVotes -= proposalData.corrects - proposalData.wrongs - 1;
             }
           } else {
-            if (oPropos.includes(change.doc.id)) {
-              oPropos = oPropos.filter((oPrId) => oPrId !== change.doc.id);
+            if (change.doc.id in oPropos) {
+              delete oPropos[change.doc.id];
             }
           }
         } else {
@@ -316,9 +317,10 @@ const RouterNav = (props) => {
               };
             }
           } else {
-            if (!oPropos.includes(change.doc.id)) {
-              oPropos.push(change.doc.id);
-            }
+            oPropos[change.doc.id] = {
+              accepted: proposalData.accepted,
+              node: proposalData.node,
+            };
           }
         }
       }
@@ -329,10 +331,17 @@ const RouterNav = (props) => {
       setOneCademyPoints(netVotes);
       setProposalsLoaded(true);
     }
-  }, [proposalsChanges, proposals, othersProposals, oneCademyPoints, username]);
+  }, [
+    notAResearcher,
+    proposalsChanges,
+    proposals,
+    othersProposals,
+    oneCademyPoints,
+    username,
+  ]);
 
   useEffect(() => {
-    if (firebaseOnecademy && username && proposalsLoaded) {
+    if (firebaseOnecademy && notAResearcher && username && proposalsLoaded) {
       const userVersionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -368,18 +377,15 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOnecademy, username, proposalsLoaded]);
+  }, [firebaseOnecademy, notAResearcher, username, proposalsLoaded]);
 
   useEffect(() => {
-    if (userVersionsChanges.length > 0) {
+    if (!notAResearcher && userVersionsChanges.length > 0) {
       let uVersions = { ...userVersions };
       let upVotes = { ...oneCademyUpvotes };
       for (let change of userVersionsChanges) {
         const userVersionData = change.doc.data();
-        if (userVersionData.version === "vRuvDZXusZAuVSQEzRRa") {
-          console.log({ userVersionData, othersProposals });
-        }
-        if (othersProposals.includes(userVersionData.version)) {
+        if (userVersionData.version in othersProposals) {
           console.log({ userVersionData });
           const voteDate = getDateString(userVersionData.updatedAt.toDate());
           if (change.type === "removed" || userVersionData.deleted) {
@@ -418,7 +424,13 @@ const RouterNav = (props) => {
         setProposalUpvotesToday(0);
       }
     }
-  }, [userVersionsChanges, userVersions, oneCademyUpvotes, othersProposals]);
+  }, [
+    notAResearcher,
+    userVersionsChanges,
+    userVersions,
+    oneCademyUpvotes,
+    othersProposals,
+  ]);
 
   useEffect(() => {
     const setProposalsVotes = async () => {
@@ -458,10 +470,17 @@ const RouterNav = (props) => {
         },
       });
     };
-    if (oneCademyPoints) {
+    if (!notAResearcher && oneCademyPoints) {
       setProposalsVotes();
     }
-  }, [oneCademyPoints, oneCademyUpvotes, firebase, fullname, project]);
+  }, [
+    notAResearcher,
+    oneCademyPoints,
+    oneCademyUpvotes,
+    firebase,
+    fullname,
+    project,
+  ]);
 
   const signOut = async (event) => {
     console.log("Signing out!");
