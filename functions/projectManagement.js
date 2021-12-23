@@ -14,6 +14,7 @@ const {
   strToBoolean,
   getActivityTimeStamps,
   getIn30Minutes,
+  getDateString,
 } = require("./utils");
 
 const researchers = [
@@ -1009,14 +1010,9 @@ exports.incrementMonths = async (req, res) => {
     for (let dayUpVoteDoc of dayUpVoteDocs.docs) {
       const dayUpVoteData = dayUpVoteDoc.data();
       const dayUpVoteRef = db.collection("dayUpVotes").doc(dayUpVoteDoc.id);
-      const dateSplit = dayUpVoteData.date.split("-");
+      const dateStr = dayUpVoteData.date;
       await dayUpVoteRef.update({
-        date:
-          dateSplit[0] +
-          "-" +
-          (parseInt(dateSplit[1]) + 1) +
-          "-" +
-          dateSplit[2],
+        date: getDateString(new Date(dateStr)),
       });
     }
     return res.status(200).json({});

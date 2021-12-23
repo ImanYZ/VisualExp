@@ -40,7 +40,7 @@ import {
 } from "../../store/ProjectAtoms";
 
 import { getTypedCollections } from "./getTypedCollections";
-import { isToday, getDateString } from "../../utils/DateFunctions";
+import { isToday, getISODateString } from "../../utils/DateFunctions";
 
 import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
@@ -417,7 +417,7 @@ const RouterNav = (props) => {
       for (let change of userVersionsChanges) {
         const userVersionData = change.doc.data();
         if (userVersionData.version in othersProposals) {
-          const voteDate = getDateString(userVersionData.updatedAt.toDate());
+          const voteDate = getISODateString(userVersionData.updatedAt.toDate());
           if (change.type === "removed" || userVersionData.deleted) {
             if (change.doc.id in uVersions) {
               delete uVersions[change.doc.id];
@@ -446,7 +446,7 @@ const RouterNav = (props) => {
       setUserVersionsChanges([]);
       setUserVersions(uVersions);
       setOneCademyUpvotes(upVotes);
-      let today = getDateString(new Date());
+      let today = getISODateString(new Date());
       if (today in upVotes) {
         setProposalUpvotesToday(upVotes[today]);
       } else {
@@ -542,7 +542,7 @@ const RouterNav = (props) => {
       for (let change of userNodesChanges) {
         const userNodeData = change.doc.data();
         if (nodes.includes(userNodeData.node)) {
-          const voteDate = getDateString(userNodeData.updatedAt.toDate());
+          const voteDate = getISODateString(userNodeData.updatedAt.toDate());
           if (change.type === "removed" || userNodeData.deleted) {
             if (change.doc.id in uNodes) {
               delete uNodes[change.doc.id];
@@ -570,7 +570,7 @@ const RouterNav = (props) => {
       setUserNodesChanges([]);
       setUserNodes(uNodes);
       setOneCademyUpvotes(upVotes);
-      let today = getDateString(new Date());
+      let today = getISODateString(new Date());
       if (today in upVotes) {
         setProposalUpvotesToday(upVotes[today]);
       } else {

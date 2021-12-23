@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 import axios from "axios";
+import { ResponsiveCalendar } from "@nivo/calendar";
 
 import Tooltip from "@mui/material/Tooltip";
 import Alert from "@mui/material/Alert";
@@ -18,6 +19,8 @@ import {
   notTakenSessionsState,
   notTakenSessionsLoadedState,
 } from "../../../store/ProjectAtoms";
+
+import { getISODateString } from "../../../utils/DateFunctions";
 
 import "./ExperimentPoints.css";
 
@@ -67,11 +70,13 @@ const ExperimentPoints = (props) => {
 
   const [expSessionsChanges, setExpSessionsChanges] = useState([]);
   const [expSessions, setExpSessions] = useState([]);
+  const [dailyPoints, setDailyPoints] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
 
   useEffect(() => {
     if (expSessionsChanges.length > 0) {
       let eSessions = [...expSessions];
+      let dPoints = [...dailyPoints];
       for (let change of expSessionsChanges) {
         if (change.type === "removed") {
           eSessions = eSessions.filter((eSe) => eSe.id !== change.doc.id);
@@ -93,14 +98,25 @@ const ExperimentPoints = (props) => {
             } else {
               eSessions[eSessionIdx] = eSessionObj;
             }
+            const theDate = getISODateString(eSessionData.sTime.toDate());
+            const dPointIdx = dPoints.findIndex((eSe) => eSe.date === theDate);
+            if (dPointIdx === -1) {
+              dPoints.push({
+                date: theDate,
+                value: eSessionData.points,
+              });
+            } else {
+              dPoints.value += eSessionData.points;
+            }
           }
         }
       }
       setExpSessionsChanges([]);
       setExpSessions(eSessions);
+      setDailyPoints(dPoints);
     }
     setExpSessionsLoaded(true);
-  }, [email, expSessions, expSessionsChanges]);
+  }, [email, expSessions, dailyPoints, expSessionsChanges]);
 
   useEffect(() => {
     if (project && fullname) {
@@ -236,6 +252,30 @@ const ExperimentPoints = (props) => {
           sessions you ran, are not in the table yet.
         </p>
       </Alert>
+      <ResponsiveCalendar
+        data={dailyPoints}
+        from="2021-05-01"
+        to="2022-05-01"
+        emptyColor="#eeeeee"
+        colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
+        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+        yearSpacing={40}
+        monthBorderColor="#ffffff"
+        dayBorderWidth={2}
+        dayBorderColor="#ffffff"
+        legends={[
+          {
+            anchor: "bottom-right",
+            direction: "row",
+            translateY: 36,
+            itemCount: 4,
+            itemWidth: 42,
+            itemHeight: 36,
+            itemsSpacing: 14,
+            itemDirection: "right-to-left",
+          },
+        ]}
+      />
       <div className="DataGridBox">
         <DataGrid
           rows={expSessions}

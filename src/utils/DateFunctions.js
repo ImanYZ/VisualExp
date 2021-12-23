@@ -7,11 +7,12 @@ export const isToday = (theDate) => {
   );
 };
 
-export const getDateString = (dateObj) => {
+export const getISODateString = (dateObj) => {
+  const theMonth = dateObj.getMonth() + 1;
   return (
     dateObj.getFullYear() +
     "-" +
-    (dateObj.getMonth() + 1) +
+    (theMonth < 10 ? "0" + theMonth : theMonth) +
     "-" +
     dateObj.getDate()
   );

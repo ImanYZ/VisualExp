@@ -31,7 +31,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import CSCObjLoader from "./CSCObjLoader";
-import { isToday, getDateString } from "../../../utils/DateFunctions";
+import { isToday, getISODateString } from "../../../utils/DateFunctions";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
@@ -633,7 +633,7 @@ const AddInstructor = (props) => {
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 25) {
-      const today = getDateString(new Date());
+      const today = getISODateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayInstructorUpVotes")
         .where("project", "==", project)
@@ -1021,7 +1021,7 @@ const AddInstructor = (props) => {
               .doc(fullname);
             const researcherDoc = await researcherRef.get();
             const researcherData = researcherDoc.data();
-            const today = getDateString(new Date());
+            const today = getISODateString(new Date());
             const dayInstructorsDocs = await firebase.db
               .collection("dayInstructors")
               .where("project", "==", project)

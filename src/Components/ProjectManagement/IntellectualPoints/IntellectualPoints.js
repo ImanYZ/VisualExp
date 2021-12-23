@@ -28,7 +28,7 @@ import {
 import { projectState, upVotedTodayState } from "../../../store/ProjectAtoms";
 
 import AdminIntellectualPoints from "./AdminIntellectualPoints";
-import { isToday, getDateString } from "../../../utils/DateFunctions";
+import { isToday, getISODateString } from "../../../utils/DateFunctions";
 
 import "./IntellectualPoints.css";
 
@@ -302,7 +302,7 @@ const IntellectualPoints = (props) => {
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 25) {
-      const today = getDateString(new Date());
+      const today = getISODateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayUpVotes")
         .where("project", "==", project)
