@@ -1010,9 +1010,8 @@ exports.incrementMonths = async (req, res) => {
       const dayUpVoteData = dayUpVoteDoc.data();
       const dayUpVoteRef = db.collection("dayUpVotes").doc(dayUpVoteDoc.id);
       const dateSplit = dayUpVoteData.date.split("-");
-      console.log({
-        data: dayUpVoteData.date,
-        month:
+      await dayUpVoteRef.update({
+        date:
           dateSplit[0] +
           "-" +
           (parseInt(dateSplit[1]) + 1) +

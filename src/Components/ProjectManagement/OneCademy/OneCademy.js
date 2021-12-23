@@ -25,31 +25,6 @@ const OneCademy = (props) => {
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);
 
-  useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uid = user.uid;
-        const userDocs = await firebase.db
-          .collection("users")
-          .where("userId", "==", uid)
-          .get();
-        if (userDocs.docs.length > 0) {
-          // Sign in and signed up:
-          console.log("Signing in!");
-          setUsername(userDocs.docs[0].id);
-        } else {
-          console.log("User not found!");
-          setUsername("");
-        }
-      } else {
-        console.log("Signing out!");
-        setUsername("");
-      }
-    });
-  }, [firebase, email]);
-
   const passwordChange = (event) => {
     setPassword(event.target.value);
   };

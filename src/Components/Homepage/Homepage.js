@@ -12,11 +12,11 @@ import {
 import UniversitiesMap from "./UniversitiesMap/UniversitiesMap";
 import HomeNavbar from "./HomeNavbar/HomeNavbar";
 // import Video from "./Video/Video";
+import HomeLanding from "./HomeLanding/HomeLanding";
+import NetworkClusters from "./NetworkClusters/NetworkClusters";
 
 import HomeBackgroundImageDarkMode from "../../assets/HomeBackGroundDarkMode.png";
 import LightModeBackground from "../../assets/LightModeBackground.jpg";
-import HomeTeamDarkMode from "../../assets/HomepageNetworkingDark.jpg";
-import HomeTeamLightMode from "../../assets/HomepageNetworkingLight.jpg";
 import "./Homepage.css";
 
 const Homepage = (props) => {
@@ -88,75 +88,9 @@ const Homepage = (props) => {
         renderAllPagesOnFirstRender={true}
         containerHeight={window.innerWidth > 900 ? "89vh" : "100vh"}
       >
-        <div
-          className={
-            theme === "Light"
-              ? "CenterMain LightModeHomeCenterMain"
-              : "CenterMain"
-          }
-        >
-          <div
-            className={
-              theme === "Light"
-                ? "MainMessageDiv LightModeHomeMainMessageDiv"
-                : "MainMessageDiv"
-            }
-          >
-            <p>
-              1Cademy is a large-scale,<br></br>online platform for students and
-              researchers
-            </p>
-          </div>
-          <div
-            className={
-              theme === "Light"
-                ? "ButtonDiv LightModeHomeButtonDiv"
-                : "ButtonDiv"
-            }
-          >
-            <button
-              className={
-                theme === "Light"
-                  ? "ButtonMore LightModeHomeButtonMore"
-                  : "ButtonMore"
-              }
-            >
-              {" "}
-              Learn More{" "}
-            </button>
-            <div>Scroll</div>
-            <div>
-              {" "}
-              <i
-                className={
-                  theme === "Light"
-                    ? "ArrowHome LightModeHomeArrow"
-                    : "ArrowHome"
-                }
-              ></i>{" "}
-            </div>
-          </div>
-        </div>
-        <div
-          className={
-            theme === "Light"
-              ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
-              : "UniversitiesMapDiv"
-          }
-        >
-          <UniversitiesMap theme={theme} />
-        </div>
-        <div
-          className={
-            theme === "Light" ? "TeamsDiv  LightModeTeamsDiv " : "TeamsDiv"
-          }
-        >
-          <img
-            className="TeamsImage"
-            src={theme === "Light" ? HomeTeamLightMode : HomeTeamDarkMode}
-            alt="Teams"
-          />
-        </div>
+        <HomeLanding theme={theme} />
+        <UniversitiesMap theme={theme} />
+        <NetworkClusters theme={theme} />
       </ReactPageScroller>
     </div>
   );

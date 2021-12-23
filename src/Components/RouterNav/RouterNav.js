@@ -133,8 +133,24 @@ const RouterNav = (props) => {
         setNotAResearcher(true);
       }
     };
+    const reloadIfNotLoadedToday = async () => {
+      const researcherRef = firebase.db.collection("researchers").doc(fullname);
+      const researcherDoc = await researcherRef.get();
+      if (researcherDoc.exists) {
+        const researcherData = researcherDoc.data();
+        if (!isToday(researcherData.lastLoad.toDate())) {
+          await researcherRef.update({
+            lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+          window.location.reload(true);
+        }
+      }
+    };
     if (firebase && fullname) {
-      return checkResearcher();
+      checkResearcher();
+      setInterval(() => {
+        reloadIfNotLoadedToday();
+      }, 3600000);
     }
   }, [firebase, fullname]);
 
@@ -298,7 +314,6 @@ const RouterNav = (props) => {
       let netVotes = oneCademyPoints;
       for (let change of proposalsChanges) {
         const proposalData = change.doc.data();
-        // console.log({ id: change.doc.id, proposalData });
         if (change.type === "removed" || proposalData.deleted) {
           if (proposalData.proposer === username) {
             if (change.doc.id in propos) {
@@ -336,7 +351,6 @@ const RouterNav = (props) => {
           }
         }
       }
-      console.log({ propos, oPropos, netVotes });
       setProposalsChanges([]);
       setProposals(propos);
       setOthersProposals(oPropos);
@@ -403,7 +417,6 @@ const RouterNav = (props) => {
       for (let change of userVersionsChanges) {
         const userVersionData = change.doc.data();
         if (userVersionData.version in othersProposals) {
-          console.log({ userVersionData });
           const voteDate = getDateString(userVersionData.updatedAt.toDate());
           if (change.type === "removed" || userVersionData.deleted) {
             if (change.doc.id in uVersions) {
@@ -499,7 +512,6 @@ const RouterNav = (props) => {
         }
       }
       setNodesChanges([]);
-      console.log({ nds });
       setNodes(nds);
       setNodesLoaded(true);
     }
@@ -530,7 +542,6 @@ const RouterNav = (props) => {
       for (let change of userNodesChanges) {
         const userNodeData = change.doc.data();
         if (nodes.includes(userNodeData.node)) {
-          console.log({ userNodeData });
           const voteDate = getDateString(userNodeData.updatedAt.toDate());
           if (change.type === "removed" || userNodeData.deleted) {
             if (change.doc.id in uNodes) {
@@ -560,7 +571,6 @@ const RouterNav = (props) => {
       setUserNodes(uNodes);
       setOneCademyUpvotes(upVotes);
       let today = getDateString(new Date());
-      console.log({ uNodes, upVotes });
       if (today in upVotes) {
         setProposalUpvotesToday(upVotes[today]);
       } else {

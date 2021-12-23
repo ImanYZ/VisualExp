@@ -231,9 +231,9 @@ const Activities = (props) => {
                             {resear.id === fullname && fullname + " - "}
                             {expanded ? (
                               <>
-                                {resear.oneCademyPoints}{" "}
-                                <img src={favicon} width="15.1" />
-                                {" - 🎓 " +
+                                <img src={favicon} width="15.1" />{" "}
+                                {resear.onePoints +
+                                  " - 🎓 " +
                                   resear.intellectualPoints +
                                   " - 🧑‍🏫 " +
                                   resear.instructorsPoints +

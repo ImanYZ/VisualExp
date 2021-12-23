@@ -70,14 +70,22 @@ const UniversitiesMap = (props) => {
   // ));
 
   return (
-    <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
-      <div id="reasonGradientText">Our Researchers Are From</div>
-      <div id="googleMapDiv">
-        {institutions.length > 0 ? (
-          <Suspense fallback={<div></div>}>
-            <GoogleMapCom institutions={institutions} />
-          </Suspense>
-        ) : null}
+    <div
+      className={
+        props.theme === "Light"
+          ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
+          : "UniversitiesMapDiv"
+      }
+    >
+      <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
+        <div className="HeaderGradientText">Our Researchers Are From</div>
+        <div id="googleMapDiv">
+          {institutions.length > 0 ? (
+            <Suspense fallback={<div></div>}>
+              <GoogleMapCom institutions={institutions} />
+            </Suspense>
+          ) : null}
+        </div>
       </div>
     </div>
   );

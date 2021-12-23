@@ -165,7 +165,7 @@
 .LightModeReasonFlexDiv {
   color: #454545;
 }
-#reasonGradientText {
+.HeaderGradientText {
   padding-top: 5vh;
   padding-bottom: 5vh;
   line-height: 150%;
@@ -208,8 +208,8 @@
 }
 
 @media screen and (max-width: 900px) and (orientation: portrait) {
-  #reasonGradientText {
-    font-size: 8vw;
+  .HeaderGradientText {
+    font-size: 5.5vw;
     background: linear-gradient(to right, #ff9800, #ff9800);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -222,8 +222,8 @@
   }
 }
 @media screen and (max-width: 900px) and (orientation: landscape) {
-  #reasonGradientText {
-    font-size: 6vh;
+  .HeaderGradientText {
+    font-size: 4vh;
     background: linear-gradient(to right, #ff9800, #ff9800);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -264,7 +264,7 @@
 }
 
 .TeamsDiv {
-  background-color: #303030; /* For browsers that do not support gradients */
+  background-color: #010101; /* For browsers that do not support gradients */
   overflow-x: hidden;
   overflow-y: hidden;
   opacity: 0.98;
@@ -285,6 +285,13 @@
   width: 100%;
   height: none;
 }
+
+#KnowledgeGraphClustersHeader {
+  margin-top: -40px;
+  margin-bottom: -85px;
+  z-index: 4;
+}
+
 @media screen and (min-width: 1300px) and (orientation: landscape) {
   .TeamsDiv {
     flex-direction: row;
