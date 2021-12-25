@@ -55,10 +55,17 @@ exports.sendPersonalInvitations = async (req, res) => {
       if (contactIdx < contactDocs.docs.length) {
         contactDoc = contactDocs.docs[contactIdx];
         contactIdx += 1;
-        const { firstname, lastname, email, from1Cademy, emailSent } =
-          contactDoc.data();
-        console.log({ firstname, lastname, emailSent });
-        if (!emailSent) {
+        const {
+          firstname,
+          lastname,
+          email,
+          from1Cademy,
+          emailSent,
+          openedEmail,
+          reminders,
+        } = contactDoc.data();
+        console.log({ firstname, lastname, emailSent, openedEmail, reminders });
+        if (!emailSent || (!openedEmail && (!reminders || reminders < 3))) {
           const fullname = getFullname(firstname, lastname);
           const userDoc = await db.collection("users").doc(fullname).get();
           if (!userDoc.exists) {
@@ -111,8 +118,15 @@ exports.sendPersonalInvitations = async (req, res) => {
                 return res.status(500).json({ error });
               } else {
                 const contactRef = db.collection("contacts").doc(contactDoc.id);
+                if (!reminders) {
+                  await contactRef.update({
+                    emailSent: admin.firestore.Timestamp.fromDate(new Date()),
+                    reminders: 0,
+                  });
+                }
                 await contactRef.update({
                   emailSent: admin.firestore.Timestamp.fromDate(new Date()),
+                  reminders: reminders + 1,
                 });
               }
             });
