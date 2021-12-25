@@ -902,7 +902,7 @@ const RouterNav = (props) => {
                       }
                       onClick={(event) => navigate("/Activities/AddInstructor")}
                     >
-                      🧑‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
+                      👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
                       {instructorsToday} / 10
                       <br /> ✅ {upvotedInstructorsToday} / 25
                     </Button>
