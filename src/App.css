@@ -74,6 +74,11 @@ button.NavLink:hover {
   margin-left: 19px;
 }
 
+#DataVisualization {
+  height: 340px;
+  width: 100%;
+}
+
 .IconImage {
   display: inline-block;
   margin-bottom: -10px;

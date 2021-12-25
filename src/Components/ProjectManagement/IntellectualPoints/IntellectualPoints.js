@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import axios from "axios";
+import { ResponsiveCalendar } from "@nivo/calendar";
 
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
@@ -25,7 +26,14 @@ import {
   fullnameState,
   isAdminState,
 } from "../../../store/AuthAtoms";
-import { projectState, upVotedTodayState } from "../../../store/ProjectAtoms";
+import {
+  projectState,
+  upVotedTodayState,
+  allTagsState,
+  allActivitiesState,
+  othersActivitiesState,
+  otherActivityState,
+} from "../../../store/ProjectAtoms";
 
 import AdminIntellectualPoints from "./AdminIntellectualPoints";
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
@@ -228,19 +236,22 @@ const IntellectualPoints = (props) => {
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
   const [upVotedToday, setUpVotedToday] = useRecoilState(upVotedTodayState);
+  const [allTags, setAllTags] = useRecoilState(allTagsState);
+  const [allActivities, setAllActivities] = useRecoilState(allActivitiesState);
+  const [othersActivities, setOthersActivities] = useRecoilState(
+    othersActivitiesState
+  );
+  const [otherActivity, setOtherActivity] = useRecoilState(otherActivityState);
 
+  const [dailyPoints, setDailyPoints] = useState([]);
   const [activityDate, setActivityDate] = useState(null);
   const [startTime, setStartTime] = useState(null);
   // const [endTime, setEndTime] = useState(null);
   const [activityDescription, setActivityDescription] = useState("");
   const [invalidActivity, setInvalidActivity] = useState(false);
-  const [allTags, setAllTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [activitiesChanges, setActivitiesChanges] = useState([]);
-  const [allActivities, setAllActivities] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [othersActivities, setOthersActivities] = useState([]);
-  const [otherActivity, setOtherActivity] = useState({});
   const [votesChanges, setVotesChanges] = useState([]);
   const [unvotedNum, setUnvotedNum] = useState(0);
   const [otherVoting, setOtherVoting] = useState(false);
@@ -271,8 +282,6 @@ const IntellectualPoints = (props) => {
         setActivitiesLoaded(true);
       });
       return () => {
-        setAllActivities([]);
-        setOthersActivities([]);
         setActivitiesLoaded(false);
         activitiesSnapshot();
       };
@@ -293,8 +302,6 @@ const IntellectualPoints = (props) => {
       });
       return () => {
         setVotesChanges([]);
-        setUpVotedToday(0);
-        setOthersActivities([]);
         votesSnapshot();
       };
     }
@@ -418,22 +425,29 @@ const IntellectualPoints = (props) => {
     }
     if (votesChanges.length > 0) {
       let oActivities = [...othersActivities];
+      let dPoints = [...dailyPoints];
       let nUpVotedToday = upVotedToday;
       for (let change of votesChanges) {
         const voteData = change.doc.data();
-        let didVoteToday = isToday(voteData.createdAt.toDate());
+        let voteDate = voteData.createdAt.toDate();
         if ("updatedAt" in voteData) {
-          didVoteToday = isToday(voteData.updatedAt.toDate());
+          voteDate = voteData.updatedAt.toDate();
         }
+        const didVoteToday = isToday(voteDate);
+        voteDate = getISODateString(voteDate);
         const didUpVoteToday = didVoteToday && voteData.upVote;
         const activityIdx = oActivities.findIndex(
           (acti) => acti.id === voteData.activity
+        );
+        const dPointsIdx = dPoints.findIndex(
+          (dPoint) => dPoint.day === voteDate
         );
         if (change.type === "removed") {
           oActivities[activityIdx].upVote = false;
           oActivities[activityIdx].noVote = false;
           oActivities[activityIdx].currentVote = 0;
           nUpVotedToday += didUpVoteToday ? -1 : 0;
+          dPoints[dPointsIdx] -= voteData.upVote ? 1 : 0;
         } else {
           if (activityIdx !== -1) {
             if (didVoteToday) {
@@ -466,16 +480,38 @@ const IntellectualPoints = (props) => {
               id: voteData.activity,
             });
           }
+          if (dPointsIdx !== -1) {
+            if (activityIdx !== -1) {
+              if (oActivities[activityIdx].currentVote < 1) {
+                if (voteData.upVote) {
+                  dPoints[dPointsIdx].value += 1;
+                }
+              } else {
+                if (!voteData.upVote) {
+                  dPoints[dPointsIdx].value -= 1;
+                }
+              }
+            } else {
+              dPoints[dPointsIdx].value += voteData.upVote ? 1 : 0;
+            }
+          } else {
+            dPoints.push({
+              day: voteDate,
+              value: voteData.upVote ? 1 : 0,
+            });
+          }
         }
       }
       assignDayUpVotesPoint(nUpVotedToday);
       setVotesChanges([]);
       setUpVotedToday(nUpVotedToday <= 25 ? nUpVotedToday : 25);
       setOthersActivities(oActivities);
+      setDailyPoints(dPoints);
     }
   }, [
     allActivities,
     othersActivities,
+    dailyPoints,
     activitiesChanges,
     votesChanges,
     upVotedToday,
@@ -698,7 +734,10 @@ const IntellectualPoints = (props) => {
           activityIdx !== -1 &&
           oActivities[activityIdx][clickedCell.field] !== "O"
         ) {
-          oActivities[activityIdx][clickedCell.field] = "O";
+          oActivities[activityIdx] = {
+            ...oActivities[activityIdx],
+            [clickedCell.field]: "O",
+          };
           setOthersActivities(oActivities);
           await firebase.idToken();
           await axios.post("/vote", {
@@ -732,6 +771,31 @@ const IntellectualPoints = (props) => {
     <>
       {isAdmin && <AdminIntellectualPoints />}
       <h2>Others' Intellectual Activities:</h2>
+      <div id="DataVisualization">
+        <ResponsiveCalendar
+          data={dailyPoints}
+          from="2021-05-01"
+          to="2022-05-01"
+          emptyColor="#eeeeee"
+          margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+          yearSpacing={40}
+          monthBorderColor="#ffffff"
+          dayBorderWidth={2}
+          dayBorderColor="#ffffff"
+          legends={[
+            {
+              anchor: "bottom-right",
+              direction: "row",
+              translateY: 36,
+              itemCount: 4,
+              itemWidth: 42,
+              itemHeight: 36,
+              itemsSpacing: 14,
+              itemDirection: "right-to-left",
+            },
+          ]}
+        />
+      </div>
       <div className="ColumnsAuto_Auto">
         <Alert className="VoteActivityAlert" severity="success">
           <ul>

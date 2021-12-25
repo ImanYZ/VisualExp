@@ -30,6 +30,26 @@ export const notTakenSessionsLoadedState = atom({
   default: false,
 });
 
+export const allTagsState = atom({
+  key: "allTagsState",
+  default: [],
+});
+
+export const allActivitiesState = atom({
+  key: "allActivitiesState",
+  default: [],
+});
+
+export const othersActivitiesState = atom({
+  key: "othersActivitiesState",
+  default: [],
+});
+
+export const otherActivityState = atom({
+  key: "otherActivityState",
+  default: {},
+});
+
 export const upVotedTodayState = atom({
   key: "upVotedTodayState",
   default: 0,
