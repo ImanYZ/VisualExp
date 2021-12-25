@@ -79,5 +79,5 @@ exports.updateNotTakenSessionsScheduler = functions.pubsub
   .onRun(updateNotTakenSessions);
 
 exports.assignExperimentSessionsPointsScheduler = functions.pubsub
-  .schedule("every 10 minutes")
+  .schedule("every 4 hours")
   .onRun(assignExperimentSessionsPoints);
