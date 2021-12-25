@@ -173,7 +173,7 @@ const Activities = (props) => {
                 </li>
                 <li>
                   <strong>100</strong> Collecting instructor/administrator
-                  contact points 🧑‍🏫 and
+                  contact points 👨‍🏫 and
                 </li>
                 <li>
                   <strong>100</strong> Coding participants' comments points 💬
@@ -235,7 +235,7 @@ const Activities = (props) => {
                                 {resear.onePoints +
                                   " - 🎓 " +
                                   resear.intellectualPoints +
-                                  " - 🧑‍🏫 " +
+                                  " - 👨‍🏫 " +
                                   resear.instructorsPoints +
                                   " - 👨‍🔬 " +
                                   resear.expPoints +
