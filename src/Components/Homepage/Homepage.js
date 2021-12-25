@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import ReactPageScroller from "react-page-scroller";
-
 import {
   firebaseOnecademyState,
   themeState,
@@ -82,16 +80,16 @@ const Homepage = (props) => {
         currentPage={currentPage}
         handleThemeSwitchCallback={handleThemeSwitchCallback}
       />
-      <ReactPageScroller
+      {/* <ReactPageScroller
         pageOnChange={handlePageChange}
         customPageNumber={currentPage}
         renderAllPagesOnFirstRender={true}
         containerHeight={window.innerWidth > 900 ? "89vh" : "100vh"}
-      >
-        <HomeLanding theme={theme} />
-        <UniversitiesMap theme={theme} />
-        <NetworkClusters theme={theme} />
-      </ReactPageScroller>
+      > */}
+      <HomeLanding theme={theme} />
+      <UniversitiesMap theme={theme} />
+      <NetworkClusters theme={theme} />
+      {/* </ReactPageScroller> */}
     </div>
   );
 };

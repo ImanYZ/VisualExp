@@ -99,14 +99,14 @@ const ExperimentPoints = (props) => {
               eSessions[eSessionIdx] = eSessionObj;
             }
             const theDate = getISODateString(eSessionData.sTime.toDate());
-            const dPointIdx = dPoints.findIndex((eSe) => eSe.date === theDate);
+            const dPointIdx = dPoints.findIndex((eSe) => eSe.day === theDate);
             if (dPointIdx === -1) {
               dPoints.push({
-                date: theDate,
+                day: theDate,
                 value: eSessionData.points,
               });
             } else {
-              dPoints.value += eSessionData.points;
+              dPoints[dPointIdx].value += eSessionData.points;
             }
           }
         }
@@ -136,6 +136,7 @@ const ExperimentPoints = (props) => {
     }
   }, [project, fullname]);
 
+  console.log({ dailyPoints });
   return (
     <>
       <Alert severity="success">
@@ -252,30 +253,31 @@ const ExperimentPoints = (props) => {
           sessions you ran, are not in the table yet.
         </p>
       </Alert>
-      <ResponsiveCalendar
-        data={dailyPoints}
-        from="2021-05-01"
-        to="2022-05-01"
-        emptyColor="#eeeeee"
-        colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
-        margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
-        yearSpacing={40}
-        monthBorderColor="#ffffff"
-        dayBorderWidth={2}
-        dayBorderColor="#ffffff"
-        legends={[
-          {
-            anchor: "bottom-right",
-            direction: "row",
-            translateY: 36,
-            itemCount: 4,
-            itemWidth: 42,
-            itemHeight: 36,
-            itemsSpacing: 14,
-            itemDirection: "right-to-left",
-          },
-        ]}
-      />
+      <div id="DataVisualization">
+        <ResponsiveCalendar
+          data={dailyPoints}
+          from="2021-05-01"
+          to="2022-05-01"
+          emptyColor="#eeeeee"
+          margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+          yearSpacing={40}
+          monthBorderColor="#ffffff"
+          dayBorderWidth={2}
+          dayBorderColor="#ffffff"
+          legends={[
+            {
+              anchor: "bottom-right",
+              direction: "row",
+              translateY: 36,
+              itemCount: 4,
+              itemWidth: 42,
+              itemHeight: 36,
+              itemsSpacing: 14,
+              itemDirection: "right-to-left",
+            },
+          ]}
+        />
+      </div>
       <div className="DataGridBox">
         <DataGrid
           rows={expSessions}

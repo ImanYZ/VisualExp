@@ -138,7 +138,10 @@ const RouterNav = (props) => {
       const researcherDoc = await researcherRef.get();
       if (researcherDoc.exists) {
         const researcherData = researcherDoc.data();
-        if (!isToday(researcherData.lastLoad.toDate())) {
+        if (
+          !("lastLoad" in researcherData) ||
+          !isToday(researcherData.lastLoad.toDate())
+        ) {
           await researcherRef.update({
             lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
           });

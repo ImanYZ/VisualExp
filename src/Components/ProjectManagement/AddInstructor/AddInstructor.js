@@ -26,6 +26,9 @@ import {
 } from "../../../store/AuthAtoms";
 import {
   projectState,
+  instructorsState,
+  othersInstructorsState,
+  otherInstructorState,
   instructorsTodayState,
   upvotedInstructorsTodayState,
 } from "../../../store/ProjectAtoms";
@@ -540,6 +543,12 @@ const AddInstructor = (props) => {
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
+  const [instructors, setInstructors] = useRecoilState(instructorsState);
+  const [othersInstructors, setOthersInstructors] = useRecoilState(
+    othersInstructorsState
+  );
+  const [otherInstructor, setOtherInstructor] =
+    useRecoilState(otherInstructorState);
   const [instructorsToday, setInstructorsToday] = useRecoilState(
     instructorsTodayState
   );
@@ -560,9 +569,6 @@ const AddInstructor = (props) => {
   const [institutionInput, setInstitutionInput] = useState("");
   const [institutions, setInstitutions] = useState([]);
   const [invalidInstructor, setInvalidInstructor] = useState("");
-  const [instructors, setInstructors] = useState([]);
-  const [othersInstructors, setOthersInstructors] = useState([]);
-  const [otherInstructor, setOtherInstructor] = useState({});
   const [instructorsLoaded, setInstructorsLoaded] = useState(false);
   const [instructorsChanges, setInstructorsChanges] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -600,10 +606,6 @@ const AddInstructor = (props) => {
       });
       return () => {
         setInstructorsChanges([]);
-        setInstructorsToday(0);
-        setInstructors([]);
-        setOthersInstructors([]);
-        setOtherInstructor({});
         instructorsSnapshot();
       };
     }
@@ -625,7 +627,6 @@ const AddInstructor = (props) => {
       );
       return () => {
         setVotesChanges([]);
-        setUpvotedInstructorsToday(0);
         instructorVotesSnapshot();
       };
     }
@@ -1149,7 +1150,10 @@ const AddInstructor = (props) => {
           instructorIdx !== -1 &&
           oInstructors[instructorIdx][clickedCell.field] !== "O"
         ) {
-          oInstructors[instructorIdx][clickedCell.field] = "O";
+          oInstructors[instructorIdx] = {
+            ...oInstructors[instructorIdx],
+            [clickedCell.field]: "O",
+          };
           setOthersInstructors(oInstructors);
           await firebase.idToken();
           await axios.post("/voteInstructor", {

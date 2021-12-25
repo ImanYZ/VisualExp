@@ -71,3 +71,8 @@ button.ProjectButton {
 button.ProjectButton:hover {
   background-color: rgb(16, 160, 255);
 }
+
+#DataVisualization {
+  height: 340px;
+  width: 100%;
+}

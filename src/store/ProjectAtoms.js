@@ -35,6 +35,21 @@ export const upVotedTodayState = atom({
   default: 0,
 });
 
+export const instructorsState = atom({
+  key: "instructorsState",
+  default: [],
+});
+
+export const othersInstructorsState = atom({
+  key: "othersInstructorsState",
+  default: [],
+});
+
+export const otherInstructorState = atom({
+  key: "otherInstructorState",
+  default: {},
+});
+
 export const instructorsTodayState = atom({
   key: "instructorsTodayState",
   default: 0,
