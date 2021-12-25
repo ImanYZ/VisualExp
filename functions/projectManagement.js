@@ -817,7 +817,7 @@ exports.loadfeedbackCodes = async (req, res) => {
   return res.status(500).json({ done: true });
 };
 
-exports.assignExperimentSessionsPoints = async (req, res) => {
+exports.assignExperimentSessionsPoints = async (context) => {
   try {
     const researchersInfo = [];
     const researchersDocs = await db.collection("researchers").get();
@@ -942,10 +942,10 @@ exports.assignExperimentSessionsPoints = async (req, res) => {
         }
       }
     }
-    return res.status(200).json({});
+    return null;
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
+    return null;
   }
 };
 

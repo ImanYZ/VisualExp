@@ -39,7 +39,6 @@ app.use(express.json());
 app.use(cors());
 
 app.get("/loadImage/:contactId/:randNum", loadImage);
-app.get("/assignExperimentSessionsPoints", assignExperimentSessionsPoints);
 app.get("/loadContacts", loadContacts);
 app.get("/sendPersonalInvitations", sendPersonalInvitations);
 app.get("/incrementMonths", incrementMonths);
@@ -75,6 +74,10 @@ exports.deleteUser = functions.firestore
   .document("users/{fullname}")
   .onDelete(deleteUser);
 
-exports.scheduledFunction = functions.pubsub
+exports.updateNotTakenSessionsScheduler = functions.pubsub
   .schedule("every 40 minutes")
   .onRun(updateNotTakenSessions);
+
+exports.assignExperimentSessionsPointsScheduler = functions.pubsub
+  .schedule("every 24 hours")
+  .onRun(assignExperimentSessionsPoints);
