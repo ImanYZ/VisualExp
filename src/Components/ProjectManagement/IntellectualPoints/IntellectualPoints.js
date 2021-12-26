@@ -777,6 +777,7 @@ const IntellectualPoints = (props) => {
           from="2021-05-01"
           to="2022-05-01"
           emptyColor="#eeeeee"
+          colors={["#61cdbb", "#97e3d5"]}
           margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
           yearSpacing={40}
           monthBorderColor="#ffffff"

@@ -250,7 +250,7 @@ const ExperimentPoints = (props) => {
         <h2>Update time:</h2>
         <p>
           We update the table below on a weekly basis. Don't panic if the
-          sessions you ran, are not in the table yet.
+          sessions you ran are not in the table yet.
         </p>
       </Alert>
       <div id="DataVisualization">
@@ -259,6 +259,7 @@ const ExperimentPoints = (props) => {
           from="2021-05-01"
           to="2022-05-01"
           emptyColor="#eeeeee"
+          colors={["#61cdbb", "#97e3d5"]}
           margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
           yearSpacing={40}
           monthBorderColor="#ffffff"
