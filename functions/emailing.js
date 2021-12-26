@@ -123,11 +123,12 @@ exports.sendPersonalInvitations = async (req, res) => {
                     emailSent: admin.firestore.Timestamp.fromDate(new Date()),
                     reminders: 0,
                   });
+                } else {
+                  await contactRef.update({
+                    emailSent: admin.firestore.Timestamp.fromDate(new Date()),
+                    reminders: reminders + 1,
+                  });
                 }
-                await contactRef.update({
-                  emailSent: admin.firestore.Timestamp.fromDate(new Date()),
-                  reminders: reminders + 1,
-                });
               }
             });
           }

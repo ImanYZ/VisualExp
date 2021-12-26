@@ -10,6 +10,7 @@ const {
   retrieveData,
   feedbackData,
   loadContacts,
+  reassignAllPConditionNums,
 } = require("./users");
 const {
   voteEndpoint,
@@ -17,7 +18,6 @@ const {
   deleteActivity,
   assignExperimentSessionsPoints,
   updateNotTakenSessions,
-  incrementMonths,
 } = require("./projectManagement");
 const {
   loadImage,
@@ -41,7 +41,7 @@ app.use(cors());
 app.get("/loadImage/:contactId/:randNum", loadImage);
 app.get("/loadContacts", loadContacts);
 app.get("/sendPersonalInvitations", sendPersonalInvitations);
-app.get("/incrementMonths", incrementMonths);
+app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
