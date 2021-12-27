@@ -252,6 +252,13 @@ const ExperimentPoints = (props) => {
           We update the table below on a weekly basis. Don't panic if the
           sessions you ran are not in the table yet.
         </p>
+        <h2>Calendar visualization:</h2>
+        <p>
+          Each small square indicates a day. The intensity of the color
+          indicates the number of points you earned on that day. You can hover
+          on the greeen dotes to see the exact date and the number of points you
+          earned on that day.
+        </p>
       </Alert>
       <div id="DataVisualization">
         <ResponsiveCalendar
@@ -259,7 +266,7 @@ const ExperimentPoints = (props) => {
           from="2021-05-01"
           to="2022-05-01"
           emptyColor="#eeeeee"
-          colors={["#61cdbb", "#97e3d5"]}
+          colors={["#97e3d5", "#61cdbb"]}
           margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
           yearSpacing={40}
           monthBorderColor="#ffffff"

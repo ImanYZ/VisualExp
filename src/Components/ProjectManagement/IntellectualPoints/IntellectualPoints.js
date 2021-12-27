@@ -771,6 +771,22 @@ const IntellectualPoints = (props) => {
     <>
       {isAdmin && <AdminIntellectualPoints />}
       <h2>Others' Intellectual Activities:</h2>
+      <Alert className="VoteActivityAlert" severity="success">
+        <h2>Calendar visualization:</h2>
+        <ul>
+          <li>
+            <strong>Each small square</strong> indicates a day. The intensity of
+            the color indicates the number of points you earned on that day. You
+            can hover on the greeen dotes to see the exact date and whether you
+            earned a point on that day.
+          </li>
+          <li>
+            <strong>A point per day</strong>: you've earned one point for every
+            25 upvotes you cast on your colleagues' activities in every single
+            day. So, on each single day, you've earned one or zero points.
+          </li>
+        </ul>
+      </Alert>
       <div id="DataVisualization">
         <ResponsiveCalendar
           data={dailyPoints}
