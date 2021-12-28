@@ -1,17 +1,17 @@
 import { createTheme } from "@mui/material/styles";
 
-const arcBlue = "#0B72B9";
-const arcOrange = "#FFBA60";
-const arcGrey = "#868686";
+const arcBlack = "#121212";
+const arcOrange = "#FF8229";
+const arcGrey = "#b3b3b3";
 
 export default createTheme({
   palette: {
     common: {
-      blue: arcBlue,
+      black: arcBlack,
       orange: arcOrange,
     },
     primary: {
-      main: arcBlue,
+      main: arcBlack,
     },
     secondary: {
       main: arcOrange,
@@ -35,24 +35,24 @@ export default createTheme({
       fontFamily: "Raleway",
       fontWeight: 700,
       fontSize: "2.5rem",
-      color: arcBlue,
+      color: arcBlack,
       lineHeight: 1.5,
     },
     h3: {
       fontFamily: "Pacifico",
       fontSize: "2.5rem",
-      color: arcBlue,
+      color: arcBlack,
     },
     h4: {
       fontFamily: "Raleway",
       fontSize: "1.75rem",
-      color: arcBlue,
+      color: arcBlack,
       fontWeight: 700,
     },
     h6: {
       fontWeight: 500,
       fontFamily: "Raleway",
-      color: arcBlue,
+      color: arcBlack,
     },
     subtitle1: {
       fontSize: "1.25rem",
@@ -75,10 +75,10 @@ export default createTheme({
       color: arcGrey,
     },
     learnButton: {
-      borderColor: arcBlue,
+      borderColor: arcBlack,
       borderWidth: 2,
       textTransform: "none",
-      color: arcBlue,
+      color: arcBlack,
       borderRadius: 50,
       fontFamily: "Roboto",
       fontWeight: "bold",
@@ -87,7 +87,7 @@ export default createTheme({
   overrides: {
     MuiInputLabel: {
       root: {
-        color: arcBlue,
+        color: arcBlack,
         fontSize: "1rem",
       },
     },
@@ -98,10 +98,10 @@ export default createTheme({
       },
       underline: {
         "&:before": {
-          borderBottom: `2px solid ${arcBlue}`,
+          borderBottom: `2px solid ${arcBlack}`,
         },
         "&:hover:not($disabled):not($focused):not($error):before": {
-          borderBottom: `2px solid ${arcBlue}`,
+          borderBottom: `2px solid ${arcBlack}`,
         },
       },
     },

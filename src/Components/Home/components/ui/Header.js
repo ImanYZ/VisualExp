@@ -153,40 +153,45 @@ export default function Header(props) {
   };
 
   const menuOptions = [
-    { name: "Services", link: "/services", activeIndex: 1, selectedIndex: 0 },
+    {
+      name: "Services",
+      link: "/Home/services",
+      activeIndex: 1,
+      selectedIndex: 0,
+    },
     {
       name: "Custom Software Development",
-      link: "/customsoftware",
+      link: "/Home/customsoftware",
       activeIndex: 1,
       selectedIndex: 1,
     },
     {
       name: "iOS/Android App Development",
-      link: "/mobileapps",
+      link: "/Home/mobileapps",
       activeIndex: 1,
       selectedIndex: 2,
     },
     {
       name: "Website Development",
-      link: "/websites",
+      link: "/Home/websites",
       activeIndex: 1,
       selectedIndex: 3,
     },
   ];
 
   const routes = [
-    { name: "Home", link: "/", activeIndex: 0 },
+    { name: "Home", link: "/Home/", activeIndex: 0 },
     {
       name: "Services",
-      link: "/services",
+      link: "/Home/services",
       activeIndex: 1,
       ariaOwns: anchorEl ? "simple-menu" : undefined,
       ariaPopup: anchorEl ? "true" : undefined,
       mouseOver: (event) => handleClick(event),
     },
-    { name: "The Revolution", link: "/revolution", activeIndex: 2 },
-    { name: "About Us", link: "/about", activeIndex: 3 },
-    { name: "Contact Us", link: "/contact", activeIndex: 4 },
+    { name: "The Revolution", link: "/Home/revolution", activeIndex: 2 },
+    { name: "About Us", link: "/Home/about", activeIndex: 3 },
+    { name: "Contact Us", link: "/Home/contact", activeIndex: 4 },
   ];
 
   useEffect(() => {
@@ -203,7 +208,7 @@ export default function Header(props) {
             }
           }
           break;
-        case "/estimate":
+        case "/Home/estimate":
           props.setValue(5);
           break;
         default:
@@ -235,7 +240,7 @@ export default function Header(props) {
       </Tabs>
       <Button
         component={Link}
-        to="/estimate"
+        to="/Home/estimate"
         variant="contained"
         color="secondary"
         className={classes.button}
@@ -319,7 +324,7 @@ export default function Header(props) {
               root: classes.drawerItemEstimate,
               selected: classes.drawerItemSelected,
             }}
-            to="/estimate"
+            to="/Home/estimate"
             selected={props.value === 5}
           >
             <ListItemText className={classes.drawerItem} disableTypography>
@@ -345,7 +350,7 @@ export default function Header(props) {
           <Toolbar disableGutters>
             <Button
               component={Link}
-              to="/"
+              to="/Home/"
               disableRipple
               onClick={() => props.setValue(0)}
               className={classes.logoContainer}

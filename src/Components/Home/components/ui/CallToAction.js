@@ -87,7 +87,7 @@ export default function CallToAction(props) {
             <Grid container justify={matchesSM ? "center" : undefined} item>
               <Button
                 component={Link}
-                to="/revolution"
+                to="/Home/revolution"
                 variant="outlined"
                 className={classes.learnButton}
                 onClick={() => props.setValue(2)}
@@ -106,7 +106,7 @@ export default function CallToAction(props) {
       <Grid item>
         <Button
           component={Link}
-          to="/estimate"
+          to="/Home/estimate"
           variant="contained"
           className={classes.estimateButton}
           onClick={() => props.setValue(5)}

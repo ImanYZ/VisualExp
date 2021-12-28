@@ -71,7 +71,7 @@ export default function MobileApps(props) {
             <IconButton
               style={{ backgroundColor: "transparent" }}
               component={Link}
-              to="/customsoftware"
+              to="/Home/customsoftware"
               onClick={() => props.setSelectedIndex(1)}
             >
               <img
@@ -120,7 +120,7 @@ export default function MobileApps(props) {
             <IconButton
               style={{ backgroundColor: "transparent" }}
               component={Link}
-              to="/websites"
+              to="/Home/websites"
               onClick={() => props.setSelectedIndex(3)}
             >
               <img

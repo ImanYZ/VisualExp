@@ -93,7 +93,7 @@ export default function Services(props) {
             </Typography>
             <Button
               component={Link}
-              to="/mobileapps"
+              to="/Home/mobileapps"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {
@@ -145,7 +145,7 @@ export default function Services(props) {
             </Typography>
             <Button
               component={Link}
-              to="/customsoftware"
+              to="/Home/customsoftware"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {
@@ -197,7 +197,7 @@ export default function Services(props) {
             </Typography>
             <Button
               component={Link}
-              to="/websites"
+              to="/Home/websites"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {

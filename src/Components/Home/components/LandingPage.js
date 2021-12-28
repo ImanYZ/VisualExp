@@ -163,7 +163,7 @@ export default function LandingPage(props) {
               <Grid item>
                 <Button
                   component={Link}
-                  to="/estimate"
+                  to="/Home/estimate"
                   className={classes.estimateButton}
                   variant="contained"
                   onClick={() => props.setValue(5)}
@@ -174,7 +174,7 @@ export default function LandingPage(props) {
               <Grid item>
                 <Button
                   component={Link}
-                  to="/revolution"
+                  to="/Home/revolution"
                   className={classes.learnButtonHero}
                   variant="outlined"
                   onClick={() => props.setValue(2)}
@@ -220,7 +220,7 @@ export default function LandingPage(props) {
             </Typography>
             <Button
               component={Link}
-              to="/customsoftware"
+              to="/Home/customsoftware"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {
@@ -270,7 +270,7 @@ export default function LandingPage(props) {
             </Typography>
             <Button
               component={Link}
-              to="/mobileapps"
+              to="/Home/mobileapps"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {
@@ -320,7 +320,7 @@ export default function LandingPage(props) {
             </Typography>
             <Button
               component={Link}
-              to="/websites"
+              to="/Home/websites"
               variant="outlined"
               className={classes.learnButton}
               onClick={() => {
@@ -372,7 +372,7 @@ export default function LandingPage(props) {
                   </Typography>
                   <Button
                     component={Link}
-                    to="/revolution"
+                    to="/Home/revolution"
                     className={classes.learnButtonHero}
                     variant="outlined"
                     onClick={() => props.setValue(2)}
@@ -425,7 +425,7 @@ export default function LandingPage(props) {
                 <Grid item>
                   <Button
                     component={Link}
-                    to="/about"
+                    to="/Home/about"
                     variant="outlined"
                     style={{ color: "white", borderColor: "white" }}
                     className={classes.learnButton}
@@ -458,7 +458,7 @@ export default function LandingPage(props) {
                 <Grid item>
                   <Button
                     component={Link}
-                    to="/contact"
+                    to="/Home/contact"
                     variant="outlined"
                     style={{ color: "white", borderColor: "white" }}
                     className={classes.learnButton}

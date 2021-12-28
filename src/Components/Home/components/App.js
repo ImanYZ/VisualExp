@@ -30,103 +30,70 @@ function App() {
       />
       <Routes>
         <Route
-          exact
-          path="/"
-          render={(props) => (
-            <LandingPage
-              {...props}
-              setValue={setValue}
-              setSelectedIndex={setSelectedIndex}
-            />
-          )}
+          path="*/Home/services"
+          element={
+            <Services setValue={setValue} setSelectedIndex={setSelectedIndex} />
+          }
         />
         <Route
-          exact
-          path="/services"
-          render={(props) => (
-            <Services
-              {...props}
-              setValue={setValue}
-              setSelectedIndex={setSelectedIndex}
-            />
-          )}
-        />
-        <Route
-          exact
-          path="/customsoftware"
-          render={(props) => (
+          path="*/Home/customsoftware"
+          element={
             <CustomSoftware
-              {...props}
               setValue={setValue}
               setSelectedIndex={setSelectedIndex}
             />
-          )}
+          }
         />
         <Route
-          exact
-          path="/mobileapps"
-          render={(props) => (
+          path="*/Home/mobileapps"
+          element={
             <MobileApps
-              {...props}
               setValue={setValue}
               setSelectedIndex={setSelectedIndex}
             />
-          )}
+          }
         />
         <Route
-          exact
-          path="/websites"
-          render={(props) => (
-            <Websites
-              {...props}
-              setValue={setValue}
-              setSelectedIndex={setSelectedIndex}
-            />
-          )}
+          path="*/Home/websites"
+          element={
+            <Websites setValue={setValue} setSelectedIndex={setSelectedIndex} />
+          }
         />
         <Route
-          exact
-          path="/revolution"
-          render={(props) => (
+          path="*/Home/revolution"
+          element={
             <Revolution
-              {...props}
               setValue={setValue}
               setSelectedIndex={setSelectedIndex}
             />
-          )}
+          }
         />
         <Route
-          exact
-          path="/about"
-          render={(props) => (
-            <About
-              {...props}
-              setValue={setValue}
-              setSelectedIndex={setSelectedIndex}
-            />
-          )}
+          path="*/Home/about"
+          element={
+            <About setValue={setValue} setSelectedIndex={setSelectedIndex} />
+          }
         />
         <Route
-          exact
-          path="/contact"
-          render={(props) => (
-            <Contact
-              {...props}
-              setValue={setValue}
-              setSelectedIndex={setSelectedIndex}
-            />
-          )}
+          path="*/Home/contact"
+          element={
+            <Contact setValue={setValue} setSelectedIndex={setSelectedIndex} />
+          }
         />
         <Route
-          exact
-          path="/estimate"
-          render={(props) => (
-            <Estimate
-              {...props}
+          path="*/Home/estimate"
+          element={
+            <Estimate setValue={setValue} setSelectedIndex={setSelectedIndex} />
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <LandingPage
               setValue={setValue}
               setSelectedIndex={setSelectedIndex}
             />
-          )}
+          }
         />
       </Routes>
       <Footer setValue={setValue} setSelectedIndex={setSelectedIndex} />

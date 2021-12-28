@@ -106,7 +106,7 @@ export default function CustomSoftware(props) {
             <IconButton
               style={{ backgroundColor: "transparent" }}
               component={Link}
-              to="/services"
+              to="/Home/services"
               onClick={() => props.setSelectedIndex(0)}
             >
               <img src={backArrow} alt="Back to Services Page" />
@@ -164,7 +164,7 @@ export default function CustomSoftware(props) {
             <IconButton
               style={{ backgroundColor: "transparent" }}
               component={Link}
-              to="/mobileapps"
+              to="/Home/mobileapps"
               onClick={() => props.setSelectedIndex(2)}
             >
               <img

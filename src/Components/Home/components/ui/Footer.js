@@ -71,7 +71,7 @@ export default function Footer(props) {
                 item
                 component={Link}
                 onClick={() => props.setValue(0)}
-                to="/"
+                to="/Home/"
                 className={classes.link}
               >
                 Home
@@ -87,7 +87,7 @@ export default function Footer(props) {
                   props.setValue(1);
                   props.setSelectedIndex(0);
                 }}
-                to="/services"
+                to="/Home/services"
                 className={classes.link}
               >
                 Services
@@ -95,7 +95,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/customsoftware"
+                to="/Home/customsoftware"
                 className={classes.link}
                 onClick={() => {
                   props.setValue(1);
@@ -107,7 +107,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/mobileapps"
+                to="/Home/mobileapps"
                 className={classes.link}
                 onClick={() => {
                   props.setValue(1);
@@ -123,7 +123,7 @@ export default function Footer(props) {
                   props.setValue(1);
                   props.setSelectedIndex(3);
                 }}
-                to="/websites"
+                to="/Home/websites"
                 className={classes.link}
               >
                 Website Development
@@ -135,7 +135,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/revolution"
+                to="/Home/revolution"
                 className={classes.link}
                 onClick={() => props.setValue(2)}
               >
@@ -144,7 +144,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/revolution"
+                to="/Home/revolution"
                 className={classes.link}
                 onClick={() => props.setValue(2)}
               >
@@ -153,7 +153,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/revolution"
+                to="/Home/revolution"
                 className={classes.link}
                 onClick={() => props.setValue(2)}
               >
@@ -162,7 +162,7 @@ export default function Footer(props) {
               <Grid
                 item
                 component={Link}
-                to="/revolution"
+                to="/Home/revolution"
                 className={classes.link}
                 onClick={() => props.setValue(2)}
               >
@@ -176,7 +176,7 @@ export default function Footer(props) {
                 item
                 component={Link}
                 onClick={() => props.setValue(3)}
-                to="/about"
+                to="/Home/about"
                 className={classes.link}
               >
                 About Us
@@ -185,7 +185,7 @@ export default function Footer(props) {
                 item
                 component={Link}
                 onClick={() => props.setValue(3)}
-                to="/about"
+                to="/Home/about"
                 className={classes.link}
               >
                 History
@@ -194,7 +194,7 @@ export default function Footer(props) {
                 item
                 component={Link}
                 onClick={() => props.setValue(3)}
-                to="/about"
+                to="/Home/about"
                 className={classes.link}
               >
                 Team
@@ -207,7 +207,7 @@ export default function Footer(props) {
                 item
                 component={Link}
                 onClick={() => props.setValue(4)}
-                to="/contact"
+                to="/Home/contact"
                 className={classes.link}
               >
                 Contact Us
