@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 
 import YueKuang from "../../../assets/Yue_Kuang.png";
 import ShannonKenny from "../../../assets/Shannon_Kenny.png";
@@ -41,20 +41,26 @@ const ContactLeaders = (props) => {
   const row = topPictures.map((leader, i) => {
     return (
       <div key={i}>
-        <Grid container > 
-        <p className="LeaderColumnTitles"> {columnTitles[i]}</p>
+        <Grid container>
+          <p className="LeaderColumnTitles"> {columnTitles[i]}</p>
         </Grid>
-        <Grid container >  
-          <div className= "LeaderInfoDiv">
+        <Grid container>
+          <div className="LeaderInfoDiv">
             <div className="LeaderBox">
-                <a href="mailto: onecademy@umich.edu"> 
-                <img className="LeaderImage" src={leader.img} alt="leader"/></a>
-                <p className="LeaderName"> {leader.name} </p>
-            </div> 
-            <div className="LeaderBox"> 
-                <a href="mailto: onecademy@umich.edu">
-                <img className="LeaderImage" src={bottomPictures[i].img}  alt="leader"/> </a>
-                <p className="LeaderName">{bottomPictures[i].name}</p>
+              <a href="mailto: onecademy@umich.edu">
+                <img className="LeaderImage" src={leader.img} alt="leader" />
+              </a>
+              <p className="LeaderName"> {leader.name} </p>
+            </div>
+            <div className="LeaderBox">
+              <a href="mailto: onecademy@umich.edu">
+                <img
+                  className="LeaderImage"
+                  src={bottomPictures[i].img}
+                  alt="leader"
+                />{" "}
+              </a>
+              <p className="LeaderName">{bottomPictures[i].name}</p>
             </div>
           </div>
         </Grid>
@@ -65,11 +71,13 @@ const ContactLeaders = (props) => {
   return (
     <div className="ContactLeader">
       <p className="gradientTextLeader">1Cademy Community Leaders</p>
-      <div className="ContactContainer" >
-        <Grid container 
-              direction="column" 
-              justify="flex-start" 
-              alignItems="flex-start">
+      <div className="ContactContainer">
+        <Grid
+          container
+          direction="column"
+          justify="flex-start"
+          alignItems="flex-start"
+        >
           {row}
         </Grid>
       </div>

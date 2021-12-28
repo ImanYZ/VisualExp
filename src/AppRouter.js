@@ -18,7 +18,7 @@ import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
-import Homepage from "./Components/Homepage/Homepage";
+import Home from "./Components/Home/components/App";
 
 import "./App.css";
 
@@ -128,7 +128,7 @@ const AppRouter = (props) => {
 
   return (
     <Routes>
-      <Route path="/Home" element={<Homepage />} />
+      <Route path="/Home" element={<Home />} />
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}

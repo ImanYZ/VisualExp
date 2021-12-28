@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Button, Grid } from "@material-ui/core";
+import { Button, Grid } from "@mui/material";
 
 import ValidatedInput from "../../ValidatedInput/ValidatedInput";
 
