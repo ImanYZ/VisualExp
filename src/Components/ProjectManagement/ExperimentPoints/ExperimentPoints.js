@@ -254,10 +254,10 @@ const ExperimentPoints = (props) => {
         </p>
         <h2>Calendar visualization:</h2>
         <p>
-          Each small square indicates a day. The intensity of the color
-          indicates the number of points you earned on that day. You can hover
-          on the greeen dotes to see the exact date and the number of points you
-          earned on that day.
+          Each small square indicates a day. The shades of the color indicate
+          the number of points you earned on that day. You can hover your mouse
+          over each of the green squares to see the exact date and the number of
+          points you earned on that day.
         </p>
       </Alert>
       <div id="DataVisualization">

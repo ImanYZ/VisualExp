@@ -775,10 +775,10 @@ const IntellectualPoints = (props) => {
         <h2>Calendar visualization:</h2>
         <ul>
           <li>
-            <strong>Each small square</strong> indicates a day. The intensity of
-            the color indicates the number of points you earned on that day. You
-            can hover on the greeen dotes to see the exact date and whether you
-            earned a point on that day.
+            <strong>Each small square</strong> indicates a day. The shades of
+            the color indicate the number of points you earned on that day. You
+            can hover your mouse over each of the green squares to see the exact
+            date and the number of points you earned on that day.
           </li>
           <li>
             <strong>A point per day</strong>: you've earned one point for every
