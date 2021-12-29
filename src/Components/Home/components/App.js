@@ -30,13 +30,13 @@ function App() {
       />
       <Routes>
         <Route
-          path="*/Home/services"
+          path="/services"
           element={
             <Services setValue={setValue} setSelectedIndex={setSelectedIndex} />
           }
         />
         <Route
-          path="*/Home/customsoftware"
+          path="/customsoftware"
           element={
             <CustomSoftware
               setValue={setValue}
@@ -45,7 +45,7 @@ function App() {
           }
         />
         <Route
-          path="*/Home/mobileapps"
+          path="/mobileapps"
           element={
             <MobileApps
               setValue={setValue}
@@ -54,13 +54,13 @@ function App() {
           }
         />
         <Route
-          path="*/Home/websites"
+          path="/websites"
           element={
             <Websites setValue={setValue} setSelectedIndex={setSelectedIndex} />
           }
         />
         <Route
-          path="*/Home/revolution"
+          path="/revolution"
           element={
             <Revolution
               setValue={setValue}
@@ -69,25 +69,25 @@ function App() {
           }
         />
         <Route
-          path="*/Home/about"
+          path="/about"
           element={
             <About setValue={setValue} setSelectedIndex={setSelectedIndex} />
           }
         />
         <Route
-          path="*/Home/contact"
+          path="/contact"
           element={
             <Contact setValue={setValue} setSelectedIndex={setSelectedIndex} />
           }
         />
         <Route
-          path="*/Home/estimate"
+          path="/estimate"
           element={
             <Estimate setValue={setValue} setSelectedIndex={setSelectedIndex} />
           }
         />
         <Route
-          path="*"
+          path="/*"
           element={
             <LandingPage
               setValue={setValue}
