@@ -10,7 +10,8 @@ import MuiAlert from "@mui/material/Alert";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
-import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { firebaseState } from "../../store/AuthAtoms";
@@ -29,6 +30,7 @@ const LifeLogger = () => {
   const [projects, setProjects] = useState({});
   const [sent, setSent] = useState(false);
   const [projectExpanded, setProjectExpanded] = React.useState(false);
+  const [sectionExpanded, setSectionExpanded] = React.useState(false);
 
   useEffect(() => {
     const getProjects = async () => {
@@ -41,16 +43,33 @@ const LifeLogger = () => {
             },
           }
         );
-        console.log({ data: tDTasks.data });
         const projs = {};
-        // for (let tsk of tDTasks.data) {
-        //     if (tsk.project_id in projs) {
-
-        //     } else {
-        //         projs[tsk.project_id] = {[tsk.section_id]: []}
-        //     }
-        // }
-        // setProjects(projs);
+        for (let tsk of tDTasks.data) {
+          if (tsk.project_id in projs) {
+            if (tsk.section_id in projs[tsk.project_id].sections) {
+              projs[tsk.project_id].sections[tsk.section_id].tasks.push({
+                id: tsk.id,
+                content: tsk.content,
+              });
+            } else {
+              projs[tsk.project_id].sections[tsk.section_id] = {
+                tasks: [{ id: tsk.id, content: tsk.content }],
+                name: tsk.project_id,
+              };
+            }
+          } else {
+            projs[tsk.project_id] = {
+              sections: {
+                [tsk.section_id]: {
+                  tasks: [{ id: tsk.id, content: tsk.content }],
+                  name: tsk.section_id,
+                },
+              },
+              name: tsk.project_id,
+            };
+          }
+        }
+        setProjects(projs);
       } catch (err) {
         console.log({ err });
       }
@@ -58,8 +77,13 @@ const LifeLogger = () => {
     getProjects();
   }, []);
 
-  const handleChange = (panel) => (event, isProjectExpanded) => {
+  const clickProject = (panel) => (event, isProjectExpanded) => {
     setProjectExpanded(isProjectExpanded ? panel : false);
+    setSectionExpanded(false);
+  };
+
+  const clickSection = (panel) => (event, isSectionExpanded) => {
+    setSectionExpanded(isSectionExpanded ? panel : false);
   };
 
   const closeSnackbar = (event, reason) => {
@@ -87,30 +111,52 @@ const LifeLogger = () => {
       {Object.keys(projects).map((prjK) => {
         return (
           <Accordion
-            expanded={projectExpanded === projects[prjK].id}
-            onChange={handleChange(projects[prjK].id)}
+            expanded={projectExpanded === prjK}
+            onChange={clickProject(prjK)}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls={projects[prjK].id + "bh-content"}
-              id={projects[prjK].id + "bh-header"}
+              aria-controls={prjK + "bh-content"}
+              id={prjK + "bh-header"}
             >
               {projects[prjK].name}
             </AccordionSummary>
             <AccordionDetails>
-              <Typography>
-                Nulla facilisi. Phasellus sollicitudin nulla et quam mattis
-                feugiat. Aliquam eget maximus est, id dignissim quam.
-              </Typography>
+              {Object.keys(projects[prjK].sections).map((sectionK) => {
+                return (
+                  <Accordion
+                    expanded={clickSection === sectionK}
+                    onChange={clickProject(sectionK)}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      aria-controls={sectionK + "bh-content"}
+                      id={sectionK + "bh-header"}
+                    >
+                      {projects[prjK].sections[sectionK].name}
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={2} direction="row">
+                        {projects[prjK].sections[sectionK].tasks.map((task) => {
+                          return (
+                            <Chip
+                              label="Clickable"
+                              variant="outlined"
+                              onClick={schedule(task.content, 1)}
+                            >
+                              {task.content}
+                            </Chip>
+                          );
+                        })}
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
+                );
+              })}
             </AccordionDetails>
           </Accordion>
         );
       })}
-      <Stack spacing={2} direction="row">
-        <Button variant="outlined" onClick={schedule("💨 1 min", 1)}>
-          💨 1 min
-        </Button>
-      </Stack>
       <Snackbar open={sent} autoHideDuration={4000} onClose={closeSnackbar}>
         <Alert
           onClose={closeSnackbar}
