@@ -20,18 +20,15 @@
   width: 100%;
 }
 
-#ActivitySubmitButton,
-#InstructorSubmitButton {
+#SubmitButton {
   background-color: rgb(112, 187, 0);
 }
 
-#ClearActivityButton,
-#ClearInstructorButton {
+#ClearButton {
   background-color: rgb(255, 94, 0);
 }
 
-#ActivitySubmitButton.Disabled,
-#InstructorSubmitButton.Disabled {
+#SubmitButton.Disabled {
   background-color: rgb(163, 163, 163);
 }
 

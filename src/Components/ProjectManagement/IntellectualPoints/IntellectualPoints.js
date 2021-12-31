@@ -1101,7 +1101,7 @@ const IntellectualPoints = (props) => {
               )}
               <div id="ActivityDateTimeContainer">
                 <Button
-                  id="ActivitySubmitButton"
+                  id="SubmitButton"
                   onClick={activitySubmit}
                   className={!invalidActivity ? "Button" : "Button Disabled"}
                   variant="contained"

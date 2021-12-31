@@ -20,18 +20,6 @@
   width: 100%;
 }
 
-#ActivitySubmitButton {
-  background-color: rgb(112, 187, 0);
-}
-
-#ClearActivityButton {
-  background-color: rgb(255, 94, 0);
-}
-
-#ActivitySubmitButton.Disabled {
-  background-color: rgb(163, 163, 163);
-}
-
 #Leaderboard .LeaderboardItem {
   margin: 4px;
 }

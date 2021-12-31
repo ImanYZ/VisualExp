@@ -1527,7 +1527,7 @@ const AddInstructor = (props) => {
                 <div className="Error">{invalidInstructor}</div>
               )}
               <Button
-                id="InstructorSubmitButton"
+                id="SubmitButton"
                 onClick={submitInstructor}
                 className={!invalidInstructor ? "Button" : "Button Disabled"}
                 variant="contained"

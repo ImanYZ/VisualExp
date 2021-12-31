@@ -1,3 +1,12 @@
 #LifeLoggerContainer {
+  display: block;
+  overflow-y: auto;
+  overflow-x: auto;
+  height: 91vh;
   margin: 19px;
+}
+
+.TaskChip {
+  display: inline-block;
+  padding: 4px;
 }
