@@ -7,12 +7,6 @@ export const firebaseState = atom({
   dangerouslyAllowMutability: true,
 });
 
-export const firebaseOnecademyState = atom({
-  key: "firebaseOnecademyState",
-  default: firebaseOnecademy,
-  dangerouslyAllowMutability: true,
-});
-
 export const emailState = atom({
   key: "emailState",
   default: "",

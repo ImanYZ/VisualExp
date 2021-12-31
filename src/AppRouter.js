@@ -19,6 +19,7 @@ import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
 import Home from "./Components/Home/components/App";
+import LifeLogger from "./Components/LifeLogger/LifeLogger";
 
 import "./App.css";
 
@@ -126,6 +127,7 @@ const AppRouter = (props) => {
     }
   }, [firebase, email, fullname]);
 
+  console.log({ fullname });
   return (
     <Routes>
       <Route path="/Home/*" element={<Home />} />
@@ -160,6 +162,18 @@ const AppRouter = (props) => {
                 <Route
                   path="Activities/*"
                   element={<Activities activityName="Intellectual" />}
+                />
+                <Route
+                  path="LifeLog"
+                  element={
+                    email === "oneweb@umich.edu" ? (
+                      <LifeLogger />
+                    ) : (
+                      <div className="Error">
+                        You don't have permission to open this page!
+                      </div>
+                    )
+                  }
                 />
                 {/* Everything else, including /schedule goes to this one. */}
                 <Route

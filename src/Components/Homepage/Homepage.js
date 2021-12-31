@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import {
-  firebaseOnecademyState,
-  themeState,
-  themeOSState,
-} from "../../store/AuthAtoms";
+import { themeState, themeOSState } from "../../store/AuthAtoms";
+
+import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
 
 import UniversitiesMap from "./UniversitiesMap/UniversitiesMap";
 import HomeNavbar from "./HomeNavbar/HomeNavbar";

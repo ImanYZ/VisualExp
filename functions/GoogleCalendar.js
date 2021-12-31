@@ -11,7 +11,7 @@ const oAuth2Client = new OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET
 );
-const calendarId = process.env.CALENDAR_ID;
+const calendarId = process.env.UX_CALENDAR_ID;
 
 // Call the setCredentials method on our oAuth2Client instance and set our refresh token.
 oAuth2Client.setCredentials({
@@ -21,7 +21,7 @@ oAuth2Client.setCredentials({
 // Create a new calender instance.
 const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-// Insert new event to Google Calendar
+// Insert new event to UX Google Calendar
 exports.insertEvent = async (start, end, summary, description) => {
   const event = {
     summary,
@@ -178,3 +178,45 @@ exports.deleteEvent = async (eventId) => {
   //   };
   // };
 }
+
+// ************
+// Life Logging
+// ************
+
+// Insert new event to Life Logging Google Calendar
+exports.insertLifeLogEvent = async (start, end, summary, description) => {
+  const event = {
+    summary,
+    description,
+    //   "We'll match a UX researcher with you who is available at this time slot. " +
+    //   "If we cannot find anyone, based on your specified availability in the following days, " +
+    //   "we'll schedule another session for you and send you the corresponding Google Calendar invite.",
+    start: {
+      dateTime: start,
+      timeZone: new Intl.DateTimeFormat().resolvedOptions(start).timeZone,
+    },
+    end: {
+      dateTime: end,
+      timeZone: new Intl.DateTimeFormat().resolvedOptions(end).timeZone,
+    },
+    // attendees: [{ email: "oneweb@umich.edu" }],
+    reminders: {
+      useDefault: false,
+    },
+  };
+  try {
+    let response = await calendar.events.insert({
+      calendarId: process.env.LIFE_LOGS_CALENDAR_ID,
+      resource: event,
+    });
+
+    if (response["status"] == 200 && response["statusText"] === "OK") {
+      return response;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(`Error at insertEvent --> ${error}`);
+    return false;
+  }
+};

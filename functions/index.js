@@ -25,7 +25,12 @@ const {
   rescheduleEventNotificationEmail,
   sendPersonalInvitations,
 } = require("./emailing");
-const { schedule, allEvents, deleteEvent } = require("./scheduling");
+const {
+  schedule,
+  allEvents,
+  deleteEvent,
+  scheduleLifeLog,
+} = require("./scheduling");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -57,6 +62,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 app.post("/schedule", schedule);
 app.post("/allEvents", allEvents);
 app.post("/deleteEvent", deleteEvent);
+app.post("/scheduleLifeLog", scheduleLifeLog);
 
 // Misinformation Experiment
 app.get("/card", card);

@@ -2,7 +2,7 @@ import React, { useState, useEffect, Suspense } from "react";
 
 import { useRecoilValue } from "recoil";
 
-import { firebaseOnecademyState } from "../../../store/AuthAtoms";
+import { firebaseOnecademyState } from "../../../store/OneCademyAtoms";
 
 import "./UniversitiesMap.css";
 
