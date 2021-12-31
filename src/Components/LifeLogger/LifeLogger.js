@@ -108,6 +108,7 @@ const LifeLogger = () => {
 
   return (
     <div id="LifeLoggerContainer">
+      <div id="SubmitContainer"></div>
       {Object.keys(projects).map((prjK) => {
         return (
           <Accordion
@@ -136,7 +137,16 @@ const LifeLogger = () => {
                       {projects[prjK].sections[sectionK].name}
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Stack spacing={2} direction="row">
+                      <Stack spacing={1} direction="row">
+                        {prjK === "123" && sectionK === "123" && (
+                          <Chip
+                            label="Clickable"
+                            variant="outlined"
+                            onClick={schedule(task.content, 1)}
+                          >
+                            💨
+                          </Chip>
+                        )}
                         {projects[prjK].sections[sectionK].tasks.map((task) => {
                           return (
                             <Chip
