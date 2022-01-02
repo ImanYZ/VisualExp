@@ -20,7 +20,7 @@ import { makeStyles } from "@mui/styles";
 
 import MenuIcon from "@mui/icons-material/Menu";
 
-import logo from "../../assets/logo.svg";
+import logo from "../../../../assets/DarkModeLogo.svg";
 
 function ElevationScroll(props) {
   const { children } = props;
@@ -47,12 +47,12 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   logo: {
-    height: "8em",
+    height: "7em",
     [theme.breakpoints.down("md")]: {
-      height: "7em",
+      height: "5.5em",
     },
     [theme.breakpoints.down("xs")]: {
-      height: "5.5em",
+      height: "4em",
     },
   },
   logoContainer: {
@@ -218,7 +218,7 @@ export default function Header(props) {
   }, [props.value, menuOptions, props.selectedIndex, routes, props]);
 
   const tabs = (
-    <React.Fragment>
+    <>
       <Tabs
         value={props.value}
         onChange={handleChange}
@@ -278,11 +278,11 @@ export default function Header(props) {
           </MenuItem>
         ))}
       </Menu>
-    </React.Fragment>
+    </>
   );
 
   const drawer = (
-    <React.Fragment>
+    <>
       <SwipeableDrawer
         disableBackdropTransition={!iOS}
         disableDiscovery={iOS}
@@ -340,11 +340,11 @@ export default function Header(props) {
       >
         <MenuIcon className={classes.drawerIcon} />
       </IconButton>
-    </React.Fragment>
+    </>
   );
 
   return (
-    <React.Fragment>
+    <>
       <ElevationScroll>
         <AppBar position="fixed" className={classes.appbar}>
           <Toolbar disableGutters>
@@ -362,6 +362,6 @@ export default function Header(props) {
         </AppBar>
       </ElevationScroll>
       <div className={classes.toolbarMargin} />
-    </React.Fragment>
+    </>
   );
 }

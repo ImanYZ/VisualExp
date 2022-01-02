@@ -172,10 +172,10 @@ export default function Contact(props) {
   };
 
   const buttonContents = (
-    <React.Fragment>
+    <>
       Send Message
       <img src={airplane} alt="paper airplane" style={{ marginLeft: "1em" }} />
-    </React.Fragment>
+    </>
   );
 
   return (

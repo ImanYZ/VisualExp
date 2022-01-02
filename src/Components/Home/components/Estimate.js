@@ -1137,14 +1137,14 @@ export default function Estimate() {
                   {loading ? (
                     <CircularProgress />
                   ) : (
-                    <React.Fragment>
+                    <>
                       Place Request
                       <img
                         src={send}
                         alt="paper airplane"
                         style={{ marginLeft: "0.5em" }}
                       />
-                    </React.Fragment>
+                    </>
                   )}
                 </Button>
               </Grid>

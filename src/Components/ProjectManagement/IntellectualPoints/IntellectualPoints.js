@@ -1101,9 +1101,12 @@ const IntellectualPoints = (props) => {
               )}
               <div id="ActivityDateTimeContainer">
                 <Button
-                  id="SubmitButton"
                   onClick={activitySubmit}
-                  className={!invalidActivity ? "Button" : "Button Disabled"}
+                  className={
+                    !invalidActivity
+                      ? "Button SubmitButton"
+                      : "Button SubmitButton Disabled"
+                  }
                   variant="contained"
                   disabled={!invalidActivity ? null : true}
                 >
@@ -1113,8 +1116,7 @@ const IntellectualPoints = (props) => {
                 </Button>
                 {selectedRows.length > 0 && (
                   <Button
-                    id="ClearActivityButton"
-                    className="Button"
+                    className="Button ClearButton"
                     onClick={clearActivity}
                     variant="contained"
                   >

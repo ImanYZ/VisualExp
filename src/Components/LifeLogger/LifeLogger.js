@@ -20,6 +20,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { firebaseState } from "../../store/AuthAtoms";
 
+import Timer from "./Timer";
+
+// import { uuidv4 } from "../../utils/DateFunctions";
+
 import "./LifeLogger.css";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -65,7 +69,10 @@ const LifeLogger = () => {
   const [projectExpanded, setProjectExpanded] = useState(false);
   const [sectionExpanded, setSectionExpanded] = useState(false);
   const [summary, setSummary] = useState("");
+  const [taskId, setTaskId] = useState(null);
   const [duration, setDuration] = useState(1);
+  const [mins, setMins] = useState(1);
+  const [expiryTimestamp, setExpiryTimestamp] = useState(1);
 
   useEffect(() => {
     const getProjects = async () => {
@@ -112,6 +119,13 @@ const LifeLogger = () => {
     getProjects();
   }, []);
 
+  const selectMins = (event) => {
+    setMins(event.target.value);
+    const time = new Date();
+    time.setSeconds(time.getSeconds() + 60 * event.target.value);
+    setExpiryTimestamp(time);
+  };
+
   const clickProject = (panel) => (event, isProjectExpanded) => {
     setProjectExpanded(isProjectExpanded ? panel : false);
     setSectionExpanded(false);
@@ -132,17 +146,32 @@ const LifeLogger = () => {
     setDuration(event.target.value);
   };
 
-  const selectTask = (content) => (event) => {
+  const selectTask = (content, tId) => (event) => {
     setSummary(content);
+    if (tId) {
+      setTaskId(tId);
+    }
   };
 
-  const schedule = async (event) => {
+  const markComplete = async (event) => {
     try {
       await firebase.idToken();
       axios.post("/scheduleLifeLog", {
         duration,
         summary,
       });
+      //   if (taskId) {
+      //     const tDTasks = await axios.post(
+      //       "https://api.todoist.com/rest/v1/tasks/" + taskId + "/close",
+      //       {
+      //         headers: {
+      //           Authorization: `Bearer ${tDApiToken}`,
+      //           ["X-Request-Id"]: uuidv4(),
+      //           ["Content-Type"]: "application/json",
+      //         },
+      //       }
+      //     );
+      //   }
       setSent(true);
     } catch (err) {
       console.error(err);
@@ -151,7 +180,27 @@ const LifeLogger = () => {
 
   return (
     <div id="LifeLoggerContainer">
-      <div id="SubmitContainer">
+      <div>
+        <FormControl component="fieldset">
+          <FormLabel component="legend">Minutes</FormLabel>
+          <RadioGroup
+            row
+            aria-label="Mins"
+            name="mins"
+            value={mins}
+            onChange={selectMins}
+          >
+            <FormControlLabel value={1} control={<Radio />} label="1" />
+            <FormControlLabel value={4} control={<Radio />} label="4" />
+            <FormControlLabel value={10} control={<Radio />} label="10" />
+            <FormControlLabel value={25} control={<Radio />} label="25" />
+            <FormControlLabel value={40} control={<Radio />} label="40" />
+            <FormControlLabel value={55} control={<Radio />} label="55" />
+          </RadioGroup>
+        </FormControl>
+        <Timer expiryTimestamp={expiryTimestamp} />
+      </div>
+      <div>
         <div id="Summary">{summary}</div>
         <FormControl component="fieldset">
           <FormLabel component="legend">Minutes</FormLabel>
@@ -171,9 +220,8 @@ const LifeLogger = () => {
           </RadioGroup>
         </FormControl>
         <Button
-          id="SubmitButton"
-          onClick={schedule}
-          className="Button"
+          onClick={markComplete}
+          className="Button SubmitButton"
           variant="contained"
         >
           Add Task
@@ -183,8 +231,9 @@ const LifeLogger = () => {
         return (
           <Accordion
             key={prjK}
-            expanded={projectExpanded === prjK}
-            onChange={clickProject(prjK)}
+            expanded={true}
+            // expanded={projectExpanded === prjK}
+            // onChange={clickProject(prjK)}
           >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -198,8 +247,9 @@ const LifeLogger = () => {
                 return (
                   <Accordion
                     key={sectionK}
-                    expanded={sectionExpanded === sectionK}
-                    onChange={clickSection(sectionK)}
+                    expanded={true}
+                    // expanded={sectionExpanded === sectionK}
+                    // onChange={clickSection(sectionK)}
                   >
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
@@ -215,7 +265,7 @@ const LifeLogger = () => {
                             <Chip
                               label="💨"
                               variant="outlined"
-                              onClick={selectTask("💨")}
+                              onClick={selectTask("💨", null)}
                             />
                           </div>
                         )}
@@ -225,7 +275,7 @@ const LifeLogger = () => {
                             <Chip
                               label={task.content}
                               variant="outlined"
-                              onClick={selectTask(task.content)}
+                              onClick={selectTask(task.content, task.id)}
                             />
                           </div>
                         );
@@ -238,6 +288,7 @@ const LifeLogger = () => {
           </Accordion>
         );
       })}
+      <div id="FooterGap"></div>
       <Snackbar open={sent} autoHideDuration={4000} onClose={closeSnackbar}>
         <Alert
           onClose={closeSnackbar}

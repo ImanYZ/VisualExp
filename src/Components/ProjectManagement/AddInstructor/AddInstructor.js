@@ -1527,9 +1527,12 @@ const AddInstructor = (props) => {
                 <div className="Error">{invalidInstructor}</div>
               )}
               <Button
-                id="SubmitButton"
                 onClick={submitInstructor}
-                className={!invalidInstructor ? "Button" : "Button Disabled"}
+                className={
+                  !invalidInstructor
+                    ? "Button SubmitButton"
+                    : "Button SubmitButton Disabled"
+                }
                 variant="contained"
                 disabled={!invalidInstructor ? null : true}
               >
@@ -1539,8 +1542,7 @@ const AddInstructor = (props) => {
               </Button>
               {selectedRows.length > 0 && (
                 <Button
-                  id="ClearInstructorButton"
-                  className="Button"
+                  className="Button ClearButton"
                   onClick={clearInstructor}
                   variant="contained"
                 >

@@ -79,15 +79,15 @@ button.NavLink:hover {
   width: 100%;
 }
 
-#SubmitButton {
+.Button.SubmitButton {
   background-color: rgb(112, 187, 0);
 }
 
-#ClearButton {
+.Button.ClearButton {
   background-color: rgb(255, 94, 0);
 }
 
-#SubmitButton.Disabled {
+.Button.SubmitButton.Disabled {
   background-color: rgb(163, 163, 163);
 }
 

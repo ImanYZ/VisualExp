@@ -267,10 +267,11 @@ const SchedulePage = (props) => {
           </div>
           <div id="SignBtnContainer">
             <Button
-              id="SubmitButton"
               onClick={submitData}
               className={
-                submitable && !isSubmitting ? "Button" : "Button Disabled"
+                submitable && !isSubmitting
+                  ? "Button SubmitButton"
+                  : "Button SubmitButton Disabled"
               }
               variant="contained"
               disabled={submitable && !isSubmitting ? null : true}

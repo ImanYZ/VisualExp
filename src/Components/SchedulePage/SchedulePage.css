@@ -46,7 +46,7 @@
   /* text-align: center; */
 }
 
-#SubmitButton {
+.SubmitButton {
   margin-top: 19px;
   font-size: 19px;
   padding: 10px 19px 10px 19px;
