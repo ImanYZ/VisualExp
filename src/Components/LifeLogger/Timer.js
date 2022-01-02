@@ -31,7 +31,7 @@ const Timer = ({ expiryTimestamp }) => {
         className="Button SubmitButton"
         variant="contained"
       >
-        Start
+        Restart
       </Button>
       <div id="Timer" className={isRunning ? "" : "Error"}>
         <span>{minutes}</span>:<span>{seconds}</span>
