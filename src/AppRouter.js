@@ -18,7 +18,7 @@ import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
-import Home from "./Components/Home/components/App";
+import Home from "./Components/Home/Home";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
 
 import "./App.css";

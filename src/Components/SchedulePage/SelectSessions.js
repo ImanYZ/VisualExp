@@ -76,11 +76,6 @@ const SelectSessions = (props) => {
           fSess.getTime() ===
           new Date(datetime.getTime() - 30 * 60000).getTime()
       ) !== -1 ||
-      props.firstSessions.findIndex(
-        (fSess) =>
-          fSess.getTime() ===
-          new Date(datetime.getTime() - 60 * 60000).getTime()
-      ) !== -1 ||
       (props.secondSession &&
         props.secondSession.getTime() === datetime.getTime()) ||
       (props.thirdSession &&

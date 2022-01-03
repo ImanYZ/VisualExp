@@ -20,10 +20,10 @@ exports.schedule = async (req, res) => {
       "third" in req.body
     ) {
       const events = [];
+      let orderredSession = "1st";
+      let start = new Date(req.body.first);
+      let end = new Date(start.getTime() + 60 * 60000);
       for (let session = 1; session < 4; session++) {
-        let orderredSession = "1st";
-        let start = new Date(req.body.first);
-        let end = new Date(start.getTime() + 60 * 60000);
         if (session === 2) {
           orderredSession = "2nd";
           start = new Date(req.body.second);
