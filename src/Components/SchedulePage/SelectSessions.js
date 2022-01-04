@@ -68,14 +68,11 @@ const SelectSessions = (props) => {
 
   const renderDateCell = (datetime, selected, refSetter) => {
     const scheduledSession =
-      props.firstSessions.findIndex(
-        (fSess) => fSess.getTime() === datetime.getTime()
-      ) !== -1 ||
-      props.firstSessions.findIndex(
-        (fSess) =>
-          fSess.getTime() ===
-          new Date(datetime.getTime() - 30 * 60000).getTime()
-      ) !== -1 ||
+      (props.firstSessions &&
+        props.firstSessions.length > 0 &&
+        (props.firstSessions[0].getTime() === datetime.getTime() ||
+          props.firstSessions[0].getTime() ===
+            new Date(datetime.getTime() - 30 * 60000).getTime())) ||
       (props.secondSession &&
         props.secondSession.getTime() === datetime.getTime()) ||
       (props.thirdSession &&

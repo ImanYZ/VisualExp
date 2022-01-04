@@ -127,7 +127,6 @@ const AppRouter = (props) => {
     }
   }, [firebase, email, fullname]);
 
-  console.log({ fullname });
   return (
     <Routes>
       <Route path="/Home/*" element={<Home />} />
