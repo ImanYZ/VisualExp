@@ -1,8 +1,22 @@
-import * as React from "react";
+import React, { useState } from "react";
+import { useRecoilState } from "recoil";
+
+// import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
+// import Brightness4Icon from "@mui/icons-material/Brightness4";
+// import Brightness7Icon from "@mui/icons-material/Brightness7";
+
+import { colorModeState } from "../../../../store/GlobalAtoms";
+
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
+
+import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
 const rightLink = {
   fontSize: 16,
@@ -10,45 +24,92 @@ const rightLink = {
   ml: 3,
 };
 
-function AppAppBar() {
+const LinkTab = (props) => {
+  return <Tab component="a" color="inherit" {...props} />;
+};
+
+const AppAppBar = () => {
+  const [section, setSection] = useState(0);
+
+  const [colorMode, setColorMode] = useRecoilState(colorModeState);
+
+  const toggleColorMode = (event) => {
+    setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  };
+
+  const switchSection = (event, newValue) => {
+    setSection(newValue);
+  };
+
   return (
     <div>
       <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Box sx={{ flex: 1 }} />
           <Link
             variant="h6"
             underline="none"
             color="inherit"
-            href="/premium-themes/onepirate/"
-            sx={{ fontSize: 24 }}
+            href="#ProductHeroSection"
+            sx={{ fontSize: 24, marginTop: "7px" }}
           >
-            {"onepirate"}
+            <img src={LogoDarkMode} alt="logo" width="52px" />
           </Link>
+          <Tabs
+            value={section}
+            onChange={switchSection}
+            aria-label="nav tabs example"
+            sx={{
+              marginLeft: "auto",
+              "& .MuiTab-root": {
+                color: "#AAAAAA",
+              },
+              "& .MuiTab-root.Mui-selected": {
+                color: "common.white",
+              },
+            }}
+          >
+            <LinkTab label="Values" href="#ProductValuesSection" />
+            <LinkTab label="Communities" href="#CommunitiesSection" />
+          </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-            <Link
-              color="inherit"
-              variant="h6"
-              underline="none"
-              href="/premium-themes/onepirate/sign-in/"
-              sx={rightLink}
+            {/* <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "background.default",
+                color: "text.primary",
+                borderRadius: 1,
+                p: 3,
+              }}
             >
-              {"Sign In"}
-            </Link>
-            <Link
-              variant="h6"
-              underline="none"
-              href="/premium-themes/onepirate/sign-up/"
-              sx={{ ...rightLink, color: "secondary.main" }}
+              {colorMode} mode
+              <IconButton
+                sx={{ ml: 1 }}
+                onClick={toggleColorMode}
+                color="inherit"
+              >
+                {colorMode === "dark" ? (
+                  <Brightness7Icon />
+                ) : (
+                  <Brightness4Icon />
+                )}
+              </IconButton>
+            </Box> */}
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ borderRadius: "40px", color: "white" }}
             >
-              {"Sign Up"}
-            </Link>
+              Join Us!
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>
       <Toolbar />
     </div>
   );
-}
+};
 
 export default AppAppBar;

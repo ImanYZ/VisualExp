@@ -20,10 +20,16 @@ import "./OneCademy.css";
 const OneCademy = (props) => {
   const firebase = useRecoilValue(firebaseOnecademyState);
   const [username, setUsername] = useRecoilState(usernameState);
-  const email = useRecoilValue(emailState);
+  const [email, setEmail] = useRecoilValue(emailState);
 
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);
+
+  useEffect(() => {
+    if (email === "tirdad.barghi@gmail.com") {
+      setEmail("tirdad_barghi@umich.edu");
+    }
+  }, [email]);
 
   const passwordChange = (event) => {
     setPassword(event.target.value);

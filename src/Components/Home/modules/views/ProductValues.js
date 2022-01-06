@@ -15,6 +15,7 @@ const item = {
 function ProductValues() {
   return (
     <Box
+      id="ProductValuesSection"
       component="section"
       sx={{ display: "flex", overflow: "hidden", bgcolor: "secondary.light" }}
     >

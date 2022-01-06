@@ -20,18 +20,6 @@
   width: 100%;
 }
 
-#SubmitButton {
-  background-color: rgb(112, 187, 0);
-}
-
-#ClearButton {
-  background-color: rgb(255, 94, 0);
-}
-
-#SubmitButton.Disabled {
-  background-color: rgb(163, 163, 163);
-}
-
 #InternsLeaderboardHeader {
   padding-left: 10px;
 }

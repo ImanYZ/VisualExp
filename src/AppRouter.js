@@ -38,57 +38,6 @@ const AppRouter = (props) => {
   const [startedFirstSession, setStartedFirstSession] = useState(false);
 
   useEffect(() => {
-    window.location.hash = "no-back-button";
-
-    // Again because Google Chrome doesn't insert
-    // the first hash into the history
-    window.location.hash = "Again-No-back-button";
-
-    window.onhashchange = function () {
-      window.location.hash = "no-back-button";
-    };
-
-    window.onbeforeunload = function (e) {
-      e = e || window.event;
-
-      // For IE and Firefox prior to version 4
-      if (e) {
-        e.returnValue = "Do you want to quit this experiment website?";
-      }
-
-      // For Safari
-      return "Do you want to quit this experiment website?";
-    };
-
-    window.addEventListener("keydown", function (e) {
-      if (e.keyCode === 114 || ((e.ctrlKey || e.metaKey) && e.keyCode === 70)) {
-        e.preventDefault();
-      }
-    });
-
-    if (
-      window.matchMedia &&
-      window.matchMedia("(prefers-color-scheme: light)").matches
-    ) {
-      // Light mode
-      setTheme("Light");
-      setThemeOS("Light");
-    }
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", (e) => {
-        const newColorScheme = e.matches ? "Dark" : "Light";
-        if (newColorScheme === "Dark") {
-          setTheme("Dark");
-          setThemeOS("Dark");
-        } else {
-          setTheme("Light");
-          setThemeOS("Light");
-        }
-      });
-  }, []);
-
-  useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {
       const currentTime = new Date().getTime();
       const scheduleDocs = await firebase.db
@@ -126,6 +75,61 @@ const AppRouter = (props) => {
       areTheyDuringAnExperimentSession();
     }
   }, [firebase, email, fullname]);
+
+  useEffect(() => {
+    if (duringAnExperiment) {
+      window.location.hash = "no-back-button";
+
+      // Again because Google Chrome doesn't insert
+      // the first hash into the history
+      window.location.hash = "Again-No-back-button";
+
+      window.onhashchange = function () {
+        window.location.hash = "no-back-button";
+      };
+
+      window.onbeforeunload = function (e) {
+        e = e || window.event;
+
+        // For IE and Firefox prior to version 4
+        if (e) {
+          e.returnValue = "Do you want to quit this experiment website?";
+        }
+
+        // For Safari
+        return "Do you want to quit this experiment website?";
+      };
+
+      window.addEventListener("keydown", function (e) {
+        if (
+          e.keyCode === 114 ||
+          ((e.ctrlKey || e.metaKey) && e.keyCode === 70)
+        ) {
+          e.preventDefault();
+        }
+      });
+    }
+    // if (
+    //   window.matchMedia &&
+    //   window.matchMedia("(prefers-color-scheme: light)").matches
+    // ) {
+    //   // Light mode
+    //   setTheme("Light");
+    //   setThemeOS("Light");
+    // }
+    // window
+    //   .matchMedia("(prefers-color-scheme: dark)")
+    //   .addEventListener("change", (e) => {
+    //     const newColorScheme = e.matches ? "Dark" : "Light";
+    //     if (newColorScheme === "Dark") {
+    //       setTheme("Dark");
+    //       setThemeOS("Dark");
+    //     } else {
+    //       setTheme("Light");
+    //       setThemeOS("Light");
+    //     }
+    //   });
+  }, [duringAnExperiment]);
 
   return (
     <Routes>

@@ -1,7 +1,7 @@
 import React from "react";
 
 import Box from "@mui/material/Box";
-import ProductCategories from "./modules/views/ProductCategories";
+import Communities from "./modules/views/Communities";
 import ProductSmokingHero from "./modules/views/ProductSmokingHero";
 import AppFooter from "./modules/views/AppFooter";
 import ProductHero from "./modules/views/ProductHero";
@@ -17,7 +17,7 @@ function Index() {
       <AppAppBar />
       <ProductHero />
       <ProductValues />
-      <ProductCategories />
+      <Communities />
       <ProductHowItWorks />
       <ProductCTA />
       <ProductSmokingHero />

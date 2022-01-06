@@ -32,7 +32,7 @@ function ProductHeroLayout(props) {
   const { sxBackground, children } = props;
 
   return (
-    <ProductHeroLayoutRoot>
+    <ProductHeroLayoutRoot id="ProductHeroSection">
       <Container
         sx={{
           mt: 3,
