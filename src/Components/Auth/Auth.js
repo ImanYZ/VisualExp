@@ -29,15 +29,9 @@ import {
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import "./ConsentDocument.css";
+import { isEmail } from "../../utils/general";
 
-const isEmail = (email) => {
-  // eslint-disable-next-line
-  const regEx =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (email.match(regEx)) return true;
-  else return false;
-};
+import "./ConsentDocument.css";
 
 const getFullname = (firstname, lastname) => {
   return (firstname + " " + lastname)

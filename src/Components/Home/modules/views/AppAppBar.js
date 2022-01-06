@@ -66,8 +66,10 @@ const AppAppBar = () => {
               },
             }}
           >
-            <LinkTab label="Values" href="#ProductValuesSection" />
-            <LinkTab label="Communities" href="#CommunitiesSection" />
+            <LinkTab label="How" href="#ValuesSection" />
+            <LinkTab label="What" href="#CommunitiesSection" />
+            <LinkTab label="Why" href="#ValuesSection" />
+            <LinkTab label="Where" href="#ValuesSection" />
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             {/* <Box

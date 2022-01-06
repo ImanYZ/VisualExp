@@ -5,7 +5,7 @@ import Communities from "./modules/views/Communities";
 import ProductSmokingHero from "./modules/views/ProductSmokingHero";
 import AppFooter from "./modules/views/AppFooter";
 import Landing from "./modules/views/Landing";
-import ProductValues from "./modules/views/ProductValues";
+import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import ProductCTA from "./modules/views/ProductCTA";
 import AppAppBar from "./modules/views/AppAppBar";
@@ -17,8 +17,8 @@ function Index() {
       <AppAppBar />
       <Landing />
       <HowItWorks />
-      <ProductValues />
       <Communities />
+      <Values />
       <ProductCTA />
       <ProductSmokingHero />
       <AppFooter />

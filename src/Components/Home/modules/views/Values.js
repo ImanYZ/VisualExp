@@ -12,10 +12,10 @@ const item = {
   px: 5,
 };
 
-function ProductValues() {
+function Values() {
   return (
     <Box
-      id="ProductValuesSection"
+      id="ValuesSection"
       component="section"
       sx={{ display: "flex", overflow: "hidden", bgcolor: "secondary.light" }}
     >
@@ -31,7 +31,7 @@ function ProductValues() {
             <Box sx={item}>
               <Box
                 component="img"
-                src="/static/productValues1.svg"
+                src="/static/Values1.svg"
                 alt="suitcase"
                 sx={{ height: 55 }}
               />
@@ -53,7 +53,7 @@ function ProductValues() {
             <Box sx={item}>
               <Box
                 component="img"
-                src="/static/productValues2.svg"
+                src="/static/Values2.svg"
                 alt="graph"
                 sx={{ height: 55 }}
               />
@@ -73,7 +73,7 @@ function ProductValues() {
             <Box sx={item}>
               <Box
                 component="img"
-                src="/static/productValues3.svg"
+                src="/static/Values3.svg"
                 alt="clock"
                 sx={{ height: 55 }}
               />
@@ -92,4 +92,4 @@ function ProductValues() {
   );
 }
 
-export default ProductValues;
+export default Values;

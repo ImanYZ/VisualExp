@@ -6,6 +6,8 @@ import Button from "@mui/material/Button";
 
 import { emailState } from "../../../store/AuthAtoms";
 
+import { isEmail } from "../../../utils/general";
+
 import {
   firebaseOnecademyState,
   usernameState,
@@ -20,19 +22,17 @@ import "./OneCademy.css";
 const OneCademy = (props) => {
   const firebase = useRecoilValue(firebaseOnecademyState);
   const [username, setUsername] = useRecoilState(usernameState);
-  const [email, setEmail] = useRecoilValue(emailState);
+  const [email, setEmail] = useRecoilState(emailState);
 
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);
 
-  useEffect(() => {
-    if (email === "tirdad.barghi@gmail.com") {
-      setEmail("tirdad_barghi@umich.edu");
-    }
-  }, [email]);
-
   const passwordChange = (event) => {
     setPassword(event.target.value);
+  };
+
+  const emailChange = (event) => {
+    setEmail(event.target.value);
   };
 
   const signIn = async (event) => {
@@ -61,6 +61,7 @@ const OneCademy = (props) => {
   };
 
   const validPassword = password.length >= 7;
+  const validEmail = isEmail(email);
 
   return (
     <div id="OneCademy">
@@ -74,6 +75,20 @@ const OneCademy = (props) => {
         <>
           <h2>Sign in to 1Cademy to see your points!</h2>
           {/* <span id="EmailAddress">{email}</span> */}
+          <ValidatedInput
+            className="PleaseSpecify"
+            onChange={emailChange}
+            name="email"
+            type="email"
+            placeholder="Your 1Cademy Associated Email"
+            label="Your 1Cademy Associated Email"
+            errorMessage={
+              validEmail
+                ? null
+                : "Please enter your 1Cademy Associated Email correctly!"
+            }
+            onKeyPress={onKeyPress}
+          />
           <ValidatedInput
             className="PleaseSpecify"
             onChange={passwordChange}

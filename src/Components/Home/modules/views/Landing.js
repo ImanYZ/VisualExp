@@ -10,7 +10,7 @@ export default function Landing() {
     <LandingLayout
       sxBackground={{
         backgroundImage: `url(${backgroundImage})`,
-        backgroundColor: "#7fc7d9", // Average color of the background image.
+        backgroundColor: "primary.light", // Average color of the background image.
         backgroundPosition: "center",
       }}
     >
@@ -21,7 +21,7 @@ export default function Landing() {
         alt="increase priority"
       />
       <Typography color="inherit" align="center" variant="h2" marked="center">
-        The 1 Graph to Learn
+        1Cademy to Learn
       </Typography>
       <Typography
         color="inherit"
