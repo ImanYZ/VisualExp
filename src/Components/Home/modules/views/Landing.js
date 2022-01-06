@@ -1,13 +1,13 @@
 import * as React from "react";
 import Button from "../components/Button";
 import Typography from "../components/Typography";
-import ProductHeroLayout from "./ProductHeroLayout";
+import LandingLayout from "./LandingLayout";
 
 import backgroundImage from "../../../../assets/LibraryBackground.jpg";
 
-export default function ProductHero() {
+export default function Landing() {
   return (
-    <ProductHeroLayout
+    <LandingLayout
       sxBackground={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundColor: "#7fc7d9", // Average color of the background image.
@@ -21,7 +21,7 @@ export default function ProductHero() {
         alt="increase priority"
       />
       <Typography color="inherit" align="center" variant="h2" marked="center">
-        Upgrade your Sundays
+        The 1 Graph to Learn
       </Typography>
       <Typography
         color="inherit"
@@ -45,6 +45,6 @@ export default function ProductHero() {
       <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
         Discover the experience
       </Typography>
-    </ProductHeroLayout>
+    </LandingLayout>
   );
 }

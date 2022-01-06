@@ -18,12 +18,6 @@ import Toolbar from "../components/Toolbar";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
-const rightLink = {
-  fontSize: 16,
-  color: "common.white",
-  ml: 3,
-};
-
 const LinkTab = (props) => {
   return <Tab component="a" color="inherit" {...props} />;
 };
@@ -49,8 +43,8 @@ const AppAppBar = () => {
             variant="h6"
             underline="none"
             color="inherit"
-            href="#ProductHeroSection"
-            sx={{ fontSize: 24, marginTop: "7px" }}
+            href="#LandingSection"
+            sx={{ fontSize: 24, margin: "7px 19px 0px -10px" }}
           >
             <img src={LogoDarkMode} alt="logo" width="52px" />
           </Link>
@@ -60,11 +54,15 @@ const AppAppBar = () => {
             aria-label="nav tabs example"
             sx={{
               marginLeft: "auto",
+              fontWeight: 400,
               "& .MuiTab-root": {
                 color: "#AAAAAA",
               },
               "& .MuiTab-root.Mui-selected": {
                 color: "common.white",
+              },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "secondary.main",
               },
             }}
           >
@@ -100,7 +98,12 @@ const AppAppBar = () => {
             <Button
               variant="contained"
               color="secondary"
-              sx={{ borderRadius: "40px", color: "white" }}
+              sx={{
+                fontSize: 16,
+                color: "common.white",
+                ml: 2.5,
+                borderRadius: 40,
+              }}
             >
               Join Us!
             </Button>
