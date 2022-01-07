@@ -25,7 +25,7 @@ function AppBar(props) {
     <>
       <CssBaseline />
       <ElevationScroll {...props}>
-        <MuiAppBar elevation={0} position="fixed" {...props} />
+        <MuiAppBar {...props} />
       </ElevationScroll>
     </>
   );

@@ -21,7 +21,7 @@ import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
 const LinkTab = (props) => {
   return (
-    <Tooltip title={props.title}>
+    <Tooltip title={props.titl}>
       <Tab component="a" color="inherit" {...props} />
     </Tooltip>
   );
@@ -42,7 +42,7 @@ const AppAppBar = () => {
 
   return (
     <div>
-      <AppBar position="fixed">
+      <AppBar>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Tooltip title="1Cademy's Landing Page">
             <Link
@@ -58,7 +58,10 @@ const AppAppBar = () => {
           <Tabs
             value={section}
             onChange={switchSection}
-            aria-label="nav tabs example"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            aria-label="scrollable auto tabs navigation bar"
             sx={{
               marginLeft: "auto",
               fontWeight: 400,
@@ -76,27 +79,27 @@ const AppAppBar = () => {
             <LinkTab
               label="How"
               href="#ValuesSection"
-              title="How does 1Cademy work?"
+              titl="How does 1Cademy work?"
             />
             <LinkTab
               label="What"
               href="#CommunitiesSection"
-              title="What communities do exist in 1Cademy?"
+              titl="What communities do exist in 1Cademy?"
             />
             <LinkTab
               label="Why"
               href="#ValuesSection"
-              title="Why does 1Cademy work?"
+              titl="Why does 1Cademy work?"
             />
             <LinkTab
               label="Where"
               href="#ValuesSection"
-              title="Where are 1Cademy members from?"
+              titl="Where are 1Cademy members from?"
             />
             <LinkTab
               label="Who"
               href="#ValuesSection"
-              title="Who is behind 1Cademy?"
+              titl="Who is behind 1Cademy?"
             />
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>

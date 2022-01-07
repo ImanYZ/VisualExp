@@ -40,7 +40,7 @@ export default function Landing() {
         href="/premium-themes/onepirate/sign-up/"
         sx={{ minWidth: 200 }}
       >
-        Register
+        Apply to Join Us!
       </Button>
       <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
         Discover the experience
