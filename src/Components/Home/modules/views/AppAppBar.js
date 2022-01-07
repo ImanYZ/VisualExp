@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Tooltip from "@mui/material/Tooltip";
 
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -19,7 +20,11 @@ import Toolbar from "../components/Toolbar";
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
 const LinkTab = (props) => {
-  return <Tab component="a" color="inherit" {...props} />;
+  return (
+    <Tooltip title={props.title}>
+      <Tab component="a" color="inherit" {...props} />
+    </Tooltip>
+  );
 };
 
 const AppAppBar = () => {
@@ -39,15 +44,17 @@ const AppAppBar = () => {
     <div>
       <AppBar position="fixed">
         <Toolbar sx={{ justifyContent: "space-between" }}>
-          <Link
-            variant="h6"
-            underline="none"
-            color="inherit"
-            href="#LandingSection"
-            sx={{ fontSize: 24, margin: "7px 19px 0px -10px" }}
-          >
-            <img src={LogoDarkMode} alt="logo" width="52px" />
-          </Link>
+          <Tooltip title="1Cademy's Landing Page">
+            <Link
+              variant="h6"
+              underline="none"
+              color="inherit"
+              href="#LandingSection"
+              sx={{ fontSize: 24, margin: "7px 19px 0px -10px" }}
+            >
+              <img src={LogoDarkMode} alt="logo" width="52px" />
+            </Link>
+          </Tooltip>
           <Tabs
             value={section}
             onChange={switchSection}
@@ -66,10 +73,31 @@ const AppAppBar = () => {
               },
             }}
           >
-            <LinkTab label="How" href="#ValuesSection" />
-            <LinkTab label="What" href="#CommunitiesSection" />
-            <LinkTab label="Why" href="#ValuesSection" />
-            <LinkTab label="Where" href="#ValuesSection" />
+            <LinkTab
+              label="How"
+              href="#ValuesSection"
+              title="How does 1Cademy work?"
+            />
+            <LinkTab
+              label="What"
+              href="#CommunitiesSection"
+              title="What communities do exist in 1Cademy?"
+            />
+            <LinkTab
+              label="Why"
+              href="#ValuesSection"
+              title="Why does 1Cademy work?"
+            />
+            <LinkTab
+              label="Where"
+              href="#ValuesSection"
+              title="Where are 1Cademy members from?"
+            />
+            <LinkTab
+              label="Who"
+              href="#ValuesSection"
+              title="Who is behind 1Cademy?"
+            />
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             {/* <Box
@@ -97,18 +125,20 @@ const AppAppBar = () => {
                 )}
               </IconButton>
             </Box> */}
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={{
-                fontSize: 16,
-                color: "common.white",
-                ml: 2.5,
-                borderRadius: 40,
-              }}
-            >
-              Join Us!
-            </Button>
+            <Tooltip title="Apply to join 1Cademy">
+              <Button
+                variant="contained"
+                color="secondary"
+                sx={{
+                  fontSize: 16,
+                  color: "common.white",
+                  ml: 2.5,
+                  borderRadius: 40,
+                }}
+              >
+                Apply!
+              </Button>
+            </Tooltip>
           </Box>
         </Toolbar>
       </AppBar>

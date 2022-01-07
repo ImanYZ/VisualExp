@@ -22,7 +22,7 @@ function Values() {
       <Container sx={{ mt: 15, mb: 30, display: "flex", position: "relative" }}>
         <Box
           component="img"
-          src="/static/productCurvyLines.png"
+          src="/static/CurvyLines.png"
           alt="curvy lines"
           sx={{ pointerEvents: "none", position: "absolute", top: -180 }}
         />

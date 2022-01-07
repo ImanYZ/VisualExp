@@ -43,7 +43,7 @@ function HowItWorks() {
       >
         <Box
           component="img"
-          src="/static/productCurvyLines.png"
+          src="/static/CurvyLines.png"
           alt="curvy lines"
           sx={{
             pointerEvents: "none",
@@ -56,8 +56,8 @@ function HowItWorks() {
           How it works
         </Typography>
         <div>
-          <Grid container spacing={5}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={2.5}>
+            <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>1.</Box>
                 <Box
@@ -71,7 +71,7 @@ function HowItWorks() {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>2.</Box>
                 <Box
@@ -86,9 +86,24 @@ function HowItWorks() {
                 </Typography>
               </Box>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>3.</Box>
+                <Box
+                  component="img"
+                  src="/static/HowItWorks3.svg"
+                  alt="clock"
+                  sx={image}
+                />
+                <Typography variant="h5" align="center">
+                  {"New offers every week. New experiences, new surprises. "}
+                  {"Your Sundays will no longer be alike."}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={3}>
+              <Box sx={item}>
+                <Box sx={number}>4.</Box>
                 <Box
                   component="img"
                   src="/static/HowItWorks3.svg"
