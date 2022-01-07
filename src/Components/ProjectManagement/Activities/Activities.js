@@ -158,34 +158,37 @@ const Activities = (props) => {
           <div className="Columns40_60">
             <Alert severity="warning">
               <h2>Inclusion and Order of Authors Criteria:</h2>
-              <strong>Inclusion:</strong> To be an author,{" "}
-              <span id="GreenText">in green</span>, one needs to earn at least:
-              <ul>
-                <li>
-                  <strong>100</strong> 1Cademy points{" "}
-                  <img src={favicon} width="15.1" /> and{" "}
-                </li>
-                <li>
-                  <strong>100</strong> Intellectual points 🎓 and
-                </li>
-                <li>
-                  <strong>100</strong> Experiment points 👨‍🔬 and
-                </li>
-                <li>
-                  <strong>100</strong> Collecting instructor/administrator
-                  contact points 👨‍🏫 and
-                </li>
-                <li>
-                  <strong>100</strong> Coding participants' comments points 💬
-                  and
-                </li>
-                <li>
-                  <strong>100</strong> Coding participants' recall responses
-                  points 🧠
-                </li>
-              </ul>
-              <strong>Order:</strong> The intern with higher total of all the
-              above categories gets a higher position.
+              <div>
+                <strong>Inclusion:</strong> To be an author,{" "}
+                <span id="GreenText">in green</span>, one needs to earn at
+                least:
+                <ul>
+                  <li>
+                    <strong>100</strong> 1Cademy points{" "}
+                    <img src={favicon} width="15.1" /> and{" "}
+                  </li>
+                  <li>
+                    <strong>100</strong> Intellectual points 🎓 and
+                  </li>
+                  <li>
+                    <strong>100</strong> Experiment points 👨‍🔬 and
+                  </li>
+                  <li>
+                    <strong>100</strong> Collecting instructor/administrator
+                    contact points 👨‍🏫 and
+                  </li>
+                  <li>
+                    <strong>100</strong> Coding participants' comments points 💬
+                    and
+                  </li>
+                  <li>
+                    <strong>100</strong> Coding participants' recall responses
+                    points 🧠
+                  </li>
+                </ul>
+                <strong>Order:</strong> The intern with higher total of all the
+                above categories gets a higher position.
+              </div>
               <Button
                 onClick={expandLeaderboard}
                 className={expanded ? "Button Red" : "Button Green"}

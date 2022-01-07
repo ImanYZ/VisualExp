@@ -960,8 +960,14 @@ const AddInstructor = (props) => {
     setFirstname("");
     setLastname("");
     setEmail("");
-    setInstitution("University of Michigan - Ann Arbor");
-    setValues(initialState);
+    // setInstitution("University of Michigan - Ann Arbor");
+    setValues({
+      ...initialState,
+      country: values.country,
+      stateInfo: values.stateInfo,
+      city: values.city,
+      major: values.major,
+    });
   };
 
   const gridRowClick = (clickedRow) => {
