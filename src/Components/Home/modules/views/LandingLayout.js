@@ -42,12 +42,12 @@ function LandingLayout(props) {
           alignItems: "center",
         }}
       >
-        <img
+        {/* <img
           src="/static/LandingWonder.png"
           alt="wonder"
           width="147"
           height="80"
-        />
+        /> */}
         {children}
         <Box
           sx={{

@@ -3,6 +3,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
+
 import Button from "../components/Button";
 import Typography from "../components/Typography";
 
@@ -21,11 +22,11 @@ const number = {
 };
 
 const image = {
-  width: 190,
+  height: 130,
   my: 4,
 };
 
-function HowItWorks() {
+const HowItWorks = (props) => {
   return (
     <Box
       id="HowItWorksSection"
@@ -68,7 +69,7 @@ function HowItWorks() {
                   sx={image}
                 />
                 <Typography variant="h6">Summarizing</Typography>
-                <Typography variant="p">
+                <Typography variant="body1">
                   Summarizing the gist of every valuable piece of knowledge on
                   the Web into small chunks of knowledge that we call "nodes."
                 </Typography>
@@ -84,7 +85,7 @@ function HowItWorks() {
                   sx={image}
                 />
                 <Typography variant="h6">Linking</Typography>
-                <Typography variant="p">
+                <Typography variant="body1">
                   Identifying and visualizing the prerequisite knowledge "links"
                   between nodes.
                 </Typography>
@@ -100,7 +101,7 @@ function HowItWorks() {
                   sx={image}
                 />
                 <Typography variant="h6">Evaluating</Typography>
-                <Typography variant="p">
+                <Typography variant="body1">
                   Group-evaluating the nodes and links, through up/down-votes
                   and comments.
                 </Typography>
@@ -116,7 +117,7 @@ function HowItWorks() {
                   sx={image}
                 />
                 <Typography variant="h6">Improving</Typography>
-                <Typography variant="p">
+                <Typography variant="body1">
                   Collaboratively improving and up-dating nodes and links
                   through proposals and community approvals.
                 </Typography>
@@ -137,6 +138,6 @@ function HowItWorks() {
       </Container>
     </Box>
   );
-}
+};
 
 export default HowItWorks;

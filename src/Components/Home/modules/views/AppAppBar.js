@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import { useRecoilState } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
@@ -14,6 +14,8 @@ import Tooltip from "@mui/material/Tooltip";
 
 import { colorModeState } from "../../../../store/GlobalAtoms";
 
+import useWindowPosition from "../../hooks/useWindowPosition";
+
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
@@ -22,15 +24,48 @@ import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 const LinkTab = (props) => {
   return (
     <Tooltip title={props.titl}>
-      <Tab component="a" color="inherit" {...props} />
+      <Tab
+        onClick={(event) => {
+          event.preventDefault();
+          document
+            .getElementById(props.href)
+            .scrollIntoView({ behavior: "smooth" });
+        }}
+        color="inherit"
+        {...props}
+      />
     </Tooltip>
   );
 };
 
-const AppAppBar = () => {
-  const [section, setSection] = useState(0);
+const sectionsOrder = [
+  {id: "LandingSection", label: "Landing", title: "1Cademy's Landing Page"},
+  {id: "HowItWorksSection", label: "How", title: "How does 1Cademy work?"},
+  {id: "CommunitiesSection", label: "What", title: "What communities do exist in 1Cademy?"},
+  {id: "ValuesSection", label: "Why", title: "Why does 1Cademy work?"},
+  {id: "ValuesSection", label: "Where", title: "Where are 1Cademy members from?"},
+  {id: "ValuesSection", label: "Who", title: "Who is behind 1Cademy?"},
+];
 
+const AppAppBar = () => {
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
+
+  const [section, setSection] = useState(-1);
+
+  const landingSectionChecked = useWindowPosition("LandingSection");
+
+  useLayoutEffect(() => {
+    function updatePosition() {
+      const landingSectionOffsetHeight = window.document.getElementById(sectionsOrder[].id).offsetHeight;
+      const landingSectionOffsetHeight = window.document.getElementById(sectionsOrder[].id).offsetHeight;
+      if (window.pageYOffset < landingSectionOffsetHeight) {
+        setSection(-1);
+      }
+    }
+    window.addEventListener("scroll", updatePosition);
+    updatePosition();
+    return () => window.removeEventListener("scroll", updatePosition);
+  }, []);
 
   const toggleColorMode = (event) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
@@ -40,20 +75,30 @@ const AppAppBar = () => {
     setSection(newValue);
   };
 
+  const homeClick = (href) => (event) => {
+    event.preventDefault();
+    setSection(-1);
+    document.getElementById(href).scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <div>
       <AppBar>
         <Toolbar sx={{ justifyContent: "space-between" }}>
           <Tooltip title="1Cademy's Landing Page">
-            <Link
+            <Box
               variant="h6"
               underline="none"
               color="inherit"
-              href="#LandingSection"
-              sx={{ fontSize: 24, margin: "7px 19px 0px -10px" }}
+              onClick={homeClick("LandingSection")}
+              sx={{
+                fontSize: 24,
+                margin: "7px 19px 0px -10px",
+                cursor: "pointer",
+              }}
             >
               <img src={LogoDarkMode} alt="logo" width="52px" />
-            </Link>
+            </Box>
           </Tooltip>
           <Tabs
             value={section}
@@ -77,29 +122,29 @@ const AppAppBar = () => {
             }}
           >
             <LinkTab
-              label="How"
-              href="#HowItWorksSection"
-              titl="How does 1Cademy work?"
+              label={sectionsOrder[1].label}
+              href={sectionsOrder[1].id}
+              titl={sectionsOrder[1].title}
             />
             <LinkTab
-              label="What"
-              href="#CommunitiesSection"
-              titl="What communities do exist in 1Cademy?"
+              label={sectionsOrder[1].label}
+              href={sectionsOrder[2].id}
+              titl={sectionsOrder[2].title}
             />
             <LinkTab
-              label="Why"
-              href="#ValuesSection"
-              titl="Why does 1Cademy work?"
+              label={sectionsOrder[1].label}
+              href={sectionsOrder[3].id}
+              titl={sectionsOrder[3].title}
             />
             <LinkTab
-              label="Where"
-              href="#ValuesSection"
-              titl="Where are 1Cademy members from?"
+              label={sectionsOrder[1].label}
+              href={sectionsOrder[4].id}
+              titl={sectionsOrder[4].title}
             />
             <LinkTab
-              label="Who"
-              href="#ValuesSection"
-              titl="Who is behind 1Cademy?"
+              label={sectionsOrder[1].label}
+              href={sectionsOrder[5].id}
+              titl={sectionsOrder[5].title}
             />
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
