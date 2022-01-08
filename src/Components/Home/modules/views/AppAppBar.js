@@ -78,7 +78,7 @@ const AppAppBar = () => {
           >
             <LinkTab
               label="How"
-              href="#ValuesSection"
+              href="#HowItWorksSection"
               titl="How does 1Cademy work?"
             />
             <LinkTab

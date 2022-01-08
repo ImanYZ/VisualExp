@@ -28,6 +28,7 @@ const image = {
 function HowItWorks() {
   return (
     <Box
+      id="HowItWorksSection"
       component="section"
       sx={{ display: "flex", bgcolor: "secondary.light", overflow: "hidden" }}
     >
@@ -52,8 +53,8 @@ function HowItWorks() {
             opacity: 0.7,
           }}
         />
-        <Typography variant="h4" marked="center" component="h2" sx={{ mb: 14 }}>
-          How it works
+        <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
+          How We Work
         </Typography>
         <div>
           <Grid container spacing={2.5}>
@@ -129,7 +130,7 @@ function HowItWorks() {
           variant="contained"
           component="a"
           href="/premium-themes/onepirate/sign-up/"
-          sx={{ mt: 8 }}
+          sx={{ mt: 1 }}
         >
           Get started
         </Button>
