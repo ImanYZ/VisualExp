@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
@@ -14,12 +14,27 @@ import Tooltip from "@mui/material/Tooltip";
 
 import { colorModeState } from "../../../../store/GlobalAtoms";
 
-import useWindowPosition from "../../hooks/useWindowPosition";
-
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
+
+const sectionsOrder = [
+  { id: "LandingSection", label: "Landing", title: "1Cademy's Landing Page" },
+  { id: "HowItWorksSection", label: "How", title: "How does 1Cademy work?" },
+  {
+    id: "CommunitiesSection",
+    label: "What",
+    title: "What communities do exist in 1Cademy?",
+  },
+  { id: "ValuesSection", label: "Why", title: "Why does 1Cademy work?" },
+  {
+    id: "ValuesSection",
+    label: "Where",
+    title: "Where are 1Cademy members from?",
+  },
+  { id: "ValuesSection", label: "Who", title: "Who is behind 1Cademy?" },
+];
 
 const LinkTab = (props) => {
   return (
@@ -38,30 +53,27 @@ const LinkTab = (props) => {
   );
 };
 
-const sectionsOrder = [
-  {id: "LandingSection", label: "Landing", title: "1Cademy's Landing Page"},
-  {id: "HowItWorksSection", label: "How", title: "How does 1Cademy work?"},
-  {id: "CommunitiesSection", label: "What", title: "What communities do exist in 1Cademy?"},
-  {id: "ValuesSection", label: "Why", title: "Why does 1Cademy work?"},
-  {id: "ValuesSection", label: "Where", title: "Where are 1Cademy members from?"},
-  {id: "ValuesSection", label: "Who", title: "Who is behind 1Cademy?"},
-];
-
 const AppAppBar = () => {
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
 
   const [section, setSection] = useState(-1);
 
-  const landingSectionChecked = useWindowPosition("LandingSection");
-
-  useLayoutEffect(() => {
-    function updatePosition() {
-      const landingSectionOffsetHeight = window.document.getElementById(sectionsOrder[].id).offsetHeight;
-      const landingSectionOffsetHeight = window.document.getElementById(sectionsOrder[].id).offsetHeight;
-      if (window.pageYOffset < landingSectionOffsetHeight) {
-        setSection(-1);
+  //   https://stackoverflow.com/questions/62497110/detect-scroll-direction-in-react-js
+  useEffect(() => {
+    const updatePosition = () => {
+      console.log({ pageYOffset: window.pageYOffset });
+      for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
+        const sectOffsetHeight = window.document.getElementById(
+          sectionsOrder[sIdx].id
+        ).offsetHeight;
+        console.log({ pageYOffset: window.pageYOffset, sectOffsetHeight });
+        if (window.pageYOffset < sectOffsetHeight) {
+          setSection(sIdx - 1);
+          break;
+        }
       }
-    }
+    };
+    console.log({ window });
     window.addEventListener("scroll", updatePosition);
     updatePosition();
     return () => window.removeEventListener("scroll", updatePosition);
@@ -127,22 +139,22 @@ const AppAppBar = () => {
               titl={sectionsOrder[1].title}
             />
             <LinkTab
-              label={sectionsOrder[1].label}
+              label={sectionsOrder[2].label}
               href={sectionsOrder[2].id}
               titl={sectionsOrder[2].title}
             />
             <LinkTab
-              label={sectionsOrder[1].label}
+              label={sectionsOrder[3].label}
               href={sectionsOrder[3].id}
               titl={sectionsOrder[3].title}
             />
             <LinkTab
-              label={sectionsOrder[1].label}
+              label={sectionsOrder[4].label}
               href={sectionsOrder[4].id}
               titl={sectionsOrder[4].title}
             />
             <LinkTab
-              label={sectionsOrder[1].label}
+              label={sectionsOrder[5].label}
               href={sectionsOrder[5].id}
               titl={sectionsOrder[5].title}
             />
