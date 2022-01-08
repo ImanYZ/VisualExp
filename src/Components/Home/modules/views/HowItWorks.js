@@ -21,7 +21,7 @@ const number = {
 };
 
 const image = {
-  height: 55,
+  width: 190,
   my: 4,
 };
 
@@ -62,12 +62,14 @@ function HowItWorks() {
                 <Box sx={number}>1.</Box>
                 <Box
                   component="img"
-                  src="/static/HowItWorks1.svg"
-                  alt="suitcase"
+                  src="/static/Summarizing.svg"
+                  alt="Summarizing"
                   sx={image}
                 />
-                <Typography variant="h5" align="center">
-                  Appointment every Wednesday 9am.
+                <Typography variant="h6">Summarizing</Typography>
+                <Typography variant="p">
+                  Summarizing the gist of every valuable piece of knowledge on
+                  the Web into small chunks of knowledge that we call "nodes."
                 </Typography>
               </Box>
             </Grid>
@@ -76,13 +78,14 @@ function HowItWorks() {
                 <Box sx={number}>2.</Box>
                 <Box
                   component="img"
-                  src="/static/HowItWorks2.svg"
-                  alt="graph"
+                  src="/static/Linking.svg"
+                  alt="Linking"
                   sx={image}
                 />
-                <Typography variant="h5" align="center">
-                  First come, first served. Our offers are in limited
-                  quantities, so be quick.
+                <Typography variant="h6">Linking</Typography>
+                <Typography variant="p">
+                  Identifying and visualizing the prerequisite knowledge "links"
+                  between nodes.
                 </Typography>
               </Box>
             </Grid>
@@ -91,13 +94,14 @@ function HowItWorks() {
                 <Box sx={number}>3.</Box>
                 <Box
                   component="img"
-                  src="/static/HowItWorks3.svg"
-                  alt="clock"
+                  src="/static/Evaluating.svg"
+                  alt="Evaluating"
                   sx={image}
                 />
-                <Typography variant="h5" align="center">
-                  {"New offers every week. New experiences, new surprises. "}
-                  {"Your Sundays will no longer be alike."}
+                <Typography variant="h6">Evaluating</Typography>
+                <Typography variant="p">
+                  Group-evaluating the nodes and links, through up/down-votes
+                  and comments.
                 </Typography>
               </Box>
             </Grid>
@@ -106,13 +110,14 @@ function HowItWorks() {
                 <Box sx={number}>4.</Box>
                 <Box
                   component="img"
-                  src="/static/HowItWorks3.svg"
-                  alt="clock"
+                  src="/static/Improving.svg"
+                  alt="Improving"
                   sx={image}
                 />
-                <Typography variant="h5" align="center">
-                  {"New offers every week. New experiences, new surprises. "}
-                  {"Your Sundays will no longer be alike."}
+                <Typography variant="h6">Improving</Typography>
+                <Typography variant="p">
+                  Collaboratively improving and up-dating nodes and links
+                  through proposals and community approvals.
                 </Typography>
               </Box>
             </Grid>
