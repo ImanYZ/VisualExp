@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRecoilState } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
@@ -17,24 +17,9 @@ import { colorModeState } from "../../../../store/GlobalAtoms";
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
-import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
+import sectionsOrder from "./sectionsOrder";
 
-const sectionsOrder = [
-  { id: "LandingSection", label: "Landing", title: "1Cademy's Landing Page" },
-  { id: "HowItWorksSection", label: "How", title: "How does 1Cademy work?" },
-  {
-    id: "CommunitiesSection",
-    label: "What",
-    title: "What communities do exist in 1Cademy?",
-  },
-  { id: "ValuesSection", label: "Why", title: "Why does 1Cademy work?" },
-  {
-    id: "ValuesSection",
-    label: "Where",
-    title: "Where are 1Cademy members from?",
-  },
-  { id: "ValuesSection", label: "Who", title: "Who is behind 1Cademy?" },
-];
+import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
 const LinkTab = (props) => {
   return (
@@ -53,43 +38,20 @@ const LinkTab = (props) => {
   );
 };
 
-const AppAppBar = () => {
+const AppAppBar = (props) => {
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
-
-  const [section, setSection] = useState(-1);
-
-  //   https://stackoverflow.com/questions/62497110/detect-scroll-direction-in-react-js
-  useEffect(() => {
-    const updatePosition = () => {
-      console.log({ pageYOffset: window.pageYOffset });
-      for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
-        const sectOffsetHeight = window.document.getElementById(
-          sectionsOrder[sIdx].id
-        ).offsetHeight;
-        console.log({ pageYOffset: window.pageYOffset, sectOffsetHeight });
-        if (window.pageYOffset < sectOffsetHeight) {
-          setSection(sIdx - 1);
-          break;
-        }
-      }
-    };
-    console.log({ window });
-    window.addEventListener("scroll", updatePosition);
-    updatePosition();
-    return () => window.removeEventListener("scroll", updatePosition);
-  }, []);
 
   const toggleColorMode = (event) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
   };
 
   const switchSection = (event, newValue) => {
-    setSection(newValue);
+    props.setSection(newValue);
   };
 
   const homeClick = (href) => (event) => {
     event.preventDefault();
-    setSection(-1);
+    props.setSection(-1);
     document.getElementById(href).scrollIntoView({ behavior: "smooth" });
   };
 
@@ -113,7 +75,7 @@ const AppAppBar = () => {
             </Box>
           </Tooltip>
           <Tabs
-            value={section}
+            value={props.section}
             onChange={switchSection}
             variant="scrollable"
             scrollButtons="auto"

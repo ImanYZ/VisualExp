@@ -1,6 +1,7 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 
 import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -10,6 +11,12 @@ import AnimatediconLoop from "../../../../assets/AnimatediconLoop.gif";
 import backgroundImage from "../../../../assets/LibraryBackground.jpg";
 
 export default function Landing() {
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    setChecked(true);
+  }, []);
+
   return (
     <LandingLayout
       sxBackground={{
@@ -29,17 +36,16 @@ export default function Landing() {
         {/* 1<Box sx={{ display: "inline", color: "secondary.main" }}>Cademy</Box>{" "}
         to Learn */}
       </Typography>
-      <Typography
-        color="inherit"
-        align="center"
-        variant="h5"
-        sx={{ mb: 4, mt: 4 }}
-      >
-        1 academic platform to collaboratively make learning and research more
-        enjoyable.
-        {/* Using 1Cademy we start learning from Advanced topics and go backwards
+      <Box align="center" sx={{ mb: 4, mt: 4 }}>
+        <Collapse in={checked} timeout={1000}>
+          <Typography color="inherit" variant="h5">
+            The one academic platform to collaboratively make learning and
+            research more enjoyable.
+            {/* Using 1Cademy we start learning from Advanced topics and go backwards
         through the prerequisites as needed! */}
-      </Typography>
+          </Typography>
+        </Collapse>
+      </Box>
       <Button
         color="secondary"
         variant="contained"

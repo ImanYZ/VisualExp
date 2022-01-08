@@ -1,11 +1,17 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
+import Collapse from "@mui/material/Collapse";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
+
+import sectionsOrder from "./sectionsOrder";
+const sectionIdx = sectionsOrder.findIndex(
+  (sect) => sect.id === "HowItWorksSection"
+);
 
 const item = {
   display: "flex",
@@ -27,6 +33,23 @@ const image = {
 };
 
 const HowItWorks = (props) => {
+  const [stepChecked, setStepChecked] = useState([false, false, false, false]);
+
+  useEffect(() => {
+    if (props.section >= sectionIdx - 1 && !stepChecked[0]) {
+      setStepChecked([true, false, false, false]);
+      setTimeout(() => {
+        setStepChecked([true, true, false, false]);
+        setTimeout(() => {
+          setStepChecked([true, true, true, false]);
+          setTimeout(() => {
+            setStepChecked([true, true, true, true]);
+          }, 1000);
+        }, 1000);
+      }, 1000);
+    }
+  }, [props.section, stepChecked]);
+
   return (
     <Box
       id="HowItWorksSection"
@@ -62,12 +85,15 @@ const HowItWorks = (props) => {
             <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>1.</Box>
-                <Box
-                  component="img"
-                  src="/static/Summarizing.svg"
-                  alt="Summarizing"
-                  sx={image}
-                />
+                <Box sx={image}>
+                  <Collapse in={stepChecked[0]} timeout={1000}>
+                    <img
+                      src="/static/Summarizing.svg"
+                      alt="Summarizing"
+                      height="130px"
+                    />
+                  </Collapse>
+                </Box>
                 <Typography variant="h6">Summarizing</Typography>
                 <Typography variant="body1">
                   Summarizing the gist of every valuable piece of knowledge on
@@ -78,12 +104,15 @@ const HowItWorks = (props) => {
             <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>2.</Box>
-                <Box
-                  component="img"
-                  src="/static/Linking.svg"
-                  alt="Linking"
-                  sx={image}
-                />
+                <Box sx={image}>
+                  <Collapse in={stepChecked[1]} timeout={1000}>
+                    <img
+                      src="/static/Linking.svg"
+                      alt="Linking"
+                      height="130px"
+                    />
+                  </Collapse>
+                </Box>
                 <Typography variant="h6">Linking</Typography>
                 <Typography variant="body1">
                   Identifying and visualizing the prerequisite knowledge "links"
@@ -94,12 +123,15 @@ const HowItWorks = (props) => {
             <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>3.</Box>
-                <Box
-                  component="img"
-                  src="/static/Evaluating.svg"
-                  alt="Evaluating"
-                  sx={image}
-                />
+                <Box sx={image}>
+                  <Collapse in={stepChecked[2]} timeout={1000}>
+                    <img
+                      src="/static/Evaluating.svg"
+                      alt="Evaluating"
+                      height="130px"
+                    />
+                  </Collapse>
+                </Box>
                 <Typography variant="h6">Evaluating</Typography>
                 <Typography variant="body1">
                   Group-evaluating the nodes and links, through up/down-votes
@@ -110,12 +142,15 @@ const HowItWorks = (props) => {
             <Grid item xs={12} md={3}>
               <Box sx={item}>
                 <Box sx={number}>4.</Box>
-                <Box
-                  component="img"
-                  src="/static/Improving.svg"
-                  alt="Improving"
-                  sx={image}
-                />
+                <Box sx={image}>
+                  <Collapse in={stepChecked[3]} timeout={1000}>
+                    <img
+                      src="/static/Improving.svg"
+                      alt="Improving"
+                      height="130px"
+                    />
+                  </Collapse>
+                </Box>
                 <Typography variant="h6">Improving</Typography>
                 <Typography variant="body1">
                   Collaboratively improving and up-dating nodes and links
