@@ -78,7 +78,7 @@ const HowItWorks = (props) => {
           }}
         />
         <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
-          How We Work
+          {sectionsOrder[sectionIdx].title}
         </Typography>
         <div>
           <Grid container spacing={2.5}>
@@ -94,9 +94,9 @@ const HowItWorks = (props) => {
                     />
                   </Collapse>
                 </Box>
-                <Typography variant="h6">Summarizing</Typography>
+                <Typography variant="h6">Summarize</Typography>
                 <Typography variant="body1">
-                  Summarizing the gist of every valuable piece of knowledge on
+                  We summarize the gist of every valuable piece of knowledge on
                   the Web into small chunks of knowledge that we call "nodes."
                 </Typography>
               </Box>
@@ -113,9 +113,9 @@ const HowItWorks = (props) => {
                     />
                   </Collapse>
                 </Box>
-                <Typography variant="h6">Linking</Typography>
+                <Typography variant="h6">Link</Typography>
                 <Typography variant="body1">
-                  Identifying and visualizing the prerequisite knowledge "links"
+                  We identify and visualize the prerequisite knowledge "links"
                   between nodes.
                 </Typography>
               </Box>
@@ -132,9 +132,9 @@ const HowItWorks = (props) => {
                     />
                   </Collapse>
                 </Box>
-                <Typography variant="h6">Evaluating</Typography>
+                <Typography variant="h6">Evaluate</Typography>
                 <Typography variant="body1">
-                  Group-evaluating the nodes and links, through up/down-votes
+                  We group-evaluate the nodes and links, through up/down-votes
                   and comments.
                 </Typography>
               </Box>
@@ -151,10 +151,10 @@ const HowItWorks = (props) => {
                     />
                   </Collapse>
                 </Box>
-                <Typography variant="h6">Improving</Typography>
+                <Typography variant="h6">Improve</Typography>
                 <Typography variant="body1">
-                  Collaboratively improving and up-dating nodes and links
-                  through proposals and community approvals.
+                  We collaboratively improve and up-date nodes and links through
+                  proposals and community approvals.
                 </Typography>
               </Box>
             </Grid>

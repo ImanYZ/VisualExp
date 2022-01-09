@@ -41,8 +41,6 @@ export default function Landing() {
           <Typography color="inherit" variant="h5">
             The one academic platform to collaboratively make learning and
             research more enjoyable.
-            {/* Using 1Cademy we start learning from Advanced topics and go backwards
-        through the prerequisites as needed! */}
           </Typography>
         </Collapse>
       </Box>

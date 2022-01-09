@@ -40,7 +40,7 @@ function Index() {
       <Landing />
       <HowItWorks section={section} />
       <Communities />
-      <Values />
+      <Values section={section} />
       <ProductCTA />
       <ProductSmokingHero />
       <AppFooter />
