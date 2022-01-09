@@ -13,6 +13,7 @@ import AppAppBar from "./modules/views/AppAppBar";
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
+import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 
 function Index() {
   const [section, setSection] = useState(-1);
@@ -40,9 +41,10 @@ function Index() {
       <Landing />
       <HowItWorks section={section} />
       <Communities />
-      <Values section={section} />
+      <Values />
+      <UniversitiesMap theme={"Light"} />
       <ProductCTA />
-      <ProductSmokingHero />
+      {/* <ProductSmokingHero /> */}
       <AppFooter />
     </Box>
   );
