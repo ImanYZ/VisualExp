@@ -2,16 +2,16 @@ export default [
   {
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
-    width: "40%",
+    width: "45%",
   },
   {
-    url: "/static/Communities/Social_Political_Psychology.jpg",
-    title: "Social/Political Psychology",
-    width: "30%",
+    url: "/static/Communities/Clinical_Psychology.jpg",
+    title: "Clinical Psychology",
+    width: "25%",
   },
   {
-    url: "/static/Communities/Deep_Learning.jpg",
-    title: "Deep Learning",
+    url: "/static/Communities/Mindfulness.jpg",
+    title: "Mindfulness",
     width: "30%",
   },
   {
@@ -25,23 +25,43 @@ export default [
     width: "40%",
   },
   {
-    url: "/static/LibraryBackground.jpg",
-    title: "Librarians",
+    url: "/static/Communities/Disability_Studies.png",
+    title: "Disability Studies",
     width: "35%",
   },
   {
-    url: "/static/Communities/Mindfulness.jpg",
-    title: "Mindfulness",
+    url: "/static/Communities/Social_Political_Psychology.jpg",
+    title: "Social/Political Psychology",
+    width: "35%",
+  },
+  {
+    url: "/static/Communities/Cryptoeconomics.jpg",
+    title: "Cryptoeconomics",
+    width: "35%",
+  },
+  {
+    url: "/static/Communities/Deep_Learning.jpg",
+    title: "Deep Learning",
+    width: "30%",
+  },
+  {
+    url: "/static/Communities/Graphic_Design.jpg",
+    title: "Graphic Design",
+    width: "25%",
+  },
+  {
+    url: "/static/Communities/UI_Design.jpg",
+    title: "UI Design",
+    width: "35%",
+  },
+  {
+    url: "/static/Communities/UX_Research.jpg",
+    title: "UX Research",
     width: "40%",
   },
   {
-    url: "https://images.unsplash.com/photo-1533727937480-da3a97967e95?auto=format&fit=crop&w=400&q=80",
-    title: "Fitness",
-    width: "20%",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1518136247453-74e7b5265980?auto=format&fit=crop&w=400&q=80",
-    title: "Reading",
-    width: "40%",
+    url: "/static/LibraryBackground.jpg",
+    title: "Librarian Liaisons",
+    width: "100%",
   },
 ];

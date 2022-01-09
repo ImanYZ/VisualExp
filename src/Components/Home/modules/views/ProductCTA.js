@@ -1,24 +1,19 @@
-import * as React from "react";
+import React from "react";
+
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+
 import Typography from "../components/Typography";
-import TextField from "../components/TextField";
-import Snackbar from "../components/Snackbar";
 import Button from "../components/Button";
 
 function ProductCTA() {
-  const [open, setOpen] = React.useState(false);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   return (
     <Container component="section" sx={{ mt: 10, display: "flex" }}>
       <Grid container>
@@ -32,32 +27,9 @@ function ProductCTA() {
               px: 3,
             }}
           >
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{ maxWidth: 400 }}
-            >
-              <Typography variant="h2" component="h2" gutterBottom>
-                Receive offers
-              </Typography>
-              <Typography variant="h5">
-                Taste the holidays of the everyday close to home.
-              </Typography>
-              <TextField
-                noBorder
-                placeholder="Your email"
-                variant="standard"
-                sx={{ width: "100%", mt: 3, mb: 2 }}
-              />
-              <Button
-                type="submit"
-                color="primary"
-                variant="contained"
-                sx={{ width: "100%" }}
-              >
-                Keep me updated
-              </Button>
-            </Box>
+            <Typography variant="h2" component="h2" gutterBottom>
+              Receive offers
+            </Typography>
           </Box>
         </Grid>
         <Grid
@@ -77,27 +49,95 @@ function ProductCTA() {
               background: "url(/static/CTAImageDots.png)",
             }}
           />
-          <Box
-            component="img"
-            src="https://images.unsplash.com/photo-1527853787696-f7be74f2e39a?auto=format&fit=crop&w=750&q=80"
-            alt="call to action"
-            sx={{
-              position: "absolute",
-              top: -28,
-              left: -28,
-              right: 0,
-              bottom: 0,
-              width: "100%",
-              maxWidth: 600,
-            }}
-          />
+          <List
+            sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+          >
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar
+                  alt="Paul Resnick Picture"
+                  src="/static/Paul_Resnick.jpg"
+                  sx={{ width: 100, height: 130, mr: 2.5 }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary="1Cademy Advisor"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: "inline" }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Paul Resnick
+                    </Typography>
+                    {
+                      " — Michael D Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
+                    }
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+            <Divider variant="inset" component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar
+                  alt="Iman YeckehZaare Picture"
+                  src="/static/Iman_YeckehZaare.jpeg"
+                  sx={{ width: 100, height: 130, mr: 2.5 }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary="1Cademy Architect"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: "inline" }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Iman YeckehZaare
+                    </Typography>
+                    {
+                      " — Ph.D. Candidate at the University of Michigan, School of Information"
+                    }
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+            <Divider variant="inset" component="li" />
+            <ListItem alignItems="flex-start">
+              <ListItemAvatar>
+                <Avatar
+                  alt="Iman YeckehZaare Picture"
+                  src="/static/Iman_YeckehZaare.jpeg"
+                  sx={{ width: 100, height: 130, mr: 2.5 }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary="1Cademy Architect"
+                secondary={
+                  <React.Fragment>
+                    <Typography
+                      sx={{ display: "inline" }}
+                      component="span"
+                      variant="body2"
+                      color="text.primary"
+                    >
+                      Iman YeckehZaare
+                    </Typography>
+                    {
+                      " — Ph.D. Candidate at the University of Michigan, School of Information"
+                    }
+                  </React.Fragment>
+                }
+              />
+            </ListItem>
+          </List>
         </Grid>
       </Grid>
-      <Snackbar
-        open={open}
-        closeFunc={handleClose}
-        message="We will send you our best offers, once a week."
-      />
     </Container>
   );
 }
