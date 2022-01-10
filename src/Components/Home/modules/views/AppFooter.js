@@ -50,42 +50,25 @@ export default function AppFooter() {
       <Container sx={{ my: 8, display: "flex" }}>
         <Grid container spacing={5}>
           <Grid item xs={6} sm={4} md={3}>
-            <Grid
-              container
-              direction="column"
-              justifyContent="flex-end"
-              spacing={2}
-              sx={{ height: 120 }}
+            <Box
+              component="a"
+              href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
             >
-              <Grid item sx={{ display: "flex" }}>
-                <Box component="a" href="https://mui.com/" sx={iconStyle}>
-                  <img src="/static/appFooterFacebook.png" alt="Facebook" />
-                </Box>
-                <Box
-                  component="a"
-                  href="https://twitter.com/MaterialUI"
-                  sx={iconStyle}
-                >
-                  <img src="/static/appFooterTwitter.png" alt="Twitter" />
-                </Box>
-              </Grid>
-              <Grid item>
-                <Copyright />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item xs={6} sm={4} md={2}>
-            <Typography variant="h6" marked="left" gutterBottom>
-              Legal
-            </Typography>
-            <Box component="ul" sx={{ m: 0, listStyle: "none", p: 0 }}>
-              <Box component="li" sx={{ py: 0.5 }}>
-                <Link href="/premium-themes/onepirate/terms/">Terms</Link>
-              </Box>
-              <Box component="li" sx={{ py: 0.5 }}>
-                <Link href="/premium-themes/onepirate/privacy/">Privacy</Link>
-              </Box>
+              <img
+                src="/static/YouTube_Logo_2017.svg"
+                alt="1Cademy YouTube Channel"
+                width="100px"
+              />
             </Box>
+          </Grid>
+          <Grid item xs={6} sm={4} md={3}>
+            <Copyright />
+          </Grid>
+          <Grid item xs={6} sm={4} md={3}>
+            <Link href="/terms">Terms</Link>
+          </Grid>
+          <Grid item xs={6} sm={4} md={3}>
+            <Link href="/privacy">Privacy</Link>
           </Grid>
           {/* <Grid item xs={6} sm={8} md={4}>
             <Typography variant="h6" marked="left" gutterBottom>

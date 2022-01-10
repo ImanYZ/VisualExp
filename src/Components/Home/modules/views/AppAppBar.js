@@ -46,11 +46,12 @@ const AppAppBar = (props) => {
   };
 
   const switchSection = (event, newValue) => {
+    console.log({ section: sectionsOrder[newValue] });
     props.setSection(newValue);
     window.history.replaceState(
       null,
-      sectionsOrder[newValue - 1].title,
-      "#" + sectionsOrder[newValue - 1].id
+      sectionsOrder[newValue].title,
+      "#" + sectionsOrder[newValue].id
     );
   };
 

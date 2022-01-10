@@ -19,6 +19,8 @@ import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
 import Home from "./Components/Home/Home";
+import Privacy from "./Components/Home/Privacy";
+import Terms from "./Components/Home/Terms";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
 
 import "./App.css";
@@ -134,6 +136,8 @@ const AppRouter = (props) => {
   return (
     <Routes>
       <Route path="/Home/*" element={<Home />} />
+      <Route path="/Privacy/*" element={<Privacy />} />
+      <Route path="/Terms/*" element={<Terms />} />
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}

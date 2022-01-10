@@ -38,19 +38,26 @@ function Index() {
   };
 
   return (
-    <Box
-      onScroll={updatePosition}
-      sx={{ height: "100vh", overflowY: "auto", overflowX: "auto" }}
-    >
+    <Box sx={{ mb: "70px" }}>
       <AppAppBar section={section} setSection={setSection} />
-      <Landing />
-      <HowItWorks section={section} />
-      <Communities />
-      <Values />
-      <UniversitiesMap theme={"Light"} />
-      <ProductCTA />
-      {/* <ProductSmokingHero /> */}
-      <AppFooter />
+      <Box
+        onScroll={updatePosition}
+        sx={{
+          height: "100vh",
+          mt: "70px",
+          overflowY: "auto",
+          overflowX: "auto",
+        }}
+      >
+        <Landing />
+        <HowItWorks section={section} />
+        <Communities />
+        <Values />
+        <UniversitiesMap theme={"Light"} />
+        <ProductCTA />
+        {/* <ProductSmokingHero /> */}
+        <AppFooter />
+      </Box>
     </Box>
   );
 }

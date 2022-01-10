@@ -5,7 +5,6 @@ import Typography from "./modules/components/Typography";
 import AppAppBar from "./modules/views/AppAppBar";
 import AppFooter from "./modules/views/AppFooter";
 import withRoot from "./modules/withRoot";
-import privacy from "./modules/views/privacy.js";
 
 function Privacy() {
   return (
