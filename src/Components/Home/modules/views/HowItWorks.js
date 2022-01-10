@@ -166,7 +166,7 @@ const HowItWorks = (props) => {
           variant="contained"
           component="a"
           href="/premium-themes/onepirate/sign-up/"
-          sx={{ mt: 1 }}
+          sx={{ mt: 10 }}
         >
           Get started
         </Button>

@@ -3,13 +3,23 @@ import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 import Collapse from "@mui/material/Collapse";
+import { CardActionArea } from "@mui/material";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
 
 import valuesItems from "./valuesItems";
 import sectionsOrder from "./sectionsOrder";
+
+const iniStepChecked = [];
+for (let value of valuesItems) {
+  iniStepChecked.push(false);
+}
+
 const sectionIdx = sectionsOrder.findIndex(
   (sect) => sect.id === "ValuesSection"
 );
@@ -27,22 +37,13 @@ const image = {
 };
 
 const Values = (props) => {
-  const [stepChecked, setStepChecked] = useState([false, false, false, false]);
+  const [stepChecked, setStepChecked] = useState(iniStepChecked);
 
-  useEffect(() => {
-    if (props.section >= sectionIdx - 1 && !stepChecked[0]) {
-      setStepChecked([true, false, false, false]);
-      setTimeout(() => {
-        setStepChecked([true, true, false, false]);
-        setTimeout(() => {
-          setStepChecked([true, true, true, false]);
-          setTimeout(() => {
-            setStepChecked([true, true, true, true]);
-          }, 1000);
-        }, 1000);
-      }, 1000);
-    }
-  }, [props.section, stepChecked]);
+  const flipCard = (idx) => (event) => {
+    const sChecked = [...stepChecked];
+    sChecked[idx] = !sChecked[idx];
+    setStepChecked(sChecked);
+  };
 
   return (
     <Box
@@ -60,7 +61,7 @@ const Values = (props) => {
           alignItems: "center",
         }}
       >
-        <Box
+        {/* <Box
           component="img"
           src="/static/CurvyLines.png"
           alt="curvy lines"
@@ -70,28 +71,39 @@ const Values = (props) => {
             top: -180,
             opacity: 0.7,
           }}
-        />
+        /> */}
         <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
           {sectionsOrder[sectionIdx].title}
         </Typography>
         <div>
           <Grid container spacing={2.5}>
-            {valuesItems.map((value) => {
+            {valuesItems.map((value, idx) => {
               return (
                 <Grid key={value.name} item xs={12} md={4}>
-                  <Box sx={item}>
-                    <Box sx={image}>
-                      <Collapse in={stepChecked[0]} timeout={1000}>
-                        <img
-                          src={"/static/" + value.name + ".svg"}
+                  <Card sx={{ maxWidth: 340 }}>
+                    <CardActionArea onClick={flipCard(idx)}>
+                      <Collapse in={!stepChecked[idx]} timeout={1000}>
+                        <CardMedia
+                          component="img"
+                          height="100%"
+                          width="100%"
+                          image={"/static/" + value.image}
                           alt={value.name}
-                          height="130px"
+                          sx={{ padding: "10px 37px 0px 37px" }}
                         />
                       </Collapse>
-                    </Box>
-                    <Typography variant="h6">{value.name}</Typography>
-                    <Typography variant="body1">{value.body}</Typography>
-                  </Box>
+                      <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                          {value.name}
+                        </Typography>
+                        <Collapse in={stepChecked[idx]} timeout={1000}>
+                          <Typography variant="body2" color="text.secondary">
+                            {value.body}
+                          </Typography>
+                        </Collapse>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
                 </Grid>
               );
             })}
@@ -103,9 +115,9 @@ const Values = (props) => {
           variant="contained"
           component="a"
           href="/premium-themes/onepirate/sign-up/"
-          sx={{ mt: 1 }}
+          sx={{ mt: 10 }}
         >
-          Join Our Communities
+          Join/Initiate Communities
         </Button>
       </Container>
     </Box>
