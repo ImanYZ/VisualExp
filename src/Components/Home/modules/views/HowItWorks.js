@@ -4,6 +4,10 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Collapse from "@mui/material/Collapse";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -17,7 +21,7 @@ const item = {
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  px: 5,
+  backgroundColor: "white",
 };
 
 const number = {
@@ -75,91 +79,113 @@ const HowItWorks = (props) => {
             position: "absolute",
             top: -180,
             opacity: 0.7,
+            zIndex: 0,
           }}
         />
         <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
           {sectionsOrder[sectionIdx].title}
         </Typography>
-        <div>
+        <Box sx={{ zIndex: 1 }}>
           <Grid container spacing={2.5}>
             <Grid item xs={12} md={3}>
-              <Box sx={item}>
+              <Card sx={{ ...item, maxWidth: 355 }}>
                 <Box sx={number}>1.</Box>
-                <Box sx={image}>
-                  <Collapse in={stepChecked[0]} timeout={1000}>
-                    <img
-                      src="/static/Summarizing.svg"
-                      alt="Summarizing"
-                      height="130px"
-                    />
-                  </Collapse>
-                </Box>
-                <Typography variant="h6">Summarize</Typography>
-                <Typography variant="body1">
-                  We summarize the gist of every valuable piece of knowledge on
-                  the Web into small chunks of knowledge that we call "nodes."
-                </Typography>
-              </Box>
+                <Collapse in={stepChecked[0]} timeout={1000}>
+                  <CardMedia
+                    component="img"
+                    src="/static/Summarizing.svg"
+                    alt="Summarizing"
+                    height="100%"
+                    width="100%"
+                    sx={{ px: "10px" }}
+                  />
+                </Collapse>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Summarize
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    We summarize the gist of every valuable piece of knowledge
+                    on the Web into small chunks of knowledge that we call
+                    "nodes."
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Box sx={item}>
+              <Card sx={{ ...item, maxWidth: 355 }}>
                 <Box sx={number}>2.</Box>
-                <Box sx={image}>
-                  <Collapse in={stepChecked[1]} timeout={1000}>
-                    <img
-                      src="/static/Linking.svg"
-                      alt="Linking"
-                      height="130px"
-                    />
-                  </Collapse>
-                </Box>
-                <Typography variant="h6">Link</Typography>
-                <Typography variant="body1">
-                  We identify and visualize the prerequisite knowledge "links"
-                  between nodes.
-                </Typography>
-              </Box>
+                <Collapse in={stepChecked[1]} timeout={1000}>
+                  <CardMedia
+                    component="img"
+                    src="/static/Linking.svg"
+                    alt="Linking"
+                    height="100%"
+                    width="100%"
+                    sx={{ px: "10px" }}
+                  />
+                </Collapse>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Link
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    We identify and visualize the prerequisite knowledge "links"
+                    between nodes.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Box sx={item}>
+              <Card sx={{ ...item, maxWidth: 355 }}>
                 <Box sx={number}>3.</Box>
-                <Box sx={image}>
-                  <Collapse in={stepChecked[2]} timeout={1000}>
-                    <img
-                      src="/static/Evaluating.svg"
-                      alt="Evaluating"
-                      height="130px"
-                    />
-                  </Collapse>
-                </Box>
-                <Typography variant="h6">Evaluate</Typography>
-                <Typography variant="body1">
-                  We group-evaluate the nodes and links, through up/down-votes
-                  and comments.
-                </Typography>
-              </Box>
+                <Collapse in={stepChecked[2]} timeout={1000}>
+                  <CardMedia
+                    component="img"
+                    src="/static/Evaluating.svg"
+                    alt="Evaluating"
+                    height="100%"
+                    width="100%"
+                    sx={{ px: "10px" }}
+                  />
+                </Collapse>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Evaluate
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    We group-evaluate the nodes and links, through up/down-votes
+                    and comments.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Box sx={item}>
+              <Card sx={{ ...item, maxWidth: 355 }}>
                 <Box sx={number}>4.</Box>
-                <Box sx={image}>
-                  <Collapse in={stepChecked[3]} timeout={1000}>
-                    <img
-                      src="/static/Improving.svg"
-                      alt="Improving"
-                      height="130px"
-                    />
-                  </Collapse>
-                </Box>
-                <Typography variant="h6">Improve</Typography>
-                <Typography variant="body1">
-                  We collaboratively improve and up-date nodes and links through
-                  proposals and community approvals.
-                </Typography>
-              </Box>
+                <Collapse in={stepChecked[3]} timeout={1000}>
+                  <CardMedia
+                    component="img"
+                    src="/static/Improving.svg"
+                    alt="Improving"
+                    height="100%"
+                    width="100%"
+                    sx={{ px: "10px" }}
+                  />
+                </Collapse>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="div">
+                    Improve
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    We collaboratively improve and up-date nodes and links
+                    through proposals and community approvals.
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
-        </div>
+        </Box>
         <Button
           color="secondary"
           size="large"
