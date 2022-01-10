@@ -50,7 +50,7 @@ export default function Landing() {
         size="large"
         component="a"
         href="/premium-themes/onepirate/sign-up/"
-        sx={{ minWidth: 200 }}
+        sx={{ minWidth: 200, color: "common.white" }}
       >
         Apply to Join Us!
       </Button>

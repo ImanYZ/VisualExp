@@ -27,6 +27,11 @@ function Index() {
       cumulativeHeight += sectOffsetHeight;
       if (event.target.scrollTop < cumulativeHeight) {
         setSection(sIdx - 1);
+        window.history.replaceState(
+          null,
+          sectionsOrder[sIdx].title,
+          "#" + sectionsOrder[sIdx].id
+        );
         break;
       }
     }

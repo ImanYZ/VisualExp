@@ -72,7 +72,13 @@ const Values = (props) => {
             opacity: 0.7,
           }}
         /> */}
-        <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
+        <Typography
+          variant="h4"
+          marked="center"
+          align="center"
+          component="h2"
+          sx={{ mb: 7 }}
+        >
           {sectionsOrder[sectionIdx].title}
         </Typography>
         <div>
@@ -113,7 +119,7 @@ const Values = (props) => {
           variant="contained"
           component="a"
           href="/premium-themes/onepirate/sign-up/"
-          sx={{ mt: 10 }}
+          sx={{ mt: 10, color: "common.white" }}
         >
           Join/Initiate Communities
         </Button>

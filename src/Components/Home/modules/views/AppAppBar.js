@@ -41,26 +41,27 @@ const LinkTab = (props) => {
 const AppAppBar = (props) => {
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
 
-  useEffect(() => {
-    const theSection = props.section + 1;
-    window.history.replaceState(
-      null,
-      sectionsOrder[theSection].title,
-      "#" + sectionsOrder[theSection].id
-    );
-  }, [props.section]);
-
   const toggleColorMode = (event) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
   };
 
   const switchSection = (event, newValue) => {
     props.setSection(newValue);
+    window.history.replaceState(
+      null,
+      sectionsOrder[newValue - 1].title,
+      "#" + sectionsOrder[newValue - 1].id
+    );
   };
 
   const homeClick = (href) => (event) => {
     event.preventDefault();
     props.setSection(-1);
+    window.history.replaceState(
+      null,
+      sectionsOrder[0].title,
+      "#" + sectionsOrder[0].id
+    );
     document.getElementById(href).scrollIntoView({ behavior: "smooth" });
   };
 

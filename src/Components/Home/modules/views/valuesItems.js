@@ -39,7 +39,7 @@ export default [
     image: "Learning_Through_Teaching.png",
   },
   {
-    name: "Searching for Learning",
+    name: "Searching as Learning",
     body: `Have you ever experienced searching for content to learn something that you don't have the right keywords for? For example, what would you search to learn to develop web animations like those you see on this website? Just "web animations"? Well, that does not really help you find the right content to learn from. 1Cademy provides us with a search engine for "factual search," in addition to a mechanism to develop a personalized view of the shared knowledge graph to facilitate "exploratory search." This way, even without having the right keywords, we can navigate through the hierarchical structure of the concepts and their prerequisite links to learn.`,
     image: "Search_for_Learning.png",
   },

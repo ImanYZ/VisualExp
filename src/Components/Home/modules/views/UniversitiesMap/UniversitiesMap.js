@@ -2,6 +2,9 @@ import React, { useState, useEffect, Suspense } from "react";
 
 import { useRecoilValue } from "recoil";
 
+import Container from "@mui/material/Container";
+import Typography from "../../components/Typography";
+
 import { firebaseOnecademyState } from "../../../../../store/OneCademyAtoms";
 
 import "./UniversitiesMap.css";
@@ -71,22 +74,33 @@ const UniversitiesMap = (props) => {
 
   return (
     <div
+      id="SchoolsSection"
       className={
         props.theme === "Light"
           ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
           : "UniversitiesMapDiv"
       }
     >
-      <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
-        <div className="HeaderGradientText">Our Researchers Are From</div>
-        <div id="googleMapDiv">
-          {institutions.length > 0 ? (
-            <Suspense fallback={<div></div>}>
-              <GoogleMapCom institutions={institutions} />
-            </Suspense>
-          ) : null}
+      <Container component="section" sx={{ mt: 8, mb: 4 }}>
+        <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
+          <Typography
+            variant="h4"
+            marked="center"
+            align="center"
+            component="h2"
+            sx={{ mb: 7 }}
+          >
+            Our Researchers Are From
+          </Typography>
+          <div id="googleMapDiv">
+            {institutions.length > 0 ? (
+              <Suspense fallback={<div></div>}>
+                <GoogleMapCom institutions={institutions} />
+              </Suspense>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </Container>
     </div>
   );
 };

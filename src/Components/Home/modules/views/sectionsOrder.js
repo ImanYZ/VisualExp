@@ -8,7 +8,7 @@ export default [
   },
   { id: "ValuesSection", label: "Why", title: "Why 1Cademy Helps" },
   {
-    id: "ValuesSection",
+    id: "SchoolsSection",
     label: "Where",
     title: "Where Are We From?",
   },

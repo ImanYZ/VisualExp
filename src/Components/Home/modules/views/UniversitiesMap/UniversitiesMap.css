@@ -8,7 +8,7 @@
 }
 
 #googleMapDiv {
-  /* width:70vw; */
+  width: 85vw;
   margin: auto;
   border: 5px solid white;
   border-radius: 15px;
