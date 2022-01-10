@@ -82,16 +82,14 @@ const Values = (props) => {
                 <Grid key={value.name} item xs={12} md={4}>
                   <Card sx={{ maxWidth: 340 }}>
                     <CardActionArea onClick={flipCard(idx)}>
-                      <Collapse in={!stepChecked[idx]} timeout={1000}>
-                        <CardMedia
-                          component="img"
-                          height="100%"
-                          width="100%"
-                          image={"/static/" + value.image}
-                          alt={value.name}
-                          sx={{ padding: "10px 37px 0px 37px" }}
-                        />
-                      </Collapse>
+                      <CardMedia
+                        component="img"
+                        height="100%"
+                        width="100%"
+                        image={"/static/" + value.image}
+                        alt={value.name}
+                        sx={{ padding: "10px 37px 0px 37px" }}
+                      />
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
                           {value.name}
