@@ -10,6 +10,11 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
+import sectionsOrder from "./sectionsOrder";
+const sectionIdx = sectionsOrder.findIndex(
+  (sect) => sect.id === "JoinUsSection"
+);
+
 const steps = [
   {
     label: "Select campaign settings",
