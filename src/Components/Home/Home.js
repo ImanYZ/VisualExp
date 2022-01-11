@@ -9,6 +9,7 @@ import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
 import AppAppBar from "./modules/views/AppAppBar";
+import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
@@ -61,7 +62,7 @@ function Index() {
         <Values />
         <UniversitiesMap theme={"Light"} />
         <WhoWeAre />
-        {/* <ProductSmokingHero /> */}
+        <JoinUs />
         <AppFooter />
       </Box>
     </Box>

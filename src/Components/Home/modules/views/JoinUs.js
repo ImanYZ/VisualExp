@@ -60,6 +60,9 @@ const JoinUs = (props) => {
         pb: 10,
       }}
     >
+      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+        {sectionsOrder[sectionIdx].title}
+      </Typography>
       <Stepper activeStep={activeStep} orientation="vertical">
         {steps.map((step, index) => (
           <Step key={step.label}>
@@ -98,10 +101,10 @@ const JoinUs = (props) => {
       </Stepper>
       {activeStep === steps.length && (
         <Paper square elevation={0} sx={{ p: 3 }}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-            Reset
-          </Button>
+          <Typography>
+            All steps completed. After reviewing your application, our community
+            leaders will contact you regarding your application.
+          </Typography>
         </Paper>
       )}
     </Container>
