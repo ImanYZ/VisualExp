@@ -40,7 +40,7 @@ function Index() {
   };
 
   return (
-    <Box sx={{ mb: "70px" }}>
+    <Box>
       <AppAppBar
         section={section}
         setSection={setSection}

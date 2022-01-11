@@ -13,4 +13,5 @@ export default [
     title: "Where Are We From?",
   },
   { id: "WhoWeAreSection", label: "Who", title: "Who Is Behind 1Cademy?" },
+  { id: "JoinUsSection", label: "Apply", title: "Apply to Join Us?" },
 ];
