@@ -49,7 +49,16 @@ export default function AppFooter() {
     >
       <Container sx={{ my: 8, display: "flex" }}>
         <Grid container spacing={5}>
-          <Grid item xs={6} sm={4} md={3}>
+          <Grid item xs={6} sm={3}>
+            <Copyright />
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <Link href="/terms">Terms</Link>
+          </Grid>
+          <Grid item xs={6} sm={2}>
+            <Link href="/privacy">Privacy</Link>
+          </Grid>
+          <Grid item xs={6} sm={2}>
             <Box
               component="a"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
@@ -60,15 +69,6 @@ export default function AppFooter() {
                 width="100px"
               />
             </Box>
-          </Grid>
-          <Grid item xs={6} sm={4} md={3}>
-            <Copyright />
-          </Grid>
-          <Grid item xs={6} sm={4} md={3}>
-            <Link href="/terms">Terms</Link>
-          </Grid>
-          <Grid item xs={6} sm={4} md={3}>
-            <Link href="/privacy">Privacy</Link>
           </Grid>
           {/* <Grid item xs={6} sm={8} md={4}>
             <Typography variant="h6" marked="left" gutterBottom>

@@ -46,12 +46,16 @@ const AppAppBar = (props) => {
   };
 
   const switchSection = (event, newValue) => {
-    console.log({ section: sectionsOrder[newValue] });
+    console.log({ section: sectionsOrder[newValue + 1] });
+    props.setNotSectionSwitching(true);
     props.setSection(newValue);
+    setTimeout(() => {
+      props.setNotSectionSwitching(false);
+    }, 1000);
     window.history.replaceState(
       null,
-      sectionsOrder[newValue].title,
-      "#" + sectionsOrder[newValue].id
+      sectionsOrder[newValue + 1].title,
+      "#" + sectionsOrder[newValue + 1].id
     );
   };
 

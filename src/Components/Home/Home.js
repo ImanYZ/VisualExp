@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 
 import Communities from "./modules/views/Communities";
-import ProductSmokingHero from "./modules/views/ProductSmokingHero";
 import AppFooter from "./modules/views/AppFooter";
 import Landing from "./modules/views/Landing";
 import Values from "./modules/views/Values";
@@ -17,34 +16,40 @@ import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 
 function Index() {
   const [section, setSection] = useState(-1);
+  const [notSectionSwitching, setNotSectionSwitching] = useState(true);
 
   const updatePosition = (event) => {
-    let cumulativeHeight = 0;
-    for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
-      const sectOffsetHeight = window.document.getElementById(
-        sectionsOrder[sIdx].id
-      ).offsetHeight;
-      cumulativeHeight += sectOffsetHeight;
-      if (event.target.scrollTop < cumulativeHeight) {
-        setSection(sIdx - 1);
-        window.history.replaceState(
-          null,
-          sectionsOrder[sIdx].title,
-          "#" + sectionsOrder[sIdx].id
-        );
-        break;
+    if (notSectionSwitching) {
+      let cumulativeHeight = 0;
+      for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
+        const sectOffsetHeight = window.document.getElementById(
+          sectionsOrder[sIdx].id
+        ).offsetHeight;
+        cumulativeHeight += sectOffsetHeight;
+        if (event.target.scrollTop < cumulativeHeight) {
+          setSection(sIdx - 1);
+          window.history.replaceState(
+            null,
+            sectionsOrder[sIdx].title,
+            "#" + sectionsOrder[sIdx].id
+          );
+          break;
+        }
       }
     }
   };
 
   return (
     <Box sx={{ mb: "70px" }}>
-      <AppAppBar section={section} setSection={setSection} />
+      <AppAppBar
+        section={section}
+        setSection={setSection}
+        setNotSectionSwitching={setNotSectionSwitching}
+      />
       <Box
         onScroll={updatePosition}
         sx={{
           height: "100vh",
-          mt: "70px",
           overflowY: "auto",
           overflowX: "auto",
         }}
