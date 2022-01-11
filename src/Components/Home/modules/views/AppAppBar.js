@@ -44,19 +44,39 @@ const AppAppBar = (props) => {
   };
 
   const switchSection = (newValue) => (event) => {
-    console.log({ newValue, section: sectionsOrder[newValue + 1] });
-    props.setNotSectionSwitching(true);
+    props.setNotSectionSwitching(false);
     props.setSection(newValue);
-    document
-      .getElementById(sectionsOrder[newValue + 1].id)
-      .scrollIntoView({ behavior: "smooth" });
+    let cumulativeHeight = 0;
+    for (let sIdx = -1; sIdx < newValue; sIdx++) {
+      const sectOffsetHeight = window.document.getElementById(
+        sectionsOrder[sIdx + 1].id
+      ).offsetHeight;
+      cumulativeHeight += sectOffsetHeight;
+    }
+    window.document.getElementById("ScrollableContainer").scroll({
+      top: cumulativeHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+    console.log({
+      newValue,
+      section: sectionsOrder[newValue + 1],
+      cumulativeHeight,
+    });
+    // document
+    //   .getElementById(sectionsOrder[newValue + 1].id)
+    //   .scrollIntoView({
+    //     block: "start",
+    //     inline: "nearest",
+    //     behavior: "smooth",
+    //   });
     window.history.replaceState(
       null,
       sectionsOrder[newValue + 1].title,
       "#" + sectionsOrder[newValue + 1].id
     );
     setTimeout(() => {
-      props.setNotSectionSwitching(false);
+      props.setNotSectionSwitching(true);
     }, 1000);
   };
 

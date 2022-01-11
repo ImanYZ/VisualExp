@@ -47,6 +47,7 @@ function Index() {
         setNotSectionSwitching={setNotSectionSwitching}
       />
       <Box
+        id="ScrollableContainer"
         onScroll={updatePosition}
         sx={{
           height: "100vh",
