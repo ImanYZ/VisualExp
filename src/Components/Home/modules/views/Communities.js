@@ -62,12 +62,12 @@ export default function Communities() {
     <Container
       id="CommunitiesSection"
       component="section"
-      sx={{ mt: 8, mb: 4 }}
+      sx={{ pt: 10, pb: 4 }}
     >
-      <Typography variant="h4" marked="center" align="center" component="h2">
+      <Typography variant="h4" marked="center" align="center">
         We're Multidisciplinary
       </Typography>
-      <Box sx={{ mt: 8, display: "flex", flexWrap: "wrap" }}>
+      <Box sx={{ mt: 7, display: "flex", flexWrap: "wrap" }}>
         {images.map((image) => (
           <ImageIconButton
             key={image.title}

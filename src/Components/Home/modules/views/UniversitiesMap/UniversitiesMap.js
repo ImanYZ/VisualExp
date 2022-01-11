@@ -73,35 +73,35 @@ const UniversitiesMap = (props) => {
   // ));
 
   return (
-    <div
-      id="SchoolsSection"
-      className={
-        props.theme === "Light"
-          ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
-          : "UniversitiesMapDiv"
-      }
-    >
-      <Container component="section" sx={{ mt: 8, mb: 4 }}>
-        <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
-          <Typography
-            variant="h4"
-            marked="center"
-            align="center"
-            component="h2"
-            sx={{ mb: 7 }}
-          >
-            Our Researchers Are From
-          </Typography>
-          <div id="googleMapDiv">
-            {institutions.length > 0 ? (
-              <Suspense fallback={<div></div>}>
-                <GoogleMapCom institutions={institutions} />
-              </Suspense>
-            ) : null}
-          </div>
+    // <div
+    //   id="SchoolsSection"
+    //   className={
+    //     props.theme === "Light"
+    //       ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
+    //       : "UniversitiesMapDiv"
+    //   }
+    // >
+    <Container id="SchoolsSection" component="section" sx={{ mt: 8, mb: 4 }}>
+      <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
+        <Typography
+          variant="h4"
+          marked="center"
+          align="center"
+          component="h2"
+          sx={{ mb: 7 }}
+        >
+          Our Researchers Are From
+        </Typography>
+        <div id="googleMapDiv">
+          {institutions.length > 0 ? (
+            <Suspense fallback={<div></div>}>
+              <GoogleMapCom institutions={institutions} />
+            </Suspense>
+          ) : null}
         </div>
-      </Container>
-    </div>
+      </div>
+    </Container>
+    // </div>
   );
 };
 

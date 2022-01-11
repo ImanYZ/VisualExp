@@ -10,6 +10,7 @@ const LandingLayoutRoot = styled("section")(({ theme }) => ({
   position: "relative",
   display: "flex",
   alignItems: "center",
+  marginTop: "40px",
   [theme.breakpoints.up("sm")]: {
     height: "80vh",
     minHeight: 500,

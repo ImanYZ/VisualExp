@@ -12,5 +12,5 @@ export default [
     label: "Where",
     title: "Where Are We From?",
   },
-  { id: "ValuesSection", label: "Who", title: "Who Is Behind 1Cademy?" },
+  { id: "WhoWeAreSection", label: "Who", title: "Who Is Behind 1Cademy?" },
 ];

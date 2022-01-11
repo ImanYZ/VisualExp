@@ -7,13 +7,13 @@
   padding-bottom: 3vh;
 }
 
-#googleMapDiv {
+/* #googleMapDiv {
   width: 91vw;
   height: 70vh;
   margin: auto;
   border: 5px solid white;
   border-radius: 15px;
-}
+} */
 
 @media screen and (max-width: 900px) and (orientation: portrait) {
   .UniversitiesAndColleges {

@@ -88,8 +88,8 @@ const HowItWorks = (props) => {
       id="HowItWorksSection"
       component="section"
       sx={{
-        mt: 10,
-        mb: 15,
+        pt: 7,
+        pb: 10,
         position: "relative",
         display: "flex",
         flexDirection: "column",
@@ -97,7 +97,7 @@ const HowItWorks = (props) => {
         bgcolor: "secondary.light",
       }}
     >
-      <Box
+      {/* <Box
         component="img"
         src="/static/CurvyLines.png"
         alt="curvy lines"
@@ -108,29 +108,35 @@ const HowItWorks = (props) => {
           opacity: 0.7,
           zIndex: 0,
         }}
-      />
-      <Typography variant="h4" marked="center" component="h2" sx={{ mb: 7 }}>
+      /> */}
+      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
         {sectionsOrder[sectionIdx].title}
       </Typography>
-      <Box sx={{ zIndex: 1 }}>
-        <Grid container spacing={2.5}>
+      <Box sx={{ zIndex: 1, mx: "auto" }}>
+        <Grid
+          container
+          spacing={2.5}
+          align="center"
+          justify="center"
+          alignItems="center"
+        >
           {howElements.map((elem, idx) => {
             return (
-              <Grid item xs={12} md={3}>
+              <Grid key={elem + idx} item xs={12} sm={6} md={3}>
                 <Card sx={{ ...item, maxWidth: 355 }}>
                   <Box sx={number}>{idx + 1}.</Box>
-                  <Box sx={{ width: "100%", height: "160px" }}>
-                    <Collapse in={stepChecked[idx]} timeout={1000}>
-                      <CardMedia
-                        component="img"
-                        src={"/static/" + elem.id + ".svg"}
-                        alt={elem.id}
-                        height="100%"
-                        width="100%"
-                        sx={{ px: "10px" }}
-                      />
-                    </Collapse>
-                  </Box>
+                  {/* <Box sx={{ width: "100%", height: "190px" }}> */}
+                  <Collapse in={stepChecked[idx]} timeout={1000}>
+                    <CardMedia
+                      component="img"
+                      src={"/static/" + elem.id + ".svg"}
+                      alt={elem.id}
+                      height="100%"
+                      width="100%"
+                      sx={{ px: "10px" }}
+                    />
+                  </Collapse>
+                  {/* </Box> */}
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                       {elem.title}

@@ -13,9 +13,24 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "../components/Typography";
 import Button from "../components/Button";
 
-function ProductCTA() {
+function WhoWeAre() {
   return (
-    <Container component="section" sx={{ mt: 10, display: "flex" }}>
+    <Container
+      id="WhoWeAreSection"
+      component="section"
+      sx={{
+        pt: 7,
+        pb: 10,
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        bgcolor: "secondary.light",
+      }}
+    >
+      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
+        Who Is Behind 1Cademy?
+      </Typography>
       <Grid container>
         <Grid item xs={12} md={6} sx={{ zIndex: 1 }}>
           <Box
@@ -89,7 +104,7 @@ function ProductCTA() {
                 />
               </ListItemAvatar>
               <ListItemText
-                primary="1Cademy Architect"
+                primary="1Cademy Architect & Developer"
                 secondary={
                   <React.Fragment>
                     <Typography
@@ -101,7 +116,7 @@ function ProductCTA() {
                       Iman YeckehZaare
                     </Typography>
                     {
-                      " — Ph.D. Candidate at the University of Michigan, School of Information"
+                      " — Ph.D. Candidate and Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                     }
                   </React.Fragment>
                 }
@@ -129,7 +144,7 @@ function ProductCTA() {
                       Iman YeckehZaare
                     </Typography>
                     {
-                      " — Ph.D. Candidate at the University of Michigan, School of Information"
+                      " — Ph.D. Candidate and Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                     }
                   </React.Fragment>
                 }
@@ -142,4 +157,4 @@ function ProductCTA() {
   );
 }
 
-export default ProductCTA;
+export default WhoWeAre;

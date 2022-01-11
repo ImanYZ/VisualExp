@@ -7,7 +7,7 @@ import AppFooter from "./modules/views/AppFooter";
 import Landing from "./modules/views/Landing";
 import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
-import ProductCTA from "./modules/views/ProductCTA";
+import WhoWeAre from "./modules/views/WhoWeAre";
 import AppAppBar from "./modules/views/AppAppBar";
 import withRoot from "./modules/withRoot";
 
@@ -24,7 +24,7 @@ function Index() {
       for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
         const sectOffsetHeight = window.document.getElementById(
           sectionsOrder[sIdx].id
-        ).offsetHeight;
+        ).scrollHeight;
         cumulativeHeight += sectOffsetHeight;
         if (event.target.scrollTop < cumulativeHeight) {
           setSection(sIdx - 1);
@@ -60,7 +60,7 @@ function Index() {
         <Communities />
         <Values />
         <UniversitiesMap theme={"Light"} />
-        <ProductCTA />
+        <WhoWeAre />
         {/* <ProductSmokingHero /> */}
         <AppFooter />
       </Box>

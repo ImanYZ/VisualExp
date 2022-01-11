@@ -50,7 +50,7 @@ const AppAppBar = (props) => {
     for (let sIdx = -1; sIdx < newValue; sIdx++) {
       const sectOffsetHeight = window.document.getElementById(
         sectionsOrder[sIdx + 1].id
-      ).offsetHeight;
+      ).scrollHeight;
       cumulativeHeight += sectOffsetHeight;
     }
     window.document.getElementById("ScrollableContainer").scroll({
@@ -124,31 +124,16 @@ const AppAppBar = (props) => {
               },
             }}
           >
-            <LinkTab
-              onClick={switchSection(0)}
-              label={sectionsOrder[1].label}
-              titl={sectionsOrder[1].title}
-            />
-            <LinkTab
-              onClick={switchSection(1)}
-              label={sectionsOrder[2].label}
-              titl={sectionsOrder[2].title}
-            />
-            <LinkTab
-              onClick={switchSection(2)}
-              label={sectionsOrder[3].label}
-              titl={sectionsOrder[3].title}
-            />
-            <LinkTab
-              onClick={switchSection(3)}
-              label={sectionsOrder[4].label}
-              titl={sectionsOrder[4].title}
-            />
-            <LinkTab
-              onClick={switchSection(4)}
-              label={sectionsOrder[5].label}
-              titl={sectionsOrder[5].title}
-            />
+            {[0, 1, 2, 3, 4].map((idx) => {
+              return (
+                <LinkTab
+                  key={"Key" + idx}
+                  onClick={switchSection(idx)}
+                  label={sectionsOrder[idx + 1].label}
+                  titl={sectionsOrder[idx + 1].title}
+                />
+              );
+            })}
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             {/* <Box
