@@ -27,9 +27,7 @@ const LinkTab = (props) => {
       <Tab
         onClick={(event) => {
           event.preventDefault();
-          document
-            .getElementById(props.href)
-            .scrollIntoView({ behavior: "smooth" });
+          props.onClick(event);
         }}
         color="inherit"
         {...props}
@@ -45,29 +43,26 @@ const AppAppBar = (props) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
   };
 
-  const switchSection = (event, newValue) => {
-    console.log({ section: sectionsOrder[newValue + 1] });
+  const switchSection = (newValue) => (event) => {
+    console.log({ newValue, section: sectionsOrder[newValue + 1] });
     props.setNotSectionSwitching(true);
     props.setSection(newValue);
-    setTimeout(() => {
-      props.setNotSectionSwitching(false);
-    }, 1000);
+    document
+      .getElementById(sectionsOrder[newValue + 1].id)
+      .scrollIntoView({ behavior: "smooth" });
     window.history.replaceState(
       null,
       sectionsOrder[newValue + 1].title,
       "#" + sectionsOrder[newValue + 1].id
     );
+    setTimeout(() => {
+      props.setNotSectionSwitching(false);
+    }, 1000);
   };
 
-  const homeClick = (href) => (event) => {
+  const homeClick = (event) => {
     event.preventDefault();
-    props.setSection(-1);
-    window.history.replaceState(
-      null,
-      sectionsOrder[0].title,
-      "#" + sectionsOrder[0].id
-    );
-    document.getElementById(href).scrollIntoView({ behavior: "smooth" });
+    switchSection(-1)(event);
   };
 
   return (
@@ -79,7 +74,7 @@ const AppAppBar = (props) => {
               variant="h6"
               underline="none"
               color="inherit"
-              onClick={homeClick("LandingSection")}
+              onClick={homeClick}
               sx={{
                 fontSize: 24,
                 margin: "7px 19px 0px -10px",
@@ -91,7 +86,6 @@ const AppAppBar = (props) => {
           </Tooltip>
           <Tabs
             value={props.section}
-            onChange={switchSection}
             variant="scrollable"
             scrollButtons="auto"
             allowScrollButtonsMobile
@@ -111,28 +105,28 @@ const AppAppBar = (props) => {
             }}
           >
             <LinkTab
+              onClick={switchSection(0)}
               label={sectionsOrder[1].label}
-              href={sectionsOrder[1].id}
               titl={sectionsOrder[1].title}
             />
             <LinkTab
+              onClick={switchSection(1)}
               label={sectionsOrder[2].label}
-              href={sectionsOrder[2].id}
               titl={sectionsOrder[2].title}
             />
             <LinkTab
+              onClick={switchSection(2)}
               label={sectionsOrder[3].label}
-              href={sectionsOrder[3].id}
               titl={sectionsOrder[3].title}
             />
             <LinkTab
+              onClick={switchSection(3)}
               label={sectionsOrder[4].label}
-              href={sectionsOrder[4].id}
               titl={sectionsOrder[4].title}
             />
             <LinkTab
+              onClick={switchSection(4)}
               label={sectionsOrder[5].label}
-              href={sectionsOrder[5].id}
               titl={sectionsOrder[5].title}
             />
           </Tabs>
