@@ -49,7 +49,7 @@ export default function Landing() {
         variant="contained"
         size="large"
         component="a"
-        href="/premium-themes/onepirate/sign-up/"
+        href="#JoinUsSection"
         sx={{ minWidth: 200, color: "common.white" }}
       >
         Apply to Join Us!

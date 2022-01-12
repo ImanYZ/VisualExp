@@ -82,7 +82,7 @@ const Values = (props) => {
       >
         {valuesItems.map((value, idx) => {
           return (
-            <Grid key={value.name} item xs={12} sm={6} md={3}>
+            <Grid key={value.name} item xs={12} sm={6} md={4} lg={3}>
               <Card sx={{ maxWidth: 340 }}>
                 <CardActionArea onClick={flipCard(idx)}>
                   <CardMedia
@@ -98,7 +98,11 @@ const Values = (props) => {
                       {value.name}
                     </Typography>
                     <Collapse in={stepChecked[idx]} timeout={1000}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: "left" }}
+                      >
                         {value.body}
                       </Typography>
                     </Collapse>
@@ -114,7 +118,7 @@ const Values = (props) => {
         size="large"
         variant="contained"
         component="a"
-        href="/premium-themes/onepirate/sign-up/"
+        href="#JoinUsSection"
         sx={{ mt: 10, color: "common.white" }}
       >
         Join/Initiate Communities

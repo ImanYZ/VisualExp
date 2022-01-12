@@ -85,6 +85,11 @@ const AppAppBar = (props) => {
     switchSection(-1)(event);
   };
 
+  const joinUsClick = (event) => {
+    event.preventDefault();
+    switchSection(5)(event);
+  };
+
   return (
     <div>
       <AppBar>
@@ -165,6 +170,7 @@ const AppAppBar = (props) => {
               <Button
                 variant="contained"
                 color="secondary"
+                onClick={joinUsClick}
                 sx={{
                   fontSize: 16,
                   color: "common.white",

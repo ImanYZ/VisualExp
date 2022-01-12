@@ -122,7 +122,7 @@ const HowItWorks = (props) => {
         >
           {howElements.map((elem, idx) => {
             return (
-              <Grid key={elem + idx} item xs={12} sm={6} md={3}>
+              <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
                 <Card sx={{ ...item, maxWidth: 355 }}>
                   <Box sx={number}>{idx + 1}.</Box>
                   {/* <Box sx={{ width: "100%", height: "190px" }}> */}
@@ -141,7 +141,11 @@ const HowItWorks = (props) => {
                     <Typography gutterBottom variant="h5" component="div">
                       {elem.title}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ textAlign: "left" }}
+                    >
                       {elem.content}
                     </Typography>
                   </CardContent>
@@ -156,7 +160,7 @@ const HowItWorks = (props) => {
         size="large"
         variant="contained"
         component="a"
-        href="/premium-themes/onepirate/sign-up/"
+        href="#JoinUsSection"
         sx={{ mt: 10, color: "common.white" }}
       >
         Get started

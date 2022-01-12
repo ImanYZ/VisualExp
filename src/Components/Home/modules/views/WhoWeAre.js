@@ -20,7 +20,7 @@ import VerifiedIcon from "@mui/icons-material/Verified";
 import EditIcon from "@mui/icons-material/Edit";
 
 import UMLogo from "../../../../assets/u-m_logo-hex-withoutline.png";
-import GCloud_Logo from "../../../../assets/GCloud_Logo.png";
+import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 
 const WhoWeAre = (props) => {
   return (
@@ -55,7 +55,7 @@ const WhoWeAre = (props) => {
             <List sx={{ width: "100%" }}>
               <ListItemButton>
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -77,7 +77,7 @@ const WhoWeAre = (props) => {
               </ListItemButton>
               <ListItemButton>
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -99,7 +99,7 @@ const WhoWeAre = (props) => {
               </ListItemButton>
               <ListItemButton>
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -134,7 +134,7 @@ const WhoWeAre = (props) => {
                 href="https://dl-acm-org.proxy.lib.umich.edu/doi/10.1145/3446871.3469760"
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -161,7 +161,7 @@ const WhoWeAre = (props) => {
                 href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3313831.3376882"
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -187,7 +187,7 @@ const WhoWeAre = (props) => {
                 href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3291279.3339411"
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -213,7 +213,7 @@ const WhoWeAre = (props) => {
                 href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3287324.3287417"
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -238,7 +238,7 @@ const WhoWeAre = (props) => {
                 href="https://www.researchgate.net/profile/Iman-Yeckehzaare/publication/341966650_Runestone_Interactive_Ebooks_A_Research_Platform_for_On-line_Computer_Science_Learning/links/5edb704945851529453ca208/Runestone-Interactive-Ebooks-A-Research-Platform-for-On-line-Computer-Science-Learning.pdf"
               >
                 <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "#00af00" }}>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
                 </ListItemAvatar>
@@ -373,7 +373,7 @@ const WhoWeAre = (props) => {
                 <ListItemAvatar>
                   <Avatar
                     alt="Google Cloud Logo"
-                    src={GCloud_Logo}
+                    src={GoogleCloud}
                     sx={{ width: 100, height: 100, mr: 2.5 }}
                   />
                 </ListItemAvatar>
