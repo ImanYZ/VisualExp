@@ -49,7 +49,11 @@ const WhoWeAre = (props) => {
       >
         <Grid item xs={12} sm={6} md={4}>
           <Paper>
-            <Typography variant="h5" component="div" sx={{ pt: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+            >
               Accepted Research Papers
             </Typography>
             <List sx={{ width: "100%" }}>
@@ -124,7 +128,11 @@ const WhoWeAre = (props) => {
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
           <Paper>
-            <Typography variant="h5" component="div" sx={{ pt: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+            >
               Recently Published Papers
             </Typography>
             <List sx={{ width: "100%" }}>
@@ -291,7 +299,7 @@ const WhoWeAre = (props) => {
                         Paul Resnick
                       </Typography>
                       {
-                        " — Michael D Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
+                        " — Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
                       }
                     </React.Fragment>
                   }

@@ -39,8 +39,8 @@ export default function Landing() {
       <Box align="center" sx={{ mb: 4, mt: 4 }}>
         <Collapse in={checked} timeout={1000}>
           <Typography color="inherit" variant="h5">
-            The one academic platform to collaboratively make learning and
-            research more enjoyable.
+            The 1 Academic Platform to Collaboratively Improve Learning &amp;
+            Research
           </Typography>
         </Collapse>
       </Box>

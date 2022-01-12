@@ -3,6 +3,16 @@ export default [
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
     width: "45%",
+    leaders: [
+      {
+        name: "Amelia Henriques",
+        image: "Amelia_Henriques.jpg",
+      },
+      {
+        name: "Asia Luboyeski",
+        image: "Asia_Luboyeski.JPG",
+      },
+    ],
   },
   {
     url: "/static/Communities/Clinical_Psychology.jpg",
