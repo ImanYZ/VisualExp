@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
+import Modal from "@mui/material/Modal";
 
 import Typography from "../components/Typography";
 
 import images from "./communitiesOrder";
+
+import sectionsOrder from "./sectionsOrder";
+const sectionIdx = sectionsOrder.findIndex(
+  (sect) => sect.id === "CommunitiesSection"
+);
 
 const ImageBackdrop = styled("div")(({ theme }) => ({
   position: "absolute",
@@ -57,20 +63,38 @@ const ImageIconButton = styled(ButtonBase)(({ theme }) => ({
   },
 }));
 
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 export default function Communities() {
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
   return (
     <Container
       id="CommunitiesSection"
       component="section"
       sx={{ pt: 10, pb: 4 }}
     >
-      <Typography variant="h4" marked="center" align="center">
-        We're Multidisciplinary
+      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+        {sectionsOrder[sectionIdx].title}
       </Typography>
       <Box sx={{ mt: 7, display: "flex", flexWrap: "wrap" }}>
         {images.map((image) => (
           <ImageIconButton
             key={image.title}
+            onClick={handleOpen}
             style={{
               width: image.width,
             }}
@@ -114,6 +138,21 @@ export default function Communities() {
           </ImageIconButton>
         ))}
       </Box>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Text in a modal
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+          </Typography>
+        </Box>
+      </Modal>
     </Container>
   );
 }

@@ -14,3 +14,10 @@ export const uuidv4 = () => {
     ).toString(16)
   );
 };
+
+export const getFullname = (firstname, lastname) => {
+  return (firstname + " " + lastname)
+    .replace(".", "")
+    .replace("__", " ")
+    .replace("/", " ");
+};

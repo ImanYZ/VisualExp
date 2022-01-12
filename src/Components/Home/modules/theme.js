@@ -23,8 +23,8 @@ const rawTheme = createTheme({
       dark: red[700],
     },
     success: {
-      light: green[50],
-      main: green[500],
+      light: green[700],
+      main: green["A700"],
       dark: green[700],
     },
   },

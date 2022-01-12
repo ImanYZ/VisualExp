@@ -4,7 +4,7 @@ export default [
   {
     id: "CommunitiesSection",
     label: "What",
-    title: "We're Interdisciplinary",
+    title: "Our Communities",
   },
   { id: "ValuesSection", label: "Why", title: "Why 1Cademy Helps" },
   {
@@ -13,5 +13,5 @@ export default [
     title: "Where Are We From?",
   },
   { id: "WhoWeAreSection", label: "Who", title: "Who Is Behind 1Cademy?" },
-  { id: "JoinUsSection", label: "Apply", title: "Apply to Join Us?" },
+  { id: "JoinUsSection", label: "Apply", title: "Apply to Join Us!" },
 ];

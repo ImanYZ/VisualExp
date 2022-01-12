@@ -17,6 +17,11 @@ export const fullnameState = atom({
   default: "",
 });
 
+export const hasScheduledState = atom({
+  key: "hasScheduledState",
+  default: false,
+});
+
 export const isAdminState = atom({
   key: "isAdminState",
   default: false,

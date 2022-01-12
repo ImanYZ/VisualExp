@@ -29,16 +29,9 @@ import {
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import { isEmail } from "../../utils/general";
+import { isEmail, getFullname } from "../../utils/general";
 
 import "./ConsentDocument.css";
-
-const getFullname = (firstname, lastname) => {
-  return (firstname + " " + lastname)
-    .replace(".", "")
-    .replace("__", " ")
-    .replace("/", " ");
-};
 
 const Auth = (props) => {
   const firebase = useRecoilValue(firebaseState);

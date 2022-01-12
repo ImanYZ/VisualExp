@@ -41,30 +41,28 @@ function Index() {
   };
 
   return (
-    <Box>
+    <Box
+      id="ScrollableContainer"
+      onScroll={updatePosition}
+      sx={{
+        height: "100vh",
+        overflowY: "auto",
+        overflowX: "auto",
+      }}
+    >
       <AppAppBar
         section={section}
         setSection={setSection}
         setNotSectionSwitching={setNotSectionSwitching}
       />
-      <Box
-        id="ScrollableContainer"
-        onScroll={updatePosition}
-        sx={{
-          height: "100vh",
-          overflowY: "auto",
-          overflowX: "auto",
-        }}
-      >
-        <Landing />
-        <HowItWorks section={section} />
-        <Communities />
-        <Values />
-        <UniversitiesMap theme={"Light"} />
-        <WhoWeAre />
-        <JoinUs />
-        <AppFooter />
-      </Box>
+      <Landing />
+      <HowItWorks section={section} />
+      <Communities />
+      <Values />
+      <UniversitiesMap theme={"Light"} />
+      <WhoWeAre />
+      <JoinUs />
+      <AppFooter />
     </Box>
   );
 }
