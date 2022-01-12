@@ -39,8 +39,7 @@ export default function Landing() {
       <Box align="center" sx={{ mb: 4, mt: 4 }}>
         <Collapse in={checked} timeout={1000}>
           <Typography color="inherit" variant="h5">
-            The 1 Academic Platform to Collaboratively Improve Learning &amp;
-            Research
+            We Synthesize Books &amp; Research Papers Together
           </Typography>
         </Collapse>
       </Box>
@@ -54,9 +53,9 @@ export default function Landing() {
       >
         Apply to Join Us!
       </Button>
-      <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
+      {/* <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
         Discover the experience
-      </Typography>
+      </Typography> */}
     </LandingLayout>
   );
 }

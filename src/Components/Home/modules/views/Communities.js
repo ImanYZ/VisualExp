@@ -9,14 +9,23 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
-import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
+import Grid from "@mui/material/Grid";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
 
 import CloseIcon from "@mui/icons-material/Close";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import LinkIcon from "@mui/icons-material/Link";
+import EmailIcon from "@mui/icons-material/Email";
 
 import Typography from "../components/Typography";
+import Button from "../components/Button";
+import YoutubeEmbed from "../components/YoutubeEmbed/YoutubeEmbed";
+import JoinUs from "./JoinUs";
 
 import communities from "./communitiesOrder";
 
@@ -73,18 +82,6 @@ const ImageIconButton = styled(ButtonBase)(({ theme }) => ({
   },
 }));
 
-const style = {
-  position: "absolute",
-  top: "2.5%",
-  left: "2.5%",
-  width: "94%",
-  height: "94%",
-  bgcolor: "background.paper",
-  border: "none",
-  boxShadow: 25,
-  p: 4,
-};
-
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -118,7 +115,7 @@ const BootstrapDialogTitle = (props) => {
   );
 };
 
-export default function Communities() {
+const Communities = (props) => {
   const [open, setOpen] = useState(false);
   const [community, setCommunity] = useState({});
 
@@ -196,11 +193,96 @@ export default function Communities() {
           {community.title + " Community"}
         </BootstrapDialogTitle>
         <DialogContent dividers>
-          <Paper sx={{ padding: "10px" }}>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
             <Typography
               variant="h5"
               component="div"
-              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Community Introduction
+            </Typography>
+            <YoutubeEmbed embedId={community.YouTube} />
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Community Description
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
+              {community.description}
+            </Typography>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Community Accomplishments
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
+              {community.accomplishments}
+            </Typography>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              By Joining Us, You Will ...
+            </Typography>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Community Requirements
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
+              {community.requirements}
+            </Typography>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
             >
               Community Leaders
             </Typography>
@@ -211,43 +293,85 @@ export default function Communities() {
               justify="center"
               alignItems="center"
             >
-              {howElements.map((elem, idx) => {
-                return (
-                  <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
-                    <Card sx={{ ...item, maxWidth: 355 }}>
-                      <Box sx={number}>{idx + 1}.</Box>
-                      {/* <Box sx={{ width: "100%", height: "190px" }}> */}
-                      <Collapse in={stepChecked[idx]} timeout={1000}>
-                        <CardMedia
-                          component="img"
-                          src={"/static/" + elem.id + ".svg"}
-                          alt={elem.id}
-                          height="100%"
-                          width="100%"
-                          sx={{ px: "10px" }}
-                        />
-                      </Collapse>
-                      {/* </Box> */}
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="div">
-                          {elem.title}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ textAlign: "left" }}
-                        >
-                          {elem.content}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
+              {community.leaders &&
+                community.leaders.map((leader, idx) => {
+                  return (
+                    <Grid key={leader.name} xs={12}>
+                      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+                        <ListItem>
+                          <ListItemAvatar>
+                            <Avatar
+                              src={"/static/CommunityLeaders/" + leader.image}
+                              alt={leader.name}
+                              sx={{ width: 100, height: 100, mr: 2.5 }}
+                            />
+                            {leader.websites.map((wSite) => {
+                              return (
+                                <IconButton
+                                  component="a"
+                                  href={wSite.url}
+                                  aria-label={wSite.name}
+                                >
+                                  {wSite.name === "LinkedIn" ? (
+                                    <LinkedInIcon />
+                                  ) : (
+                                    <LinkIcon />
+                                  )}
+                                </IconButton>
+                              );
+                            })}
+                            <IconButton
+                              component="a"
+                              href={
+                                "mailto:onecademy@umich.edu?subject=" +
+                                community.title +
+                                " Question for " +
+                                leader.name
+                              }
+                              aria-label="email"
+                            >
+                              <EmailIcon />
+                            </IconButton>
+                          </ListItemAvatar>
+                          <ListItemText
+                            primary={leader.name}
+                            secondary={
+                              <React.Fragment>
+                                <Typography
+                                  sx={{ display: "inline" }}
+                                  component="span"
+                                  variant="body2"
+                                  color="text.primary"
+                                >
+                                  {leader.about}
+                                </Typography>
+                              </React.Fragment>
+                            }
+                          />
+                        </ListItem>
+                        <Divider variant="inset" component="li" />
+                      </List>
+                    </Grid>
+                  );
+                })}
             </Grid>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+              }}
+            >
+              Apply to Join this Community
+            </Typography>
+            <JoinUs community={community} />
           </Paper>
         </DialogContent>
       </BootstrapDialog>
     </Container>
   );
-}
+};
+
+export default Communities;

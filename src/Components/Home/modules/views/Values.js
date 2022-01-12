@@ -113,7 +113,7 @@ const Values = (props) => {
           );
         })}
       </Grid>
-      <Button
+      {/* <Button
         color="secondary"
         size="large"
         variant="contained"
@@ -122,7 +122,7 @@ const Values = (props) => {
         sx={{ mt: 10, color: "common.white" }}
       >
         Join/Initiate Communities
-      </Button>
+      </Button> */}
     </Container>
   );
 };

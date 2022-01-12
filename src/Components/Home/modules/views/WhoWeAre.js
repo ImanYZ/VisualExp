@@ -19,7 +19,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import EditIcon from "@mui/icons-material/Edit";
 
-import UMLogo from "../../../../assets/u-m_logo-hex-withoutline.png";
+import UMLogo from "../../../../assets/umsi-logo-vert-u.png";
 import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 
 const WhoWeAre = (props) => {
@@ -343,11 +343,11 @@ const WhoWeAre = (props) => {
                 alignItems="flex-start"
                 component="a"
                 target="_blank"
-                href="https://innovationpartnerships.umich.edu/"
+                href="https://www.si.umich.edu/"
               >
                 <ListItemAvatar>
                   <Avatar
-                    alt="University of Michigan Logo"
+                    alt="University of Michigan School of Information Logo"
                     src={UMLogo}
                     sx={{ width: 100, height: 100, mr: 2.5 }}
                   />
@@ -362,11 +362,8 @@ const WhoWeAre = (props) => {
                         variant="body2"
                         color="text.primary"
                       >
-                        Innovation Partnerships
+                        School of Information
                       </Typography>
-                      {
-                        " — We have initiated a collaboration with Innovation Partnerships at the University of Michigan to publicize 1Cademy."
-                      }
                     </React.Fragment>
                   }
                 />

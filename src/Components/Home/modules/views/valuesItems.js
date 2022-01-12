@@ -1,15 +1,20 @@
 export default [
   {
-    name: "Developing Learning Pathways",
-    body: "Whatever topic one wants to learn is explained somewhere on the Web, but we still pay for textbooks and courses because they provide us with learning pathways (i.e. step-by-step procedures to achieve our learning objectives.) However, textbooks and courses have only a few authors, and they are difficult to update/improve. 1Cademy provides a platform for students, instructors, and researchers to collaboratively design learning pathways on every topic on a single shared knowledge graph.",
-    image: "Improving.svg",
-    padding: "4px 37px 0px 37px",
-  },
-  {
     name: "Learning Like Researchers",
     body: "1Cademy helps us to start learning from advanced topics and go backwards through the prerequisites as needed! This is how researchers start learning new topics, they specify targets and only learn those prerequisites that are absolutely necessary to help them achieve their objectives.",
     image: "Learning_Like_Researchers.svg",
     padding: "4px 40px 0px 40px",
+  },
+  {
+    name: "Research Communities",
+    body: "Communities of enthusiasts of scientific topics emerge on 1Cademy who are from a large number of schools and research institutions. They share what they find helpful on 1Cademy and meet on a weekly basis to discuss their topics of interest. We learn about state-of-the-art topics that our collaborators research/learn at their institutions, and find connections that help us form new research ideas.",
+    image: "Research_Communities.png",
+  },
+  {
+    name: "Learning Deeply",
+    body: "The process of thinking through the prerequisites of each concept to add them to 1Cademy deepens our learning and helps us discover learning pathways to learn complex concepts that we never thought of.",
+    image: "Learning_Deeply.svg",
+    padding: "13px 79px 0px 79px",
   },
   {
     name: "Effective Ways to Learn",
@@ -18,20 +23,15 @@ export default [
     padding: "4px 37px 0px 37px",
   },
   {
-    name: "Learning Deeply",
-    body: "The process of thinking through the prerequisites of each concept to add it to 1Cademy deepens our learning and helps us discover learning pathways to learn complex concepts that we never thought of.",
-    image: "Learning_Deeply.svg",
-    padding: "13px 79px 0px 79px",
+    name: "Developing Learning Pathways",
+    body: "Whatever topic one wants to learn is explained somewhere on the Web, but we still pay for textbooks and courses because they provide us with learning pathways (i.e. step-by-step procedures to achieve our learning objectives.) However, textbooks and courses have only a few authors, and they are difficult to update/improve. 1Cademy provides a platform for students, instructors, and researchers to collaboratively design learning pathways on every topic on a single shared knowledge graph.",
+    image: "Improving.svg",
+    padding: "4px 37px 0px 37px",
   },
   {
     name: "Crowdsourced",
     body: "1Cademy is developed through a large-scale collaboration, like Wikipedia. However, while Wikipedia is the most comprehensive encyclopedia, 1Cademy aims to harness the collective intelligence to identify learning pathways to learn any topic through identifying the most effective prerequisite links.",
     image: "Crowdsourcing.png",
-  },
-  {
-    name: "Research Communities",
-    body: "Communities of enthusiasts of scientific topics emerge on 1Cademy who are from a large number of schools and research institutions. They share what they find helpful on 1Cademy and meet on a weekly basis to discuss their topics of interest. We learn about state-of-the-art topics that our collaborators research/learn at their institutions, and find connections that help us form new research ideas.",
-    image: "Research_Communities.png",
   },
   {
     name: "Learning Through Teaching",

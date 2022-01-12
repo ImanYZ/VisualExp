@@ -155,7 +155,7 @@ const HowItWorks = (props) => {
           })}
         </Grid>
       </Box>
-      <Button
+      {/* <Button
         color="secondary"
         size="large"
         variant="contained"
@@ -164,7 +164,7 @@ const HowItWorks = (props) => {
         sx={{ mt: 10, color: "common.white" }}
       >
         Get started
-      </Button>
+      </Button> */}
     </Container>
   );
 };

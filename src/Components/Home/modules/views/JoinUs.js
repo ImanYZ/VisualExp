@@ -41,9 +41,11 @@ const JoinUs = (props) => {
         pb: 10,
       }}
     >
-      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
-        {sectionsOrder[sectionIdx].title}
-      </Typography>
+      {!props.community && (
+        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+          {sectionsOrder[sectionIdx].title}
+        </Typography>
+      )}
       <Alert severity="success">
         <strong>Note: </strong> Our application process is sequential; i.e., you
         need to complete each step to unlock the following steps.
@@ -80,21 +82,23 @@ const JoinUs = (props) => {
           <StepContent>
             <Typography>
               One of the most important aspects of 1Cademy is its unique
-              knowledge representation format. As the first step in your
-              application process, we need to figure out which knowledge
-              representation format works better for your reading comprehension,
-              short-term learning, and long-term learning. You should create an
+              knowledge representation format. To become a researcher on
+              1Cademy, you should first engage in one of our ongoing research
+              projects, as a participant. In the project, randomly chosen for
+              you, we will test which type of knowledge representation format
+              works better for your reading comprehension, short-term learning,
+              and long-term learning. This will not only help us improve the
+              design of 1Cademy, but along the way, you will get experience
+              about how to use 1Cademy. For this purpose, you should create an
               account on our research website and specify your availabilities
-              for three sessions in a week with our UX researchers. In the first
-              session, they will meet with you for an hour and will ask you to
-              read two short passages in two different knowledge representation
-              formats. Then, you'll answer some questions about those passages
-              and express your ideas comparing the two. This will take an hour.
-              The second and third sessions will be only for 30 minutes each and
-              follow a similar format. Note that it is necessary to complete the
-              second and the third sessions, exactly three and seven days after
-              the first session. So, please carefully specify your availability
-              on our research website.
+              for three sessions with our UX researchers. In the first session,
+              they will ask you to read two short passages and answer some
+              questions about those passages. This will take an hour. The second
+              and third sessions will be only for 30 minutes each and follow a
+              similar format. Note that it is necessary to complete the second
+              and third sessions, exactly three and seven days after the first
+              session. So, please carefully specify your availability on our
+              research website.
             </Typography>
             <Box sx={{ mb: 2 }}>
               <div>
