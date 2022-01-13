@@ -55,7 +55,8 @@ const JoinUs = (props) => {
           >
             US Department of Labor Federal Internship Guidelines
           </a>
-          . If you have any questions regarding this community, contact{" "}
+          . We DO NOT sponsor CPT or OPT for international students. If you have
+          any questions regarding this community, contact{" "}
           <a
             href={
               "mailto:onecademy@umich.edu?subject=" +

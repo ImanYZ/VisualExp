@@ -332,7 +332,7 @@ const WhoWeAre = (props) => {
                         Iman YeckehZaare
                       </Typography>
                       {
-                        " — Ph.D. Candidate and Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
+                        " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                       }
                     </React.Fragment>
                   }
