@@ -37,14 +37,38 @@ const JoinUs = (props) => {
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: 7,
+        pt: !props.community ? 7 : 1,
         pb: 10,
       }}
     >
-      {!props.community && (
+      {!props.community ? (
         <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
           {sectionsOrder[sectionIdx].title}
         </Typography>
+      ) : (
+        <Alert severity="warning">
+          <strong>Note: </strong> Participation is unpaid, solely for the
+          purpose of improving research and education, and this position meets{" "}
+          <a
+            href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm"
+            target="_blank"
+          >
+            US Department of Labor Federal Internship Guidelines
+          </a>
+          . If you have any questions regarding this community, contact{" "}
+          <a
+            href={
+              "mailto:onecademy@umich.edu?subject=" +
+              props.community.title +
+              " - Question"
+            }
+            aria-label="email"
+            target="_blank"
+          >
+            the community leaders
+          </a>
+          .
+        </Alert>
       )}
       <Alert severity="success">
         <strong>Note: </strong> Our application process is sequential; i.e., you

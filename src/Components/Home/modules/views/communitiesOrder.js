@@ -82,7 +82,7 @@ export default [
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field.`,
     qualifications: [
       `Interest and enthusiasm for clinical psychology`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
@@ -102,6 +102,60 @@ export default [
     url: "/static/Communities/Mindfulness.jpg",
     title: "Mindfulness",
     width: "30%",
+    leaders: [
+      {
+        name: "Dallas Wilburn",
+        image: "Dallas_Wilburn.jpg",
+        about: `I am a student at the University of Texas at Austin pursuing a Bachelor's of Art in Psychology. I am passionate about increasing mental health awareness and learning the best techniques for treatment of mental illness. I have experience mentoring my peers and have held several leadership positions within and outside of my university. I am dedicated to helping those in my community, whether that be social or academic, and love learning more about psychology in any context.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/dallas-wilburn-795145228/",
+          },
+        ],
+      },
+      {
+        name: "Noor Jassim",
+        image: "Noor_Jassim.jpeg",
+        about: `Honors student at Eastern Michigan University pursuing a Bachelor of Science in psychology and sociology. A research assistant at the Self-regulation, Early Experience, and Development (SEED) lab in the psychology department. An assistant manager at a real estate company. Active Humane Society volunteer. Adamant enthusiast of quantitative methods in social psychology and medical sociology. Other interests include dialectical behavior therapy (DBT) as well as emotional regulation.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/noor-jassim/",
+          },
+        ],
+      },
+    ],
+    YouTube: "cL-dxExeIaY",
+    description: `The Mindfulness Community works together to review literature that describes the benefits of mindfulness in a clinical and psychological context. Interns review research, synthesize the information in easy-to-follow presentations, and collaborate together to improve the community map of mindfulness research. Additionally, interns will interact with mindfulness practices in their daily lives to gain a greater understanding of these practices and their uses in a clinical context.`,
+    accomplishments: `We have examined and updated the mindfulness community tag on 1Cademy with cross-disciplinary applications of mindfulness in thorough detail.
+    We have compiled an inclusive list of mental disorders from the DSM-5 that can benefit from clinical mindfulness as well as documented case studies of certain populations that were able to benefit from mindfulness when it applied to psychopathological symptoms.
+    We have outlined multiple mindfulness interventions that have been backed by empirical research and heavily tested across the world in multiple research institutions.
+    Also, we have connected the origins of mindfulness that stemmed from eastern traditions to the current applications of mindfulness in the clinical western setting as well as provided a cohesive snapshot of the roots of mindfulness in ancient eastern religions.`,
+    gains: [
+      `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
+      `Work towards proposing and executing research on mindfulness, mindfulness meditation, positive psychology, clinical psychology, and neuroscience.`,
+      `Collaborate with other interns to summarize existing research and brainstorm new research ideas.`,
+      `Collect and organize research in an effective and meaningful manner that will have cohesive interactions`,
+      `Work remotely with all interactions, task fulfillment, and communications.`,
+      `Completing responsibilities will require a minimum of 6 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
+      `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
+    qualifications: [
+      `Interest and enthusiasm for clinical psychology`,
+      `Strong desire and willingness to collaborate with others and engage in group discussions.`,
+      `Willingness to present work at weekly meetings.`,
+      `Able to commit to approximately 5-10 hours of work each week.`,
+      `Fluency in writing and reading in English (will have to summarize research articles).`,
+    ],
+    responsibilities: [
+      `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
+      `Attend weekly online meetings.`,
+      `Contribute in meetings by presenting work.`,
+      `Contribute in meetings by engaging in discussion with other interns about research topics.`,
+      `Be able to make connections between different resources and research articles`,
+    ],
   },
   {
     url: "/static/Communities/Health_Psychology.png",

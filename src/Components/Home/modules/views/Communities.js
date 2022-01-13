@@ -16,7 +16,6 @@ import Divider from "@mui/material/Divider";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
-import Alert from "@mui/material/Alert";
 
 import CloseIcon from "@mui/icons-material/Close";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -406,22 +405,11 @@ const Communities = (props) => {
               component="div"
               sx={{
                 pt: "19px",
+                pb: "0px",
               }}
             >
               Apply to Join this Community
             </Typography>
-            <Alert severity="Warning">
-              <strong>Note: </strong> Participation is unpaid, solely for the
-              purpose of improving research and education, and this position
-              meets{" "}
-              <a
-                href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm"
-                target="_blank"
-              >
-                US Department of Labor Federal Internship Guidelines
-              </a>
-              . For more information about the project, contact
-            </Alert>
             <JoinUs community={community} />
           </Paper>
         </DialogContent>
