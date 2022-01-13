@@ -387,7 +387,7 @@ export default [
       {
         name: "Isaac F Maruyama",
         image: "Isaac_F_Maruyama.jpeg",
-        about: `Undergraduate student of Political Science and Economics Student at the University of Minnesota`,
+        about: `I'm a sophomore studying political science and economics at the University of Minnesota. I started working with 1Cademy's Interdisciplinary Community in the summer of 2021, and founded the Cryptoeconomics Community in the fall of 2021. I'm particularly interested in the ways in which different countries regulate their economies, and how those strategies can be used to minimize inequality and maximize social welfare. Outside of 1Cademy, I'm currently interning for Minnesota Senator Steve Cwodzinski, and I'm also the history reporter for Radio K's Real College Podcast. In my spare time, I love to run, cross-country ski, and play the piano, guitar, and mandolin.`,
         websites: [
           {
             name: "LinkedIn",
