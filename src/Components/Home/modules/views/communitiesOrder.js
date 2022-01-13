@@ -224,9 +224,14 @@ export default [
       },
       {
         name: "Amrit Das Pradhan",
-        image: "Amrit_Das_Pradhan.jpg",
-        about: `Undergraduate student at California Polytechnic State University`,
-        websites: [],
+        image: "Amrit_Das_Pradhan.png",
+        about: `I am a third-year psychology major at Cal Poly SLO interested in pursuing a career in clinical neuropsychology. I joined 1Cademy in January 2021 as an intern for the Educational Psychology community. I helped create the Neuroscience Community and have been a co-leader since April 2021. Other than working with 1Cademy, I work as a research assistant in three labs: a neurogenesis lab where we study the effect of different factors on the creation of new neurons and neural cells in snakes, a memory lab where we run a multitude of studies related to memory, and a LGBTQ+ and mental health lab, where we examine problems surrounding mental health and the LGBTQ+ community in San Luis Obispo and come up with potential solutions.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/",
+          },
+        ],
       },
     ],
     YouTube: "Mj45B59k4fo",
@@ -243,7 +248,7 @@ export default [
       `Be publicly accredited for any work you produce for years to come. `,
       `Individual contributions will be available through google search and cite your name (and other search engines)`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field.`,
     qualifications: [
       `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
       `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
@@ -251,14 +256,13 @@ export default [
       `Experience and willingness to work in large-scale collaborative environments. `,
     ],
     responsibilities: [
-      `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner. `,
-      `Gather information from Behavioral Neuroscience ed. 6, Breedlove & Watson `,
-      `Give presentations over what you have researched in weekly meetings for further discussion. `,
-      `Generate ideas for future research in the field and point out areas of missing information or a gap in research. `,
-      `Actively utilizing 1Cademy to refine and properly structure the information. `,
-      `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group. `,
+      `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
+      `Give presentations over what you have researched in weekly meetings for further discussion.`,
+      `Generate ideas for future research in the field and point out areas of missing information or a gap in research.`,
+      `Actively utilizing 1Cademy to refine and properly structure the information.`,
+      `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group.`,
       `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
-      `Expected 5hrs a week minimum to retain the internship. `,
+      `Expected 5hrs a week minimum to retain the internship.`,
       `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
     ],
   },
@@ -343,7 +347,7 @@ export default [
       {
         name: "Alex Nikolaidis Konstas",
         image: "Alex_Nikolaidis_Konstas.jpg",
-        about: `Psychology and Studio Art Student at Davidson, North Carolina, United States`,
+        about: `I am an undergraduate student from Thessaloniki, Greece, and I am in my senior year at Davidson College, NC. Specifically, I am double majoring in Psychology and Studio Art. I joined 1Cademy as an intern for the Educational Psychology research group in the summer of 2021. For the fall semester of 2021, I began interning for the Social/Political Psychology research team. However, I started co-leading the group in November of 2021, as I was very passionate about the interdisciplinary and collaborative approach of the platform. I have conducted research related to social psychology, and I hope to pursue graduate studies in the field. My research interests include social cognition, bias, and gender.`,
         websites: [
           {
             name: "LinkedIn",
@@ -397,19 +401,19 @@ export default [
       },
     ],
     YouTube: "RBIRquj1dD8",
-    description: `Join an interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of the Cryptoeconomics Research Community on 1Cademy is to conduct detailed and comprehensive research on the various applications of blockchain technology, as well as the underlying mechanisms that enable decentralized marketplaces and applications to function.`,
-    accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of Cryptoeconomics and strengthen research skills to prepare for a future in the Cryptoeconomics field.`,
+    description: `The goal of the Cryptoeconomics Research Community is to conduct detailed and comprehensive research on the various applications of blockchain technology, as well as the underlying mechanisms that enable decentralized marketplaces and applications to function. Through 1Cademy, we aim to create and continuously improve upon a comprehensive map of cryptoeconomics knowledge, resulting in an ideal resource for learning about blockchain, cryptocurrencies, and their usage.`,
+    accomplishments: `We have covered a wide range of topics, from the mechanisms than enable individual cryptocurrencies to function, to the macroeconomic impacts of blockchain technology on different nations across the world. We have summarized information from multiple cryptocurrency whitepapers, as well as academic studies on the usage of blockchain in areas including health, music, international transfers, and global criminal activity. We allow individual interns to explore topics of their own interest, and collaborate with other interns to best utilize their talents and passions.`,
     gains: [
       `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
       `Collaborate with other interns to summarize existing research and brainstorm new research ideas.`,
       `Have a flexible schedule and work remotely with all interactions, task fulfillment, and communications.`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcript (official or unofficial). We prefer our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
     qualifications: [
       `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy. `,
       `Willingness to present work and engage in group discussions about research topics.`,
       `Fluency in writing and reading in English (will have to summarize research articles). `,
-      `Must be able to attend weekly meetings on Wednesdays from 8:30-9:30PM EST.`,
+      `Must be able to attend weekly meetings on Thursdays at 8:30PM EST.`,
     ],
     responsibilities: [
       `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
@@ -448,8 +452,8 @@ export default [
       },
     ],
     YouTube: "J0y0tZzzuQ0",
-    description: `Join a cross-community movement of learners and researchers collaboratively learning and crowd-sourcing their machine learning knowledge and expertise to advance deep learning. We are an interdisciplinary group of researchers at the University of Michigan, School of Information and Computer Science Department, who have been iteratively developing a large-scale online collaborative platform.`,
-    accomplishments: `Our platform facilitates knowledge sharing while getting users involved in large-scale collaborative research. The primary focus of our deep learning team is to collaboratively learn about deep learning by using this book (https://web.stanford.edu/~jurafsky/slp3/) and working with other members of the community to fully comprehend and explain the information in the textbook.`,
+    description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the deep learning area on 1Cademy, our collaborative research platform. This semester, we will explore natural language processing, which is a branch of artificial intelligence concerned with giving computers the ability to understand text and spoken words in much the same way human beings can. Our team members will dive into the Speech and Language Processing textbook and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
+    accomplishments: `In our research teams, we work on versatile projects, share our ideas, and collaboratively develop research ideas that not only boost our knowledge in deep learning but also give us the possibility to publish research papers in the most prestigious conferences and journals. Recently we completed a knowledge tracing paper and submitted it to SIGCSE, one of the top conferences in computer science education. Our team consists of machine learning enthusiasts and we would be more than happy to share our passion for machine learning and work together with anyone who has a keen interest and qualifications in deep learning.`,
     gains: [
       `You will spend the majority of the fall semester going through the Speech and Language Processing textbook to deeply learn about natural language processing. No prior experience is required.`,
       `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines). `,
@@ -638,7 +642,7 @@ export default [
       {
         name: "Grace Victoria Ramstad",
         image: "Grace_Victoria_Ramstad.jpeg",
-        about: `Student at Stockholm, Stockholm County, Sweden`,
+        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
         websites: [
           {
             name: "LinkedIn",
@@ -674,7 +678,7 @@ export default [
       `Collaboratively identify and resolve content gaps on the knowledge map`,
       `Connect with a team of passionate researchers from different fields and schools`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in information science, library science, or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. Interns applying for this position should have a passion for helping other's develop their information processes.`,
     qualifications: [
       `Enthusiasm for topics related to information/knowledge building`,
       `Strong information literacy skills`,

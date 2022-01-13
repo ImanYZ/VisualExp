@@ -40,6 +40,48 @@ function Index() {
     }
   };
 
+  const switchSection = (newValue) => (event) => {
+    setNotSectionSwitching(false);
+    setSection(newValue);
+    let cumulativeHeight = 0;
+    for (let sIdx = -1; sIdx < newValue; sIdx++) {
+      const sectOffsetHeight = window.document.getElementById(
+        sectionsOrder[sIdx + 1].id
+      ).scrollHeight;
+      cumulativeHeight += sectOffsetHeight;
+    }
+    window.document.getElementById("ScrollableContainer").scroll({
+      top: cumulativeHeight,
+      left: 0,
+      behavior: "smooth",
+    });
+    // document
+    //   .getElementById(sectionsOrder[newValue + 1].id)
+    //   .scrollIntoView({
+    //     block: "start",
+    //     inline: "nearest",
+    //     behavior: "smooth",
+    //   });
+    window.history.replaceState(
+      null,
+      sectionsOrder[newValue + 1].title,
+      "#" + sectionsOrder[newValue + 1].id
+    );
+    setTimeout(() => {
+      setNotSectionSwitching(true);
+    }, 1000);
+  };
+
+  const homeClick = (event) => {
+    event.preventDefault();
+    switchSection(-1)(event);
+  };
+
+  const joinUsClick = (event) => {
+    event.preventDefault();
+    switchSection(5)(event);
+  };
+
   return (
     <Box
       id="ScrollableContainer"
@@ -51,9 +93,9 @@ function Index() {
       }}
     >
       <AppAppBar
-        section={section}
-        setSection={setSection}
-        setNotSectionSwitching={setNotSectionSwitching}
+        switchSection={switchSection}
+        homeClick={homeClick}
+        joinUsClick={joinUsClick}
       />
       <Landing />
       <HowItWorks section={section} />

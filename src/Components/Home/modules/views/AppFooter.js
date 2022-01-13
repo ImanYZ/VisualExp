@@ -59,6 +59,9 @@ export default function AppFooter() {
             <Link href="/privacy">Privacy</Link>
           </Grid>
           <Grid item xs={6} sm={2}>
+            <Link href="/cookie">Cookie</Link>
+          </Grid>
+          <Grid item xs={6} sm={3}>
             <Box
               component="a"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"

@@ -142,48 +142,6 @@ const AppAppBar = (props) => {
     </Menu>
   );
 
-  const switchSection = (newValue) => (event) => {
-    props.setNotSectionSwitching(false);
-    props.setSection(newValue);
-    let cumulativeHeight = 0;
-    for (let sIdx = -1; sIdx < newValue; sIdx++) {
-      const sectOffsetHeight = window.document.getElementById(
-        sectionsOrder[sIdx + 1].id
-      ).scrollHeight;
-      cumulativeHeight += sectOffsetHeight;
-    }
-    window.document.getElementById("ScrollableContainer").scroll({
-      top: cumulativeHeight,
-      left: 0,
-      behavior: "smooth",
-    });
-    // document
-    //   .getElementById(sectionsOrder[newValue + 1].id)
-    //   .scrollIntoView({
-    //     block: "start",
-    //     inline: "nearest",
-    //     behavior: "smooth",
-    //   });
-    window.history.replaceState(
-      null,
-      sectionsOrder[newValue + 1].title,
-      "#" + sectionsOrder[newValue + 1].id
-    );
-    setTimeout(() => {
-      props.setNotSectionSwitching(true);
-    }, 1000);
-  };
-
-  const homeClick = (event) => {
-    event.preventDefault();
-    switchSection(-1)(event);
-  };
-
-  const joinUsClick = (event) => {
-    event.preventDefault();
-    switchSection(5)(event);
-  };
-
   return (
     <div>
       <AppBar>
@@ -193,7 +151,7 @@ const AppAppBar = (props) => {
               variant="h6"
               underline="none"
               color="inherit"
-              onClick={homeClick}
+              onClick={props.homeClick}
               sx={{
                 fontSize: 24,
                 margin: "7px 19px 0px -10px",
@@ -227,7 +185,7 @@ const AppAppBar = (props) => {
               return (
                 <LinkTab
                   key={"Key" + idx}
-                  onClick={switchSection(idx)}
+                  onClick={props.switchSection(idx)}
                   label={sectionsOrder[idx + 1].label}
                   titl={sectionsOrder[idx + 1].title}
                 />
@@ -264,7 +222,7 @@ const AppAppBar = (props) => {
               <Button
                 variant="contained"
                 color="secondary"
-                onClick={joinUsClick}
+                onClick={props.joinUsClick}
                 sx={{
                   fontSize: 16,
                   color: "common.white",

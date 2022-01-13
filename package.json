@@ -56,6 +56,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "devDependencies": {
+    "react-error-overlay": "6.0.9"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",

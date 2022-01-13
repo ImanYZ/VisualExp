@@ -21,6 +21,7 @@ import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEven
 import Home from "./Components/Home/Home";
 import Privacy from "./Components/Home/Privacy";
 import Terms from "./Components/Home/Terms";
+import CookiePolicy from "./Components/Home/CookiePolicy";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
 
 import "./App.css";
@@ -138,6 +139,7 @@ const AppRouter = (props) => {
       <Route path="/Home/*" element={<Home />} />
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
+      <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}
