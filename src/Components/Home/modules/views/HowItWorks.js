@@ -126,28 +126,28 @@ const HowItWorks = (props) => {
                 <Card sx={{ ...item, maxWidth: 355 }}>
                   <Box sx={number}>{idx + 1}.</Box>
                   {/* <Box sx={{ width: "100%", height: "190px" }}> */}
-                  <Collapse in={stepChecked[idx]} timeout={1000}>
-                    <CardMedia
-                      component="img"
-                      src={"/static/" + elem.id + ".svg"}
-                      alt={elem.id}
-                      height="100%"
-                      width="100%"
-                      sx={{ px: "10px" }}
-                    />
-                  </Collapse>
+                  <CardMedia
+                    component="img"
+                    src={"/static/" + elem.id + ".svg"}
+                    alt={elem.id}
+                    height="100%"
+                    width="100%"
+                    sx={{ px: "10px" }}
+                  />
                   {/* </Box> */}
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                       {elem.title}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {elem.content}
-                    </Typography>
+                    <Collapse in={stepChecked[idx]} timeout={1000}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: "left" }}
+                      >
+                        {elem.content}
+                      </Typography>
+                    </Collapse>
                   </CardContent>
                 </Card>
               </Grid>
