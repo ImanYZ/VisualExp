@@ -16,6 +16,7 @@ import Divider from "@mui/material/Divider";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
+import Alert from "@mui/material/Alert";
 
 import CloseIcon from "@mui/icons-material/Close";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -255,6 +256,12 @@ const Communities = (props) => {
             >
               By Joining Us, You Will ...
             </Typography>
+            <ul>
+              {community.gains &&
+                community.gains.map((gain) => {
+                  return <li>{gain}</li>;
+                })}
+            </ul>
           </Paper>
           <Paper sx={{ padding: "10px", mb: "19px" }}>
             <Typography
@@ -274,6 +281,42 @@ const Communities = (props) => {
             >
               {community.requirements}
             </Typography>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Qualifications
+            </Typography>
+            <ul>
+              {community.qualifications &&
+                community.qualifications.map((qualifi) => {
+                  return <li>{qualifi}</li>;
+                })}
+            </ul>
+          </Paper>
+          <Paper sx={{ padding: "10px", mb: "19px" }}>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{
+                pt: "19px",
+                pb: "19px",
+              }}
+            >
+              Responsibilities
+            </Typography>
+            <ul>
+              {community.responsibilities &&
+                community.responsibilities.map((responsibility) => {
+                  return <li>{responsibility}</li>;
+                })}
+            </ul>
           </Paper>
           <Paper sx={{ padding: "10px", mb: "19px" }}>
             <Typography
@@ -305,21 +348,22 @@ const Communities = (props) => {
                               alt={leader.name}
                               sx={{ width: 100, height: 100, mr: 2.5 }}
                             />
-                            {leader.websites.map((wSite) => {
-                              return (
-                                <IconButton
-                                  component="a"
-                                  href={wSite.url}
-                                  aria-label={wSite.name}
-                                >
-                                  {wSite.name === "LinkedIn" ? (
-                                    <LinkedInIcon />
-                                  ) : (
-                                    <LinkIcon />
-                                  )}
-                                </IconButton>
-                              );
-                            })}
+                            {leader.websites &&
+                              leader.websites.map((wSite) => {
+                                return (
+                                  <IconButton
+                                    component="a"
+                                    href={wSite.url}
+                                    aria-label={wSite.name}
+                                  >
+                                    {wSite.name === "LinkedIn" ? (
+                                      <LinkedInIcon />
+                                    ) : (
+                                      <LinkIcon />
+                                    )}
+                                  </IconButton>
+                                );
+                              })}
                             <IconButton
                               component="a"
                               href={
@@ -366,6 +410,18 @@ const Communities = (props) => {
             >
               Apply to Join this Community
             </Typography>
+            <Alert severity="Warning">
+              <strong>Note: </strong> Participation is unpaid, solely for the
+              purpose of improving research and education, and this position
+              meets{" "}
+              <a
+                href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm"
+                target="_blank"
+              >
+                US Department of Labor Federal Internship Guidelines
+              </a>
+              . For more information about the project, contact
+            </Alert>
             <JoinUs community={community} />
           </Paper>
         </DialogContent>
