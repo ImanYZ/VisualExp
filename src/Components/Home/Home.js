@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import Box from "@mui/material/Box";
 
-import Communities from "./modules/views/Communities";
+import What from "./modules/views/What";
 import AppFooter from "./modules/views/AppFooter";
 import Landing from "./modules/views/Landing";
 import Values from "./modules/views/Values";
@@ -100,7 +100,7 @@ function Index() {
       />
       <Landing />
       <HowItWorks section={section} />
-      <Communities />
+      <What />
       <Values />
       <UniversitiesMap theme={"Light"} />
       <WhoWeAre />

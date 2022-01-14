@@ -115,7 +115,7 @@ const BootstrapDialogTitle = (props) => {
   );
 };
 
-const Communities = (props) => {
+const What = (props) => {
   const [open, setOpen] = useState(false);
   const [community, setCommunity] = useState({});
 
@@ -418,4 +418,4 @@ const Communities = (props) => {
   );
 };
 
-export default Communities;
+export default What;
