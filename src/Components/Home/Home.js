@@ -93,6 +93,7 @@ function Index() {
       }}
     >
       <AppAppBar
+        section={section}
         switchSection={switchSection}
         homeClick={homeClick}
         joinUsClick={joinUsClick}

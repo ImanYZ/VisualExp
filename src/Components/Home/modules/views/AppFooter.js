@@ -10,7 +10,7 @@ function Copyright() {
   return (
     <React.Fragment>
       {"© "}
-      {/* <Link color="inherit" href="/Home"> */}
+      {/* <Link color="inherit" target="_blank" href="/Home"> */}
       1Cademy
       {/* </Link> */} {new Date().getFullYear()}
     </React.Fragment>
@@ -53,17 +53,24 @@ export default function AppFooter() {
             <Copyright />
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link href="/terms">Terms</Link>
+            <Link target="_blank" href="/terms">
+              Terms
+            </Link>
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link href="/privacy">Privacy</Link>
+            <Link target="_blank" href="/privacy">
+              Privacy
+            </Link>
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link href="/cookie">Cookie</Link>
+            <Link target="_blank" href="/cookie">
+              Cookie
+            </Link>
           </Grid>
           <Grid item xs={6} sm={3}>
             <Box
               component="a"
+              target="_blank"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
             >
               <img
