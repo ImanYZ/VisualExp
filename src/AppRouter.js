@@ -23,6 +23,8 @@ import Privacy from "./Components/Home/Privacy";
 import Terms from "./Components/Home/Terms";
 import CookiePolicy from "./Components/Home/CookiePolicy";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
+import Communities from "./Components/Home/Communities";
+import communities from "./Components/Home/modules/views/communitiesOrder";
 
 import "./App.css";
 
@@ -140,6 +142,12 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
+      {communities.map((communi) => (
+        <Route
+          path={"/community/" + communi.id}
+          element={<Communities commId={communi.id} />}
+        />
+      ))}
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}

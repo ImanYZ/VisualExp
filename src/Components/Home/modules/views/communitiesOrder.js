@@ -1,5 +1,6 @@
 export default [
   {
+    id: "Educational_Organizational_Psychology",
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
     width: "45%",
@@ -56,6 +57,7 @@ export default [
     ],
   },
   {
+    id: "Clinical_Psychology",
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
     width: "25%",
@@ -99,6 +101,7 @@ export default [
     ],
   },
   {
+    id: "Mindfulness",
     url: "/static/Communities/Mindfulness.jpg",
     title: "Mindfulness",
     width: "30%",
@@ -158,6 +161,7 @@ export default [
     ],
   },
   {
+    id: "Health_Psychology",
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
     width: "25%",
@@ -207,6 +211,7 @@ export default [
     ],
   },
   {
+    id: "Neuroscience",
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
     width: "40%",
@@ -267,6 +272,7 @@ export default [
     ],
   },
   {
+    id: "Disability_Studies",
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
     width: "35%",
@@ -284,7 +290,7 @@ export default [
       },
       {
         name: "Joe Casiglia",
-        image: "Joe_Casiglia.jpg",
+        image: "Joe_Casiglia.png",
         about: `Joe Casiglia graduated from Pepperdine University with a degree in Economics in 2021 and is Co-leader of 1Cademy's Disability Studies Community. Within the group, Joe edits the Economics of Disability, Disability Law, and Culture of Disability, subtopics, along with working together with the library liaison team to improve cohesion between Disability Studies and the wider 1Cademy platform. He was led to researching disability after personal experiences navigating the complexity of college level disability services and hopes to illuminate the diversity of issues facing disabled individuals seeking an education. Outside of 1Cademy, Joe works as a Market Analytics Analyst at a top managed service provider, specializing in talent intelligence, labor economics, and providing market strategy. His hobbies include: importing tea, reading comic books, and thrifting vintage fashion.`,
         websites: [
           {
@@ -329,6 +335,7 @@ export default [
     ],
   },
   {
+    id: "Social_Political_Psychology",
     url: "/static/Communities/Social_Political_Psychology.jpg",
     title: "Social/Political Psychology",
     width: "35%",
@@ -384,6 +391,7 @@ export default [
     ],
   },
   {
+    id: "Cryptoeconomics",
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Cryptoeconomics",
     width: "35%",
@@ -421,6 +429,7 @@ export default [
     ],
   },
   {
+    id: "Deep_Learning",
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
     width: "30%",
@@ -477,6 +486,7 @@ export default [
     ],
   },
   {
+    id: "Graphic_Design",
     url: "/static/Communities/Graphic_Design.jpg",
     title: "Graphic Design",
     width: "25%",
@@ -519,6 +529,7 @@ export default [
     ],
   },
   {
+    id: "UI_Design",
     url: "/static/Communities/UI_Design.jpg",
     title: "UI Design",
     width: "35%",
@@ -568,6 +579,7 @@ export default [
     ],
   },
   {
+    id: "UX_Research",
     url: "/static/Communities/UX_Research.jpg",
     title: "UX Research",
     width: "40%",
@@ -613,6 +625,7 @@ export default [
     ],
   },
   {
+    id: "Librarian_Liaisons",
     url: "/static/LibraryBackground.jpg",
     title: "Librarian Liaisons",
     width: "100%",

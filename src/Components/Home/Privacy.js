@@ -35,7 +35,11 @@ function Privacy() {
         homeClick={homeClick}
         joinUsClick={joinUsClick}
       />
-      <Box sx={{ margin: 7 }}>
+      <Box
+        sx={{
+          margin: { xs: 0, sm: "4px", md: "10px", lg: "16px", xl: "25px" },
+        }}
+      >
         <Typography variant="h3" gutterBottom marked="center" align="center">
           1Cademy Privacy Policy
         </Typography>
