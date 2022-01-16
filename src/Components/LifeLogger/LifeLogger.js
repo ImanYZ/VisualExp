@@ -15,6 +15,8 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -225,11 +227,18 @@ const LifeLogger = () => {
             <FormControlLabel value={40} control={<Radio />} label="40" />
             <FormControlLabel value={55} control={<Radio />} label="55" />
           </RadioGroup>
-          <Switch
-            checked={backwards}
-            onChange={switchBackwards}
-            inputProps={{ "aria-label": "Backwards Switch" }}
-          />
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={backwards}
+                  onChange={switchBackwards}
+                  inputProps={{ "aria-label": "Backwards Switch" }}
+                />
+              }
+              label="Backwards"
+            />
+          </FormGroup>
         </FormControl>
         <Button
           onClick={markComplete}
