@@ -54,6 +54,7 @@ export default [
       `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
       `Must be prepared and willing to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, epidemiologists, and cognitive and behavioral scientists.`,
       `Presenting the essence of what you learn in weekly meetings for further discussion, at least once a month.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -98,6 +99,7 @@ export default [
       `Contribute concise summaries of information to the online 1Cademy platform.`,
       `Attend weekly online meetings.`,
       `Contribute in meetings by presenting work and engaging in discussions.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -158,6 +160,7 @@ export default [
       `Contribute in meetings by presenting work.`,
       `Contribute in meetings by engaging in discussion with other interns about research topics.`,
       `Be able to make connections between different resources and research articles`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -208,6 +211,7 @@ export default [
       `Regularly study textbooks and research papers, summarize them, and add notes to the collaborative platform `,
       `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, epidemiologists, and cognitive and behavioral scientists. `,
       `Attend weekly meetings and engage in meaningful discussion about the articles presented. `,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -269,6 +273,7 @@ export default [
       `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
       `Expected 5hrs a week minimum to retain the internship.`,
       `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -332,6 +337,7 @@ export default [
       `Contribute concise summaries of information to the online 1Cademy platform.`,
       `Attend weekly online meetings.`,
       `Contribute in meetings by presenting work and engaging in discussions.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -388,6 +394,7 @@ export default [
       `Constantly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team `,
       `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, epidemiologists, and cognitive and behavioral scientists. `,
       `Presenting the essence of what you learn in weekly meetings for further discussion. `,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -426,6 +433,7 @@ export default [
     responsibilities: [
       `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
       `Contribute in meetings by engaging in discussion with other interns about research topics.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -483,6 +491,7 @@ export default [
       `Constantly study the previously mentioned textbook, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
       `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week. `,
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -526,6 +535,7 @@ export default [
       `Regularly updating visuals as the web app evolves. `,
       `Ensure final visuals and layouts are visually appealing and on-brand. `,
       `Ability to work methodically and meet deadlines.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -558,7 +568,6 @@ export default [
       `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
       `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
       `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
       `Successful interns would continue with taking leadership roles.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit both their most current resume and online portfolio.`,
@@ -576,6 +585,7 @@ export default [
       `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
       `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
       `Attend weekly meetings.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -622,6 +632,7 @@ export default [
       `Gather knowledge from books and papers regarding the best UX practices, summarize important ideas you find, and use 1Cademy to present these findings with the team in weekly meetings. This is how our team finds new projects to work on so we can iteratively improve the usability of 1Cademy.`,
       `Attend and actively participate in all-team meetings twice a week`,
       `Regularly communicate with team using Microsoft Teams`,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {
@@ -711,6 +722,7 @@ export default [
       `Work with a team of UX designers to develop tutorials and guides for platform use`,
       `Develop Information Search Process (ISP) and Information Literacy Instruction (ILI) guides`,
       `Work remotely for all interactions, task fulfillment, and communications `,
+      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
 ];
