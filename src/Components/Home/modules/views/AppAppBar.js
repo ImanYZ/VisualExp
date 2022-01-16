@@ -252,7 +252,7 @@ const AppAppBar = (props) => {
           </Box>
         </Toolbar>
       </AppBar>
-      {renderProfileMenu}
+      {fullname && renderProfileMenu}
       <Toolbar />
     </div>
   );
