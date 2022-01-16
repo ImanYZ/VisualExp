@@ -305,7 +305,7 @@ const LifeLogger = () => {
           severity="success"
           sx={{ width: "100%" }}
         >
-          💨 1 min Sent!
+          {summary}
         </Alert>
       </Snackbar>
     </div>
