@@ -15,6 +15,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
+import Switch from '@mui/material/Switch';
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -71,6 +72,7 @@ const LifeLogger = () => {
   const [summary, setSummary] = useState("");
   const [taskId, setTaskId] = useState(null);
   const [duration, setDuration] = useState(1);
+  const [backwards, setBackwards] = useState(true);
   const [mins, setMins] = useState(1);
   const [expiryTimestamp, setExpiryTimestamp] = useState(1);
 
@@ -119,6 +121,10 @@ const LifeLogger = () => {
     getProjects();
   }, []);
 
+  const switchBackwards = (event) => {
+    setBackwards(event.target.checked);
+  };
+  
   const selectMins = (event) => {
     setMins(event.target.value);
     const time = new Date();
@@ -159,6 +165,7 @@ const LifeLogger = () => {
       axios.post("/scheduleLifeLog", {
         duration,
         summary,
+        backwards
       });
       //   if (taskId) {
       //     const tDTasks = await axios.post(
@@ -218,8 +225,11 @@ const LifeLogger = () => {
             <FormControlLabel value={40} control={<Radio />} label="40" />
             <FormControlLabel value={55} control={<Radio />} label="55" />
           </RadioGroup>
-        </FormControl>
-        <Button
+          <Switch
+      checked={backwards}
+      onChange={switchBackwards}
+      inputProps={{ 'aria-label': 'Backwards Switch' }}
+    />        <Button
           onClick={markComplete}
           className="Button SubmitButton"
           variant="contained"

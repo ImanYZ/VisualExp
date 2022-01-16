@@ -130,8 +130,14 @@ exports.scheduleLifeLog = async (req, res) => {
       .auth()
       .verifyIdToken(req.headers.authorization);
     if (authUser.email === "oneweb@umich.edu") {
-      let end = new Date();
-      let start = new Date(end.getTime() - req.body.duration * 60 * 1000);
+      let start, end;
+      if (req.body.backwards) {
+        end = new Date();
+        start = new Date(end.getTime() - req.body.duration * 60 * 1000);
+      } else {
+        start = new Date();
+        end = new Date(start.getTime() + req.body.duration * 60 * 1000);
+      }
       const summary = req.body.summary;
       const description = "";
       const eventCreated = await insertLifeLogEvent(
