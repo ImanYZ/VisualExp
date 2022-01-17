@@ -118,7 +118,8 @@ const What = (props) => {
                 className="imageTitle"
               >
                 {communi.title}
-                {/* <br />
+                {/* Adding the number of members, nodes, and links to the community buttons in the homepage.
+                <br />
                 <Typography
                   variant="body2"
                   color="inherit"
