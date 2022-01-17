@@ -926,27 +926,28 @@ const RouterNav = (props) => {
                   </Box> */}
                 </>
               )}
-              <Box>
-                {/* {fullname}{" "} */}
-                <Tooltip title="Account">
-                  <IconButton
-                    size="large"
-                    edge="end"
-                    aria-haspopup="true"
-                    aria-controls="lock-menu"
-                    aria-label={`${fullname}'s Account`}
-                    aria-expanded={isProfileMenuOpen ? "true" : undefined}
-                    onClick={handleProfileMenuOpen}
-                    color="inherit"
-                  >
-                    <AccountCircle />
-                  </IconButton>
-                </Tooltip>
-              </Box>
+              {fullname && (
+                <Box>
+                  <Tooltip title="Account">
+                    <IconButton
+                      size="large"
+                      edge="end"
+                      aria-haspopup="true"
+                      aria-controls="lock-menu"
+                      aria-label={`${fullname}'s Account`}
+                      aria-expanded={isProfileMenuOpen ? "true" : undefined}
+                      onClick={handleProfileMenuOpen}
+                      color="inherit"
+                    >
+                      <AccountCircle />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              )}
             </Toolbar>
           </AppBar>
           {/* {projects.length > 0 && renderProjectsMenu} */}
-          {renderProfileMenu}
+          {fullname && renderProfileMenu}
         </Box>
       )}
       <Outlet />
