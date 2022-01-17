@@ -118,6 +118,14 @@ const What = (props) => {
                 className="imageTitle"
               >
                 {communi.title}
+                {/* <br />
+                <Typography
+                  variant="body2"
+                  color="inherit"
+                  sx={{ textTransform: "none" }}
+                >
+                  220 Members - 220 Nodes - 220 Links
+                </Typography> */}
                 <div className="imageMarked" />
               </Typography>
             </Box>
