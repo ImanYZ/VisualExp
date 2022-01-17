@@ -41,6 +41,7 @@ import { isToday, getISODateString } from "../../../utils/DateFunctions";
 import "./IntellectualPoints.css";
 
 const othersActivitiesColumns = [
+  { field: "fullname", headerName: "Fullname", width: 178 },
   { field: "start", headerName: "Start", type: "dateTime", width: 178 },
   {
     field: "description",
@@ -864,7 +865,7 @@ const IntellectualPoints = (props) => {
               You've not evaluated {unvotedNum.toLocaleString()} activit
               {unvotedNum === 1 ? "y" : "ies"} yet!
             </h3>
-            <h3>This is one of them:</h3>
+            <h3>One of them is by {otherActivity.fullname}:</h3>
             <p>
               <strong>Start:</strong> {otherActivity.start.toLocaleString()}
             </p>
