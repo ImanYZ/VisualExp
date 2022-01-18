@@ -62,7 +62,7 @@ export default [
     id: "Clinical_Psychology",
     tags: ["L35Nac3iqGKuqGnn0xdD"],
     url: "/static/Communities/Clinical_Psychology.jpg",
-    title: "2DRAaqsjnWaZ7KL10UKb",
+    title: "Clinical Psychology",
     width: "25%",
     leaders: [
       {
