@@ -467,7 +467,6 @@ export default [
     ],
     allTime: [],
     weekly: [],
-    tags: ["SAbEQzSxChSJWnpiSAmX"],
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Cryptoeconomics",
     width: "35%",
