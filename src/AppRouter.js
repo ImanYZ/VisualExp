@@ -144,6 +144,7 @@ const AppRouter = (props) => {
       <Route path="/cookie/*" element={<CookiePolicy />} />
       {communities.map((communi) => (
         <Route
+          key={communi.id}
           path={"/community/" + communi.id}
           element={<Communities commId={communi.id} />}
         />

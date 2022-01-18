@@ -1,6 +1,7 @@
 export default [
   {
     id: "Educational_Organizational_Psychology",
+    tags: ["L35Nac3iqGKuqGnn0xdD"],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
     width: "45%",
@@ -59,8 +60,9 @@ export default [
   },
   {
     id: "Clinical_Psychology",
+    tags: ["L35Nac3iqGKuqGnn0xdD"],
     url: "/static/Communities/Clinical_Psychology.jpg",
-    title: "Clinical Psychology",
+    title: "2DRAaqsjnWaZ7KL10UKb",
     width: "25%",
     leaders: [
       {
@@ -104,6 +106,7 @@ export default [
   },
   {
     id: "Mindfulness",
+    tags: ["L6N5EOy8Ij73XoJgy09e"],
     url: "/static/Communities/Mindfulness.jpg",
     title: "Mindfulness",
     width: "30%",
@@ -165,6 +168,7 @@ export default [
   },
   {
     id: "Health_Psychology",
+    tags: ["7kScwzjwIaxgBv1RyjVM"],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
     width: "25%",
@@ -216,6 +220,7 @@ export default [
   },
   {
     id: "Neuroscience",
+    tags: ["EotqbmSg4XdYq5U5BQCP"],
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
     width: "40%",
@@ -278,6 +283,7 @@ export default [
   },
   {
     id: "Disability_Studies",
+    tags: ["Y4HihWopCsKNaVZSr6s0"],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
     width: "35%",
@@ -342,6 +348,7 @@ export default [
   },
   {
     id: "Social_Political_Psychology",
+    tags: ["FyQoGIdVVeDHvn1lHOZL", "owiurXq2sPdbHTC3zWHq"],
     url: "/static/Communities/Social_Political_Psychology.jpg",
     title: "Social/Political Psychology",
     width: "35%",
@@ -399,6 +406,7 @@ export default [
   },
   {
     id: "Cryptoeconomics",
+    tags: ["SAbEQzSxChSJWnpiSAmX"],
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Cryptoeconomics",
     width: "35%",
@@ -438,6 +446,7 @@ export default [
   },
   {
     id: "Deep_Learning",
+    tags: ["FJfzAX7zbgQS8jU5XcEk"],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
     width: "30%",
@@ -496,6 +505,7 @@ export default [
   },
   {
     id: "Graphic_Design",
+    tags: ["oLmj9pmrh2wtR0tPTnpb"],
     url: "/static/Communities/Graphic_Design.jpg",
     title: "Graphic Design",
     width: "25%",
@@ -540,6 +550,7 @@ export default [
   },
   {
     id: "UI_Design",
+    tags: ["y1GorOIkFb255Oiqm9k3"],
     url: "/static/Communities/UI_Design.jpg",
     title: "UI Design",
     width: "35%",
@@ -590,6 +601,7 @@ export default [
   },
   {
     id: "UX_Research",
+    tags: ["0OcDwfPChQuXFRnNCH9G", "WgF7yr5q7tJc54apVQSr"],
     url: "/static/Communities/UX_Research.jpg",
     title: "UX Research",
     width: "40%",
@@ -637,6 +649,7 @@ export default [
   },
   {
     id: "Librarian_Liaisons",
+    tags: ["gRRpc1O61kMszcrW07lW"],
     url: "/static/LibraryBackground.jpg",
     title: "Librarian Liaisons",
     width: "100%",

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+// import { useRecoilValue } from "recoil";
 
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -6,6 +7,8 @@ import ButtonBase from "@mui/material/ButtonBase";
 import Container from "@mui/material/Container";
 
 import Typography from "../components/Typography";
+
+// import { firebaseOnecademyState } from "../../../../store/OneCademyAtoms";
 
 import communities from "./communitiesOrder";
 
@@ -67,6 +70,76 @@ const goToCommPage = (commId) => (event) => {
 };
 
 const What = (props) => {
+  // const firebase = useRecoilValue(firebaseOnecademyState);
+
+  // const [nodesChanges, setNodesChanges] = useState([]);
+  // const [nodes, setNodes] = useState({});
+  // const [nodesLoaded, setNodesLoaded] = useState(false);
+  // const [teams, setTeams] = useState({});
+
+  // useEffect(() => {
+  //   let groups = {};
+  //   for (let communi of communities) {
+  //     groups[communi.id] = {
+  //       tags: communi.tags,
+  //       nodes: 0,
+  //       links: 0,
+  //       members: 0,
+  //     };
+  //   }
+  //   setTeams(groups);
+  // }, []);
+
+  // useEffect(() => {
+  //   if (firebase) {
+  //     const nodesQuery = firebase.db.collection("nodes");
+  //     const nodesSnapshot = nodesQuery.onSnapshot((snapshot) => {
+  //       const docChanges = snapshot.docChanges();
+  //       setNodesChanges((oldNodesChanges) => {
+  //         return [...oldNodesChanges, ...docChanges];
+  //       });
+  //     });
+  //     return () => {
+  //       setNodesChanges([]);
+  //       nodesSnapshot();
+  //     };
+  //   }
+  // }, [firebase]);
+
+  // useEffect(() => {
+  //   if (nodesChanges.length > 0) {
+  //     let nds = { ...nodes };
+  //     let groups = { ...teams };
+  //     for (let change of nodesChanges) {
+  //       const nodeData = change.doc.data();
+  //       if (change.type === "removed" || nodeData.deleted) {
+  //         if (change.doc.id in nds) {
+  //           delete nds[change.doc.id];
+  //         }
+  //       } else {
+  //         if (!(change.doc.id in nds)) {
+  //           const node = change.doc.data();
+  //           nds[change.doc.id] = node;
+  //           for (let communi of communities) {
+  //             for (let deTag of communi.tags) {
+  //               for (let tag of node.tags) {
+  //                 if (tag.node === deTag) {
+  //                   groups[communi.id].nodes += 1;
+  //                   groups[communi.id].links += node.children.length;
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //     setNodesChanges([]);
+  //     setNodes(nds);
+  //     setTeams(groups);
+  //     setNodesLoaded(true);
+  //   }
+  // }, [nodesChanges, nodes, teams]);
+
   return (
     <Container
       id="CommunitiesSection"
@@ -120,13 +193,16 @@ const What = (props) => {
                 {communi.title}
                 {/* Adding the number of members, nodes, and links to the community buttons in the homepage.
                 <br />
-                <Typography
-                  variant="body2"
-                  color="inherit"
-                  sx={{ textTransform: "none" }}
-                >
-                  220 Members - 220 Nodes - 220 Links
-                </Typography> */}
+                {nodesLoaded && (
+                  <Typography
+                    variant="body2"
+                    color="inherit"
+                    sx={{ textTransform: "none" }}
+                  >
+                    220 Members - {teams[communi.id].nodes} Nodes -{" "}
+                    {teams[communi.id].links} Links
+                  </Typography>
+                )} */}
                 <div className="imageMarked" />
               </Typography>
             </Box>

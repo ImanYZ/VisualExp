@@ -70,11 +70,11 @@ const WhoWeAre = (props) => {
                       YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp;
                       Resnick, P. (2022). Semester-level Spacing but Not
                       Procrastination Affected Student Exam Performance. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 12th International Conference on
-                        Learning Analytics and Knowledge (LAK’22) online, March
-                        21-25, 2022. ACM.
-                      </i>
+                        Learning Analytics and Knowledge (LAK&#8216;22) online,
+                        March 21-25, 2022. ACM.
+                      </Box>
                     </Typography>
                   }
                 />
@@ -92,11 +92,11 @@ const WhoWeAre = (props) => {
                       YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
                       Retrieval-based Teaching Incentivizes Spacing and Improves
                       Grades in Computer Science Education. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 53rd ACM Technical Symposium on
                         Computer Science Education V. 1 (SIGCSE 2022), March
                         3--5, 2022, Providence, RI, USA. ACM.
-                      </i>
+                      </Box>
                     </Typography>
                   }
                 />
@@ -114,11 +114,11 @@ const WhoWeAre = (props) => {
                       YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K.,
                       &amp; Fox, E. (2022). Another Victim of COVID-19: Computer
                       Science Education. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 53rd ACM Technical Symposium on
                         Computer Science Education V. 1 (SIGCSE 2022), March
                         3--5, 2022, Providence, RI, USA. ACM.
-                      </i>
+                      </Box>
                     </Typography>
                   }
                 />
@@ -154,10 +154,10 @@ const WhoWeAre = (props) => {
                       C., Kwon, K., ... &amp; Silverstein, N. (2021, August).
                       Incentivized Spacing and Gender in Computer Science
                       Education. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 17th ACM Conference on International
                         Computing Education Research
-                      </i>{" "}
+                      </Box>{" "}
                       (pp. 18-28).
                     </Typography>
                   }
@@ -180,10 +180,10 @@ const WhoWeAre = (props) => {
                       Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020,
                       April). QMaps: Engaging Students in Voluntary Question
                       Generation and Linking. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 2020 CHI Conference on Human Factors
                         in Computing Systems
-                      </i>{" "}
+                      </Box>{" "}
                       (pp. 1-14).
                     </Typography>
                   }
@@ -206,10 +206,10 @@ const WhoWeAre = (props) => {
                       YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019,
                       July). A spaced, interleaved retrieval practice tool that
                       is motivating and effective. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 2019 ACM Conference on International
                         Computing Education Research
-                      </i>{" "}
+                      </Box>{" "}
                       (pp. 71-79).
                     </Typography>
                   }
@@ -231,10 +231,10 @@ const WhoWeAre = (props) => {
                     <Typography variant="body2" color="text.secondary">
                       YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed
                       and Studying: Gendered Pathways to Success. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of the 50th ACM Technical Symposium on
                         Computer Science Education
-                      </i>{" "}
+                      </Box>{" "}
                       (pp. 693-698).
                     </Typography>
                   }
@@ -257,12 +257,12 @@ const WhoWeAre = (props) => {
                       Ericson, B. J., YeckehZaare, I., &amp; Guzdial, M. J.
                       (2019). Runestone Interactive Ebooks: A Research Platform
                       for On-line Computer Science Learning. In{" "}
-                      <i>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
                         Proceedings of SPLICE 2019 workshop Computing Science
                         Education Infrastructure: From Tools to Data at 15th ACM
                         International Computing Education Research Conference,
                         Aug 11, 2019, Toronto, Canada.
-                      </i>
+                      </Box>
                     </Typography>
                   }
                 />
@@ -395,7 +395,7 @@ const WhoWeAre = (props) => {
                         Google Cloud
                       </Typography>
                       {
-                        " — has 1Cademy, research credits to host it on GCP services, under award number 205607640."
+                        " — awarded research credits to host 1Cademy on GCP services, under award number 205607640."
                       }
                     </React.Fragment>
                   }
