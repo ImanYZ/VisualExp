@@ -1,7 +1,12 @@
 export default [
   {
     id: "Educational_Organizational_Psychology",
-    tags: ["L35Nac3iqGKuqGnn0xdD"],
+    tags: [
+      {
+        title: "Educational Psychology",
+        node: "L35Nac3iqGKuqGnn0xdD",
+      },
+    ],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
     width: "45%",
@@ -60,7 +65,12 @@ export default [
   },
   {
     id: "Clinical_Psychology",
-    tags: ["L35Nac3iqGKuqGnn0xdD"],
+    tags: [
+      {
+        title: "Clinical Psychology",
+        node: "2DRAaqsjnWaZ7KL10UKb",
+      },
+    ],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
     width: "25%",
@@ -106,7 +116,12 @@ export default [
   },
   {
     id: "Mindfulness",
-    tags: ["L6N5EOy8Ij73XoJgy09e"],
+    tags: [
+      {
+        title: "Mindfulness",
+        node: "L6N5EOy8Ij73XoJgy09e",
+      },
+    ],
     url: "/static/Communities/Mindfulness.jpg",
     title: "Mindfulness",
     width: "30%",
@@ -168,7 +183,12 @@ export default [
   },
   {
     id: "Health_Psychology",
-    tags: ["7kScwzjwIaxgBv1RyjVM"],
+    tags: [
+      {
+        title: "Health Psychology",
+        node: "7kScwzjwIaxgBv1RyjVM",
+      },
+    ],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
     width: "25%",
@@ -220,7 +240,12 @@ export default [
   },
   {
     id: "Neuroscience",
-    tags: ["EotqbmSg4XdYq5U5BQCP"],
+    tags: [
+      {
+        title: "Behavioral Neuroscience",
+        node: "EotqbmSg4XdYq5U5BQCP",
+      },
+    ],
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
     width: "40%",
@@ -283,7 +308,12 @@ export default [
   },
   {
     id: "Disability_Studies",
-    tags: ["Y4HihWopCsKNaVZSr6s0"],
+    tags: [
+      {
+        title: "Disability Studies",
+        node: "Y4HihWopCsKNaVZSr6s0",
+      },
+    ],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
     width: "35%",
@@ -348,7 +378,16 @@ export default [
   },
   {
     id: "Social_Political_Psychology",
-    tags: ["FyQoGIdVVeDHvn1lHOZL", "owiurXq2sPdbHTC3zWHq"],
+    tags: [
+      {
+        title: "Social psychology",
+        node: "FyQoGIdVVeDHvn1lHOZL",
+      },
+      {
+        title: "Psychology",
+        node: "owiurXq2sPdbHTC3zWHq",
+      },
+    ],
     url: "/static/Communities/Social_Political_Psychology.jpg",
     title: "Social/Political Psychology",
     width: "35%",
@@ -406,6 +445,12 @@ export default [
   },
   {
     id: "Cryptoeconomics",
+    tags: [
+      {
+        title: "Cryptoeconomics",
+        node: "SAbEQzSxChSJWnpiSAmX",
+      },
+    ],
     tags: ["SAbEQzSxChSJWnpiSAmX"],
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Cryptoeconomics",
@@ -446,7 +491,16 @@ export default [
   },
   {
     id: "Deep_Learning",
-    tags: ["FJfzAX7zbgQS8jU5XcEk"],
+    tags: [
+      {
+        title: "Data Science",
+        node: "FJfzAX7zbgQS8jU5XcEk",
+      },
+      {
+        title: "Deep Learning (in Machine learning)",
+        node: "DkS1Gz9mxKBbvZ5bs6he",
+      },
+    ],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
     width: "30%",
@@ -505,7 +559,12 @@ export default [
   },
   {
     id: "Graphic_Design",
-    tags: ["oLmj9pmrh2wtR0tPTnpb"],
+    tags: [
+      {
+        title: "Graphic Design",
+        node: "oLmj9pmrh2wtR0tPTnpb",
+      },
+    ],
     url: "/static/Communities/Graphic_Design.jpg",
     title: "Graphic Design",
     width: "25%",
@@ -550,7 +609,16 @@ export default [
   },
   {
     id: "UI_Design",
-    tags: ["y1GorOIkFb255Oiqm9k3"],
+    tags: [
+      {
+        title: "Design Science",
+        node: "y1GorOIkFb255Oiqm9k3",
+      },
+      {
+        title: "User Interface Design",
+        node: "1wyXrpreH942fh2MfnEd",
+      },
+    ],
     url: "/static/Communities/UI_Design.jpg",
     title: "UI Design",
     width: "35%",
@@ -601,7 +669,16 @@ export default [
   },
   {
     id: "UX_Research",
-    tags: ["0OcDwfPChQuXFRnNCH9G", "WgF7yr5q7tJc54apVQSr"],
+    tags: [
+      {
+        title: "User experience (UX) research",
+        node: "0OcDwfPChQuXFRnNCH9G",
+      },
+      {
+        title: "Knowledge Visualization",
+        node: "WgF7yr5q7tJc54apVQSr",
+      },
+    ],
     url: "/static/Communities/UX_Research.jpg",
     title: "UX Research",
     width: "40%",
@@ -649,7 +726,12 @@ export default [
   },
   {
     id: "Librarian_Liaisons",
-    tags: ["gRRpc1O61kMszcrW07lW"],
+    tags: [
+      {
+        title: "Library Science",
+        node: "gRRpc1O61kMszcrW07lW",
+      },
+    ],
     url: "/static/LibraryBackground.jpg",
     title: "Librarian Liaisons",
     width: "100%",

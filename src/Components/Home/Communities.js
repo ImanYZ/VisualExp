@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRecoilValue } from "recoil";
 
 import Box from "@mui/material/Box";
 import Accordion from "@mui/material/Accordion";
@@ -18,6 +19,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
 import EmailIcon from "@mui/icons-material/Email";
+
+import { firebaseOnecademyState } from "../../../store/OneCademyAtoms";
 
 import Typography from "./modules/components/Typography";
 import AppAppBar from "./modules/views/AppAppBar";
@@ -44,20 +47,85 @@ const joinUsClick = (event) => {
 };
 
 const Communities = (props) => {
+  const firebase = useRecoilValue(firebaseOnecademyState);
+
+  const [reputationsChanges, setReputationsChanges] = useState([]);
+  const [reputations, setReputations] = useState({});
+  const [reputationsLoaded, setReputationsLoaded] = useState(false);
   const [expanded, setExpanded] = useState(props.commId);
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
+    let newCommunities = [...allCommunities];
+    for (let communi of newCommunities) {
+      newCommunities[communi.id] = {
+        ...newCommunities[communi.id],
+        allTime: [],
+        weekly: [],
+      };
+    }
+    setCommunities(newCommunities);
+  }, []);
+
+  useEffect(() => {
     if (props.commId) {
-      let newCommunities = [...allCommunities];
-      const commIdx = newCommunities.findIndex(
-        (communi) => communi.id === props.commId
-      );
-      const theCommunity = newCommunities.splice(commIdx, 1);
-      newCommunities = [...theCommunity, ...newCommunities];
-      setCommunities(newCommunities);
+      setCommunities((oldCommunities) => {
+        let newCommunities = [...oldCommunities];
+        const commIdx = newCommunities.findIndex(
+          (communi) => communi.id === props.commId
+        );
+        const theCommunity = newCommunities.splice(commIdx, 1);
+        newCommunities = [...theCommunity, ...newCommunities];
+        return newCommunities;
+      });
     }
   }, [props.commId]);
+
+  useEffect(() => {
+    if (firebase) {
+      const reputationsQuery = firebase.db.collection("reputations");
+      const reputationsSnapshot = reputationsQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        setReputationsChanges((oldReputationsChanges) => {
+          return [...oldReputationsChanges, ...docChanges];
+        });
+      });
+      return () => {
+        setReputationsChanges([]);
+        reputationsSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  useEffect(() => {
+    if (reputationsChanges.length > 0) {
+      let rpts = { ...reputations };
+      for (let change of reputationsChanges) {
+        const reputationData = change.doc.data();
+        if (change.type === "removed" || reputationData.deleted) {
+          if (change.doc.id in rpts) {
+            delete rpts[change.doc.id];
+          }
+        } else {
+          if (!(change.doc.id in rpts)) {
+            rpts[change.doc.id] = reputationData;
+            for (let communi of communities) {
+              for (let deTag of communi.tags) {
+                if (reputationData.tag === deTag) {
+                  groups[communi.id].reputations += 1;
+                  groups[communi.id].links += node.children.length;
+                }
+              }
+            }
+          }
+        }
+      }
+      setReputationsChanges([]);
+      setReputations(rpts);
+      setTeams(groups);
+      setReputationsLoaded(true);
+    }
+  }, [reputationsChanges, reputations, teams]);
 
   const handleChange = (commId) => (event, newExpanded) => {
     const idx = communities.findIndex((communi) => communi.id === commId);
