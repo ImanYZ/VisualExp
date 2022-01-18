@@ -564,7 +564,7 @@ const Communities = (props) => {
                                         variant="body2"
                                         component="div"
                                       >
-                                        🏆
+                                        {idx < 3 ? "🏆" : "✔️"}
                                         {" " +
                                           Math.round(
                                             (member.points + Number.EPSILON) *
