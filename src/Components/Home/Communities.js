@@ -8,6 +8,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
+import Chip from "@mui/material/Chip";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import Divider from "@mui/material/Divider";
@@ -20,7 +21,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
 import EmailIcon from "@mui/icons-material/Email";
 
-import { firebaseOnecademyState } from "../../../store/OneCademyAtoms";
+import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
 
 import Typography from "./modules/components/Typography";
 import AppAppBar from "./modules/views/AppAppBar";
@@ -52,20 +53,11 @@ const Communities = (props) => {
   const [reputationsChanges, setReputationsChanges] = useState([]);
   const [reputations, setReputations] = useState({});
   const [reputationsLoaded, setReputationsLoaded] = useState(false);
+  const [usersChanges, setUsersChanges] = useState([]);
+  const [users, setUsers] = useState({});
+  const [usersLoaded, setUsersLoaded] = useState(false);
   const [expanded, setExpanded] = useState(props.commId);
   const [communities, setCommunities] = useState(allCommunities);
-
-  useEffect(() => {
-    let newCommunities = [...allCommunities];
-    for (let communi of newCommunities) {
-      newCommunities[communi.id] = {
-        ...newCommunities[communi.id],
-        allTime: [],
-        weekly: [],
-      };
-    }
-    setCommunities(newCommunities);
-  }, []);
 
   useEffect(() => {
     if (props.commId) {
@@ -83,6 +75,45 @@ const Communities = (props) => {
 
   useEffect(() => {
     if (firebase) {
+      const usersQuery = firebase.db.collection("users");
+      const usersSnapshot = usersQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        setUsersChanges((oldUsersChanges) => {
+          return [...oldUsersChanges, ...docChanges];
+        });
+      });
+      return () => {
+        setUsersChanges([]);
+        usersSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  useEffect(() => {
+    if (usersChanges.length > 0) {
+      let members = { ...users };
+      for (let change of usersChanges) {
+        const userData = change.doc.data();
+        if (change.type === "removed" || userData.deleted) {
+          if (change.doc.id in members) {
+            delete members[change.doc.id];
+          }
+        } else {
+          members[change.doc.id] = {
+            uname: userData.uname,
+            fullname: userData.fName + " " + userData.lName,
+            imageUrl: userData.imageUrl,
+          };
+        }
+      }
+      setUsersChanges([]);
+      setUsers(members);
+      setUsersLoaded(true);
+    }
+  }, [usersChanges, users]);
+
+  useEffect(() => {
+    if (firebase && usersLoaded) {
       const reputationsQuery = firebase.db.collection("reputations");
       const reputationsSnapshot = reputationsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
@@ -95,37 +126,80 @@ const Communities = (props) => {
         reputationsSnapshot();
       };
     }
-  }, [firebase]);
+  }, [firebase, usersLoaded]);
 
   useEffect(() => {
     if (reputationsChanges.length > 0) {
       let rpts = { ...reputations };
+      const groups = [...communities];
       for (let change of reputationsChanges) {
         const reputationData = change.doc.data();
+        const points =
+          reputationData.dCorrects +
+          reputationData.iCorrects +
+          reputationData.mCorrects -
+          reputationData.dWrongs -
+          reputationData.iWrongs -
+          reputationData.mWrongs;
         if (change.type === "removed" || reputationData.deleted) {
-          if (change.doc.id in rpts) {
-            delete rpts[change.doc.id];
+          if (reputationData.uname in rpts) {
+            delete rpts[reputationData.uname];
           }
         } else {
-          if (!(change.doc.id in rpts)) {
-            rpts[change.doc.id] = reputationData;
-            for (let communi of communities) {
+          const user = users[reputationData.uname];
+          if (!(reputationData.uname in rpts)) {
+            for (let communi of groups) {
               for (let deTag of communi.tags) {
-                if (reputationData.tag === deTag) {
-                  groups[communi.id].reputations += 1;
-                  groups[communi.id].links += node.children.length;
+                if (reputationData.tag === deTag.title) {
+                  communi.allTime.push({
+                    uname: reputationData.uname,
+                    ...user,
+                    points,
+                  });
                 }
               }
+            }
+            rpts[reputationData.uname] = { [reputationData.tag]: points };
+          } else {
+            if (!(reputationData.tag in rpts[reputationData.uname])) {
+              for (let communi of groups) {
+                for (let deTag of communi.tags) {
+                  if (reputationData.tag === deTag.title) {
+                    communi.allTime.push({
+                      uname: reputationData.uname,
+                      ...user,
+                      points,
+                    });
+                  }
+                }
+              }
+              rpts[reputationData.uname][reputationData.tag] = points;
+            } else {
+              for (let communi of groups) {
+                for (let deTag of communi.tags) {
+                  if (reputationData.tag === deTag.title) {
+                    const userIdx = communi.allTime.findIndex(
+                      (pt) => pt.uname === reputationData.uname
+                    );
+                    communi.allTime[userIdx] +=
+                      points - rpts[reputationData.uname][reputationData.tag];
+                  }
+                }
+              }
+              rpts[reputationData.uname][reputationData.tag] = points;
             }
           }
         }
       }
+      for (let communi of groups) {
+        communi.allTime.sort((a, b) => b.points - a.points);
+      }
       setReputationsChanges([]);
       setReputations(rpts);
-      setTeams(groups);
+      setCommunities(groups);
       setReputationsLoaded(true);
     }
-  }, [reputationsChanges, reputations, teams]);
+  }, [reputationsChanges, reputations, communities]);
 
   const handleChange = (commId) => (event, newExpanded) => {
     const idx = communities.findIndex((communi) => communi.id === commId);
@@ -330,9 +404,183 @@ const Communities = (props) => {
                         pb: "19px",
                       }}
                     >
-                      Community Leaders
+                      Community Members
                     </Typography>
-                    <Grid
+                    <Paper
+                      sx={{
+                        m: "2.5px",
+                        minHeight: "130px",
+                      }}
+                    >
+                      <Typography
+                        variant="h5"
+                        component="div"
+                        sx={{
+                          display: "block",
+                          padding: "19px 0px 0px 19px",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Community Leaders
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "left",
+                          flexWrap: "wrap",
+                          listStyle: "none",
+                          p: 0.5,
+                          m: 0,
+                        }}
+                        component="ul"
+                      >
+                        {communi.leaders &&
+                          communi.leaders.map((leader, idx) => {
+                            return (
+                              <li key={leader.name}>
+                                <Chip
+                                  sx={{
+                                    height: "109px",
+                                    margin: "10px",
+                                    borderRadius: "58px",
+                                  }}
+                                  icon={
+                                    <Avatar
+                                      src={
+                                        "/static/CommunityLeaders/" +
+                                        leader.image
+                                      }
+                                      alt={leader.name}
+                                      sx={{
+                                        width: "100px",
+                                        height: "100px",
+                                        mr: 2.5,
+                                      }}
+                                    />
+                                  }
+                                  variant="outlined"
+                                  label={
+                                    <>
+                                      <Typography variant="h5" component="div">
+                                        {leader.name}
+                                      </Typography>
+                                      {leader.websites &&
+                                        leader.websites.map((wSite) => {
+                                          return (
+                                            <IconButton
+                                              component="a"
+                                              href={wSite.url}
+                                              target="_blank"
+                                              aria-label={wSite.name}
+                                            >
+                                              {wSite.name === "LinkedIn" ? (
+                                                <LinkedInIcon />
+                                              ) : (
+                                                <LinkIcon />
+                                              )}
+                                            </IconButton>
+                                          );
+                                        })}
+                                      <IconButton
+                                        component="a"
+                                        href={
+                                          "mailto:onecademy@umich.edu?subject=" +
+                                          communi.title +
+                                          " Question for " +
+                                          leader.name
+                                        }
+                                        target="_blank"
+                                        aria-label="email"
+                                      >
+                                        <EmailIcon />
+                                      </IconButton>
+                                    </>
+                                  }
+                                />
+                              </li>
+                            );
+                          })}
+                      </Box>
+                    </Paper>
+                    <Paper
+                      sx={{
+                        m: "2.5px",
+                        minHeight: "130px",
+                      }}
+                    >
+                      <Typography
+                        variant="h5"
+                        component="div"
+                        sx={{
+                          display: "block",
+                          padding: "19px 0px 0px 19px",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Leaderboard
+                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "left",
+                          flexWrap: "wrap",
+                          listStyle: "none",
+                          p: 0.5,
+                          m: 0,
+                        }}
+                        component="ul"
+                      >
+                        {communi.allTime &&
+                          communi.allTime.map((member, idx) => {
+                            return member.points > 0 ? (
+                              <li key={member.uname}>
+                                <Chip
+                                  sx={{
+                                    height: "49px",
+                                    margin: "4px",
+                                    borderRadius: "28px",
+                                  }}
+                                  icon={
+                                    <Avatar
+                                      src={member.imageUrl}
+                                      alt={member.fullname}
+                                      sx={{
+                                        width: "40px",
+                                        height: "40px",
+                                        mr: 2.5,
+                                      }}
+                                    />
+                                  }
+                                  variant="outlined"
+                                  label={
+                                    <>
+                                      <Typography
+                                        variant="body2"
+                                        component="div"
+                                      >
+                                        {member.fullname}
+                                      </Typography>
+                                      <Typography
+                                        variant="body2"
+                                        component="div"
+                                      >
+                                        🏆
+                                        {" " +
+                                          Math.round(
+                                            (member.points + Number.EPSILON) *
+                                              100
+                                          ) /
+                                            100}
+                                      </Typography>
+                                    </>
+                                  }
+                                />
+                              </li>
+                            ) : null;
+                          })}
+                      </Box>
+                    </Paper>
+                    {/* <Grid
                       container
                       spacing={2.5}
                       align="center"
@@ -409,7 +657,7 @@ const Communities = (props) => {
                             </Grid>
                           );
                         })}
-                    </Grid>
+                    </Grid> */}
                   </Paper>
                 </Grid>
                 <Grid item xs={12} lg={6} xl={4}>

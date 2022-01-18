@@ -26,7 +26,6 @@ const JoinUs = (props) => {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    console.log({ hasScheduled });
     if (hasScheduled) {
       setActiveStep(1);
     }

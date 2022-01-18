@@ -21,3 +21,15 @@ export const getFullname = (firstname, lastname) => {
     .replace("__", " ")
     .replace("/", " ");
 };
+
+export const sortedIndex = (array, value) => {
+  let low = 0,
+    high = array.length;
+
+  while (low < high) {
+    const mid = (low + high) >>> 1;
+    if (array[mid] < value) low = mid + 1;
+    else high = mid;
+  }
+  return low;
+};
