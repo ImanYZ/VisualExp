@@ -11,6 +11,7 @@ import CardMedia from "@mui/material/CardMedia";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
+import YoutubeEmbed from "../components/YoutubeEmbed/YoutubeEmbed";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
@@ -154,6 +155,9 @@ const HowItWorks = (props) => {
             );
           })}
         </Grid>
+        <Box sx={{ mt: "19px" }}>
+          <YoutubeEmbed embedId="rN75Smf1-4U" />
+        </Box>
       </Box>
       {/* <Button
         color="secondary"
