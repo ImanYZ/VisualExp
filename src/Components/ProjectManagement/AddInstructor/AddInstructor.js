@@ -28,7 +28,6 @@ import {
   projectState,
   instructorsState,
   othersInstructorsState,
-  otherInstructorState,
   instructorsTodayState,
   upvotedInstructorsTodayState,
 } from "../../../store/ProjectAtoms";
@@ -539,7 +538,58 @@ const othersInstructorsColumns = [
       );
     },
   },
+  {
+    field: "comment",
+    headerName: "comment",
+    width: 250,
+    renderCell: (cellValues) => {
+      return (
+        <Tooltip
+          title={cellValues.value ? cellValues.value : ""}
+          placement="top"
+        >
+          <div
+            style={{
+              fontSize: 13,
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+          >
+            {cellValues.value}
+          </div>
+        </Tooltip>
+      );
+    },
+  },
 ];
+
+const commentsColumn = {
+  field: "comments",
+  headerName: "comments",
+  width: 250,
+  renderCell: (cellValues) => {
+    const cellText =
+      cellValues.value && cellValues.value.length > 0
+        ? cellValues.value.join(", ")
+        : "";
+    return (
+      <Tooltip title={cellText} placement="top">
+        <div
+          style={{
+            fontSize: 13,
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+          }}
+        >
+          {cellText}
+        </div>
+      </Tooltip>
+    );
+  },
+};
+
+instructorsColumns.push(commentsColumn);
+othersInstructorsColumns.push(commentsColumn);
 
 const AddInstructor = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -550,8 +600,6 @@ const AddInstructor = (props) => {
   const [othersInstructors, setOthersInstructors] = useRecoilState(
     othersInstructorsState
   );
-  const [otherInstructor, setOtherInstructor] =
-    useRecoilState(otherInstructorState);
   const [instructorsToday, setInstructorsToday] = useRecoilState(
     instructorsTodayState
   );
@@ -577,7 +625,10 @@ const AddInstructor = (props) => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [votesChanges, setVotesChanges] = useState([]);
   const [unvotedNum, setUnvotedNum] = useState(0);
+  const [otherInstructor, setOtherInstructor] = useState({});
   const [otherVoting, setOtherVoting] = useState(false);
+  const [comment, setComment] = useState("");
+  const [commenting, setCommenting] = useState(false);
 
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
@@ -704,6 +755,7 @@ const AddInstructor = (props) => {
         } else {
           if (instructorData.fullname === fullname) {
             const newInstructor = {
+              comments: [],
               ...instructorData,
               deleteButton: "❌",
               id: change.doc.id,
@@ -727,6 +779,7 @@ const AddInstructor = (props) => {
               (instruct) => instruct.id === change.doc.id
             );
             const newInstructor = {
+              comments: [],
               ...instructorData,
               id: change.doc.id,
             };
@@ -777,6 +830,7 @@ const AddInstructor = (props) => {
             oInsts[oInstsIdx].upVote = false;
             oInsts[oInstsIdx].downVote = false;
             oInsts[oInstsIdx].currentVote = 0;
+            oInsts[oInstsIdx].comment = "";
             nUpVotedToday += didUpVoteToday ? -1 : 0;
           }
         } else {
@@ -794,12 +848,14 @@ const AddInstructor = (props) => {
             }
             oInsts[oInstsIdx] = {
               ...oInsts[oInstsIdx],
+              comment: voteData.comment ? voteData.comment : "",
               upVote: voteData.upVote ? "👍" : "◻",
               downVote: voteData.downVote ? "👎" : "◻",
               currentVote: voteData.upVote - voteData.downVote,
             };
           } else {
             oInsts.push({
+              comment: voteData.comment ? voteData.comment : "",
               upVote: voteData.upVote ? "👍" : "◻",
               downVote: voteData.downVote ? "👎" : "◻",
               currentVote: voteData.upVote - voteData.downVote,
@@ -830,21 +886,37 @@ const AddInstructor = (props) => {
   ]);
 
   useEffect(() => {
-    let theInstructor;
-    let uInstructorsNum = 0;
-    for (let oInstructor of othersInstructors) {
-      if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-        if (!theInstructor) {
-          theInstructor = oInstructor;
+    if (!commenting) {
+      let theInstructor;
+      let uInstructorsNum = 0;
+      for (let oInstructor of othersInstructors) {
+        if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
+          if (!theInstructor) {
+            theInstructor = oInstructor;
+          }
+          uInstructorsNum += 1;
         }
-        uInstructorsNum += 1;
+      }
+      if (theInstructor) {
+        setOtherInstructor(theInstructor);
+      }
+      setUnvotedNum(uInstructorsNum);
+    }
+  }, [commenting, othersInstructors]);
+
+  const othersInstructorsRowClick = (clickedRow) => {
+    const theRow = clickedRow.row;
+    if (theRow) {
+      const instrIdx = othersInstructors.findIndex(
+        (othInstr) => othInstr.id === clickedRow.id
+      );
+      if (instrIdx !== -1) {
+        setOtherInstructor(othersInstructors[instrIdx]);
+        setComment(othersInstructors[instrIdx].comment);
+        setCommenting(true);
       }
     }
-    if (theInstructor) {
-      setOtherInstructor(theInstructor);
-    }
-    setUnvotedNum(uInstructorsNum);
-  }, [othersInstructors]);
+  };
 
   useEffect(() => {
     const validwebURL = isValidHttpUrl(values.webURL);
@@ -906,6 +978,56 @@ const AddInstructor = (props) => {
     values.position,
   ]);
 
+  const voteOthersInstructors = async (clickedCell) => {
+    if (clickedCell.field === "upVote" || clickedCell.field === "downVote") {
+      try {
+        let oInstructors = [...othersInstructors];
+        const instructorIdx = oInstructors.findIndex(
+          (instr) => instr.id === clickedCell.id
+        );
+        if (
+          instructorIdx !== -1 &&
+          oInstructors[instructorIdx][clickedCell.field] !== "O"
+        ) {
+          oInstructors[instructorIdx] = {
+            ...oInstructors[instructorIdx],
+            [clickedCell.field]: "O",
+          };
+          setOthersInstructors(oInstructors);
+          await firebase.idToken();
+          await axios.post("/voteInstructor", {
+            instructor: clickedCell.id,
+            vote: clickedCell.field,
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  };
+
+  const voteOtherInstructor = (instructorId, voteType) => async (event) => {
+    try {
+      if (!otherVoting) {
+        setOtherVoting(true);
+        await firebase.idToken();
+        await axios.post("/voteInstructor", {
+          instructor: instructorId,
+          vote: voteType,
+          comment,
+        });
+        setOtherVoting(false);
+        setCommenting(false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const changeComment = (event) => {
+    setComment(event.target.value);
+  };
+
   const changeInstitution = (event, value) => setInstitution(value);
 
   const changeInstitutionInput = (event, value) => setInstitutionInput(value);
@@ -926,7 +1048,7 @@ const AddInstructor = (props) => {
     setEmail(event.target.value.toLowerCase());
   };
 
-  function handleChange(event) {
+  const handleChange = (event) => {
     if ("persist" in event) {
       event.persist();
     }
@@ -937,7 +1059,7 @@ const AddInstructor = (props) => {
       };
       return newValues;
     });
-  }
+  };
 
   const emailBlur = async (event) => {
     const instructorDocs = await firebase.db
@@ -973,7 +1095,7 @@ const AddInstructor = (props) => {
     });
   };
 
-  const gridRowClick = (clickedRow) => {
+  const myInstructorsRowClick = (clickedRow) => {
     const theRow = clickedRow.row;
     if (theRow) {
       setSelectedRows([clickedRow.id]);
@@ -1148,50 +1270,6 @@ const AddInstructor = (props) => {
     }
   };
 
-  const voteOthersInstructors = async (clickedCell) => {
-    if (clickedCell.field === "upVote" || clickedCell.field === "downVote") {
-      try {
-        let oInstructors = [...othersInstructors];
-        const instructorIdx = oInstructors.findIndex(
-          (instr) => instr.id === clickedCell.id
-        );
-        if (
-          instructorIdx !== -1 &&
-          oInstructors[instructorIdx][clickedCell.field] !== "O"
-        ) {
-          oInstructors[instructorIdx] = {
-            ...oInstructors[instructorIdx],
-            [clickedCell.field]: "O",
-          };
-          setOthersInstructors(oInstructors);
-          await firebase.idToken();
-          await axios.post("/voteInstructor", {
-            instructor: clickedCell.id,
-            vote: clickedCell.field,
-          });
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-
-  const voteOtherInstructor = (instructorId, voteType) => async (event) => {
-    try {
-      if (!otherVoting) {
-        setOtherVoting(true);
-        await firebase.idToken();
-        await axios.post("/voteInstructor", {
-          instructor: instructorId,
-          vote: voteType,
-        });
-        setOtherVoting(false);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
       <h2>Instructors Added by Others:</h2>
@@ -1267,6 +1345,13 @@ const AddInstructor = (props) => {
                 ", " +
                 otherInstructor.city}
             </p>
+            <TextField
+              className="TextField"
+              label="Comment"
+              onChange={changeComment}
+              name="comment"
+              value={comment}
+            />
             <div id="VoteOtherFooter">
               <Tooltip title="Skip" placement="top">
                 <Button
@@ -1312,6 +1397,7 @@ const AddInstructor = (props) => {
           autoHeight
           // checkboxSelection
           hideFooterSelectedRowCount
+          onRowClick={othersInstructorsRowClick}
           loading={!instructorsLoaded}
           onCellClick={voteOthersInstructors}
         />
@@ -1625,7 +1711,7 @@ const AddInstructor = (props) => {
             autoHeight
             hideFooterSelectedRowCount
             loading={!instructorsLoaded}
-            onRowClick={gridRowClick}
+            onRowClick={myInstructorsRowClick}
             onCellClick={deleteInstructor}
             onSelectionChange={(newSelection) => {
               setSelectedRows(newSelection.rowIds);

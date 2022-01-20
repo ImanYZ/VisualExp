@@ -29,7 +29,7 @@ const researchers = [
   { fullname: "Molly Kraine", email: "krainem@umich.edu" },
 ];
 
-const voteFn = async (voter, activity, vote) => {
+const voteFn = async (voter, activity, vote, comment) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
     await db.runTransaction(async (t) => {
@@ -68,6 +68,7 @@ const voteFn = async (voter, activity, vote) => {
             newNoVote = !noVote;
           }
           newVoteData = {
+            comment,
             upVote: newUpVote,
             noVote: newNoVote,
             updatedAt: currentTime,
@@ -81,6 +82,7 @@ const voteFn = async (voter, activity, vote) => {
             project: activityData.project,
             upVote: newUpVote,
             noVote: newNoVote,
+            comment,
             voter,
             createdAt: currentTime,
           };
@@ -175,6 +177,7 @@ exports.voteEndpoint = async (req, res) => {
   try {
     const activity = req.body.activity;
     const vote = req.body.vote;
+    const comment = req.body.comment;
     if (activity && vote) {
       const authUser = await admin
         .auth()
@@ -185,7 +188,7 @@ exports.voteEndpoint = async (req, res) => {
         .limit(1)
         .get();
       if (userDocs.docs.length > 0) {
-        await voteFn(userDocs.docs[0].id, activity, vote);
+        await voteFn(userDocs.docs[0].id, activity, vote, comment);
       }
     }
     return res.status(200).json({});

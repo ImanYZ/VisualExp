@@ -65,11 +65,6 @@ export const othersInstructorsState = atom({
   default: [],
 });
 
-export const otherInstructorState = atom({
-  key: "otherInstructorState",
-  default: {},
-});
-
 export const instructorsTodayState = atom({
   key: "instructorsTodayState",
   default: 0,
