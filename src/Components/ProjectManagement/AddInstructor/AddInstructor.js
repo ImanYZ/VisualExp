@@ -34,6 +34,8 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import CSCObjLoader from "./CSCObjLoader";
+import communities from "../../Home/modules/views/communitiesOrder";
+
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
@@ -77,18 +79,19 @@ const occupations = ["Instructor", "Administrator"];
 
 // From https://www.act.org/content/act/en/research/reports/act-publications/college-choice-report-class-of-2013/college-majors-and-occupational-choices/college-majors-and-occupational-choices.html
 // Later on, add other majors.
-const majors = [
-  "ARTS: VISUAL & PERFORMING",
-  "BUSINESS",
-  "COMMUNICATIONS",
-  "COMMUNITY, FAMILY, & PERSONAL SERVICES",
-  "COMPUTER SCIENCE & MATHEMATICS",
-  "EDUCATION",
-  "ENGLISH & FOREIGN LANGUAGES",
-  "INFORMATION SCIENCE",
-  "PHILOSOPHY, RELIGION, & THEOLOGY",
-  "SOCIAL SCIENCES & LAW",
-];
+// const majors = [
+//   "ARTS: VISUAL & PERFORMING",
+//   "BUSINESS",
+//   "COMMUNICATIONS",
+//   "COMMUNITY, FAMILY, & PERSONAL SERVICES",
+//   "COMPUTER SCIENCE & MATHEMATICS",
+//   "EDUCATION",
+//   "ENGLISH & FOREIGN LANGUAGES",
+//   "INFORMATION SCIENCE",
+//   "PHILOSOPHY, RELIGION, & THEOLOGY",
+//   "SOCIAL SCIENCES & LAW",
+// ];
+const majors = communities.map((communi) => communi.title);
 
 const initialState = {
   country: "🇺🇸 United States;US",
@@ -142,7 +145,7 @@ const getStateId = (s) => {
 const instructorsColumns = [
   {
     field: "GoogleScholar",
-    headerName: "Google Scholar Address",
+    headerName: "Google Scholar/ResearchGate Address",
     width: 100,
     renderCell: (cellValues) => {
       return (
@@ -359,7 +362,7 @@ const instructorsColumns = [
   },
   {
     field: "major",
-    headerName: "Major",
+    headerName: "1Cademy Community",
     width: 130,
     renderCell: (cellValues) => {
       return (
@@ -864,7 +867,7 @@ const AddInstructor = (props) => {
       );
     } else if (isNaN(values.citations)) {
       setInvalidInstructor(
-        "Please enter a valid number of citations from their Google Scholar profile!"
+        "Please enter a valid number of citations from their Google Scholar/ResearchGate profile!"
       );
     } else if (!validEmail) {
       setInvalidInstructor("Please enter a valid email address!");
@@ -881,7 +884,7 @@ const AddInstructor = (props) => {
     } else if (!values.city) {
       setInvalidInstructor("Please specify their city!");
     } else if (!values.major) {
-      setInvalidInstructor("Please specify their major!");
+      setInvalidInstructor("Please specify their related 1Cademy Community!");
     } else if (!values.position) {
       setInvalidInstructor("Please specify their position!");
     } else {
@@ -1319,17 +1322,24 @@ const AddInstructor = (props) => {
             <h2>Who to add:</h2>
             <p>
               Enter a US-based college/university instructor/administrator's
-              information from majors:
+              information that relate to our 1Cademy communities:
             </p>
             <ul>
               {majors.map((maj) => {
                 return <li key={maj}>{maj}</li>;
               })}
             </ul>
-            <h2>Google Scholar Profile:</h2>
+            <h2>Prefixes:</h2>
             <p>
-              To find the Google Scholar Profile info for the
-              instructor/administrator, please do the following:
+              If there is any declaration of their prefix on their profile page,
+              we should use that exact prefix, otherwise, if we have reasons to
+              believe they're doctors, we should enter "Dr", otherwise, add
+              "Prof."
+            </p>
+            <h2>Google Scholar / ResearchGate Profile:</h2>
+            <p>
+              First try to find the Google Scholar Profile info for the
+              instructor/administrator through the following instructions:
             </p>
             <ul>
               <li>
@@ -1348,6 +1358,7 @@ const AddInstructor = (props) => {
                   src={GoogleScholarIcon}
                   alt="Google Scholar Icon"
                   width="40px"
+                  sx={{ mb: "-25px" }}
                 />{" "}
                 at the top right corner of your Google Chrome browser.
               </li>
@@ -1366,12 +1377,58 @@ const AddInstructor = (props) => {
                 Copy their Google Scholar profile address and their number of
                 citations to the input boxes on the right.
               </li>
-              <li>
-                Note: If there is no Google Scholar profile for an individual,
-                leave the address empty and enter 0 for their number of
-                citations.
-              </li>
             </ul>
+            <p>
+              If they do not have a Google Scholar profile, report their
+              ResearchGate info through the following instructions:
+              <ul>
+                <li>
+                  Open{" "}
+                  <a href="https://www.google.com/search?q=site%3Ahttps%3A%2F%2Fwww.researchgate.net">
+                    Google Search restricted to only the content of ResearchGate
+                    website
+                  </a>{" "}
+                  in your Internet browser. Then search the full name of the
+                  instructor/administrator plus their school name. Doing this is
+                  as easy as typing "site:https://www.researchgate.net FULLNAME
+                  SCHOOL_NAME" in Google Search. Note that you should replace
+                  FULLNAME and SCHOOL_NAME in this query string. Also, don't
+                  miss the first part of the query string
+                  "site:https://www.researchgate.net " that restrics your search
+                  to only the content of the ResearchGate website.
+                </li>
+                <li>
+                  In the list of Google Search results, click their ResearchGate
+                  profile page. If there are multiple profiles for people with
+                  the same name, please choose the right one based on their
+                  institution and profile picture.
+                </li>
+                <li>
+                  In their ResearchGate profile page, you should be able to find
+                  their number of citations either:
+                  <ul>
+                    <li>
+                      In the middle of the page, there should be a section
+                      titled "Stats overview"
+                    </li>
+                    <li>
+                      Or, on the right sidebar, you should be able to find a
+                      section titled "Publication Stats."
+                    </li>
+                  </ul>
+                  From either of these sections, copy their number of citations
+                  in the corresponding input boxes.
+                </li>
+                <li>
+                  Copy the URL of this webpage in the corresponding input box.
+                </li>
+              </ul>
+            </p>
+            <p>
+              <strong>Note:</strong> If they don't have have either a Google
+              Scholar or a ResearchGate profile, leave the address empty and
+              enter 0 for their number of citations.
+            </p>
           </Alert>
           <Paper className="VoteActivityPaper">
             <Alert className="VoteActivityAlert" severity="success">
@@ -1393,7 +1450,7 @@ const AddInstructor = (props) => {
             </Alert>
             <TextField
               className="TextField"
-              label="Google Scholar Profile"
+              label="Google Scholar/ResearchGate Profile"
               onChange={handleChange}
               name="GoogleScholar"
               value={values.GoogleScholar}
@@ -1401,7 +1458,7 @@ const AddInstructor = (props) => {
             />
             <TextField
               className="TextField"
-              label="Google Scholar Citations #"
+              label="Google Scholar/ResearchGate Citations #"
               onChange={handleChange}
               name="citations"
               type="number"
@@ -1488,12 +1545,12 @@ const AddInstructor = (props) => {
               onKeyPress={onKeyPress}
             />
             <FormControl className="Select">
-              <InputLabel id="MajorSelectLabel">Major:</InputLabel>
+              <InputLabel id="MajorSelectLabel">1Cademy Community:</InputLabel>
               <Select
                 labelId="MajorSelectLabel"
                 id="MajorSelect"
                 value={values.major}
-                label="Major"
+                label="1Cademy Community"
                 name="major"
                 onChange={handleChange}
               >
