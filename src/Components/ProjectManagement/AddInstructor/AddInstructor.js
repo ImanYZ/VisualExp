@@ -3,8 +3,10 @@ import { useRecoilValue, useRecoilState } from "recoil";
 
 import axios from "axios";
 
+import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -1345,13 +1347,17 @@ const AddInstructor = (props) => {
                 ", " +
                 otherInstructor.city}
             </p>
-            <TextField
-              className="TextField"
-              label="Comment"
+            <TextareaAutosize
+              aria-label="Comment Text box"
+              minRows={4}
+              style={{ width: "94%" }}
+              placeholder="Comment"
               onChange={changeComment}
-              name="comment"
               value={comment}
             />
+            <Box sx={{ textAlign: "center" }}>
+              To submit your comment, click one of the vote buttons!
+            </Box>
             <div id="VoteOtherFooter">
               <Tooltip title="Skip" placement="top">
                 <Button
@@ -1405,16 +1411,6 @@ const AddInstructor = (props) => {
       <div id="AddInstructor">
         <div className="Columns40_60">
           <Alert className="VoteActivityAlert" severity="success">
-            <h2>Who to add:</h2>
-            <p>
-              Enter a US-based college/university instructor/administrator's
-              information that relate to our 1Cademy communities:
-            </p>
-            <ul>
-              {majors.map((maj) => {
-                return <li key={maj}>{maj}</li>;
-              })}
-            </ul>
             <h2>Prefixes:</h2>
             <p>
               If there is any declaration of their prefix on their profile page,
@@ -1517,7 +1513,17 @@ const AddInstructor = (props) => {
             </p>
           </Alert>
           <Paper className="VoteActivityPaper">
-            <Alert className="VoteActivityAlert" severity="success">
+            <Alert className="VoteActivityAlert" severity="warning">
+              <h2>Who to add:</h2>
+              <p>
+                Enter a US-based college/university instructor/administrator's
+                information that relate to our 1Cademy communities:
+              </p>
+              <ul>
+                {majors.map((maj) => {
+                  return <li key={maj}>{maj}</li>;
+                })}
+              </ul>
               <h2>Earning points:</h2>
               <ul>
                 <li>
