@@ -32,6 +32,7 @@ const researchers = [
 const voteFn = async (voter, activity, vote, comment) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+
     await db.runTransaction(async (t) => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
