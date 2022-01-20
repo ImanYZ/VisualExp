@@ -47,6 +47,27 @@ const joinUsClick = (event) => {
   window.location.replace("/Home#JoinUsSection");
 };
 
+const accumulatePoints = (groups, reputationData, user, points) => {
+  for (let communi of groups) {
+    for (let deTag of communi.tags) {
+      if (reputationData.tag === deTag.title) {
+        const userIdx = communi.allTime.findIndex(
+          (obj) => obj.uname === reputationData.uname
+        );
+        if (userIdx !== -1) {
+          communi.allTime[userIdx].points += points;
+        } else {
+          communi.allTime.push({
+            uname: reputationData.uname,
+            ...user,
+            points,
+          });
+        }
+      }
+    }
+  }
+};
+
 const Communities = (props) => {
   const firebase = useRecoilValue(firebaseOnecademyState);
 
@@ -148,44 +169,19 @@ const Communities = (props) => {
         } else {
           const user = users[reputationData.uname];
           if (!(reputationData.uname in rpts)) {
-            for (let communi of groups) {
-              for (let deTag of communi.tags) {
-                if (reputationData.tag === deTag.title) {
-                  communi.allTime.push({
-                    uname: reputationData.uname,
-                    ...user,
-                    points,
-                  });
-                }
-              }
-            }
+            accumulatePoints(groups, reputationData, user, points);
             rpts[reputationData.uname] = { [reputationData.tag]: points };
           } else {
             if (!(reputationData.tag in rpts[reputationData.uname])) {
-              for (let communi of groups) {
-                for (let deTag of communi.tags) {
-                  if (reputationData.tag === deTag.title) {
-                    communi.allTime.push({
-                      uname: reputationData.uname,
-                      ...user,
-                      points,
-                    });
-                  }
-                }
-              }
+              accumulatePoints(groups, reputationData, user, points);
               rpts[reputationData.uname][reputationData.tag] = points;
             } else {
-              for (let communi of groups) {
-                for (let deTag of communi.tags) {
-                  if (reputationData.tag === deTag.title) {
-                    const userIdx = communi.allTime.findIndex(
-                      (pt) => pt.uname === reputationData.uname
-                    );
-                    communi.allTime[userIdx] +=
-                      points - rpts[reputationData.uname][reputationData.tag];
-                  }
-                }
-              }
+              accumulatePoints(
+                groups,
+                reputationData,
+                user,
+                points - rpts[reputationData.uname][reputationData.tag]
+              );
               rpts[reputationData.uname][reputationData.tag] = points;
             }
           }
