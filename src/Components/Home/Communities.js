@@ -513,7 +513,7 @@ const Communities = (props) => {
                           fontStyle: "italic",
                         }}
                       >
-                        Leaderboard
+                        Leaderboard (Only those with &gt; 25 points)
                       </Typography>
                       <Box
                         sx={{
@@ -528,7 +528,7 @@ const Communities = (props) => {
                       >
                         {communi.allTime &&
                           communi.allTime.map((member, idx) => {
-                            return member.points > 0 ? (
+                            return member.points >= 25 ? (
                               <li key={member.uname}>
                                 <Chip
                                   sx={{
