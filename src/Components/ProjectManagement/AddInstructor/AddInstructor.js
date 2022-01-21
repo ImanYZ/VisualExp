@@ -832,20 +832,12 @@ const AddInstructor = (props) => {
                 ...newInstructor,
               };
             } else {
-              if (
-                !instructorData.upVotes ||
-                !instructorData.downVotes ||
-                instructorData.upVotes + instructorData.downVotes < 3
-              ) {
-                oInsts.push({
-                  ...newInstructor,
-                  upVote: "◻",
-                  downVote: "◻",
-                  currentVote: 0,
-                });
-              } else {
-                oInsts.filter((instruct) => instruct.id !== change.doc.id);
-              }
+              oInsts.push({
+                ...newInstructor,
+                upVote: "◻",
+                downVote: "◻",
+                currentVote: 0,
+              });
             }
           }
         }
@@ -931,18 +923,27 @@ const AddInstructor = (props) => {
   useEffect(() => {
     let theInstructor;
     let uInstructorsNum = 0;
+    let oInsts = [...othersInstructors];
+    let oInstsChanged = false;
     for (let oInstructor of othersInstructors) {
       if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
         if (!theInstructor) {
           theInstructor = oInstructor;
         }
         uInstructorsNum += 1;
+        if (oInstructor.upVotes + oInstructor.downVotes < 3) {
+          oInsts = oInsts.filter((instruct) => instruct.id !== oInstructor.id);
+          oInstsChanged = true;
+        }
       }
     }
     if (theInstructor) {
       setOtherInstructor(theInstructor);
     }
     setUnvotedNum(uInstructorsNum);
+    if (oInstsChanged) {
+      setOthersInstructors(oInsts);
+    }
   }, [othersInstructors]);
 
   const othersInstructorsRowClick = (clickedRow) => {
@@ -1477,7 +1478,9 @@ const AddInstructor = (props) => {
               If there is any declaration of their prefix on their profile page,
               we should use that exact prefix, otherwise, if we have reasons to
               believe they're doctors, we should enter "Dr", otherwise, add
-              "Prof."
+              "Prof." Those with a Ph.D. usually prefer the prefix, "Dr."
+              Sometimes, instructors' descriptions are written in their
+              biography, so you can find their prefix there.
             </p>
             <h2>Google Scholar / ResearchGate Profile:</h2>
             <p>
