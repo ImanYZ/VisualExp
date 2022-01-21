@@ -156,7 +156,7 @@ const HowItWorks = (props) => {
           })}
         </Grid>
         <Box sx={{ mt: "19px" }}>
-          <YoutubeEmbed embedId="rN75Smf1-4U" />
+          <YoutubeEmbed embedId="vkNx-QUmbNI" />
         </Box>
       </Box>
       {/* <Button
