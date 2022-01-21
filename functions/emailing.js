@@ -238,7 +238,7 @@ exports.sendEventNotificationEmail = async (req, res) => {
         from: "onecademy@umich.edu",
         to: email,
         subject:
-          (from1Cademy ? "[1Cademy] " : "") +
+          "[1Cademy] " +
           (courseName ? "[" + courseName + "] " : "") +
           (weAreWaiting
             ? "We Are Waiting for You in the UX Research Experiment Session!"

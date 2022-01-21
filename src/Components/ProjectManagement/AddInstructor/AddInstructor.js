@@ -143,7 +143,7 @@ const getStateId = (s) => {
   return matches.length > 1 ? matches[1] : "";
 };
 
-const instructorsColumns = [
+let instructorsColumns = [
   {
     field: "GoogleScholar",
     headerName: "Google Scholar/ResearchGate Address",
@@ -484,11 +484,11 @@ const instructorsColumns = [
   // },
 ];
 
-const othersInstructorsColumns = [
+let othersInstructorsColumns = [
   ...instructorsColumns,
   {
     field: "upVote",
-    headerName: "upVote",
+    headerName: "Up Vote",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
@@ -515,12 +515,12 @@ const othersInstructorsColumns = [
   },
   {
     field: "downVote",
-    headerName: "downVote",
+    headerName: "Down Vote",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Skip" placement="top">
+        <Tooltip title="Down Vote" placement="top">
           <div
             style={{
               fontSize: 19,
@@ -565,33 +565,75 @@ const othersInstructorsColumns = [
   },
 ];
 
-const commentsColumn = {
-  field: "comments",
-  headerName: "comments",
-  width: 250,
-  renderCell: (cellValues) => {
-    const cellText =
-      cellValues.value && cellValues.value.length > 0
-        ? cellValues.value.join(", ")
-        : "";
-    return (
-      <Tooltip title={cellText} placement="top">
-        <div
-          style={{
-            fontSize: 13,
-            textOverflow: "ellipsis",
-            overflow: "hidden",
-          }}
-        >
-          {cellText}
-        </div>
-      </Tooltip>
-    );
+const extraColumns = [
+  {
+    field: "upVotes",
+    headerName: "Up Votes",
+    width: 10,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <Tooltip title="Up Votes" placement="top">
+          <div
+            style={{
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            {cellValues.value}
+          </div>
+        </Tooltip>
+      );
+    },
   },
-};
+  {
+    field: "downVotes",
+    headerName: "Down Votes",
+    width: 10,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <Tooltip title="Down Votes" placement="top">
+          <div
+            style={{
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            {cellValues.value}
+          </div>
+        </Tooltip>
+      );
+    },
+  },
+  {
+    field: "comments",
+    headerName: "comments",
+    width: 250,
+    renderCell: (cellValues) => {
+      const cellText =
+        cellValues.value && cellValues.value.length > 0
+          ? cellValues.value.join(", ")
+          : "";
+      return (
+        <Tooltip title={cellText} placement="top">
+          <div
+            style={{
+              fontSize: 13,
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+            }}
+          >
+            {cellText}
+          </div>
+        </Tooltip>
+      );
+    },
+  },
+];
 
-instructorsColumns.push(commentsColumn);
-othersInstructorsColumns.push(commentsColumn);
+instructorsColumns = [...instructorsColumns, ...extraColumns];
+othersInstructorsColumns = [...othersInstructorsColumns, ...extraColumns];
 
 const AddInstructor = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -630,7 +672,6 @@ const AddInstructor = (props) => {
   const [otherInstructor, setOtherInstructor] = useState({});
   const [otherVoting, setOtherVoting] = useState(false);
   const [comment, setComment] = useState("");
-  const [commenting, setCommenting] = useState(false);
 
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
@@ -888,23 +929,21 @@ const AddInstructor = (props) => {
   ]);
 
   useEffect(() => {
-    if (!commenting) {
-      let theInstructor;
-      let uInstructorsNum = 0;
-      for (let oInstructor of othersInstructors) {
-        if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-          if (!theInstructor) {
-            theInstructor = oInstructor;
-          }
-          uInstructorsNum += 1;
+    let theInstructor;
+    let uInstructorsNum = 0;
+    for (let oInstructor of othersInstructors) {
+      if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
+        if (!theInstructor) {
+          theInstructor = oInstructor;
         }
+        uInstructorsNum += 1;
       }
-      if (theInstructor) {
-        setOtherInstructor(theInstructor);
-      }
-      setUnvotedNum(uInstructorsNum);
     }
-  }, [commenting, othersInstructors]);
+    if (theInstructor) {
+      setOtherInstructor(theInstructor);
+    }
+    setUnvotedNum(uInstructorsNum);
+  }, [othersInstructors]);
 
   const othersInstructorsRowClick = (clickedRow) => {
     const theRow = clickedRow.row;
@@ -915,7 +954,6 @@ const AddInstructor = (props) => {
       if (instrIdx !== -1) {
         setOtherInstructor(othersInstructors[instrIdx]);
         setComment(othersInstructors[instrIdx].comment);
-        setCommenting(true);
       }
     }
   };
@@ -1019,7 +1057,6 @@ const AddInstructor = (props) => {
           comment,
         });
         setOtherVoting(false);
-        setCommenting(false);
       }
     } catch (err) {
       console.error(err);
@@ -1369,7 +1406,19 @@ const AddInstructor = (props) => {
                   {otherVoting ? (
                     <CircularProgress color="warning" size="16px" />
                   ) : (
-                    "👎"
+                    <Box
+                      sx={
+                        otherInstructor.downVote === "👎"
+                          ? {
+                              textDecoration: "line-through",
+                              color: "red",
+                              fontWeight: 700,
+                            }
+                          : {}
+                      }
+                    >
+                      👎
+                    </Box>
                   )}
                 </Button>
               </Tooltip>
@@ -1383,7 +1432,19 @@ const AddInstructor = (props) => {
                   {otherVoting ? (
                     <CircularProgress color="warning" size="16px" />
                   ) : (
-                    "👍"
+                    <Box
+                      sx={
+                        otherInstructor.upVote === "👍"
+                          ? {
+                              textDecoration: "line-through",
+                              color: "red",
+                              fontWeight: 700,
+                            }
+                          : {}
+                      }
+                    >
+                      👍
+                    </Box>
                   )}
                 </Button>
               </Tooltip>

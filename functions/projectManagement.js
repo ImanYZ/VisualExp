@@ -29,10 +29,9 @@ const researchers = [
   { fullname: "Molly Kraine", email: "krainem@umich.edu" },
 ];
 
-const voteFn = async (voter, activity, vote, comment) => {
+const voteFn = async (voter, activity, vote) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-
     await db.runTransaction(async (t) => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
@@ -69,7 +68,6 @@ const voteFn = async (voter, activity, vote, comment) => {
             newNoVote = !noVote;
           }
           newVoteData = {
-            comment,
             upVote: newUpVote,
             noVote: newNoVote,
             updatedAt: currentTime,
@@ -83,7 +81,6 @@ const voteFn = async (voter, activity, vote, comment) => {
             project: activityData.project,
             upVote: newUpVote,
             noVote: newNoVote,
-            comment,
             voter,
             createdAt: currentTime,
           };
@@ -178,7 +175,6 @@ exports.voteEndpoint = async (req, res) => {
   try {
     const activity = req.body.activity;
     const vote = req.body.vote;
-    const comment = req.body.comment;
     if (activity && vote) {
       const authUser = await admin
         .auth()
@@ -189,7 +185,7 @@ exports.voteEndpoint = async (req, res) => {
         .limit(1)
         .get();
       if (userDocs.docs.length > 0) {
-        await voteFn(userDocs.docs[0].id, activity, vote, comment);
+        await voteFn(userDocs.docs[0].id, activity, vote);
       }
     }
     return res.status(200).json({});
@@ -199,7 +195,7 @@ exports.voteEndpoint = async (req, res) => {
   }
 };
 
-const voteInstructorFn = async (voter, instructor, vote) => {
+const voteInstructorFn = async (voter, instructor, vote, comment) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
     await db.runTransaction(async (t) => {
@@ -220,10 +216,10 @@ const voteInstructorFn = async (voter, instructor, vote) => {
         let downVote = false;
         let newUpVote = vote === "upVote";
         let newDownVote = vote === "downVote";
-        let voteRef, newVoteData;
+        let voteRef, voteData, newVoteData;
         if (voteDocs.docs.length > 0) {
           voteRef = db.collection("instructorVotes").doc(voteDocs.docs[0].id);
-          const voteData = voteDocs.docs[0].data();
+          voteData = voteDocs.docs[0].data();
           ({ upVote, downVote } = voteData);
           if (newUpVote) {
             newUpVote = !upVote;
@@ -237,6 +233,9 @@ const voteInstructorFn = async (voter, instructor, vote) => {
             downVote: newDownVote,
             updatedAt: currentTime,
           };
+          if (comment) {
+            newVoteData.comment = comment;
+          }
           t.update(voteRef, newVoteData);
         } else {
           voteRef = db.collection("instructorVotes").doc();
@@ -249,6 +248,9 @@ const voteInstructorFn = async (voter, instructor, vote) => {
             voter,
             createdAt: currentTime,
           };
+          if (comment) {
+            newVoteData.comment = comment;
+          }
           t.set(voteRef, newVoteData);
         }
         const voteLogRef = db.collection("instructorVoteLogs").doc();
@@ -304,6 +306,16 @@ const voteInstructorFn = async (voter, instructor, vote) => {
           upVotes: instructorUpVotes + upVoteVal,
           downVotes: instructorDownVotes + downVoteVal,
         };
+        if (comment) {
+          if (!("comments" in instructorData)) {
+            instructorUpdates.comments = [comment];
+          } else if (voteData.comment !== comment) {
+            instructorUpdates.comments = instructorData.comments.filter(
+              (comm) => comm !== voteData.comment
+            );
+            instructorUpdates.comments.push(comment);
+          }
+        }
         t.update(instructorRef, instructorUpdates);
         const instructorLogRef = db.collection("instructorLogs").doc();
         t.set(instructorLogRef, {
@@ -322,6 +334,7 @@ exports.voteInstructorEndpoint = async (req, res) => {
   try {
     const instructor = req.body.instructor;
     const vote = req.body.vote;
+    const comment = req.body.comment;
     if (instructor && vote) {
       const authUser = await admin
         .auth()
@@ -332,7 +345,7 @@ exports.voteInstructorEndpoint = async (req, res) => {
         .limit(1)
         .get();
       if (userDocs.docs.length > 0) {
-        await voteInstructorFn(userDocs.docs[0].id, instructor, vote);
+        await voteInstructorFn(userDocs.docs[0].id, instructor, vote, comment);
       }
     }
     return res.status(200).json({});
