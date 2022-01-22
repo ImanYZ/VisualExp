@@ -883,11 +883,11 @@ const RouterNav = (props) => {
                           up-voting per day on other's collected data.
                         </div>
                         <div>
-                          You collected {instructorsToday} / 10
+                          You collected {instructorsToday} / 7
                           instructors/administrators' info today.
                         </div>
                         <div>
-                          You cast {upvotedInstructorsToday} / 25 up-votes today
+                          You cast {upvotedInstructorsToday} / 16 up-votes today
                           on others' collected instructors/administrators' data.
                         </div>
                       </div>
@@ -903,8 +903,8 @@ const RouterNav = (props) => {
                       onClick={(event) => navigate("/Activities/AddInstructor")}
                     >
                       👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
-                      {instructorsToday} / 10
-                      <br /> ✅ {upvotedInstructorsToday} / 25
+                      {instructorsToday} / 7
+                      <br /> ✅ {upvotedInstructorsToday} / 16
                     </Button>
                   </Tooltip>
                   {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
