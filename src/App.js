@@ -76,26 +76,24 @@ import "./App.css";
   //     }
   //   }
   // };
+  // const arraysEqual = (arr1, arr2) => {
+  //   if (arr1.length !== arr2.length) {
+  //     return false;
+  //   }
+  //   for (let idx = 0; idx < arr1.length; idx++) {
+  //     if (arr1[idx] !== arr2[idx]) {
+  //       return false;
+  //     }
+  //   }
+  //   return true;
+  // };
+  // const initialCMap = [
+  //   { from: "Sea", link: "is", to: "A body of water" },
+  //   { from: "Different fishes", link: "swim in", to: "Sea" },
+  //   { from: "Different fishes", link: "live in", to: "A body of water" },
+  //   { from: "", link: "", to: "" },
+  // ];
 }
-
-const arraysEqual = (arr1, arr2) => {
-  if (arr1.length !== arr2.length) {
-    return false;
-  }
-  for (let idx = 0; idx < arr1.length; idx++) {
-    if (arr1[idx] !== arr2[idx]) {
-      return false;
-    }
-  }
-  return true;
-};
-
-// const initialCMap = [
-//   { from: "Sea", link: "is", to: "A body of water" },
-//   { from: "Different fishes", link: "swim in", to: "Sea" },
-//   { from: "Different fishes", link: "live in", to: "A body of water" },
-//   { from: "", link: "", to: "" },
-// ];
 
 const postQuestions = [
   {
@@ -469,9 +467,6 @@ const App = () => {
       case 3:
         userUpdates = {};
         if (phase === 0) {
-          setPhase(1);
-          setPassage(pConditions[1].passage);
-          setCondition(pConditions[1].condition);
           userUpdates = {
             phase: 1,
             currentPCon: {
@@ -479,9 +474,6 @@ const App = () => {
               condition: pConditions[1].condition,
             },
           };
-          newStep = 0;
-        } else {
-          newStep = 4;
         }
         await submitAnswers(
           currentTime,
@@ -491,6 +483,14 @@ const App = () => {
           userUpdates,
           newStep
         );
+        if (phase === 0) {
+          setPhase(1);
+          setPassage(pConditions[1].passage);
+          setCondition(pConditions[1].condition);
+          newStep = 0;
+        } else {
+          newStep = 4;
+        }
         setTimer(15 * 60);
         break;
       case 4:
