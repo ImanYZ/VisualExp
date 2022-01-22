@@ -474,6 +474,9 @@ const App = () => {
               condition: pConditions[1].condition,
             },
           };
+          newStep = 0;
+        } else {
+          newStep = 4;
         }
         await submitAnswers(
           currentTime,
@@ -487,9 +490,6 @@ const App = () => {
           setPhase(1);
           setPassage(pConditions[1].passage);
           setCondition(pConditions[1].condition);
-          newStep = 0;
-        } else {
-          newStep = 4;
         }
         setTimer(15 * 60);
         break;
