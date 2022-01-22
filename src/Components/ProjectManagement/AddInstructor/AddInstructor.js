@@ -730,7 +730,7 @@ const AddInstructor = (props) => {
   }, [firebase, project, fullname, instructorsLoaded]);
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
-    if (nUpVotedToday === 25) {
+    if (nUpVotedToday === 16) {
       const today = getISODateString(new Date());
       const dayUpVotesDocs = await firebase.db
         .collection("dayInstructorUpVotes")
@@ -843,7 +843,7 @@ const AddInstructor = (props) => {
         }
       }
       setInstructorsChanges([]);
-      setInstructorsToday(instToday <= 10 ? instToday : 10);
+      setInstructorsToday(instToday <= 7 ? instToday : 7);
       setInstructors(insts);
       setOthersInstructors(oInsts);
     }
@@ -906,7 +906,7 @@ const AddInstructor = (props) => {
       }
       assignDayUpVotesPoint(nUpVotedToday);
       setVotesChanges([]);
-      setUpvotedInstructorsToday(nUpVotedToday <= 25 ? nUpVotedToday : 25);
+      setUpvotedInstructorsToday(nUpVotedToday <= 16 ? nUpVotedToday : 16);
       setOthersInstructors(oInsts);
     }
   }, [
@@ -1322,13 +1322,13 @@ const AddInstructor = (props) => {
                   You earn points for evaluating the instructors added by
                   others:
                 </strong>{" "}
-                you receive one point for every 25 upvotes you cast on the
+                you receive one point for every 16 upvotes you cast on the
                 instructors added by your colleagues in every single day.
               </li>
               <li>
                 <strong>No partial or extra points:</strong> if on a single day
-                you cast more than 25 upvotes, you'll not receive any extra
-                points. If you cast fewer than 25 upvotes, you'll not receive
+                you cast more than 16 upvotes, you'll not receive any extra
+                points. If you cast fewer than 16 upvotes, you'll not receive
                 any partial points, either.
               </li>
             </ul>
@@ -1476,11 +1476,9 @@ const AddInstructor = (props) => {
             <h2>Prefixes:</h2>
             <p>
               If there is any declaration of their prefix on their profile page,
-              we should use that exact prefix, otherwise, if we have reasons to
-              believe they're doctors, we should enter "Dr", otherwise, add
-              "Prof." Those with a Ph.D. usually prefer the prefix, "Dr."
-              Sometimes, instructors' descriptions are written in their
-              biography, so you can find their prefix there.
+              we should use that exact prefix, otherwise, add "Prof." However,
+              if someone is a Dean or has any administrative position other than
+              instructor, they should not be called a Prof.
             </p>
             <h2>Google Scholar / ResearchGate Profile:</h2>
             <p>
@@ -1592,14 +1590,14 @@ const AddInstructor = (props) => {
               <ul>
                 <li>
                   <strong>Only 1 point per day:</strong> to earn the point of
-                  each day, you need to add 10 instructors' contact information.
+                  each day, you need to add 7 instructors' contact information.
                 </li>
                 <li>
-                  <strong>No partial points:</strong> if you add fewer than 10
+                  <strong>No partial points:</strong> if you add fewer than 7
                   instructors on a day, you'll not earn any partial points.
                 </li>
                 <li>
-                  <strong>No extra points:</strong> if you add more than 10
+                  <strong>No extra points:</strong> if you add more than 7
                   instructors on a day, you'll not earn any extra points.
                 </li>
               </ul>
