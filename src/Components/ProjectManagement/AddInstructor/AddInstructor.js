@@ -1373,11 +1373,17 @@ const AddInstructor = (props) => {
               {otherInstructor.occupation +
                 "/" +
                 otherInstructor.position +
-                " in " +
+                " in 1Cademy Community: " +
                 otherInstructor.major +
-                " from " +
+                ", from " +
                 otherInstructor.institution}
             </p>
+            {!(otherInstructor.major in majors) && (
+              <Alert severity="error">
+                This researcher needs to update the 1Cademy Community for this
+                instructor!
+              </Alert>
+            )}
             <p>
               {getCountry(otherInstructor.country) +
                 ", " +
