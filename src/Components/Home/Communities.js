@@ -20,9 +20,6 @@ import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
 
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
-import AppAppBar from "./modules/views/AppAppBar";
-import AppFooter from "./modules/views/AppFooter";
-import withRoot from "./modules/withRoot";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import JoinUs from "./modules/views/JoinUs";
