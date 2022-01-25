@@ -344,7 +344,7 @@ export default [
       {
         name: "Joe Casiglia",
         image: "Joe_Casiglia.png",
-        about: `Joe Casiglia graduated from Pepperdine University with a degree in Economics in 2021 and is Co-leader of 1Cademy's Disability Studies Community. Within the group, Joe edits the Economics of Disability, Disability Law, and Culture of Disability, subtopics, along with working together with the library liaison team to improve cohesion between Disability Studies and the wider 1Cademy platform. He was led to researching disability after personal experiences navigating the complexity of college level disability services and hopes to illuminate the diversity of issues facing disabled individuals seeking an education. Outside of 1Cademy, Joe works as a Market Analytics Analyst at a top managed service provider, specializing in talent intelligence, labor economics, and providing market strategy. His hobbies include: importing tea, reading comic books, and thrifting vintage fashion.`,
+        about: `Joe Casiglia graduated from Pepperdine University with a degree in Economics in 2021 and is Co-leader of 1Cademy's Disability Studies Community. Within the group, Joe edits the Economics of Disability, Disability Law, and Culture of Disability, subtopics, along with working together with the liaison library team to improve cohesion between Disability Studies and the wider 1Cademy platform. He was led to researching disability after personal experiences navigating the complexity of college level disability services and hopes to illuminate the diversity of issues facing disabled individuals seeking an education. Outside of 1Cademy, Joe works as a Market Analytics Analyst at a top managed service provider, specializing in talent intelligence, labor economics, and providing market strategy. His hobbies include: importing tea, reading comic books, and thrifting vintage fashion.`,
         websites: [
           {
             name: "LinkedIn",
@@ -479,6 +479,17 @@ export default [
           {
             name: "LinkedIn",
             url: "https://www.linkedin.com/in/isaac-maruyama-0273a91b7/",
+          },
+        ],
+      },
+      {
+        name: "Daniel Li",
+        image: "Daniel_Li.jpeg",
+        about: `I am junior at NYU Stern concentrating in quantitative economics. I have experience working at startups and in financial roles. I'm interested in a career in investing in venture and growth companies. I also like analyzing data and have experience with Python and R.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/daniel-x-li/",
           },
         ],
       },
@@ -748,7 +759,7 @@ export default [
     ],
   },
   {
-    id: "Librarian_Liaisons",
+    id: "Liaison_Librarians",
     tags: [
       {
         title: "Library Science",
@@ -758,7 +769,7 @@ export default [
     allTime: [],
     weekly: [],
     url: "/static/LibraryBackground.jpg",
-    title: "Librarian Liaisons",
+    title: "Liaison Librarians",
     width: "100%",
     leaders: [
       {
@@ -802,6 +813,17 @@ export default [
           {
             name: "LinkedIn",
             url: "https://www.linkedin.com/in/sarah-licht-84343316b/",
+          },
+        ],
+      },
+      {
+        name: "Stephanie Sandoval",
+        image: "Stephanie_Sandoval.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/stephsand14/",
           },
         ],
       },

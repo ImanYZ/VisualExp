@@ -1040,6 +1040,7 @@ const AddInstructor = (props) => {
             instructor: clickedCell.id,
             vote: clickedCell.field,
           });
+          setComment("");
         }
       } catch (err) {
         console.error(err);

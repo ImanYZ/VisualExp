@@ -9,11 +9,6 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import Divider from "@mui/material/Divider";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -24,28 +19,15 @@ import EmailIcon from "@mui/icons-material/Email";
 import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
 
 import Typography from "./modules/components/Typography";
+import PagesNavbar from "./PagesNavbar";
 import AppAppBar from "./modules/views/AppAppBar";
 import AppFooter from "./modules/views/AppFooter";
 import withRoot from "./modules/withRoot";
-import Button from "./modules/components/Button";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import JoinUs from "./modules/views/JoinUs";
 
 import allCommunities from "./modules/views/communitiesOrder";
-import sectionsOrder from "./modules/views/sectionsOrder";
-
-const switchSection = (newValue) => (event) => {
-  window.location.replace("/Home#" + sectionsOrder[newValue + 1].id);
-};
-
-const homeClick = (event) => {
-  window.location.replace("/Home");
-};
-
-const joinUsClick = (event) => {
-  window.location.replace("/Home#JoinUsSection");
-};
 
 const accumulatePoints = (groups, reputationData, user, points) => {
   for (let communi of groups) {
@@ -210,373 +192,349 @@ const Communities = (props) => {
   };
 
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        overflowY: "auto",
-        overflowX: "auto",
-      }}
-    >
-      <AppAppBar
-        switchSection={switchSection}
-        homeClick={homeClick}
-        joinUsClick={joinUsClick}
-      />
-      <Box
-        sx={{
-          margin: { xs: 0, sm: "4px", md: "10px", lg: "16px", xl: "25px" },
-        }}
-      >
-        <Typography variant="h3" gutterBottom marked="center" align="center">
-          1Cademy Communities
-        </Typography>
-        {communities.map((communi, idx) => (
-          <Accordion
-            key={communi.id}
-            expanded={expanded === communi.id}
-            onChange={handleChange(communi.id)}
+    <PagesNavbar>
+      <Typography variant="h3" gutterBottom marked="center" align="center">
+        1Cademy Communities
+      </Typography>
+      {communities.map((communi, idx) => (
+        <Accordion
+          key={communi.id}
+          expanded={expanded === communi.id}
+          onChange={handleChange(communi.id)}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
           >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+            <Typography
+              variant="h5"
+              gutterBottom
+              align="center"
+              sx={{ fontWeight: "700" }}
             >
-              <Typography
-                variant="h5"
-                gutterBottom
-                align="center"
-                sx={{ fontWeight: "700" }}
-              >
-                {communi.title + " Community"}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={{ xs: 1, md: 2.2 }}>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
+              {communi.title + " Community"}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={{ xs: 1, md: 2.2 }}>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Introduction
+                  </Typography>
+                  <YoutubeEmbed embedId={communi.YouTube} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Description
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "left" }}
+                  >
+                    {communi.description}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Accomplishments
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "left" }}
+                  >
+                    {communi.accomplishments}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    By Joining Us, You Will ...
+                  </Typography>
+                  <ul>
+                    {communi.gains &&
+                      communi.gains.map((gain) => {
+                        return <li>{gain}</li>;
+                      })}
+                  </ul>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Requirements
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "left" }}
+                  >
+                    {communi.requirements}
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Qualifications
+                  </Typography>
+                  <ul>
+                    {communi.qualifications &&
+                      communi.qualifications.map((qualifi) => {
+                        return <li>{qualifi}</li>;
+                      })}
+                  </ul>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Responsibilities
+                  </Typography>
+                  <ul>
+                    {communi.responsibilities &&
+                      communi.responsibilities.map((responsibility) => {
+                        return <li>{responsibility}</li>;
+                      })}
+                  </ul>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Members
+                  </Typography>
+                  <Paper
+                    sx={{
+                      m: "2.5px",
+                      minHeight: "130px",
+                    }}
+                  >
                     <Typography
                       variant="h5"
                       component="div"
                       sx={{
-                        pt: "19px",
-                        pb: "19px",
+                        display: "block",
+                        padding: "19px 0px 0px 19px",
+                        fontStyle: "italic",
                       }}
                     >
-                      Community Introduction
+                      Community Leaders
                     </Typography>
-                    <YoutubeEmbed embedId={communi.YouTube} />
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
+                    <Box
                       sx={{
-                        pt: "19px",
-                        pb: "19px",
+                        display: "flex",
+                        justifyContent: "left",
+                        flexWrap: "wrap",
+                        listStyle: "none",
+                        p: 0.5,
+                        m: 0,
                       }}
+                      component="ul"
                     >
-                      Community Description
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.description}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Accomplishments
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.accomplishments}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      By Joining Us, You Will ...
-                    </Typography>
-                    <ul>
-                      {communi.gains &&
-                        communi.gains.map((gain) => {
-                          return <li>{gain}</li>;
-                        })}
-                    </ul>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Requirements
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.requirements}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Qualifications
-                    </Typography>
-                    <ul>
-                      {communi.qualifications &&
-                        communi.qualifications.map((qualifi) => {
-                          return <li>{qualifi}</li>;
-                        })}
-                    </ul>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Responsibilities
-                    </Typography>
-                    <ul>
-                      {communi.responsibilities &&
-                        communi.responsibilities.map((responsibility) => {
-                          return <li>{responsibility}</li>;
-                        })}
-                    </ul>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Members
-                    </Typography>
-                    <Paper
-                      sx={{
-                        m: "2.5px",
-                        minHeight: "130px",
-                      }}
-                    >
-                      <Typography
-                        variant="h5"
-                        component="div"
-                        sx={{
-                          display: "block",
-                          padding: "19px 0px 0px 19px",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Community Leaders
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "left",
-                          flexWrap: "wrap",
-                          listStyle: "none",
-                          p: 0.5,
-                          m: 0,
-                        }}
-                        component="ul"
-                      >
-                        {communi.leaders &&
-                          communi.leaders.map((leader, idx) => {
-                            return (
-                              <li key={leader.name}>
-                                <Chip
-                                  sx={{
-                                    height: "109px",
-                                    margin: "10px",
-                                    borderRadius: "58px",
-                                  }}
-                                  icon={
-                                    <Avatar
-                                      src={
-                                        "/static/CommunityLeaders/" +
-                                        leader.image
+                      {communi.leaders &&
+                        communi.leaders.map((leader, idx) => {
+                          return (
+                            <li key={leader.name}>
+                              <Chip
+                                sx={{
+                                  height: "109px",
+                                  margin: "10px",
+                                  borderRadius: "58px",
+                                }}
+                                icon={
+                                  <Avatar
+                                    src={
+                                      "/static/CommunityLeaders/" + leader.image
+                                    }
+                                    alt={leader.name}
+                                    sx={{
+                                      width: "100px",
+                                      height: "100px",
+                                      mr: 2.5,
+                                    }}
+                                  />
+                                }
+                                variant="outlined"
+                                label={
+                                  <>
+                                    <Typography variant="h5" component="div">
+                                      {leader.name}
+                                    </Typography>
+                                    {leader.websites &&
+                                      leader.websites.map((wSite) => {
+                                        return (
+                                          <IconButton
+                                            component="a"
+                                            href={wSite.url}
+                                            target="_blank"
+                                            aria-label={wSite.name}
+                                          >
+                                            {wSite.name === "LinkedIn" ? (
+                                              <LinkedInIcon />
+                                            ) : (
+                                              <LinkIcon />
+                                            )}
+                                          </IconButton>
+                                        );
+                                      })}
+                                    <IconButton
+                                      component="a"
+                                      href={
+                                        "mailto:onecademy@umich.edu?subject=" +
+                                        communi.title +
+                                        " Question for " +
+                                        leader.name
                                       }
-                                      alt={leader.name}
-                                      sx={{
-                                        width: "100px",
-                                        height: "100px",
-                                        mr: 2.5,
-                                      }}
-                                    />
-                                  }
-                                  variant="outlined"
-                                  label={
-                                    <>
-                                      <Typography variant="h5" component="div">
-                                        {leader.name}
-                                      </Typography>
-                                      {leader.websites &&
-                                        leader.websites.map((wSite) => {
-                                          return (
-                                            <IconButton
-                                              component="a"
-                                              href={wSite.url}
-                                              target="_blank"
-                                              aria-label={wSite.name}
-                                            >
-                                              {wSite.name === "LinkedIn" ? (
-                                                <LinkedInIcon />
-                                              ) : (
-                                                <LinkIcon />
-                                              )}
-                                            </IconButton>
-                                          );
-                                        })}
-                                      <IconButton
-                                        component="a"
-                                        href={
-                                          "mailto:onecademy@umich.edu?subject=" +
-                                          communi.title +
-                                          " Question for " +
-                                          leader.name
-                                        }
-                                        target="_blank"
-                                        aria-label="email"
-                                      >
-                                        <EmailIcon />
-                                      </IconButton>
-                                    </>
-                                  }
-                                />
-                              </li>
-                            );
-                          })}
-                      </Box>
-                    </Paper>
-                    <Paper
+                                      target="_blank"
+                                      aria-label="email"
+                                    >
+                                      <EmailIcon />
+                                    </IconButton>
+                                  </>
+                                }
+                              />
+                            </li>
+                          );
+                        })}
+                    </Box>
+                  </Paper>
+                  <Paper
+                    sx={{
+                      m: "2.5px",
+                      minHeight: "130px",
+                    }}
+                  >
+                    <Typography
+                      variant="h5"
+                      component="div"
                       sx={{
-                        m: "2.5px",
-                        minHeight: "130px",
+                        display: "block",
+                        padding: "19px 0px 0px 19px",
+                        fontStyle: "italic",
                       }}
                     >
-                      <Typography
-                        variant="h5"
-                        component="div"
-                        sx={{
-                          display: "block",
-                          padding: "19px 0px 0px 19px",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Leaderboard (Only those with &gt; 25 points)
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "left",
-                          flexWrap: "wrap",
-                          listStyle: "none",
-                          p: 0.5,
-                          m: 0,
-                        }}
-                        component="ul"
-                      >
-                        {communi.allTime &&
-                          communi.allTime.map((member, idx) => {
-                            return member.points >= 25 ? (
-                              <li key={member.uname}>
-                                <Chip
-                                  sx={{
-                                    height: "49px",
-                                    margin: "4px",
-                                    borderRadius: "28px",
-                                  }}
-                                  icon={
-                                    <Avatar
-                                      src={member.imageUrl}
-                                      alt={member.fullname}
-                                      sx={{
-                                        width: "40px",
-                                        height: "40px",
-                                        mr: 2.5,
-                                      }}
-                                    />
-                                  }
-                                  variant="outlined"
-                                  label={
-                                    <>
-                                      <Typography
-                                        variant="body2"
-                                        component="div"
-                                      >
-                                        {member.fullname}
-                                      </Typography>
-                                      <Typography
-                                        variant="body2"
-                                        component="div"
-                                      >
-                                        {idx < 3 ? "🏆" : "✔️"}
-                                        {" " +
-                                          Math.round(
-                                            (member.points + Number.EPSILON) *
-                                              100
-                                          ) /
-                                            100}
-                                      </Typography>
-                                    </>
-                                  }
-                                />
-                              </li>
-                            ) : null;
-                          })}
-                      </Box>
-                    </Paper>
-                    {/* <Grid
+                      Leaderboard (Only those with &gt; 25 points)
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "left",
+                        flexWrap: "wrap",
+                        listStyle: "none",
+                        p: 0.5,
+                        m: 0,
+                      }}
+                      component="ul"
+                    >
+                      {communi.allTime &&
+                        communi.allTime.map((member, idx) => {
+                          return member.points >= 25 ? (
+                            <li key={member.uname}>
+                              <Chip
+                                sx={{
+                                  height: "49px",
+                                  margin: "4px",
+                                  borderRadius: "28px",
+                                }}
+                                icon={
+                                  <Avatar
+                                    src={member.imageUrl}
+                                    alt={member.fullname}
+                                    sx={{
+                                      width: "40px",
+                                      height: "40px",
+                                      mr: 2.5,
+                                    }}
+                                  />
+                                }
+                                variant="outlined"
+                                label={
+                                  <>
+                                    <Typography variant="body2" component="div">
+                                      {member.fullname}
+                                    </Typography>
+                                    <Typography variant="body2" component="div">
+                                      {idx < 3 ? "🏆" : "✔️"}
+                                      {" " +
+                                        Math.round(
+                                          (member.points + Number.EPSILON) * 100
+                                        ) /
+                                          100}
+                                    </Typography>
+                                  </>
+                                }
+                              />
+                            </li>
+                          ) : null;
+                        })}
+                    </Box>
+                  </Paper>
+                  {/* <Grid
                       container
                       spacing={2.5}
                       align="center"
@@ -654,31 +612,29 @@ const Communities = (props) => {
                           );
                         })}
                     </Grid> */}
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "0px",
-                      }}
-                    >
-                      Apply to Join this Community
-                    </Typography>
-                    <JoinUs community={communi} />
-                  </Paper>
-                </Grid>
+                </Paper>
               </Grid>
-            </AccordionDetails>
-          </Accordion>
-        ))}
-      </Box>
-      <AppFooter />
-    </Box>
+              <Grid item xs={12} lg={6} xl={4}>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "0px",
+                    }}
+                  >
+                    Apply to Join this Community
+                  </Typography>
+                  <JoinUs community={communi} />
+                </Paper>
+              </Grid>
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
+      ))}
+    </PagesNavbar>
   );
 };
 
-export default withRoot(Communities);
+export default Communities;

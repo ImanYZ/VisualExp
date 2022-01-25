@@ -158,11 +158,23 @@ const SchedulePage = (props) => {
     <div id="SchedulePageContainer">
       {submitted ? (
         <div className="DateDescription">
-          Based on your specified availability, we'll match you with one of our
-          UX researchers and will send you Google Calendar invites in the
-          following days. After receiving the Calendar invites, please accept
-          them as sson as possible. If any of the Calendar invites do not work
-          for you, please contact Iman at oneweb@umich.edu
+          <p>
+            Based on your specified availability, we'll match you with one of
+            our UX researchers and will send you Google Calendar invites in the
+            following days. After receiving the Calendar invites, please accept
+            them as soon as possible. If any of the Calendar invites do not work
+            for you, please contact Iman at oneweb@umich.edu
+          </p>
+          <p>
+            For this purpose, please open the Google Calendar invitation email,
+            scroll all the way down to find the options to respond to the
+            Calendar invite, and click "Yes."
+          </p>
+          <p>
+            Note that accepting/declining the invitation through Outlook does
+            not work. You should only accept/reject the invitation through the
+            Yes/No links at the bottom of the Google Calendar invitation email.
+          </p>
         </div>
       ) : participatedBefore ? (
         <Alert severity="error">

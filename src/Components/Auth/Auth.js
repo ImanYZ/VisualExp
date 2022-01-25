@@ -478,7 +478,7 @@ const Auth = (props) => {
             }
             onKeyPress={onKeyPress}
           />
-          <p>If participating for course credit, specify the course:</p>
+          {/* <p>If participating for course credit, specify the course:</p>
           <FormControl fullWidth>
             <InputLabel id="CourseSelectLabel">Select course:</InputLabel>
             <Select
@@ -496,7 +496,7 @@ const Auth = (props) => {
                 );
               })}
             </Select>
-          </FormControl>
+          </FormControl> */}
         </TabPanel>
         {databaseAccountNotCreatedYet && (
           <div className="Error">

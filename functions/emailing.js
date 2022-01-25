@@ -261,7 +261,8 @@ ${
       hoursLeft +
       "," +
       " but you've not accepted our invitation on Google Calendar yet!</p>" +
-      "<p>Please respond Yes to our invitation on your Google Calendar, or reply to this email if you prefer to meet at another time today."
+      '<p>Please open the Google Calendar invitation email, scroll all the way down to find the options to respond to the Calendar invite, and click "Yes."</p>' +
+      "<p>Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject the invitation through the Yes/No links at the bottom of the Google Calendar invitation email."
 }
 </p>
 <p></p>
