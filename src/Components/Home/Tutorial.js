@@ -8,13 +8,15 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
-import Chip from "@mui/material/Chip";
-import Avatar from "@mui/material/Avatar";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import FormLabel from "@mui/material/FormLabel";
+import Button from "@mui/material/Button";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import LinkIcon from "@mui/icons-material/Link";
-import EmailIcon from "@mui/icons-material/Email";
 
 import {
   firebaseState,
@@ -22,8 +24,8 @@ import {
   fullnameState,
 } from "../../store/AuthAtoms";
 
-import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
+import Typography from "./modules/components/Typography";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import instructions from "./tutorialIntroductionQuestions";
@@ -64,6 +66,7 @@ const Tutorial = (props) => {
             <Grid container spacing={1}>
               <Grid item xs={12} md={8}>
                 <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <YoutubeEmbed embedId={instr.YouTube} />
                   <Typography
                     variant="body2"
                     component="div"
@@ -74,29 +77,10 @@ const Tutorial = (props) => {
                   >
                     {instr.description}
                   </Typography>
-                  <YoutubeEmbed embedId={instr.YouTube} />
                 </Paper>
               </Grid>
               <Grid item xs={12} md={4}>
-                <Paper sx={{ padding: "10px", mb: "19px" }}>
-                  <Typography
-                    variant="h5"
-                    component="div"
-                    sx={{
-                      pt: "19px",
-                      pb: "19px",
-                    }}
-                  >
-                    Community Description
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ textAlign: "left" }}
-                  >
-                    {instr.description}
-                  </Typography>
-                </Paper>
+                <Paper sx={{ padding: "10px", mb: "19px" }}></Paper>
               </Grid>
             </Grid>
           </AccordionDetails>
