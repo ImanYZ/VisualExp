@@ -97,6 +97,9 @@ const Values = (props) => {
                     <Typography gutterBottom variant="h5" component="div">
                       {value.name}
                     </Typography>
+                    <Collapse in={!stepChecked[idx]} timeout={1000}>
+                      Learn more ...
+                    </Collapse>
                     <Collapse in={stepChecked[idx]} timeout={1000}>
                       <Typography
                         variant="body2"
