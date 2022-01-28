@@ -142,11 +142,11 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
-      {communities.map((communi) => (
+      {communities.map((communi, idx) => (
         <Route
           key={communi.id}
           path={"/community/" + communi.id}
-          element={<Communities commId={communi.id} />}
+          element={<Communities commIdx={idx} />}
         />
       ))}
       <Route

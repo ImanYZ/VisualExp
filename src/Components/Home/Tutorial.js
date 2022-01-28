@@ -8,8 +8,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
@@ -35,20 +35,63 @@ const Tutorial = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [expanded, setExpanded] = useState(instructions[0].title);
   const [questions, setQuestions] = useState([]);
+  const [expanded, setExpanded] = useState(0);
 
   useEffect(() => {
     const quests = [];
     for (let ques of instructions[0].questions) {
-      quests.push({
+      const quest = {
         ...ques,
-        choice: "",
+        checks: {},
         error: false,
         helperText: "",
-      });
+      };
+      for (let choice of quest.choices) {
+        quest.checks[choice] = false;
+      }
+      quests.push();
     }
+    setQuestions(quests);
   }, []);
+
+  const checkChoice = (idx) => (event) => {
+    const quests = [...questions];
+    quests[idx].checks[event.target.name] = event.target.checked;
+    quests[idx].error = false;
+    quests[idx].helperText = " ";
+    setQuestions(quests);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const quests = [...questions];
+    for (let ques of quests) {
+      let wrong = false;
+      for (let choice in ques.checks) {
+        if (
+          (ques.checks[choice] && !ques.answers.includes(choice)) ||
+          (!ques.checks[choice] && ques.answers.includes(choice))
+        ) {
+          wrong = true;
+        }
+      }
+      if (wrong) {
+        ques.helperText =
+          "Wrong answer! Please rewatch the video and answer again.";
+        ques.error = true;
+      } else {
+        ques.helperText = "You got it! Let's continue...";
+        ques.error = false;
+      }
+    }
+    setQuestions(quests);
+  };
+
+  const handleChange = (idx) => (event, newExpanded) => {
+    setExpanded(newExpanded ? idx : false);
+  };
 
   return (
     <PagesNavbar>
@@ -58,8 +101,8 @@ const Tutorial = (props) => {
       {instructions.map((instr, idx) => (
         <Accordion
           key={instr.title}
-          expanded={expanded === instr.title}
-          onChange={handleChange(instr.title)}
+          expanded={expanded === idx}
+          onChange={handleChange(idx)}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -72,7 +115,7 @@ const Tutorial = (props) => {
               align="center"
               sx={{ fontWeight: "700" }}
             >
-              {idx + instr.title}
+              {idx + ". " + instr.title}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -95,30 +138,39 @@ const Tutorial = (props) => {
               <Grid item xs={12} md={4}>
                 <Paper sx={{ padding: "10px", mb: "19px" }}>
                   <form onSubmit={handleSubmit}>
-                    {questions.map((question, idx) => {
+                    {questions.map((question, qIdx) => {
                       return (
-                        <FormControl error={question.error} variant="standard">
-                          <FormLabel id="QuestionsErrorRadios">
+                        <FormControl
+                          key={qIdx}
+                          required
+                          error={question.error}
+                          component="fieldset"
+                          variant="standard"
+                        >
+                          <FormLabel component="legend">
                             {question.stem}
                           </FormLabel>
-                          <RadioGroup
-                            aria-labelledby="QuestionsErrorRadios"
-                            name="quiz"
-                            value={question.choice}
-                            onChange={chooseAnswers(idx)}
-                          >
-                            {Object.keys(question.choices).map((choice) => {
-                              return (
-                                <FormControlLabel
-                                  value={choice}
-                                  control={<Radio />}
-                                  label={
-                                    choice + ". " + question.choices[choice]
-                                  }
-                                />
-                              );
-                            })}
-                          </RadioGroup>
+                          <FormGroup>
+                            {Object.keys(question.choices).map(
+                              (choice, cIdx) => {
+                                return (
+                                  <FormControlLabel
+                                    key={choice}
+                                    control={
+                                      <Checkbox
+                                        checked={question.checks[cIdx]}
+                                        onChange={checkChoice(qIdx)}
+                                        name={choice}
+                                      />
+                                    }
+                                    label={
+                                      choice + ". " + question.choices[choice]
+                                    }
+                                  />
+                                );
+                              }
+                            )}
+                          </FormGroup>
                           <FormHelperText>{question.helperText}</FormHelperText>
                         </FormControl>
                       );

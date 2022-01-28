@@ -56,22 +56,19 @@ const Communities = (props) => {
   const [usersChanges, setUsersChanges] = useState([]);
   const [users, setUsers] = useState({});
   const [usersLoaded, setUsersLoaded] = useState(false);
-  const [expanded, setExpanded] = useState(props.commId);
+  const [expanded, setExpanded] = useState(props.commIdx);
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
-    if (props.commId) {
+    if (props.commIdx) {
       setCommunities((oldCommunities) => {
         let newCommunities = [...oldCommunities];
-        const commIdx = newCommunities.findIndex(
-          (communi) => communi.id === props.commId
-        );
-        const theCommunity = newCommunities.splice(commIdx, 1);
+        const theCommunity = newCommunities.splice(props.commIdx, 1);
         newCommunities = [...theCommunity, ...newCommunities];
         return newCommunities;
       });
     }
-  }, [props.commId]);
+  }, [props.commIdx]);
 
   useEffect(() => {
     if (firebase) {
@@ -176,16 +173,15 @@ const Communities = (props) => {
     }
   }, [reputationsChanges, reputations, communities]);
 
-  const handleChange = (commId) => (event, newExpanded) => {
-    const idx = communities.findIndex((communi) => communi.id === commId);
+  const handleChange = (idx) => (event, newExpanded) => {
     if (idx !== -1) {
       window.history.replaceState(
         null,
         communities[idx].title,
-        "/community/" + commId
+        "/community/" + communities[idx].id
       );
     }
-    setExpanded(newExpanded ? commId : false);
+    setExpanded(newExpanded ? idx : false);
   };
 
   return (
@@ -196,8 +192,8 @@ const Communities = (props) => {
       {communities.map((communi, idx) => (
         <Accordion
           key={communi.id}
-          expanded={expanded === communi.id}
-          onChange={handleChange(communi.id)}
+          expanded={expanded === idx}
+          onChange={handleChange(idx)}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
