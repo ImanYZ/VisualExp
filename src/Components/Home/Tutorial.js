@@ -82,7 +82,7 @@ const Tutorial = (props) => {
       }
       if (wrong) {
         ques.helperText =
-          "Incorrect! Please rewatch the video and answer again.";
+          "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
         ques.error = true;
       } else {
         ques.helperText = "You got it!";
