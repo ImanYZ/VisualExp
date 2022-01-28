@@ -309,7 +309,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
         if (comment) {
           if (!("comments" in instructorData)) {
             instructorUpdates.comments = [comment];
-          } else if (voteData.comment !== comment) {
+          } else if (voteData && voteData.comment !== comment) {
             instructorUpdates.comments = instructorData.comments.filter(
               (comm) => comm !== voteData.comment
             );

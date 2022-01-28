@@ -563,7 +563,7 @@ const Communities = (props) => {
                                         return (
                                           <IconButton
                                             component="a"
-                                            href={wSite.url}
+                                            href={wSite.url} target="_blank"
                                             aria-label={wSite.name}
                                           >
                                             {wSite.name === "LinkedIn" ? (
@@ -581,7 +581,7 @@ const Communities = (props) => {
                                         communi.title +
                                         " Question for " +
                                         leader.name
-                                      }
+                                      } target="_blank"
                                       aria-label="email"
                                     >
                                       <EmailIcon />

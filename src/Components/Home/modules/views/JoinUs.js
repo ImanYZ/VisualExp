@@ -130,6 +130,7 @@ const JoinUs = (props) => {
                   variant="contained"
                   component="a"
                   href="/"
+                  target="_blank"
                   sx={{ mt: 1, mr: 1, color: "common.white" }}
                 >
                   Create My Account &amp; Schedule
@@ -167,7 +168,8 @@ const JoinUs = (props) => {
                 <Button
                   variant="contained"
                   component="a"
-                  href="/"
+                  href="/tutorial"
+                  target="_blank"
                   sx={{ mt: 1, mr: 1, color: "common.white" }}
                 >
                   Start 1Cademy Tutorial
@@ -197,10 +199,11 @@ const JoinUs = (props) => {
                 <Button
                   variant="contained"
                   component="a"
-                  href="/"
+                  href="/communities"
+                  target="_blank"
                   sx={{ mt: 1, mr: 1, color: "common.white" }}
                 >
-                  Jump to our list of communities
+                  Explore our communities &amp; their requirements
                 </Button>
               </div>
             </Box>

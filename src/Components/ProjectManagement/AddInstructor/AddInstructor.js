@@ -101,7 +101,7 @@ const initialState = {
   major: "",
   occupation: "Instructor",
   position: "",
-  prefix: "",
+  prefix: "Prof",
   webURL: "",
   GoogleScholar: "",
   citations: 0,
@@ -1234,7 +1234,7 @@ const AddInstructor = (props) => {
               id: instructorRef.id,
             });
 
-            if (instructorsToday === 9) {
+            if (instructorsToday === 6) {
               if (dayInstructorsDocs.docs.length === 0) {
                 const dayInstructorRef = firebase.db
                   .collection("dayInstructors")
@@ -1535,7 +1535,10 @@ const AddInstructor = (props) => {
               <ul>
                 <li>
                   Open{" "}
-                  <a href="https://www.google.com/search?q=site%3Ahttps%3A%2F%2Fwww.researchgate.net">
+                  <a
+                    href="https://www.google.com/search?q=site%3Ahttps%3A%2F%2Fwww.researchgate.net"
+                    target="_blank"
+                  >
                     Google Search restricted to only the content of ResearchGate
                     website
                   </a>{" "}

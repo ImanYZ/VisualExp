@@ -35,7 +35,20 @@ const Tutorial = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [expanded, setExpanded] = useState(props.commId);
+  const [expanded, setExpanded] = useState(instructions[0].title);
+  const [questions, setQuestions] = useState([]);
+
+  useEffect(() => {
+    const quests = [];
+    for (let ques of instructions[0].questions) {
+      quests.push({
+        ...ques,
+        choice: "",
+        error: false,
+        helperText: "",
+      });
+    }
+  }, []);
 
   return (
     <PagesNavbar>
@@ -80,7 +93,45 @@ const Tutorial = (props) => {
                 </Paper>
               </Grid>
               <Grid item xs={12} md={4}>
-                <Paper sx={{ padding: "10px", mb: "19px" }}></Paper>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <form onSubmit={handleSubmit}>
+                    {questions.map((question, idx) => {
+                      return (
+                        <FormControl error={question.error} variant="standard">
+                          <FormLabel id="QuestionsErrorRadios">
+                            {question.stem}
+                          </FormLabel>
+                          <RadioGroup
+                            aria-labelledby="QuestionsErrorRadios"
+                            name="quiz"
+                            value={question.choice}
+                            onChange={chooseAnswers(idx)}
+                          >
+                            {Object.keys(question.choices).map((choice) => {
+                              return (
+                                <FormControlLabel
+                                  value={choice}
+                                  control={<Radio />}
+                                  label={
+                                    choice + ". " + question.choices[choice]
+                                  }
+                                />
+                              );
+                            })}
+                          </RadioGroup>
+                          <FormHelperText>{question.helperText}</FormHelperText>
+                        </FormControl>
+                      );
+                    })}
+                    <Button
+                      sx={{ mt: 1, mr: 1 }}
+                      type="submit"
+                      variant="outlined"
+                    >
+                      Submit Answers
+                    </Button>
+                  </form>
+                </Paper>
               </Grid>
             </Grid>
           </AccordionDetails>

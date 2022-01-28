@@ -47,13 +47,13 @@ const ContactLeaders = (props) => {
         <Grid container>
           <div className="LeaderInfoDiv">
             <div className="LeaderBox">
-              <a href="mailto: onecademy@umich.edu">
+              <a href="mailto: onecademy@umich.edu" target="_blank">
                 <img className="LeaderImage" src={leader.img} alt="leader" />
               </a>
               <p className="LeaderName"> {leader.name} </p>
             </div>
             <div className="LeaderBox">
-              <a href="mailto: onecademy@umich.edu">
+              <a href="mailto: onecademy@umich.edu" target="_blank">
                 <img
                   className="LeaderImage"
                   src={bottomPictures[i].img}
