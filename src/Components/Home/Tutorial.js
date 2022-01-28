@@ -37,6 +37,7 @@ const Tutorial = (props) => {
 
   const [questions, setQuestions] = useState([]);
   const [expanded, setExpanded] = useState(0);
+  const [completed, setCompleted] = useState(-1);
 
   useEffect(() => {
     const quests = [];
@@ -67,6 +68,7 @@ const Tutorial = (props) => {
     event.preventDefault();
 
     const quests = [...questions];
+    let allCorrect = true;
     for (let ques of quests) {
       let wrong = false;
       for (let choice in ques.checks) {
@@ -75,18 +77,22 @@ const Tutorial = (props) => {
           (!ques.checks[choice] && ques.answers.includes(choice))
         ) {
           wrong = true;
+          allCorrect = false;
         }
       }
       if (wrong) {
         ques.helperText =
-          "Wrong answer! Please rewatch the video and answer again.";
+          "Incorrect! Please rewatch the video and answer again.";
         ques.error = true;
       } else {
-        ques.helperText = "You got it! Let's continue...";
+        ques.helperText = "You got it!";
         ques.error = false;
       }
     }
     setQuestions(quests);
+    if (allCorrect) {
+      setCompleted(expanded);
+    }
   };
 
   const handleChange = (idx) => (event, newExpanded) => {
@@ -106,8 +112,8 @@ const Tutorial = (props) => {
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
+            aria-controls="TutorialSections-content"
+            id="TutorialSections-header"
           >
             <Typography
               variant="h5"
