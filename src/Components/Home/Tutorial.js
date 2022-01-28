@@ -95,8 +95,16 @@ const Tutorial = (props) => {
     }
   };
 
+  const nextStep = (idx) => (event) => {
+    if (idx <= completed + 1) {
+      setExpanded(idx + 1);
+    }
+  };
+
   const handleChange = (idx) => (event, newExpanded) => {
-    setExpanded(newExpanded ? idx : false);
+    if (idx <= completed + 1) {
+      setExpanded(newExpanded ? idx : false);
+    }
   };
 
   return (
@@ -109,6 +117,7 @@ const Tutorial = (props) => {
           key={instr.title}
           expanded={expanded === idx}
           onChange={handleChange(idx)}
+          disabled={idx > completed + 1}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
@@ -190,6 +199,14 @@ const Tutorial = (props) => {
                     </Button>
                   </form>
                 </Paper>
+                <Button
+                  onClick={nextStep(idx)}
+                  sx={{ mt: 1, mr: 1 }}
+                  color="success"
+                  variant="outlined"
+                >
+                  Next Step
+                </Button>
               </Grid>
             </Grid>
           </AccordionDetails>
