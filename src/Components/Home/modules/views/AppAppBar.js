@@ -21,8 +21,11 @@ import {
   firebaseState,
   emailState,
   fullnameState,
-  hasScheduledState,
 } from "../../../../store/AuthAtoms";
+import {
+  hasScheduledState,
+  completedExperimentState,
+} from "../../../../store/ExperimentAtoms";
 import { colorModeState } from "../../../../store/GlobalAtoms";
 
 import AppBar from "../components/AppBar";
@@ -53,6 +56,9 @@ const AppAppBar = (props) => {
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
+  const [completedExperiment, setCompletedExperiment] = useRecoilState(
+    completedExperimentState
+  );
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -80,6 +86,10 @@ const AppAppBar = (props) => {
             .collection("schedule")
             .where("email", "==", uEmail)
             .get();
+          const nowTimestamp = firebase.firestore.Timestamp.fromDate(
+            new Date()
+          );
+          let allPassed = true;
           if (scheduleDocs.docs.length >= 3) {
             let scheduledSessions = 0;
             for (let scheduleDoc of scheduleDocs.docs) {
@@ -87,9 +97,15 @@ const AppAppBar = (props) => {
               if (scheduleData.order) {
                 scheduledSessions += 1;
               }
+              if (scheduleData.session >= nowTimestamp) {
+                allPassed = false;
+              }
             }
             if (scheduledSessions >= 3) {
               setHasScheduled(true);
+            }
+            if (allPassed) {
+              setCompletedExperiment(true);
             }
           }
         } else {

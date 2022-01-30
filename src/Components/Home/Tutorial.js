@@ -302,17 +302,31 @@ const Tutorial = (props) => {
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Box sx={{ mb: "19px" }}>
-                      Please carefully watch the video before answering the
-                      questions. The community leaders will decide about your
-                      application based on your total correct and wrong
-                      attempts.
-                    </Box>
-                    <Box
-                      sx={{ mb: "10px", fontWeight: 700, fontStyle: "italic" }}
-                    >
-                      The fewer attempts, the better.
-                    </Box>
+                    {idx < instructions.length - 1 && (
+                      <>
+                        <Box sx={{ mb: "19px" }}>
+                          Please carefully watch the video before answering the
+                          questions. The community leaders will decide about
+                          your application based on your total correct and wrong
+                          attempts.
+                        </Box>
+                        <Box
+                          sx={{
+                            mb: "10px",
+                            fontWeight: 700,
+                            fontStyle: "italic",
+                          }}
+                        >
+                          The fewer attempts, the better.
+                        </Box>
+                      </>
+                    )}
+                    {idx === instructions.length - 1 && (
+                      <Box sx={{ mb: "10px", fontWeight: 700 }}>
+                        You had a total of {correctAttempts + wrongAttempts}{" "}
+                        attemps in answering the questions.
+                      </Box>
+                    )}
                     <Box sx={{ mb: "19px" }}>
                       <Box
                         sx={{ display: "inline", color: "green", mr: "7px" }}
@@ -330,7 +344,8 @@ const Tutorial = (props) => {
                       >
                         {wrongAttempts} Wrong
                       </Box>
-                      attemps in all sections so far!
+                      attemps in all sections
+                      {idx < instructions.length - 1 ? " so far!" : "!"}
                     </Box>
                     {questions.map((question, qIdx) => {
                       return (
@@ -396,27 +411,29 @@ const Tutorial = (props) => {
                         </form>
                       );
                     })}
-                    <Box sx={{ mb: "10px" }}>
-                      <Box
-                        sx={{ display: "inline", color: "green", mr: "7px" }}
-                      >
-                        {instr.id in attempts && attempts[instr.id].corrects}{" "}
-                        Correct
+                    {idx < instructions.length - 1 && (
+                      <Box sx={{ mb: "10px" }}>
+                        <Box
+                          sx={{ display: "inline", color: "green", mr: "7px" }}
+                        >
+                          {instr.id in attempts && attempts[instr.id].corrects}{" "}
+                          Correct
+                        </Box>
+                        &amp;
+                        <Box
+                          sx={{
+                            display: "inline",
+                            color: "red",
+                            ml: "7px",
+                            mr: "7px",
+                          }}
+                        >
+                          {instr.id in attempts && attempts[instr.id].wrongs}{" "}
+                          Wrong
+                        </Box>
+                        attemps in this section!
                       </Box>
-                      &amp;
-                      <Box
-                        sx={{
-                          display: "inline",
-                          color: "red",
-                          ml: "7px",
-                          mr: "7px",
-                        }}
-                      >
-                        {instr.id in attempts && attempts[instr.id].wrongs}{" "}
-                        Wrong
-                      </Box>
-                      attemps in this section!
-                    </Box>
+                    )}
                   </Paper>
                   {idx > 0 && (
                     <Button

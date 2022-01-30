@@ -10,7 +10,10 @@ import StepContent from "@mui/material/StepContent";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 
-import { hasScheduledState } from "../../../../store/AuthAtoms";
+import {
+  hasScheduledState,
+  completedExperimentState,
+} from "../../../../store/ExperimentAtoms";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -22,6 +25,7 @@ const sectionIdx = sectionsOrder.findIndex(
 
 const JoinUs = (props) => {
   const hasScheduled = useRecoilValue(hasScheduledState);
+  const completedExperiment = useRecoilValue(completedExperimentState);
 
   const [activeStep, setActiveStep] = useState(0);
 
@@ -30,6 +34,12 @@ const JoinUs = (props) => {
       setActiveStep(1);
     }
   }, [hasScheduled]);
+
+  useEffect(() => {
+    if (completedExperiment) {
+      setActiveStep(2);
+    }
+  }, [completedExperiment]);
 
   return (
     <Container

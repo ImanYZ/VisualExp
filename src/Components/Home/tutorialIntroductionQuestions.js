@@ -87,18 +87,27 @@ export default {
         },
       },
       What_kind_of_content_should_be_added_to_1Cademy: {
-        stem: "What kind of content should be added to 1Cademy?",
-        answers: ["c", "d", "e", "g", "h"],
+        stem: (
+          <div>
+            What kind of content should be added to 1Cademy? (Hint: check out{" "}
+            <a
+              href="https://apastyle.apa.org/style-grammar-guidelines/citations/paraphrasing"
+              target="_blank"
+            >
+              the APA guidelines
+            </a>
+            .)
+          </div>
+        ),
+        answers: ["c", "e", "f"],
         choices: {
           a: "Original content without proper citation",
           b: "Quotes that are not cited",
           c: "Paraphrased and correctly cited content",
-          d: "Short and correctly cited quotes from books or research papers",
-          e: "Content directly copied from open-source websites and correctly cited",
-          f: "Content copied from books or research papers",
-          g: "Links to online videos or audio recordings",
-          h: "Images from websites under public domain with correct citation",
-          i: "Images from copyrighted websites with correct citation",
+          d: "Content copied from books or research papers",
+          e: "Links to online videos or audio recordings",
+          f: "Images from websites under public domain with correct citation",
+          g: "Images from copyrighted websites with correct citation",
         },
       },
       What_should_you_do_if_you_re_not_sure: {
