@@ -30,16 +30,12 @@ const JoinUs = (props) => {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    if (hasScheduled) {
-      setActiveStep(1);
-    }
-  }, [hasScheduled]);
-
-  useEffect(() => {
     if (completedExperiment) {
       setActiveStep(2);
+    } else if (hasScheduled) {
+      setActiveStep(1);
     }
-  }, [completedExperiment]);
+  }, [hasScheduled, completedExperiment]);
 
   return (
     <Container
@@ -81,7 +77,7 @@ const JoinUs = (props) => {
         </Alert>
       )}
       <Alert severity="success">
-        <strong>Note: </strong> Our application process is sequential; i.e., you
+        <strong>Note:</strong> Our application process is sequential; i.e., you
         need to complete each step to unlock the following steps.
       </Alert>
       <Stepper

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
@@ -55,10 +55,8 @@ const AppAppBar = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
-  const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(
-    completedExperimentState
-  );
+  const setHasScheduled = useSetRecoilState(hasScheduledState);
+  const setCompletedExperiment = useSetRecoilState(completedExperimentState);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -96,16 +94,16 @@ const AppAppBar = (props) => {
               const scheduleData = scheduleDoc.data();
               if (scheduleData.order) {
                 scheduledSessions += 1;
-              }
-              if (scheduleData.session >= nowTimestamp) {
-                allPassed = false;
+                if (scheduleData.session >= nowTimestamp) {
+                  allPassed = false;
+                }
               }
             }
             if (scheduledSessions >= 3) {
               setHasScheduled(true);
-            }
-            if (allPassed) {
-              setCompletedExperiment(true);
+              if (allPassed) {
+                setCompletedExperiment(true);
+              }
             }
           }
         } else {
