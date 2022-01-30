@@ -23,6 +23,7 @@ import Privacy from "./Components/Home/Privacy";
 import Terms from "./Components/Home/Terms";
 import CookiePolicy from "./Components/Home/CookiePolicy";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
+import Tutorial from "./Components/Home/Tutorial";
 import Communities from "./Components/Home/Communities";
 import communities from "./Components/Home/modules/views/communitiesOrder";
 
@@ -142,6 +143,7 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
+      {fullname && <Route path="/tutorial/*" element={<Tutorial />} />}
       {communities.map((communi, idx) => (
         <Route
           key={communi.id}

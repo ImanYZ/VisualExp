@@ -23,6 +23,7 @@ const joinUsClick = (event) => {
 const PagesNavbar = ({ children }) => {
   return (
     <Box
+      id="ScrollableContainer"
       sx={{
         height: "100vh",
         overflowY: "auto",
