@@ -303,10 +303,10 @@ const Tutorial = (props) => {
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Box sx={{ mb: "19px" }}>
-                      Please carefully watch each video and answer the
-                      corresponding questions. The community leaders will decide
-                      about your application based on your total correct and
-                      wrong attempts.
+                      Please carefully watch the video before answering the
+                      questions. The community leaders will decide about your
+                      application based on your total correct and wrong
+                      attempts.
                     </Box>
                     <Box
                       sx={{ mb: "10px", fontWeight: 700, fontStyle: "italic" }}
@@ -383,6 +383,7 @@ const Tutorial = (props) => {
                           </FormControl>
                           <Button
                             sx={{
+                              display: "block",
                               margin: "-10px 0px 25px 0px",
                               color: "white",
                             }}

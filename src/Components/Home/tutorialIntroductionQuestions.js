@@ -854,14 +854,13 @@ export default {
     questions: {
       What_languages_can_be_specified_in_code_nodes: {
         stem: "What languages can be specified in code nodes?",
-        answers: ["a", "b", "c", "d", "e", "f"],
+        answers: ["a", "c", "d", "e"],
         choices: {
           a: "JavaScript",
           b: "C++",
           c: "Python",
           d: "HTML",
-          e: "CSS",
-          f: "R",
+          e: "R",
         },
       },
     },
