@@ -119,7 +119,7 @@ const Tutorial = (props) => {
     setQuestions(quests);
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (instrId, question) => async (event) => {
     event.preventDefault();
 
     if (expanded === false) {
@@ -129,44 +129,56 @@ const Tutorial = (props) => {
     const quests = [...questions];
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
+    let wrong = false;
+    for (let choice in question.checks) {
+      if (
+        question.checks[choice] &&
+        !oAttempts[instrId].questions[question.id].answers.includes(choice)
+      ) {
+        oAttempts[instrId].questions[question.id].answers.push(choice);
+      }
+      if (
+        !question.checks[choice] &&
+        oAttempts[instrId].questions[question.id].answers.includes(choice)
+      ) {
+        oAttempts[instrId].questions[question.id].answers = oAttempts[
+          instrId
+        ].questions[question.id].answers.filter((answ) => answ !== choice);
+      }
+      if (
+        (question.checks[choice] && !question.answers.includes(choice)) ||
+        (!question.checks[choice] && question.answers.includes(choice))
+      ) {
+        wrong = true;
+      }
+    }
     let allCorrect = true;
-    for (let ques of quests) {
-      let wrong = false;
-      for (let choice in ques.checks) {
-        if (
-          ques.checks[choice] &&
-          !oAttempts[instructions[expanded].id].questions[
-            ques.id
-          ].answers.includes(choice)
-        ) {
-          oAttempts[instructions[expanded].id].questions[ques.id].answers.push(
-            choice
-          );
+    const qIdx = quests.findIndex((ques) => ques.id === question.id);
+    if (wrong) {
+      oAttempts[instrId].questions[question.id].wrongs += 1;
+      oAttempts[instrId].wrongs += 1;
+      allCorrect = false;
+      wAttempts += 1;
+      quests[qIdx].helperText =
+        "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+      quests[qIdx].error = true;
+    } else {
+      oAttempts[instrId].questions[question.id].corrects += 1;
+      oAttempts[instrId].corrects += 1;
+      cAttempts += 1;
+      quests[qIdx].helperText = "You got it!";
+      quests[qIdx].error = false;
+    }
+    if (allCorrect) {
+      for (let ques of quests) {
+        for (let choice in ques.checks) {
+          if (
+            (ques.checks[choice] && !ques.answers.includes(choice)) ||
+            (!ques.checks[choice] && ques.answers.includes(choice))
+          ) {
+            allCorrect = false;
+          }
         }
-        if (
-          (ques.checks[choice] && !ques.answers.includes(choice)) ||
-          (!ques.checks[choice] && ques.answers.includes(choice))
-        ) {
-          wrong = true;
-          allCorrect = false;
-        }
-      }
-      if (wrong) {
-        oAttempts[instructions[expanded].id].questions[ques.id].wrongs += 1;
-        oAttempts[instructions[expanded].id].wrongs += 1;
-        ques.helperText =
-          "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
-        ques.error = true;
-      } else {
-        oAttempts[instructions[expanded].id].questions[ques.id].corrects += 1;
-        oAttempts[instructions[expanded].id].corrects += 1;
-        ques.helperText = "You got it!";
-        ques.error = false;
-      }
-      if (wrong) {
-        wAttempts += 1;
-      } else {
-        cAttempts += 1;
       }
     }
     setCorrectAttempts(cAttempts);
@@ -175,9 +187,9 @@ const Tutorial = (props) => {
     setQuestions(quests);
     let compl = completed;
     if (allCorrect) {
-      if (expanded < instructions.length - 1) {
-        changeExpand(expanded + 1);
-      }
+      // if (expanded < instructions.length - 1) {
+      //   changeExpand(expanded + 1);
+      // }
       if (compl < expanded) {
         compl = expanded;
         setCompleted(expanded);
@@ -200,11 +212,21 @@ const Tutorial = (props) => {
   const changeExpand = (newExpand) => {
     setExpanded(newExpand);
     if (Number.isInteger(newExpand)) {
-      window.document.getElementById("ScrollableContainer").scroll({
-        top: 100 + newExpand * 55,
-        left: 0,
-        behavior: "smooth",
-      });
+      setTimeout(() => {
+        let cumulativeHeight = 0;
+        for (let sIdx = 0; sIdx < newExpand; sIdx++) {
+          const sectOffsetHeight = window.document.getElementById(
+            "Section" + sIdx
+          ).scrollHeight;
+          cumulativeHeight += sectOffsetHeight;
+        }
+        console.log({ cumulativeHeight });
+        window.document.getElementById("ScrollableContainer").scroll({
+          top: 100 + cumulativeHeight,
+          left: 0,
+          behavior: "smooth",
+        });
+      }, 400);
     }
   };
 
@@ -234,6 +256,7 @@ const Tutorial = (props) => {
       {instructions.map((instr, idx) => (
         <Accordion
           key={instr.title}
+          id={"Section" + idx}
           expanded={expanded === idx}
           onChange={handleChange(idx)}
           disabled={idx > completed + 1}
@@ -280,6 +303,17 @@ const Tutorial = (props) => {
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Box sx={{ mb: "19px" }}>
+                      Please carefully watch each video and answer the
+                      corresponding questions. The community leaders will decide
+                      about your application based on your total correct and
+                      wrong attempts.
+                    </Box>
+                    <Box
+                      sx={{ mb: "10px", fontWeight: 700, fontStyle: "italic" }}
+                    >
+                      The fewer attempts, the better.
+                    </Box>
+                    <Box sx={{ mb: "19px" }}>
                       <Box
                         sx={{ display: "inline", color: "green", mr: "7px" }}
                       >
@@ -296,13 +330,15 @@ const Tutorial = (props) => {
                       >
                         {wrongAttempts} Wrong
                       </Box>
-                      answers so far!
+                      attemps in all sections so far!
                     </Box>
-                    <form onSubmit={handleSubmit}>
-                      {questions.map((question, qIdx) => {
-                        return (
+                    {questions.map((question, qIdx) => {
+                      return (
+                        <form
+                          key={qIdx}
+                          onSubmit={handleSubmit(instr.id, question)}
+                        >
                           <FormControl
-                            key={qIdx}
                             error={question.error}
                             component="fieldset"
                             variant="standard"
@@ -345,40 +381,41 @@ const Tutorial = (props) => {
                               </span>
                             </FormHelperText>
                           </FormControl>
-                        );
-                      })}
-                      <Box sx={{ mb: "10px" }}>
-                        <Box
-                          sx={{ display: "inline", color: "green", mr: "7px" }}
-                        >
-                          {instr.id in attempts && attempts[instr.id].corrects}{" "}
-                          Correct
-                        </Box>
-                        &amp;
-                        <Box
-                          sx={{
-                            display: "inline",
-                            color: "red",
-                            ml: "7px",
-                            mr: "7px",
-                          }}
-                        >
-                          {instr.id in attempts && attempts[instr.id].wrongs}{" "}
-                          Wrong
-                        </Box>
-                        answers in this part!
+                          <Button
+                            sx={{
+                              margin: "-10px 0px 25px 0px",
+                              color: "white",
+                            }}
+                            type="submit"
+                            color="success"
+                            variant="contained"
+                          >
+                            Submit Answer
+                          </Button>
+                        </form>
+                      );
+                    })}
+                    <Box sx={{ mb: "10px" }}>
+                      <Box
+                        sx={{ display: "inline", color: "green", mr: "7px" }}
+                      >
+                        {instr.id in attempts && attempts[instr.id].corrects}{" "}
+                        Correct
                       </Box>
-                      {questions.length > 0 && (
-                        <Button
-                          sx={{ mt: 1, mr: 1, color: "white" }}
-                          type="submit"
-                          color="success"
-                          variant="contained"
-                        >
-                          Submit Answers
-                        </Button>
-                      )}
-                    </form>
+                      &amp;
+                      <Box
+                        sx={{
+                          display: "inline",
+                          color: "red",
+                          ml: "7px",
+                          mr: "7px",
+                        }}
+                      >
+                        {instr.id in attempts && attempts[instr.id].wrongs}{" "}
+                        Wrong
+                      </Box>
+                      attemps in this section!
+                    </Box>
                   </Paper>
                   {idx > 0 && (
                     <Button
