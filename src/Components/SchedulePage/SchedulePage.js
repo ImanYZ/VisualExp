@@ -220,19 +220,19 @@ const SchedulePage = (props) => {
                     <strong>
                       1<sup>st</sup> session
                     </strong>{" "}
-                    for an hour
+                    for an hour (two consecutive slots)
                   </li>
                   <li>
                     <strong>
                       2<sup>nd</sup> session
                     </strong>
-                    , 3 days later, for 30 minutes
+                    , 3 days later, for 30 minutes (one slot)
                   </li>
                   <li>
                     <strong>
                       3<sup>rd</sup> session
                     </strong>
-                    , 7 days later, for 30 minutes
+                    , 7 days later, for 30 minutes (one slot)
                   </li>
                 </ul>
               </li>
