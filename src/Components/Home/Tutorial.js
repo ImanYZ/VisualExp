@@ -19,6 +19,8 @@ import Button from "@mui/material/Button";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckIcon from "@mui/icons-material/Check";
 
+import { Fireworks } from "fireworks-js/dist/react";
+
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { tutorialEndedState } from "../../store/ExperimentAtoms";
 
@@ -27,6 +29,18 @@ import Typography from "./modules/components/Typography";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import instructs from "./tutorialIntroductionQuestions";
+
+const options = {
+  speed: 3,
+};
+
+const style = {
+  left: "25%",
+  bottom: 0,
+  width: "49%",
+  height: "49%",
+  position: "fixed",
+};
 
 const Tutorial = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -187,30 +201,28 @@ const Tutorial = (props) => {
     setWrongAttempts(wAttempts);
     setAttempts(oAttempts);
     setQuestions(quests);
-    let compl = completed;
+    let tutorialData = {
+      attempts: oAttempts,
+      corrects: cAttempts,
+      wrongs: wAttempts,
+      completed,
+    };
     if (allCorrect) {
       // if (expanded < instructions.length - 1) {
       //   changeExpand(expanded + 1);
       // }
-      if (compl < expanded) {
-        compl = expanded;
+      if (completed < expanded) {
+        tutorialData.completed = expanded;
         setCompleted(expanded);
-        if (compl === instructions.length - 1) {
+        if (expanded === instructions.length - 2) {
           setTutorialEnded(true);
+          tutorialData.ended = true;
         }
       }
     }
     if (fullname) {
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
-      await tutorialRef.set(
-        {
-          attempts: oAttempts,
-          corrects: cAttempts,
-          wrongs: wAttempts,
-          completed: compl,
-        },
-        { merge: true }
-      );
+      await tutorialRef.set(tutorialData, { merge: true });
     }
   };
 
@@ -279,7 +291,7 @@ const Tutorial = (props) => {
             >
               {(idx > completed + 1
                 ? "🔒 "
-                : idx === completed + 1
+                : idx === completed + 1 && idx !== instructions.length - 1
                 ? "🔓 "
                 : "✅ ") +
                 (idx + 1) +
@@ -466,6 +478,9 @@ const Tutorial = (props) => {
           </AccordionDetails>
         </Accordion>
       ))}
+      {completed === instructions.length - 2 && (
+        <Fireworks options={options} style={style} />
+      )}
     </PagesNavbar>
   );
 };
