@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
 import Accordion from "@mui/material/Accordion";
@@ -20,6 +20,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckIcon from "@mui/icons-material/Check";
 
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
+import { tutorialEndedState } from "../../store/ExperimentAtoms";
 
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
@@ -30,6 +31,7 @@ import instructs from "./tutorialIntroductionQuestions";
 const Tutorial = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
+  const setTutorialEnded = useSetRecoilState(tutorialEndedState);
 
   const [instructions, setInstructions] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -193,6 +195,9 @@ const Tutorial = (props) => {
       if (compl < expanded) {
         compl = expanded;
         setCompleted(expanded);
+        if (compl === instructions.length - 1) {
+          setTutorialEnded(true);
+        }
       }
     }
     if (fullname) {
@@ -305,10 +310,10 @@ const Tutorial = (props) => {
                     {idx < instructions.length - 1 && (
                       <>
                         <Box sx={{ mb: "19px" }}>
-                          Please carefully watch the video before answering the
-                          questions. The community leaders will decide about
-                          your application based on your total correct and wrong
-                          attempts.
+                          Please carefully watch the video before answering each
+                          question and select all the choices that apply. The
+                          community leaders will decide about your application
+                          based on your total correct and wrong attempts.
                         </Box>
                         <Box
                           sx={{

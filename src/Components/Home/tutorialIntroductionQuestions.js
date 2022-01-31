@@ -22,10 +22,11 @@ export default {
           Welcome to the second step in the application process! Please go
           through this tutorial to learn more about 1Cademy and how it works.
           First, we will introduce 1Cademy, its objective, and how it works
-          before digging into collaborating with others on 1Cademy.
+          before digging into collaborating with others on 1Cademy. This
+          tutorial takes on average an hour and a half.
         </p>
         <p>
-          Before moving forward, please make sure to make an account on{" "}
+          Before moving forward, please make an account on{" "}
           <a href="https://1cademy.com/" target="_blank">
             1Cademy web app
           </a>
@@ -36,7 +37,15 @@ export default {
     video: "vkNx-QUmbNI",
     questions: {
       How_can_1Cademy_help_us: {
-        stem: "How can 1Cademy help us?",
+        stem: (
+          <div>
+            How can 1Cademy help us? (Hint: find the answer from{" "}
+            <a href="https://1cademy.us/home" target="_blank">
+              the 1Cademy homepage
+            </a>
+            .)
+          </div>
+        ),
         answers: ["a", "c", "d", "e"],
         choices: {
           a: "Through learning backwards like researchers",
@@ -47,7 +56,15 @@ export default {
         },
       },
       How_can_1Cademy_help_our_society: {
-        stem: "How can 1Cademy help our society?",
+        stem: (
+          <div>
+            How can 1Cademy help our society? (Hint: find the answer from{" "}
+            <a href="https://1cademy.us/home" target="_blank">
+              the 1Cademy homepage
+            </a>
+            .)
+          </div>
+        ),
         answers: ["a", "b", "c", "d", "e"],
         choices: {
           a: "Joining/forming multi-school research communities",
@@ -59,14 +76,13 @@ export default {
       },
       If_everything_is_explained_somewhere: {
         stem: "If everything is explained somewhere on the internet, then why do we pay for textbooks and online courses?",
-        answers: ["f"],
+        answers: ["e"],
         choices: {
           a: "Because we cannot find the explanations on the Internet.",
           b: "Because we are lazy!",
-          c: "Because we don't know how to use the Internet efficiently.",
-          d: "Because most explanations on the Internet are not free.",
-          e: "Because most explanations on the Internet are incorrect.",
-          f: "Because most explanations on the Internet do not provide us with learning pathways.",
+          c: "Because most explanations on the Internet are not free.",
+          d: "Because most explanations on the Internet are incorrect.",
+          e: "Because most explanations on the Internet do not provide us with learning pathways.",
         },
       },
       Is_the_content_on_1Cademy_peer_reviewed: {

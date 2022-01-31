@@ -13,6 +13,7 @@ import Alert from "@mui/material/Alert";
 import {
   hasScheduledState,
   completedExperimentState,
+  tutorialEndedState,
 } from "../../../../store/ExperimentAtoms";
 
 import Button from "../components/Button";
@@ -26,16 +27,19 @@ const sectionIdx = sectionsOrder.findIndex(
 const JoinUs = (props) => {
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
+  const tutorialEnded = useRecoilValue(tutorialEndedState);
 
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    if (completedExperiment) {
+    if (tutorialEnded) {
+      setActiveStep(3);
+    } else if (completedExperiment) {
       setActiveStep(2);
     } else if (hasScheduled) {
       setActiveStep(1);
     }
-  }, [hasScheduled, completedExperiment]);
+  }, [hasScheduled, completedExperiment, tutorialEnded]);
 
   return (
     <Container
