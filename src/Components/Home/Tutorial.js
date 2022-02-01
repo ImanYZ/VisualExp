@@ -91,14 +91,12 @@ const Tutorial = (props) => {
       let oAttempts = {};
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
       const tutorialDoc = await tutorialRef.get();
+      let tutorialData;
       if (tutorialDoc.exists) {
-        const tutorialData = tutorialDoc.data();
+        tutorialData = tutorialDoc.data();
         setCorrectAttempts(tutorialData.corrects);
         setWrongAttempts(tutorialData.wrongs);
         setCompleted(tutorialData.completed);
-        if (tutorialData.completed < Object.keys(instructs).length - 1) {
-          changeExpand(tutorialData.completed + 1);
-        }
         oAttempts = tutorialData.attempts;
       }
       for (let instr in instructs) {
@@ -106,9 +104,10 @@ const Tutorial = (props) => {
           oAttempts[instr] = {
             corrects: 0,
             wrongs: 0,
-            completed: 0,
             questions: {},
           };
+        } else if ("completed" in oAttempts[instr]) {
+          delete oAttempts[instr].completed;
         }
         for (let ques in instructs[instr].questions) {
           if (!(ques in oAttempts[instr].questions)) {
@@ -120,12 +119,26 @@ const Tutorial = (props) => {
           }
         }
       }
-      setAttempts(oAttempts);
+      let sectionChanged = false;
+      if (tutorialDoc.exists) {
+        if (tutorialData.completed < Object.keys(instructs).length - 1) {
+          changeExpand(
+            tutorialData.completed + 1,
+            tutorialRef,
+            tutorialDoc,
+            oAttempts
+          );
+          sectionChanged = true;
+        }
+      }
+      if (!sectionChanged) {
+        setAttempts(oAttempts);
+      }
     };
-    if (fullname) {
+    if (instructions.length > 0 && fullname) {
       loadAttempts();
     }
-  }, [fullname]);
+  }, [instructions, fullname]);
 
   const checkChoice = (idx) => (event) => {
     const quests = [...questions];
@@ -146,6 +159,9 @@ const Tutorial = (props) => {
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
     let wrong = false;
+    oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
+      new Date()
+    );
     for (let choice in question.checks) {
       if (
         question.checks[choice] &&
@@ -222,13 +238,45 @@ const Tutorial = (props) => {
     }
     if (fullname) {
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
-      await tutorialRef.set(tutorialData, { merge: true });
+      const tutorialDoc = await tutorialRef.get();
+      if (tutorialDoc.exists) {
+        await tutorialRef.update(tutorialData);
+      } else {
+        await tutorialRef.set(tutorialData);
+      }
+      if (tutorialData.ended) {
+        const userRef = firebase.db.collection("users").doc(fullname);
+        await userRef.update({ tutorialEnded: true });
+      }
     }
   };
 
-  const changeExpand = (newExpand) => {
+  const changeExpand = async (
+    newExpand,
+    tutorialRef,
+    tutorialDoc,
+    oAttempts
+  ) => {
     setExpanded(newExpand);
     if (Number.isInteger(newExpand)) {
+      if (!tutorialRef) {
+        tutorialRef = firebase.db.collection("tutorial").doc(fullname);
+        tutorialDoc = await tutorialRef.get();
+        oAttempts = { ...attempts };
+      }
+      oAttempts[instructions[newExpand].id].started =
+        firebase.firestore.Timestamp.fromDate(new Date());
+      setAttempts(oAttempts);
+      if (tutorialDoc.exists) {
+        await tutorialRef.update({ attempts: oAttempts });
+      } else {
+        await tutorialRef.set({
+          attempts: oAttempts,
+          corrects: correctAttempts,
+          wrongs: wrongAttempts,
+          completed,
+        });
+      }
       setTimeout(() => {
         let cumulativeHeight = 0;
         for (let sIdx = 0; sIdx < newExpand; sIdx++) {
@@ -237,7 +285,6 @@ const Tutorial = (props) => {
           ).scrollHeight;
           cumulativeHeight += sectOffsetHeight;
         }
-        console.log({ cumulativeHeight });
         window.document.getElementById("ScrollableContainer").scroll({
           top: 100 + cumulativeHeight,
           left: 0,
@@ -308,35 +355,45 @@ const Tutorial = (props) => {
                       variant="body2"
                       component="div"
                       sx={{
-                        pt: "19px",
                         pb: "19px",
                       }}
                     >
                       {instr.description}
                     </Typography>
                     {instr.video && <YoutubeEmbed embedId={instr.video} />}
+                    {idx < instructions.length - 1 && (
+                      <Box sx={{ mt: "19px" }}>
+                        <Box>
+                          Please carefully read{" "}
+                          <a href="https://1cademy.us/home" target="_blank">
+                            the 1Cademy homepage
+                          </a>{" "}
+                          and watch the video above before answering each
+                          question on the right, and{" "}
+                          <strong>select all the choices that apply</strong>.{" "}
+                        </Box>
+                        <Box sx={{ mt: "10px", fontStyle: "italic" }}>
+                          The community leaders will decide about your
+                          application based on{" "}
+                          <strong>your total correct and wrong attempts</strong>
+                          .
+                        </Box>
+                      </Box>
+                    )}
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     {idx < instructions.length - 1 && (
-                      <>
-                        <Box sx={{ mb: "19px" }}>
-                          Please carefully watch the video before answering each
-                          question and select all the choices that apply. The
-                          community leaders will decide about your application
-                          based on your total correct and wrong attempts.
-                        </Box>
-                        <Box
-                          sx={{
-                            mb: "10px",
-                            fontWeight: 700,
-                            fontStyle: "italic",
-                          }}
-                        >
-                          The fewer attempts, the better.
-                        </Box>
-                      </>
+                      <Box
+                        sx={{
+                          mb: "10px",
+                          fontWeight: 700,
+                          fontStyle: "italic",
+                        }}
+                      >
+                        The fewer attempts, the better.
+                      </Box>
                     )}
                     {idx === instructions.length - 1 && (
                       <Box sx={{ mb: "10px", fontWeight: 700 }}>

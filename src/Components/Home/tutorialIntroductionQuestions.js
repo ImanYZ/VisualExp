@@ -1235,12 +1235,13 @@ export default {
   Congratulations: {
     title: "Congratulations!",
     description: (
-      <div>
+      <div style={{ fontSize: "19px", fontWeight: 700 }}>
         You successfully completed the 1Cademy tutorial. You can now explore
-        1Cademy communities{" "}
-        <a href="/community/Social_Political_Psychology" target="_blank">
-          on this page
-        </a>{" "}
+        <p>
+          <a href="/community/Social_Political_Psychology" target="_blank">
+            1Cademy communities on this page
+          </a>
+        </p>
         and complete the requirements of whichever community you'd like to apply
         to.
       </div>
