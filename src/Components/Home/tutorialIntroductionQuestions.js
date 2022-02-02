@@ -19,11 +19,8 @@ export default {
     description: (
       <div>
         <p>
-          Welcome to the second step in the application process! Please go
-          through this tutorial to learn more about 1Cademy and how it works.
           First, we will introduce 1Cademy, its objective, and how it works
-          before digging into collaborating with others on 1Cademy. This
-          tutorial takes on average an hour and a half.
+          before digging into collaborating with others on 1Cademy.
         </p>
         <p>
           Before moving forward, please make an account on{" "}
@@ -32,6 +29,21 @@ export default {
           </a>
           .
         </p>
+        <p>
+          Our communities care a lot about the integrity of the knowledge shared
+          on 1Cademy. If you're not sure about the credibility of the sources
+          that you'd like to summarize, please do one of the followings:
+        </p>
+        <ul>
+          <li>
+            {" "}
+            Ask the 1Cademy liaison librarians working with your community.
+          </li>
+          <li>
+            Ask the 1Cademy liaison librarians working with your community.
+          </li>
+          <li>Discuss in your community weekly meetings.</li>
+        </ul>
       </div>
     ),
     video: "vkNx-QUmbNI",
@@ -145,6 +157,27 @@ export default {
       'A node represents the smallest unit of knowledge on 1Cademy. It can define a concept (i.e., "Concept" node), explain relationships between multiple concepts (i.e., "Relation" node), cite a reference (i.e., "Reference" node), ask a multiple-choice question (i.e., "Question" node), or represent a new idea (i.e., "Idea" node).',
     video: "NX2uJJ3RFsM",
     questions: {
+      What_is_all_knowledge_on_1Cademy_summarized_into: {
+        stem: "What is all knowledge on 1Cademy summarized into?",
+        answers: ["b"],
+        choices: {
+          a: "Paragraphs",
+          b: "Nodes",
+          c: "Articles",
+        },
+      },
+      What_kind_of_content_can_be_contained_in_a_node: {
+        stem: "What kind of content can be contained in a node?",
+        answers: ["a", "b", "c", "e", "f"],
+        choices: {
+          a: "Cited sources",
+          b: "A single concept",
+          c: "Relating multiple concepts",
+          d: "Definitions of multiple concepts",
+          e: "An idea without any citations",
+          f: "A multiple-choice question",
+        },
+      },
       Which_of_the_following_choices_are_true_about_a_node_on_1Cademy: {
         stem: "Which of the following choices are true about a node on 1Cademy?",
         answers: ["a", "b", "d", "e", "f", "g"],
@@ -156,18 +189,6 @@ export default {
           e: "It represents the smallest unit of knowledge on 1Cademy.",
           f: "It can be connected to other nodes.",
           g: "It can cite sources.",
-        },
-      },
-      Which_of_the_following_types_of_nodes_exist_on_1Cademy: {
-        stem: "Which of the following types of nodes exist on 1Cademy?",
-        answers: ["a", "c", "d", "e", "f"],
-        choices: {
-          a: 'A "Concept" node defines a concept.',
-          b: 'A "Multimedia" node contains an image or video.',
-          c: 'A "Relation" node explains relationships between multiple concepts.',
-          d: 'A "Reference" node cites a reference.',
-          e: 'A "Question" node asks a multiple-choice question.',
-          f: 'An "Idea" node represents a new idea.',
         },
       },
     },
@@ -225,7 +246,16 @@ export default {
         },
       What_are_the_overarching_learning_activities_supported_by_the_personalized:
         {
-          stem: "What are the overarching learning activities supported by the personalized knowledge map view? [Hint: one of the correct answers was not mentioned in the video]",
+          stem: (
+            <div>
+              What are the overarching learning activities supported by the
+              personalized knowledge map view? [Hint: one of the correct answers
+              was not mentioned in the video, but you can find it from{" "}
+              <a href="https://1cademy.us/home" target="_blank">
+                the 1Cademy homepage
+              </a>
+            </div>
+          ),
           answers: ["a", "b", "c", "d", "f"],
           choices: {
             a: "Navigation",
@@ -343,50 +373,17 @@ export default {
           h: "Sign out button",
         },
       },
-      How_can_you_change_your_default_tag_on_1Cademy: {
-        stem: "How can you change your default tag on 1Cademy?",
-        answers: ["a"],
-        choices: {
-          a: (
-            <ol>
-              <li>Open the user settings sidebar.</li>
-              <li>Click the default tag button.</li>
-              <li>Click the node corresponding to your desired tag.</li>
-            </ol>
-          ),
-          b: (
-            <ol>
-              <li>Click the default tag in sidebar.</li>
-              <li>Click the node corresponding to your desired tag.</li>
-            </ol>
-          ),
-          c: "Open the node corresponding to your desired tag.",
-          d: "Tag the desired tag when proposing changes to current nodes.",
-          e: "Ask your community leaders to change your default tag.",
-        },
-      },
       OneCademy_interface_is_in_dark_mode_by_default: {
         stem: "1Cademy interface is in dark mode by default. How can you change it to light mode?",
         answers: ["a"],
         choices: {
-          a: (
-            <ol>
-              <li>
-                Open the user settings by clicking your profile picture in the
-                sidebar
-              </li>
-              <li>
-                Click the switch button, below your reputation points, and
-                change it to light.
-              </li>
-            </ol>
-          ),
+          a: "Open the user settings by clicking your profile picture in the sidebar ⇨ Click the switch button, below your reputation points, and change it to light.",
           b: "You cannot, because there is no light mode for 1Cademy.",
           c: "You should change it outside of 1Cademy website.",
         },
       },
       True_or_False_You_can_change_the_background_color_and_image: {
-        stem: "True or False: You can change the background color and image of your 1Cademy map view.",
+        stem: "True or False: You can switch the background image to a solid color on your 1Cademy map view.",
         answers: ["a"],
         choices: {
           a: "True",
@@ -447,23 +444,6 @@ export default {
           a: "Top contributors across the platform",
           b: "All contributors",
           c: "Top contributors in your community",
-        },
-      },
-    },
-  },
-  Introduction_Changing_Your_Default_Community_Tag: {
-    title: "1Cademy Introduction: Changing Your Default Community Tag",
-    description:
-      "Now, it is time for you to change your default tag. Please watch this video to help you change it to the correct community tag that you are a member of, otherwise you'll not receive points on the community leaderboard.",
-    video: "D_2A4s__SfM",
-    questions: {
-      Have_you_changed_your_tag_to_the_correct_community: {
-        stem: "Have you changed your tag to the correct community?",
-        answers: ["b"],
-        choices: {
-          a: "No",
-          b: "Yes",
-          c: "I'll change it later!",
         },
       },
     },
@@ -565,13 +545,12 @@ export default {
     questions: {
       What_kind_of_messages_can_be_sent_in_the_chatroom: {
         stem: "What kind of messages can be sent in the chatroom?",
-        answers: ["a", "c", "d", "e"],
+        answers: ["a", "c", "d"],
         choices: {
           a: "Text",
           b: "Video",
           c: "Node link",
-          d: "Image",
-          e: "GIFs",
+          d: "Image (jpg, png, gif, svg)",
         },
       },
       Who_will_see_the_messages_your_send_in_1Cademy_chatroom: {
@@ -589,18 +568,8 @@ export default {
         stem: "How can you share the link to a node in the chatroom?",
         answers: ["b"],
         choices: {
-          a: (
-            <ol>
-              <li>Click the title of the node you want to share</li>
-              <li>Click the node button in the chatroom</li>
-            </ol>
-          ),
-          b: (
-            <ol>
-              <li>Click the node button in the chatroom</li>
-              <li>Click the title of the node you want to share</li>
-            </ol>
-          ),
+          a: "Click the title of the node you want to share ⇨ Click the node button in the chatroom",
+          b: "Click the node button in the chatroom ⇨ Click the title of the node you want to share",
           c: "You cannot share a node link in the chatroom",
           d: "Click the share button at the node footer",
         },
@@ -632,31 +601,41 @@ export default {
       },
     },
   },
-  Nodes_Defining_a_Node: {
-    title: "1Cademy Nodes: Defining a Node",
+  Introduction_Changing_Your_Default_Community_Tag: {
+    title: "1Cademy Introduction: Changing Your Default Community Tag",
     description:
-      "Now that you have gone through the introduction tutorial, it is time to learn about nodes on 1Cademy! In this video, we define what a node is on 1Cademy.",
-    video: "NX2uJJ3RFsM",
+      "Now, it is time for you to change your default tag. Please watch this video to help you change it to the correct community tag that you are a member of, otherwise you'll not receive points on the community leaderboard.",
+    video: "D_2A4s__SfM",
     questions: {
-      What_is_all_knowledge_on_1Cademy_summarized_into: {
-        stem: "What is all knowledge on 1Cademy summarized into?",
-        answers: ["b"],
+      How_can_you_change_your_default_tag_on_1Cademy: {
+        stem: "How can you change your default tag on 1Cademy?",
+        answers: ["a"],
         choices: {
-          a: "Paragraphs",
-          b: "Nodes",
-          c: "Articles",
+          a: (
+            <ol>
+              <li>Open the user settings sidebar.</li>
+              <li>Click the default tag button.</li>
+              <li>Click the node corresponding to your desired tag.</li>
+            </ol>
+          ),
+          b: (
+            <ol>
+              <li>Click the default tag in sidebar.</li>
+              <li>Click the node corresponding to your desired tag.</li>
+            </ol>
+          ),
+          c: "Open the node corresponding to your desired tag.",
+          d: "Tag the desired tag when proposing changes to current nodes.",
+          e: "Ask your community leaders to change your default tag.",
         },
       },
-      What_kind_of_content_can_be_contained_in_a_node: {
-        stem: "What kind of content can be contained in a node?",
-        answers: ["a", "b", "c", "e", "f"],
+      Have_you_changed_your_tag_to_the_correct_community: {
+        stem: "Have you changed your tag to the correct community?",
+        answers: ["b"],
         choices: {
-          a: "Cited sources",
-          b: "A single concept",
-          c: "Relating multiple concepts",
-          d: "Definitions of multiple concepts",
-          e: "An idea without any citations",
-          f: "A multiple-choice question",
+          a: "No",
+          b: "Yes",
+          c: "I'll change it later!",
         },
       },
     },
@@ -791,18 +770,17 @@ export default {
     description: "This video goes over the types of nodes.",
     video: "UD9kCb9LKWU",
     questions: {
-      What_are_different_types_of_nodes_on_1Cademy: {
-        stem: "What are different types of nodes on 1Cademy?",
-        answers: ["a", "b", "d", "e", "f", "g"],
+      Which_of_the_following_types_of_nodes_exist_on_1Cademy: {
+        stem: "Which of the following types of nodes exist on 1Cademy?",
+        answers: ["a", "c", "d", "e", "f", "g"],
         choices: {
-          a: "Concept",
-          b: "Relation",
-          c: "Funny",
-          d: "Reference",
-          e: "Code",
-          f: "Question",
-          g: "Idea",
-          h: "Social Network",
+          a: 'A "Concept" node defines a concept.',
+          b: 'A "Multimedia" node contains an image or video.',
+          c: 'A "Relation" node explains relationships between multiple concepts.',
+          d: 'A "Reference" node cites a reference.',
+          e: 'A "Question" node asks a multiple-choice question.',
+          f: 'An "Idea" node represents a new idea.',
+          g: 'A "Code" node contains a code snippet in its content.',
         },
       },
     },
@@ -909,7 +887,17 @@ export default {
   },
   Nodes_Idea_Nodes: {
     title: "1Cademy Nodes: Idea Nodes",
-    description: "This video introduces idea nodes on 1Cademy.",
+    description: (
+      <div>
+        This video introduces "idea" nodes on 1Cademy. We can use this type of
+        node to:
+        <ul>
+          <li>Explain one of our ideas to others in a consice way</li>
+          <li>Relate our ideas to others' idea, concept, and relation nodes</li>
+          <li>Organize our ideas</li>
+        </ul>
+      </div>
+    ),
     video: "5dXSNS4npFk",
     questions: {
       For_what_purpose_should_we_propose_an_idea_node_on_1Cademy: {
@@ -943,22 +931,21 @@ export default {
   },
   Proposal_System_Getting_Started_as_a_User: {
     title: "1Cademy Proposal System: Getting Started as a User",
-    description:
-      "Before going into the specifics of the proposal system, here is a brief video going over what your first steps as a user on 1Cademy may look like when you are proposing nodes.",
+    description: (
+      <div>
+        Before going into the specifics of the proposal system, here is a brief
+        video going over what your first steps as a user on 1Cademy may look
+        like when you are proposing nodes.
+        <strong>Note: </strong>{" "}
+        <i>
+          To propose a new reference node, first consult with your community
+          leaders or a liaison librarian to figure out the right prerequisites
+          for that new reference node.
+        </i>
+      </div>
+    ),
     video: "jhFAmGAr2fU",
     questions: {
-      What_is_the_very_first_step_in_proposing_a_new_node_on_1Cademy: {
-        stem: "What is the very first step in proposing a new node on 1Cademy?",
-        answers: ["a", "b"],
-        choices: {
-          a: "Reviewing the knowledge graph to make sure that the information you want to add does not already exist on 1Cademy",
-          b: "Using the search tool to make sure that the information you want to add does not already exist on 1Cademy",
-          c: "Creating a proposal",
-          d: "Finding the right prerequisite node",
-          e: "Adding the right citation to the node",
-          f: "Defining the node type",
-        },
-      },
       What_should_your_first_step_be_as_a_new_user_on_1Cademy: {
         stem: "What should your first step be as a new user on 1Cademy?",
         answers: ["a"],
@@ -968,6 +955,30 @@ export default {
           c: "Upvoting nodes you find helpful",
         },
       },
+      Which_of_these_steps_are_needed_to_link_a_concept_node_to_a_reference_node:
+        {
+          stem: "Which of these steps are needed to link a concept node to a reference node?",
+          answers: ["a", "b", "c", "d"],
+          choices: {
+            a: "Create a reference node or find an existing one.",
+            b: "Consult a liaison librarian if the reference node does not exist.",
+            c: 'Click "Cite an existing reference."',
+            d: "Click the node that you want to cite.",
+            e: "Add the link to the website/textbook in the content of the concept node.",
+          },
+        },
+      How_can_one_figure_out_whether_a_node_they_want_to_propose_already_exists_on_the_map:
+        {
+          stem: "How can one figure out whether a node they want to propose already exists on the map? (Hint: part of the answer is in the section where we explained the search engine.)",
+          answers: ["a", "e"],
+          choices: {
+            a: "By navigating through the prerequisite nodes and their children to find the immediate prerequisite, and then seeing if the proposed information is already there.",
+            b: "Asking the community leader.",
+            c: "It is OK. to add repetitive information on 1Cademy.",
+            d: "Using Ctrl+F or (Command+F on MAC).",
+            e: "Using 1Cademy search engine",
+          },
+        },
     },
   },
   Proposal_System_Prerequisite_Linking_on_1Cademy: {
@@ -1003,18 +1014,18 @@ export default {
           ),
           answers: ["a"],
           choices: {
-            a: "[ 1Cademy ] --> [ 1Cademy's goal ]",
-            b: "[ 1Cademy's goal ] --> [ 1Cademy ]",
+            a: "[ 1Cademy ] ⇨ [ 1Cademy's goal ]",
+            b: "[ 1Cademy's goal ] ⇨ [ 1Cademy ]",
           },
         },
       You_want_to_teach_a_friend_about_how_to_use_exponents: {
         stem: "You want to teach a friend about how to use exponents. How would you organize the prerequisite links for them? (Assume each node already has a definition.)",
         answers: ["b"],
         choices: {
-          a: "[ Summation ] -->  [ Exponents ] --> [ Multiplication ]",
-          b: "[ Summation ] --> [ Multiplication ] --> [ Exponents ]",
-          c: "[ Exponents ] --> [ Multiplication ] --> [ Summation ]",
-          d: "[ Exponents ] --> [ Summation ] --> [ Multiplication ]",
+          a: "[ Summation ] ⇨  [ Exponents ] ⇨ [ Multiplication ]",
+          b: "[ Summation ] ⇨ [ Multiplication ] ⇨ [ Exponents ]",
+          c: "[ Exponents ] ⇨ [ Multiplication ] ⇨ [ Summation ]",
+          d: "[ Exponents ] ⇨ [ Summation ] ⇨ [ Multiplication ]",
         },
       },
       What_is_the_correct_prerequisite_linking_of_these_three_nodes: {
@@ -1032,11 +1043,11 @@ export default {
         ),
         answers: ["d"],
         choices: {
-          a: "[ Problem ] --> [ Group brainstorming ] --> [ Problem solving ]",
-          b: "[ Group brainstorming ] --> [ Problem ] --> [ Problem solving ]",
-          c: "[ Problem solving ] --> [ Problem ] --> [ Group brainstorming ]",
-          d: "[ Problem ] --> [ Problem solving ] --> [ Group brainstorming ]",
-          e: "[ Group brainstorming ] --> [ Problem solving ] --> [ Problem ]",
+          a: "[ Problem ] ⇨ [ Group brainstorming ] ⇨ [ Problem solving ]",
+          b: "[ Group brainstorming ] ⇨ [ Problem ] ⇨ [ Problem solving ]",
+          c: "[ Problem solving ] ⇨ [ Problem ] ⇨ [ Group brainstorming ]",
+          d: "[ Problem ] ⇨ [ Problem solving ] ⇨ [ Group brainstorming ]",
+          e: "[ Group brainstorming ] ⇨ [ Problem solving ] ⇨ [ Problem ]",
         },
       },
     },

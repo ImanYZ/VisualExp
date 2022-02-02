@@ -317,6 +317,43 @@ const Tutorial = (props) => {
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Tutorial
       </Typography>
+      <Box sx={{ mb: "10px" }}>
+        <Box>
+          Welcome to the second step in the application process! Please go
+          through this tutorial to learn more about 1Cademy and how it works.
+          This tutorial takes on average an hour and a half. Please carefully
+          read{" "}
+          <a href="https://1cademy.us/home" target="_blank">
+            the 1Cademy homepage
+          </a>{" "}
+          and watch the following videos before answering any of the questions,
+          and <strong>select all the choices that apply</strong>.{" "}
+        </Box>
+        <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
+          The community leaders will decide about your application based on{" "}
+          <strong>
+            your total correct and wrong attempts. The fewer attempts, the
+            better.
+          </strong>
+        </Box>
+        <Box sx={{ mb: "19px" }}>
+          <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
+            {correctAttempts} Correct
+          </Box>
+          &amp;
+          <Box
+            sx={{
+              display: "inline",
+              color: "red",
+              ml: "7px",
+              mr: "7px",
+            }}
+          >
+            {wrongAttempts} Wrong
+          </Box>
+          attemps in all sections so far!
+        </Box>
+      </Box>
       {instructions.map((instr, idx) => (
         <Accordion
           key={instr.title}
@@ -330,12 +367,7 @@ const Tutorial = (props) => {
             aria-controls="TutorialSections-content"
             id="TutorialSections-header"
           >
-            <Typography
-              variant="h5"
-              gutterBottom
-              align="center"
-              sx={{ fontWeight: "700" }}
-            >
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: "700" }}>
               {(idx > completed + 1
                 ? "🔒 "
                 : idx === completed + 1 && idx !== instructions.length - 1
@@ -361,66 +393,16 @@ const Tutorial = (props) => {
                       {instr.description}
                     </Typography>
                     {instr.video && <YoutubeEmbed embedId={instr.video} />}
-                    {idx < instructions.length - 1 && (
-                      <Box sx={{ mt: "19px" }}>
-                        <Box>
-                          Please carefully read{" "}
-                          <a href="https://1cademy.us/home" target="_blank">
-                            the 1Cademy homepage
-                          </a>{" "}
-                          and watch the video above before answering each
-                          question on the right, and{" "}
-                          <strong>select all the choices that apply</strong>.{" "}
-                        </Box>
-                        <Box sx={{ mt: "10px", fontStyle: "italic" }}>
-                          The community leaders will decide about your
-                          application based on{" "}
-                          <strong>your total correct and wrong attempts</strong>
-                          .
-                        </Box>
-                      </Box>
-                    )}
                   </Paper>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    {idx < instructions.length - 1 && (
-                      <Box
-                        sx={{
-                          mb: "10px",
-                          fontWeight: 700,
-                          fontStyle: "italic",
-                        }}
-                      >
-                        The fewer attempts, the better.
-                      </Box>
-                    )}
                     {idx === instructions.length - 1 && (
                       <Box sx={{ mb: "10px", fontWeight: 700 }}>
                         You had a total of {correctAttempts + wrongAttempts}{" "}
                         attemps in answering the questions.
                       </Box>
                     )}
-                    <Box sx={{ mb: "19px" }}>
-                      <Box
-                        sx={{ display: "inline", color: "green", mr: "7px" }}
-                      >
-                        {correctAttempts} Correct
-                      </Box>
-                      &amp;
-                      <Box
-                        sx={{
-                          display: "inline",
-                          color: "red",
-                          ml: "7px",
-                          mr: "7px",
-                        }}
-                      >
-                        {wrongAttempts} Wrong
-                      </Box>
-                      attemps in all sections
-                      {idx < instructions.length - 1 ? " so far!" : "!"}
-                    </Box>
                     {questions.map((question, qIdx) => {
                       return (
                         <form
@@ -434,6 +416,7 @@ const Tutorial = (props) => {
                             sx={{ mb: "19px" }}
                           >
                             <FormLabel component="legend">
+                              {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
                               {question.stem}
                             </FormLabel>
                             <FormGroup>
