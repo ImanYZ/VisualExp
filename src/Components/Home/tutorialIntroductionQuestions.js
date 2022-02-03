@@ -12,6 +12,11 @@ import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import RemoveIcon from "@mui/icons-material/Remove";
+import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import CodeIcon from "@mui/icons-material/Code";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ShareIcon from "@mui/icons-material/Share";
 
 export default {
   Introduction_Fundamentals: {
@@ -29,21 +34,6 @@ export default {
           </a>
           .
         </p>
-        <p>
-          Our communities care a lot about the integrity of the knowledge shared
-          on 1Cademy. If you're not sure about the credibility of the sources
-          that you'd like to summarize, please do one of the followings:
-        </p>
-        <ul>
-          <li>
-            {" "}
-            Ask the 1Cademy liaison librarians working with your community.
-          </li>
-          <li>
-            Ask the 1Cademy liaison librarians working with your community.
-          </li>
-          <li>Discuss in your community weekly meetings.</li>
-        </ul>
       </div>
     ),
     video: "vkNx-QUmbNI",
@@ -136,17 +126,6 @@ export default {
           e: "Links to online videos or audio recordings",
           f: "Images from websites under public domain with correct citation",
           g: "Images from copyrighted websites with correct citation",
-        },
-      },
-      What_should_you_do_if_you_re_not_sure: {
-        stem: "What should you do if you're not sure whether a source is reputable to cite on 1Cademy?",
-        answers: ["c", "d", "e"],
-        choices: {
-          a: "Ask other people on the Internet.",
-          b: "Trust your best guess.",
-          c: "Ask the leaders of your 1Cademy community.",
-          d: "Ask the 1Cademy liaison librarians working with your community.",
-          e: "Discuss in your community weekly meetings.",
         },
       },
     },
@@ -335,7 +314,7 @@ export default {
         },
       },
       Which_of_the_following_are_considered_a_method_of_opening_nodes: {
-        stem: "Which of the following are considered a method of opening nodes on your personalized knowledge map view?",
+        stem: "Which of the following methods are used to add nodes to your personalized knowledge map view?",
         answers: ["a", "b", "c", "d", "e", "f", "g", "h", "j", "k"],
         choices: {
           a: "Search box",
@@ -474,7 +453,7 @@ export default {
     questions: {
       Which_icon_at_the_node_footer_should_you_click_to_mark_a_node_as_studied:
         {
-          stem: "Which icon at the node footer should you click to mark a node as studied?",
+          stem: "Which icon in the node footer should you click to mark a node as studied?",
           answers: ["a"],
           choices: {
             a: <EmailIcon />,
@@ -516,7 +495,7 @@ export default {
         },
       },
       Which_icon_at_the_node_footer_should_you_click_to_bookmark_a_node: {
-        stem: "Which icon at the node footer should you click to bookmark a node to be notified of its updates?",
+        stem: "Which icon in the node footer should you click to bookmark a node to be notified of its updates?",
         answers: ["c"],
         choices: {
           a: <EmailIcon />,
@@ -554,7 +533,7 @@ export default {
         },
       },
       Who_will_see_the_messages_your_send_in_1Cademy_chatroom: {
-        stem: "Who will see the messages your send in 1Cademy chatroom?",
+        stem: "Who will see the messages you send in 1Cademy chatroom?",
         answers: ["a"],
         choices: {
           a: "Every member of every community",
@@ -800,6 +779,18 @@ export default {
           c: "Displays a single concept and its definition",
         },
       },
+      Which_of_the_following_icons_represent_a_concept_node: {
+        stem: "Which of the following icons represent a concept node?",
+        answers: ["b"],
+        choices: {
+          a: <MenuBookIcon />,
+          b: <LocalLibraryIcon />,
+          c: <EmojiObjectsIcon />,
+          d: <CodeIcon />,
+          e: <HelpOutlineIcon />,
+          f: <ShareIcon />,
+        },
+      },
     },
   },
   Nodes_Relation_Nodes_vs_Concept_Nodes: {
@@ -848,6 +839,18 @@ export default {
         },
       },
     },
+    Which_of_the_following_icons_represent_a_relation_node: {
+      stem: "Which of the following icons represent a relation node?",
+      answers: ["f"],
+      choices: {
+        a: <MenuBookIcon />,
+        b: <LocalLibraryIcon />,
+        c: <EmojiObjectsIcon />,
+        d: <CodeIcon />,
+        e: <HelpOutlineIcon />,
+        f: <ShareIcon />,
+      },
+    },
   },
   Nodes_Code_Nodes: {
     title: "1Cademy Nodes: Code Nodes",
@@ -867,6 +870,18 @@ export default {
         },
       },
     },
+    Which_of_the_following_icons_represent_a_code_node: {
+      stem: "Which of the following icons represent a code node?",
+      answers: ["d"],
+      choices: {
+        a: <MenuBookIcon />,
+        b: <LocalLibraryIcon />,
+        c: <EmojiObjectsIcon />,
+        d: <CodeIcon />,
+        e: <HelpOutlineIcon />,
+        f: <ShareIcon />,
+      },
+    },
   },
   Nodes_Reference_Nodes: {
     title: "1Cademy Nodes: Reference Nodes",
@@ -881,6 +896,31 @@ export default {
           b: "APA",
           c: "Chicago",
           d: "AMA",
+        },
+      },
+      Which_of_the_following_icons_represent_a_reference_node: {
+        stem: "Which of the following icons represent a reference node?",
+        answers: ["a"],
+        choices: {
+          a: <MenuBookIcon />,
+          b: <LocalLibraryIcon />,
+          c: <EmojiObjectsIcon />,
+          d: <CodeIcon />,
+          e: <HelpOutlineIcon />,
+          f: <ShareIcon />,
+        },
+      },
+      Which_of_the_following_can_a_reference_node_represent: {
+        stem: "Which of the following can a reference node represent?",
+        answers: ["a", "b", "c", "d", "f"],
+        choices: {
+          a: "Video (e.g YouTube)",
+          b: "Book",
+          c: "Scholarly article",
+          d: "Audio",
+          e: "Book chapter",
+          f: "Website (which may include many webpages)",
+          g: "Webpage (i.e., a specific page of a website)",
         },
       },
     },
@@ -910,6 +950,18 @@ export default {
           d: "To organize our ideas",
         },
       },
+      Which_of_the_following_icons_represent_a_idea_node: {
+        stem: "Which of the following icons represent a idea node?",
+        answers: ["c"],
+        choices: {
+          a: <MenuBookIcon />,
+          b: <LocalLibraryIcon />,
+          c: <EmojiObjectsIcon />,
+          d: <CodeIcon />,
+          e: <HelpOutlineIcon />,
+          f: <ShareIcon />,
+        },
+      },
     },
   },
   Nodes_Question_Nodes: {
@@ -925,6 +977,18 @@ export default {
           b: "To ask experts solutions to difficult problems",
           c: "To design a multiple-choice question to test others' learning",
           d: "To design a multiple-choice question to improve others' learning",
+        },
+      },
+      Which_of_the_following_icons_represent_a_question_node: {
+        stem: "Which of the following icons represent a question node?",
+        answers: ["e"],
+        choices: {
+          a: <MenuBookIcon />,
+          b: <LocalLibraryIcon />,
+          c: <EmojiObjectsIcon />,
+          d: <CodeIcon />,
+          e: <HelpOutlineIcon />,
+          f: <ShareIcon />,
         },
       },
     },
@@ -974,7 +1038,7 @@ export default {
           choices: {
             a: "By navigating through the prerequisite nodes and their children to find the immediate prerequisite, and then seeing if the proposed information is already there.",
             b: "Asking the community leader.",
-            c: "It is OK. to add repetitive information on 1Cademy.",
+            c: "It is OK to add repetitive information on 1Cademy.",
             d: "Using Ctrl+F or (Command+F on MAC).",
             e: "Using 1Cademy search engine",
           },
@@ -1072,7 +1136,7 @@ export default {
         answers: ["b"],
         choices: {
           a: "When it contains direct (immediate) prerequisite information to the information you would like to add",
-          b: "When it contains direct and indirect information a user needs to know to understand the information you would like to add",
+          b: "When it contains direct or indirect information a user needs to know to understand the information you would like to add",
           c: "When it contains unrelated information",
           d: "A parent node is also considered an ancestor node",
         },
@@ -1163,8 +1227,20 @@ export default {
   },
   Proposal_System_What_Happens_to_Proposals_on_1Cademy: {
     title: "1Cademy Proposal System: What Happens to Proposals on 1Cademy",
-    description:
-      "This video gives an overview of what happens after a node edit is proposed, and how the pending proposals list works.",
+    description: (
+      <div>
+        <p>
+          This video gives an overview of what happens after a node edit is
+          proposed, how the pending proposals list works, and what happens when
+          one up/down-votes nodes and proposals.
+        </p>
+        <p>
+          <strong>Note:</strong> if the number of down-votes on a node gets
+          greater than its number of up-votes, the node will be deleted from the
+          whole knowledge graph and no one will be able to retrieve it.
+        </p>
+      </div>
+    ),
     video: "4JKsI0zIEzU",
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
@@ -1187,7 +1263,7 @@ export default {
             e: "0 downvotes; 3 upvotes",
           },
         },
-      You_are_making_a_proposal_on_a_node_with_____________downvotes_and_____________upvotes:
+      Which_of_the_following_combinations_of_upvotes_and_downvotes_will_result_in_2_net_votes:
         {
           stem: "Which of the following combinations of upvotes and downvotes will result in 2 net votes?",
           answers: ["b"],
@@ -1197,6 +1273,44 @@ export default {
             c: "0 downvotes; 1 upvote",
           },
         },
+      What_steps_are_needed_to_evaluate_a_proposed_edit_to_a_node: {
+        stem: (
+          <div>
+            Which choice shows the correct order of steps needed to evaluate a
+            proposed edit to a node?
+            <ol>
+              <li>Select the pending proposal you would like to evaluate.</li>
+              <li>
+                Click the tags and citations icon to find pending proposals to a
+                specific node.
+              </li>
+              <li>
+                Click propose/evaluate versions of this node to see the pending
+                proposals to a specific node.
+              </li>
+              <li>
+                Click the pending list on the sidebar (for nodes in your
+                community).
+              </li>
+              <li>
+                Click notifications in the side bar to view proposed edits to
+                nodes.
+              </li>
+              <li>
+                Click on a proposal in the pending list to open a specific node
+                with a proposed edit.
+              </li>
+            </ol>
+          </div>
+        ),
+        answers: ["b"],
+        choices: {
+          a: "2 ⇨ 6 ⇨ 3 ⇨ 4",
+          b: "4 ⇨ 6 ⇨ 3 ⇨ 1",
+          c: "6 ⇨ 1 ⇨ 3 ⇨ 5",
+          d: "1 ⇨ 2 ⇨ 4 ⇨ 6",
+        },
+      },
       What_happens_to_a_node_with_more_downvotes_than_upvotes: {
         stem: "What happens to a node with more downvotes than upvotes?",
         answers: ["a"],
@@ -1211,8 +1325,31 @@ export default {
   },
   Proposal_System_Summarizing_a_Paper_on_1Cademy: {
     title: "1Cademy Proposal System: Summarizing a Paper on 1Cademy",
-    description:
-      "This video gives an overview of how to summarize papers on 1Cademy.",
+    description: (
+      <div>
+        <p>
+          This video gives an overview of how to summarize papers on 1Cademy.
+        </p>
+        <p>
+          Our communities care a lot about the integrity of the knowledge shared
+          on 1Cademy. For this purpose, in addition to the community leaders who
+          supervise your contributions to 1Cademy, we have a dedicated community
+          of liaison librarians who supervise all communities to ensure cohesion
+          of the content across 1Cademy communities. If you're not sure about
+          the credibility of the sources that you'd like to summarize, please do
+          one of the followings:
+        </p>
+        <ul>
+          <li>
+            Ask the 1Cademy liaison librarians working with your community.
+          </li>
+          <li>
+            Ask the 1Cademy liaison librarians working with your community.
+          </li>
+          <li>Discuss in your community weekly meetings.</li>
+        </ul>
+      </div>
+    ),
     video: "zrVh93YXHfY",
     questions: {
       When_summarizing_a_research_paper_should_you_propose_nodes_about_each_section_in_the_paper:
@@ -1241,6 +1378,17 @@ export default {
             b: "No",
           },
         },
+      What_should_you_do_if_you_re_not_sure: {
+        stem: "What should you do if you're not sure whether a source is reputable to cite on 1Cademy?",
+        answers: ["c", "d", "e"],
+        choices: {
+          a: "Ask other people on the Internet.",
+          b: "Trust your best guess.",
+          c: "Ask the leaders of your 1Cademy community.",
+          d: "Ask the 1Cademy liaison librarians working with your community.",
+          e: "Discuss in your community weekly meetings.",
+        },
+      },
     },
   },
   Congratulations: {

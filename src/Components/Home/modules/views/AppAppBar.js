@@ -25,6 +25,7 @@ import {
 import {
   hasScheduledState,
   completedExperimentState,
+  tutorialEndedState,
 } from "../../../../store/ExperimentAtoms";
 import { colorModeState } from "../../../../store/GlobalAtoms";
 
@@ -57,6 +58,7 @@ const AppAppBar = (props) => {
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const setHasScheduled = useSetRecoilState(hasScheduledState);
   const setCompletedExperiment = useSetRecoilState(completedExperimentState);
+  const setTutorialEnded = useSetRecoilState(tutorialEndedState);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -73,13 +75,15 @@ const AppAppBar = (props) => {
           .where("email", "==", uEmail)
           .get();
         if (userDocs.docs.length > 0) {
-          // Sign in and signed up:
+          setEmail(uEmail.toLowerCase());
           const userData = userDocs.docs[0].data();
           if (!userData.firstname || !userData.lastname) {
             window.location.href = "/";
           }
           setFullname(getFullname(userData.firstname, userData.lastname));
-          setEmail(uEmail.toLowerCase());
+          if (userData.tutorialEnded) {
+            setTutorialEnded(true);
+          }
           const scheduleDocs = await firebase.db
             .collection("schedule")
             .where("email", "==", uEmail)
@@ -115,6 +119,8 @@ const AppAppBar = (props) => {
         setFullname("");
         setEmail("");
         setHasScheduled(false);
+        setCompletedExperiment(false);
+        setTutorialEnded(false);
       }
     });
   }, [firebase]);

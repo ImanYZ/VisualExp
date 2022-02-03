@@ -327,7 +327,7 @@ exports.rescheduleEventNotificationEmail = async (req, res) => {
         from: "onecademy@umich.edu",
         to: email,
         subject:
-          (from1Cademy ? "[1Cademy] " : "") +
+          "[1Cademy] " +
           (courseName ? "[" + courseName + "] " : "") +
           ("You declined our invitation to the UX Research Experiment Session that will begin in " +
             hoursLeft +

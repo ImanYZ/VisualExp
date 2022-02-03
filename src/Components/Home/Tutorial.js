@@ -29,6 +29,7 @@ import Typography from "./modules/components/Typography";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import instructs from "./tutorialIntroductionQuestions";
+import { instructorsState } from "../../store/ProjectAtoms";
 
 const options = {
   speed: 3,
@@ -48,30 +49,25 @@ const Tutorial = (props) => {
   const setTutorialEnded = useSetRecoilState(tutorialEndedState);
 
   const [instructions, setInstructions] = useState([]);
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
   const [completed, setCompleted] = useState(-1);
+  const [fireworks, setFireworks] = useState(false);
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
 
   useEffect(() => {
     const instrs = [];
+    const quests = {};
     for (let instId in instructs) {
       instrs.push({
         ...instructs[instId],
         id: instId,
       });
-    }
-    setInstructions(instrs);
-  }, []);
-
-  useEffect(() => {
-    if (instructions.length > 0 && expanded !== false) {
-      const quests = [];
-      for (let qId in instructions[expanded].questions) {
+      for (let qId in instructs[instId].questions) {
         const quest = {
-          ...instructions[expanded].questions[qId],
+          ...instructs[instId].questions[qId],
           id: qId,
           checks: {},
           error: false,
@@ -80,11 +76,16 @@ const Tutorial = (props) => {
         for (let choice in quest.choices) {
           quest.checks[choice] = false;
         }
-        quests.push(quest);
+        if (instId in quests) {
+          quests[instId].push(quest);
+        } else {
+          quests[instId] = [quest];
+        }
       }
-      setQuestions(quests);
     }
-  }, [instructions, expanded]);
+    setInstructions(instrs);
+    setQuestions(quests);
+  }, []);
 
   useEffect(() => {
     const loadAttempts = async () => {
@@ -121,15 +122,13 @@ const Tutorial = (props) => {
       }
       let sectionChanged = false;
       if (tutorialDoc.exists) {
-        if (tutorialData.completed < Object.keys(instructs).length - 1) {
-          changeExpand(
-            tutorialData.completed + 1,
-            tutorialRef,
-            tutorialDoc,
-            oAttempts
-          );
-          sectionChanged = true;
-        }
+        changeExpand(
+          tutorialData.completed + 1,
+          tutorialRef,
+          tutorialDoc,
+          oAttempts
+        );
+        sectionChanged = true;
       }
       if (!sectionChanged) {
         setAttempts(oAttempts);
@@ -139,6 +138,15 @@ const Tutorial = (props) => {
       loadAttempts();
     }
   }, [instructions, fullname]);
+
+  useEffect(() => {
+    if (completed === instructions.length - 2) {
+      setFireworks(true);
+      setTimeout(() => {
+        setFireworks(false);
+      }, 7000);
+    }
+  }, [completed]);
 
   const checkChoice = (idx) => (event) => {
     const quests = [...questions];
@@ -278,7 +286,8 @@ const Tutorial = (props) => {
         });
       }
       setTimeout(() => {
-        let cumulativeHeight = 0;
+        let cumulativeHeight =
+          window.document.getElementById("TutorialHeader").scrollHeight;
         for (let sIdx = 0; sIdx < newExpand; sIdx++) {
           const sectOffsetHeight = window.document.getElementById(
             "Section" + sIdx
@@ -286,11 +295,11 @@ const Tutorial = (props) => {
           cumulativeHeight += sectOffsetHeight;
         }
         window.document.getElementById("ScrollableContainer").scroll({
-          top: 100 + cumulativeHeight,
+          top: cumulativeHeight + 25,
           left: 0,
           behavior: "smooth",
         });
-      }, 400);
+      }, 100);
     }
   };
 
@@ -313,30 +322,187 @@ const Tutorial = (props) => {
   };
 
   return (
-    <PagesNavbar>
-      <Typography variant="h3" gutterBottom marked="center" align="center">
-        1Cademy Tutorial
-      </Typography>
-      <Box sx={{ mb: "10px" }}>
+    <>
+      <PagesNavbar>
+        <div id="TutorialHeader">
+          <Typography variant="h3" gutterBottom marked="center" align="center">
+            1Cademy Tutorial
+          </Typography>
+          <Box sx={{ mb: "10px" }}>
+            <Box>
+              Welcome to the second step in the application process! Please go
+              through this tutorial to learn more about 1Cademy and how it
+              works. This tutorial takes on average an hour and a half. Please
+              carefully read{" "}
+              <a href="https://1cademy.us/home" target="_blank">
+                the 1Cademy homepage
+              </a>{" "}
+              and watch the following videos before answering any of the
+              questions, and <strong>select all the choices that apply</strong>.{" "}
+            </Box>
+            <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
+              The community leaders will decide about your application based on{" "}
+              <strong>
+                your total correct and wrong attempts. The fewer attempts, the
+                better.
+              </strong>
+            </Box>
+          </Box>
+        </div>
+        {instructions.map((instr, idx) => (
+          <Accordion
+            key={instr.title}
+            id={"Section" + idx}
+            expanded={expanded === idx}
+            onChange={handleChange(idx)}
+            disabled={idx > completed + 1}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="TutorialSections-content"
+              id="TutorialSections-header"
+            >
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: "700" }}>
+                {(idx > completed + 1
+                  ? "🔒 "
+                  : idx === completed + 1 && idx !== instructions.length - 1
+                  ? "🔓 "
+                  : "✅ ") +
+                  (idx + 1) +
+                  ". " +
+                  instr.title}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {expanded === idx && (
+                <Grid container spacing={1}>
+                  <Grid item xs={12} md={8}>
+                    <Paper sx={{ padding: "10px", mb: "19px" }}>
+                      <Typography
+                        variant="body2"
+                        component="div"
+                        sx={{
+                          pb: "19px",
+                        }}
+                      >
+                        {instr.description}
+                      </Typography>
+                      {instr.video && <YoutubeEmbed embedId={instr.video} />}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Paper sx={{ padding: "10px", mb: "19px" }}>
+                      {idx === instructions.length - 1 && (
+                        <Box sx={{ mb: "10px", fontWeight: 700 }}>
+                          You had a total of {correctAttempts + wrongAttempts}{" "}
+                          attemps in answering the questions.
+                        </Box>
+                      )}
+                      {questions.map((question, qIdx) => {
+                        return (
+                          <form
+                            key={qIdx}
+                            onSubmit={handleSubmit(instr.id, question)}
+                          >
+                            <FormControl
+                              error={question.error}
+                              component="fieldset"
+                              variant="standard"
+                              sx={{ mb: "19px" }}
+                            >
+                              <FormLabel component="legend">
+                                {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
+                                {question.stem}
+                              </FormLabel>
+                              <FormGroup>
+                                {Object.keys(question.choices).map(
+                                  (choice, cIdx) => {
+                                    return (
+                                      <FormControlLabel
+                                        key={choice}
+                                        control={
+                                          <Checkbox
+                                            checked={question.checks[cIdx]}
+                                            onChange={checkChoice(qIdx)}
+                                            name={choice}
+                                          />
+                                        }
+                                        label={
+                                          <span>
+                                            {choice + ". "}
+                                            {question.choices[choice]}
+                                          </span>
+                                        }
+                                      />
+                                    );
+                                  }
+                                )}
+                              </FormGroup>
+                              <FormHelperText>
+                                <span
+                                  style={{
+                                    color: question.error ? "red" : "green",
+                                  }}
+                                >
+                                  {question.helperText}
+                                </span>
+                              </FormHelperText>
+                            </FormControl>
+                            <Button
+                              sx={{
+                                display: "block",
+                                margin: "-10px 0px 25px 0px",
+                                color: "white",
+                              }}
+                              type="submit"
+                              color="success"
+                              variant="contained"
+                            >
+                              Submit Answer
+                            </Button>
+                          </form>
+                        );
+                      })}
+                    </Paper>
+                    {idx > 0 && (
+                      <Button
+                        onClick={previousStep(idx)}
+                        sx={{ mt: 1, mr: 1 }}
+                        color="secondary"
+                        variant="contained"
+                      >
+                        Previous Step
+                      </Button>
+                    )}
+                    {idx < completed + 1 && idx < instructions.length - 1 && (
+                      <Button
+                        onClick={nextStep(idx)}
+                        sx={{ float: "right", mt: 1, mr: 1, color: "white" }}
+                        color="success"
+                        variant="contained"
+                      >
+                        Next Step
+                      </Button>
+                    )}
+                  </Grid>
+                </Grid>
+              )}
+            </AccordionDetails>
+          </Accordion>
+        ))}
+        {fireworks && <Fireworks options={options} style={style} />}
+      </PagesNavbar>
+      <Paper
+        sx={{
+          position: "fixed",
+          width: "340px",
+          left: "calc(49vw - 169px)",
+          bottom: "0px",
+          padding: "10px",
+          textAlign: "center",
+        }}
+      >
         <Box>
-          Welcome to the second step in the application process! Please go
-          through this tutorial to learn more about 1Cademy and how it works.
-          This tutorial takes on average an hour and a half. Please carefully
-          read{" "}
-          <a href="https://1cademy.us/home" target="_blank">
-            the 1Cademy homepage
-          </a>{" "}
-          and watch the following videos before answering any of the questions,
-          and <strong>select all the choices that apply</strong>.{" "}
-        </Box>
-        <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
-          The community leaders will decide about your application based on{" "}
-          <strong>
-            your total correct and wrong attempts. The fewer attempts, the
-            better.
-          </strong>
-        </Box>
-        <Box sx={{ mb: "19px" }}>
           <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
             {correctAttempts} Correct
           </Box>
@@ -351,177 +517,39 @@ const Tutorial = (props) => {
           >
             {wrongAttempts} Wrong
           </Box>
-          attemps in all sections so far!
+          total attemps!
         </Box>
-      </Box>
-      {instructions.map((instr, idx) => (
-        <Accordion
-          key={instr.title}
-          id={"Section" + idx}
-          expanded={expanded === idx}
-          onChange={handleChange(idx)}
-          disabled={idx > completed + 1}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="TutorialSections-content"
-            id="TutorialSections-header"
-          >
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: "700" }}>
-              {(idx > completed + 1
-                ? "🔒 "
-                : idx === completed + 1 && idx !== instructions.length - 1
-                ? "🔓 "
-                : "✅ ") +
-                (idx + 1) +
-                ". " +
-                instr.title}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            {expanded === idx && (
-              <Grid container spacing={1}>
-                <Grid item xs={12} md={8}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="body2"
-                      component="div"
-                      sx={{
-                        pb: "19px",
-                      }}
-                    >
-                      {instr.description}
-                    </Typography>
-                    {instr.video && <YoutubeEmbed embedId={instr.video} />}
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    {idx === instructions.length - 1 && (
-                      <Box sx={{ mb: "10px", fontWeight: 700 }}>
-                        You had a total of {correctAttempts + wrongAttempts}{" "}
-                        attemps in answering the questions.
-                      </Box>
-                    )}
-                    {questions.map((question, qIdx) => {
-                      return (
-                        <form
-                          key={qIdx}
-                          onSubmit={handleSubmit(instr.id, question)}
-                        >
-                          <FormControl
-                            error={question.error}
-                            component="fieldset"
-                            variant="standard"
-                            sx={{ mb: "19px" }}
-                          >
-                            <FormLabel component="legend">
-                              {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
-                              {question.stem}
-                            </FormLabel>
-                            <FormGroup>
-                              {Object.keys(question.choices).map(
-                                (choice, cIdx) => {
-                                  return (
-                                    <FormControlLabel
-                                      key={choice}
-                                      control={
-                                        <Checkbox
-                                          checked={question.checks[cIdx]}
-                                          onChange={checkChoice(qIdx)}
-                                          name={choice}
-                                        />
-                                      }
-                                      label={
-                                        <span>
-                                          {choice + ". "}
-                                          {question.choices[choice]}
-                                        </span>
-                                      }
-                                    />
-                                  );
-                                }
-                              )}
-                            </FormGroup>
-                            <FormHelperText>
-                              <span
-                                style={{
-                                  color: question.error ? "red" : "green",
-                                }}
-                              >
-                                {question.helperText}
-                              </span>
-                            </FormHelperText>
-                          </FormControl>
-                          <Button
-                            sx={{
-                              display: "block",
-                              margin: "-10px 0px 25px 0px",
-                              color: "white",
-                            }}
-                            type="submit"
-                            color="success"
-                            variant="contained"
-                          >
-                            Submit Answer
-                          </Button>
-                        </form>
-                      );
-                    })}
-                    {idx < instructions.length - 1 && (
-                      <Box sx={{ mb: "10px" }}>
-                        <Box
-                          sx={{ display: "inline", color: "green", mr: "7px" }}
-                        >
-                          {instr.id in attempts && attempts[instr.id].corrects}{" "}
-                          Correct
-                        </Box>
-                        &amp;
-                        <Box
-                          sx={{
-                            display: "inline",
-                            color: "red",
-                            ml: "7px",
-                            mr: "7px",
-                          }}
-                        >
-                          {instr.id in attempts && attempts[instr.id].wrongs}{" "}
-                          Wrong
-                        </Box>
-                        attemps in this section!
-                      </Box>
-                    )}
-                  </Paper>
-                  {idx > 0 && (
-                    <Button
-                      onClick={previousStep(idx)}
-                      sx={{ mt: 1, mr: 1 }}
-                      color="secondary"
-                      variant="contained"
-                    >
-                      Previous Step
-                    </Button>
-                  )}
-                  {idx < completed + 1 && idx < instructions.length - 1 && (
-                    <Button
-                      onClick={nextStep(idx)}
-                      sx={{ float: "right", mt: 1, mr: 1, color: "white" }}
-                      color="success"
-                      variant="contained"
-                    >
-                      Next Step
-                    </Button>
-                  )}
-                </Grid>
-              </Grid>
-            )}
-          </AccordionDetails>
-        </Accordion>
-      ))}
-      {completed === instructions.length - 2 && (
-        <Fireworks options={options} style={style} />
-      )}
-    </PagesNavbar>
+        {expanded < instructions.length - 1 && (
+          <Box sx={{ mt: "4px" }}>
+            <Box
+              sx={{
+                display: "inline",
+                color: "green",
+                mr: "7px",
+              }}
+            >
+              {instructions[expanded].id in attempts &&
+                attempts[instructions[expanded].id].corrects}{" "}
+              Correct
+            </Box>
+            &amp;
+            <Box
+              sx={{
+                display: "inline",
+                color: "red",
+                ml: "7px",
+                mr: "7px",
+              }}
+            >
+              {instructions[expanded].id in attempts &&
+                attempts[instructions[expanded].id].wrongs}{" "}
+              Wrong
+            </Box>
+            in this section!
+          </Box>
+        )}
+      </Paper>
+    </>
   );
 };
 

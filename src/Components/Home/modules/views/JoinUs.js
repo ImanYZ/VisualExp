@@ -167,11 +167,11 @@ const JoinUs = (props) => {
           <StepLabel>Complete the 1Cademy tutorial test</StepLabel>
           <StepContent>
             <Typography>
-              Please go through the 1Cademy tutorial and carefully watch the
-              short videos and answer the questions. Note that your test scores
-              may impact our community leaders' decision in whether to accept
-              your application. For effective participation in our communities,
-              you need to first learn how our system works.
+              Please go through the 1Cademy tutorial, carefully watch the short
+              videos, and answer the questions. Note that your test scores may
+              impact our community leaders' decision in whether to accept your
+              application. For effective participation in our communities, you
+              need to first learn how our system works.
             </Typography>
             <Box sx={{ mb: 2 }}>
               <div>
@@ -197,12 +197,11 @@ const JoinUs = (props) => {
           <StepContent>
             <Typography>
               Choose one of our communities and complete its application
-              requirements Your last step is to complete your chosen
-              communities' application requirements. These requirements may
-              differ from community to community. You can find more information
-              about each community and their requirements by clicking the
-              corresponding community from our list of communities. You can
-              click the following button to jump to our list of communities.
+              requirements. These requirements may differ from community to
+              community. Click the following button to jump to our list of
+              communities. Then, you can find more information about each
+              community and their requirements by clicking the corresponding
+              community section.
             </Typography>
             <Box sx={{ mb: 2 }}>
               <div>
@@ -214,6 +213,23 @@ const JoinUs = (props) => {
                   sx={{ mt: 1, mr: 1, color: "common.white" }}
                 >
                   Explore our communities &amp; their requirements
+                </Button>
+              </div>
+            </Box>
+            <Typography>
+              You can always return and review the 1Cademy tutorial by clicking
+              the following button:
+            </Typography>
+            <Box sx={{ mb: 2 }}>
+              <div>
+                <Button
+                  variant="contained"
+                  component="a"
+                  href="/tutorial"
+                  target="_blank"
+                  sx={{ mt: 1, mr: 1, color: "common.white" }}
+                >
+                  Review 1Cademy Tutorial
                 </Button>
               </div>
             </Box>

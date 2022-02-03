@@ -56,7 +56,7 @@ const Communities = (props) => {
   const [usersChanges, setUsersChanges] = useState([]);
   const [users, setUsers] = useState({});
   const [usersLoaded, setUsersLoaded] = useState(false);
-  const [expanded, setExpanded] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
@@ -67,6 +67,7 @@ const Communities = (props) => {
         newCommunities = [...theCommunity, ...newCommunities];
         return newCommunities;
       });
+      setExpanded(0);
     }
   }, [props.commIdx]);
 
