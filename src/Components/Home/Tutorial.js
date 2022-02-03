@@ -59,37 +59,19 @@ const Tutorial = (props) => {
 
   useEffect(() => {
     const instrs = [];
-    const quests = {};
     for (let instId in instructs) {
       instrs.push({
         ...instructs[instId],
         id: instId,
       });
-      for (let qId in instructs[instId].questions) {
-        const quest = {
-          ...instructs[instId].questions[qId],
-          id: qId,
-          checks: {},
-          error: false,
-          helperText: " ",
-        };
-        for (let choice in quest.choices) {
-          quest.checks[choice] = false;
-        }
-        if (instId in quests) {
-          quests[instId].push(quest);
-        } else {
-          quests[instId] = [quest];
-        }
-      }
     }
     setInstructions(instrs);
-    setQuestions(quests);
   }, []);
 
   useEffect(() => {
     const loadAttempts = async () => {
       let oAttempts = {};
+      const quests = {};
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
       const tutorialDoc = await tutorialRef.get();
       let tutorialData;
@@ -118,9 +100,49 @@ const Tutorial = (props) => {
               wrongs: 0,
             };
           }
+          const quest = {
+            ...instructs[instr].questions[ques],
+            id: ques,
+            checks: {},
+            error: false,
+            helperText: " ",
+          };
+          if (oAttempts[instr].questions[ques].answers.length > 0) {
+            let wrong = false;
+            for (let choice in quest.choices) {
+              if (oAttempts[instr].questions[ques].answers.includes(choice)) {
+                quest.checks[choice] = true;
+                if (!quest.answers.includes(choice)) {
+                  wrong = true;
+                }
+              } else {
+                quest.checks[choice] = false;
+                if (quest.answers.includes(choice)) {
+                  wrong = true;
+                }
+              }
+            }
+            if (wrong) {
+              quests[ques].helperText =
+                "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+              quests[ques].error = true;
+            } else {
+              quests[ques].helperText = "You got it!";
+              quests[ques].error = false;
+            }
+          } else {
+            for (let choice in quest.choices) {
+              quest.checks[choice] = false;
+            }
+          }
+          if (instr in quests) {
+            quests[instr].push(quest);
+          } else {
+            quests[instr] = [quest];
+          }
         }
       }
-      let sectionChanged = false;
+      setQuestions(quests);
       if (tutorialDoc.exists) {
         changeExpand(
           tutorialData.completed + 1,
@@ -128,9 +150,7 @@ const Tutorial = (props) => {
           tutorialDoc,
           oAttempts
         );
-        sectionChanged = true;
-      }
-      if (!sectionChanged) {
+      } else {
         setAttempts(oAttempts);
       }
     };
@@ -148,11 +168,11 @@ const Tutorial = (props) => {
     }
   }, [completed]);
 
-  const checkChoice = (idx) => (event) => {
-    const quests = [...questions];
-    quests[idx].checks[event.target.name] = event.target.checked;
-    quests[idx].error = false;
-    quests[idx].helperText = " ";
+  const checkChoice = (idx, qIdx) => (event) => {
+    const quests = { ...questions };
+    quests[idx][qIdx].checks[event.target.name] = event.target.checked;
+    quests[idx][qIdx].error = false;
+    quests[idx][qIdx].helperText = " ";
     setQuestions(quests);
   };
 
@@ -163,7 +183,7 @@ const Tutorial = (props) => {
       return;
     }
     const oAttempts = { ...attempts };
-    const quests = [...questions];
+    const quests = { ...questions };
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
     let wrong = false;
@@ -193,24 +213,24 @@ const Tutorial = (props) => {
       }
     }
     let allCorrect = true;
-    const qIdx = quests.findIndex((ques) => ques.id === question.id);
+    const qIdx = quests[instrId].findIndex((ques) => ques.id === question.id);
     if (wrong) {
       oAttempts[instrId].questions[question.id].wrongs += 1;
       oAttempts[instrId].wrongs += 1;
       allCorrect = false;
       wAttempts += 1;
-      quests[qIdx].helperText =
+      quests[instrId][qIdx].helperText =
         "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
-      quests[qIdx].error = true;
+      quests[instrId][qIdx].error = true;
     } else {
       oAttempts[instrId].questions[question.id].corrects += 1;
       oAttempts[instrId].corrects += 1;
       cAttempts += 1;
-      quests[qIdx].helperText = "You got it!";
-      quests[qIdx].error = false;
+      quests[instrId][qIdx].helperText = "You got it!";
+      quests[instrId][qIdx].error = false;
     }
     if (allCorrect) {
-      for (let ques of quests) {
+      for (let ques of quests[instrId]) {
         for (let choice in ques.checks) {
           if (
             (ques.checks[choice] && !ques.answers.includes(choice)) ||
@@ -285,21 +305,21 @@ const Tutorial = (props) => {
           completed,
         });
       }
-      setTimeout(() => {
-        let cumulativeHeight =
-          window.document.getElementById("TutorialHeader").scrollHeight;
-        for (let sIdx = 0; sIdx < newExpand; sIdx++) {
-          const sectOffsetHeight = window.document.getElementById(
-            "Section" + sIdx
-          ).scrollHeight;
-          cumulativeHeight += sectOffsetHeight;
-        }
-        window.document.getElementById("ScrollableContainer").scroll({
-          top: cumulativeHeight + 25,
-          left: 0,
-          behavior: "smooth",
-        });
-      }, 100);
+      // setTimeout(() => {
+      let cumulativeHeight =
+        window.document.getElementById("TutorialHeader").scrollHeight;
+      for (let sIdx = 0; sIdx < newExpand; sIdx++) {
+        const sectOffsetHeight = window.document.getElementById(
+          "Section" + sIdx
+        ).scrollHeight;
+        cumulativeHeight += sectOffsetHeight;
+      }
+      window.document.getElementById("ScrollableContainer").scroll({
+        top: cumulativeHeight + 25,
+        left: 0,
+        behavior: "smooth",
+      });
+      // }, 100);
     }
   };
 
@@ -398,7 +418,7 @@ const Tutorial = (props) => {
                           attemps in answering the questions.
                         </Box>
                       )}
-                      {questions.map((question, qIdx) => {
+                      {questions[idx].map((question, qIdx) => {
                         return (
                           <form
                             key={qIdx}
@@ -423,7 +443,7 @@ const Tutorial = (props) => {
                                         control={
                                           <Checkbox
                                             checked={question.checks[cIdx]}
-                                            onChange={checkChoice(qIdx)}
+                                            onChange={checkChoice(idx, qIdx)}
                                             name={choice}
                                           />
                                         }
