@@ -123,12 +123,12 @@ const Tutorial = (props) => {
               }
             }
             if (wrong) {
-              quests[ques].helperText =
+              quest.helperText =
                 "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
-              quests[ques].error = true;
+              quest.error = true;
             } else {
-              quests[ques].helperText = "You got it!";
-              quests[ques].error = false;
+              quest.helperText = "You got it!";
+              quest.error = false;
             }
           } else {
             for (let choice in quest.choices) {
@@ -168,11 +168,11 @@ const Tutorial = (props) => {
     }
   }, [completed]);
 
-  const checkChoice = (idx, qIdx) => (event) => {
+  const checkChoice = (instrId, qIdx) => (event) => {
     const quests = { ...questions };
-    quests[idx][qIdx].checks[event.target.name] = event.target.checked;
-    quests[idx][qIdx].error = false;
-    quests[idx][qIdx].helperText = " ";
+    quests[instrId][qIdx].checks[event.target.name] = event.target.checked;
+    quests[instrId][qIdx].error = false;
+    quests[instrId][qIdx].helperText = " ";
     setQuestions(quests);
   };
 
@@ -418,76 +418,80 @@ const Tutorial = (props) => {
                           attemps in answering the questions.
                         </Box>
                       )}
-                      {questions[idx].map((question, qIdx) => {
-                        return (
-                          <form
-                            key={qIdx}
-                            onSubmit={handleSubmit(instr.id, question)}
-                          >
-                            <FormControl
-                              error={question.error}
-                              component="fieldset"
-                              variant="standard"
-                              sx={{ mb: "19px" }}
+                      {instr.id in questions &&
+                        questions[instr.id].map((question, qIdx) => {
+                          return (
+                            <form
+                              key={qIdx}
+                              onSubmit={handleSubmit(instr.id, question)}
                             >
-                              <FormLabel component="legend">
-                                {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
-                                {question.stem}
-                              </FormLabel>
-                              <FormGroup>
-                                {Object.keys(question.choices).map(
-                                  (choice, cIdx) => {
-                                    return (
-                                      <FormControlLabel
-                                        key={choice}
-                                        control={
-                                          <Checkbox
-                                            checked={question.checks[cIdx]}
-                                            onChange={checkChoice(idx, qIdx)}
-                                            name={choice}
-                                          />
-                                        }
-                                        label={
-                                          <span>
-                                            {choice + ". "}
-                                            {question.choices[choice]}
-                                          </span>
-                                        }
-                                      />
-                                    );
-                                  }
-                                )}
-                              </FormGroup>
-                              <FormHelperText>
-                                <span
-                                  style={{
-                                    color: question.error ? "red" : "green",
-                                  }}
-                                >
-                                  {question.helperText}
-                                </span>
-                              </FormHelperText>
-                            </FormControl>
-                            <Button
-                              sx={{
-                                display: "block",
-                                margin: "-10px 0px 25px 0px",
-                                color: "white",
-                              }}
-                              type="submit"
-                              color="success"
-                              variant="contained"
-                            >
-                              Submit Answer
-                            </Button>
-                          </form>
-                        );
-                      })}
+                              <FormControl
+                                error={question.error}
+                                component="fieldset"
+                                variant="standard"
+                                sx={{ mb: "19px" }}
+                              >
+                                <FormLabel component="legend">
+                                  {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
+                                  {question.stem}
+                                </FormLabel>
+                                <FormGroup>
+                                  {Object.keys(question.choices).map(
+                                    (choice, cIdx) => {
+                                      return (
+                                        <FormControlLabel
+                                          key={choice}
+                                          control={
+                                            <Checkbox
+                                              checked={question.checks[choice]}
+                                              onChange={checkChoice(
+                                                instr.id,
+                                                qIdx
+                                              )}
+                                              name={choice}
+                                            />
+                                          }
+                                          label={
+                                            <span>
+                                              {choice + ". "}
+                                              {question.choices[choice]}
+                                            </span>
+                                          }
+                                        />
+                                      );
+                                    }
+                                  )}
+                                </FormGroup>
+                                <FormHelperText>
+                                  <span
+                                    style={{
+                                      color: question.error ? "red" : "green",
+                                    }}
+                                  >
+                                    {question.helperText}
+                                  </span>
+                                </FormHelperText>
+                              </FormControl>
+                              <Button
+                                sx={{
+                                  display: "block",
+                                  margin: "-10px 0px 25px 0px",
+                                  color: "white",
+                                }}
+                                type="submit"
+                                color="success"
+                                variant="contained"
+                              >
+                                Submit Answer
+                              </Button>
+                            </form>
+                          );
+                        })}
                     </Paper>
                     {idx > 0 && (
                       <Button
                         onClick={previousStep(idx)}
-                        sx={{ mt: 1, mr: 1 }}
+                        sx={{ mt: 1, mr: 1, color: "common.white" }}
                         color="secondary"
                         variant="contained"
                       >
@@ -497,7 +501,12 @@ const Tutorial = (props) => {
                     {idx < completed + 1 && idx < instructions.length - 1 && (
                       <Button
                         onClick={nextStep(idx)}
-                        sx={{ float: "right", mt: 1, mr: 1, color: "white" }}
+                        sx={{
+                          float: "right",
+                          mt: 1,
+                          mr: 1,
+                          color: "common.white",
+                        }}
                         color="success"
                         variant="contained"
                       >

@@ -1,5 +1,7 @@
 import React from "react";
 
+import Button from "@mui/material/Button";
+
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import EmailIcon from "@mui/icons-material/Email";
@@ -1394,15 +1396,24 @@ export default {
   Congratulations: {
     title: "Congratulations!",
     description: (
-      <div style={{ fontSize: "19px", fontWeight: 700 }}>
-        You successfully completed the 1Cademy tutorial. You can now explore
-        <p>
-          <a href="/community/Social_Political_Psychology" target="_blank">
-            1Cademy communities on this page
-          </a>
-        </p>
-        and complete the requirements of whichever community you'd like to apply
-        to.
+      <div>
+        <div>
+          You successfully completed the 1Cademy tutorial. You can now click the
+          following button to explore 1Cademy communities and complete the
+          requirements of whichever community you'd like to apply to.
+        </div>
+        <div>
+          <Button
+            variant="contained"
+            component="a"
+            href="/community/Social_Political_Psychology"
+            target="_blank"
+            color="secondary"
+            sx={{ mt: 1, ml: 1, color: "common.white" }}
+          >
+            1Cademy Communities
+          </Button>
+        </div>
       </div>
     ),
     video: "",
