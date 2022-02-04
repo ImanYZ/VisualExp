@@ -79,7 +79,13 @@ const MCQuestion = (props) => {
   const previousAvailable = props.currentQIdx !== 0;
 
   return (
-    <div>
+    <div
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        overflowX: "hidden",
+      }}
+    >
       <Paper id="QuestionContainer" elevation={4}>
         <Typography component="p">
           <Button
