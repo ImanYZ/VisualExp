@@ -5,6 +5,11 @@ import axios from "axios";
 
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import {
   firebaseState,
@@ -53,6 +58,7 @@ const SchedulePage = (props) => {
   const [thirdSession, setThirdSession] = useState(null);
   const [submitable, setSubmitable] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -78,7 +84,20 @@ const SchedulePage = (props) => {
     }
   }, [email]);
 
-  const submitData = async (event) => {
+  const confirmClickOpen = (event) => {
+    setOpenConfirm(true);
+  };
+
+  const confirmClose = (value) => (event) => {
+    if (value) {
+      if (value === "Confirmed") {
+        submitData();
+      }
+    }
+    setOpenConfirm(false);
+  };
+
+  const submitData = async () => {
     setIsSubmitting(true);
     const userRef = firebase.db.collection("users").doc(fullname);
     const userDoc = await userRef.get();
@@ -279,7 +298,7 @@ const SchedulePage = (props) => {
           </div>
           <div id="SignBtnContainer">
             <Button
-              onClick={submitData}
+              onClick={confirmClickOpen}
               className={
                 submitable && !isSubmitting
                   ? "Button SubmitButton"
@@ -293,6 +312,59 @@ const SchedulePage = (props) => {
           </div>
         </>
       )}
+      <Dialog
+        open={openConfirm}
+        onClose={confirmClose()}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Please Confirm!"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <div>
+              Press "Confirm" if you'd like to schedule the following three
+              sessions, or press "Cancel" to revise your sessions.
+            </div>
+            {firstSessions[0] && secondSession && thirdSession && (
+              <ul>
+                <li>
+                  1<sup>st</sup>
+                  {" session: " +
+                    firstSessions[0].toLocaleString() +
+                    " - " +
+                    new Date(
+                      firstSessions[0].getTime() + 60 * 60000
+                    ).toLocaleTimeString()}
+                </li>
+                <li>
+                  2<sup>nd</sup>
+                  {" session: " +
+                    secondSession.toLocaleString() +
+                    " - " +
+                    new Date(
+                      secondSession.getTime() + 30 * 60000
+                    ).toLocaleTimeString()}
+                </li>
+                <li>
+                  3<sup>rd</sup>
+                  {" session: " +
+                    thirdSession.toLocaleString() +
+                    " - " +
+                    new Date(
+                      thirdSession.getTime() + 30 * 60000
+                    ).toLocaleTimeString()}
+                </li>
+              </ul>
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={confirmClose("Cancelled")}>Cancel</Button>
+          <Button onClick={confirmClose("Confirmed")} autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
