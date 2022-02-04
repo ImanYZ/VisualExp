@@ -1406,7 +1406,7 @@ export default {
           <Button
             variant="contained"
             component="a"
-            href="/community/Social_Political_Psychology"
+            href="/communities"
             target="_blank"
             color="secondary"
             sx={{ mt: 1, ml: 1, color: "common.white" }}
