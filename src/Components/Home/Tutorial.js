@@ -481,6 +481,11 @@ const Tutorial = (props) => {
                                 type="submit"
                                 color="success"
                                 variant="contained"
+                                disabled={
+                                  Object.values(question.checks).findIndex(
+                                    (chec) => chec
+                                  ) === -1
+                                }
                               >
                                 Submit Answer
                               </Button>
@@ -548,35 +553,37 @@ const Tutorial = (props) => {
           </Box>
           total attemps!
         </Box>
-        {expanded < instructions.length - 1 && (
-          <Box sx={{ mt: "4px" }}>
-            <Box
-              sx={{
-                display: "inline",
-                color: "green",
-                mr: "7px",
-              }}
-            >
-              {instructions[expanded].id in attempts &&
-                attempts[instructions[expanded].id].corrects}{" "}
-              Correct
+        {expanded !== false &&
+          expanded < instructions.length - 1 &&
+          instructions[expanded].id in attempts && (
+            <Box sx={{ mt: "4px" }}>
+              <Box
+                sx={{
+                  display: "inline",
+                  color: "green",
+                  mr: "7px",
+                }}
+              >
+                {instructions[expanded].id in attempts &&
+                  attempts[instructions[expanded].id].corrects}{" "}
+                Correct
+              </Box>
+              &amp;
+              <Box
+                sx={{
+                  display: "inline",
+                  color: "red",
+                  ml: "7px",
+                  mr: "7px",
+                }}
+              >
+                {instructions[expanded].id in attempts &&
+                  attempts[instructions[expanded].id].wrongs}{" "}
+                Wrong
+              </Box>
+              in this section!
             </Box>
-            &amp;
-            <Box
-              sx={{
-                display: "inline",
-                color: "red",
-                ml: "7px",
-                mr: "7px",
-              }}
-            >
-              {instructions[expanded].id in attempts &&
-                attempts[instructions[expanded].id].wrongs}{" "}
-              Wrong
-            </Box>
-            in this section!
-          </Box>
-        )}
+          )}
       </Paper>
     </>
   );
