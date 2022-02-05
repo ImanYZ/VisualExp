@@ -80,11 +80,16 @@ const MCQuestion = (props) => {
 
   return (
     <div
-      style={{
-        height: "100vh",
-        overflowY: "auto",
-        overflowX: "hidden",
-      }}
+      style={
+        props.explanations && props.explanations.length > 0
+          ? {
+              height: "100vh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingRight: "10px",
+            }
+          : {}
+      }
     >
       <Paper id="QuestionContainer" elevation={4}>
         <Typography component="p">

@@ -828,7 +828,7 @@ export default [
         ],
       },
     ],
-    YouTube: "ewWAKtMD8dk",
+    YouTube: "-dQOuGeu0IQ",
     description: `The 1Cademy Librarian community supports the information processes of all the communities on the 1Cademy platform. We do this by liaising with the co-leaders and interns from each community to help them develop their area of the map and information literacy skills. This work supports communities across all fields of focus in three ways:
     1) Embedded Liaison: We work directly with other communities and attend meetings to help create, edit, and arrange their content
     2) Asynchronous Support: We review a portion of a community's map during Librarian meetings
