@@ -27,7 +27,7 @@
 }
 
 #ScheduleSelectorContainer {
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 190px;
 }

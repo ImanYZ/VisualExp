@@ -46,6 +46,29 @@ const errorAlert = (data) => {
   }
 };
 
+const sessionFormatter = (start, minutes) => {
+  return (
+    " session: " +
+    start.toLocaleDateString(navigator.language, {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }) +
+    ", " +
+    start.toLocaleTimeString(navigator.language, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }) +
+    " - " +
+    new Date(start.getTime() + minutes * 60000).toLocaleTimeString(
+      navigator.language,
+      { hour: "2-digit", minute: "2-digit", hour12: false }
+    )
+  );
+};
+
 const SchedulePage = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -329,30 +352,15 @@ const SchedulePage = (props) => {
               <ul>
                 <li>
                   1<sup>st</sup>
-                  {" session: " +
-                    firstSessions[0].toLocaleString() +
-                    " - " +
-                    new Date(
-                      firstSessions[0].getTime() + 60 * 60000
-                    ).toLocaleTimeString()}
+                  {sessionFormatter(firstSessions[0], 60)}
                 </li>
                 <li>
                   2<sup>nd</sup>
-                  {" session: " +
-                    secondSession.toLocaleString() +
-                    " - " +
-                    new Date(
-                      secondSession.getTime() + 30 * 60000
-                    ).toLocaleTimeString()}
+                  {sessionFormatter(secondSession, 30)}
                 </li>
                 <li>
                   3<sup>rd</sup>
-                  {" session: " +
-                    thirdSession.toLocaleString() +
-                    " - " +
-                    new Date(
-                      thirdSession.getTime() + 30 * 60000
-                    ).toLocaleTimeString()}
+                  {sessionFormatter(thirdSession, 30)}
                 </li>
               </ul>
             )}
