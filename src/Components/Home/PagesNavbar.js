@@ -20,7 +20,7 @@ const joinUsClick = (event) => {
   window.location.replace("/Home#JoinUsSection");
 };
 
-const PagesNavbar = ({ children }) => {
+const PagesNavbar = ({ children, tutorial }) => {
   return (
     <Box
       id="ScrollableContainer"
@@ -34,6 +34,7 @@ const PagesNavbar = ({ children }) => {
         switchSection={switchSection}
         homeClick={homeClick}
         joinUsClick={joinUsClick}
+        tutorial={tutorial}
       />
       <Box
         sx={{

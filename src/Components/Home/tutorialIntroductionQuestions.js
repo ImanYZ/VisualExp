@@ -951,17 +951,17 @@ export default {
           e: "R",
         },
       },
-    },
-    Which_of_the_following_icons_represent_a_code_node: {
-      stem: quNum() + "Which of the following icons represent a code node?",
-      answers: ["d"],
-      choices: {
-        a: <MenuBookIcon />,
-        b: <LocalLibraryIcon />,
-        c: <EmojiObjectsIcon />,
-        d: <CodeIcon />,
-        e: <HelpOutlineIcon />,
-        f: <ShareIcon />,
+      Which_of_the_following_icons_represent_a_code_node: {
+        stem: quNum() + "Which of the following icons represent a code node?",
+        answers: ["d"],
+        choices: {
+          a: <MenuBookIcon />,
+          b: <LocalLibraryIcon />,
+          c: <EmojiObjectsIcon />,
+          d: <CodeIcon />,
+          e: <HelpOutlineIcon />,
+          f: <ShareIcon />,
+        },
       },
     },
   },
@@ -1116,13 +1116,14 @@ export default {
           stem:
             quNum() +
             "Which of these steps are needed to link a concept node to a reference node?",
-          answers: ["a", "b", "c", "d"],
+          answers: ["a", "b", "c", "d", "f"],
           choices: {
             a: "Create a reference node or find an existing one.",
             b: "Consult a liaison librarian if the reference node does not exist.",
             c: 'Click "Cite an existing reference."',
             d: "Click the node that you want to cite.",
             e: "Add the link to the website/textbook in the content of the concept node.",
+            f: "Depending on the type of the reference, add the corresponding chapter, page numbers, webpage URL, or video/audio timeslot.",
           },
         },
       How_can_one_figure_out_whether_a_node_they_want_to_propose_already_exists_on_the_map:

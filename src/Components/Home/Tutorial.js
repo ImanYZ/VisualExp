@@ -96,10 +96,10 @@ const Tutorial = (props) => {
             helperText: " ",
           };
           if (
-            "explanantion" in oAttempts[instr].questions[ques] &&
-            oAttempts[instr].questions[ques].explanantion
+            "explanation" in oAttempts[instr].questions[ques] &&
+            oAttempts[instr].questions[ques].explanation
           ) {
-            quest.explanantion = oAttempts[instr].questions[ques].explanantion;
+            quest.explanation = oAttempts[instr].questions[ques].explanation;
             if (
               "explaId" in oAttempts[instr].questions[ques] &&
               oAttempts[instr].questions[ques].explaId
@@ -367,7 +367,7 @@ const Tutorial = (props) => {
         cumulativeHeight += sectOffsetHeight;
       }
       window.document.getElementById("ScrollableContainer").scroll({
-        top: cumulativeHeight + 25,
+        top: cumulativeHeight + 40,
         left: 0,
         behavior: "smooth",
       });
@@ -395,7 +395,7 @@ const Tutorial = (props) => {
 
   return (
     <>
-      <PagesNavbar>
+      <PagesNavbar tutorial={true}>
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
             1Cademy Tutorial
@@ -518,11 +518,17 @@ const Tutorial = (props) => {
                                   </span>
                                 </FormHelperText>
                               </FormControl>
-                              <Box>
+                              <Box
+                                sx={{
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(2, 1fr)",
+                                  width: "100%",
+                                  margin: "-10px 0px 10px 0px",
+                                }}
+                              >
                                 <Button
                                   sx={{
-                                    float: "left",
-                                    margin: "-10px 0px 25px 0px",
+                                    margin: "0px 7px 10px 7px",
                                     color: "common.white",
                                   }}
                                   type="submit"
@@ -540,21 +546,20 @@ const Tutorial = (props) => {
                                 <Button
                                   onClick={openExplanation(instr.id, qIdx)}
                                   sx={{
-                                    float: "right",
-                                    margin: "-10px 10px 25px 0px",
+                                    margin: "0px 7px 10px 7px",
                                     color: "common.white",
                                   }}
                                   color="warning"
                                   variant="contained"
                                 >
-                                  Report Difficulty with Question
+                                  Report Difficulty
                                 </Button>
                               </Box>
                               {question.explanationOpen && (
                                 <>
                                   <TextareaAutosize
                                     style={{ width: "100%" }}
-                                    aria-label="Explanantion text box"
+                                    aria-label="explanation text box"
                                     minRows={7}
                                     placeholder={
                                       "If you're experiencing difficulties with this question, please explain why."

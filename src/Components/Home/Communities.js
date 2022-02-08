@@ -60,7 +60,7 @@ const Communities = (props) => {
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
-    if (props.commIdx) {
+    if (props.commIdx !== undefined) {
       setCommunities((oldCommunities) => {
         let newCommunities = [...oldCommunities];
         const theCommunity = newCommunities.splice(props.commIdx, 1);

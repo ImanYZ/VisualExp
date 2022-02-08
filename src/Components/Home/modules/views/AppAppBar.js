@@ -238,21 +238,23 @@ const AppAppBar = (props) => {
                 )}
               </IconButton>
             </Box> */}
-            <Tooltip title="Apply to join 1Cademy">
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={props.joinUsClick}
-                sx={{
-                  fontSize: 16,
-                  color: "common.white",
-                  ml: 2.5,
-                  borderRadius: 40,
-                }}
-              >
-                Apply!
-              </Button>
-            </Tooltip>
+            {!props.tutorial && (
+              <Tooltip title="Apply to join 1Cademy">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={props.joinUsClick}
+                  sx={{
+                    fontSize: 16,
+                    color: "common.white",
+                    ml: 2.5,
+                    borderRadius: 40,
+                  }}
+                >
+                  Apply!
+                </Button>
+              </Tooltip>
+            )}
             {fullname && (
               <Tooltip title="Account">
                 <IconButton

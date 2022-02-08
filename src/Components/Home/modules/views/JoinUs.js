@@ -30,6 +30,7 @@ const JoinUs = (props) => {
   const tutorialEnded = useRecoilValue(tutorialEndedState);
 
   const [activeStep, setActiveStep] = useState(0);
+  const [activeInnerStep, setActiveInnerStep] = useState(0);
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -195,44 +196,115 @@ const JoinUs = (props) => {
             Complete the community-specific application requirements
           </StepLabel>
           <StepContent>
-            <Typography>
-              Choose one of our communities and complete its application
-              requirements. These requirements may differ from community to
-              community. Click the following button to jump to our list of
-              communities. Then, you can find more information about each
-              community and their requirements by clicking the corresponding
-              community section.
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-              <div>
-                <Button
-                  variant="contained"
-                  component="a"
-                  href="/communities"
-                  target="_blank"
-                  sx={{ mt: 1, mr: 1, color: "common.white" }}
-                >
-                  Explore our communities &amp; their requirements
-                </Button>
-              </div>
-            </Box>
-            <Typography>
-              You can always return and review the 1Cademy tutorial by clicking
-              the following button:
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-              <div>
-                <Button
-                  variant="contained"
-                  component="a"
-                  href="/tutorial"
-                  target="_blank"
-                  sx={{ mt: 1, mr: 1, color: "common.white" }}
-                >
-                  Review 1Cademy Tutorial
-                </Button>
-              </div>
-            </Box>
+            {props.community ? (
+              <Stepper
+                activeStep={activeInnerStep}
+                orientation="vertical"
+                sx={{
+                  mt: "19px",
+                  "& .MuiStepIcon-root": {
+                    color: "warning.dark",
+                  },
+                  "& .MuiStepIcon-root.Mui-active": {
+                    color: "secondary.main",
+                  },
+                  "& .MuiStepIcon-root.Mui-completed": {
+                    color: "success.main",
+                  },
+                  "& .MuiButton-root": {
+                    backgroundColor: "secondary.main",
+                  },
+                  "& .MuiButton-root:hover": {
+                    backgroundColor: "secondary.dark",
+                  },
+                  "& .MuiButton-root.Mui-disabled": {
+                    backgroundColor: "secondary.light",
+                  },
+                }}
+              >
+                <Step>
+                  <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
+                  <StepContent>
+                    <Box>
+                      <label htmlFor="ResumeFile">
+                        <input
+                          accept="application/pdf"
+                          id="ResumeFile"
+                          multiple
+                          type="file"
+                          style={{ display: "none" }}
+                        />
+                        <Button variant="contained" component="span">
+                          CV/Résumé
+                        </Button>
+                      </label>
+                    </Box>
+                  </StepContent>
+                </Step>
+                <Step>
+                  <StepLabel>
+                    Upload your most recent unofficial transcript in PDF format.
+                  </StepLabel>
+                  <StepContent>
+                    <Box>
+                      <label htmlFor="TranscriptFile">
+                        <input
+                          accept="application/pdf"
+                          id="TranscriptFile"
+                          multiple
+                          type="file"
+                          style={{ display: "none" }}
+                        />
+                        <Button variant="contained" component="span">
+                          Unofficial Transcript
+                        </Button>
+                      </label>
+                    </Box>
+                  </StepContent>
+                </Step>
+              </Stepper>
+            ) : (
+              <>
+                <Typography>
+                  Choose one of our communities and complete its application
+                  requirements. These requirements may differ from community to
+                  community. Click the following button to jump to our list of
+                  communities. Then, you can find more information about each
+                  community and their requirements by clicking the corresponding
+                  community section.
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <div>
+                    <Button
+                      variant="contained"
+                      component="a"
+                      href="/communities"
+                      target="_blank"
+                      sx={{ mt: 1, mr: 1, color: "common.white" }}
+                    >
+                      Explore our communities &amp; their requirements
+                    </Button>
+                  </div>
+                </Box>
+                <Typography>
+                  You can always return and review the 1Cademy tutorial by
+                  clicking the following button:
+                </Typography>
+                <Box sx={{ mb: 2 }}>
+                  <div>
+                    <Button
+                      variant="contained"
+                      component="a"
+                      href="/tutorial"
+                      target="_blank"
+                      sx={{ mt: 1, mr: 1, color: "common.white" }}
+                    >
+                      Review 1Cademy Tutorial
+                    </Button>
+                  </div>
+                </Box>
+              </>
+            )}
           </StepContent>
         </Step>
       </Stepper>
