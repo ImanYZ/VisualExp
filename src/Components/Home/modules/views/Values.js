@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
@@ -9,7 +8,6 @@ import CardMedia from "@mui/material/CardMedia";
 import Collapse from "@mui/material/Collapse";
 import { CardActionArea } from "@mui/material";
 
-import Button from "../components/Button";
 import Typography from "../components/Typography";
 
 import valuesItems from "./valuesItems";
@@ -23,18 +21,6 @@ for (let value of valuesItems) {
 const sectionIdx = sectionsOrder.findIndex(
   (sect) => sect.id === "ValuesSection"
 );
-
-const item = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  px: 5,
-};
-
-const image = {
-  height: 130,
-  my: 4,
-};
 
 const Values = (props) => {
   const [stepChecked, setStepChecked] = useState(iniStepChecked);

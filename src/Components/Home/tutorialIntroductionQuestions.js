@@ -20,9 +20,23 @@ import CodeIcon from "@mui/icons-material/Code";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import ShareIcon from "@mui/icons-material/Share";
 
+let secCounter = 0;
+let quCounter = 0;
+
+const newSec = () => {
+  secCounter += 1;
+  quCounter = 0;
+  return secCounter + ". ";
+};
+
+const quNum = () => {
+  quCounter += 1;
+  return secCounter + "." + quCounter + ". ";
+};
+
 export default {
   Introduction_Fundamentals: {
-    title: "1Cademy Introduction: Fundamentals",
+    title: newSec() + "1Cademy Introduction: Fundamentals",
     description: (
       <div>
         <p>
@@ -43,7 +57,7 @@ export default {
       How_can_1Cademy_help_us: {
         stem: (
           <div>
-            How can 1Cademy help us? (Hint: find the answer from{" "}
+            {quNum()}How can 1Cademy help us? (Hint: find the answer from{" "}
             <a href="https://1cademy.us/home" target="_blank">
               the 1Cademy homepage
             </a>
@@ -62,7 +76,8 @@ export default {
       How_can_1Cademy_help_our_society: {
         stem: (
           <div>
-            How can 1Cademy help our society? (Hint: find the answer from{" "}
+            {quNum()}How can 1Cademy help our society? (Hint: find the answer
+            from{" "}
             <a href="https://1cademy.us/home" target="_blank">
               the 1Cademy homepage
             </a>
@@ -78,19 +93,19 @@ export default {
           e: "Collaboratively learning by comparing and contrasting alternative or even competing perspectives side-by-side.",
         },
       },
-      If_everything_is_explained_somewhere: {
-        stem: "If everything is explained somewhere on the internet, then why do we pay for textbooks and online courses?",
-        answers: ["e"],
-        choices: {
-          a: "Because we cannot find the explanations on the Internet.",
-          b: "Because we are lazy!",
-          c: "Because most explanations on the Internet are not free.",
-          d: "Because most explanations on the Internet are incorrect.",
-          e: "Because most explanations on the Internet do not provide us with learning pathways.",
-        },
-      },
+      // If_everything_is_explained_somewhere: {
+      //   stem: "If everything is explained somewhere on the internet, then why do we pay for textbooks and online courses?",
+      //   answers: ["e"],
+      //   choices: {
+      //     a: "Because we cannot find the explanations on the Internet.",
+      //     b: "Because we are lazy!",
+      //     c: "Because most explanations on the Internet are not free.",
+      //     d: "Because most explanations on the Internet are incorrect.",
+      //     e: "Because most explanations on the Internet do not provide us with learning pathways.",
+      //   },
+      // },
       Is_the_content_on_1Cademy_peer_reviewed: {
-        stem: "Is the content on 1Cademy peer-reviewed?",
+        stem: quNum() + "Is the content on 1Cademy peer-reviewed?",
         answers: ["a"],
         choices: {
           a: "Yes",
@@ -98,7 +113,7 @@ export default {
         },
       },
       How_can_you_learn_like_a_researcher_on_1Cademy: {
-        stem: "How can you learn like a researcher on 1Cademy?",
+        stem: quNum() + "How can you learn like a researcher on 1Cademy?",
         answers: ["a"],
         choices: {
           a: "Find complex topics and learn backwards",
@@ -109,37 +124,48 @@ export default {
       What_kind_of_content_should_be_added_to_1Cademy: {
         stem: (
           <div>
-            What kind of content should be added to 1Cademy? (Hint: check out{" "}
-            <a
-              href="https://apastyle.apa.org/style-grammar-guidelines/citations/paraphrasing"
-              target="_blank"
-            >
-              the APA guidelines
-            </a>
-            .)
+            <p>
+              {quNum()}What kind of content should be added to 1Cademy? (Hint:
+              check out{" "}
+              <a
+                href="https://apastyle.apa.org/style-grammar-guidelines/citations/paraphrasing"
+                target="_blank"
+              >
+                the APA guidelines
+              </a>
+              .)
+            </p>
+            <p>
+              <strong>Note:</strong> in addition to the types of content
+              discussed in the video and APA guidelines, you can add links to
+              online videos or audio recordings, and images from websites under
+              public domain with correct citations in the content of the nodes
+              you propose on 1Cademy.
+            </p>
           </div>
         ),
-        answers: ["c", "e", "f"],
+        answers: ["c", "e", "f", "h"],
         choices: {
-          a: "Original content without proper citation",
+          a: "Content from external source without proper citation",
           b: "Quotes that are not cited",
           c: "Paraphrased and correctly cited content",
           d: "Content copied from books or research papers",
           e: "Links to online videos or audio recordings",
-          f: "Images from websites under public domain with correct citation",
-          g: "Images from copyrighted websites with correct citation",
+          f: "Images from websites under public domain with correct citations",
+          g: "Images from copyrighted websites with correct citations",
+          h: "Your own original ideas without citations",
         },
       },
     },
   },
   Introduction_What_is_a_node_on_1Cademy: {
-    title: "1Cademy Introduction: What is a node on 1Cademy?",
+    title: newSec() + "1Cademy Introduction: What is a node on 1Cademy?",
     description:
       'A node represents the smallest unit of knowledge on 1Cademy. It can define a concept (i.e., "Concept" node), explain relationships between multiple concepts (i.e., "Relation" node), cite a reference (i.e., "Reference" node), ask a multiple-choice question (i.e., "Question" node), or represent a new idea (i.e., "Idea" node).',
     video: "NX2uJJ3RFsM",
     questions: {
       What_is_all_knowledge_on_1Cademy_summarized_into: {
-        stem: "What is all knowledge on 1Cademy summarized into?",
+        stem: quNum() + "What is all knowledge on 1Cademy summarized into?",
         answers: ["b"],
         choices: {
           a: "Paragraphs",
@@ -148,7 +174,14 @@ export default {
         },
       },
       What_kind_of_content_can_be_contained_in_a_node: {
-        stem: "What kind of content can be contained in a node?",
+        stem: (
+          <div>
+            <p>{quNum()}What kind of content can be contained in a node?</p>
+            <p>
+              <strong>Note:</strong> "Idea" nodes do not require citations.
+            </p>
+          </div>
+        ),
         answers: ["a", "b", "c", "e", "f"],
         choices: {
           a: "Cited sources",
@@ -160,7 +193,9 @@ export default {
         },
       },
       Which_of_the_following_choices_are_true_about_a_node_on_1Cademy: {
-        stem: "Which of the following choices are true about a node on 1Cademy?",
+        stem:
+          quNum() +
+          "Which of the following choices are true about a node on 1Cademy?",
         answers: ["a", "b", "d", "e", "f", "g"],
         choices: {
           a: "It is shown as a single rectangular box.",
@@ -175,13 +210,15 @@ export default {
     },
   },
   Introduction_The_Shared_Knowledge_Graph: {
-    title: "1Cademy Introduction: The Shared Knowledge Graph",
+    title: newSec() + "1Cademy Introduction: The Shared Knowledge Graph",
     description:
       "First, please watch this video to learn more about how the 1Cademy knowledge map is organized.",
     video: "Yc3VOpFb8Gc",
     questions: {
       Users_generate_evaluate_and__: {
-        stem: "Users generate, evaluate, and ________________ nodes by proposing changes to the graph.",
+        stem:
+          quNum() +
+          "Users generate, evaluate, and ________________ nodes by proposing changes to the graph.",
         answers: ["c"],
         choices: {
           a: "Change",
@@ -191,7 +228,8 @@ export default {
         },
       },
       What_is_contained_in_the_1Cademy_shared_knowledge_graph: {
-        stem: "What is contained in the 1Cademy shared knowledge graph?",
+        stem:
+          quNum() + "What is contained in the 1Cademy shared knowledge graph?",
         answers: ["b"],
         choices: {
           a: "Nodes and prerequisite relations (links) only you have proposed that have been accepted",
@@ -201,7 +239,9 @@ export default {
         },
       },
       Is_the_content_of_the_shared_knowledge_graph_accessible_to_all_users: {
-        stem: "Is the content of the shared knowledge graph accessible to all users?",
+        stem:
+          quNum() +
+          "Is the content of the shared knowledge graph accessible to all users?",
         answers: ["a"],
         choices: {
           a: "Yes",
@@ -211,14 +251,16 @@ export default {
     },
   },
   Introduction_Personalizing_Your_Knowledge_Map: {
-    title: "1Cademy Introduction: Personalizing Your Knowledge Map",
+    title: newSec() + "1Cademy Introduction: Personalizing Your Knowledge Map",
     description:
       "This next video is about creating your own personal knowledge map view from the nodes created in the 1Cademy knowledge graph.",
     video: "IzLaiIboPVE",
     questions: {
       True_or_False_Closing_a_node_on_your_map_view_changes_everyone_else_s_map_view:
         {
-          stem: "True or False? Closing a node on your map view changes everyone else's map view.",
+          stem:
+            quNum() +
+            "True or False? Closing a node on your map view changes everyone else's map view.",
           answers: ["b"],
           choices: {
             a: "True",
@@ -229,35 +271,38 @@ export default {
         {
           stem: (
             <div>
-              What are the overarching learning activities supported by the
-              personalized knowledge map view? [Hint: one of the correct answers
-              was not mentioned in the video, but you can find it from{" "}
+              {quNum()}What are the overarching learning activities supported by
+              the personalized knowledge map view? [Hint: one of the correct
+              answers was not mentioned in the video, but you can find it from{" "}
               <a href="https://1cademy.us/home" target="_blank">
                 the 1Cademy homepage
               </a>
             </div>
           ),
-          answers: ["a", "b", "c", "d", "f"],
+          answers: ["a", "b", "c", "d", "e"],
           choices: {
             a: "Navigation",
             b: "Summarization",
             c: "Evaluation",
             d: "Improvement",
-            e: "Citations",
-            f: "Linking",
+            e: "Linking",
           },
         },
     },
   },
   Introduction_Ways_to_View_Nodes_on_Your_Personalized_Map: {
-    title: "1Cademy Introduction: Ways to View Nodes on Your Personalized Map",
+    title:
+      newSec() +
+      "1Cademy Introduction: Ways to View Nodes on Your Personalized Map",
     description:
       "This video explains the different ways nodes can be viewed while you're on 1Cademy",
     video: "6Auq_ZFVD7Q",
     questions: {
       Which_icon_closes_collapses_a_node_on_your_personalized_knowledge_map_view:
         {
-          stem: "Which icon closes (collapses) a node on your personalized knowledge map view?",
+          stem:
+            quNum() +
+            "Which icon closes (collapses) a node on your personalized knowledge map view?",
           answers: ["a"],
           choices: {
             a: <RemoveIcon />,
@@ -267,7 +312,9 @@ export default {
           },
         },
       Which_icon_opens_expands_a_node_on_your_personalized_knowledge_map_view: {
-        stem: "Which icon opens (expands) a node on your personalized knowledge map view?",
+        stem:
+          quNum() +
+          "Which icon opens (expands) a node on your personalized knowledge map view?",
         answers: ["b"],
         choices: {
           a: <RemoveIcon />,
@@ -277,7 +324,9 @@ export default {
         },
       },
       Which_icon_hides_a_node_on_your_personalized_knowledge_map_view: {
-        stem: "Which icon hides a node on your personalized knowledge map view?",
+        stem:
+          quNum() +
+          "Which icon hides a node on your personalized knowledge map view?",
         answers: ["d"],
         choices: {
           a: <RemoveIcon />,
@@ -288,7 +337,9 @@ export default {
       },
       Which_icon_hides_the_descendants_of_a_node_on_your_personalized_knowledge_map_view:
         {
-          stem: "Which icon hides the descendants of a node on your personalized knowledge map view?",
+          stem:
+            quNum() +
+            "Which icon hides the descendants of a node on your personalized knowledge map view?",
           answers: ["c"],
           choices: {
             a: <RemoveIcon />,
@@ -300,13 +351,13 @@ export default {
     },
   },
   Introduction_Opening_Nodes_on_1Cademy: {
-    title: "1Cademy Introduction: Opening Nodes on 1Cademy",
+    title: newSec() + "1Cademy Introduction: Opening Nodes on 1Cademy",
     description:
       "This video goes over the ways a user can open nodes on 1Cademy.",
     video: "zXedPM2xPCc",
     questions: {
       How_many_ways_are_there_to_open_nodes_on_1Cademy: {
-        stem: "How many ways are there to open nodes on 1Cademy?",
+        stem: quNum() + "How many ways are there to open nodes on 1Cademy?",
         answers: ["b"],
         choices: {
           a: "8",
@@ -316,7 +367,9 @@ export default {
         },
       },
       Which_of_the_following_are_considered_a_method_of_opening_nodes: {
-        stem: "Which of the following methods are used to add nodes to your personalized knowledge map view?",
+        stem:
+          quNum() +
+          "Which of the following methods are used to add nodes to your personalized knowledge map view?",
         answers: ["a", "b", "c", "d", "e", "f", "g", "h", "j", "k"],
         choices: {
           a: "Search box",
@@ -335,13 +388,13 @@ export default {
     },
   },
   Introduction_1Cademy_Sidebar: {
-    title: "1Cademy Introduction: 1Cademy Sidebar",
+    title: newSec() + "1Cademy Introduction: 1Cademy Sidebar",
     description:
       "In this next section, you will be introduced to the sidebar on 1Cademy. The sidebar holds all the important functions and information users need on 1Cademy.",
     video: "xEdNDQDImEM",
     questions: {
       What_tools_are_accessible_through_the_sidebar: {
-        stem: "What tools are accessible through the sidebar?",
+        stem: quNum() + "What tools are accessible through the sidebar?",
         answers: ["a", "b", "c", "d", "e", "f", "g"],
         choices: {
           a: "User settings",
@@ -355,7 +408,9 @@ export default {
         },
       },
       OneCademy_interface_is_in_dark_mode_by_default: {
-        stem: "1Cademy interface is in dark mode by default. How can you change it to light mode?",
+        stem:
+          quNum() +
+          "1Cademy interface is in dark mode by default. How can you change it to light mode?",
         answers: ["a"],
         choices: {
           a: "Open the user settings by clicking your profile picture in the sidebar ⇨ Click the switch button, below your reputation points, and change it to light.",
@@ -364,7 +419,9 @@ export default {
         },
       },
       True_or_False_You_can_change_the_background_color_and_image: {
-        stem: "True or False: You can switch the background image to a solid color on your 1Cademy map view.",
+        stem:
+          quNum() +
+          "True or False: You can switch the background image to a solid color on your 1Cademy map view.",
         answers: ["a"],
         choices: {
           a: "True",
@@ -372,7 +429,7 @@ export default {
         },
       },
       What_does_the_clustering_feature_do: {
-        stem: "What does the clustering feature do?",
+        stem: quNum() + "What does the clustering feature do?",
         answers: ["a"],
         choices: {
           a: "Puts a labeled box around nodes with the same tag",
@@ -381,7 +438,7 @@ export default {
         },
       },
       What_are_you_notified_of_on_1Cademy: {
-        stem: "What are you notified of on 1Cademy?",
+        stem: quNum() + "What are you notified of on 1Cademy?",
         answers: ["a", "b", "c"],
         choices: {
           a: "Upvotes on the nodes you contributed to",
@@ -391,7 +448,9 @@ export default {
         },
       },
       When_will_a_proposal_appear_on_the_pending_proposals_list: {
-        stem: "When will a proposal appear on the pending proposals list?",
+        stem:
+          quNum() +
+          "When will a proposal appear on the pending proposals list?",
         answers: ["b"],
         choices: {
           a: "Anytime you make a proposal on a node",
@@ -401,7 +460,9 @@ export default {
       },
       Which_pending_proposals_do_you_see_in_the_list_of_pending_proposals_in_the_sidebar:
         {
-          stem: "Which pending proposals do you see in the list of pending proposals in the sidebar?",
+          stem:
+            quNum() +
+            "Which pending proposals do you see in the list of pending proposals in the sidebar?",
           answers: ["b"],
           choices: {
             a: "All pending proposals",
@@ -410,7 +471,7 @@ export default {
           },
         },
       What_is_the_weekly_leaderboard: {
-        stem: "What is the weekly leaderboard?",
+        stem: quNum() + "What is the weekly leaderboard?",
         answers: ["a"],
         choices: {
           a: "Top contributors of the week in your community",
@@ -419,7 +480,7 @@ export default {
         },
       },
       What_is_the_all_time_leaderboard: {
-        stem: "What is the all-time leaderboard?",
+        stem: quNum() + "What is the all-time leaderboard?",
         answers: ["c"],
         choices: {
           a: "Top contributors across the platform",
@@ -430,13 +491,15 @@ export default {
     },
   },
   Introduction_Changing_Your_Profile_Picture: {
-    title: "1Cademy Introduction: Changing Your Profile Picture",
+    title: newSec() + "1Cademy Introduction: Changing Your Profile Picture",
     description:
       "We highly encourage you to upload your profile picture by following the procedure in this video.",
     video: "oRv8CEjF1Bw",
     questions: {
       Which_choices_are_true_regarding_your_profile_picture_on_1Cademy: {
-        stem: "Which choices are true regarding your profile picture on 1Cademy?",
+        stem:
+          quNum() +
+          "Which choices are true regarding your profile picture on 1Cademy?",
         answers: ["a", "b", "c", "d"],
         choices: {
           a: "It increases your social presence within 1Cademy.",
@@ -448,14 +511,18 @@ export default {
     },
   },
   Introduction_Bookmarking_and_Marking_Nodes_as_Studied: {
-    title: "1Cademy Introduction: Bookmarking and Marking Nodes as Studied",
+    title:
+      newSec() +
+      "1Cademy Introduction: Bookmarking and Marking Nodes as Studied",
     description:
       "This video goes over how to bookmark nodes and how to mark nodes as studied.",
     video: "ohhJvJ0yhqs",
     questions: {
       Which_icon_at_the_node_footer_should_you_click_to_mark_a_node_as_studied:
         {
-          stem: "Which icon in the node footer should you click to mark a node as studied?",
+          stem:
+            quNum() +
+            "Which icon in the node footer should you click to mark a node as studied?",
           answers: ["a"],
           choices: {
             a: <EmailIcon />,
@@ -467,7 +534,9 @@ export default {
           },
         },
       After_marking_a_node_as_studied_the_border_turns_to_which_color: {
-        stem: "After marking a node as studied, the border turns to which color?",
+        stem:
+          quNum() +
+          "After marking a node as studied, the border turns to which color?",
         answers: ["b"],
         choices: {
           a: "Red",
@@ -477,7 +546,9 @@ export default {
         },
       },
       If_a_node_is_NOT_marked_as_studied_what_is_its_border_color: {
-        stem: "If a node is NOT marked as studied, what is its border color?",
+        stem:
+          quNum() +
+          "If a node is NOT marked as studied, what is its border color?",
         answers: ["a"],
         choices: {
           a: "Red",
@@ -487,7 +558,9 @@ export default {
         },
       },
       If_a_node_is_marked_as_studied_but_someone_updates_the_node: {
-        stem: "If a node is marked as studied, but someone updates the node through a proposal, what is its border color?",
+        stem:
+          quNum() +
+          "If a node is marked as studied, but someone updates the node through a proposal, what is its border color?",
         answers: ["a"],
         choices: {
           a: "Red",
@@ -497,7 +570,9 @@ export default {
         },
       },
       Which_icon_at_the_node_footer_should_you_click_to_bookmark_a_node: {
-        stem: "Which icon in the node footer should you click to bookmark a node to be notified of its updates?",
+        stem:
+          quNum() +
+          "Which icon in the node footer should you click to bookmark a node to be notified of its updates?",
         answers: ["c"],
         choices: {
           a: <EmailIcon />,
@@ -509,7 +584,9 @@ export default {
         },
       },
       When_do_you_see_a_bookmarked_node_in_your_bookmarked_updates_tab: {
-        stem: "When do you see a bookmarked node in your bookmarked updates tab?",
+        stem:
+          quNum() +
+          "When do you see a bookmarked node in your bookmarked updates tab?",
         answers: ["b", "c"],
         choices: {
           a: "When it is marked as studied",
@@ -520,12 +597,12 @@ export default {
     },
   },
   Introduction_Chatroom: {
-    title: "1Cademy Introduction: Chatroom",
+    title: newSec() + "1Cademy Introduction: Chatroom",
     description: "In this video, we go over how to use the 1Cademy chatroom.",
     video: "BSmoSN4RTxk",
     questions: {
       What_kind_of_messages_can_be_sent_in_the_chatroom: {
-        stem: "What kind of messages can be sent in the chatroom?",
+        stem: quNum() + "What kind of messages can be sent in the chatroom?",
         answers: ["a", "c", "d"],
         choices: {
           a: "Text",
@@ -535,7 +612,8 @@ export default {
         },
       },
       Who_will_see_the_messages_your_send_in_1Cademy_chatroom: {
-        stem: "Who will see the messages you send in 1Cademy chatroom?",
+        stem:
+          quNum() + "Who will see the messages you send in 1Cademy chatroom?",
         answers: ["a"],
         choices: {
           a: "Every member of every community",
@@ -546,7 +624,7 @@ export default {
         },
       },
       How_can_you_share_the_link_to_a_node_in_the_chatroom: {
-        stem: "How can you share the link to a node in the chatroom?",
+        stem: quNum() + "How can you share the link to a node in the chatroom?",
         answers: ["b"],
         choices: {
           a: "Click the title of the node you want to share ⇨ Click the node button in the chatroom",
@@ -558,12 +636,12 @@ export default {
     },
   },
   Introduction_Search_Engine: {
-    title: "1Cademy Introduction: Search Engine",
+    title: newSec() + "1Cademy Introduction: Search Engine",
     description: "This video goes over how to use the search tool on 1Cademy.",
     video: "WRUld8vA3i4",
     questions: {
       How_do_you_search_within_all_community_tags: {
-        stem: "How do you search within all community tags?",
+        stem: quNum() + "How do you search within all community tags?",
         answers: ["b"],
         choices: {
           a: 'Select the "All" option under "Tags"',
@@ -572,7 +650,9 @@ export default {
         },
       },
       How_do_you_specify_the_node_type_while_using_the_search_engine: {
-        stem: "How do you specify the node type while using the search engine?",
+        stem:
+          quNum() +
+          "How do you specify the node type while using the search engine?",
         answers: ["a"],
         choices: {
           a: "Select node types you want in a dropdown menu",
@@ -583,35 +663,25 @@ export default {
     },
   },
   Introduction_Changing_Your_Default_Community_Tag: {
-    title: "1Cademy Introduction: Changing Your Default Community Tag",
+    title:
+      newSec() + "1Cademy Introduction: Changing Your Default Community Tag",
     description:
       "Now, it is time for you to change your default tag. Please watch this video to help you change it to the correct community tag that you are a member of, otherwise you'll not receive points on the community leaderboard.",
     video: "D_2A4s__SfM",
     questions: {
       How_can_you_change_your_default_tag_on_1Cademy: {
-        stem: "How can you change your default tag on 1Cademy?",
+        stem: quNum() + "How can you change your default tag on 1Cademy?",
         answers: ["a"],
         choices: {
-          a: (
-            <ol>
-              <li>Open the user settings sidebar.</li>
-              <li>Click the default tag button.</li>
-              <li>Click the node corresponding to your desired tag.</li>
-            </ol>
-          ),
-          b: (
-            <ol>
-              <li>Click the default tag in sidebar.</li>
-              <li>Click the node corresponding to your desired tag.</li>
-            </ol>
-          ),
+          a: "Open the user settings sidebar ⇨ Click the default tag button ⇨ Click the node corresponding to your desired tag",
+          b: "Click the default tag in sidebar ⇨ Click the node corresponding to your desired tag",
           c: "Open the node corresponding to your desired tag.",
           d: "Tag the desired tag when proposing changes to current nodes.",
           e: "Ask your community leaders to change your default tag.",
         },
       },
       Have_you_changed_your_tag_to_the_correct_community: {
-        stem: "Have you changed your tag to the correct community?",
+        stem: quNum() + "Have you changed your tag to the correct community?",
         answers: ["b"],
         choices: {
           a: "No",
@@ -622,12 +692,12 @@ export default {
     },
   },
   Nodes_Node_Header: {
-    title: "1Cademy Nodes: Node Header",
+    title: newSec() + "1Cademy Nodes: Node Header",
     description: "This video goes over the node header.",
     video: "m6qIjU4tpL4",
     questions: {
       What_functions_are_in_the_node_header: {
-        stem: "What functions are in the node header?",
+        stem: quNum() + "What functions are in the node header?",
         answers: ["b", "c", "e"],
         choices: {
           a: "Open offspring",
@@ -640,13 +710,15 @@ export default {
     },
   },
   Nodes_Node_Footer: {
-    title: "1Cademy Nodes: Node Footer",
+    title: newSec() + "1Cademy Nodes: Node Footer",
     description: "This video goes over the node footer.",
     video: "mhj3OeF1iFQ",
     questions: {
       Which_icon_should_you_click_to_get_access_to_the_node_s_parent_and_child_links:
         {
-          stem: "Which icon should you click to get access to the node's parent and child links?",
+          stem:
+            quNum() +
+            "Which icon should you click to get access to the node's parent and child links?",
           answers: ["g"],
           choices: {
             a: <EmailIcon />,
@@ -664,8 +736,8 @@ export default {
       If_your_nodes_overlap_like_this_which_icon_in_the_node_footer_can: {
         stem: (
           <div>
-            If your nodes overlap like this, which icon in the node footer can
-            you click to fix them?
+            {quNum()}If your nodes overlap like this, which icon in the node
+            footer can you click to fix them?
             <img src="/static/tutorial/OverlappingNodes.jpg" width="100%" />
           </div>
         ),
@@ -685,7 +757,9 @@ export default {
       },
       If_you_find_a_node_helpful_to_your_learning_what_icon_do_you_click_to_upvote_it:
         {
-          stem: "If you find a node helpful to your learning, what icon do you click to upvote it?",
+          stem:
+            quNum() +
+            "If you find a node helpful to your learning, what icon do you click to upvote it?",
           answers: ["i"],
           choices: {
             a: <EmailIcon />,
@@ -702,7 +776,9 @@ export default {
         },
       If_you_find_a_node_unhelpful_and_youd_like_to_vote_to_delete_it_what_icon_do_you_click:
         {
-          stem: "If you find a node unhelpful and you'd like to vote to delete it, what icon do you click?",
+          stem:
+            quNum() +
+            "If you find a node unhelpful and you'd like to vote to delete it, what icon do you click?",
           answers: ["j"],
           choices: {
             a: <EmailIcon />,
@@ -720,12 +796,12 @@ export default {
     },
   },
   Nodes_Node_Body: {
-    title: "1Cademy Nodes: Node Body",
+    title: newSec() + "1Cademy Nodes: Node Body",
     description: "This video goes over the node body.",
     video: "pRK5SpjMPlI",
     questions: {
       What_components_does_the_node_body_contain: {
-        stem: "What components does the node body contain?",
+        stem: quNum() + "What components does the node body contain?",
         answers: ["a", "b"],
         choices: {
           a: "Title",
@@ -735,7 +811,7 @@ export default {
         },
       },
       Both_the_node_title_and_content_should_be: {
-        stem: "Both the node title and content should be:",
+        stem: quNum() + "Both the node title and content should be:",
         answers: ["a", "c", "d"],
         choices: {
           a: "Comprehensive",
@@ -747,12 +823,13 @@ export default {
     },
   },
   Nodes_Types_of_Nodes: {
-    title: "1Cademy Nodes: Types of Nodes",
+    title: newSec() + "1Cademy Nodes: Types of Nodes",
     description: "This video goes over the types of nodes.",
     video: "UD9kCb9LKWU",
     questions: {
       Which_of_the_following_types_of_nodes_exist_on_1Cademy: {
-        stem: "Which of the following types of nodes exist on 1Cademy?",
+        stem:
+          quNum() + "Which of the following types of nodes exist on 1Cademy?",
         answers: ["a", "c", "d", "e", "f", "g"],
         choices: {
           a: 'A "Concept" node defines a concept.',
@@ -767,13 +844,13 @@ export default {
     },
   },
   Nodes_Concept_Nodes: {
-    title: "1Cademy Nodes: Concept Nodes",
+    title: newSec() + "1Cademy Nodes: Concept Nodes",
     description:
       "This video introduces the purpose of concept nodes on 1Cademy.",
     video: "stRxLxXVsGw",
     questions: {
       A_concept_node: {
-        stem: "A concept node:",
+        stem: quNum() + "A concept node:",
         answers: ["c"],
         choices: {
           a: "Displays multiple concepts and their definitions",
@@ -782,7 +859,8 @@ export default {
         },
       },
       Which_of_the_following_icons_represent_a_concept_node: {
-        stem: "Which of the following icons represent a concept node?",
+        stem:
+          quNum() + "Which of the following icons represent a concept node?",
         answers: ["b"],
         choices: {
           a: <MenuBookIcon />,
@@ -796,13 +874,15 @@ export default {
     },
   },
   Nodes_Relation_Nodes_vs_Concept_Nodes: {
-    title: "1Cademy Nodes: Relation Nodes vs. Concept Nodes",
+    title: newSec() + "1Cademy Nodes: Relation Nodes vs. Concept Nodes",
     description:
       "Understanding the difference between relation nodes and concept nodes can be difficult. Please watch this video to gain a deeper understanding of the differences between these two types of nodes.",
     video: "Z9TzJUuLj9A",
     questions: {
       A_relation_node____________topics_and_a_concept_node___________topics: {
-        stem: "A relation node __________ topics, and a concept node _________ topics.",
+        stem:
+          quNum() +
+          "A relation node __________ topics, and a concept node _________ topics.",
         answers: ["a"],
         choices: {
           a: "compares; defines",
@@ -813,7 +893,7 @@ export default {
       Relation_Is_the_following_node_a_relation_node_or_a_concept_node: {
         stem: (
           <div>
-            Is the following node a relation node, or a concept node?
+            {quNum()}Is the following node a relation node, or a concept node?
             <img src="/static/tutorial/RelationNode.jpg" width="100%" />
           </div>
         ),
@@ -828,7 +908,7 @@ export default {
       Concept_Is_the_following_node_a_relation_node_or_a_concept_node: {
         stem: (
           <div>
-            Is the following node a relation node, or a concept node?
+            {quNum()}Is the following node a relation node, or a concept node?
             <img src="/static/tutorial/ConceptNode.jpg" width="100%" />
           </div>
         ),
@@ -842,7 +922,7 @@ export default {
       },
     },
     Which_of_the_following_icons_represent_a_relation_node: {
-      stem: "Which of the following icons represent a relation node?",
+      stem: quNum() + "Which of the following icons represent a relation node?",
       answers: ["f"],
       choices: {
         a: <MenuBookIcon />,
@@ -855,13 +935,13 @@ export default {
     },
   },
   Nodes_Code_Nodes: {
-    title: "1Cademy Nodes: Code Nodes",
+    title: newSec() + "1Cademy Nodes: Code Nodes",
     description:
       "This video goes over the purpose of code nodes on 1Cademy and how to create them.",
     video: "C0r6W2gC_Wc",
     questions: {
       What_languages_can_be_specified_in_code_nodes: {
-        stem: "What languages can be specified in code nodes?",
+        stem: quNum() + "What languages can be specified in code nodes?",
         answers: ["a", "c", "d", "e"],
         choices: {
           a: "JavaScript",
@@ -873,7 +953,7 @@ export default {
       },
     },
     Which_of_the_following_icons_represent_a_code_node: {
-      stem: "Which of the following icons represent a code node?",
+      stem: quNum() + "Which of the following icons represent a code node?",
       answers: ["d"],
       choices: {
         a: <MenuBookIcon />,
@@ -886,12 +966,14 @@ export default {
     },
   },
   Nodes_Reference_Nodes: {
-    title: "1Cademy Nodes: Reference Nodes",
+    title: newSec() + "1Cademy Nodes: Reference Nodes",
     description: "This video introduces reference nodes on 1Cademy.",
     video: "R9V7Kjoznyw",
     questions: {
       What_format_of_citation_should_be_used_in_reference_nodes: {
-        stem: "What format of citation should be used in reference nodes?",
+        stem:
+          quNum() +
+          "What format of citation should be used in reference nodes?",
         answers: ["b"],
         choices: {
           a: "MLA",
@@ -901,7 +983,8 @@ export default {
         },
       },
       Which_of_the_following_icons_represent_a_reference_node: {
-        stem: "Which of the following icons represent a reference node?",
+        stem:
+          quNum() + "Which of the following icons represent a reference node?",
         answers: ["a"],
         choices: {
           a: <MenuBookIcon />,
@@ -913,7 +996,8 @@ export default {
         },
       },
       Which_of_the_following_can_a_reference_node_represent: {
-        stem: "Which of the following can a reference node represent?",
+        stem:
+          quNum() + "Which of the following can a reference node represent?",
         answers: ["a", "b", "c", "d", "f"],
         choices: {
           a: "Video (e.g YouTube)",
@@ -928,7 +1012,7 @@ export default {
     },
   },
   Nodes_Idea_Nodes: {
-    title: "1Cademy Nodes: Idea Nodes",
+    title: newSec() + "1Cademy Nodes: Idea Nodes",
     description: (
       <div>
         This video introduces "idea" nodes on 1Cademy. We can use this type of
@@ -943,7 +1027,9 @@ export default {
     video: "5dXSNS4npFk",
     questions: {
       For_what_purpose_should_we_propose_an_idea_node_on_1Cademy: {
-        stem: "For what purpose should we propose an idea node on 1Cademy?",
+        stem:
+          quNum() +
+          "For what purpose should we propose an idea node on 1Cademy?",
         answers: ["b", "c", "d"],
         choices: {
           a: "To enforce others to listen to our ideas",
@@ -953,7 +1039,7 @@ export default {
         },
       },
       Which_of_the_following_icons_represent_a_idea_node: {
-        stem: "Which of the following icons represent a idea node?",
+        stem: quNum() + "Which of the following icons represent a idea node?",
         answers: ["c"],
         choices: {
           a: <MenuBookIcon />,
@@ -967,12 +1053,14 @@ export default {
     },
   },
   Nodes_Question_Nodes: {
-    title: "1Cademy Nodes: Question Nodes",
+    title: newSec() + "1Cademy Nodes: Question Nodes",
     description: "This video introduces question nodes on 1Cademy.",
     video: "4lgJqIr1BJA",
     questions: {
       For_what_purpose_should_we_propose_a_question_node_on_1Cademy: {
-        stem: "For what purpose should we propose a question node on 1Cademy?",
+        stem:
+          quNum() +
+          "For what purpose should we propose a question node on 1Cademy?",
         answers: ["c", "d"],
         choices: {
           a: "To ask others' help to solve our problems",
@@ -982,7 +1070,8 @@ export default {
         },
       },
       Which_of_the_following_icons_represent_a_question_node: {
-        stem: "Which of the following icons represent a question node?",
+        stem:
+          quNum() + "Which of the following icons represent a question node?",
         answers: ["e"],
         choices: {
           a: <MenuBookIcon />,
@@ -996,7 +1085,7 @@ export default {
     },
   },
   Proposal_System_Getting_Started_as_a_User: {
-    title: "1Cademy Proposal System: Getting Started as a User",
+    title: newSec() + "1Cademy Proposal System: Getting Started as a User",
     description: (
       <div>
         Before going into the specifics of the proposal system, here is a brief
@@ -1013,7 +1102,8 @@ export default {
     video: "jhFAmGAr2fU",
     questions: {
       What_should_your_first_step_be_as_a_new_user_on_1Cademy: {
-        stem: "What should your first step be as a new user on 1Cademy?",
+        stem:
+          quNum() + "What should your first step be as a new user on 1Cademy?",
         answers: ["a"],
         choices: {
           a: "Changing your default tag to reflect your community membership",
@@ -1023,7 +1113,9 @@ export default {
       },
       Which_of_these_steps_are_needed_to_link_a_concept_node_to_a_reference_node:
         {
-          stem: "Which of these steps are needed to link a concept node to a reference node?",
+          stem:
+            quNum() +
+            "Which of these steps are needed to link a concept node to a reference node?",
           answers: ["a", "b", "c", "d"],
           choices: {
             a: "Create a reference node or find an existing one.",
@@ -1035,7 +1127,9 @@ export default {
         },
       How_can_one_figure_out_whether_a_node_they_want_to_propose_already_exists_on_the_map:
         {
-          stem: "How can one figure out whether a node they want to propose already exists on the map? (Hint: part of the answer is in the section where we explained the search engine.)",
+          stem:
+            quNum() +
+            "How can one figure out whether a node they want to propose already exists on the map? (Hint: part of the answer is in the section where we explained the search engine.)",
           answers: ["a", "e"],
           choices: {
             a: "By navigating through the prerequisite nodes and their children to find the immediate prerequisite, and then seeing if the proposed information is already there.",
@@ -1048,30 +1142,32 @@ export default {
     },
   },
   Proposal_System_Prerequisite_Linking_on_1Cademy: {
-    title: "1Cademy Proposal System: Prerequisite Linking on 1Cademy",
+    title:
+      newSec() + "1Cademy Proposal System: Prerequisite Linking on 1Cademy",
     description:
       "This video defines prerequisite linking and how it is used on 1Cademy",
     video: "76MSksNQYN0",
     questions: {
       What_do_you_think_the_phrase_prerequisite_relation_means: {
-        stem: 'What do you think the phrase "prerequisite relation" means?',
+        stem:
+          quNum() + 'What do you think the phrase "prerequisite link" means?',
         answers: ["b", "e"],
         choices: {
           a: "A relation of parallel concepts in different disciplines",
           b: "A relation between knowledge and what it helps to learn next",
           c: "An example from a source related to a certain topic",
           d: "A relation of two similar principles",
-          e: "A relation between concepts A and B if you need to learn A to be able to learn B",
+          e: "A relation between concepts A and B only if you need to learn A to be able to learn B",
         },
       },
       The_following_boxes_are_two_nodes_on_1Cademy_each_of_them_defining_a_concept:
         {
           stem: (
             <div>
-              The following boxes are two nodes on 1Cademy, each of them
-              defining a concept: "1Cademy" or "1Cademy's Goal." Which of these
-              is the correct order of prerequisite linking? (Hint: try reading
-              the content in the nodes if you are confused.)
+              {quNum()}The following boxes are two nodes on 1Cademy, each of
+              them defining a concept: "1Cademy" or "1Cademy's Goal." Which of
+              these is the correct order of prerequisite linking? (Hint: try
+              reading the content in the nodes if you are confused.)
               <img
                 src="/static/tutorial/TwoPrerequisiteNodes.jpg"
                 width="100%"
@@ -1085,7 +1181,9 @@ export default {
           },
         },
       You_want_to_teach_a_friend_about_how_to_use_exponents: {
-        stem: "You want to teach a friend about how to use exponents. How would you organize the prerequisite links for them? (Assume each node already has a definition.)",
+        stem:
+          quNum() +
+          "You want to teach a friend about how to use exponents. How would you organize the prerequisite links for them? (Assume each node already has a definition.)",
         answers: ["b"],
         choices: {
           a: "[ Summation ] ⇨  [ Exponents ] ⇨ [ Multiplication ]",
@@ -1098,8 +1196,8 @@ export default {
         stem: (
           <div>
             <div>
-              What is the correct prerequisite linking of these three nodes?
-              (Hint: try reading the node contents if you are confused.)
+              {quNum()}What is the correct prerequisite linking of these three
+              nodes? (Hint: try reading the node contents if you are confused.)
             </div>
             <img
               src="/static/tutorial/ThreePrerequisiteNodes.jpg"
@@ -1119,13 +1217,15 @@ export default {
     },
   },
   Proposal_System_Finding_the_Immediate_Prerequisite: {
-    title: "1Cademy Proposal System: Finding the Immediate Prerequisite",
+    title:
+      newSec() + "1Cademy Proposal System: Finding the Immediate Prerequisite",
     description:
       "This video goes over how to find the immediate prerequisite information when you want to add nodes to the 1Cademy map.",
     video: "2idtxBKxS08",
     questions: {
       When_can_a_node_be_defined_as_a_parent_node_on_1Cademy: {
-        stem: "When can a node be defined as a parent node on 1Cademy?",
+        stem:
+          quNum() + "When can a node be defined as a parent node on 1Cademy?",
         answers: ["a"],
         choices: {
           a: "When it contains direct (immediate) prerequisite information to the information you would like to add",
@@ -1134,26 +1234,29 @@ export default {
         },
       },
       What_is_an_ancestor_node: {
-        stem: "What is an ancestor node?",
+        stem: quNum() + "An ancestor node ...",
         answers: ["b"],
         choices: {
-          a: "When it contains direct (immediate) prerequisite information to the information you would like to add",
-          b: "When it contains direct or indirect information a user needs to know to understand the information you would like to add",
-          c: "When it contains unrelated information",
-          d: "A parent node is also considered an ancestor node",
+          a: "Contains direct (immediate) prerequisite information to the information you would like to add",
+          b: "Contains direct or indirect information a user needs to know to understand the information you would like to add",
+          c: "Contains unrelated information",
+          d: "Can be a parent node",
         },
       },
     },
   },
   Proposal_System_Demonstration_of_Finding_the_Immediate_Prerequisite: {
     title:
+      newSec() +
       "1Cademy Proposal System: Demonstration of Finding the Immediate Prerequisite",
     description:
       "This video goes over the process a user might go through while trying to find an immediate prerequisite node.",
     video: "fc6varqBW4s",
     questions: {
       What_is_the_first_step_in_finding_a_parent_node_on_1Cademy: {
-        stem: "What is the first step in finding a parent node on 1Cademy?",
+        stem:
+          quNum() +
+          "What is the first step in finding a parent node on 1Cademy?",
         answers: ["a"],
         choices: {
           a: "Using the search tool",
@@ -1164,13 +1267,15 @@ export default {
     },
   },
   Proposal_System_Proposals_on_1Cademy: {
-    title: "1Cademy Proposal System: Proposals on 1Cademy",
+    title: newSec() + "1Cademy Proposal System: Proposals on 1Cademy",
     description:
       "Now that you are well versed in prerequisite and immediate prerequisite linking, it is time to learn about proposals on 1Cademy.",
     video: "9dKL7ojJvro",
     questions: {
       For_what_purposes_should_we_submit_a_proposal_on_1Cademy: {
-        stem: "For what purpose(s) should we submit a proposal on 1Cademy?",
+        stem:
+          quNum() +
+          "For what purpose(s) should we submit a proposal on 1Cademy?",
         answers: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
         choices: {
           a: "Creating a node",
@@ -1188,13 +1293,16 @@ export default {
     },
   },
   Proposal_System_Proposing_a_Child_Node_on_1Cademy: {
-    title: "1Cademy Proposal System: Proposing a Child Node on 1Cademy",
+    title:
+      newSec() + "1Cademy Proposal System: Proposing a Child Node on 1Cademy",
     description:
       "This video gives an overview of the steps to proposing a child node on 1Cademy.",
     video: "bhMvCqXbvbg",
     questions: {
       How_many_steps_are_there_to_proposing_a_child_node_on_1Cademy: {
-        stem: "How many steps are there to proposing a child node on 1Cademy?",
+        stem:
+          quNum() +
+          "How many steps are there to proposing a child node on 1Cademy?",
         answers: ["b"],
         choices: {
           a: "6",
@@ -1206,13 +1314,13 @@ export default {
     },
   },
   Proposal_System_Proposing_an_edit_on_1Cademy: {
-    title: "1Cademy Proposal System: Proposing an edit on 1Cademy",
+    title: newSec() + "1Cademy Proposal System: Proposing an edit on 1Cademy",
     description:
       "This video goes over how to propose an edit to a node on 1Cademy.",
     video: "rb0-ZvYTavE",
     questions: {
       What_can_users_edit_in_a_node: {
-        stem: "What can users edit in a node?",
+        stem: quNum() + "What can users edit in a node?",
         answers: ["a", "b", "c", "d", "e", "f", "h"],
         choices: {
           a: "Node title",
@@ -1228,7 +1336,9 @@ export default {
     },
   },
   Proposal_System_What_Happens_to_Proposals_on_1Cademy: {
-    title: "1Cademy Proposal System: What Happens to Proposals on 1Cademy",
+    title:
+      newSec() +
+      "1Cademy Proposal System: What Happens to Proposals on 1Cademy",
     description: (
       <div>
         <p>
@@ -1246,7 +1356,9 @@ export default {
     video: "4JKsI0zIEzU",
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
-        stem: "Can a node be downvoted directly off the pending proposals list?",
+        stem:
+          quNum() +
+          "Can a node be downvoted directly off the pending proposals list?",
         answers: ["b"],
         choices: {
           a: "Yes",
@@ -1255,7 +1367,9 @@ export default {
       },
       You_are_making_a_proposal_on_a_node_with_____________downvotes_and_____________upvotes:
         {
-          stem: "You are making a proposal on a node with ___________ downvotes and ___________ upvotes. How many of each should there be so your proposal is accepted right away?",
+          stem:
+            quNum() +
+            "If you make a proposal on a node with ___________ and ___________, your proposal is accepted right away.",
           answers: ["a", "c", "d"],
           choices: {
             a: "0 downvotes; 2 upvotes",
@@ -1267,7 +1381,9 @@ export default {
         },
       Which_of_the_following_combinations_of_upvotes_and_downvotes_will_result_in_2_net_votes:
         {
-          stem: "Which of the following combinations of upvotes and downvotes will result in 2 net votes?",
+          stem:
+            quNum() +
+            "Which of the following combinations of upvotes and downvotes will result in 2 net votes?",
           answers: ["b"],
           choices: {
             a: "3 downvotes; 6 upvotes",
@@ -1278,8 +1394,8 @@ export default {
       What_steps_are_needed_to_evaluate_a_proposed_edit_to_a_node: {
         stem: (
           <div>
-            Which choice shows the correct order of steps needed to evaluate a
-            proposed edit to a node?
+            {quNum()}Which choice shows the correct order of steps needed to
+            evaluate a proposed edit to a node?
             <ol>
               <li>Select the pending proposal you would like to evaluate.</li>
               <li>
@@ -1314,7 +1430,8 @@ export default {
         },
       },
       What_happens_to_a_node_with_more_downvotes_than_upvotes: {
-        stem: "What happens to a node with more downvotes than upvotes?",
+        stem:
+          quNum() + "What happens to a node with more downvotes than upvotes?",
         answers: ["a"],
         choices: {
           a: "It gets deleted from the whole knowledge graph.",
@@ -1326,7 +1443,7 @@ export default {
     },
   },
   Proposal_System_Summarizing_a_Paper_on_1Cademy: {
-    title: "1Cademy Proposal System: Summarizing a Paper on 1Cademy",
+    title: newSec() + "1Cademy Proposal System: Summarizing a Paper on 1Cademy",
     description: (
       <div>
         <p>
@@ -1356,7 +1473,9 @@ export default {
     questions: {
       When_summarizing_a_research_paper_should_you_propose_nodes_about_each_section_in_the_paper:
         {
-          stem: "When summarizing a research paper, should you propose nodes about each section in the paper?",
+          stem:
+            quNum() +
+            "When summarizing a research paper, should you propose nodes about each section in the paper?",
           answers: ["b"],
           choices: {
             a: "Yes",
@@ -1364,7 +1483,8 @@ export default {
           },
         },
       Is_it_okay_to_duplicate_content_on_the_knowledge_graph: {
-        stem: "Is it okay to duplicate content on the knowledge graph?",
+        stem:
+          quNum() + "Is it okay to duplicate content on the knowledge graph?",
         answers: ["b"],
         choices: {
           a: "Yes",
@@ -1373,15 +1493,19 @@ export default {
       },
       Is_it_okay_to_use_direct_quotes_when_summarizing_a_paper_on_1Cademy_s_knowledge_graph:
         {
-          stem: "Is it okay to use direct quotes when summarizing a paper on 1Cademy's knowledge graph?",
+          stem:
+            quNum() +
+            "Is it okay to block quote when summarizing a paper on 1Cademy?",
           answers: ["b"],
           choices: {
-            a: "Yes",
-            b: "No",
+            a: "Yes.",
+            b: "No. We should paraphrase it.",
           },
         },
       What_should_you_do_if_you_re_not_sure: {
-        stem: "What should you do if you're not sure whether a source is reputable to cite on 1Cademy?",
+        stem:
+          quNum() +
+          "What should you do if you're not sure whether a source is reputable to cite on 1Cademy?",
         answers: ["c", "d", "e"],
         choices: {
           a: "Ask other people on the Internet.",

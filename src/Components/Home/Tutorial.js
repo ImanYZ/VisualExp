@@ -15,6 +15,7 @@ import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import CheckIcon from "@mui/icons-material/Check";
@@ -29,19 +30,6 @@ import Typography from "./modules/components/Typography";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import instructs from "./tutorialIntroductionQuestions";
-import { instructorsState } from "../../store/ProjectAtoms";
-
-const options = {
-  speed: 3,
-};
-
-const style = {
-  left: "25%",
-  bottom: 0,
-  width: "49%",
-  height: "49%",
-  position: "fixed",
-};
 
 const Tutorial = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -107,6 +95,18 @@ const Tutorial = (props) => {
             error: false,
             helperText: " ",
           };
+          if (
+            "explanantion" in oAttempts[instr].questions[ques] &&
+            oAttempts[instr].questions[ques].explanantion
+          ) {
+            quest.explanantion = oAttempts[instr].questions[ques].explanantion;
+            if (
+              "explaId" in oAttempts[instr].questions[ques] &&
+              oAttempts[instr].questions[ques].explaId
+            ) {
+              quest.explaId = oAttempts[instr].questions[ques].explaId;
+            }
+          }
           if (oAttempts[instr].questions[ques].answers.length > 0) {
             let wrong = false;
             for (let choice in quest.choices) {
@@ -176,7 +176,20 @@ const Tutorial = (props) => {
     setQuestions(quests);
   };
 
-  const handleSubmit = (instrId, question) => async (event) => {
+  const openExplanation = (instrId, qIdx) => (event) => {
+    const quests = { ...questions };
+    quests[instrId][qIdx].explanationOpen =
+      !quests[instrId][qIdx].explanationOpen;
+    setQuestions(quests);
+  };
+
+  const changeExplanation = (instrId, qIdx) => (event) => {
+    const quests = { ...questions };
+    quests[instrId][qIdx].explanation = event.target.value;
+    setQuestions(quests);
+  };
+
+  const handleSubmit = (instrId, qIdx) => async (event) => {
     event.preventDefault();
 
     if (expanded === false) {
@@ -184,12 +197,20 @@ const Tutorial = (props) => {
     }
     const oAttempts = { ...attempts };
     const quests = { ...questions };
+    const question = quests[instrId][qIdx];
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
     let wrong = false;
     oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
       new Date()
     );
+    if ("explanation" in question && question.explanation) {
+      oAttempts[instrId].questions[question.id].explanation =
+        question.explanation;
+      if ("explaId" in question && question.explaId) {
+        oAttempts[instrId].questions[question.id].explaId = question.explaId;
+      }
+    }
     for (let choice in question.checks) {
       if (
         question.checks[choice] &&
@@ -213,21 +234,20 @@ const Tutorial = (props) => {
       }
     }
     let allCorrect = true;
-    const qIdx = quests[instrId].findIndex((ques) => ques.id === question.id);
     if (wrong) {
       oAttempts[instrId].questions[question.id].wrongs += 1;
       oAttempts[instrId].wrongs += 1;
       allCorrect = false;
       wAttempts += 1;
-      quests[instrId][qIdx].helperText =
+      question.helperText =
         "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
-      quests[instrId][qIdx].error = true;
+      question.error = true;
     } else {
       oAttempts[instrId].questions[question.id].corrects += 1;
       oAttempts[instrId].corrects += 1;
       cAttempts += 1;
-      quests[instrId][qIdx].helperText = "You got it!";
-      quests[instrId][qIdx].error = false;
+      question.helperText = "You got it!";
+      question.error = false;
     }
     if (allCorrect) {
       for (let ques of quests[instrId]) {
@@ -267,6 +287,38 @@ const Tutorial = (props) => {
     if (fullname) {
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
       const tutorialDoc = await tutorialRef.get();
+      if ("explanation" in question && question.explanation) {
+        let explaRef = firebase.db.collection("explanations").doc();
+        let explaDoc;
+        if ("explaId" in question && question.explaId) {
+          explaRef = firebase.db
+            .collection("explanations")
+            .doc(question.explaId);
+          explaDoc = await explaRef.get();
+        } else {
+          oAttempts[instrId].questions[question.id].explaId = explaRef.id;
+          question.explaId = explaRef.id;
+          tutorialData.attempts[instrId].questions[question.id].explaId =
+            explaRef.id;
+        }
+        const explaData = {
+          fullname,
+          instrId,
+          qIdx,
+          explanation: question.explanation,
+        };
+        if (explaDoc && explaDoc.exists) {
+          await explaRef.update({
+            ...explaData,
+            updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        } else {
+          await explaRef.set({
+            ...explaData,
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        }
+      }
       if (tutorialDoc.exists) {
         await tutorialRef.update(tutorialData);
       } else {
@@ -362,10 +414,7 @@ const Tutorial = (props) => {
             </Box>
             <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
               The community leaders will decide about your application based on{" "}
-              <strong>
-                your total correct and wrong attempts. The fewer attempts, the
-                better.
-              </strong>
+              <strong>your total WRONG attempts.</strong>
             </Box>
           </Box>
         </div>
@@ -387,10 +436,7 @@ const Tutorial = (props) => {
                   ? "🔒 "
                   : idx === completed + 1 && idx !== instructions.length - 1
                   ? "🔓 "
-                  : "✅ ") +
-                  (idx + 1) +
-                  ". " +
-                  instr.title}
+                  : "✅ ") + instr.title}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -423,7 +469,7 @@ const Tutorial = (props) => {
                           return (
                             <form
                               key={qIdx}
-                              onSubmit={handleSubmit(instr.id, question)}
+                              onSubmit={handleSubmit(instr.id, qIdx)}
                             >
                               <FormControl
                                 error={question.error}
@@ -472,23 +518,64 @@ const Tutorial = (props) => {
                                   </span>
                                 </FormHelperText>
                               </FormControl>
-                              <Button
-                                sx={{
-                                  display: "block",
-                                  margin: "-10px 0px 25px 0px",
-                                  color: "white",
-                                }}
-                                type="submit"
-                                color="success"
-                                variant="contained"
-                                disabled={
-                                  Object.values(question.checks).findIndex(
-                                    (chec) => chec
-                                  ) === -1
-                                }
-                              >
-                                Submit Answer
-                              </Button>
+                              <Box>
+                                <Button
+                                  sx={{
+                                    float: "left",
+                                    margin: "-10px 0px 25px 0px",
+                                    color: "common.white",
+                                  }}
+                                  type="submit"
+                                  color="success"
+                                  variant="contained"
+                                  disabled={
+                                    Object.values(question.checks).findIndex(
+                                      (chec) => chec
+                                    ) === -1 ||
+                                    question.helperText === "You got it!"
+                                  }
+                                >
+                                  Submit Answer
+                                </Button>
+                                <Button
+                                  onClick={openExplanation(instr.id, qIdx)}
+                                  sx={{
+                                    float: "right",
+                                    margin: "-10px 10px 25px 0px",
+                                    color: "common.white",
+                                  }}
+                                  color="warning"
+                                  variant="contained"
+                                >
+                                  Report Difficulty with Question
+                                </Button>
+                              </Box>
+                              {question.explanationOpen && (
+                                <>
+                                  <TextareaAutosize
+                                    style={{ width: "100%" }}
+                                    aria-label="Explanantion text box"
+                                    minRows={7}
+                                    placeholder={
+                                      "If you're experiencing difficulties with this question, please explain why."
+                                    }
+                                    onChange={changeExplanation(instr.id, qIdx)}
+                                    value={question.explanation}
+                                  />
+                                  <Button
+                                    sx={{
+                                      display: "block",
+                                      margin: "10px 0px 25px 0px",
+                                      color: "common.white",
+                                    }}
+                                    type="submit"
+                                    color="success"
+                                    variant="contained"
+                                  >
+                                    Submit Explanation
+                                  </Button>
+                                </>
+                              )}
                             </form>
                           );
                         })}
@@ -524,7 +611,20 @@ const Tutorial = (props) => {
             </AccordionDetails>
           </Accordion>
         ))}
-        {fireworks && <Fireworks options={options} style={style} />}
+        {fireworks && (
+          <Fireworks
+            options={{
+              speed: 3,
+            }}
+            style={{
+              left: "25%",
+              bottom: 0,
+              width: "49%",
+              height: "49%",
+              position: "fixed",
+            }}
+          />
+        )}
       </PagesNavbar>
       <Paper
         sx={{
@@ -536,22 +636,8 @@ const Tutorial = (props) => {
           textAlign: "center",
         }}
       >
-        <Box>
-          <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
-            {correctAttempts} Correct
-          </Box>
-          &amp;
-          <Box
-            sx={{
-              display: "inline",
-              color: "red",
-              ml: "7px",
-              mr: "7px",
-            }}
-          >
-            {wrongAttempts} Wrong
-          </Box>
-          total attemps!
+        <Box sx={{ mt: "4px", fontWeight: "bold", fontStyle: "italic" }}>
+          The fewer wrong attempts, the better.
         </Box>
         {expanded !== false &&
           expanded < instructions.length - 1 &&
@@ -573,6 +659,7 @@ const Tutorial = (props) => {
                 sx={{
                   display: "inline",
                   color: "red",
+                  fontWeight: 700,
                   ml: "7px",
                   mr: "7px",
                 }}
@@ -584,6 +671,24 @@ const Tutorial = (props) => {
               in this section!
             </Box>
           )}
+        <Box>
+          <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
+            {correctAttempts} Correct
+          </Box>
+          &amp;
+          <Box
+            sx={{
+              display: "inline",
+              color: "red",
+              fontWeight: 700,
+              ml: "7px",
+              mr: "7px",
+            }}
+          >
+            {wrongAttempts} Wrong
+          </Box>
+          total attemps!
+        </Box>
       </Paper>
     </>
   );
