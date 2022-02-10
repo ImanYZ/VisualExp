@@ -34,7 +34,7 @@ exports.schedule = async (req, res) => {
           end = new Date(start.getTime() + 30 * 60000);
         }
         const summary =
-          "UX Research Experiment - " + orderredSession + " Session";
+          "[1Cademy] UX Research Experiment - " + orderredSession + " Session";
         const description =
           "This is your " +
           orderredSession +

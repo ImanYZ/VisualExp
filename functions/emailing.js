@@ -320,7 +320,7 @@ exports.rescheduleEventNotificationEmail = async (req, res) => {
         } else if (hoursLeft === 1) {
           hoursLeft = "an hour";
         } else {
-          hoursLeft = hoursLeft + "  hours";
+          hoursLeft = hoursLeft + " hours";
         }
       }
       const mailOptions = {

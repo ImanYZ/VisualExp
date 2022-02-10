@@ -79,7 +79,7 @@ function Index() {
 
   const joinUsClick = (event) => {
     event.preventDefault();
-    switchSection(5)(event);
+    switchSection(sectionsOrder.length - 2)(event);
   };
 
   return (
@@ -94,6 +94,7 @@ function Index() {
     >
       <AppAppBar
         section={section}
+        joinNowSec={section === sectionsOrder.length - 2}
         switchSection={switchSection}
         homeClick={homeClick}
         joinUsClick={joinUsClick}

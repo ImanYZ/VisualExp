@@ -191,7 +191,7 @@ const Communities = (props) => {
   };
 
   return (
-    <PagesNavbar>
+    <PagesNavbar communities={true}>
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Communities
       </Typography>
