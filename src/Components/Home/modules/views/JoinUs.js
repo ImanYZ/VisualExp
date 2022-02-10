@@ -18,6 +18,7 @@ import {
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
+import UploadButton from "../components/UploadButton";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
@@ -197,73 +198,69 @@ const JoinUs = (props) => {
           </StepLabel>
           <StepContent>
             {props.community ? (
-              // <Stepper
-              //   activeStep={activeInnerStep}
-              //   orientation="vertical"
-              //   sx={{
-              //     mt: "19px",
-              //     "& .MuiStepIcon-root": {
-              //       color: "warning.dark",
-              //     },
-              //     "& .MuiStepIcon-root.Mui-active": {
-              //       color: "secondary.main",
-              //     },
-              //     "& .MuiStepIcon-root.Mui-completed": {
-              //       color: "success.main",
-              //     },
-              //     "& .MuiButton-root": {
-              //       backgroundColor: "secondary.main",
-              //     },
-              //     "& .MuiButton-root:hover": {
-              //       backgroundColor: "secondary.dark",
-              //     },
-              //     "& .MuiButton-root.Mui-disabled": {
-              //       backgroundColor: "secondary.light",
-              //     },
-              //   }}
-              // >
-              //   <Step>
-              //     <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
-              //     <StepContent>
-              //       <Box>
-              //         <label htmlFor="ResumeFile">
-              //           <input
-              //             accept="application/pdf"
-              //             id="ResumeFile"
-              //             multiple
-              //             type="file"
-              //             style={{ display: "none" }}
-              //           />
-              //           <Button variant="contained" component="span">
-              //             CV/Résumé
-              //           </Button>
-              //         </label>
-              //       </Box>
-              //     </StepContent>
-              //   </Step>
-              //   <Step>
-              //     <StepLabel>
-              //       Upload your most recent unofficial transcript in PDF format.
-              //     </StepLabel>
-              //     <StepContent>
-              //       <Box>
-              //         <label htmlFor="TranscriptFile">
-              //           <input
-              //             accept="application/pdf"
-              //             id="TranscriptFile"
-              //             multiple
-              //             type="file"
-              //             style={{ display: "none" }}
-              //           />
-              //           <Button variant="contained" component="span">
-              //             Unofficial Transcript
-              //           </Button>
-              //         </label>
-              //       </Box>
-              //     </StepContent>
-              //   </Step>
-              // </Stepper>
-              <></>
+              <Stepper
+                activeStep={activeInnerStep}
+                orientation="vertical"
+                sx={{
+                  mt: "19px",
+                  "& .MuiStepIcon-root": {
+                    color: "warning.dark",
+                  },
+                  "& .MuiStepIcon-root.Mui-active": {
+                    color: "secondary.main",
+                  },
+                  "& .MuiStepIcon-root.Mui-completed": {
+                    color: "success.main",
+                  },
+                  "& .MuiButton-root": {
+                    backgroundColor: "secondary.main",
+                  },
+                  "& .MuiButton-root:hover": {
+                    backgroundColor: "secondary.dark",
+                  },
+                  "& .MuiButton-root.Mui-disabled": {
+                    backgroundColor: "secondary.light",
+                  },
+                }}
+              >
+                <Step>
+                  <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
+                  <StepContent>
+                    <Box>
+                      <UploadButton
+                        name="Resume"
+                        mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
+                        typeErrorMessage="We only accept a file with PDF format. Please upload another file."
+                        sizeErrorMessage="We only accept file sizes less than 10MB. Please upload another file."
+                        maxSize={10}
+                        storageBucket="visualexp-a7d2c"
+                        storageFolder="Resumes/"
+                      />
+                    </Box>
+                  </StepContent>
+                </Step>
+                <Step>
+                  <StepLabel>
+                    Upload your most recent unofficial transcript in PDF format.
+                  </StepLabel>
+                  <StepContent>
+                    <Box>
+                      <label htmlFor="TranscriptFile">
+                        <input
+                          accept="application/pdf"
+                          id="TranscriptFile"
+                          multiple
+                          type="file"
+                          style={{ display: "none" }}
+                        />
+                        <Button variant="contained" component="span">
+                          Unofficial Transcript
+                        </Button>
+                      </label>
+                    </Box>
+                  </StepContent>
+                </Step>
+              </Stepper>
             ) : (
               <>
                 <Typography>
