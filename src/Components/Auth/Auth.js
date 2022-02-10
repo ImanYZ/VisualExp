@@ -303,6 +303,7 @@ const Auth = (props) => {
         // User is signed out
         console.log("Signing out!");
         setFullname("");
+        setEmail("");
         setPhase(0);
         setStep(0);
         setPassage("");

@@ -6,15 +6,10 @@ import axios from "axios";
 import LoadingButton from "@mui/lab/LoadingButton";
 import UploadIcon from "@mui/icons-material/Upload";
 
-import {
-  firebaseState,
-  //   uidState,
-  fullnameState,
-} from "../../../../store/AuthAtoms";
+import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 
 const UploadButton = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  //   const uid = useRecoilValue(uidState);
   const fullname = useRecoilValue(fullnameState);
 
   const [isUploading, setIsUploading] = useState(false);
@@ -38,7 +33,7 @@ const UploadButton = (props) => {
             props.storageBucket +
             ".appspot.com/";
           const filesFolder = props.storageFolder;
-          const fileNameSplit = file.name.split(".");
+          const fileNameSplit = fil.name.split(".");
           const fileExtension = fileNameSplit[fileNameSplit.length - 1];
           let fileName =
             fullname + "/" + new Date().toGMTString() + "." + fileExtension;
@@ -61,46 +56,44 @@ const UploadButton = (props) => {
               );
             },
             async function complete() {
-              const imageGeneratedUrl =
-                await task.snapshot.ref.getDownloadURL();
-              let responseObj = {};
-              const postData = {
-                imageUrl: imageGeneratedUrl,
-              };
-              const userAuthObj = firebase.auth.currentUser;
-              await userAuthObj.updateProfile({
-                photoURL: imageGeneratedUrl,
-              });
-              await firebase.idToken();
-              responseObj = await axios.post("/user/image", postData);
-              setImageUrlError(false);
+              const generatedUrl = await task.snapshot.ref.getDownloadURL();
+              const applRef = firebase.db
+                .collection("explanations")
+                .doc(prps.communiId + fullname);
+              const applDoc = await applRef.get();
+              if (applDoc.exists) {
+                await applRef.update({
+                  [props.name]: generatedUrl,
+                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                });
+              } else {
+                await applRef.set({
+                  fullname,
+                  communiId: props.communiId,
+                  [props.name]: generatedUrl,
+                  createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                });
+              }
+              setUploadError(false);
               setIsUploading(false);
-              setImageUrl(imageGeneratedUrl);
-              setPercentageUploaded(100);
+              setFileUrl(generatedUrl);
+              setPercentUploaded(100);
             }
           );
         }
       } catch (err) {
-        console.error("Image Upload Error: ", err);
+        console.error("Upload Error: ", err);
         setIsUploading(false);
-        setImageUrlError("Upload your profile picture!");
+        setUploadError("Upload your " + props.name + "!");
       }
     },
-    [firebase, uid]
-  );
-
-  const handleEditImage = useCallback(
-    (event) => {
-      if (!isUploading) {
-        inputEl.current.click();
-      }
-    },
-    [isUploading, inputEl]
+    [firebase, fullname]
   );
 
   return (
     <label htmlFor={props.name + "File"}>
       <input
+        onChange={handleFileChange}
         accept={props.mimeTypes.join(", ")}
         id={props.name + "File"}
         type="file"
