@@ -40,13 +40,7 @@ const WhoWeAre = (props) => {
       <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
         Who Is Behind 1Cademy?
       </Typography>
-      <Grid
-        container
-        spacing={2.5}
-        align="center"
-        justify="center"
-        alignItems="center"
-      >
+      <Grid container spacing={2.5} align="center">
         <Grid item xs={12} sm={6} md={4}>
           <Paper>
             <Typography

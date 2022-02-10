@@ -8,13 +8,13 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 import {
   firebaseState,
-  uidState,
+  //   uidState,
   fullnameState,
 } from "../../../../store/AuthAtoms";
 
 const UploadButton = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  const uid = useRecoilValue(uidState);
+  //   const uid = useRecoilValue(uidState);
   const fullname = useRecoilValue(fullnameState);
 
   const [isUploading, setIsUploading] = useState(false);

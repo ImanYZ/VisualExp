@@ -18,7 +18,7 @@ import {
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
-import UploadButton from "../components/UploadButton";
+// import UploadButton from "../components/UploadButton";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
@@ -227,7 +227,7 @@ const JoinUs = (props) => {
                   <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
                   <StepContent>
                     <Box>
-                      <UploadButton
+                      {/* <UploadButton
                         name="Resume"
                         mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
                         typeErrorMessage="We only accept a file with PDF format. Please upload another file."
@@ -235,7 +235,7 @@ const JoinUs = (props) => {
                         maxSize={10}
                         storageBucket="visualexp-a7d2c"
                         storageFolder="Resumes/"
-                      />
+                      /> */}
                     </Box>
                   </StepContent>
                 </Step>

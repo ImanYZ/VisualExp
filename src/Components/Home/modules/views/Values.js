@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
@@ -59,26 +60,29 @@ const Values = (props) => {
       <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
         {sectionsOrder[sectionIdx].title}
       </Typography>
-      <Grid
-        container
-        spacing={2.5}
-        align="center"
-        justify="center"
-        alignItems="center"
-      >
+      <Grid container spacing={2.5} align="center">
         {valuesItems.map((value, idx) => {
           return (
             <Grid key={value.name} item xs={12} sm={6} md={4} lg={3}>
               <Card sx={{ maxWidth: 340 }}>
                 <CardActionArea onClick={flipCard(idx)}>
-                  <CardMedia
-                    component="img"
-                    height="100%"
-                    width="100%"
-                    image={"/static/" + value.image}
-                    alt={value.name}
-                    sx={{ padding: "10px 37px 0px 37px" }}
-                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justify: "center",
+                      alignItems: "center",
+                      height: "199px",
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      // height="100%"
+                      width="100%"
+                      image={"/static/" + value.image}
+                      alt={value.name}
+                      sx={{ padding: "10px 37px 0px 37px" }}
+                    />
+                  </Box>
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                       {value.name}

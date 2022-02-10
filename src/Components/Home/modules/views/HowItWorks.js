@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
-import Collapse from "@mui/material/Collapse";
+// import Collapse from "@mui/material/Collapse";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
-import { CardActionArea } from "@mui/material";
+// import { CardActionArea } from "@mui/material";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -66,19 +66,19 @@ const howElements = [
   },
 ];
 
-const iniStepChecked = [];
-for (let value of howElements) {
-  iniStepChecked.push(false);
-}
+// const iniStepChecked = [];
+// for (let value of howElements) {
+//   iniStepChecked.push(false);
+// }
 
 const HowItWorks = (props) => {
-  const [stepChecked, setStepChecked] = useState(iniStepChecked);
+  // const [stepChecked, setStepChecked] = useState(iniStepChecked);
 
-  const flipCard = (idx) => (event) => {
-    const sChecked = [...stepChecked];
-    sChecked[idx] = !sChecked[idx];
-    setStepChecked(sChecked);
-  };
+  // const flipCard = (idx) => (event) => {
+  //   const sChecked = [...stepChecked];
+  //   sChecked[idx] = !sChecked[idx];
+  //   setStepChecked(sChecked);
+  // };
 
   // const [stepChecked, setStepChecked] = useState([false, false, false, false]);
 
@@ -127,20 +127,22 @@ const HowItWorks = (props) => {
         {sectionsOrder[sectionIdx].title}
       </Typography>
       <Box sx={{ zIndex: 1, mx: "auto" }}>
-        <Grid
-          container
-          spacing={2.5}
-          align="center"
-          justify="center"
-          alignItems="center"
-        >
+        <Grid container spacing={2.5} align="center">
           {howElements.map((elem, idx) => {
             return (
               <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
                 <Card sx={{ ...item, maxWidth: 355 }}>
-                  <CardActionArea onClick={flipCard(idx)}>
-                    <Box sx={number}>{idx + 1}.</Box>
-                    {/* <Box sx={{ width: "100%", height: "190px" }}> */}
+                  {/* <CardActionArea onClick={flipCard(idx)}> */}
+                  <Box sx={number}>{idx + 1}.</Box>
+                  <Box
+                    alignItems="center"
+                    sx={{
+                      display: "flex",
+                      justify: "center",
+                      alignItems: "center",
+                      height: "190px",
+                    }}
+                  >
                     <CardMedia
                       component="img"
                       src={"/static/" + elem.id + ".svg"}
@@ -149,25 +151,25 @@ const HowItWorks = (props) => {
                       width="100%"
                       sx={{ px: "10px" }}
                     />
-                    {/* </Box> */}
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {elem.title}
-                      </Typography>
-                      <Collapse in={!stepChecked[idx]} timeout={1000}>
+                  </Box>
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {elem.title}
+                    </Typography>
+                    {/* <Collapse in={!stepChecked[idx]} timeout={1000}>
                         Learn more ...
                       </Collapse>
-                      <Collapse in={stepChecked[idx]} timeout={1000}>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ textAlign: "left" }}
-                        >
-                          {elem.content}
-                        </Typography>
-                      </Collapse>
-                    </CardContent>
-                  </CardActionArea>
+                      <Collapse in={stepChecked[idx]} timeout={1000}> */}
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ textAlign: "left" }}
+                    >
+                      {elem.content}
+                    </Typography>
+                    {/* </Collapse> */}
+                  </CardContent>
+                  {/* </CardActionArea> */}
                 </Card>
               </Grid>
             );
