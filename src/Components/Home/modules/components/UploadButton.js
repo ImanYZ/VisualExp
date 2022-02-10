@@ -15,42 +15,35 @@ import {
 const UploadButton = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const uid = useRecoilValue(uidState);
-  const [fileUrl, setFileUrl] = useRecoilState(fileUrlState);
+  const fullname = useRecoilValue(fullnameState);
 
   const [isUploading, setIsUploading] = useState(false);
   const [percentUploaded, setPercentUploaded] = useState(0);
   const [uploadError, setUploadError] = useState(false);
+  const [fileUrl, setFileUrl] = useState("");
 
-  const handleImageChange = useCallback(
+  const handleFileChange = useCallback(
     (event) => {
       try {
         event.preventDefault();
-        const image = event.target.files[0];
-        if (
-          image.type !== "image/jpg" &&
-          image.type !== "image/jpeg" &&
-          image.type !== "image/png"
-        ) {
-          setImageUrlError(
-            "We only accept JPG, JPEG, or PNG images. Please upload another image."
-          );
-        } else if (image.size > 1024 * 1024) {
-          setImageUrlError(
-            "We only accept file sizes less than 1MB for profile images. Please upload another image."
-          );
+        const fil = event.target.files[0];
+        if (!props.mimeTypes.includes(fil.type)) {
+          setUploadError(props.typeErrorMessage);
+        } else if (fil.size > props.maxSize * 1024 * 1024) {
+          setUploadError(props.sizeErrorMessage);
         } else {
           setIsUploading(true);
           const rootURL =
-            "https://storage.googleapis.com/onecademy-1.appspot.com/";
-          const picturesFolder = "ProfilePictures/";
-          const imageNameSplit = image.name.split(".");
-          const imageExtension = imageNameSplit[imageNameSplit.length - 1];
-          let imageFileName =
-            uid + "/" + new Date().toGMTString() + "." + imageExtension;
-          const storageRef = firebase.storage.ref(
-            picturesFolder + imageFileName
-          );
-          const task = storageRef.put(image);
+            "https://storage.googleapis.com/" +
+            props.storageBucket +
+            ".appspot.com/";
+          const filesFolder = props.storageFolder;
+          const fileNameSplit = file.name.split(".");
+          const fileExtension = fileNameSplit[fileNameSplit.length - 1];
+          let fileName =
+            fullname + "/" + new Date().toGMTString() + "." + fileExtension;
+          const storageRef = firebase.storage.ref(filesFolder + fileName);
+          const task = storageRef.put(fil);
           task.on(
             "state_changed",
             function progress(snapshot) {
@@ -61,10 +54,10 @@ const UploadButton = (props) => {
               );
             },
             function error(err) {
-              console.error("Image Upload Error: ", err);
+              console.error("Upload Error: ", err);
               setIsUploading(false);
-              setImageUrlError(
-                "There is an error with uploading your picture. Please upload your profile picture again! If the problem persists, please try another picture."
+              setUploadError(
+                "There is an error with uploading your file. Please upload it again! If the problem persists, please try another file."
               );
             },
             async function complete() {
@@ -106,15 +99,23 @@ const UploadButton = (props) => {
   );
 
   return (
-    <LoadingButton
-      loading={isUploading}
-      loadingIndicator={percentUploaded + "%"}
-      loadingPosition="start"
-      startIcon={<UploadIcon />}
-      variant="outlined"
-    >
-      {"Upload " + props.name}
-    </LoadingButton>
+    <label htmlFor={props.name + "File"}>
+      <input
+        accept={props.mimeTypes.join(", ")}
+        id={props.name + "File"}
+        type="file"
+        style={{ display: "none" }}
+      />
+      <LoadingButton
+        loading={isUploading}
+        loadingIndicator={percentUploaded + "%"}
+        loadingPosition="start"
+        startIcon={<UploadIcon />}
+        variant="outlined"
+      >
+        {"Upload " + props.name}
+      </LoadingButton>
+    </label>
   );
 };
 
