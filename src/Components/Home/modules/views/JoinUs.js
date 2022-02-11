@@ -9,6 +9,7 @@ import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 import {
@@ -37,6 +38,7 @@ const JoinUs = (props) => {
   const [activeInnerStep, setActiveInnerStep] = useState(0);
   const [resumeUrl, setResumeUrl] = useState("");
   const [transcriptUrl, setTranscriptUrl] = useState("");
+  const [explanation, setExplanation] = useState("");
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -64,12 +66,43 @@ const JoinUs = (props) => {
           setTranscriptUrl(applData["Transcript"]);
           setActiveInnerStep(2);
         }
+        if ("explanation" in applData && applData.explanation) {
+          setExplanation(applData["explanation"]);
+          setActiveInnerStep(3);
+        }
       }
     };
     if (firebase && fullname) {
       loadExistingFiles();
     }
   }, [firebase, fullname]);
+
+  const changeExplanation = (event) => {
+    setExplanation(event.target.value);
+  };
+
+  const submitExplanation = async (event) => {
+    if (explanation) {
+      const applRef = firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.community.id);
+      const applDoc = await applRef.get();
+      if (applDoc.exists) {
+        await applRef.update({
+          explanation,
+          updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      } else {
+        await applRef.set({
+          fullname,
+          communiId: props.communiId,
+          explanation,
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      }
+      setActiveInnerStep(3);
+    }
+  };
 
   const changeInnerStep = (newStep) => (event) => {
     setActiveInnerStep(newStep);
@@ -274,6 +307,7 @@ const JoinUs = (props) => {
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Resumes/"
                       fileUrl={resumeUrl}
+                      setFileUrl={setResumeUrl}
                     />
                   </StepContent>
                 </Step>
@@ -288,14 +322,50 @@ const JoinUs = (props) => {
                     <UploadButton
                       name="Transcript"
                       communiId={props.community.id}
-                      mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
+                      mimeTypes={["application/pdf"]}
                       typeErrorMessage="We only accept a file with PDF format. Please upload another file."
                       sizeErrorMessage="We only accept file sizes less than 10MB. Please upload another file."
                       maxSize={10}
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Transcripts/"
                       fileUrl={transcriptUrl}
+                      setFileUrl={setTranscriptUrl}
                     />
+                  </StepContent>
+                </Step>
+                <Step>
+                  <StepLabel
+                    onClick={changeInnerStep(2)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Explain why you are applying to join the{" "}
+                    {props.community.title} community.
+                  </StepLabel>
+                  <StepContent>
+                    <TextareaAutosize
+                      style={{ width: "100%" }}
+                      aria-label="explanation text box"
+                      minRows={7}
+                      placeholder={
+                        "Type one or a few paragraph(s) explaining why you are applying to join the " +
+                        props.community.title +
+                        " community."
+                      }
+                      onChange={changeExplanation}
+                      value={explanation}
+                    />
+                    <Button
+                      sx={{
+                        display: "block",
+                        margin: "10px 0px 25px 0px",
+                        color: "common.white",
+                      }}
+                      onClick={submitExplanation}
+                      color="success"
+                      variant="contained"
+                    >
+                      Submit Explanation
+                    </Button>
                   </StepContent>
                 </Step>
               </Stepper>

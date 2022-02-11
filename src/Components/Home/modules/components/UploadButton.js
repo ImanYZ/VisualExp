@@ -16,7 +16,6 @@ const UploadButton = (props) => {
   const [isUploading, setIsUploading] = useState(false);
   const [percentUploaded, setPercentUploaded] = useState(0);
   const [uploadError, setUploadError] = useState(false);
-  const [fileUrl, setFileUrl] = useState(props.fileUrl);
 
   const handleFileChange = (event) => {
     try {
@@ -74,7 +73,7 @@ const UploadButton = (props) => {
             }
             setUploadError(false);
             setIsUploading(false);
-            setFileUrl(generatedUrl);
+            props.setFileUrl(generatedUrl);
             setPercentUploaded(100);
           }
         );
@@ -86,6 +85,7 @@ const UploadButton = (props) => {
     }
   };
 
+  console.log({ fileUrl: props.fileUrl });
   return (
     <>
       <label htmlFor={props.name + "File"}>
@@ -111,7 +111,7 @@ const UploadButton = (props) => {
         </LoadingButton>
       </label>
       {uploadError && <Alert severity="warning">{uploadError}</Alert>}
-      {fileUrl && (
+      {props.fileUrl && (
         <Paper
           sx={{
             margin: "19px 0px 0px 0px",
@@ -120,7 +120,7 @@ const UploadButton = (props) => {
             overflow: "auto",
           }}
         >
-          <iframe src={fileUrl} width="100%" height="100%"></iframe>
+          <iframe src={props.fileUrl} width="100%" height="100%"></iframe>
         </Paper>
       )}
     </>
