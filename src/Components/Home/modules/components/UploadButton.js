@@ -85,7 +85,6 @@ const UploadButton = (props) => {
     }
   };
 
-  console.log({ fileUrl: props.fileUrl });
   return (
     <>
       <label htmlFor={props.name + "File"}>
@@ -117,7 +116,6 @@ const UploadButton = (props) => {
             margin: "19px 0px 0px 0px",
             padding: "10px",
             height: "220px",
-            overflow: "auto",
           }}
         >
           <iframe src={props.fileUrl} width="100%" height="100%"></iframe>
