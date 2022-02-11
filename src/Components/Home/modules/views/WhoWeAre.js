@@ -51,7 +51,7 @@ const WhoWeAre = (props) => {
               Accepted Research Papers
             </Typography>
             <List sx={{ width: "100%" }}>
-              <ListItemButton>
+              <ListItem>
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
@@ -72,8 +72,8 @@ const WhoWeAre = (props) => {
                     </Typography>
                   }
                 />
-              </ListItemButton>
-              <ListItemButton>
+              </ListItem>
+              <ListItem>
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
@@ -94,8 +94,8 @@ const WhoWeAre = (props) => {
                     </Typography>
                   }
                 />
-              </ListItemButton>
-              <ListItemButton>
+              </ListItem>
+              <ListItem>
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
@@ -116,7 +116,7 @@ const WhoWeAre = (props) => {
                     </Typography>
                   }
                 />
-              </ListItemButton>
+              </ListItem>
             </List>
           </Paper>
         </Grid>
@@ -133,7 +133,7 @@ const WhoWeAre = (props) => {
               <ListItemButton
                 component="a"
                 target="_blank"
-                href="https://dl-acm-org.proxy.lib.umich.edu/doi/10.1145/3446871.3469760"
+                href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760"
               >
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
@@ -160,7 +160,7 @@ const WhoWeAre = (props) => {
               <ListItemButton
                 component="a"
                 target="_blank"
-                href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3313831.3376882"
+                href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882"
               >
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
@@ -186,7 +186,7 @@ const WhoWeAre = (props) => {
               <ListItemButton
                 component="a"
                 target="_blank"
-                href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3291279.3339411"
+                href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411"
               >
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
@@ -212,7 +212,7 @@ const WhoWeAre = (props) => {
               <ListItemButton
                 component="a"
                 target="_blank"
-                href="https://dl-acm-org.proxy.lib.umich.edu/doi/abs/10.1145/3287324.3287417"
+                href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417"
               >
                 <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>

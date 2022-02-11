@@ -72,10 +72,10 @@ const JoinUs = (props) => {
         }
       }
     };
-    if (firebase && fullname) {
+    if (firebase && fullname && props.community) {
       loadExistingFiles();
     }
-  }, [firebase, fullname]);
+  }, [firebase, fullname, props.community]);
 
   const changeExplanation = (event) => {
     setExplanation(event.target.value);

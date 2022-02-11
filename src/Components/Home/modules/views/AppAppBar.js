@@ -152,7 +152,12 @@ const AppAppBar = (props) => {
       onClose={handleProfileMenuClose}
     >
       {fullname && email && (
-        <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>
+        <MenuItem
+          disabled
+          sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}
+        >
+          {fullname}
+        </MenuItem>
       )}
       {fullname && email && (
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
