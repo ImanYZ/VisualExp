@@ -18,7 +18,7 @@ import {
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
-// import UploadButton from "../components/UploadButton";
+import UploadButton from "../components/UploadButton";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
@@ -226,17 +226,16 @@ const JoinUs = (props) => {
                 <Step>
                   <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
                   <StepContent>
-                    <Box>
-                      {/* <UploadButton
-                        name="Resume"
-                        mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
-                        typeErrorMessage="We only accept a file with PDF format. Please upload another file."
-                        sizeErrorMessage="We only accept file sizes less than 10MB. Please upload another file."
-                        maxSize={10}
-                        storageBucket="visualexp-a7d2c"
-                        storageFolder="Resumes/"
-                      /> */}
-                    </Box>
+                    <UploadButton
+                      name="Resume"
+                      communiId={props.community.id}
+                      mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
+                      typeErrorMessage="We only accept a file with PDF format. Please upload another file."
+                      sizeErrorMessage="We only accept file sizes less than 10MB. Please upload another file."
+                      maxSize={10}
+                      storageBucket="visualexp-a7d2c"
+                      storageFolder="Resumes/"
+                    />
                   </StepContent>
                 </Step>
                 <Step>
@@ -244,20 +243,16 @@ const JoinUs = (props) => {
                     Upload your most recent unofficial transcript in PDF format.
                   </StepLabel>
                   <StepContent>
-                    <Box>
-                      <label htmlFor="TranscriptFile">
-                        <input
-                          accept="application/pdf"
-                          id="TranscriptFile"
-                          multiple
-                          type="file"
-                          style={{ display: "none" }}
-                        />
-                        <Button variant="contained" component="span">
-                          Unofficial Transcript
-                        </Button>
-                      </label>
-                    </Box>
+                    <UploadButton
+                      name="Transcript"
+                      communiId={props.community.id}
+                      mimeTypes={["application/pdf"]} // Alternatively "image/png, image/gif, image/jpeg"
+                      typeErrorMessage="We only accept a file with PDF format. Please upload another file."
+                      sizeErrorMessage="We only accept file sizes less than 10MB. Please upload another file."
+                      maxSize={10}
+                      storageBucket="visualexp-a7d2c"
+                      storageFolder="Transcripts/"
+                    />
                   </StepContent>
                 </Step>
               </Stepper>
