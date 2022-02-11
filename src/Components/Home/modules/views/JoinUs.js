@@ -10,6 +10,7 @@ import StepContent from "@mui/material/StepContent";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 
+import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
@@ -26,12 +27,16 @@ const sectionIdx = sectionsOrder.findIndex(
 );
 
 const JoinUs = (props) => {
+  const firebase = useRecoilValue(firebaseState);
+  const fullname = useRecoilValue(fullnameState);
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
   const tutorialEnded = useRecoilValue(tutorialEndedState);
 
   const [activeStep, setActiveStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
+  const [resumeUrl, setResumeUrl] = useState("");
+  const [transcriptUrl, setTranscriptUrl] = useState("");
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -44,22 +49,31 @@ const JoinUs = (props) => {
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
   useEffect(() => {
-    const loadExistingFile = async () => {
+    const loadExistingFiles = async () => {
       const applDoc = await firebase.db
         .collection("applications")
-        .doc(fullname + "_" + props.communiId)
+        .doc(fullname + "_" + props.community.id)
         .get();
       if (applDoc.exists) {
         const applData = applDoc.data();
-        if (props.name in applData) {
-          setFileUrl(applData[props.name]);
+        if ("Resume" in applData) {
+          setResumeUrl(applData["Resume"]);
+          setActiveInnerStep(1);
+        }
+        if ("Transcript" in applData) {
+          setTranscriptUrl(applData["Transcript"]);
+          setActiveInnerStep(2);
         }
       }
     };
     if (firebase && fullname) {
-      loadExistingFile();
+      loadExistingFiles();
     }
   }, [firebase, fullname]);
+
+  const changeInnerStep = (newStep) => (event) => {
+    setActiveInnerStep(newStep);
+  };
 
   return (
     <Container
@@ -131,7 +145,8 @@ const JoinUs = (props) => {
       >
         <Step>
           <StepLabel>
-            Create an account and Schedule for our knowledge representation test
+            Create an account and Schedule for our knowledge representation
+            test.
           </StepLabel>
           <StepContent>
             <Typography>
@@ -170,7 +185,7 @@ const JoinUs = (props) => {
           </StepContent>
         </Step>
         <Step>
-          <StepLabel>Complete our knowledge representation test</StepLabel>
+          <StepLabel>Complete our knowledge representation test.</StepLabel>
           <StepContent>
             <Typography>
               Please check your Google Calendar. You're invited to three UX
@@ -184,7 +199,7 @@ const JoinUs = (props) => {
           </StepContent>
         </Step>
         <Step>
-          <StepLabel>Complete the 1Cademy tutorial test</StepLabel>
+          <StepLabel>Complete the 1Cademy tutorial test.</StepLabel>
           <StepContent>
             <Typography>
               Please go through the 1Cademy tutorial, carefully watch the short
@@ -212,7 +227,7 @@ const JoinUs = (props) => {
           <StepLabel
             optional={<Typography variant="caption">Last step</Typography>}
           >
-            Complete the community-specific application requirements
+            Complete the community-specific application requirements.
           </StepLabel>
           <StepContent>
             {props.community ? (
@@ -242,7 +257,12 @@ const JoinUs = (props) => {
                 }}
               >
                 <Step>
-                  <StepLabel>Upload your CV/Résumé in PDF format.</StepLabel>
+                  <StepLabel
+                    onClick={changeInnerStep(0)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Upload your CV/Résumé in PDF format.
+                  </StepLabel>
                   <StepContent>
                     <UploadButton
                       name="Resume"
@@ -253,11 +273,15 @@ const JoinUs = (props) => {
                       maxSize={10}
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Resumes/"
+                      fileUrl={resumeUrl}
                     />
                   </StepContent>
                 </Step>
                 <Step>
-                  <StepLabel>
+                  <StepLabel
+                    onClick={changeInnerStep(1)}
+                    style={{ cursor: "pointer" }}
+                  >
                     Upload your most recent unofficial transcript in PDF format.
                   </StepLabel>
                   <StepContent>
@@ -270,6 +294,7 @@ const JoinUs = (props) => {
                       maxSize={10}
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Transcripts/"
+                      fileUrl={transcriptUrl}
                     />
                   </StepContent>
                 </Step>

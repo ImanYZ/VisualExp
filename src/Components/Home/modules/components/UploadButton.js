@@ -7,8 +7,6 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 import UploadIcon from "@mui/icons-material/Upload";
 
-import PDFViewer from "./PDFViewer";
-
 import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 
 const UploadButton = (props) => {
@@ -122,7 +120,7 @@ const UploadButton = (props) => {
             overflow: "auto",
           }}
         >
-          <PDFViewer pdf={fileUrl} />
+          <iframe src={fileUrl} width="100%" height="100%"></iframe>
         </Paper>
       )}
     </>
