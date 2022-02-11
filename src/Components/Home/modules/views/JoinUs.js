@@ -43,6 +43,24 @@ const JoinUs = (props) => {
     }
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
+  useEffect(() => {
+    const loadExistingFile = async () => {
+      const applDoc = await firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.communiId)
+        .get();
+      if (applDoc.exists) {
+        const applData = applDoc.data();
+        if (props.name in applData) {
+          setFileUrl(applData[props.name]);
+        }
+      }
+    };
+    if (firebase && fullname) {
+      loadExistingFile();
+    }
+  }, [firebase, fullname]);
+
   return (
     <Container
       id="JoinUsSection"

@@ -1,6 +1,7 @@
 import fbApp from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 import axios from "axios";
 
@@ -25,6 +26,8 @@ class Firebase {
     this.currentUser = this.auth.currentUser;
     this.db = app.firestore();
     this.firestore = app.firestore;
+    this.storage = app.storage();
+    this.storageBucket = firebaseConfig.storageBucket;
     this.batch = this.db.batch();
     this.writeCounts = 0;
   }

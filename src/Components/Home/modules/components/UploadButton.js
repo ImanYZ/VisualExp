@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useRecoilValue } from "recoil";
 
 import Paper from "@mui/material/Paper";
@@ -18,7 +18,7 @@ const UploadButton = (props) => {
   const [isUploading, setIsUploading] = useState(false);
   const [percentUploaded, setPercentUploaded] = useState(0);
   const [uploadError, setUploadError] = useState(false);
-  const [fileUrl, setFileUrl] = useState("");
+  const [fileUrl, setFileUrl] = useState(props.fileUrl);
 
   const handleFileChange = (event) => {
     try {
@@ -58,8 +58,8 @@ const UploadButton = (props) => {
           async function complete() {
             const generatedUrl = await task.snapshot.ref.getDownloadURL();
             const applRef = firebase.db
-              .collection("explanations")
-              .doc(props.communiId + fullname);
+              .collection("applications")
+              .doc(fullname + "_" + props.communiId);
             const applDoc = await applRef.get();
             if (applDoc.exists) {
               await applRef.update({
@@ -100,22 +100,28 @@ const UploadButton = (props) => {
         />
         <LoadingButton
           loading={isUploading}
-          loadingIndicator={percentUploaded + "%"}
           loadingPosition="start"
           startIcon={<UploadIcon />}
           variant="outlined"
           component="span"
           style={{
-            color: "white",
+            color: isUploading ? "gray" : "white",
             border: "none",
           }}
         >
-          {"Upload " + props.name}
+          {(isUploading ? percentUploaded + "% " : "") + "Upload " + props.name}
         </LoadingButton>
       </label>
       {uploadError && <Alert severity="warning">{uploadError}</Alert>}
       {fileUrl && (
-        <Paper sx={{ height: "100%", maxHeight: "250px", overflow: "auto" }}>
+        <Paper
+          sx={{
+            margin: "19px 0px 0px 0px",
+            padding: "10px",
+            height: "220px",
+            overflow: "auto",
+          }}
+        >
           <PDFViewer pdf={fileUrl} />
         </Paper>
       )}
