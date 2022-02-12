@@ -54,26 +54,9 @@ const UploadButton = (props) => {
           },
           async function complete() {
             const generatedUrl = await task.snapshot.ref.getDownloadURL();
-            const applRef = firebase.db
-              .collection("applications")
-              .doc(fullname + "_" + props.communiId);
-            const applDoc = await applRef.get();
-            if (applDoc.exists) {
-              await applRef.update({
-                [props.name]: generatedUrl,
-                updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
-              });
-            } else {
-              await applRef.set({
-                fullname,
-                communiId: props.communiId,
-                [props.name]: generatedUrl,
-                createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-              });
-            }
+            props.setFileUrl(props.name, generatedUrl);
             setUploadError(false);
             setIsUploading(false);
-            props.setFileUrl(generatedUrl);
             setPercentUploaded(100);
           }
         );

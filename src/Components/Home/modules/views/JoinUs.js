@@ -42,6 +42,7 @@ const JoinUs = (props) => {
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
 
   const [activeStep, setActiveStep] = useState(0);
+  const [checkedInnerStep, setCheckedInnerStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
   const [explanation, setExplanation] = useState("");
 
@@ -56,15 +57,17 @@ const JoinUs = (props) => {
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
   useEffect(() => {
-    if (resumeUrl) {
-      setActiveInnerStep(1);
-    } else if (transcriptUrl) {
+    if (transcriptUrl) {
+      setCheckedInnerStep(2);
       setActiveInnerStep(2);
+    } else if (resumeUrl) {
+      setCheckedInnerStep(1);
+      setActiveInnerStep(1);
     }
   }, [resumeUrl, transcriptUrl]);
 
   useEffect(() => {
-    const loadExistingFiles = async () => {
+    const loadExistingApplication = async () => {
       const applDoc = await firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id)
@@ -73,12 +76,13 @@ const JoinUs = (props) => {
         const applData = applDoc.data();
         if ("explanation" in applData && applData.explanation) {
           setExplanation(applData["explanation"]);
+          setCheckedInnerStep(3);
           setActiveInnerStep(3);
         }
       }
     };
     if (firebase && fullname && props.community) {
-      loadExistingFiles();
+      loadExistingApplication();
     }
   }, [firebase, fullname, props.community]);
 
@@ -105,12 +109,33 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
+      setCheckedInnerStep(3);
       setActiveInnerStep(3);
     }
   };
 
+  const setFileUrl = (setUrl) => async (name, generatedUrl) => {
+    if (fullname) {
+      const userRef = firebase.db.collection("users").doc(fullname);
+      const userDoc = await userRef.get();
+      if (userDoc.exists) {
+        await userRef.update({
+          [name]: generatedUrl,
+          updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      }
+      setUrl(generatedUrl);
+      if (activeInnerStep === checkedInnerStep) {
+        setCheckedInnerStep(activeInnerStep + 1);
+        setActiveInnerStep(activeInnerStep + 1);
+      }
+    }
+  };
+
   const changeInnerStep = (newStep) => (event) => {
-    setActiveInnerStep(newStep);
+    if (newStep <= checkedInnerStep) {
+      setActiveInnerStep(newStep);
+    }
   };
 
   return (
@@ -297,7 +322,17 @@ const JoinUs = (props) => {
                 <Step>
                   <StepLabel
                     onClick={changeInnerStep(0)}
-                    style={{ cursor: "pointer" }}
+                    sx={
+                      0 <= checkedInnerStep
+                        ? {
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor:
+                                "rgba(100, 100, 100, 0.1) !important",
+                            },
+                          }
+                        : {}
+                    }
                   >
                     Upload your CV/Résumé in PDF format.
                   </StepLabel>
@@ -312,14 +347,24 @@ const JoinUs = (props) => {
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Resumes/"
                       fileUrl={resumeUrl}
-                      setFileUrl={setResumeUrl}
+                      setFileUrl={setFileUrl(setResumeUrl)}
                     />
                   </StepContent>
                 </Step>
                 <Step>
                   <StepLabel
                     onClick={changeInnerStep(1)}
-                    style={{ cursor: "pointer" }}
+                    sx={
+                      1 <= checkedInnerStep
+                        ? {
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor:
+                                "rgba(100, 100, 100, 0.1) !important",
+                            },
+                          }
+                        : {}
+                    }
                   >
                     Upload your most recent unofficial transcript in PDF format.
                   </StepLabel>
@@ -334,14 +379,24 @@ const JoinUs = (props) => {
                       storageBucket="visualexp-a7d2c"
                       storageFolder="Transcripts/"
                       fileUrl={transcriptUrl}
-                      setFileUrl={setTranscriptUrl}
+                      setFileUrl={setFileUrl(setTranscriptUrl)}
                     />
                   </StepContent>
                 </Step>
                 <Step>
                   <StepLabel
                     onClick={changeInnerStep(2)}
-                    style={{ cursor: "pointer" }}
+                    sx={
+                      2 <= checkedInnerStep
+                        ? {
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor:
+                                "rgba(100, 100, 100, 0.1) !important",
+                            },
+                          }
+                        : {}
+                    }
                   >
                     Explain why you are applying to join the{" "}
                     {props.community.title} community.
