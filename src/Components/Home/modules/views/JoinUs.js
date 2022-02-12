@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -11,7 +11,12 @@ import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 
-import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
+import {
+  firebaseState,
+  fullnameState,
+  resumeUrlState,
+  transcriptUrlState,
+} from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
@@ -33,11 +38,11 @@ const JoinUs = (props) => {
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
   const tutorialEnded = useRecoilValue(tutorialEndedState);
+  const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
+  const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
 
   const [activeStep, setActiveStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
-  const [resumeUrl, setResumeUrl] = useState("");
-  const [transcriptUrl, setTranscriptUrl] = useState("");
   const [explanation, setExplanation] = useState("");
 
   useEffect(() => {
@@ -51,6 +56,14 @@ const JoinUs = (props) => {
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
   useEffect(() => {
+    if (resumeUrl) {
+      setActiveInnerStep(1);
+    } else if (transcriptUrl) {
+      setActiveInnerStep(2);
+    }
+  }, [resumeUrl, transcriptUrl]);
+
+  useEffect(() => {
     const loadExistingFiles = async () => {
       const applDoc = await firebase.db
         .collection("applications")
@@ -58,14 +71,6 @@ const JoinUs = (props) => {
         .get();
       if (applDoc.exists) {
         const applData = applDoc.data();
-        if ("Resume" in applData) {
-          setResumeUrl(applData["Resume"]);
-          setActiveInnerStep(1);
-        }
-        if ("Transcript" in applData) {
-          setTranscriptUrl(applData["Transcript"]);
-          setActiveInnerStep(2);
-        }
         if ("explanation" in applData && applData.explanation) {
           setExplanation(applData["explanation"]);
           setActiveInnerStep(3);

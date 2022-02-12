@@ -21,6 +21,8 @@ import {
   firebaseState,
   emailState,
   fullnameState,
+  resumeUrlState,
+  transcriptUrlState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
@@ -59,6 +61,8 @@ const AppAppBar = (props) => {
   const setHasScheduled = useSetRecoilState(hasScheduledState);
   const setCompletedExperiment = useSetRecoilState(completedExperimentState);
   const setTutorialEnded = useSetRecoilState(tutorialEndedState);
+  const setResumeUrl = useSetRecoilState(resumeUrlState);
+  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -83,6 +87,12 @@ const AppAppBar = (props) => {
           setFullname(getFullname(userData.firstname, userData.lastname));
           if (userData.tutorialEnded) {
             setTutorialEnded(true);
+          }
+          if ("Resume" in userData) {
+            setResumeUrl(userData["Resume"]);
+          }
+          if ("Transcript" in userData) {
+            setTranscriptUrl(userData["Transcript"]);
           }
           const scheduleDocs = await firebase.db
             .collection("schedule")

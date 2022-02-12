@@ -17,6 +17,16 @@ export const fullnameState = atom({
   default: "",
 });
 
+export const resumeUrlState = atom({
+  key: "resumeUrlState",
+  default: "",
+});
+
+export const transcriptUrlState = atom({
+  key: "transcriptUrlState",
+  default: "",
+});
+
 export const isAdminState = atom({
   key: "isAdminState",
   default: false,
