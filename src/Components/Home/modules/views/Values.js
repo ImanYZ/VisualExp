@@ -71,7 +71,7 @@ const Values = (props) => {
                       display: "flex",
                       justify: "center",
                       alignItems: "center",
-                      height: "199px",
+                      height: "250px",
                     }}
                   >
                     <CardMedia

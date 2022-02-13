@@ -620,7 +620,7 @@ const RouterNav = (props) => {
         },
       });
     };
-    if (!notAResearcher && oneCademyPoints) {
+    if (!notAResearcher) {
       setProposalsVotes();
     }
   }, [

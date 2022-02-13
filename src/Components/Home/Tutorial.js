@@ -443,7 +443,14 @@ const Tutorial = (props) => {
               {expanded === idx && (
                 <Grid container spacing={1}>
                   <Grid item xs={12} md={8}>
-                    <Paper sx={{ padding: "10px", mb: "19px" }}>
+                    <Paper
+                      sx={{
+                        padding: "10px",
+                        mb: "19px",
+                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
+                        overflowY: { sx: "hidden", md: "auto" },
+                      }}
+                    >
                       <Typography
                         variant="body2"
                         component="div"
@@ -457,7 +464,14 @@ const Tutorial = (props) => {
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
-                    <Paper sx={{ padding: "10px", mb: "19px" }}>
+                    <Paper
+                      sx={{
+                        padding: "10px",
+                        mb: "19px",
+                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
+                        overflowY: { sx: "hidden", md: "auto" },
+                      }}
+                    >
                       {idx === instructions.length - 1 && (
                         <Box sx={{ mb: "10px", fontWeight: 700 }}>
                           You had a total of {correctAttempts + wrongAttempts}{" "}
