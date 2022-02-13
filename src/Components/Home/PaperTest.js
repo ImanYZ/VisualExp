@@ -23,7 +23,6 @@ import CheckIcon from "@mui/icons-material/Check";
 import { Fireworks } from "fireworks-js/dist/react";
 
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
-import { tutorialEndedState } from "../../store/ExperimentAtoms";
 
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
@@ -33,12 +32,12 @@ import allCommunities from "./modules/views/communitiesOrder";
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const setTestEnded = useSetRecoilState(testEndedState);
 
   const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
   const [completed, setCompleted] = useState(-1);
   const [fireworks, setFireworks] = useState(false);
+  const [testEnded, setTestEnded] = useState(false);
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
@@ -47,10 +46,12 @@ const PaperTest = (props) => {
     const loadAttempts = async () => {
       let oAttempts = {};
       const quests = {};
-      const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
-      const tutorialDoc = await tutorialRef.get();
+      const applDoc = await firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.community.id)
+        .get();
       let tutorialData;
-      if (tutorialDoc.exists) {
+      if (applDoc.exists) {
         tutorialData = tutorialDoc.data();
         setCorrectAttempts(tutorialData.corrects);
         setWrongAttempts(tutorialData.wrongs);
