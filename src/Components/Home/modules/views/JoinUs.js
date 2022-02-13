@@ -49,6 +49,9 @@ const JoinUs = (props) => {
   const [activeInnerStep, setActiveInnerStep] = useState(0);
   const [explanation, setExplanation] = useState("");
   const [courseraUrl, setCourseraUrl] = useState("");
+  const [courseraUrlError, setCourseraUrlError] = useState(false);
+  const [portfolioUrl, setPortfolioUrl] = useState("");
+  const [portfolioUrlError, setPortfolioUrlError] = useState(false);
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -109,10 +112,33 @@ const JoinUs = (props) => {
               }
             });
           }
+          if ("portfolioUrl" in applData && applData.portfolioUrl) {
+            setPortfolioUrl(applData["portfolioUrl"]);
+            setCheckedInnerStep(4);
+            setActiveInnerStep(4);
+          } else {
+            setPortfolioUrl("");
+            if ("explanation" in applData && applData.explanation) {
+              setCheckedInnerStep(3);
+              setActiveInnerStep(3);
+            } else {
+              setCheckedInnerStep((oldValue) => {
+                if (oldValue === 3) {
+                  return 2;
+                }
+              });
+              setActiveInnerStep((oldValue) => {
+                if (oldValue === 3) {
+                  return 2;
+                }
+              });
+            }
+          }
         }
       } else {
         setExplanation("");
         setCourseraUrl("");
+        setPortfolioUrl("");
         setCheckedInnerStep((oldValue) => {
           if (oldValue === 3 || oldValue === 2) {
             return 2;
@@ -136,6 +162,23 @@ const JoinUs = (props) => {
 
   const changeCourseraUrl = (event) => {
     setCourseraUrl(event.target.value);
+    if (
+      !isValidHttpUrl(event.target.value) ||
+      !event.target.value.startsWith("https://coursera.org/share/")
+    ) {
+      setCourseraUrlError(true);
+    } else {
+      setCourseraUrlError(false);
+    }
+  };
+
+  const changePortfolioUrl = (event) => {
+    setPortfolioUrl(event.target.value);
+    if (!isValidHttpUrl(event.target.value)) {
+      setPortfolioUrlError(true);
+    } else {
+      setPortfolioUrlError(false);
+    }
   };
 
   const submitExplanation = async (event) => {
@@ -152,7 +195,7 @@ const JoinUs = (props) => {
       } else {
         await applRef.set({
           fullname,
-          communiId: props.communiId,
+          communiId: props.community.id,
           explanation,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
@@ -171,7 +214,7 @@ const JoinUs = (props) => {
   };
 
   const submitCourseraUrl = async (event) => {
-    if (CourseraUrl) {
+    if (courseraUrl) {
       const applRef = firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id);
@@ -184,8 +227,40 @@ const JoinUs = (props) => {
       } else {
         await applRef.set({
           fullname,
-          communiId: props.communiId,
+          communiId: props.community.id,
           courseraUrl,
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      }
+      setCheckedInnerStep((oldValue) => {
+        if (oldValue === 3) {
+          return 4;
+        }
+      });
+      setActiveInnerStep((oldValue) => {
+        if (oldValue === 3) {
+          return 4;
+        }
+      });
+    }
+  };
+
+  const submitPortfolioUrl = async (event) => {
+    if (portfolioUrl) {
+      const applRef = firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.community.id);
+      const applDoc = await applRef.get();
+      if (applDoc.exists) {
+        await applRef.update({
+          portfolioUrl,
+          updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      } else {
+        await applRef.set({
+          fullname,
+          communiId: props.community.id,
+          portfolioUrl,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
@@ -516,7 +591,7 @@ const JoinUs = (props) => {
                     </Button>
                   </StepContent>
                 </Step>
-                {communi.coursera && (
+                {props.community.coursera && (
                   <Step>
                     <StepLabel
                       onClick={changeInnerStep(3)}
@@ -532,20 +607,64 @@ const JoinUs = (props) => {
                           : {}
                       }
                     >
-                      As a requirement to apply to this community, you should
-                      complete{" "}
-                      <a href={communi.coursera} target="_blank">
+                      Complete{" "}
+                      <a href={props.community.coursera} target="_blank">
                         this Coursera MOOC
                       </a>
-                      . Please enter the webpage address (URL) of your Coursera
-                      MOOC certificate.
+                      and enter the certificate URL.
                     </StepLabel>
                     <StepContent>
+                      <Typography>
+                        As a requirement to apply to this community, you should
+                        complete{" "}
+                        <a href={props.community.coursera} target="_blank">
+                          this Coursera MOOC
+                        </a>
+                        . Please enter the webpage address (URL) of your
+                        Coursera MOOC certificate in the textbox below. You can
+                        find this URL by following the following steps:
+                        <ol>
+                          <li>
+                            Complete{" "}
+                            <a href={props.community.coursera} target="_blank">
+                              this Coursera MOOC
+                            </a>
+                            .
+                          </li>
+                          <li>
+                            Log in to Coursera and click your name in the
+                            top-right corner.
+                          </li>
+                          <li>
+                            In the drop-down menu, click "Accomplishments."
+                          </li>
+                          <li>
+                            In "My Courses" list, click the corresponding
+                            course.
+                          </li>
+                          <li>
+                            In the page that opens, you should be able to see
+                            the image of your certificate, otherwise, you can
+                            contact Coursera customer service to give you
+                            guidance on where to find your certificate.
+                          </li>
+                          <li>Click the "Share Certificate" button.</li>
+                          <li>Click "copy."</li>
+                          <li>Paste the copied URL in the textbox below.</li>
+                          <li>Click "Submit Certificate URL."</li>
+                        </ol>
+                      </Typography>
                       <TextField
                         style={{ width: "100%" }}
+                        error={courseraUrlError}
                         aria-label="Coursera Certificate URL text box"
-                        label="Your Coursera MOOC Certificate URL"
+                        label="Paste Your Coursera MOOC Certificate URL"
                         variant="outlined"
+                        helperText={
+                          courseraUrlError
+                            ? "Invalid Coursera MOOC Certificate URL!"
+                            : undefined
+                        }
                         onChange={changeCourseraUrl}
                         value={courseraUrl}
                       />
@@ -560,6 +679,54 @@ const JoinUs = (props) => {
                         variant="contained"
                       >
                         Submit Certificate URL
+                      </Button>
+                    </StepContent>
+                  </Step>
+                )}
+                {props.community.portfolio && (
+                  <Step>
+                    <StepLabel
+                      onClick={changeInnerStep(3)}
+                      sx={
+                        3 <= checkedInnerStep
+                          ? {
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor:
+                                  "rgba(100, 100, 100, 0.1) !important",
+                              },
+                            }
+                          : {}
+                      }
+                    >
+                      Enter your online portfolio URL.
+                    </StepLabel>
+                    <StepContent>
+                      <TextField
+                        style={{ width: "100%" }}
+                        error={portfolioUrlError}
+                        aria-label="Online portfolio URL text box"
+                        label="Enter Your Online Portfolio URL"
+                        variant="outlined"
+                        helperText={
+                          portfolioUrlError
+                            ? "Invalid online portfolio URL!"
+                            : undefined
+                        }
+                        onChange={changePortfolioUrl}
+                        value={portfolioUrl}
+                      />
+                      <Button
+                        sx={{
+                          display: "block",
+                          margin: "10px 0px 25px 0px",
+                          color: "common.white",
+                        }}
+                        onClick={submitPortfolioUrl}
+                        color="success"
+                        variant="contained"
+                      >
+                        Submit Portfolio URL
                       </Button>
                     </StepContent>
                   </Step>

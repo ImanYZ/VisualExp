@@ -857,17 +857,17 @@ export default [
           },
         ],
       },
-      {
-        name: "Gail Grot",
-        image: "Gail_Grot.jpeg",
-        about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/gail-grot-264278219/",
-          },
-        ],
-      },
+      // {
+      //   name: "Gail Grot",
+      //   image: "Gail_Grot.jpeg",
+      //   about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/gail-grot-264278219/",
+      //     },
+      //   ],
+      // },
       {
         name: "Grace Victoria Ramstad",
         image: "Grace_Victoria_Ramstad.jpeg",
