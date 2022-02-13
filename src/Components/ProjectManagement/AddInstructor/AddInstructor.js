@@ -771,20 +771,20 @@ const AddInstructor = (props) => {
         .get();
       if (dayUpVotesDocs.docs.length === 0) {
         try {
+          const dayUpVoteRef = firebase.db
+            .collection("dayInstructorUpVotes")
+            .doc();
+          await dayUpVoteRef.set({
+            project,
+            voter: fullname,
+            date: today,
+          });
           await firebase.db.runTransaction(async (t) => {
             const researcherRef = firebase.db
               .collection("researchers")
               .doc(fullname);
-            const researcherDoc = await researcherRef.get();
+            const researcherDoc = await t.get(researcherRef);
             const researcherData = researcherDoc.data();
-            const dayUpVoteRef = firebase.db
-              .collection("dayInstructorUpVotes")
-              .doc();
-            await dayUpVoteRef.set({
-              project,
-              voter: fullname,
-              date: today,
-            });
             const researcherDayUpVotePoints = {
               projects: {
                 ...researcherData.projects,
@@ -808,8 +808,12 @@ const AddInstructor = (props) => {
               updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
             });
           });
-        } catch (e) {
-          console.log("Transaction failure:", e);
+        } catch (err) {
+          console.log("Transaction failure:", err);
+          window.alert(
+            "You did not get today's point for 16 upvotes on others' instructors. Copy the text of this complete message to Iman on Microsoft Teams. Do not take a screenshot. The error message is: " +
+              err
+          );
         }
       }
     }
