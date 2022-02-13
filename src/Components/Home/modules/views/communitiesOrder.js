@@ -32,6 +32,17 @@ export default [
         ],
       },
       {
+        name: "Desiree Mayrie Comer",
+        image: "Desiree_Mayrie_Comer.jpeg",
+        about: `My name is Desiree Comer and I am a recent graduate of Albion College. I graduated with a double major in psychology and sociology. I am currently taking additional courses at Mott Community College to expand my understanding of the Criminal Justice system. I hope to one day work in the field of forensic psychology. I joined the organizational/educational psychology community with hopes of expanding my knowledge of the field of psychology as well as gaining experience in different types of research. When I am not working, studying, or doing research I am reading. I am an avid reader and most of the time I have my noise in a book.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/desireecomer/",
+          },
+        ],
+      },
+      {
         name: "Asia Luboyeski",
         image: "Asia_Luboyeski.jpg",
         about: `As the writer and director of a musical revue for kindergarteners during the coronavirus pandemic, I expanded my creativity, problem-solving skills, and my patience. The successful performance and smiles on the children's faces made everything worth it.
@@ -64,7 +75,7 @@ export default [
         url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
         questions: {
           What_is_this_article_about: {
-            stem: quNum() + "WWhat is this article about?",
+            stem: quNum() + "What is this article about?",
             answers: ["a"],
             choices: {
               a: "Task Management",

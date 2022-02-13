@@ -160,8 +160,24 @@ export default {
   },
   Introduction_What_is_a_node_on_1Cademy: {
     title: newSec() + "1Cademy Introduction: What is a node on 1Cademy?",
-    description:
-      'A node represents the smallest unit of knowledge on 1Cademy. It can define a concept (i.e., "Concept" node), explain relationships between multiple concepts (i.e., "Relation" node), cite a reference (i.e., "Reference" node), ask a multiple-choice question (i.e., "Question" node), or represent a new idea (i.e., "Idea" node).',
+    description: (
+      <div>
+        <p>
+          <strong>Notes:</strong> A node represents the smallest unit of
+          knowledge on 1Cademy. It can:
+        </p>
+        <ul>
+          <li>Define a concept (i.e., "Concept" node)</li>
+          <li>
+            Explain relationships between multiple concepts (i.e., "Relation"
+            node)
+          </li>
+          <li>Cite a reference (i.e., "Reference" node)</li>
+          <li>Ask a multiple-choice question (i.e., "Question" node)</li>
+          <li>Represent a new idea (i.e., "Idea" node).</li>
+        </ul>
+      </div>
+    ),
     video: "NX2uJJ3RFsM",
     questions: {
       What_is_all_knowledge_on_1Cademy_summarized_into: {
@@ -389,8 +405,34 @@ export default {
   },
   Introduction_1Cademy_Sidebar: {
     title: newSec() + "1Cademy Introduction: 1Cademy Sidebar",
-    description:
-      "In this next section, you will be introduced to the sidebar on 1Cademy. The sidebar holds all the important functions and information users need on 1Cademy.",
+    description: (
+      <div>
+        <p>
+          In this next section, you will be introduced to the sidebar on
+          1Cademy.
+        </p>
+        <p>
+          <strong>Notes:</strong>
+        </p>
+        <ul>
+          <li>
+            The sidebar holds all the important functions and information users
+            need on 1Cademy.
+          </li>
+          <li>The sidebar includes your community's leaderboard.</li>
+          <li>
+            By clicking your user profile picture, on top of the sidebar, you
+            can open your user settings, where you can change your default
+            community tag, profile picture, and the light/dark themes.
+          </li>
+          <li>
+            If you click any other user's profile picture, in the leaderboard,
+            it'll open their user profile, where you can see their history of
+            contributions.
+          </li>
+        </ul>
+      </div>
+    ),
     video: "xEdNDQDImEM",
     questions: {
       What_tools_are_accessible_through_the_sidebar: {
@@ -404,7 +446,7 @@ export default {
           e: "Pending proposals list",
           f: "Chat room",
           g: "leaderboard",
-          h: "Sign out button",
+          h: "Tags assigned to a node",
         },
       },
       OneCademy_interface_is_in_dark_mode_by_default: {

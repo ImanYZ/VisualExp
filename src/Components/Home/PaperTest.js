@@ -27,16 +27,14 @@ import { tutorialEndedState } from "../../store/ExperimentAtoms";
 
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
-import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
-import instructs from "./tutorialIntroductionQuestions";
+import allCommunities from "./modules/views/communitiesOrder";
 
-const Tutorial = (props) => {
+const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const setTutorialEnded = useSetRecoilState(tutorialEndedState);
+  const setTestEnded = useSetRecoilState(testEndedState);
 
-  const [instructions, setInstructions] = useState([]);
   const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
   const [completed, setCompleted] = useState(-1);
@@ -44,17 +42,6 @@ const Tutorial = (props) => {
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
-
-  useEffect(() => {
-    const instrs = [];
-    for (let instId in instructs) {
-      instrs.push({
-        ...instructs[instId],
-        id: instId,
-      });
-    }
-    setInstructions(instrs);
-  }, []);
 
   useEffect(() => {
     const loadAttempts = async () => {
@@ -714,4 +701,4 @@ const Tutorial = (props) => {
   );
 };
 
-export default Tutorial;
+export default PaperTest;
