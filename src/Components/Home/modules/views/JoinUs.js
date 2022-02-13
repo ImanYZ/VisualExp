@@ -9,6 +9,7 @@ import StepLabel from "@mui/material/StepLabel";
 import StepContent from "@mui/material/StepContent";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
+import TextField from "@mui/material/TextField";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 import {
@@ -26,6 +27,8 @@ import {
 import Button from "../components/Button";
 import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
+
+import { isValidHttpUrl } from "../../../../utils/general";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
@@ -45,6 +48,7 @@ const JoinUs = (props) => {
   const [checkedInnerStep, setCheckedInnerStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
   const [explanation, setExplanation] = useState("");
+  const [courseraUrl, setCourseraUrl] = useState("");
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -53,6 +57,8 @@ const JoinUs = (props) => {
       setActiveStep(2);
     } else if (hasScheduled) {
       setActiveStep(1);
+    } else {
+      setActiveStep(0);
     }
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
@@ -63,8 +69,11 @@ const JoinUs = (props) => {
     } else if (resumeUrl) {
       setCheckedInnerStep(1);
       setActiveInnerStep(1);
+    } else {
+      setCheckedInnerStep(0);
+      setActiveInnerStep(0);
     }
-  }, [resumeUrl, transcriptUrl]);
+  }, [resumeUrl, transcriptUrl, explanation]);
 
   useEffect(() => {
     const loadExistingApplication = async () => {
@@ -76,9 +85,44 @@ const JoinUs = (props) => {
         const applData = applDoc.data();
         if ("explanation" in applData && applData.explanation) {
           setExplanation(applData["explanation"]);
-          setCheckedInnerStep(3);
-          setActiveInnerStep(3);
+        } else {
+          setExplanation("");
         }
+        if ("courseraUrl" in applData && applData.courseraUrl) {
+          setCourseraUrl(applData["courseraUrl"]);
+          setCheckedInnerStep(4);
+          setActiveInnerStep(4);
+        } else {
+          setCourseraUrl("");
+          if ("explanation" in applData && applData.explanation) {
+            setCheckedInnerStep(3);
+            setActiveInnerStep(3);
+          } else {
+            setCheckedInnerStep((oldValue) => {
+              if (oldValue === 3) {
+                return 2;
+              }
+            });
+            setActiveInnerStep((oldValue) => {
+              if (oldValue === 3) {
+                return 2;
+              }
+            });
+          }
+        }
+      } else {
+        setExplanation("");
+        setCourseraUrl("");
+        setCheckedInnerStep((oldValue) => {
+          if (oldValue === 3 || oldValue === 2) {
+            return 2;
+          }
+        });
+        setActiveInnerStep((oldValue) => {
+          if (oldValue === 3 || oldValue === 2) {
+            return 2;
+          }
+        });
       }
     };
     if (firebase && fullname && props.community) {
@@ -88,6 +132,10 @@ const JoinUs = (props) => {
 
   const changeExplanation = (event) => {
     setExplanation(event.target.value);
+  };
+
+  const changeCourseraUrl = (event) => {
+    setCourseraUrl(event.target.value);
   };
 
   const submitExplanation = async (event) => {
@@ -109,8 +157,48 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
-      setCheckedInnerStep(3);
-      setActiveInnerStep(3);
+      setCheckedInnerStep((oldValue) => {
+        if (oldValue === 2) {
+          return 3;
+        }
+      });
+      setActiveInnerStep((oldValue) => {
+        if (oldValue === 2) {
+          return 3;
+        }
+      });
+    }
+  };
+
+  const submitCourseraUrl = async (event) => {
+    if (CourseraUrl) {
+      const applRef = firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.community.id);
+      const applDoc = await applRef.get();
+      if (applDoc.exists) {
+        await applRef.update({
+          courseraUrl,
+          updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      } else {
+        await applRef.set({
+          fullname,
+          communiId: props.communiId,
+          courseraUrl,
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        });
+      }
+      setCheckedInnerStep((oldValue) => {
+        if (oldValue === 3) {
+          return 4;
+        }
+      });
+      setActiveInnerStep((oldValue) => {
+        if (oldValue === 3) {
+          return 4;
+        }
+      });
     }
   };
 
@@ -428,6 +516,54 @@ const JoinUs = (props) => {
                     </Button>
                   </StepContent>
                 </Step>
+                {communi.coursera && (
+                  <Step>
+                    <StepLabel
+                      onClick={changeInnerStep(3)}
+                      sx={
+                        3 <= checkedInnerStep
+                          ? {
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor:
+                                  "rgba(100, 100, 100, 0.1) !important",
+                              },
+                            }
+                          : {}
+                      }
+                    >
+                      As a requirement to apply to this community, you should
+                      complete{" "}
+                      <a href={communi.coursera} target="_blank">
+                        this Coursera MOOC
+                      </a>
+                      . Please enter the webpage address (URL) of your Coursera
+                      MOOC certificate.
+                    </StepLabel>
+                    <StepContent>
+                      <TextField
+                        style={{ width: "100%" }}
+                        aria-label="Coursera Certificate URL text box"
+                        label="Your Coursera MOOC Certificate URL"
+                        variant="outlined"
+                        onChange={changeCourseraUrl}
+                        value={courseraUrl}
+                      />
+                      <Button
+                        sx={{
+                          display: "block",
+                          margin: "10px 0px 25px 0px",
+                          color: "common.white",
+                        }}
+                        onClick={submitCourseraUrl}
+                        color="success"
+                        variant="contained"
+                      >
+                        Submit Certificate URL
+                      </Button>
+                    </StepContent>
+                  </Step>
+                )}
               </Stepper>
             ) : (
               <>

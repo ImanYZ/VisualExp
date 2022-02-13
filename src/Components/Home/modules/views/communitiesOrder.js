@@ -691,6 +691,7 @@ export default [
       `Participants will work in a team-led environment under the leadership of Iman Yeckehzaare, a Ph.D. candidate at the School of Information, and will regularly report their accomplishments in weekly online team meetings.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit both their most current resume and online portfolio.`,
+    portfolio: true,
     qualifications: [
       `Experience with creating online style guidelines, images and graphics using design software (e.g., Adobe Illustrator, Adobe Photoshop, Adobe After Effects and Adobe Premier and Figma. `,
       `Strong understanding of the principles of UX, web information architecture, graphic design, web design, branding, composition, and typography.`,
@@ -754,6 +755,7 @@ export default [
       `Successful interns would continue with taking leadership roles.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit both their most current resume and online portfolio.`,
+    portfolio: true,
     qualifications: [
       `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
       `Instinct and intuition for good UI design.`,
