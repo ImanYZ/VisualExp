@@ -1,3 +1,10 @@
+let quCounter = 0;
+
+const quNum = () => {
+  quCounter += 1;
+  return quCounter + ". ";
+};
+
 export default [
   {
     id: "Educational_Organizational_Psychology",
@@ -51,6 +58,71 @@ export default [
       `Have opportunities to take on leadership roles within the community.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and the most current version of their university transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field.`,
+    coursera: "https://www.coursera.org/learn/academicinfoseek",
+    papers: {
+      The_psychology_of_task_management_The_smaller_tasks_trap: {
+        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
+        questions: {
+          What_is_this_article_about: {
+            stem: quNum() + "WWhat is this article about?",
+            answers: ["a"],
+            choices: {
+              a: "Task Management",
+              b: "Procrastination",
+              c: "Multitasking",
+            },
+          },
+          When_is_this_article_published: {
+            stem: quNum() + "When is this article published?",
+            answers: ["a"],
+            choices: {
+              a: "2020",
+              b: "2017",
+              c: "2014",
+              d: "2008",
+            },
+          },
+          When_confronted_with_multiple_tasks_what_is_the_normative_approach: {
+            stem:
+              quNum() +
+              "When confronted with multiple tasks, what is the normative approach?",
+            answers: ["b"],
+            choices: {
+              a: "Complete the smallest tasks first.",
+              b: "Rely on a cost-benefit analysis to schedule them.",
+              c: "Complete the task with the soonest deadline first.",
+            },
+          },
+          The_goal_of_the_first_study_is_to: {
+            stem: quNum() + "The_goal_of_the_first_study_is_to:",
+            answers: ["c"],
+            choices: {
+              a: "Examine whether participants were able to meet the deadlines of their assigned tasks.",
+              b: "Explore if participants preferred quantitative or qualitative tasks more.",
+              c: "Examine whether participants were prone to the small tasks trap bias.",
+            },
+          },
+          The_goal_of_the_second_study_is_to: {
+            stem: quNum() + "The goal of the second study is to:",
+            answers: ["a"],
+            choices: {
+              a: "Examine the impact of starting with a smaller or larger task on overall performance.",
+              b: "Determine whether starting with smaller or larger tasks was better for quality of work completed.",
+              c: "Examine if starting with smaller tasks sped up the rate of completion of more tasks.",
+            },
+          },
+          What_are_the_findings_of_these_studies: {
+            stem: quNum() + "What are the findings of these studies?",
+            answers: ["c"],
+            choices: {
+              a: "Starting with smaller tasks leads to faster completion and better quality of work overall.",
+              b: "The smaller task trap can delay the completion of sub-goals but can make achieving larger tasks easier.",
+              c: "The smaller task trap can lead to the completion of sub-goals but impede achieving the larger, more beneficial goal.",
+            },
+          },
+        },
+      },
+    },
     qualifications: [
       `Academic background and knowledge in topics related to education, learning science, industrial-organizational psychology, or cognitive psychology.`,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
@@ -132,17 +204,17 @@ export default [
     title: "Mindfulness",
     width: "30%",
     leaders: [
-      {
-        name: "Dallas Wilburn",
-        image: "Dallas_Wilburn.jpg",
-        about: `I am a student at the University of Texas at Austin pursuing a Bachelor's of Art in Psychology. I am passionate about increasing mental health awareness and learning the best techniques for treatment of mental illness. I have experience mentoring my peers and have held several leadership positions within and outside of my university. I am dedicated to helping those in my community, whether that be social or academic, and love learning more about psychology in any context.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/dallas-wilburn-795145228/",
-          },
-        ],
-      },
+      // {
+      //   name: "Dallas Wilburn",
+      //   image: "Dallas_Wilburn.jpg",
+      //   about: `I am a student at the University of Texas at Austin pursuing a Bachelor's of Art in Psychology. I am passionate about increasing mental health awareness and learning the best techniques for treatment of mental illness. I have experience mentoring my peers and have held several leadership positions within and outside of my university. I am dedicated to helping those in my community, whether that be social or academic, and love learning more about psychology in any context.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/dallas-wilburn-795145228/",
+      //     },
+      //   ],
+      // },
       {
         name: "Noor Jassim",
         image: "Noor_Jassim.jpeg",

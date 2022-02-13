@@ -41,6 +41,7 @@ import CSCObjLoader from "./CSCObjLoader";
 import communities from "../../Home/modules/views/communitiesOrder";
 
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
+import { isValidHttpUrl, isEmail } from "../../../utils/general";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
@@ -111,24 +112,6 @@ const initialState = {
 };
 
 let lastCountry;
-
-const isValidHttpUrl = (string) => {
-  let url;
-  try {
-    url = new URL(string);
-  } catch (_) {
-    return false;
-  }
-  return url.protocol === "http:" || url.protocol === "https:";
-};
-
-const isEmail = (email) => {
-  // eslint-disable-next-line
-  const regEx =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (email.match(regEx)) return true;
-  else return false;
-};
 
 const doNothing = () => {};
 

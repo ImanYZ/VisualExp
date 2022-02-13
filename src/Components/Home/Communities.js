@@ -313,6 +313,16 @@ const Communities = (props) => {
                       sx={{ textAlign: "left" }}
                     >
                       {communi.requirements}
+                      {communi.coursera && (
+                        <div>
+                          The applicants also need to complete{" "}
+                          <a href={communi.coursera} target="_blank">
+                            this Coursera course
+                          </a>{" "}
+                          and upload their certificate as a part of their
+                          application.
+                        </div>
+                      )}
                     </Typography>
                   </Paper>
                 </Grid>

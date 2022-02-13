@@ -19,6 +19,8 @@ import {
 
 import SelectSessions from "./SelectSessions";
 
+import { isEmail } from "../../utils/general";
+
 import UMSI_Logo_Light from "../../assets/UMSI_Logo_Light.jpeg";
 
 import "./SchedulePage.css";
@@ -30,14 +32,6 @@ tomorrow = new Date(
   tomorrow.getMonth(),
   tomorrow.getDate()
 );
-
-const isEmail = (email) => {
-  // eslint-disable-next-line
-  const regEx =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  if (email.match(regEx)) return true;
-  else return false;
-};
 
 const errorAlert = (data) => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
