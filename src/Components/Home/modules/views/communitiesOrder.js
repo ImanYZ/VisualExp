@@ -1,10 +1,3 @@
-let quCounter = 0;
-
-const quNum = () => {
-  quCounter += 1;
-  return quCounter + ". ";
-};
-
 export default [
   {
     id: "Educational_Organizational_Psychology",
@@ -68,72 +61,8 @@ export default [
       `Work remotely with all interactions, task fulfillment, and communications with other interns.`,
       `Have opportunities to take on leadership roles within the community.`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field.`,
-    coursera: "https://www.coursera.org/learn/academicinfoseek",
-    papers: {
-      The_psychology_of_task_management_The_smaller_tasks_trap: {
-        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
-        questions: {
-          What_is_this_article_about: {
-            stem: quNum() + "What is this article about?",
-            answers: ["a"],
-            choices: {
-              a: "Task Management",
-              b: "Procrastination",
-              c: "Multitasking",
-            },
-          },
-          When_is_this_article_published: {
-            stem: quNum() + "When is this article published?",
-            answers: ["a"],
-            choices: {
-              a: "2020",
-              b: "2017",
-              c: "2014",
-              d: "2008",
-            },
-          },
-          When_confronted_with_multiple_tasks_what_is_the_normative_approach: {
-            stem:
-              quNum() +
-              "When confronted with multiple tasks, what is the normative approach?",
-            answers: ["b"],
-            choices: {
-              a: "Complete the smallest tasks first.",
-              b: "Rely on a cost-benefit analysis to schedule them.",
-              c: "Complete the task with the soonest deadline first.",
-            },
-          },
-          The_goal_of_the_first_study_is_to: {
-            stem: quNum() + "The_goal_of_the_first_study_is_to:",
-            answers: ["c"],
-            choices: {
-              a: "Examine whether participants were able to meet the deadlines of their assigned tasks.",
-              b: "Explore if participants preferred quantitative or qualitative tasks more.",
-              c: "Examine whether participants were prone to the small tasks trap bias.",
-            },
-          },
-          The_goal_of_the_second_study_is_to: {
-            stem: quNum() + "The goal of the second study is to:",
-            answers: ["a"],
-            choices: {
-              a: "Examine the impact of starting with a smaller or larger task on overall performance.",
-              b: "Determine whether starting with smaller or larger tasks was better for quality of work completed.",
-              c: "Examine if starting with smaller tasks sped up the rate of completion of more tasks.",
-            },
-          },
-          What_are_the_findings_of_these_studies: {
-            stem: quNum() + "What are the findings of these studies?",
-            answers: ["c"],
-            choices: {
-              a: "Starting with smaller tasks leads to faster completion and better quality of work overall.",
-              b: "The smaller task trap can delay the completion of sub-goals but can make achieving larger tasks easier.",
-              c: "The smaller task trap can lead to the completion of sub-goals but impede achieving the larger, more beneficial goal.",
-            },
-          },
-        },
-      },
-    },
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+    // coursera: "https://www.coursera.org/learn/academicinfoseek",
     qualifications: [
       `Academic background and knowledge in topics related to education, learning science, industrial-organizational psychology, or cognitive psychology.`,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
@@ -184,7 +113,8 @@ export default [
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
+    coursera: "https://www.coursera.org/learn/talkmentalillness",
     qualifications: [
       `Interest and enthusiasm for clinical psychology`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
@@ -316,7 +246,8 @@ export default [
       `Experience a flexible and collaborative work environment, with all work being done remotely `,
       `Work towards publishing research on health psychology.`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in health psychology or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in health psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
+    coursera: "https://www.coursera.org/learn/positive-psychiatry",
     qualifications: [
       `Knowledge and interest in topics related to the field of health psychology `,
       `Fluency in reading and writing in English (written summaries of research articles necessary) `,
@@ -380,7 +311,7 @@ export default [
       `Be publicly accredited for any work you produce for years to come. `,
       `Individual contributions will be available through google search and cite your name (and other search engines)`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     qualifications: [
       `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
       `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
@@ -454,7 +385,7 @@ export default [
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5 GPA to apply for this position. All majors are welcome to apply. A personal or academic interest in disability is highly preferred.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5 GPA to apply for this position. All majors are welcome to apply. A personal or academic interest in disability is highly preferred, and answer our quiz questions to evaluate their domain knowledge.`,
     qualifications: [
       `Interest and enthusiasm for topics related to Disability Studies.`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
@@ -526,7 +457,7 @@ export default [
       `Work towards publishing research on the social and political psychology of misinformation.`,
       `Work remotely with all interactions, task fulfillment, and communications`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field, and answer our quiz questions.`,
     qualifications: [
       `Knowledge and enthusiasm for topics related to the field of social and political psychology. `,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
