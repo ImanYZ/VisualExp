@@ -274,75 +274,111 @@ export default {
     },
   },
   ["Disability_Studies"]: {
-    Mindfulness_Based_Eating_Awareness_Training: {
-      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FKristellerWoleverSheets_BED_In_Mindfulness2013.pdf?alt=media&token=ee440abf-b8ef-459d-92de-3e32475b8cf8",
+    What_is_Disability_Studies_UMInDS: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat_is_Disability_Studies_UMInDS.pdf?alt=media&token=3e16f0ee-e8b5-492e-a776-8b8025b18559",
       questions: {
-        In_this_community_we_will_focus_on_Mindfulness_in_what_context: {
-          stem: "1. In this community, we will focus on Mindfulness in what context?",
-          answers: ["b"],
-          choices: {
-            a: "Religious history",
-            b: "Clinical Psychology",
-            c: "Professional settings",
-            d: "Physical exercise",
-          },
-        },
-        As_an_intern_you_will_be_expected_to: {
-          stem: "2. As an intern, you will be expected to:",
-          answers: ["d"],
-          choices: {
-            a: "Attend weekly meetings",
-            b: "Collaborate with peers on presentations",
-            c: "Partake in mindfulness practices",
-            d: "All of the Above",
-          },
-        },
-        What_disorder_was_Mindfulness_Based_Eating_Awareness_Training_MB_EAT_developed_for:
+        Disability_studies_is_primarily_interested_in_looking_at_disability_from_a_medical_perspective:
           {
-            stem: "3. What disorder was Mindfulness Based Eating Awareness Training (MB-EAT) developed for?",
-            answers: ["c"],
-            choices: {
-              a: "Anorexia",
-              b: "Bulimia",
-              c: "Binge Eating Disorder",
-              d: "None of the Above",
-            },
-          },
-        What_are_the_stages_of_MB_EAT: {
-          stem: "4. What are the stages of MB-EAT?",
-          answers: ["a"],
-          choices: {
-            a: "Cultivating Mindfulness, Cultivating Mindful Eating, Cultivating Emotional Balance, Cultivating Self-Acceptance",
-            b: "Psychotherapy, Mindfulness Practices, Eating Practice",
-            c: "Individual Counseling, Group Counseling, At-Home Interventions",
-            d: "Emotional Mindfulness, Mindful Eating, Mindful Wisdom",
-          },
-        },
-        Which_of_the_following_is_a_core_issue_of_the_disorder_that_MB_EAT_treats:
-          {
-            stem: "5. Which of the following is a core issue of the disorder that MB-EAT treats?",
-            answers: ["c"],
-            choices: {
-              a: "Calorie counting",
-              b: "Compulsive binging",
-              c: "Awareness of hunger and satiety cues",
-              d: "Taste recognition",
-            },
-          },
-        True_or_False_MB_EAT_focuses_on_the_internal_experiences_of_eating_as_well_as_external_patterns_and_triggers:
-          {
-            stem: "6. True or False: MB-EAT focuses on the internal experiences of eating as well as external patterns and triggers.",
-            answers: ["a"],
+            stem: "1. Disability studies is primarily interested in looking at disability from a medical perspective.",
+            answers: ["b"],
             choices: {
               a: "True",
               b: "False",
             },
           },
+        Around_8_of_Americans_have_a_disability: {
+          stem: "2. Around 8% of Americans have a disability",
+          answers: ["d"],
+          choices: {
+            a: "True",
+            b: "False",
+          },
+        },
+        What_did_the_Americans_with_Disabilities_Act_ADA_accomplish: {
+          stem: "3. What did the Americans with Disabilities Act (ADA) accomplish?",
+          answers: ["d"],
+          choices: {
+            a: "It added a disability component to the census",
+            b: "It changed the definition of disability to be more than just a medical condition",
+            c: `It created an “International Day of Disabled Persons” to raise awareness and promote participation`,
+            d: "It empowered persons with disabilities and changed how institutions conduct business",
+          },
+        },
+      },
+    },
+    What_is_Disability_Studies_UMInDS: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat_is_Disability_Studies_UMInDS.pdf?alt=media&token=3e16f0ee-e8b5-492e-a776-8b8025b18559",
+      questions: {
+        Which_of_the_following_is_NOT_part_of_the_Disability_Discrimination_Act_s_definition_of_disability:
+          {
+            stem: "1. Which of the following is NOT part of the Disability Discrimination Act's definition of disability?",
+            answers: ["b"],
+            choices: {
+              a: "The impairment must be long-term (more than 12 months)",
+              b: "The impairment must be severe",
+              c: "The impairment can be physical OR mental",
+              d: "The impairment must impact day-to-day activities",
+            },
+          },
+        Which_model_of_disability_was_influenced_by_the_black_civil_rights_movement_in_America:
+          {
+            stem: "2. Which model of disability was influenced by the black civil rights movement in America?",
+            answers: ["d"],
+            choices: {
+              a: "The social model",
+              b: "The medical model",
+              c: "The minority model",
+              d: "The cultural model",
+            },
+          },
+        Which_model_of_disability_views_disability_as_an_umbrella_term_for_considering:
+          {
+            stem: `3. Which model of disability views "disability" as an umbrella term for considering the interaction of impairment, body functions, activity, and environmental factors?`,
+            answers: ["d"],
+            choices: {
+              a: "The ICF model",
+              b: "The social model",
+              c: "The cultural model",
+              d: "The Nordic relational model",
+            },
+          },
+        Most_disabilities_are: {
+          stem: `4. Most disabilities are...`,
+          answers: ["d"],
+          choices: {
+            a: "Acquired",
+            b: "Congenital",
+          },
+        },
+        What_is_the_oldest_model_of_disability: {
+          stem: `5. What is the oldest model of disability?`,
+          answers: ["d"],
+          choices: {
+            a: "The medical model",
+            b: "The social model",
+            c: "The cultural model",
+            d: "The moral model",
+          },
+        },
       },
     },
   },
-  ["Social_Political_Psychology"]: {},
-  ["Cryptoeconomics"]: {},
+  ["Social_Political_Psychology"]: {
+    When_Fake_News_feels_true: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen_Fake_News_feels_true.pdf?alt=media&token=f7d6bfa1-5937-409e-ace8-3ad4d087a3cb",
+      questions: {},
+    },
+    Fake_news_game_confers_psychological_resistance_ag: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFake_news_game_confers_psychological_resistance_ag.pdf?alt=media&token=4a2332d4-3750-4308-9c72-96e28c514e80",
+      questions: {},
+    },
+  },
+  ["Cryptoeconomics"]: {
+    Bitcoin_whitepaper: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FBitcoin_whitepaper.pdf?alt=media&token=372bf6cc-642b-4541-9407-d51527fd83a5",
+      questions: {},
+    },
+  },
   ["Deep_Learning"]: {},
   ["Graphic_Design"]: {},
   ["UI_Design"]: {},
