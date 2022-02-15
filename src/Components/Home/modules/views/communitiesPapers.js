@@ -130,7 +130,97 @@ export default {
       },
     },
   },
-  ["Health_Psychology"]: {},
+  ["Health_Psychology"]: {
+    Health_Psychology_Chapter_1: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FHealth%20Psychology.%20Fifth%20Edition%20Chapter%201.pdf?alt=media&token=484f630b-18b6-467a-a65a-faec2257e39c",
+      questions: {
+        In_the_definition_given_in_this_book_health_psychology_is_defined_as_an________field:
+          {
+            stem: "1. In the definition given in this book, health psychology is defined as an ______ field.",
+            answers: ["b"],
+            choices: {
+              a: "International",
+              b: "Interdisciplinary",
+              c: "Interactive",
+              d: "Interesting",
+            },
+          },
+        The_leading_risk_factor_for_global_disease_burden_in_2002_was_______: {
+          stem: "2. The leading risk factor for global disease burden in 2002 was ______.",
+          answers: ["b"],
+          choices: {
+            b: "Alcohol",
+            a: "Childhood and maternal underweight",
+            c: "Tobacco",
+            d: "High blood pressure",
+          },
+        },
+        According_to_S_S_Stevens_measurement_is_the_assignment_of_numbers_to_attributes:
+          {
+            stem: "3. According to S.S. Stevens, measurement is the assignment of numbers to attributes according to ______.",
+            answers: ["c"],
+            choices: {
+              b: "Formulae",
+              a: "Size",
+              c: "Rules",
+              d: "Quality",
+            },
+          },
+        According_to_Michell_before_quantification_can_happen_it_is_first_necessary:
+          {
+            stem: "4. According to Michell, before quantification can happen, it is first necessary to obtain evidence that the relevant attribute is quantitative in ______.",
+            answers: ["a"],
+            choices: {
+              b: "Structure",
+              a: "Stature",
+              c: "Status",
+              d: "Studies",
+            },
+          },
+        When_findings_are_difficult_to_generalize_to_the_world_outside_of_the_laboratory:
+          {
+            stem: "5. When findings are difficult to generalize to the world outside of the laboratory, we say the research is lacking in ______ validity.",
+            answers: ["a"],
+            choices: {
+              b: "Ecological",
+              a: "Economical",
+              c: "Empirical",
+              d: "Experimental",
+            },
+          },
+        The_Health_Onion_is_an_example_of_a_______: {
+          stem: "6. The 'Health Onion' is an example of a ______.",
+          answers: ["d"],
+          choices: {
+            b: "Paradigm",
+            a: "Model",
+            c: "Theory",
+            d: "Framework",
+          },
+        },
+        More_research_is_necessary_to_confirm_the_assumption_that: {
+          stem: "7. More research is necessary to confirm the assumption that ______ cause positive changes to quality of life.",
+          answers: ["a"],
+          choices: {
+            b: "Lifestyle changes",
+            a: "Research findings",
+            c: "Survey data",
+            d: "Questionnaire responses",
+          },
+        },
+        _______have_some_of_the_characteristics_of_paradigms: {
+          stem: "8. ______ have some of the characteristics of paradigms (Kuhn, 1970) as they refer to a complete system of thinking about a field of inquiry.",
+          answers: ["c"],
+          choices: {
+            b: "Pathways",
+            a: "Theories",
+            c: "Frameworks",
+            d: "Models",
+          },
+        },
+      },
+    },
+  },
   ["Neuroscience"]: {
     Fundamentals_of_Neuroscience: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFundamentals_of_Neuroscience.pdf?alt=media&token=ede5917c-2278-4143-89b1-60797ad530ca",
