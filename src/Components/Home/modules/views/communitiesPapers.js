@@ -456,11 +456,141 @@ export default {
   ["Social_Political_Psychology"]: {
     When_Fake_News_feels_true: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen_Fake_News_feels_true.pdf?alt=media&token=f7d6bfa1-5937-409e-ace8-3ad4d087a3cb",
-      questions: {},
+      questions: {
+        What_is_the_goal_of_article_1_When_Fake_News_Feels_True: {
+          stem: `1. What is the goal of article 1, "When (Fake) News Feels True"?`,
+          answers: ["d"],
+          choices: {
+            a: "To explain how we evaluate messages",
+            b: "To describe the impact of certain features in a message and how this can lead to message acceptance.",
+            c: "To give a history of how media has been regulated to prevent misinformation",
+            d: "a and b",
+          },
+        },
+        According_to_article_1_what_are_the_most_important_things_people_consider:
+          {
+            stem: `2. According to article 1, what are the most important things people consider when evaluating information (click all that apply)?`,
+            answers: ["a", "b", "c", "d", "f"],
+            choices: {
+              a: "The compatibility of the new information with one's previous knowledge.",
+              b: "The coherence of the information in its own context.",
+              c: "The credibility of the source.",
+              d: "The consensus among other people that the information is true.",
+              e: "The length of the message.",
+              f: "If there is supporting evidence.",
+            },
+          },
+        What_are_the_different_types_of_system_processing: {
+          stem: `3. What are the different types of system processing (click all that apply)?`,
+          answers: ["a", "c"],
+          choices: {
+            a: "Intuitive",
+            b: "Autonomic",
+            c: "Analytic",
+            d: "Academic",
+          },
+        },
+        Repetition_plays_a_role_in_information_acceptance_by_manipulating_our_perception_of:
+          {
+            stem: `4. Repetition plays a role in information acceptance by manipulating our perception of ________.`,
+            answers: ["c"],
+            choices: {
+              a: "Compatibility",
+              b: "Coherence",
+              c: "Social consensus",
+            },
+          },
+        Warnings_against_misinformation_are_most_effective_when_issued: {
+          stem: `5. Warnings against misinformation are most effective when issued _______.`,
+          answers: ["a"],
+          choices: {
+            a: "Before the claim",
+            b: "After the claim",
+          },
+        },
+        How_do_the_factors_discussed_in_this_article_play_a_role_in_the_spread_of_misinformation_on_social_media:
+          {
+            stem: `6. How do the factors discussed in this article play a role in the spread of misinformation on social media (click all that apply)?`,
+            answers: ["b", "c", "d"],
+            choices: {
+              a: "People see a diversity in opinions.",
+              b: "Short messages are easy to process.",
+              c: "We see posts from friends, establishing credibility.",
+              d: "Users can gain a false sense of expertise.",
+            },
+          },
+        What_does_this_article_recommend_as_a_means_to_correct_and_prevent_misinformation:
+          {
+            stem: `7. What does this article recommend as a means to correct and prevent misinformation?`,
+            answers: ["a"],
+            choices: {
+              a: "Avoid repeating false information",
+              b: "Bust myths",
+              c: "Use jargon in corrections",
+            },
+          },
+        What_is_associated_with_the_intuitive_processing_system: {
+          stem: `8. What is associated with the intuitive processing system?`,
+          answers: ["b"],
+          choices: {
+            a: "Effort, analysis",
+            b: "Speed, heuristics",
+          },
+        },
+        What_is_associated_with_the_analytic_system: {
+          stem: `9. What is associated with the analytic system?`,
+          answers: ["a"],
+          choices: {
+            a: "Effort, slowness, systematic reasoning",
+            b: "Speed, heuristics",
+          },
+        },
+        What_is_naive_realism: {
+          stem: `10. What is naive realism?`,
+          answers: ["a"],
+          choices: {
+            a: "People believe that their view of the world is the true perception and other opposing opinions are either wrong or deliberately causing harm.",
+            b: "People incorrectly believe that people who spread information are doing so unintentionally and with pure intentions.",
+          },
+        },
+      },
     },
     Fake_news_game_confers_psychological_resistance_ag: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFake_news_game_confers_psychological_resistance_ag.pdf?alt=media&token=4a2332d4-3750-4308-9c72-96e28c514e80",
-      questions: {},
+      questions: {
+        What_is_the_inoculation_theory_of_misinformation: {
+          stem: `1. What is the inoculation theory of misinformation?`,
+          answers: ["a"],
+          choices: {
+            a: "A theory that proposes that vaccination-related information tends to be misconstrued by people.",
+            b: "A theory that suggests that people build immunity against misinformation by being exposed to false information that is later corrected.",
+            c: "A theory that proposes that media platforms gain benefits by intentionally misinforming viewers on controversial topics, such as vaccinations.",
+            d: "A theory that suggests that when people are repeatedly exposed to fake news, they tend to internalize misinformation.",
+          },
+        },
+        Which_of_the_following_does_the_article_describe_as_a_limitation_of_the_majority_of_research_on_the_inoculation_theory:
+          {
+            stem: `2. Which of the following does the article describe as a limitation of the majority of research on the inoculation theory?`,
+            answers: ["c"],
+            choices: {
+              a: "Research has not investigated the effects of inoculating against misinformation using naturalistic media platforms.",
+              b: "Researchers have mostly studied participants from Western countries and have yet to investigate the effects of the inoculation of misinformation on people from other cultures.",
+              c: "Studies have focused on inoculating against specific topics, which brings into question whether the effects of the inoculation of misinformation extend to other contexts.",
+              d: "Limited research has been conducted on the topic, since the inoculation theory of misinformation is fairly recent.",
+            },
+          },
+        Which_of_the_following_does_the_article_describe_as_a_limitation_of_the_majority_of_research_on_the_inoculation_theory:
+          {
+            stem: `3. Which of the following does the article describe as a limitation of the majority of research on the inoculation theory?`,
+            answers: ["c"],
+            choices: {
+              a: "Research has not investigated the effects of inoculating against misinformation using naturalistic media platforms.",
+              b: "Researchers have mostly studied participants from Western countries and have yet to investigate the effects of the inoculation of misinformation on people from other cultures.",
+              c: "Studies have focused on inoculating against specific topics, which brings into question whether the effects of the inoculation of misinformation extend to other contexts.",
+              d: "Limited research has been conducted on the topic, since the inoculation theory of misinformation is fairly recent.",
+            },
+          },
+      },
     },
   },
   ["Cryptoeconomics"]: {
