@@ -275,11 +275,13 @@ const IntellectualPoints = (props) => {
       }
       setAllTags(aTags);
     };
-    loadTags();
-  }, []);
+    if (firebase) {
+      loadTags();
+    }
+  }, [firebase]);
 
   useEffect(() => {
-    if (project && fullname) {
+    if (firebase && project && fullname) {
       const activitiesQuery = firebase.db
         .collection("activities")
         .where("project", "==", project);
@@ -295,10 +297,10 @@ const IntellectualPoints = (props) => {
         activitiesSnapshot();
       };
     }
-  }, [project, fullname]);
+  }, [firebase, project, fullname]);
 
   useEffect(() => {
-    if (project && fullname && activitiesLoaded) {
+    if (firebase && project && fullname && activitiesLoaded) {
       const votesQuery = firebase.db
         .collection("votes")
         .where("voter", "==", fullname)
@@ -314,7 +316,7 @@ const IntellectualPoints = (props) => {
         votesSnapshot();
       };
     }
-  }, [project, fullname, activitiesLoaded]);
+  }, [firebase, project, fullname, activitiesLoaded]);
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 25) {

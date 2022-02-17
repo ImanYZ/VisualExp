@@ -304,7 +304,7 @@ const Tutorial = (props) => {
         const explaData = {
           fullname,
           instrId,
-          qIdx,
+          qId: question.id,
           explanation: question.explanation,
         };
         if (explaDoc && explaDoc.exists) {
