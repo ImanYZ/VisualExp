@@ -61,7 +61,72 @@ export default {
       },
     },
   },
-  ["Clinical_Psychology"]: {},
+  ["Clinical_Psychology"]: {
+    Clinical_Psychology_Reading_Test: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FClinical%20Psychology%20Reading.pdf?alt=media&token=fbf1103d-d716-40f2-a95f-5e70178a5e09",
+      questions: {
+        What_aspect_of_training_distinguishes_clinical_psychology_from_other_helping_professions:
+          {
+            stem: "1. What aspect of training distinguishes clinical psychology from other helping professions?",
+            answers: ["b"],
+            choices: {
+              a: "Graduate school",
+              b: "Training in research",
+              c: "Assessment",
+            },
+          },
+        Which_of_the_following_is_a_field_closely_related_to_clinical_psychology:
+          {
+            stem: "2. Which of the following is a field closely related to clinical psychology?",
+            answers: ["c"],
+            choices: {
+              a: "Police officer",
+              b: "Neuroscientist",
+              c: "Social work",
+            },
+          },
+        What_is_the_difference_between_a_psychiatrist_and_clinical_psychologist:
+          {
+            stem: "3. What is the difference between a psychiatrist and clinical psychologist?",
+            answers: ["d"],
+            choices: {
+              a: "A clinical psychologist is not a doctor",
+              b: "A psychiatrist is an M.D.",
+              c: "There are differences in training content and methods",
+              d: "Options 2 and 3",
+            },
+          },
+        What_is_the_most_common_approach_to_training_clinical_psychologists: {
+          stem: "4. What is the most common approach to training clinical psychologists?",
+          answers: ["b"],
+          choices: {
+            a: "Scholar-practitioner model (Vail model)",
+            b: "Science-practitioner model (Boulder-model)",
+            c: "Clinical-scientist model",
+          },
+        },
+        What_integration_defines_training_in_clinical_psychology: {
+          stem: "5. What integration defines training in clinical psychology?",
+          answers: ["c"],
+          choices: {
+            a: "Teaching and counseling",
+            b: "Assessment and consultation",
+            c: "Science and practice",
+          },
+        },
+        Which_of_the_following_is_an_aspect_of_clinical_psychology: {
+          stem: "6. Which of the following is an aspect of clinical psychology?",
+          answers: ["d"],
+          choices: {
+            a: "Psychotherapy",
+            b: "Teaching",
+            b: "Research",
+            b: "All of the above",
+          },
+        },
+      },
+    },
+  },
   ["Mindfulness"]: {
     Mindfulness_Based_Eating_Awareness_Training: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FKristellerWoleverSheets_BED_In_Mindfulness2013.pdf?alt=media&token=ee440abf-b8ef-459d-92de-3e32475b8cf8",

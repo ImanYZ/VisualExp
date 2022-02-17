@@ -212,7 +212,7 @@ const Communities = (props) => {
               align="center"
               sx={{ fontWeight: "700" }}
             >
-              {communi.title + " Community"}
+              {communi.title}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>

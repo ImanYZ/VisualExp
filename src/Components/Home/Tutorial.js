@@ -412,7 +412,7 @@ const Tutorial = (props) => {
               and watch the following videos before answering any of the
               questions, and <strong>select all the choices that apply</strong>.{" "}
             </Box>
-            <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
+            <Box sx={{ mt: "10px", fontSize: "19px" }}>
               The community leaders will decide about your application based on{" "}
               <strong>your total WRONG attempts.</strong>
             </Box>
@@ -656,7 +656,7 @@ const Tutorial = (props) => {
           zIndex: 1300,
         }}
       >
-        <Box sx={{ mt: "4px", fontWeight: "bold", fontStyle: "italic" }}>
+        <Box sx={{ mt: "4px", fontWeight: "bold" }}>
           The fewer wrong attempts, the better.
         </Box>
         {/* {expanded !== false &&
