@@ -169,7 +169,11 @@ export default [
       },
     ],
     YouTube: "FB0C3vJWd2g",
-    description: `The Mindfulness Community works together to review literature that describes the benefits of mindfulness in a clinical and psychological context. Interns review research, synthesize the information in easy-to-follow presentations, and collaborate together to improve the community map of mindfulness research. Additionally, interns will interact with mindfulness practices in their daily lives to gain a greater understanding of these practices and their uses in a clinical context.`,
+    description: `Join an interdisciplinary, transnational group of researchers who have been iteratively
+    developing and executing empirical research on the large-scale, online collaborative
+    platform 1Cademy. The goal of the Mindfulness Research Community on 1Cademy is to
+    investigate the psychological effects of mindfulness in everyday life and as treatment for
+    mental and physical illnesses.`,
     accomplishments: `We have examined and updated the mindfulness community tag on 1Cademy with cross-disciplinary applications of mindfulness in thorough detail.
     We have compiled an inclusive list of mental disorders from the DSM-5 that can benefit from clinical mindfulness as well as documented case studies of certain populations that were able to benefit from mindfulness when it applied to psychopathological symptoms.
     We have outlined multiple mindfulness interventions that have been backed by empirical research and heavily tested across the world in multiple research institutions.
@@ -183,21 +187,19 @@ export default [
       `Completing responsibilities will require a minimum of 6 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
       `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
     ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
     qualifications: [
-      `Interest and enthusiasm for clinical psychology`,
-      `Strong desire and willingness to collaborate with others and engage in group discussions.`,
-      `Willingness to present work at weekly meetings.`,
-      `Able to commit to approximately 5-10 hours of work each week.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`,
+      `Interest and enthusiasm for topics related to mindfulness, mindfulness meditation, positive psychology, clinical psychology, and neuroscience.`,
+      `Fluency in writing and reading in English, as well as experience with academic literature review.`,
+      `Must be able to attend weekly meetings on Thursdays @ 7pm EST.`,
     ],
     responsibilities: [
-      `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
+      `Read through textbooks and research papers, summarize content on our
+      knowledge visualization platform, 1Cademy, and publicly share summaries with
+      the research team.`,
+      `Improve the Mindfulness 1Cademy Map through minor and major updates to previous nodes.`,
       `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work.`,
-      `Contribute in meetings by engaging in discussion with other interns about research topics.`,
-      `Be able to make connections between different resources and research articles`,
-      `All interactions, task fulfillment, and communications will be remote.`,
+      `Contribute in meetings by presenting work and engage in discussion with other interns’ presentations.`,
     ],
   },
   {

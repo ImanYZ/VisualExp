@@ -124,6 +124,26 @@ export default {
             b: "All of the above",
           },
         },
+        Which_doctorate_emphasizes_psychological_practice: {
+          stem: "7. Which doctorate emphasizes psychological practice?",
+          answers: ["a"],
+          choices: {
+            a: "Psy.D.",
+            b: "Ph.D.",
+          },
+        },
+        Which_of_the_following_do_undergraduates_need_to_do_in_order_to_prepare:
+          {
+            stem: "8. Which of the following do undergraduates need to do in order to prepare for graduate training in clinical psychology?",
+            answers: ["a", "b", "d", "e"],
+            choices: {
+              a: "Impressive GRE scores",
+              b: "Gain research experience",
+              c: "Get a masters degree",
+              d: "High GPA",
+              e: "Strong recommendation letters from professors and/or research supervisors",
+            },
+          },
       },
     },
   },
@@ -443,7 +463,7 @@ export default {
           },
         Around_8_of_Americans_have_a_disability: {
           stem: "2. Around 8% of Americans have a disability",
-          answers: ["d"],
+          answers: ["b"],
           choices: {
             a: "True",
             b: "False",
@@ -461,60 +481,61 @@ export default {
         },
       },
     },
-    What_is_Disability_Studies_UMInDS: {
-      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat_is_Disability_Studies_UMInDS.pdf?alt=media&token=3e16f0ee-e8b5-492e-a776-8b8025b18559",
+    Redefining_disability_culture: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FForber-Pratt-2018-CP-DisCulture.pdf?alt=media&token=d74a5104-9735-4f6b-9c90-299d097be30d",
       questions: {
-        Which_of_the_following_is_NOT_part_of_the_Disability_Discrimination_Act_s_definition_of_disability:
+        Which_of_the_following_is_NOT_part_of_the_ADAs_definition_of_disability:
           {
-            stem: "1. Which of the following is NOT part of the Disability Discrimination Act's definition of disability?",
-            answers: ["b"],
+            stem: "4. Which of the following is NOT part of the ADA's definition of disability?",
+            answers: ["a"],
             choices: {
-              a: "The impairment must be long-term (more than 12 months)",
-              b: "The impairment must be severe",
-              c: "The impairment can be physical OR mental",
-              d: "The impairment must impact day-to-day activities",
+              a: "You must have been born with the impairment",
+              b: "The impairment can be physical OR mental",
+              c: "The impairment must substantially limit one's life activities",
             },
           },
-        Which_model_of_disability_was_influenced_by_the_black_civil_rights_movement_in_America:
+        Which_of_the_following_was_NOT_identified_as_one_of_the_three_main_values:
           {
-            stem: "2. Which model of disability was influenced by the black civil rights movement in America?",
+            stem: "5. Which of the following was NOT identified as one of the three main values of disability culture in this article?",
+            answers: ["c"],
+            choices: {
+              a: "Social justice",
+              b: "Giving back to others",
+              c: "Positivity",
+              d: "Independence",
+            },
+          },
+        Which_of_the_following_was_listed_as_a_shortcoming_of_previous_disability_culture_research:
+          {
+            stem: `6. Which of the following was listed as a shortcoming of previous disability culture research?`,
+            answers: ["a"],
+            choices: {
+              a: "Many scholars have limited their demographic to one subgroup of disability",
+              b: "Previous research has focused too heavily on the social model of disability",
+              c: "Many researchers use the wrong terminology when talking about disability",
+              d: "Previous studies have focused too heavily on the experiences of school age children",
+            },
+          },
+        What_does_the_author_mean_when_they_say_that_disability_is_cross_cultural:
+          {
+            stem: `7. What does the author mean when they say that disability is cross-cultural?`,
             answers: ["d"],
             choices: {
-              a: "The social model",
-              b: "The medical model",
-              c: "The minority model",
-              d: "The cultural model",
+              a: "Disability culture looks similar in different parts of the world",
+              b: "Disabled people have an agreed upon set of values and beliefs",
+              c: "Disabled people can belong to different nationalities, religions, and ethnicities",
             },
           },
-        Which_model_of_disability_views_disability_as_an_umbrella_term_for_considering:
+        Why_does_the_author_say_that_university_students_with_disabilities_are_a_unique_demographic:
           {
-            stem: `3. Which model of disability views "disability" as an umbrella term for considering the interaction of impairment, body functions, activity, and environmental factors?`,
+            stem: `8. Why does the author say that university students with disabilities are a unique demographic?`,
             answers: ["d"],
             choices: {
-              a: "The ICF model",
-              b: "The social model",
-              c: "The cultural model",
-              d: "The Nordic relational model",
+              a: "They are more educated about their rights",
+              b: "They are living away from home for the first time",
+              c: "They are first first generation to have lived their entire lives with the ADA in effect",
             },
           },
-        Most_disabilities_are: {
-          stem: `4. Most disabilities are...`,
-          answers: ["d"],
-          choices: {
-            a: "Acquired",
-            b: "Congenital",
-          },
-        },
-        What_is_the_oldest_model_of_disability: {
-          stem: `5. What is the oldest model of disability?`,
-          answers: ["d"],
-          choices: {
-            a: "The medical model",
-            b: "The social model",
-            c: "The cultural model",
-            d: "The moral model",
-          },
-        },
       },
     },
   },
@@ -625,7 +646,7 @@ export default {
       questions: {
         What_is_the_inoculation_theory_of_misinformation: {
           stem: `1. What is the inoculation theory of misinformation?`,
-          answers: ["a"],
+          answers: ["b"],
           choices: {
             a: "A theory that proposes that vaccination-related information tends to be misconstrued by people.",
             b: "A theory that suggests that people build immunity against misinformation by being exposed to false information that is later corrected.",
@@ -644,17 +665,91 @@ export default {
               d: "Limited research has been conducted on the topic, since the inoculation theory of misinformation is fairly recent.",
             },
           },
-        Which_of_the_following_does_the_article_describe_as_a_limitation_of_the_majority_of_research_on_the_inoculation_theory:
+        The_researchers_created_an_intervention_in_the_form_of_a_game_that_essentially_asks_participants_to:
           {
-            stem: `3. Which of the following does the article describe as a limitation of the majority of research on the inoculation theory?`,
-            answers: ["c"],
+            stem: `3. The researchers created an intervention in the form of a game that essentially asks participants to ...`,
+            answers: ["d"],
             choices: {
-              a: "Research has not investigated the effects of inoculating against misinformation using naturalistic media platforms.",
-              b: "Researchers have mostly studied participants from Western countries and have yet to investigate the effects of the inoculation of misinformation on people from other cultures.",
-              c: "Studies have focused on inoculating against specific topics, which brings into question whether the effects of the inoculation of misinformation extend to other contexts.",
-              d: "Limited research has been conducted on the topic, since the inoculation theory of misinformation is fairly recent.",
+              a: "Read hypothetical fake news scenarios and rate how believable they are.",
+              b: "Openly discuss instances when they have been victims of misinformation with other users.",
+              c: "Identify and share techniques through which misinformation can be avoided.",
+              d: "Assume the role of the originator of misinformation by attempting to gain followers and credibility.",
             },
           },
+        How_was_the_effectiveness_of_the_intervention_evaluated: {
+          stem: `4. How was the effectiveness of the intervention evaluated?`,
+          answers: ["a"],
+          choices: {
+            a: "Through a pretest-posttest survey design that required participants to rate the credibility of headlines and tweets.",
+            b: "By observing the participants' use of Twitter for one month to see whether they retweeted fake news.",
+            c: "Through the points the users gained after playing the game for 15 minutes.",
+            d: "By asking them how confident they were about identifying fake news.",
+          },
+        },
+        Why_do_the_researchers_argue_that_the_differences_in_the_ratings_of_the_two_control_stimuli_were_not_important:
+          {
+            stem: `5. Why do the researchers argue that the differences in the ratings of the two control stimuli were not important, even though the results were statistically significant?`,
+            answers: ["d"],
+            choices: {
+              a: "The p-values were above .05.",
+              b: "The effect sizes (Cohen's d, Hedges g) were too large, meaning that the p-values were not significant.",
+              c: "The researchers did not believe the intervention would affect the participants' perception of control tweets.",
+              d: "The effect sizes (Cohen's d, Hedges g) were too small, meaning that statistical significance was likely reached because of the large sample size.",
+            },
+          },
+        For_which_of_the_following_domains_of_misinformation_was_there_a_better_performance_after_the_intervention:
+          {
+            stem: `6. For which of the following domains of misinformation was there a better performance after the intervention?`,
+            answers: ["a"],
+            choices: {
+              a: "Impersonation, Conspiracy, Deflection",
+              b: "Impersonation, Emotion",
+              c: "Conspiracy, Trolling, Discredit, Impersonation",
+              d: "Polarization, Trolling, Discredit",
+            },
+          },
+        Why_was_the_addition_of_control_stimuli_important_in_combination_with_fake_news_stimuli:
+          {
+            stem: `7. Why was the addition of control stimuli important (in combination with fake news stimuli)?`,
+            answers: ["d"],
+            choices: {
+              a: "It tricked participants into answering differently.",
+              b: "It made the study more realistic.",
+              c: "It showed that participants answer more accurately when they are asked multiple questions.",
+              d: "It suggested that the inoculation was effective against false information without having an impact on correct information.",
+            },
+          },
+        Which_of_the_following_groups_benefited_the_most_from_the_intervention:
+          {
+            stem: `8. Which of the following groups benefited the most from the intervention?`,
+            answers: ["b"],
+            choices: {
+              a: "People who were young.",
+              b: "People who were more likely to believe false information before the intervention.",
+              c: "People who were less likely to trust misinformation before the intervention.",
+              d: "People who identified as liberal.",
+            },
+          },
+        Which_of_the_following_is_discussed_as_a_limitation_of_the_research: {
+          stem: `9. Which of the following is discussed as a limitation of the research?`,
+          answers: ["b"],
+          choices: {
+            a: "The participants were predominantly university students from private academic institutions.",
+            b: "The researchers did not have a control group.",
+            c: "The participants were not enough for the statistical analyses.",
+            d: "The study did not ask the participants questions about their Facebook use.",
+          },
+        },
+        What_suggestion_for_future_research_do_the_authors_offer: {
+          stem: `10. What suggestion for future research do the authors offer?`,
+          answers: ["c"],
+          choices: {
+            a: "To perform the same study using stimuli from varied social media platforms.",
+            b: "To collect information on people's social media use through data scraping.",
+            c: "To identify the rate at which the inoculation decreases.",
+            d: "To investigate why men tend to be overrepresented in game-related research.",
+          },
+        },
       },
     },
   },
