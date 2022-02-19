@@ -27,7 +27,7 @@ import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
 
-import allCommunities from "./modules/views/communitiesOrder";
+import papers from "./modules/views/communitiesPapers";
 
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -50,55 +50,53 @@ const PaperTest = (props) => {
         .collection("applications")
         .doc(fullname + "_" + props.community.id)
         .get();
-      let tutorialData;
+      let applData;
       if (applDoc.exists) {
-        tutorialData = tutorialDoc.data();
-        setCorrectAttempts(tutorialData.corrects);
-        setWrongAttempts(tutorialData.wrongs);
-        setCompleted(tutorialData.completed);
-        oAttempts = tutorialData.attempts;
+        applData = applDoc.data();
+        setCorrectAttempts(applData.corrects);
+        setWrongAttempts(applData.wrongs);
+        setCompleted(applData.completed);
+        oAttempts = applData.attempts;
       }
-      for (let instr in instructs) {
-        if (!(instr in oAttempts)) {
-          oAttempts[instr] = {
+      for (let paperId in papers[props.community.id]) {
+        if (!(paperId in oAttempts)) {
+          oAttempts[paperId] = {
             corrects: 0,
             wrongs: 0,
             questions: {},
           };
-        } else if ("completed" in oAttempts[instr]) {
-          delete oAttempts[instr].completed;
         }
-        for (let ques in instructs[instr].questions) {
-          if (!(ques in oAttempts[instr].questions)) {
-            oAttempts[instr].questions[ques] = {
+        for (let ques in papers[props.community.id][paperId].questions) {
+          if (!(ques in oAttempts[paperId].questions)) {
+            oAttempts[paperId].questions[ques] = {
               answers: [],
               corrects: 0,
               wrongs: 0,
             };
           }
           const quest = {
-            ...instructs[instr].questions[ques],
+            ...papers[props.community.id][paperId].questions[ques],
             id: ques,
             checks: {},
             error: false,
             helperText: " ",
           };
           if (
-            "explanation" in oAttempts[instr].questions[ques] &&
-            oAttempts[instr].questions[ques].explanation
+            "explanation" in oAttempts[paperId].questions[ques] &&
+            oAttempts[paperId].questions[ques].explanation
           ) {
-            quest.explanation = oAttempts[instr].questions[ques].explanation;
+            quest.explanation = oAttempts[paperId].questions[ques].explanation;
             if (
-              "explaId" in oAttempts[instr].questions[ques] &&
-              oAttempts[instr].questions[ques].explaId
+              "explaId" in oAttempts[paperId].questions[ques] &&
+              oAttempts[paperId].questions[ques].explaId
             ) {
-              quest.explaId = oAttempts[instr].questions[ques].explaId;
+              quest.explaId = oAttempts[paperId].questions[ques].explaId;
             }
           }
-          if (oAttempts[instr].questions[ques].answers.length > 0) {
+          if (oAttempts[paperId].questions[ques].answers.length > 0) {
             let wrong = false;
             for (let choice in quest.choices) {
-              if (oAttempts[instr].questions[ques].answers.includes(choice)) {
+              if (oAttempts[paperId].questions[ques].answers.includes(choice)) {
                 quest.checks[choice] = true;
                 if (!quest.answers.includes(choice)) {
                   wrong = true;
@@ -123,29 +121,24 @@ const PaperTest = (props) => {
               quest.checks[choice] = false;
             }
           }
-          if (instr in quests) {
-            quests[instr].push(quest);
+          if (paperId in quests) {
+            quests[paperId].push(quest);
           } else {
-            quests[instr] = [quest];
+            quests[paperId] = [quest];
           }
         }
       }
       setQuestions(quests);
-      if (tutorialDoc.exists) {
-        changeExpand(
-          tutorialData.completed + 1,
-          tutorialRef,
-          tutorialDoc,
-          oAttempts
-        );
+      if (applDoc.exists) {
+        changeExpand(applData.completed + 1, applRef, applDoc, oAttempts);
       } else {
         setAttempts(oAttempts);
       }
     };
-    if (instructions.length > 0 && fullname) {
+    if (fullname) {
       loadAttempts();
     }
-  }, [instructions, fullname]);
+  }, [fullname]);
 
   useEffect(() => {
     if (completed === instructions.length - 2) {
@@ -680,10 +673,10 @@ const PaperTest = (props) => {
             </Box>
           )} */}
         <Box>
-          <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
+          {/* <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
             {correctAttempts} Correct
           </Box>
-          &amp;
+          &amp; */}
           <Box
             sx={{
               display: "inline",
@@ -695,7 +688,7 @@ const PaperTest = (props) => {
           >
             {wrongAttempts} Wrong
           </Box>
-          total attemps!
+          attemps so far!
         </Box>
       </Paper>
     </>
