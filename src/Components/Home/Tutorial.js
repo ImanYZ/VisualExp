@@ -474,8 +474,8 @@ const Tutorial = (props) => {
                     >
                       {idx === instructions.length - 1 && (
                         <Box sx={{ mb: "10px", fontWeight: 700 }}>
-                          You had a total of {correctAttempts + wrongAttempts}{" "}
-                          attemps in answering the questions.
+                          You had a total of {wrongAttempts} wrong attemps in
+                          answering the questions.
                         </Box>
                       )}
                       {instr.id in questions &&
@@ -692,10 +692,10 @@ const Tutorial = (props) => {
             </Box>
           )} */}
         <Box>
-          <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
+          {/* <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
             {correctAttempts} Correct
           </Box>
-          &amp;
+          &amp; */}
           <Box
             sx={{
               display: "inline",
@@ -707,7 +707,7 @@ const Tutorial = (props) => {
           >
             {wrongAttempts} Wrong
           </Box>
-          total attemps!
+          attemps so far!
         </Box>
       </Paper>
     </>

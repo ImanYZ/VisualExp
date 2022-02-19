@@ -756,12 +756,220 @@ export default {
   ["Cryptoeconomics"]: {
     Bitcoin_whitepaper: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FBitcoin_whitepaper.pdf?alt=media&token=372bf6cc-642b-4541-9407-d51527fd83a5",
-      questions: {},
+      questions: {
+        What_is_a_blockchain: {
+          stem: `1. What is a blockchain?`,
+          answers: ["a"],
+          choices: {
+            a: "A distributed database that is shared among the nodes of a computer network",
+            b: "A digital currency",
+            c: "A file where data pertaining to the network are recorded",
+            d: "A database which structures its data into tables",
+          },
+        },
+        How_does_a_blockchain_prevent_users_from_tampering_with_its_data: {
+          stem: `2. How does a blockchain prevent users from tampering with its data?`,
+          answers: ["a"],
+          choices: {
+            a: "All other nodes cross-reference each other and pinpoint the node with incorrect information",
+            b: "A company has full control over the database",
+            c: "The identities of all users are known and linked to their transactions",
+            d: "A single node in the network can alter the information held within",
+          },
+        },
+        Of_the_sentences_describing_blockchain_listed_below_which_are_true: {
+          stem: `3. Of the sentences describing blockchain listed below, which are true?`,
+          answers: ["b", "c", "d"],
+          choices: {
+            a: "Blockchain has a physical form",
+            b: "Blockchain has intrinsic value as a trustworthy, secure, and fast way to transfer value",
+            c: "Data entered into a blockchain is irreversible",
+            d: "Blockchain has been most commonly used as a ledger for transactions",
+          },
+        },
+        What_is_a_cryptocurrency: {
+          stem: `4. What is a cryptocurrency?`,
+          answers: ["a"],
+          choices: {
+            a: "A digital currency that is secured by cryptography",
+            b: "A distributed ledger enforced by a disparate network of computers",
+            c: "A currency issued by a central authority",
+            d: "A currency that enables secure online payments with the use of third-party intermediaries",
+          },
+        },
+        Section_2_A_common_solution_to_prevent_double_spending_is_to_introduce:
+          {
+            stem: `5. [Section 2] A common solution to prevent double-spending is to introduce a trusted
+          central authority. What is the main problem with this solution?`,
+            answers: ["a"],
+            choices: {
+              a: "The fate of the entire money system depends on the trusted central authority",
+              b: "Transactions aren't publicly announced",
+              c: "Participants can't agree on a single transaction history",
+              d: "Later attempts to double-spend are not counted",
+            },
+          },
+        Section_4_Under_Proof_of_Work,
+        _what_would_an_attacker_have_to_do_to_modify_a_past_block: {
+          stem: `5. [Section 4] Under Proof-of-Work, what would an attacker have to do to modify a past
+          block?`,
+          answers: ["a", "b"],
+          choices: {
+            a: "Redo the proof-of-work of the block and all blocks after it",
+            b: "Catch up and then surpass the work of the honest nodes",
+            c: "Scan for a value that when hashed begins with a number of zero bits",
+            d: "Allocate many IPs",
+          },
+        },
+        Section_6_What_are_two_ways_to_fund_an_incentive_for_nodes_to_support_the_network:
+          {
+            stem: `5. [Section 6] What are two ways to fund an incentive for nodes to support the network?`,
+            answers: ["a", "b"],
+            choices: {
+              a: "Generating new coins",
+              b: "Transaction fees",
+              c: "Proof-of-Stake",
+              d: "Timestamp Server",
+            },
+          },
+        Section_7_What_is_the_name_for_the_data_structure_used_to_save_disk_space_by_hashing_transactions_in_a_block:
+          {
+            stem: `5. [Section 7] What is the name for the data structure used to save disk space by hashing
+          transactions in a block?`,
+            answers: ["a"],
+            choices: {
+              a: "Merkle Tree",
+              b: "Block Hash",
+              c: "Blockchain",
+              d: "Proof-of-Work Chain",
+            },
+          },
+      },
     },
   },
   ["Deep_Learning"]: {},
-  ["Graphic_Design"]: {},
+  ["Graphic_Design"]: {
+    Graphic_Design_Reading_Chapter_1: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGraphic_Design_Reading.pdf?alt=media&token=ad7bd3fc-6541-4a3b-978a-b412b43f260c",
+      questions: {
+        What_is_one_of_the_consequences_of_poor_product_behavior: {
+          stem: `1. What is one of the consequences of poor product behavior?`,
+          answers: ["b"],
+          choices: {
+            a: "The user can lose their phone",
+            b: "Can cause users who are not familiar with certain jargon confusion when operating a digital product",
+            c: "The user's needs are anticipated",
+          },
+        },
+        How_could_a_lack_of_a_design_process_cause_a_digital_product_to_fail: {
+          stem: `2. How could a lack of a design process cause a digital product to fail?`,
+          answers: ["c"],
+          choices: {
+            a: "The product fails to increase productivity",
+            b: "The developer fails to advocate for the user, the business, and the technology",
+            c: "The product is not desirable to the users and fails to meet their professional, personal, and emotional needs",
+          },
+        },
+        What_does_design_of_behavior_require_a_greater_knowledge_of: {
+          stem: `3. What does design of behavior require a greater knowledge of?`,
+          answers: ["a"],
+          choices: {
+            a: "Context",
+            b: "Logos",
+            c: "Typography",
+          },
+        },
+        Personal_goals_of_employee_s_matter_when_building_a_product_for_a_business:
+          {
+            stem: `4. Personal goals of employee's matter when building a product for a business.`,
+            answers: ["a"],
+            choices: {
+              a: "True",
+              b: "False",
+            },
+          },
+        What_is_a_problem_within_the_traditional_style_of_the_design_process: {
+          stem: `5. What is a problem within the traditional style of the design process?`,
+          answers: ["a"],
+          choices: {
+            a: "Researchers are overbearing",
+            b: "Designers are not included in the research process",
+            c: "There is no ethnographic data",
+          },
+        },
+        Good_designs_make_users_more______: {
+          stem: `6. Good designs make users more _____`,
+          answers: ["a"],
+          choices: {
+            a: "Effective",
+            b: "Quick",
+            c: "Intelligent",
+          },
+        },
+      },
+    },
+  },
   ["UI_Design"]: {},
-  ["UX_Research"]: {},
+  ["UX_Research"]: {
+    When_to_Use_Which_User_Experience_Research_Methods: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen%20to%20Use%20Which%20User-Experience%20Research%20Methods.pdf?alt=media&token=948c0113-1abb-452b-83e2-6c7a9c6e1189",
+      questions: {
+        What_are_the_phases_of_product_development: {
+          stem: `1. What are the phases of product development? Please select all that apply.`,
+          answers: ["b", "c", "d"],
+          choices: {
+            a: "Create",
+            b: "Strategize",
+            c: "Assess",
+            d: "Execute",
+          },
+        },
+        Exploring_what_people_say_and_trying_to_discover_how_why_to_fix_their_problem_is_what_kind_of_research_method:
+          {
+            stem: `2. Exploring what people say and trying to discover how &amp; why to fix their problem is what kind of research method?`,
+            answers: ["c"],
+            choices: {
+              a: "Behavioral, qualitative",
+              b: "Behavioral, quantitative",
+              c: "Attitudinal, qualitative",
+              c: "Attitudinal, quantitative",
+            },
+          },
+        What_are_ethnographic_field_studies: {
+          stem: `3. What are ethnographic field studies?`,
+          answers: ["b"],
+          choices: {
+            a: "A researcher meets with participants one-on-one to discuss in-depth what the participant thinks about the topic in question",
+            b: "Researchers meet with and study participants in their natural environment, where they would most likely encounter the product or service in question",
+            c: "Participants are brought into a lab and given a set of scenarios that lead to tasks and usage of specific interest within a product or service",
+          },
+        },
+        Which_UX_research_methods_fall_in_the_attitudinal_AND_qualitative_categories:
+          {
+            stem: `4. Which UX research methods fall in the attitudinal AND qualitative categories?`,
+            answers: ["a", "b", "e"],
+            choices: {
+              a: "Focus groups",
+              b: "Interviews",
+              c: "Email surveys",
+              d: "Eye-tracking",
+              e: "Diary studies",
+              f: "A/B testing",
+            },
+          },
+        What_UX_research_method_is_best_to_study_participants_over_a_long_period_of_time:
+          {
+            stem: `5. What UX research method is best to study participants over a long period of time and lets participants record their experiences with a product?`,
+            answers: ["b"],
+            choices: {
+              a: "Participatory Design",
+              b: "Diary Study",
+              c: "Eye-tracking",
+              d: "A/B testing",
+            },
+          },
+      },
+    },
+  },
   ["Liaison_Librarians"]: {},
 };
