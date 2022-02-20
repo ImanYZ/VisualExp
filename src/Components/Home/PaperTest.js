@@ -400,7 +400,7 @@ const PaperTest = (props) => {
       <PagesNavbar tutorial={true}>
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
-            1Cademy {props.communiTitle} Specific Test
+            Community Specific Test
           </Typography>
           <Box sx={{ mb: "10px" }}>
             <Box>
@@ -442,16 +442,31 @@ const PaperTest = (props) => {
                       sx={{
                         padding: "10px",
                         mb: "19px",
-                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
-                        overflowY: { sx: "hidden", md: "auto" },
+                        height: "calc(100vh - 160px)",
+                        overflowY: "hidden",
                       }}
                     >
-                      <iframe
-                        src={paper.url + "#zoom=100"}
-                        title={paper.title}
+                      <Typography>
+                        Read{" "}
+                        <a href={paper.url} target="_blank">
+                          the following document
+                        </a>{" "}
+                        first.
+                      </Typography>
+                      <object
+                        data={paper.url}
+                        type="application/pdf"
                         width="100%"
-                        height="100vh"
-                      ></iframe>
+                        height="100%"
+                      >
+                        <iframe
+                          src={
+                            "https://docs.google.com/viewer?url=" +
+                            paper.url +
+                            "&embedded=true"
+                          }
+                        ></iframe>
+                      </object>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
