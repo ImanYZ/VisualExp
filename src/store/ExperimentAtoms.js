@@ -15,11 +15,6 @@ export const completedExperimentState = atom({
   default: false,
 });
 
-export const tutorialEndedState = atom({
-  key: "tutorialEndedState",
-  default: false,
-});
-
 export const phaseState = atom({
   key: "phaseState",
   default: 0,

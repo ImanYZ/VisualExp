@@ -17,11 +17,12 @@ import {
   fullnameState,
   resumeUrlState,
   transcriptUrlState,
+  tutorialEndedState,
+  communiTestsEndedState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
-  tutorialEndedState,
 } from "../../../../store/ExperimentAtoms";
 
 import Button from "../components/Button";
@@ -41,6 +42,9 @@ const JoinUs = (props) => {
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
   const tutorialEnded = useRecoilValue(tutorialEndedState);
+  const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(
+    communiTestsEndedState
+  );
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
 
@@ -97,41 +101,43 @@ const JoinUs = (props) => {
           setActiveInnerStep(4);
         } else {
           setCourseraUrl("");
-          if ("explanation" in applData && applData.explanation) {
-            setCheckedInnerStep(3);
-            setActiveInnerStep(3);
-          } else {
-            setCheckedInnerStep((oldValue) => {
-              if (oldValue === 3) {
-                return 2;
-              }
-            });
-            setActiveInnerStep((oldValue) => {
-              if (oldValue === 3) {
-                return 2;
-              }
-            });
-          }
           if ("portfolioUrl" in applData && applData.portfolioUrl) {
             setPortfolioUrl(applData["portfolioUrl"]);
             setCheckedInnerStep(4);
             setActiveInnerStep(4);
           } else {
             setPortfolioUrl("");
-            if ("explanation" in applData && applData.explanation) {
-              setCheckedInnerStep(3);
-              setActiveInnerStep(3);
+            if ("ended" in applData && applData.ended) {
+              setCommuniTestsEnded((oldObj) => {
+                return {
+                  ...oldObj,
+                  [props.community.id]: true,
+                };
+              });
+              setCheckedInnerStep(4);
+              setActiveInnerStep(4);
             } else {
-              setCheckedInnerStep((oldValue) => {
-                if (oldValue === 3) {
-                  return 2;
-                }
+              setCommuniTestsEnded((oldObj) => {
+                return {
+                  ...oldObj,
+                  [props.community.id]: false,
+                };
               });
-              setActiveInnerStep((oldValue) => {
-                if (oldValue === 3) {
-                  return 2;
-                }
-              });
+              if ("explanation" in applData && applData.explanation) {
+                setCheckedInnerStep(3);
+                setActiveInnerStep(3);
+              } else {
+                setCheckedInnerStep((oldValue) => {
+                  if (oldValue === 3) {
+                    return 2;
+                  }
+                });
+                setActiveInnerStep((oldValue) => {
+                  if (oldValue === 3) {
+                    return 2;
+                  }
+                });
+              }
             }
           }
         }

@@ -32,6 +32,21 @@ export const isAdminState = atom({
   default: false,
 });
 
+export const isLeaderState = atom({
+  key: "isLeaderState",
+  default: false,
+});
+
+export const tutorialEndedState = atom({
+  key: "tutorialEndedState",
+  default: false,
+});
+
+export const communiTestsEndedState = atom({
+  key: "communiTestsEndedState",
+  default: {},
+});
+
 export const themeState = atom({
   key: "themeState",
   default: "Dark",
@@ -40,4 +55,9 @@ export const themeState = atom({
 export const themeOSState = atom({
   key: "themeOSState",
   default: "Dark",
+});
+
+export const colorModeState = atom({
+  key: "colorModeState",
+  default: "light",
 });

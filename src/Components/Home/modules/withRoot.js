@@ -5,7 +5,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import { colorModeState } from "../../../store/GlobalAtoms";
+import { colorModeState } from "../../../store/AuthAtoms";
 
 import theme from "./theme";
 

@@ -6,7 +6,6 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
@@ -18,11 +17,14 @@ import Button from "@mui/material/Button";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CheckIcon from "@mui/icons-material/Check";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
-import { firebaseState, fullnameState } from "../../store/AuthAtoms";
+import {
+  firebaseState,
+  fullnameState,
+  communiTestsEndedState,
+} from "../../store/AuthAtoms";
 
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
@@ -32,13 +34,15 @@ import communitiesPapers from "./modules/views/communitiesPapers";
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
+  const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(
+    communiTestsEndedState
+  );
 
   const [papers, setPapers] = useState([]);
   const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
   const [completed, setCompleted] = useState(-1);
   const [fireworks, setFireworks] = useState(false);
-  const [testEnded, setTestEnded] = useState(false);
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
@@ -282,7 +286,12 @@ const PaperTest = (props) => {
         applData.completed = expanded;
         setCompleted(expanded);
         if (expanded === papers.length - 2) {
-          setTestEnded(true);
+          setCommuniTestsEnded((oldObj) => {
+            return {
+              ...oldObj,
+              [props.communiId]: true,
+            };
+          });
           applData.ended = true;
         }
       }
@@ -328,10 +337,6 @@ const PaperTest = (props) => {
         await applRef.update(applData);
       } else {
         await applRef.set(applData);
-      }
-      if (applData.ended) {
-        const userRef = firebase.db.collection("users").doc(fullname);
-        await userRef.update({ applEnded: true });
       }
     }
   };

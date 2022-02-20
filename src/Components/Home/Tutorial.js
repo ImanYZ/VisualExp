@@ -6,7 +6,6 @@ import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
@@ -18,12 +17,11 @@ import Button from "@mui/material/Button";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import CheckIcon from "@mui/icons-material/Check";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
-import { tutorialEndedState } from "../../store/ExperimentAtoms";
+import { tutorialEndedState } from "../../store/AuthAtoms";
 
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";

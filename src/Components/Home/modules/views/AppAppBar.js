@@ -23,13 +23,13 @@ import {
   fullnameState,
   resumeUrlState,
   transcriptUrlState,
+  tutorialEndedState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
-  tutorialEndedState,
 } from "../../../../store/ExperimentAtoms";
-import { colorModeState } from "../../../../store/GlobalAtoms";
+import { colorModeState } from "../../../../store/AuthAtoms";
 
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
