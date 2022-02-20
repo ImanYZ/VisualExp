@@ -72,12 +72,21 @@ const PaperTest = (props) => {
       let applData;
       if (applDoc.exists) {
         applData = applDoc.data();
-        setCorrectAttempts(applData.corrects);
-        setWrongAttempts(applData.wrongs);
-        setCompleted(applData.completed);
-        oAttempts = applData.attempts;
+        if ("corrects" in applData) {
+          setCorrectAttempts(applData.corrects);
+        }
+        if ("wrongs" in applData) {
+          setWrongAttempts(applData.wrongs);
+        }
+        if ("completed" in applData) {
+          setCompleted(applData.completed);
+        }
+        if ("attempts" in applData) {
+          oAttempts = applData.attempts;
+        }
       }
       for (let paperId in communitiesPapers[props.communiId]) {
+        console.log({ oAttempts });
         if (!(paperId in oAttempts)) {
           oAttempts[paperId] = {
             corrects: 0,
@@ -144,7 +153,7 @@ const PaperTest = (props) => {
         }
       }
       setQuestions(quests);
-      if (applDoc.exists) {
+      if (applDoc.exists && "completed" in applData) {
         changeExpand(applData.completed + 1, applRef, applDoc, oAttempts);
       } else {
         setAttempts(oAttempts);
@@ -391,7 +400,7 @@ const PaperTest = (props) => {
       <PagesNavbar tutorial={true}>
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
-            1Cademy {props.community.title} Specific Test
+            1Cademy {props.communiTitle} Specific Test
           </Typography>
           <Box sx={{ mb: "10px" }}>
             <Box>
@@ -437,7 +446,12 @@ const PaperTest = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      {paper.video && <YoutubeEmbed embedId={paper.video} />}
+                      <iframe
+                        src={paper.url + "#zoom=100"}
+                        title={paper.title}
+                        width="100%"
+                        height="100vh"
+                      ></iframe>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -636,38 +650,6 @@ const PaperTest = (props) => {
         <Box sx={{ mt: "4px", fontWeight: "bold", fontStyle: "italic" }}>
           The fewer wrong attempts, the better.
         </Box>
-        {/* {expanded !== false &&
-          expanded < papers.length - 1 &&
-          papeructions[expanded].id in attempts && (
-            <Box sx={{ mt: "4px" }}>
-              <Box
-                sx={{
-                  display: "inline",
-                  color: "green",
-                  mr: "7px",
-                }}
-              >
-                {papeructions[expanded].id in attempts &&
-                  attempts[papeructions[expanded].id].corrects}{" "}
-                Correct
-              </Box>
-              &amp;
-              <Box
-                sx={{
-                  display: "inline",
-                  color: "red",
-                  fontWeight: 700,
-                  ml: "7px",
-                  mr: "7px",
-                }}
-              >
-                {papeructions[expanded].id in attempts &&
-                  attempts[papeructions[expanded].id].wrongs}{" "}
-                Wrong
-              </Box>
-              in this section!
-            </Box>
-          )} */}
         <Box>
           {/* <Box sx={{ display: "inline", color: "green", mr: "7px" }}>
             {correctAttempts} Correct

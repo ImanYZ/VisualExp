@@ -747,19 +747,22 @@ const JoinUs = (props) => {
                           : {}
                       }
                     >
-                      The last step to apply to this community is a test of your
-                      domain-specific knowledge. If you are interested in
-                      joining this community but don't have the background
-                      knowledge, no worries. Similar to the second phase, we
-                      have provided you with a document about the topic and ask
-                      you only questions from that document. Just make sure you
-                      carefully read the document and choose the most
-                      appropriate answers for each question. The community
-                      leaders will evaluate your application based on your
-                      number of WRONG attempts in answering the questions. Click
-                      the button to start the community-specific test.
+                      Complete your domain-specific knowledge test.
                     </StepLabel>
                     <StepContent>
+                      <Typography>
+                        The last step to apply to this community is a test of
+                        your domain-specific knowledge. If you are interested in
+                        joining this community but don't have the background
+                        knowledge, no worries. Similar to the second phase, we
+                        have provided you with a document about the topic and
+                        ask you only questions from that document. Just make
+                        sure you carefully read the document and choose the most
+                        appropriate answers for each question. The community
+                        leaders will evaluate your application based on your
+                        number of WRONG attempts in answering the questions.
+                        Click the button to start the community-specific test.
+                      </Typography>
                       <Button
                         variant="contained"
                         component="a"

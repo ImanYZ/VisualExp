@@ -1,6 +1,7 @@
 export default {
   ["Educational_Organizational_Psychology"]: {
     The_psychology_of_task_management_The_smaller_tasks_trap: {
+      title: "The Psychology of Task Management: The Smaller Tasks Trap",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
       questions: {
         What_is_this_article_about: {
@@ -63,6 +64,7 @@ export default {
   },
   ["Clinical_Psychology"]: {
     Clinical_Psychology_Reading_Test: {
+      title: "Definition and Training of Clinical Psychology",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FClinical%20Psychology%20Reading.pdf?alt=media&token=fbf1103d-d716-40f2-a95f-5e70178a5e09",
       questions: {
         What_aspect_of_training_distinguishes_clinical_psychology_from_other_helping_professions:
@@ -149,6 +151,7 @@ export default {
   },
   ["Mindfulness"]: {
     Mindfulness_Based_Eating_Awareness_Training: {
+      title: "MB-EAT for Binge Eating: A Randomized Clinical Trial",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FKristellerWoleverSheets_BED_In_Mindfulness2013.pdf?alt=media&token=ee440abf-b8ef-459d-92de-3e32475b8cf8",
       questions: {
         In_this_community_we_will_focus_on_Mindfulness_in_what_context: {
@@ -217,6 +220,7 @@ export default {
   },
   ["Health_Psychology"]: {
     Health_Psychology_Chapter_1: {
+      title: "Health Psychology: An Introduction",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FHealth%20Psychology.%20Fifth%20Edition%20Chapter%201.pdf?alt=media&token=484f630b-18b6-467a-a65a-faec2257e39c",
       questions: {
         In_the_definition_given_in_this_book_health_psychology_is_defined_as_an________field:
@@ -308,6 +312,7 @@ export default {
   },
   ["Neuroscience"]: {
     Fundamentals_of_Neuroscience: {
+      title: "Fundamentals of Neuroscience",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFundamentals_of_Neuroscience.pdf?alt=media&token=ede5917c-2278-4143-89b1-60797ad530ca",
       questions: {
         Vertebrate_nervous_system_components_are_named_for_both_their: {
@@ -450,6 +455,7 @@ export default {
   },
   ["Disability_Studies"]: {
     What_is_Disability_Studies_UMInDS: {
+      title: "UM Initiative on Disability Studies: What is Disability Studies?",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat_is_Disability_Studies_UMInDS.pdf?alt=media&token=3e16f0ee-e8b5-492e-a776-8b8025b18559",
       questions: {
         Disability_studies_is_primarily_interested_in_looking_at_disability_from_a_medical_perspective:
@@ -482,6 +488,7 @@ export default {
       },
     },
     Redefining_disability_culture: {
+      title: "(Re)defining Disability Culture",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FForber-Pratt-2018-CP-DisCulture.pdf?alt=media&token=d74a5104-9735-4f6b-9c90-299d097be30d",
       questions: {
         Which_of_the_following_is_NOT_part_of_the_ADAs_definition_of_disability:
@@ -541,6 +548,7 @@ export default {
   },
   ["Social_Political_Psychology"]: {
     When_Fake_News_feels_true: {
+      title: "When (Fake) News Feels True",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen_Fake_News_feels_true.pdf?alt=media&token=f7d6bfa1-5937-409e-ace8-3ad4d087a3cb",
       questions: {
         What_is_the_goal_of_article_1_When_Fake_News_Feels_True: {
@@ -642,6 +650,8 @@ export default {
       },
     },
     Fake_news_game_confers_psychological_resistance_ag: {
+      title:
+        "Fake News Game Confers Psychological Resistance Against Online Misinformation",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFake_news_game_confers_psychological_resistance_ag.pdf?alt=media&token=4a2332d4-3750-4308-9c72-96e28c514e80",
       questions: {
         What_is_the_inoculation_theory_of_misinformation: {
@@ -755,6 +765,7 @@ export default {
   },
   ["Cryptoeconomics"]: {
     Bitcoin_whitepaper: {
+      title: "Bitcoin: A Peer-to-Peer Electronic Cash System",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FBitcoin_whitepaper.pdf?alt=media&token=372bf6cc-642b-4541-9407-d51527fd83a5",
       questions: {
         What_is_a_blockchain: {
@@ -849,6 +860,7 @@ export default {
   },
   ["Deep_Learning"]: {
     NLP_Chapter13: {
+      title: "Natural Language Processing",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FNLP_Chapter.pdf?alt=media&token=b49e9a3d-cf77-49ec-a17e-81757c1ca72b",
       questions: {
         Which_of_the_following_is_TRUE_about_NLP: {
@@ -991,6 +1003,7 @@ export default {
   },
   ["Graphic_Design"]: {
     Graphic_Design_Reading_Chapter_1: {
+      title: "A Design Process for Digital Products",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGraphic_Design_Reading.pdf?alt=media&token=ad7bd3fc-6541-4a3b-978a-b412b43f260c",
       questions: {
         What_is_one_of_the_consequences_of_poor_product_behavior: {
@@ -1053,6 +1066,7 @@ export default {
   ["UI_Design"]: {},
   ["UX_Research"]: {
     When_to_Use_Which_User_Experience_Research_Methods: {
+      title: "When to Use Which User-Experience Research Methods",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen%20to%20Use%20Which%20User-Experience%20Research%20Methods.pdf?alt=media&token=948c0113-1abb-452b-83e2-6c7a9c6e1189",
       questions: {
         What_are_the_phases_of_product_development: {

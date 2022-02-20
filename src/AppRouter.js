@@ -161,7 +161,12 @@ const AppRouter = (props) => {
             <Route
               key={communi.id}
               path={"/paperTest/" + communi.id}
-              element={<PaperTest communiId={communi.id} />}
+              element={
+                <PaperTest
+                  communiId={communi.id}
+                  communiTitle={communi.title}
+                />
+              }
             />
           )}
         </>
