@@ -27,12 +27,13 @@ import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
 
-import papers from "./modules/views/communitiesPapers";
+import communitiesPapers from "./modules/views/communitiesPapers";
 
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
+  const [papers, setPapers] = useState([]);
   const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
   const [completed, setCompleted] = useState(-1);
@@ -41,6 +42,24 @@ const PaperTest = (props) => {
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
+
+  useEffect(() => {
+    const paps = [];
+    for (let paperId in communitiesPapers[props.community.id]) {
+      paps.push({
+        ...communitiesPapers[props.community.id][paperId],
+        id: paperId,
+      });
+    }
+    paps.push({
+      id: "Congratulations",
+      title: "Congratulations!",
+      description: `You successfully completed the 1Cademy application process.
+    The community leaders will review all parts of your application and will email you about the result in a few days to weeks, depending on the number of applications they have received.`,
+      questions: {},
+    });
+    setPapers(paps);
+  }, []);
 
   useEffect(() => {
     const loadAttempts = async () => {
@@ -58,7 +77,7 @@ const PaperTest = (props) => {
         setCompleted(applData.completed);
         oAttempts = applData.attempts;
       }
-      for (let paperId in papers[props.community.id]) {
+      for (let paperId in communitiesPapers[props.community.id]) {
         if (!(paperId in oAttempts)) {
           oAttempts[paperId] = {
             corrects: 0,
@@ -66,7 +85,8 @@ const PaperTest = (props) => {
             questions: {},
           };
         }
-        for (let ques in papers[props.community.id][paperId].questions) {
+        for (let ques in communitiesPapers[props.community.id][paperId]
+          .questions) {
           if (!(ques in oAttempts[paperId].questions)) {
             oAttempts[paperId].questions[ques] = {
               answers: [],
@@ -75,7 +95,7 @@ const PaperTest = (props) => {
             };
           }
           const quest = {
-            ...papers[props.community.id][paperId].questions[ques],
+            ...communitiesPapers[props.community.id][paperId].questions[ques],
             id: ques,
             checks: {},
             error: false,
@@ -86,12 +106,7 @@ const PaperTest = (props) => {
             oAttempts[paperId].questions[ques].explanation
           ) {
             quest.explanation = oAttempts[paperId].questions[ques].explanation;
-            if (
-              "explaId" in oAttempts[paperId].questions[ques] &&
-              oAttempts[paperId].questions[ques].explaId
-            ) {
-              quest.explaId = oAttempts[paperId].questions[ques].explaId;
-            }
+            quest.explaId = oAttempts[paperId].questions[ques].explaId;
           }
           if (oAttempts[paperId].questions[ques].answers.length > 0) {
             let wrong = false;
@@ -110,7 +125,7 @@ const PaperTest = (props) => {
             }
             if (wrong) {
               quest.helperText =
-                "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+                "Incorrect! Please review the document and answer again. Please select all that apply.";
               quest.error = true;
             } else {
               quest.helperText = "You got it!";
@@ -135,42 +150,42 @@ const PaperTest = (props) => {
         setAttempts(oAttempts);
       }
     };
-    if (fullname) {
+    if (papers.length > 0 && fullname) {
       loadAttempts();
     }
-  }, [fullname]);
+  }, [papers, fullname]);
 
   useEffect(() => {
-    if (completed === instructions.length - 2) {
+    if (completed === papers.length - 2) {
       setFireworks(true);
       setTimeout(() => {
         setFireworks(false);
       }, 7000);
     }
-  }, [completed]);
+  }, [papers, completed]);
 
-  const checkChoice = (instrId, qIdx) => (event) => {
+  const checkChoice = (paperId, qIdx) => (event) => {
     const quests = { ...questions };
-    quests[instrId][qIdx].checks[event.target.name] = event.target.checked;
-    quests[instrId][qIdx].error = false;
-    quests[instrId][qIdx].helperText = " ";
+    quests[paperId][qIdx].checks[event.target.name] = event.target.checked;
+    quests[paperId][qIdx].error = false;
+    quests[paperId][qIdx].helperText = " ";
     setQuestions(quests);
   };
 
-  const openExplanation = (instrId, qIdx) => (event) => {
+  const openExplanation = (paperId, qIdx) => (event) => {
     const quests = { ...questions };
-    quests[instrId][qIdx].explanationOpen =
-      !quests[instrId][qIdx].explanationOpen;
+    quests[paperId][qIdx].explanationOpen =
+      !quests[paperId][qIdx].explanationOpen;
     setQuestions(quests);
   };
 
-  const changeExplanation = (instrId, qIdx) => (event) => {
+  const changeExplanation = (paperId, qIdx) => (event) => {
     const quests = { ...questions };
-    quests[instrId][qIdx].explanation = event.target.value;
+    quests[paperId][qIdx].explanation = event.target.value;
     setQuestions(quests);
   };
 
-  const handleSubmit = (instrId, qIdx) => async (event) => {
+  const handleSubmit = (paperId, qIdx) => async (event) => {
     event.preventDefault();
 
     if (expanded === false) {
@@ -178,33 +193,31 @@ const PaperTest = (props) => {
     }
     const oAttempts = { ...attempts };
     const quests = { ...questions };
-    const question = quests[instrId][qIdx];
+    const question = quests[paperId][qIdx];
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
     let wrong = false;
-    oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
+    oAttempts[paperId].submitted = firebase.firestore.Timestamp.fromDate(
       new Date()
     );
     if ("explanation" in question && question.explanation) {
-      oAttempts[instrId].questions[question.id].explanation =
+      oAttempts[paperId].questions[question.id].explanation =
         question.explanation;
-      if ("explaId" in question && question.explaId) {
-        oAttempts[instrId].questions[question.id].explaId = question.explaId;
-      }
+      oAttempts[paperId].questions[question.id].explaId = question.explaId;
     }
     for (let choice in question.checks) {
       if (
         question.checks[choice] &&
-        !oAttempts[instrId].questions[question.id].answers.includes(choice)
+        !oAttempts[paperId].questions[question.id].answers.includes(choice)
       ) {
-        oAttempts[instrId].questions[question.id].answers.push(choice);
+        oAttempts[paperId].questions[question.id].answers.push(choice);
       }
       if (
         !question.checks[choice] &&
-        oAttempts[instrId].questions[question.id].answers.includes(choice)
+        oAttempts[paperId].questions[question.id].answers.includes(choice)
       ) {
-        oAttempts[instrId].questions[question.id].answers = oAttempts[
-          instrId
+        oAttempts[paperId].questions[question.id].answers = oAttempts[
+          paperId
         ].questions[question.id].answers.filter((answ) => answ !== choice);
       }
       if (
@@ -216,22 +229,22 @@ const PaperTest = (props) => {
     }
     let allCorrect = true;
     if (wrong) {
-      oAttempts[instrId].questions[question.id].wrongs += 1;
-      oAttempts[instrId].wrongs += 1;
+      oAttempts[paperId].questions[question.id].wrongs += 1;
+      oAttempts[paperId].wrongs += 1;
       allCorrect = false;
       wAttempts += 1;
       question.helperText =
-        "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+        "Incorrect! Please review the document and answer again. Please select all that apply.";
       question.error = true;
     } else {
-      oAttempts[instrId].questions[question.id].corrects += 1;
-      oAttempts[instrId].corrects += 1;
+      oAttempts[paperId].questions[question.id].corrects += 1;
+      oAttempts[paperId].corrects += 1;
       cAttempts += 1;
       question.helperText = "You got it!";
       question.error = false;
     }
     if (allCorrect) {
-      for (let ques of quests[instrId]) {
+      for (let ques of quests[paperId]) {
         for (let choice in ques.checks) {
           if (
             (ques.checks[choice] && !ques.answers.includes(choice)) ||
@@ -246,28 +259,30 @@ const PaperTest = (props) => {
     setWrongAttempts(wAttempts);
     setAttempts(oAttempts);
     setQuestions(quests);
-    let tutorialData = {
+    let applData = {
       attempts: oAttempts,
       corrects: cAttempts,
       wrongs: wAttempts,
       completed,
     };
     if (allCorrect) {
-      // if (expanded < instructions.length - 1) {
+      // if (expanded < papers.length - 1) {
       //   changeExpand(expanded + 1);
       // }
       if (completed < expanded) {
-        tutorialData.completed = expanded;
+        applData.completed = expanded;
         setCompleted(expanded);
-        if (expanded === instructions.length - 2) {
-          setTutorialEnded(true);
-          tutorialData.ended = true;
+        if (expanded === papers.length - 2) {
+          setTestEnded(true);
+          applData.ended = true;
         }
       }
     }
     if (fullname) {
-      const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
-      const tutorialDoc = await tutorialRef.get();
+      const applRef = firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.community.id);
+      const applDoc = await applRef.get();
       if ("explanation" in question && question.explanation) {
         let explaRef = firebase.db.collection("explanations").doc();
         let explaDoc;
@@ -277,14 +292,14 @@ const PaperTest = (props) => {
             .doc(question.explaId);
           explaDoc = await explaRef.get();
         } else {
-          oAttempts[instrId].questions[question.id].explaId = explaRef.id;
+          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
           question.explaId = explaRef.id;
-          tutorialData.attempts[instrId].questions[question.id].explaId =
+          explaData.attempts[paperId].questions[question.id].explaId =
             explaRef.id;
         }
         const explaData = {
           fullname,
-          instrId,
+          paperId,
           qIdx,
           explanation: question.explanation,
         };
@@ -300,38 +315,35 @@ const PaperTest = (props) => {
           });
         }
       }
-      if (tutorialDoc.exists) {
-        await tutorialRef.update(tutorialData);
+      if (applDoc.exists) {
+        await applRef.update(applData);
       } else {
-        await tutorialRef.set(tutorialData);
+        await applRef.set(applData);
       }
-      if (tutorialData.ended) {
+      if (applData.ended) {
         const userRef = firebase.db.collection("users").doc(fullname);
-        await userRef.update({ tutorialEnded: true });
+        await userRef.update({ applEnded: true });
       }
     }
   };
 
-  const changeExpand = async (
-    newExpand,
-    tutorialRef,
-    tutorialDoc,
-    oAttempts
-  ) => {
+  const changeExpand = async (newExpand, applRef, applDoc, oAttempts) => {
     setExpanded(newExpand);
     if (Number.isInteger(newExpand)) {
-      if (!tutorialRef) {
-        tutorialRef = firebase.db.collection("tutorial").doc(fullname);
-        tutorialDoc = await tutorialRef.get();
+      if (!applRef) {
+        applRef = firebase.db
+          .collection("applications")
+          .doc(fullname + "_" + props.community.id);
+        applDoc = await applRef.get();
         oAttempts = { ...attempts };
       }
-      oAttempts[instructions[newExpand].id].started =
+      oAttempts[papers[newExpand].id].started =
         firebase.firestore.Timestamp.fromDate(new Date());
       setAttempts(oAttempts);
-      if (tutorialDoc.exists) {
-        await tutorialRef.update({ attempts: oAttempts });
+      if (applDoc.exists) {
+        await applRef.update({ attempts: oAttempts });
       } else {
-        await tutorialRef.set({
+        await applRef.set({
           attempts: oAttempts,
           corrects: correctAttempts,
           wrongs: wrongAttempts,
@@ -363,7 +375,7 @@ const PaperTest = (props) => {
   };
 
   const nextStep = (idx) => (event) => {
-    if (idx <= completed + 1 && idx < instructions.length - 1) {
+    if (idx <= completed + 1 && idx < papers.length - 1) {
       changeExpand(idx + 1);
     }
   };
@@ -379,19 +391,12 @@ const PaperTest = (props) => {
       <PagesNavbar tutorial={true}>
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
-            1Cademy Tutorial
+            1Cademy {props.community.title} Specific Test
           </Typography>
           <Box sx={{ mb: "10px" }}>
             <Box>
-              Welcome to the second step in the application process! Please go
-              through this tutorial to learn more about 1Cademy and how it
-              works. This tutorial takes on average an hour and a half. Please
-              carefully read{" "}
-              <a href="https://1cademy.us/home" target="_blank">
-                the 1Cademy homepage
-              </a>{" "}
-              and watch the following videos before answering any of the
-              questions, and <strong>select all the choices that apply</strong>.{" "}
+              Please carefully read the document before answering any of the
+              questions, and <strong>select all the choices that apply</strong>.
             </Box>
             <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
               The community leaders will decide about your application based on{" "}
@@ -415,7 +420,7 @@ const PaperTest = (props) => {
               <Typography variant="h5" gutterBottom sx={{ fontWeight: "700" }}>
                 {(idx > completed + 1
                   ? "🔒 "
-                  : idx === completed + 1 && idx !== instructions.length - 1
+                  : idx === completed + 1 && idx !== papers.length - 1
                   ? "🔓 "
                   : "✅ ") + instr.title}
               </Typography>
@@ -453,7 +458,7 @@ const PaperTest = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      {idx === instructions.length - 1 && (
+                      {idx === papers.length - 1 && (
                         <Box sx={{ mb: "10px", fontWeight: 700 }}>
                           You had a total of {correctAttempts + wrongAttempts}{" "}
                           attemps in answering the questions.
@@ -590,7 +595,7 @@ const PaperTest = (props) => {
                         Previous Step
                       </Button>
                     )}
-                    {idx < completed + 1 && idx < instructions.length - 1 && (
+                    {idx < completed + 1 && idx < papers.length - 1 && (
                       <Button
                         onClick={nextStep(idx)}
                         sx={{
@@ -641,7 +646,7 @@ const PaperTest = (props) => {
           The fewer wrong attempts, the better.
         </Box>
         {/* {expanded !== false &&
-          expanded < instructions.length - 1 &&
+          expanded < papers.length - 1 &&
           instructions[expanded].id in attempts && (
             <Box sx={{ mt: "4px" }}>
               <Box

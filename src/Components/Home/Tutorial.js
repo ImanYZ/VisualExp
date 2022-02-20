@@ -166,7 +166,7 @@ const Tutorial = (props) => {
         setFireworks(false);
       }, 7000);
     }
-  }, [completed]);
+  }, [instructions, completed]);
 
   const checkChoice = (instrId, qIdx) => (event) => {
     const quests = { ...questions };
@@ -410,7 +410,7 @@ const Tutorial = (props) => {
                 the 1Cademy homepage
               </a>{" "}
               and watch the following videos before answering any of the
-              questions, and <strong>select all the choices that apply</strong>.{" "}
+              questions, and <strong>select all the choices that apply</strong>.
             </Box>
             <Box sx={{ mt: "10px", fontSize: "19px" }}>
               The community leaders will decide about your application based on{" "}
