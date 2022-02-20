@@ -63,6 +63,7 @@ export default [
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
+    hasTest: true,
     qualifications: [
       `Academic background and knowledge in topics related to education, learning science, industrial-organizational psychology, or cognitive psychology.`,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
@@ -114,7 +115,8 @@ export default [
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
-    coursera: "https://www.coursera.org/learn/talkmentalillness",
+    // coursera: "https://www.coursera.org/learn/talkmentalillness",
+    hasTest: true,
     qualifications: [
       `Interest and enthusiasm for clinical psychology`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
@@ -188,6 +190,7 @@ export default [
       `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
+    hasTest: true,
     qualifications: [
       `Interest and enthusiasm for topics related to mindfulness, mindfulness meditation, positive psychology, clinical psychology, and neuroscience.`,
       `Fluency in writing and reading in English, as well as experience with academic literature review.`,
@@ -249,7 +252,8 @@ export default [
       `Work towards publishing research on health psychology.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in health psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
-    coursera: "https://www.coursera.org/learn/positive-psychiatry",
+    // coursera: "https://www.coursera.org/learn/positive-psychiatry",
+    hasTest: true,
     qualifications: [
       `Knowledge and interest in topics related to the field of health psychology `,
       `Fluency in reading and writing in English (written summaries of research articles necessary) `,
@@ -314,6 +318,7 @@ export default [
       `Individual contributions will be available through google search and cite your name (and other search engines)`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+    hasTest: true,
     qualifications: [
       `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
       `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
@@ -388,6 +393,7 @@ export default [
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5 GPA to apply for this position. All majors are welcome to apply. A personal or academic interest in disability is highly preferred, and answer our quiz questions to evaluate their domain knowledge.`,
+    hasTest: true,
     qualifications: [
       `Interest and enthusiasm for topics related to Disability Studies.`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
@@ -460,6 +466,7 @@ export default [
       `Work remotely with all interactions, task fulfillment, and communications`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field, and answer our quiz questions.`,
+    hasTest: true,
     qualifications: [
       `Knowledge and enthusiasm for topics related to the field of social and political psychology. `,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
@@ -519,6 +526,7 @@ export default [
       `Have a flexible schedule and work remotely with all interactions, task fulfillment, and communications.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts. We prefer our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
+    hasTest: true,
     qualifications: [
       `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy. `,
       `Willingness to present work and engage in group discussions about research topics.`,
@@ -586,6 +594,7 @@ export default [
       `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
     qualifications: [
       `Knowledge and enthusiasm for topics related to machine learning and deep learning.`,
       `Proficiency in Python (or R) and linear algebra.`,
@@ -636,6 +645,7 @@ export default [
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
     portfolio: true,
+    hasTest: true,
     qualifications: [
       `Experience with creating online style guidelines, images and graphics using design software (e.g., Adobe Illustrator, Adobe Photoshop, Adobe After Effects and Adobe Premier and Figma. `,
       `Strong understanding of the principles of UX, web information architecture, graphic design, web design, branding, composition, and typography.`,
@@ -759,6 +769,7 @@ export default [
       `Learn about various theories and contribute to novel research within the UX Research field`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in information science, psychology, or a related field.`,
+    hasTest: true,
     qualifications: [
       `Self-starter with a passion for improving user experience`,
       `Strong interest in the user experience field`,

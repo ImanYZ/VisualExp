@@ -809,21 +809,21 @@ export default {
               d: "Later attempts to double-spend are not counted",
             },
           },
-        Section_4_Under_Proof_of_Work,
-        _what_would_an_attacker_have_to_do_to_modify_a_past_block: {
-          stem: `5. [Section 4] Under Proof-of-Work, what would an attacker have to do to modify a past
+        Section_4_Under_Proof_of_Work_what_would_an_attacker_have_to_do_to_modify_a_past_block:
+          {
+            stem: `6. [Section 4] Under Proof-of-Work, what would an attacker have to do to modify a past
           block?`,
-          answers: ["a", "b"],
-          choices: {
-            a: "Redo the proof-of-work of the block and all blocks after it",
-            b: "Catch up and then surpass the work of the honest nodes",
-            c: "Scan for a value that when hashed begins with a number of zero bits",
-            d: "Allocate many IPs",
+            answers: ["a", "b"],
+            choices: {
+              a: "Redo the proof-of-work of the block and all blocks after it",
+              b: "Catch up and then surpass the work of the honest nodes",
+              c: "Scan for a value that when hashed begins with a number of zero bits",
+              d: "Allocate many IPs",
+            },
           },
-        },
         Section_6_What_are_two_ways_to_fund_an_incentive_for_nodes_to_support_the_network:
           {
-            stem: `5. [Section 6] What are two ways to fund an incentive for nodes to support the network?`,
+            stem: `7. [Section 6] What are two ways to fund an incentive for nodes to support the network?`,
             answers: ["a", "b"],
             choices: {
               a: "Generating new coins",
@@ -834,7 +834,7 @@ export default {
           },
         Section_7_What_is_the_name_for_the_data_structure_used_to_save_disk_space_by_hashing_transactions_in_a_block:
           {
-            stem: `5. [Section 7] What is the name for the data structure used to save disk space by hashing
+            stem: `8. [Section 7] What is the name for the data structure used to save disk space by hashing
           transactions in a block?`,
             answers: ["a"],
             choices: {
@@ -847,7 +847,148 @@ export default {
       },
     },
   },
-  ["Deep_Learning"]: {},
+  ["Deep_Learning"]: {
+    NLP_Chapter13: {
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FNLP_Chapter.pdf?alt=media&token=b49e9a3d-cf77-49ec-a17e-81757c1ca72b",
+      questions: {
+        Which_of_the_following_is_TRUE_about_NLP: {
+          stem: `1. Which of the following is TRUE about NLP?`,
+          answers: ["d"],
+          choices: {
+            a: "We must take care of Syntax, Semantics, and Pragmatics in NLP",
+            b: "Preprocessing tasks include Tokenization, Stemming, Lemmatization, and Vectorization",
+            c: "NLP can be used for spam filtering, sentiment analysis, and machine translation",
+            d: "All of the above",
+          },
+        },
+        Which_of_the_following_is_NOT_an_application_of_NLP: {
+          stem: `2. Which of the following is NOT an application of NLP?`,
+          answers: ["b"],
+          choices: {
+            a: "Personal assistants (like Alexa, Siri, Google Assistant, Cortana, etc.)",
+            b: "Image recognition",
+            c: "Auto-correct grammatical mistakes",
+            d: "Named entity recognition",
+          },
+        },
+        Which_of_the_following_is_an_application_of_NLP: {
+          stem: `3. Which of the following is an application of NLP?`,
+          answers: ["d"],
+          choices: {
+            a: "Google Translate",
+            b: "Google Assista",
+            c: "Chatbots",
+            d: "All of the above",
+          },
+        },
+        Which_of_the_following_is_FALSE_about_Tokenization_in_NLP: {
+          stem: `4. Which of the following is FALSE about Tokenization in NLP?`,
+          answers: ["a"],
+          choices: {
+            a: "It is used to remove stopwords from the text",
+            b: "Each word in a text is called a token",
+            c: "We can use regular expressions to find out tokens from the text",
+            d: "None of the above",
+          },
+        },
+        Which_of_the_following_is_a_correct_order_of_preprocessing_of_raw_data_in_NLP:
+          {
+            stem: `5. Which of the following is a correct order of preprocessing of raw data in NLP?`,
+            answers: ["a"],
+            choices: {
+              a: "Remove Punctuation, Tokenization, Remove Stopwords, Stemming / Lemmatization, Vectorization",
+              b: "Tokenization, Vectorization, Remove Punctuation, Remove Stopwords, Stemming / Lemmatization",
+              c: "Stemming / Lemmatization, Remove Punctuation, Tokenization, Remove Stopwords, Vectorization",
+              d: "Remove Stopwords, Remove Punctuation, Stemming / Lemmatization, Vectorization, Tokenization",
+            },
+          },
+        Which_of_the_following_is_FALSE_about_preprocessing_of_raw_data_in_NLP:
+          {
+            stem: `6. Which of the following is FALSE about preprocessing of raw data in NLP?`,
+            answers: ["c"],
+            choices: {
+              a: "We remove stopwords and do stemming to decrease the number of tokens",
+              b: "We should remove all the punctuation marks and stopwords from the text",
+              c: "Lemmatization is a process of removing punctuation and stopwords from the text",
+              d: "Vectorization is used to encode tokens into numbers to create feature vectors",
+            },
+          },
+        Which_of_the_following_is_FALSE_about_Stemming_and_Lemmatization_in_NLP:
+          {
+            stem: `7. Which of the following is FALSE about Stemming and Lemmatization in NLP?`,
+            answers: ["b"],
+            choices: {
+              a: "Lemmatization is more powerful and sophisticated as compared to stemming",
+              b: "Lemmatization is fast but more complex as compared to the stemming",
+              c: "Both are used to reduce the inflected words to their word stem or root",
+              d: "Both are used to reduce the number of tokens",
+            },
+          },
+        Which_of_the_following_is_TRUE_about_Stemming_and_Lemmatization_in_NLP:
+          {
+            stem: `8. Which of the following is TRUE about Stemming and Lemmatization in NLP?`,
+            answers: ["c"],
+            choices: {
+              a: "Stemming considers the context of a word in which it is used in a sentence while Lemmatization does not",
+              b: "Stemming provides more accurate results as compared to Lemmatization",
+              c: "Stemming is faster than Lemmatization",
+              d: "All of the above",
+            },
+          },
+        Which_of_the_following_is_TRUE_about_Vectorization_in_NLP: {
+          stem: `9. Which of the following is TRUE about Vectorization in NLP?`,
+          answers: ["d"],
+          choices: {
+            a: "It is used to encode tokens into feature vectors which algorithms can understand",
+            b: "Document term matrix is used to represent the words in the text in the form of a matrix of numbers",
+            c: "Count, N-gram, and TF-IDF are the types of Vectorization",
+            d: "All of the above",
+          },
+        },
+        Which_of_the_following_is_TRUE_about_types_of_Vectorization_in_NLP: {
+          stem: `10. Which of the following is TRUE about types of Vectorization in NLP?`,
+          answers: ["b"],
+          choices: {
+            a: "Count vectorization considers the count and weightage of each word in a text",
+            b: "N-gram vectorization considers the context of the word depending upon the value of N",
+            c: "TF-IDF vectorization considers both the count and context of the words in the text",
+            d: "All of the above",
+          },
+        },
+        Which_of_the_following_is_FALSE_about_Term_Frequency_Inverse_Document: {
+          stem: `11. Which of the following is FALSE about Term Frequency - Inverse Document Frequency (TF- IDF) Vectorization in NLP?`,
+          answers: ["a"],
+          choices: {
+            a: "It considers the context of the word in a particular document",
+            b: "It considers how frequent the word occurs in a particular document",
+            c: "It considers how frequent the word occurs in other documents",
+            d: "None of the above",
+          },
+        },
+        Which_of_the_following_is_FALSE_about_the_NLTK_library_in_Python: {
+          stem: `12. Which of the following is FALSE about the NLTK library in Python?`,
+          answers: ["d"],
+          choices: {
+            a: "It is the most commonly used library in Python for NLP",
+            b: "It provides efficient modules for preprocessing and cleaning of raw data in NLP",
+            c: "It can be used for tokenization, stemming, lemmatization, and vectorization",
+            d: "All of the above",
+          },
+        },
+        Which_of_the_following_stemmers_are_available_in_the_NLTK_library_in_Python:
+          {
+            stem: `13. Which of the following stemmers are available in the NLTK library in Python?`,
+            answers: ["d"],
+            choices: {
+              a: "Porter Stemmer",
+              b: "Snowball Stemmer",
+              c: "Lancaster Stemmer",
+              d: "All of the above",
+            },
+          },
+      },
+    },
+  },
   ["Graphic_Design"]: {
     Graphic_Design_Reading_Chapter_1: {
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGraphic_Design_Reading.pdf?alt=media&token=ad7bd3fc-6541-4a3b-978a-b412b43f260c",

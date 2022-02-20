@@ -27,6 +27,7 @@ import Tutorial from "./Components/Home/Tutorial";
 import TutorialFeedback from "./Components/Home/TutorialFeedback";
 import Communities from "./Components/Home/Communities";
 import communities from "./Components/Home/modules/views/communitiesOrder";
+import PaperTest from "./Components/Home/PaperTest";
 
 import "./App.css";
 
@@ -150,11 +151,20 @@ const AppRouter = (props) => {
       )}
       <Route path="/communities/" element={<Communities />} />
       {communities.map((communi, idx) => (
-        <Route
-          key={communi.id}
-          path={"/community/" + communi.id}
-          element={<Communities commIdx={idx} />}
-        />
+        <>
+          <Route
+            key={communi.id}
+            path={"/community/" + communi.id}
+            element={<Communities commIdx={idx} />}
+          />
+          {fullname && (
+            <Route
+              key={communi.id}
+              path={"/paperTest/" + communi.id}
+              element={<PaperTest communiId={communi.id} />}
+            />
+          )}
+        </>
       ))}
       <Route
         path="/*"

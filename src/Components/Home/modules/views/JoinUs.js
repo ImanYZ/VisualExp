@@ -731,6 +731,47 @@ const JoinUs = (props) => {
                     </StepContent>
                   </Step>
                 )}
+                {props.community.hasTest && (
+                  <Step>
+                    <StepLabel
+                      onClick={changeInnerStep(3)}
+                      sx={
+                        3 <= checkedInnerStep
+                          ? {
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor:
+                                  "rgba(100, 100, 100, 0.1) !important",
+                              },
+                            }
+                          : {}
+                      }
+                    >
+                      The last step to apply to this community is a test of your
+                      domain-specific knowledge. If you are interested in
+                      joining this community but don't have the background
+                      knowledge, no worries. Similar to the second phase, we
+                      have provided you with a document about the topic and ask
+                      you only questions from that document. Just make sure you
+                      carefully read the document and choose the most
+                      appropriate answers for each question. The community
+                      leaders will evaluate your application based on your
+                      number of WRONG attempts in answering the questions. Click
+                      the button to start the community-specific test.
+                    </StepLabel>
+                    <StepContent>
+                      <Button
+                        variant="contained"
+                        component="a"
+                        href={"/paperTest/" + props.community.id}
+                        target="_blank"
+                        sx={{ mt: 1, mr: 1, color: "common.white" }}
+                      >
+                        Start the Test
+                      </Button>
+                    </StepContent>
+                  </Step>
+                )}
               </Stepper>
             ) : (
               <>

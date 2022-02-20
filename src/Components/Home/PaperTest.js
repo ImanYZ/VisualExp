@@ -45,9 +45,9 @@ const PaperTest = (props) => {
 
   useEffect(() => {
     const paps = [];
-    for (let paperId in communitiesPapers[props.community.id]) {
+    for (let paperId in communitiesPapers[props.communiId]) {
       paps.push({
-        ...communitiesPapers[props.community.id][paperId],
+        ...communitiesPapers[props.communiId][paperId],
         id: paperId,
       });
     }
@@ -65,10 +65,10 @@ const PaperTest = (props) => {
     const loadAttempts = async () => {
       let oAttempts = {};
       const quests = {};
-      const applDoc = await firebase.db
+      const applRef = firebase.db
         .collection("applications")
-        .doc(fullname + "_" + props.community.id)
-        .get();
+        .doc(fullname + "_" + props.communiId);
+      const applDoc = await applRef.get();
       let applData;
       if (applDoc.exists) {
         applData = applDoc.data();
@@ -77,7 +77,7 @@ const PaperTest = (props) => {
         setCompleted(applData.completed);
         oAttempts = applData.attempts;
       }
-      for (let paperId in communitiesPapers[props.community.id]) {
+      for (let paperId in communitiesPapers[props.communiId]) {
         if (!(paperId in oAttempts)) {
           oAttempts[paperId] = {
             corrects: 0,
@@ -85,7 +85,7 @@ const PaperTest = (props) => {
             questions: {},
           };
         }
-        for (let ques in communitiesPapers[props.community.id][paperId]
+        for (let ques in communitiesPapers[props.communiId][paperId]
           .questions) {
           if (!(ques in oAttempts[paperId].questions)) {
             oAttempts[paperId].questions[ques] = {
@@ -95,7 +95,7 @@ const PaperTest = (props) => {
             };
           }
           const quest = {
-            ...communitiesPapers[props.community.id][paperId].questions[ques],
+            ...communitiesPapers[props.communiId][paperId].questions[ques],
             id: ques,
             checks: {},
             error: false,
@@ -281,7 +281,7 @@ const PaperTest = (props) => {
     if (fullname) {
       const applRef = firebase.db
         .collection("applications")
-        .doc(fullname + "_" + props.community.id);
+        .doc(fullname + "_" + props.communiId);
       const applDoc = await applRef.get();
       if ("explanation" in question && question.explanation) {
         let explaRef = firebase.db.collection("explanations").doc();
@@ -333,7 +333,7 @@ const PaperTest = (props) => {
       if (!applRef) {
         applRef = firebase.db
           .collection("applications")
-          .doc(fullname + "_" + props.community.id);
+          .doc(fullname + "_" + props.communiId);
         applDoc = await applRef.get();
         oAttempts = { ...attempts };
       }
@@ -404,9 +404,9 @@ const PaperTest = (props) => {
             </Box>
           </Box>
         </div>
-        {instructions.map((instr, idx) => (
+        {papers.map((paper, idx) => (
           <Accordion
-            key={instr.title}
+            key={paper.id}
             id={"Section" + idx}
             expanded={expanded === idx}
             onChange={handleChange(idx)}
@@ -422,7 +422,7 @@ const PaperTest = (props) => {
                   ? "🔒 "
                   : idx === completed + 1 && idx !== papers.length - 1
                   ? "🔓 "
-                  : "✅ ") + instr.title}
+                  : "✅ ") + paper.title}
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -437,16 +437,7 @@ const PaperTest = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        sx={{
-                          pb: "19px",
-                        }}
-                      >
-                        {instr.description}
-                      </Typography>
-                      {instr.video && <YoutubeEmbed embedId={instr.video} />}
+                      {paper.video && <YoutubeEmbed embedId={paper.video} />}
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -464,12 +455,12 @@ const PaperTest = (props) => {
                           attemps in answering the questions.
                         </Box>
                       )}
-                      {instr.id in questions &&
-                        questions[instr.id].map((question, qIdx) => {
+                      {paper.id in questions &&
+                        questions[paper.id].map((question, qIdx) => {
                           return (
                             <form
                               key={qIdx}
-                              onSubmit={handleSubmit(instr.id, qIdx)}
+                              onSubmit={handleSubmit(paper.id, qIdx)}
                             >
                               <FormControl
                                 error={question.error}
@@ -491,7 +482,7 @@ const PaperTest = (props) => {
                                             <Checkbox
                                               checked={question.checks[choice]}
                                               onChange={checkChoice(
-                                                instr.id,
+                                                paper.id,
                                                 qIdx
                                               )}
                                               name={choice}
@@ -544,7 +535,7 @@ const PaperTest = (props) => {
                                   Submit Answer
                                 </Button>
                                 <Button
-                                  onClick={openExplanation(instr.id, qIdx)}
+                                  onClick={openExplanation(paper.id, qIdx)}
                                   sx={{
                                     margin: "0px 7px 10px 7px",
                                     color: "common.white",
@@ -564,7 +555,7 @@ const PaperTest = (props) => {
                                     placeholder={
                                       "If you're experiencing difficulties with this question, please explain why."
                                     }
-                                    onChange={changeExplanation(instr.id, qIdx)}
+                                    onChange={changeExplanation(paper.id, qIdx)}
                                     value={question.explanation}
                                   />
                                   <Button
@@ -647,7 +638,7 @@ const PaperTest = (props) => {
         </Box>
         {/* {expanded !== false &&
           expanded < papers.length - 1 &&
-          instructions[expanded].id in attempts && (
+          papeructions[expanded].id in attempts && (
             <Box sx={{ mt: "4px" }}>
               <Box
                 sx={{
@@ -656,8 +647,8 @@ const PaperTest = (props) => {
                   mr: "7px",
                 }}
               >
-                {instructions[expanded].id in attempts &&
-                  attempts[instructions[expanded].id].corrects}{" "}
+                {papeructions[expanded].id in attempts &&
+                  attempts[papeructions[expanded].id].corrects}{" "}
                 Correct
               </Box>
               &amp;
@@ -670,8 +661,8 @@ const PaperTest = (props) => {
                   mr: "7px",
                 }}
               >
-                {instructions[expanded].id in attempts &&
-                  attempts[instructions[expanded].id].wrongs}{" "}
+                {papeructions[expanded].id in attempts &&
+                  attempts[papeructions[expanded].id].wrongs}{" "}
                 Wrong
               </Box>
               in this section!
