@@ -56,6 +56,7 @@ const JoinUs = (props) => {
   const [courseraUrlError, setCourseraUrlError] = useState(false);
   const [portfolioUrl, setPortfolioUrl] = useState("");
   const [portfolioUrlError, setPortfolioUrlError] = useState(false);
+  const [needsUpdate, setNeedsUpdate] = useState(false);
 
   useEffect(() => {
     if (tutorialEnded) {
@@ -70,17 +71,41 @@ const JoinUs = (props) => {
   }, [hasScheduled, completedExperiment, tutorialEnded]);
 
   useEffect(() => {
-    if (transcriptUrl) {
-      setCheckedInnerStep(2);
-      setActiveInnerStep(2);
-    } else if (resumeUrl) {
-      setCheckedInnerStep(1);
-      setActiveInnerStep(1);
-    } else {
-      setCheckedInnerStep(0);
-      setActiveInnerStep(0);
+    if (needsUpdate) {
+      let stepsIdx = 0;
+      const commTestEnded =
+        props.community.id in communiTestsEnded &&
+        communiTestsEnded[props.community.id];
+      if (courseraUrl && portfolioUrl && commTestEnded) {
+        stepsIdx = 6;
+      } else if (
+        (courseraUrl && portfolioUrl) ||
+        (courseraUrl && commTestEnded) ||
+        (portfolioUrl && commTestEnded)
+      ) {
+        stepsIdx = 5;
+      } else if (courseraUrl || commTestEnded || portfolioUrl) {
+        stepsIdx = 4;
+      } else if (explanation) {
+        stepsIdx = 3;
+      } else if (transcriptUrl) {
+        stepsIdx = 2;
+      } else if (resumeUrl) {
+        stepsIdx = 1;
+      }
+      setCheckedInnerStep(stepsIdx);
+      setActiveInnerStep(stepsIdx);
+      setNeedsUpdate(false);
     }
-  }, [resumeUrl, transcriptUrl, explanation]);
+  }, [
+    needsUpdate,
+    resumeUrl,
+    transcriptUrl,
+    explanation,
+    courseraUrl,
+    portfolioUrl,
+    communiTestsEnded,
+  ]);
 
   useEffect(() => {
     const loadExistingApplication = async () => {
@@ -97,65 +122,41 @@ const JoinUs = (props) => {
         }
         if ("courseraUrl" in applData && applData.courseraUrl) {
           setCourseraUrl(applData["courseraUrl"]);
-          setCheckedInnerStep(4);
-          setActiveInnerStep(4);
         } else {
           setCourseraUrl("");
-          if ("portfolioUrl" in applData && applData.portfolioUrl) {
-            setPortfolioUrl(applData["portfolioUrl"]);
-            setCheckedInnerStep(4);
-            setActiveInnerStep(4);
-          } else {
-            setPortfolioUrl("");
-            if ("ended" in applData && applData.ended) {
-              setCommuniTestsEnded((oldObj) => {
-                return {
-                  ...oldObj,
-                  [props.community.id]: true,
-                };
-              });
-              setCheckedInnerStep(4);
-              setActiveInnerStep(4);
-            } else {
-              setCommuniTestsEnded((oldObj) => {
-                return {
-                  ...oldObj,
-                  [props.community.id]: false,
-                };
-              });
-              if ("explanation" in applData && applData.explanation) {
-                setCheckedInnerStep(3);
-                setActiveInnerStep(3);
-              } else {
-                setCheckedInnerStep((oldValue) => {
-                  if (oldValue === 3) {
-                    return 2;
-                  }
-                });
-                setActiveInnerStep((oldValue) => {
-                  if (oldValue === 3) {
-                    return 2;
-                  }
-                });
-              }
-            }
-          }
+        }
+        if ("portfolioUrl" in applData && applData.portfolioUrl) {
+          setPortfolioUrl(applData["portfolioUrl"]);
+        } else {
+          setPortfolioUrl("");
+        }
+        if ("ended" in applData && applData.ended) {
+          setCommuniTestsEnded((oldObj) => {
+            return {
+              ...oldObj,
+              [props.community.id]: true,
+            };
+          });
+        } else {
+          setCommuniTestsEnded((oldObj) => {
+            return {
+              ...oldObj,
+              [props.community.id]: false,
+            };
+          });
         }
       } else {
+        setCommuniTestsEnded((oldObj) => {
+          return {
+            ...oldObj,
+            [props.community.id]: false,
+          };
+        });
         setExplanation("");
         setCourseraUrl("");
         setPortfolioUrl("");
-        setCheckedInnerStep((oldValue) => {
-          if (oldValue === 3 || oldValue === 2) {
-            return 2;
-          }
-        });
-        setActiveInnerStep((oldValue) => {
-          if (oldValue === 3 || oldValue === 2) {
-            return 2;
-          }
-        });
       }
+      setNeedsUpdate(true);
     };
     if (firebase && fullname && props.community) {
       loadExistingApplication();
@@ -206,16 +207,7 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
-      setCheckedInnerStep((oldValue) => {
-        if (oldValue === 2) {
-          return 3;
-        }
-      });
-      setActiveInnerStep((oldValue) => {
-        if (oldValue === 2) {
-          return 3;
-        }
-      });
+      setNeedsUpdate(true);
     }
   };
 
@@ -238,16 +230,7 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
-      setCheckedInnerStep((oldValue) => {
-        if (oldValue === 3) {
-          return 4;
-        }
-      });
-      setActiveInnerStep((oldValue) => {
-        if (oldValue === 3) {
-          return 4;
-        }
-      });
+      setNeedsUpdate(true);
     }
   };
 
@@ -270,16 +253,7 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
-      setCheckedInnerStep((oldValue) => {
-        if (oldValue === 3) {
-          return 4;
-        }
-      });
-      setActiveInnerStep((oldValue) => {
-        if (oldValue === 3) {
-          return 4;
-        }
-      });
+      setNeedsUpdate(true);
     }
   };
 
@@ -294,10 +268,7 @@ const JoinUs = (props) => {
         });
       }
       setUrl(generatedUrl);
-      if (activeInnerStep === checkedInnerStep) {
-        setCheckedInnerStep(activeInnerStep + 1);
-        setActiveInnerStep(activeInnerStep + 1);
-      }
+      setNeedsUpdate(true);
     }
   };
 

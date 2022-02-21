@@ -122,8 +122,8 @@ export default {
           choices: {
             a: "Psychotherapy",
             b: "Teaching",
-            b: "Research",
-            b: "All of the above",
+            c: "Research",
+            d: "All of the above",
           },
         },
         Which_doctorate_emphasizes_psychological_practice: {
@@ -238,8 +238,8 @@ export default {
           stem: "2. The leading risk factor for global disease burden in 2002 was ______.",
           answers: ["b"],
           choices: {
-            b: "Alcohol",
-            a: "Childhood and maternal underweight",
+            a: "Alcohol",
+            b: "Childhood and maternal underweight",
             c: "Tobacco",
             d: "High blood pressure",
           },
@@ -249,8 +249,8 @@ export default {
             stem: "3. According to S.S. Stevens, measurement is the assignment of numbers to attributes according to ______.",
             answers: ["c"],
             choices: {
-              b: "Formulae",
-              a: "Size",
+              a: "Formulae",
+              b: "Size",
               c: "Rules",
               d: "Quality",
             },
@@ -260,8 +260,8 @@ export default {
             stem: "4. According to Michell, before quantification can happen, it is first necessary to obtain evidence that the relevant attribute is quantitative in ______.",
             answers: ["a"],
             choices: {
-              b: "Structure",
-              a: "Stature",
+              a: "Structure",
+              b: "Stature",
               c: "Status",
               d: "Studies",
             },
@@ -271,8 +271,8 @@ export default {
             stem: "5. When findings are difficult to generalize to the world outside of the laboratory, we say the research is lacking in ______ validity.",
             answers: ["a"],
             choices: {
-              b: "Ecological",
-              a: "Economical",
+              a: "Ecological",
+              b: "Economical",
               c: "Empirical",
               d: "Experimental",
             },
@@ -281,8 +281,8 @@ export default {
           stem: "6. The 'Health Onion' is an example of a ______.",
           answers: ["d"],
           choices: {
-            b: "Paradigm",
-            a: "Model",
+            a: "Paradigm",
+            b: "Model",
             c: "Theory",
             d: "Framework",
           },
@@ -291,8 +291,8 @@ export default {
           stem: "7. More research is necessary to confirm the assumption that ______ cause positive changes to quality of life.",
           answers: ["a"],
           choices: {
-            b: "Lifestyle changes",
-            a: "Research findings",
+            a: "Lifestyle changes",
+            b: "Research findings",
             c: "Survey data",
             d: "Questionnaire responses",
           },
@@ -301,8 +301,8 @@ export default {
           stem: "8. ______ have some of the characteristics of paradigms (Kuhn, 1970) as they refer to a complete system of thinking about a field of inquiry.",
           answers: ["c"],
           choices: {
-            b: "Pathways",
-            a: "Theories",
+            a: "Pathways",
+            b: "Theories",
             c: "Frameworks",
             d: "Models",
           },

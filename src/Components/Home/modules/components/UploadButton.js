@@ -101,7 +101,20 @@ const UploadButton = (props) => {
             height: "220px",
           }}
         >
-          <iframe src={props.fileUrl} width="100%" height="100%"></iframe>
+          <object
+            data={props.fileUrl}
+            type="application/pdf"
+            width="100%"
+            height="100%"
+          >
+            <iframe
+              src={
+                "https://docs.google.com/viewer?url=" +
+                props.fileUrl +
+                "&embedded=true"
+              }
+            ></iframe>
+          </object>
         </Paper>
       )}
     </>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
 import Accordion from "@mui/material/Accordion";
@@ -31,6 +31,13 @@ import Typography from "./modules/components/Typography";
 
 import communitiesPapers from "./modules/views/communitiesPapers";
 
+for (let communi in communitiesPapers) {
+  communitiesPapers[communi]["Congratulations"] = {
+    title: "Congratulations!",
+    questions: {},
+  };
+}
+
 const PaperTest = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -55,13 +62,6 @@ const PaperTest = (props) => {
         id: paperId,
       });
     }
-    paps.push({
-      id: "Congratulations",
-      title: "Congratulations!",
-      description: `You successfully completed the 1Cademy application process.
-    The community leaders will review all parts of your application and will email you about the result in a few days to weeks, depending on the number of applications they have received.`,
-      questions: {},
-    });
     setPapers(paps);
   }, []);
 
@@ -90,7 +90,6 @@ const PaperTest = (props) => {
         }
       }
       for (let paperId in communitiesPapers[props.communiId]) {
-        console.log({ oAttempts });
         if (!(paperId in oAttempts)) {
           oAttempts[paperId] = {
             corrects: 0,
@@ -169,7 +168,7 @@ const PaperTest = (props) => {
   }, [papers, fullname]);
 
   useEffect(() => {
-    if (completed === papers.length - 2) {
+    if (completed !== -1 && completed === papers.length - 2) {
       setFireworks(true);
       setTimeout(() => {
         setFireworks(false);
@@ -310,10 +309,9 @@ const PaperTest = (props) => {
             .doc(question.explaId);
           explaDoc = await explaRef.get();
         } else {
-          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
           question.explaId = explaRef.id;
-          explaData.attempts[paperId].questions[question.id].explaId =
-            explaRef.id;
+          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
+          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
         }
         const explaData = {
           fullname,
@@ -412,7 +410,7 @@ const PaperTest = (props) => {
               Please carefully read the document before answering any of the
               questions, and <strong>select all the choices that apply</strong>.
             </Box>
-            <Box sx={{ mt: "10px", fontStyle: "italic", fontSize: "19px" }}>
+            <Box sx={{ mt: "10px", fontSize: "19px" }}>
               The community leaders will decide about your application based on{" "}
               <strong>your total WRONG attempts.</strong>
             </Box>
@@ -451,27 +449,43 @@ const PaperTest = (props) => {
                         overflowY: "hidden",
                       }}
                     >
-                      <Typography>
-                        Read{" "}
-                        <a href={paper.url} target="_blank">
-                          the following document
-                        </a>{" "}
-                        first.
-                      </Typography>
-                      <object
-                        data={paper.url}
-                        type="application/pdf"
-                        width="100%"
-                        height="100%"
-                      >
-                        <iframe
-                          src={
-                            "https://docs.google.com/viewer?url=" +
-                            paper.url +
-                            "&embedded=true"
-                          }
-                        ></iframe>
-                      </object>
+                      {expanded !== papers.length - 1 ? (
+                        <>
+                          <Typography>
+                            Read{" "}
+                            <a href={paper.url} target="_blank">
+                              the following document
+                            </a>{" "}
+                            first.
+                          </Typography>
+                          <object
+                            data={paper.url}
+                            type="application/pdf"
+                            width="100%"
+                            height="100%"
+                          >
+                            <iframe
+                              src={
+                                "https://docs.google.com/viewer?url=" +
+                                paper.url +
+                                "&embedded=true"
+                              }
+                            ></iframe>
+                          </object>
+                        </>
+                      ) : (
+                        <Typography
+                          variant="h5"
+                          gutterBottom
+                          sx={{ fontWeight: "700" }}
+                        >
+                          You successfully completed the 1Cademy application
+                          process. The community leaders will review all parts
+                          of your application and will email you about the
+                          result in a few days to weeks, depending on the number
+                          of applications they have received.
+                        </Typography>
+                      )}
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -667,7 +681,7 @@ const PaperTest = (props) => {
           zIndex: 1300,
         }}
       >
-        <Box sx={{ mt: "4px", fontWeight: "bold", fontStyle: "italic" }}>
+        <Box sx={{ mt: "4px", fontWeight: "bold" }}>
           The fewer wrong attempts, the better.
         </Box>
         <Box>

@@ -158,7 +158,7 @@ const Tutorial = (props) => {
   }, [instructions, fullname]);
 
   useEffect(() => {
-    if (completed === instructions.length - 2) {
+    if (completed !== -1 && completed === instructions.length - 2) {
       setFireworks(true);
       setTimeout(() => {
         setFireworks(false);
