@@ -33,9 +33,9 @@ import "./App.css";
 
 const AppRouter = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  const [email, setEmail] = useRecoilState(emailState);
-  const [fullname, setFullname] = useRecoilState(fullnameState);
-  const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
+  const email = useRecoilValue(emailState);
+  const fullname = useRecoilValue(fullnameState);
+  const isAdmin = useRecoilValue(isAdminState);
   const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
   const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
   // selected theme for authenticated user (dark mode/light mode)
