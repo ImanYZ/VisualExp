@@ -94,29 +94,34 @@ const AppAppBar = (props) => {
           if ("Transcript" in userData) {
             setTranscriptUrl(userData["Transcript"]);
           }
-          const scheduleDocs = await firebase.db
-            .collection("schedule")
-            .where("email", "==", uEmail)
-            .get();
-          const nowTimestamp = firebase.firestore.Timestamp.fromDate(
-            new Date()
-          );
-          let allPassed = true;
-          if (scheduleDocs.docs.length >= 3) {
-            let scheduledSessions = 0;
-            for (let scheduleDoc of scheduleDocs.docs) {
-              const scheduleData = scheduleDoc.data();
-              if (scheduleData.order) {
-                scheduledSessions += 1;
-                if (scheduleData.session >= nowTimestamp) {
-                  allPassed = false;
+          if ("projectDone" in userData && userData.projectDone) {
+            setHasScheduled(true);
+            setCompletedExperiment(true);
+          } else {
+            const scheduleDocs = await firebase.db
+              .collection("schedule")
+              .where("email", "==", uEmail)
+              .get();
+            const nowTimestamp = firebase.firestore.Timestamp.fromDate(
+              new Date()
+            );
+            let allPassed = true;
+            if (scheduleDocs.docs.length >= 3) {
+              let scheduledSessions = 0;
+              for (let scheduleDoc of scheduleDocs.docs) {
+                const scheduleData = scheduleDoc.data();
+                if (scheduleData.order) {
+                  scheduledSessions += 1;
+                  if (scheduleData.session >= nowTimestamp) {
+                    allPassed = false;
+                  }
                 }
               }
-            }
-            if (scheduledSessions >= 3) {
-              setHasScheduled(true);
-              if (allPassed) {
-                setCompletedExperiment(true);
+              if (scheduledSessions >= 3) {
+                setHasScheduled(true);
+                if (allPassed) {
+                  setCompletedExperiment(true);
+                }
               }
             }
           }

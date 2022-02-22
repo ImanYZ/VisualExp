@@ -1020,21 +1020,3 @@ exports.updateNotTakenSessions = async (context) => {
   }
   return null;
 };
-
-exports.incrementMonths = async (req, res) => {
-  try {
-    const dayUpVoteDocs = await db.collection("dayUpVotes").get();
-    for (let dayUpVoteDoc of dayUpVoteDocs.docs) {
-      const dayUpVoteData = dayUpVoteDoc.data();
-      const dayUpVoteRef = db.collection("dayUpVotes").doc(dayUpVoteDoc.id);
-      const dateStr = dayUpVoteData.date;
-      await dayUpVoteRef.update({
-        date: getDateString(new Date(dateStr)),
-      });
-    }
-    return res.status(200).json({});
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ err });
-  }
-};

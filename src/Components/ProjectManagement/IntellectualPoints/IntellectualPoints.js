@@ -40,6 +40,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import AdminIntellectualPoints from "./AdminIntellectualPoints";
+import GridCellToolTip from "../../GridCellToolTip";
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
 
 import "./IntellectualPoints.css";
@@ -52,22 +53,7 @@ const othersActivitiesColumns = [
     headerName: "Description",
     width: 400,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   // {
@@ -160,22 +146,7 @@ const activitiesColumns = [
     headerName: "Description",
     width: 400,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {

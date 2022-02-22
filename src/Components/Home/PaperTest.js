@@ -255,7 +255,6 @@ const PaperTest = (props) => {
       question.helperText = "You got it!";
       question.error = false;
     }
-    console.log({ quests, paperId });
     if (allCorrect) {
       for (let ques of quests[paperId]) {
         for (let choice in ques.checks) {
@@ -264,6 +263,7 @@ const PaperTest = (props) => {
             (!ques.checks[choice] && ques.answers.includes(choice))
           ) {
             allCorrect = false;
+            break;
           }
         }
       }

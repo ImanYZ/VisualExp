@@ -20,6 +20,8 @@ import {
   notTakenSessionsLoadedState,
 } from "../../../store/ProjectAtoms";
 
+import GridCellToolTip from "../../GridCellToolTip";
+
 import { getISODateString } from "../../../utils/DateFunctions";
 
 import "./ExperimentPoints.css";
@@ -32,22 +34,7 @@ const expSessionsColumns = [
     headerName: "Attendees",
     width: 400,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   { field: "points", headerName: "Points", type: "number", width: 130 },

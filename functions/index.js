@@ -24,6 +24,7 @@ const {
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
   sendPersonalInvitations,
+  emailApplicationStatus,
 } = require("./emailing");
 const {
   schedule,
@@ -57,6 +58,7 @@ app.post("/deleteActivity", deleteActivity);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
 app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
+app.post("/emailApplicationStatus", emailApplicationStatus);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);

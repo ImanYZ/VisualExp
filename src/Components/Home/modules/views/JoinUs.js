@@ -212,7 +212,7 @@ const JoinUs = (props) => {
   };
 
   const submitCourseraUrl = async (event) => {
-    if (courseraUrl) {
+    if (courseraUrl && !courseraUrlError) {
       const applRef = firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id);
@@ -235,7 +235,7 @@ const JoinUs = (props) => {
   };
 
   const submitPortfolioUrl = async (event) => {
-    if (portfolioUrl) {
+    if (portfolioUrl && !portfolioUrlError) {
       const applRef = firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id);

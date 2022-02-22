@@ -262,13 +262,24 @@ const PassageRight = (props) => {
       ) : [10, 20].includes(step) ? (
         <>
           <h1>Thank you for taking part in this study!</h1>
-          {nextSessionDate && (
+          {nextSessionDate ? (
+            <>
+              <h1>
+                See you at our {secondSession ? "final" : "second"} session on{" "}
+                <i>{nextSessionDate}!</i>
+              </h1>
+              <Fireworks options={options} style={style} />
+            </>
+          ) : (
             <h1>
-              See you at our {secondSession ? "final" : "second"} session on{" "}
-              <i>{nextSessionDate}!</i>
+              You can now start the third step of your application process by
+              going through{" "}
+              <a href="https://1cademy.us/tutorial" target="_blank">
+                the 1Cademy tutorial
+              </a>{" "}
+              at your convenience.
             </h1>
           )}
-          <Fireworks options={options} style={style} />{" "}
         </>
       ) : step === 11 ? (
         <>

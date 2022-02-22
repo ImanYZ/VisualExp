@@ -38,6 +38,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import CSCObjLoader from "./CSCObjLoader";
+import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
@@ -135,24 +136,7 @@ let instructorsColumns = [
     headerName: "Google Scholar/ResearchGate Address",
     width: 100,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <a href={cellValues.value} target="_blank">
-            <div
-              style={{
-                fontSize: 13,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-              }}
-            >
-              {cellValues.value}
-            </div>
-          </a>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
     },
   },
   {
@@ -166,24 +150,7 @@ let instructorsColumns = [
     headerName: "Website Address",
     width: 100,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <a href={cellValues.value} target="_blank">
-            <div
-              style={{
-                fontSize: 13,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-              }}
-            >
-              {cellValues.value}
-            </div>
-          </a>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
     },
   },
   {
@@ -191,22 +158,7 @@ let instructorsColumns = [
     headerName: "Prefix",
     width: 70,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -214,22 +166,7 @@ let instructorsColumns = [
     headerName: "Firstname",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -237,22 +174,7 @@ let instructorsColumns = [
     headerName: "Lastname",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -260,22 +182,7 @@ let instructorsColumns = [
     headerName: "Email",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -283,22 +190,7 @@ let instructorsColumns = [
     headerName: "Institution",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -306,22 +198,7 @@ let instructorsColumns = [
     headerName: "Occupation",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -329,22 +206,7 @@ let instructorsColumns = [
     headerName: "Position",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -352,22 +214,7 @@ let instructorsColumns = [
     headerName: "1Cademy Community",
     width: 130,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -421,22 +268,7 @@ let instructorsColumns = [
     headerName: "City",
     width: 100,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   // {
@@ -531,22 +363,7 @@ let othersInstructorsColumns = [
     headerName: "comment",
     width: 250,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip
-          title={cellValues.value ? cellValues.value : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
 ];

@@ -526,7 +526,7 @@ export default {
         What_does_the_author_mean_when_they_say_that_disability_is_cross_cultural:
           {
             stem: `7. What does the author mean when they say that disability is cross-cultural?`,
-            answers: ["d"],
+            answers: ["c"],
             choices: {
               a: "Disability culture looks similar in different parts of the world",
               b: "Disabled people have an agreed upon set of values and beliefs",
@@ -541,6 +541,7 @@ export default {
               a: "They are more educated about their rights",
               b: "They are living away from home for the first time",
               c: "They are first first generation to have lived their entire lives with the ADA in effect",
+              d: "They are the first generation to have lived their entire lives with the ADA in effect.",
             },
           },
       },

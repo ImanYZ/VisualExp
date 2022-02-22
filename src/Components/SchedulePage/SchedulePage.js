@@ -275,7 +275,7 @@ const SchedulePage = (props) => {
               <li>
                 Please specify your availability{" "}
                 <strong>in your timezone</strong> to satisfy the above criteria.
-                As sson as you meet them, the SCHEDULE button will be enabled
+                As soon as you meet them, the SCHEDULE button will be enabled
                 and the time slots with ✅ will indicate your possible sessions.
                 You should click the SCHEDULE button and get the confirmation
                 message, otherwise, your available time slots will not be saved.

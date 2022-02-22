@@ -255,6 +255,7 @@ const Tutorial = (props) => {
             (!ques.checks[choice] && ques.answers.includes(choice))
           ) {
             allCorrect = false;
+            break;
           }
         }
       }

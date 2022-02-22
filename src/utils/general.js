@@ -10,6 +10,9 @@ export const isValidHttpUrl = (string) => {
   let url;
   try {
     url = new URL(string);
+    if (string.includes(" ")) {
+      return false;
+    }
   } catch (_) {
     return false;
   }
