@@ -32,9 +32,9 @@ export const isAdminState = atom({
   default: false,
 });
 
-export const isLeaderState = atom({
-  key: "isLeaderState",
-  default: false,
+export const leadingState = atom({
+  key: "leadingState",
+  default: [],
 });
 
 export const tutorialEndedState = atom({

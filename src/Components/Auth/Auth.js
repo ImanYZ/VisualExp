@@ -14,6 +14,7 @@ import {
   firebaseState,
   emailState,
   fullnameState,
+  leadingState,
 } from "../../store/AuthAtoms";
 
 import {
@@ -36,6 +37,7 @@ import "./ConsentDocument.css";
 const Auth = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
+  const [leading, setLeading] = useRecoilState(leadingState);
   const currentProject = useRecoilValue(currentProjectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [phase, setPhase] = useRecoilState(phaseState);
@@ -97,6 +99,9 @@ const Auth = (props) => {
             console.log({ fName, lName });
           }
           fuName = getFullname(fName, lName);
+          if ("leading" in userData && userData.leading.length > 0) {
+            setLeading(userData.leading);
+          }
           const researcherDoc = await firebase.db
             .collection("researchers")
             .doc(fuName)

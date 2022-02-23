@@ -9,6 +9,7 @@ import {
   isAdminState,
   themeState,
   themeOSState,
+  leadingState,
 } from "./store/AuthAtoms";
 import { secondSessionState, thirdSessionState } from "./store/ExperimentAtoms";
 
@@ -36,6 +37,7 @@ const AppRouter = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
+  const leading = useRecoilValue(leadingState);
   const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
   const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
   // selected theme for authenticated user (dark mode/light mode)
@@ -146,7 +148,7 @@ const AppRouter = (props) => {
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
       {fullname && <Route path="/tutorial/*" element={<Tutorial />} />}
-      {fullname && isAdmin && (
+      {fullname && leading.length > 0 && (
         <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
       )}
       <Route path="/communities/" element={<Communities />} />
@@ -159,7 +161,7 @@ const AppRouter = (props) => {
           />
           {fullname && (
             <Route
-              key={communi.id}
+              key={communi.id + "Test"}
               path={"/paperTest/" + communi.id}
               element={
                 <PaperTest

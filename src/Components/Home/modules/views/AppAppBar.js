@@ -24,12 +24,12 @@ import {
   resumeUrlState,
   transcriptUrlState,
   tutorialEndedState,
+  colorModeState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
 } from "../../../../store/ExperimentAtoms";
-import { colorModeState } from "../../../../store/AuthAtoms";
 
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
