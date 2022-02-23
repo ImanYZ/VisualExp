@@ -35,20 +35,20 @@ export default [
           },
         ],
       },
-      {
-        name: "Asia Luboyeski",
-        image: "Asia_Luboyeski.jpg",
-        about: `As the writer and director of a musical revue for kindergarteners during the coronavirus pandemic, I expanded my creativity, problem-solving skills, and my patience. The successful performance and smiles on the children's faces made everything worth it.
-        I am passionate about helping others, particularly children, in any way I can. Currently, I volunteer my time to give alto saxophone lessons to middle schoolers nearby.
-        Freshman year, I conducted my own research project investigating how teachers' beliefs about math development impacted their time teaching math. I became efficient at consolidating datasets and summarizing key variable statistics. I also gained experience in data collection, data imputation, and data organization.
-        I am excited for the opportunities that the future holds.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/asia-luboyeski/",
-          },
-        ],
-      },
+      // {
+      //   name: "Asia Luboyeski",
+      //   image: "Asia_Luboyeski.jpg",
+      //   about: `As the writer and director of a musical revue for kindergarteners during the coronavirus pandemic, I expanded my creativity, problem-solving skills, and my patience. The successful performance and smiles on the children's faces made everything worth it.
+      //   I am passionate about helping others, particularly children, in any way I can. Currently, I volunteer my time to give alto saxophone lessons to middle schoolers nearby.
+      //   Freshman year, I conducted my own research project investigating how teachers' beliefs about math development impacted their time teaching math. I became efficient at consolidating datasets and summarizing key variable statistics. I also gained experience in data collection, data imputation, and data organization.
+      //   I am excited for the opportunities that the future holds.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/asia-luboyeski/",
+      //     },
+      //   ],
+      // },
     ],
     YouTube: "2uM3EGYy5o4",
     description: `The Organizational/Educational Psychology community explores research on both the study of psychology in academia and the psychology utilized in productivity and task management. By using 1Cademy, interns learn how to break down articles into granular concepts, connect them within a larger context of research, communicate their findings to other community interns, and utilize information to write research studies. We value collaborative learning, and expect interns to participate in group discussions both to dive deeper into the content and regularly improve their own content.`,

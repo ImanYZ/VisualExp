@@ -185,7 +185,7 @@ const applicantsColumns = [
   { field: "createdAt", headerName: "Created", type: "dateTime", width: 178 },
   {
     field: "user",
-    headerName: "User",
+    headerName: "Applicant",
     width: 190,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -193,7 +193,7 @@ const applicantsColumns = [
   },
   {
     field: "email",
-    headerName: "email",
+    headerName: "Email",
     width: 190,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;

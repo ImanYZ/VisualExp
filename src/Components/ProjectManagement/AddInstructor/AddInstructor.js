@@ -372,6 +372,7 @@ const extraColumns = [
   {
     field: "upVotes",
     headerName: "Up Votes",
+    type: "number",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
@@ -392,6 +393,7 @@ const extraColumns = [
   {
     field: "downVotes",
     headerName: "Down Votes",
+    type: "number",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
