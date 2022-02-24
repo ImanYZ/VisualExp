@@ -1514,9 +1514,7 @@ export default {
           <li>
             Ask the 1Cademy liaison librarians working with your community.
           </li>
-          <li>
-            Ask the 1Cademy liaison librarians working with your community.
-          </li>
+          <li>Ask your 1Cademy community leader(s).</li>
           <li>Discuss in your community weekly meetings.</li>
         </ul>
       </div>

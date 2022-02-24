@@ -3,9 +3,34 @@ import React from "react";
 import Tooltip from "@mui/material/Tooltip";
 
 const GridCellToolTip = (props) => {
+  if (Array.isArray(props.cellValues.value)) {
+    const cellText =
+      props.cellValues.value && props.cellValues.value.length > 0
+        ? props.cellValues.value.join(", ")
+        : "";
+    return (
+      <Tooltip title={cellText} placement="top">
+        <div
+          style={{
+            fontSize: 13,
+            textOverflow: "ellipsis",
+            overflow: "hidden",
+          }}
+        >
+          {cellText}
+        </div>
+      </Tooltip>
+    );
+  }
   return (
     <Tooltip
-      title={props.cellValues.value ? props.cellValues.value : ""}
+      title={
+        "Tooltip" in props
+          ? props.Tooltip
+          : props.cellValues.value || props.cellValues.value === 0
+          ? props.cellValues.value
+          : ""
+      }
       placement="top"
     >
       {"isLink" in props && props.isLink ? (

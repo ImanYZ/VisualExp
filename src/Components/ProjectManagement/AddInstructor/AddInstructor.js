@@ -223,20 +223,11 @@ let instructorsColumns = [
     width: 130,
     renderCell: (cellValues) => {
       return (
-        <Tooltip
-          title={cellValues.value ? getCountry(cellValues.value) : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {getCountry(cellValues.value)}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip={cellValues.value ? getCountry(cellValues.value) : ""}
+        />
       );
     },
   },
@@ -246,20 +237,11 @@ let instructorsColumns = [
     width: 100,
     renderCell: (cellValues) => {
       return (
-        <Tooltip
-          title={cellValues.value ? getStateId(cellValues.value) : ""}
-          placement="top"
-        >
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {getStateId(cellValues.value)}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip={cellValues.value ? getStateId(cellValues.value) : ""}
+        />
       );
     },
   },
@@ -376,18 +358,7 @@ const extraColumns = [
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip title="Up Votes" placement="top">
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -397,18 +368,7 @@ const extraColumns = [
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip title="Down Votes" placement="top">
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -416,23 +376,7 @@ const extraColumns = [
     headerName: "comments",
     width: 250,
     renderCell: (cellValues) => {
-      const cellText =
-        cellValues.value && cellValues.value.length > 0
-          ? cellValues.value.join(", ")
-          : "";
-      return (
-        <Tooltip title={cellText} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellText}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
 ];

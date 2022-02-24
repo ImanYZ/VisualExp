@@ -15,6 +15,7 @@ import FormHelperText from "@mui/material/FormHelperText";
 import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
+import Alert from "@mui/material/Alert";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
@@ -400,21 +401,24 @@ const Tutorial = (props) => {
             1Cademy Tutorial
           </Typography>
           <Box sx={{ mb: "10px" }}>
-            <Box>
-              Welcome to the second step in the application process! Please go
-              through this tutorial to learn more about 1Cademy and how it
-              works. This tutorial takes on average an hour and a half. Please
-              carefully read{" "}
-              <a href="https://1cademy.us/home" target="_blank">
-                the 1Cademy homepage
-              </a>{" "}
-              and watch the following videos before answering any of the
-              questions, and <strong>select all the choices that apply</strong>.
-            </Box>
-            <Box sx={{ mt: "10px", fontSize: "19px" }}>
-              The community leaders will decide about your application based on{" "}
-              <strong>your total WRONG attempts.</strong>
-            </Box>
+            <Alert severity="success">
+              <Box>
+                Welcome to the second step in the application process! Please go
+                through this tutorial to learn more about 1Cademy and how it
+                works. This tutorial takes on average an hour and a half. Please
+                carefully read{" "}
+                <a href="https://1cademy.us/home" target="_blank">
+                  the 1Cademy homepage
+                </a>{" "}
+                and watch the following videos before answering any of the
+                questions, and{" "}
+                <strong>select all the choices that apply</strong>.
+              </Box>
+              <Box sx={{ mt: "10px", fontSize: "19px" }}>
+                The community leaders will decide about your application based
+                on <strong>your total WRONG attempts.</strong>
+              </Box>
+            </Alert>
           </Box>
         </div>
         {instructions.map((instr, idx) => (
@@ -450,15 +454,17 @@ const Tutorial = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        component="div"
-                        sx={{
-                          pb: "19px",
-                        }}
-                      >
-                        {instr.description}
-                      </Typography>
+                      <Alert severity="warning">
+                        <Typography
+                          variant="body2"
+                          component="div"
+                          sx={{
+                            fontSize: "19px",
+                          }}
+                        >
+                          {instr.description}
+                        </Typography>
+                      </Alert>
                       {instr.video && <YoutubeEmbed embedId={instr.video} />}
                     </Paper>
                   </Grid>

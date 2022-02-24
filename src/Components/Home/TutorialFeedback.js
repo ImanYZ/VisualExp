@@ -8,6 +8,7 @@ import { DataGrid } from "@mui/x-data-grid";
 
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 
+import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
@@ -19,19 +20,7 @@ const explanationsColumns = [
     headerName: "Section",
     width: 220,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip title={cellValues.value} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -39,19 +28,7 @@ const explanationsColumns = [
     headerName: "Question",
     width: 220,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip title={cellValues.value} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -59,19 +36,7 @@ const explanationsColumns = [
     headerName: "Explanation",
     width: 220,
     renderCell: (cellValues) => {
-      return (
-        <Tooltip title={cellValues.value} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -110,6 +75,9 @@ const explanationsColumns = [
     field: "participant",
     headerName: "Participant",
     width: 190,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
   },
   { field: "posted", headerName: "Posted", type: "dateTime", width: 178 },
 ];
@@ -151,9 +119,17 @@ const TutorialFeedback = () => {
             const instr = instructs[explanData.instrId];
             let question;
             if ("qIdx" in explanData) {
-              question = Object.values(instr.questions)[explanData.qIdx].stem;
+              if (explanData.qIdx < Object.keys(instr.questions).length) {
+                question = Object.values(instr.questions)[explanData.qIdx].stem;
+              } else {
+                question = "The Question is deleted!";
+              }
             } else if ("qId" in explanData) {
-              question = instr.questions[explanData.qId].stem;
+              if (explanData.qId in instr.questions) {
+                question = instr.questions[explanData.qId].stem;
+              } else {
+                question = "The Question is deleted!";
+              }
             }
             const newExplan = {
               participant: explanData.fullname,
@@ -212,11 +188,6 @@ const TutorialFeedback = () => {
             checked: !isChecked,
             checkedBy: fullname,
           });
-          explans[explanIdx] = {
-            ...explans[explanIdx],
-            [clickedCell.field]: isChecked ? "◻" : "✅",
-          };
-          setExplanations(explans);
         }
       } catch (err) {
         console.error(err);

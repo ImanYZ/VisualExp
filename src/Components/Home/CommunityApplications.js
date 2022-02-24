@@ -12,6 +12,7 @@ import {
   leadingState,
 } from "../../store/AuthAtoms";
 
+import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
@@ -41,16 +42,11 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Reading Comprehension Immediate Score" placement="top">
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip="Reading Comprehension Immediate Score"
+        />
       );
     },
   },
@@ -62,19 +58,11 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip
-          title="Reading Comprehension After Three Days Score"
-          placement="top"
-        >
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip="Reading Comprehension After Three Days Score"
+        />
       );
     },
   },
@@ -86,19 +74,11 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip
-          title="Reading Comprehension After One Week Score"
-          placement="top"
-        >
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip="Reading Comprehension After One Week Score"
+        />
       );
     },
   },
@@ -110,16 +90,11 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Tutorial Wrong Attemps" placement="top">
-          <div
-            style={{
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip="Tutorial Wrong Attemps"
+        />
       );
     },
   },
@@ -131,16 +106,104 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Quiz Wrong Attemps" placement="top">
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip="Quiz Wrong Attemps"
+        />
+      );
+    },
+  },
+  {
+    field: "transcript",
+    headerName: "Transcript",
+    width: 100,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+    },
+  },
+  {
+    field: "resume",
+    headerName: "Resume",
+    width: 100,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+    },
+  },
+  {
+    field: "portfolio",
+    headerName: "Portfolio",
+    width: 100,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+    },
+  },
+  {
+    field: "accept",
+    headerName: "Accept",
+    width: 10,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <Tooltip title="Accept" placement="top">
           <div
             style={{
+              fontSize: 19,
+              fontWeight: "bold",
+              cursor: cellValues.value === "O" ? "default" : "pointer",
               width: "100%",
               textAlign: "center",
             }}
           >
-            {cellValues.value}
+            {cellValues.value === "O" ? (
+              <CircularProgress color="warning" size="16px" />
+            ) : (
+              cellValues.value
+            )}
           </div>
         </Tooltip>
+      );
+    },
+  },
+  {
+    field: "reject",
+    headerName: "Reject",
+    width: 10,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <Tooltip title="Reject" placement="top">
+          <div
+            style={{
+              fontSize: 19,
+              fontWeight: "bold",
+              cursor: cellValues.value === "O" ? "default" : "pointer",
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            {cellValues.value === "O" ? (
+              <CircularProgress color="warning" size="16px" />
+            ) : (
+              cellValues.value
+            )}
+          </div>
+        </Tooltip>
+      );
+    },
+  },
+  {
+    field: "leader",
+    headerName: "Leader",
+    width: 10,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <GridCellToolTip
+          isLink={false}
+          cellValues={cellValues}
+          Tooltip={"Decision made by " + cellValues.value}
+        />
       );
     },
   },

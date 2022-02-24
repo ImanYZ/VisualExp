@@ -90,22 +90,7 @@ const expSessionsColumns = [
     headerName: "Not Accepted",
     width: 280,
     renderCell: (cellValues) => {
-      const textVal = Array.isArray(cellValues.value)
-        ? cellValues.value.join(", ")
-        : "";
-      return (
-        <Tooltip title={textVal} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {textVal}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -113,22 +98,7 @@ const expSessionsColumns = [
     headerName: "Attendees",
     width: 220,
     renderCell: (cellValues) => {
-      const textVal = Array.isArray(cellValues.value)
-        ? cellValues.value.join(", ")
-        : "";
-      return (
-        <Tooltip title={textVal} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {textVal}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
@@ -161,22 +131,7 @@ const expSessionsColumns = [
     headerName: "Declined",
     width: 220,
     renderCell: (cellValues) => {
-      const textVal = Array.isArray(cellValues.value)
-        ? cellValues.value.join(", ")
-        : "";
-      return (
-        <Tooltip title={textVal} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {textVal}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
 ];
@@ -231,23 +186,7 @@ const applicantsColumns = [
     headerName: "Applications Started",
     width: 280,
     renderCell: (cellValues) => {
-      const cellText =
-        cellValues.value && cellValues.value.length > 0
-          ? cellValues.value.join(", ")
-          : "";
-      return (
-        <Tooltip title={cellText} placement="top">
-          <div
-            style={{
-              fontSize: 13,
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-            }}
-          >
-            {cellText}
-          </div>
-        </Tooltip>
-      );
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
   {
