@@ -144,16 +144,15 @@ export default {
             </p>
           </div>
         ),
-        answers: ["c", "e", "f", "h"],
+        answers: ["c", "e", "f"],
         choices: {
           a: "Content from external source without proper citation",
           b: "Quotes that are not cited",
           c: "Paraphrased and correctly cited content",
-          d: "Content copied from books or research papers",
-          e: "Links to online videos or audio recordings",
+          d: "Content directly copied from books or research papers, with or without citation",
+          e: "Links to online videos or audio recordings with proper citation",
           f: "Images from websites under public domain with correct citations",
-          g: "Images from copyrighted websites with correct citations",
-          h: "Your own original ideas without citations",
+          g: "Images from copyrighted websites",
         },
       },
     },
@@ -283,27 +282,27 @@ export default {
             b: "False",
           },
         },
-      What_are_the_overarching_learning_activities_supported_by_the_personalized:
-        {
-          stem: (
-            <div>
-              {quNum()}What are the overarching learning activities supported by
-              the personalized knowledge map view? [Hint: one of the correct
-              answers was not mentioned in the video, but you can find it from{" "}
-              <a href="https://1cademy.us/home" target="_blank">
-                the 1Cademy homepage
-              </a>
-            </div>
-          ),
-          answers: ["a", "b", "c", "d", "e"],
-          choices: {
-            a: "Navigation",
-            b: "Summarization",
-            c: "Evaluation",
-            d: "Improvement",
-            e: "Linking",
-          },
-        },
+      // What_are_the_overarching_learning_activities_supported_by_the_personalized:
+      //   {
+      //     stem: (
+      //       <div>
+      //         {quNum()}What are the overarching learning activities supported by
+      //         the personalized knowledge map view? [Hint: one of the correct
+      //         answers was not mentioned in the video, but you can find it from{" "}
+      //         <a href="https://1cademy.us/home" target="_blank">
+      //           the 1Cademy homepage
+      //         </a>
+      //       </div>
+      //     ),
+      //     answers: ["a", "b", "c", "d", "e"],
+      //     choices: {
+      //       a: "Navigation",
+      //       b: "Summarization",
+      //       c: "Evaluation",
+      //       d: "Improvement",
+      //       e: "Linking",
+      //     },
+      //   },
     },
   },
   Introduction_Ways_to_View_Nodes_on_Your_Personalized_Map: {
@@ -446,7 +445,6 @@ export default {
           e: "Pending proposals list",
           f: "Chat room",
           g: "leaderboard",
-          h: "Tags assigned to a node",
         },
       },
       OneCademy_interface_is_in_dark_mode_by_default: {
@@ -489,17 +487,6 @@ export default {
           d: "Other proposed nodes in your community",
         },
       },
-      When_will_a_proposal_appear_on_the_pending_proposals_list: {
-        stem:
-          quNum() +
-          "When will a proposal appear on the pending proposals list?",
-        answers: ["b"],
-        choices: {
-          a: "Anytime you make a proposal on a node",
-          b: "When you make a proposal on a node with a netvote higher than 2",
-          c: "When you make a proposal on a node with 2 votes",
-        },
-      },
       Which_pending_proposals_do_you_see_in_the_list_of_pending_proposals_in_the_sidebar:
         {
           stem:
@@ -516,9 +503,9 @@ export default {
         stem: quNum() + "What is the weekly leaderboard?",
         answers: ["a"],
         choices: {
-          a: "Top contributors of the week in your community",
-          b: "Top contributors of the week across the platform",
-          c: "All contributors of the week",
+          a: "Rankings of all contributors of the week in your community",
+          b: "Rankings of all contributors across the platform",
+          c: "Rankings of all contributors",
         },
       },
       What_is_the_all_time_leaderboard: {
@@ -1009,7 +996,18 @@ export default {
   },
   Nodes_Reference_Nodes: {
     title: newSec() + "1Cademy Nodes: Reference Nodes",
-    description: "This video introduces reference nodes on 1Cademy.",
+    description: (
+      <div>
+        <p>This video introduces reference nodes on 1Cademy.</p>
+        <p>
+          <strong>Note:</strong> You cannot cite a book chapter, video section,
+          or webpage in a reference node, instead you should cite the
+          encompassing book, video, or website. You can cite the specific
+          section of the reference when putting it in the context of a concept,
+          relation, question, or code node.
+        </p>
+      </div>
+    ),
     video: "R9V7Kjoznyw",
     questions: {
       What_format_of_citation_should_be_used_in_reference_nodes: {
@@ -1200,7 +1198,7 @@ export default {
           b: "A relation between knowledge and what it helps to learn next",
           c: "An example from a source related to a certain topic",
           d: "A relation of two similar principles",
-          e: "A relation between concepts A and B only if you need to learn A to be able to learn B",
+          e: "If you need to learn concept A to be able to learn concept B, there is a prerequisite link from A to B.",
         },
       },
       The_following_boxes_are_two_nodes_on_1Cademy_each_of_them_defining_a_concept:
@@ -1283,7 +1281,7 @@ export default {
           a: "Contains direct (immediate) prerequisite information to the information you would like to add",
           b: "Contains direct or indirect information a user needs to know to understand the information you would like to add",
           c: "Contains unrelated information",
-          d: "Can be a parent node",
+          // d: "Can be a parent node",
         },
       },
     },
@@ -1434,6 +1432,17 @@ export default {
             c: "0 downvotes; 1 upvote",
           },
         },
+      // When_will_a_proposal_appear_on_the_pending_proposals_list: {
+      //   stem:
+      //     quNum() +
+      //     "When will a proposal appear on the pending proposals list?",
+      //   answers: ["b"],
+      //   choices: {
+      //     a: "Anytime you make a proposal on a node",
+      //     b: "When you make a proposal on a node with a netvote higher than 2",
+      //     c: "When you make a proposal on a node with 2 votes",
+      //   },
+      // },
       What_steps_are_needed_to_evaluate_a_proposed_edit_to_a_node: {
         stem: (
           <div>

@@ -575,7 +575,7 @@ const Tutorial = (props) => {
                                     aria-label="explanation text box"
                                     minRows={7}
                                     placeholder={
-                                      "If you're experiencing difficulties with this question, please explain why."
+                                      "If you're experiencing difficulties with this question, please explain why and which options are confusing."
                                     }
                                     onChange={changeExplanation(instr.id, qIdx)}
                                     value={question.explanation}
