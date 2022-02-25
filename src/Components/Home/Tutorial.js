@@ -454,7 +454,7 @@ const Tutorial = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      <Alert severity="warning">
+                      <Alert severity="error">
                         <Typography
                           variant="body2"
                           component="div"
