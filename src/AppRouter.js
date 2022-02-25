@@ -26,6 +26,7 @@ import CookiePolicy from "./Components/Home/CookiePolicy";
 import LifeLogger from "./Components/LifeLogger/LifeLogger";
 import Tutorial from "./Components/Home/Tutorial";
 import TutorialFeedback from "./Components/Home/TutorialFeedback";
+import Withdraw from "./Components/Home/Withdraw";
 import Communities from "./Components/Home/Communities";
 import communities from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
@@ -151,6 +152,7 @@ const AppRouter = (props) => {
       {fullname && leading.length > 0 && (
         <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
       )}
+      {fullname && <Route path="/withdraw/*" element={<Withdraw />} />}
       <Route path="/communities/" element={<Communities />} />
       {communities.map((communi, idx) => (
         <>
