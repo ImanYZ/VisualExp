@@ -331,6 +331,69 @@ const Tutorial = (props) => {
     }
   };
 
+  const submitExplanation = (instrId, qIdx) => async (event) => {
+    event.preventDefault();
+
+    if (expanded === false) {
+      return;
+    }
+    const question = quests[instrId][qIdx];
+    if (fullname && "explanation" in question && question.explanation) {
+      const oAttempts = { ...attempts };
+      oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
+        new Date()
+      );
+      oAttempts[instrId].questions[question.id].explanation =
+        question.explanation;
+      if ("explaId" in question && question.explaId) {
+        oAttempts[instrId].questions[question.id].explaId = question.explaId;
+      }
+      setAttempts(oAttempts);
+      let tutorialData = {
+        attempts: oAttempts,
+      };
+      const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
+      const tutorialDoc = await tutorialRef.get();
+      if ("explanation" in question && question.explanation) {
+        let explaRef = firebase.db.collection("explanations").doc();
+        let explaDoc;
+        if ("explaId" in question && question.explaId) {
+          explaRef = firebase.db
+            .collection("explanations")
+            .doc(question.explaId);
+          explaDoc = await explaRef.get();
+        } else {
+          oAttempts[instrId].questions[question.id].explaId = explaRef.id;
+          question.explaId = explaRef.id;
+          tutorialData.attempts[instrId].questions[question.id].explaId =
+            explaRef.id;
+        }
+        const explaData = {
+          fullname,
+          instrId,
+          qId: question.id,
+          explanation: question.explanation,
+        };
+        if (explaDoc && explaDoc.exists) {
+          await explaRef.update({
+            ...explaData,
+            updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        } else {
+          await explaRef.set({
+            ...explaData,
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        }
+      }
+      if (tutorialDoc.exists) {
+        await tutorialRef.update(tutorialData);
+      } else {
+        await tutorialRef.set(tutorialData);
+      }
+    }
+  };
+
   const changeExpand = async (
     newExpand,
     tutorialRef,
@@ -486,94 +549,98 @@ const Tutorial = (props) => {
                       {instr.id in questions &&
                         questions[instr.id].map((question, qIdx) => {
                           return (
-                            <form
-                              key={qIdx}
-                              onSubmit={handleSubmit(instr.id, qIdx)}
-                            >
-                              <FormControl
-                                error={question.error}
-                                component="fieldset"
-                                variant="standard"
-                                sx={{ mb: "19px" }}
+                            <>
+                              <form
+                                key={qIdx}
+                                onSubmit={handleSubmit(instr.id, qIdx)}
                               >
-                                <FormLabel component="legend">
-                                  {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
-                                  {question.stem}
-                                </FormLabel>
-                                <FormGroup>
-                                  {Object.keys(question.choices).map(
-                                    (choice, cIdx) => {
-                                      return (
-                                        <FormControlLabel
-                                          key={choice}
-                                          control={
-                                            <Checkbox
-                                              checked={question.checks[choice]}
-                                              onChange={checkChoice(
-                                                instr.id,
-                                                qIdx
-                                              )}
-                                              name={choice}
-                                            />
-                                          }
-                                          label={
-                                            <span>
-                                              {choice + ". "}
-                                              {question.choices[choice]}
-                                            </span>
-                                          }
-                                        />
-                                      );
-                                    }
-                                  )}
-                                </FormGroup>
-                                <FormHelperText>
-                                  <span
-                                    style={{
-                                      color: question.error ? "red" : "green",
+                                <FormControl
+                                  error={question.error}
+                                  component="fieldset"
+                                  variant="standard"
+                                  sx={{ mb: "19px" }}
+                                >
+                                  <FormLabel component="legend">
+                                    {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
+                                    {question.stem}
+                                  </FormLabel>
+                                  <FormGroup>
+                                    {Object.keys(question.choices).map(
+                                      (choice, cIdx) => {
+                                        return (
+                                          <FormControlLabel
+                                            key={choice}
+                                            control={
+                                              <Checkbox
+                                                checked={
+                                                  question.checks[choice]
+                                                }
+                                                onChange={checkChoice(
+                                                  instr.id,
+                                                  qIdx
+                                                )}
+                                                name={choice}
+                                              />
+                                            }
+                                            label={
+                                              <span>
+                                                {choice + ". "}
+                                                {question.choices[choice]}
+                                              </span>
+                                            }
+                                          />
+                                        );
+                                      }
+                                    )}
+                                  </FormGroup>
+                                  <FormHelperText>
+                                    <span
+                                      style={{
+                                        color: question.error ? "red" : "green",
+                                      }}
+                                    >
+                                      {question.helperText}
+                                    </span>
+                                  </FormHelperText>
+                                </FormControl>
+                                <Box
+                                  sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(2, 1fr)",
+                                    width: "100%",
+                                    margin: "-10px 0px 10px 0px",
+                                  }}
+                                >
+                                  <Button
+                                    sx={{
+                                      margin: "0px 7px 10px 7px",
+                                      color: "common.white",
                                     }}
+                                    type="submit"
+                                    color="success"
+                                    variant="contained"
+                                    disabled={
+                                      Object.values(question.checks).findIndex(
+                                        (chec) => chec
+                                      ) === -1 ||
+                                      question.helperText === "You got it!"
+                                    }
                                   >
-                                    {question.helperText}
-                                  </span>
-                                </FormHelperText>
-                              </FormControl>
-                              <Box
-                                sx={{
-                                  display: "grid",
-                                  gridTemplateColumns: "repeat(2, 1fr)",
-                                  width: "100%",
-                                  margin: "-10px 0px 10px 0px",
-                                }}
-                              >
-                                <Button
-                                  sx={{
-                                    margin: "0px 7px 10px 7px",
-                                    color: "common.white",
-                                  }}
-                                  type="submit"
-                                  color="success"
-                                  variant="contained"
-                                  disabled={
-                                    Object.values(question.checks).findIndex(
-                                      (chec) => chec
-                                    ) === -1 ||
-                                    question.helperText === "You got it!"
-                                  }
-                                >
-                                  Submit Answer
-                                </Button>
-                                <Button
-                                  onClick={openExplanation(instr.id, qIdx)}
-                                  sx={{
-                                    margin: "0px 7px 10px 7px",
-                                    color: "common.white",
-                                  }}
-                                  color="warning"
-                                  variant="contained"
-                                >
-                                  Report Difficulty
-                                </Button>
-                              </Box>
+                                    Submit Answer
+                                  </Button>
+                                  <Button
+                                    onClick={openExplanation(instr.id, qIdx)}
+                                    sx={{
+                                      margin: "0px 7px 10px 7px",
+                                      color: "common.white",
+                                    }}
+                                    color="warning"
+                                    variant="contained"
+                                  >
+                                    Report Difficulty
+                                  </Button>
+                                </Box>
+                              </form>
                               {question.explanationOpen && (
                                 <>
                                   <TextareaAutosize
@@ -592,7 +659,7 @@ const Tutorial = (props) => {
                                       margin: "10px 0px 25px 0px",
                                       color: "common.white",
                                     }}
-                                    type="submit"
+                                    onClick={submitExplanation(instr.id, qIdx)}
                                     color="success"
                                     variant="contained"
                                   >
@@ -600,7 +667,7 @@ const Tutorial = (props) => {
                                   </Button>
                                 </>
                               )}
-                            </form>
+                            </>
                           );
                         })}
                     </Paper>
