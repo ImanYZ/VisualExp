@@ -337,7 +337,7 @@ const Tutorial = (props) => {
     if (expanded === false) {
       return;
     }
-    const question = quests[instrId][qIdx];
+    const question = questions[instrId][qIdx];
     if (fullname && "explanation" in question && question.explanation) {
       const oAttempts = { ...attempts };
       oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
@@ -517,7 +517,7 @@ const Tutorial = (props) => {
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
-                      <Alert severity="error">
+                      <Alert severity="warning">
                         <Typography
                           variant="body2"
                           component="div"
