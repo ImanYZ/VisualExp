@@ -4,7 +4,14 @@ const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
 
-const { getFullname, generateUID } = require("./utils");
+const {
+  getFullname,
+  generateUID,
+  nextWeek,
+  capitalizeFirstLetter,
+} = require("./utils");
+
+const { signatureHTML } = require("./emailSignature");
 
 require("dotenv").config();
 
@@ -76,7 +83,7 @@ exports.sendPersonalInvitations = async (req, res) => {
               subject: from1Cademy
                 ? "Help Improve 1Cademy by Participating in Our UX Research Study!"
                 : "Learn Which Knowledge Visualization Method is Better For You by Participating in Our UX Experiment!",
-              html: `<p>Hi ${firstname},</p>
+              html: `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
   <p></p>
   ${
     from1Cademy
@@ -159,7 +166,8 @@ exports.sendInvitationEmail = async (req, res) => {
         subject:
           (from1Cademy ? "[1Cademy] " : "") +
           "Learn Which Knowledge Visualization Method is Better For You by Participating in our Experiment!",
-        html: `<p>Hi ${firstname},</p>
+        html:
+          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
   from1Cademy
@@ -181,8 +189,7 @@ ${
 <p>Please fill out your availability in our scheduling website: <a href="https://visualexp1.web.app/schedule" target="_blank">https://visualexp1.web.app/schedule</a></p>
 <p></p>
 <p>Best regards,</p>
-<div dir="ltr" class="gmail_signature"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://1cademy.us/Home" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=12lQOGIsvgO45QTD4qlLxQ7_Y7NrHnbGx&amp;revid=0B8-wWhGFpGYCNzd4VFl6cTdxSUF2RnRkeS9RVGp0dUNqaENnPQ"></a>&nbsp;<a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a><img src="https://docs.google.com/uc?export=download&amp;id=1ud7zHiXzQC6VFyViSG7MUuqKb4t8Y75U&amp;revid=0B8-wWhGFpGYCSjM3WjVja2YzWGVPY1dKaSt0Y2tRM095VENnPQ"><img src="https://docs.google.com/uc?export=download&amp;id=1-G9ZAlwduWfEyrDzXWTZU1uuiuljMcWP&amp;revid=0B8-wWhGFpGYCS3dRMXl2U3Q0WTRsZE05SmMrSGtZWFRicENjPQ">&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17NADDvDZVvuHni-xM6Ej_IbBS9MHBZa-&amp;revid=0B8-wWhGFpGYCUkllWEtyTTMvL3IwcUp5cE1BRE16cnphSHJzPQ"></a>&nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a><a href="https://www.ifit.com/profile/5fab18836a996c03ad43af64" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1Iy3PATWUwaZ-hinGScGA5xxYT8maVHL0&amp;revid=0B8-wWhGFpGYCeUtBS2pSbFgzak1RQnpydXZHcUtaaEtnWkhFPQ"></a></span></div></div></div></div></div></div></div></div></div></div></div>
-`,
+` + signatureHTML,
       };
       return transporter.sendMail(mailOptions, (error, data) => {
         if (error) {
@@ -245,7 +252,8 @@ exports.sendEventNotificationEmail = async (req, res) => {
             : "Your UX Research Experiment Session Will Begin in " +
               hoursLeft +
               "!"),
-        html: `<p>Hi ${firstname},</p>
+        html:
+          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
   weAreWaiting
@@ -267,8 +275,7 @@ ${
 </p>
 <p></p>
 <p>Best regards,</p>
-<div dir="ltr" class="gmail_signature"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://1cademy.us/Home" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=12lQOGIsvgO45QTD4qlLxQ7_Y7NrHnbGx&amp;revid=0B8-wWhGFpGYCNzd4VFl6cTdxSUF2RnRkeS9RVGp0dUNqaENnPQ"></a>&nbsp;<a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a><img src="https://docs.google.com/uc?export=download&amp;id=1ud7zHiXzQC6VFyViSG7MUuqKb4t8Y75U&amp;revid=0B8-wWhGFpGYCSjM3WjVja2YzWGVPY1dKaSt0Y2tRM095VENnPQ"><img src="https://docs.google.com/uc?export=download&amp;id=1-G9ZAlwduWfEyrDzXWTZU1uuiuljMcWP&amp;revid=0B8-wWhGFpGYCS3dRMXl2U3Q0WTRsZE05SmMrSGtZWFRicENjPQ">&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17NADDvDZVvuHni-xM6Ej_IbBS9MHBZa-&amp;revid=0B8-wWhGFpGYCUkllWEtyTTMvL3IwcUp5cE1BRE16cnphSHJzPQ"></a>&nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a><a href="https://www.ifit.com/profile/5fab18836a996c03ad43af64" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1Iy3PATWUwaZ-hinGScGA5xxYT8maVHL0&amp;revid=0B8-wWhGFpGYCeUtBS2pSbFgzak1RQnpydXZHcUtaaEtnWkhFPQ"></a></span></div></div></div></div></div></div></div></div></div></div></div>
-`,
+` + signatureHTML,
       };
       return transporter.sendMail(mailOptions, (error, data) => {
         if (error) {
@@ -332,7 +339,8 @@ exports.rescheduleEventNotificationEmail = async (req, res) => {
           ("You declined our invitation to the UX Research Experiment Session that will begin in " +
             hoursLeft +
             "!"),
-        html: `<p>Hi ${firstname},</p>
+        html:
+          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
   "<p>You declined our invitation to the UX Research Experiment Session that will begin in " +
@@ -344,8 +352,7 @@ ${
 </p>
 <p></p>
 <p>Best regards,</p>
-<div dir="ltr" class="gmail_signature"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://1cademy.us/Home" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=12lQOGIsvgO45QTD4qlLxQ7_Y7NrHnbGx&amp;revid=0B8-wWhGFpGYCNzd4VFl6cTdxSUF2RnRkeS9RVGp0dUNqaENnPQ"></a>&nbsp;<a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a><img src="https://docs.google.com/uc?export=download&amp;id=1ud7zHiXzQC6VFyViSG7MUuqKb4t8Y75U&amp;revid=0B8-wWhGFpGYCSjM3WjVja2YzWGVPY1dKaSt0Y2tRM095VENnPQ"><img src="https://docs.google.com/uc?export=download&amp;id=1-G9ZAlwduWfEyrDzXWTZU1uuiuljMcWP&amp;revid=0B8-wWhGFpGYCS3dRMXl2U3Q0WTRsZE05SmMrSGtZWFRicENjPQ">&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17NADDvDZVvuHni-xM6Ej_IbBS9MHBZa-&amp;revid=0B8-wWhGFpGYCUkllWEtyTTMvL3IwcUp5cE1BRE16cnphSHJzPQ"></a>&nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a><a href="https://www.ifit.com/profile/5fab18836a996c03ad43af64" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1Iy3PATWUwaZ-hinGScGA5xxYT8maVHL0&amp;revid=0B8-wWhGFpGYCeUtBS2pSbFgzak1RQnpydXZHcUtaaEtnWkhFPQ"></a></span></div></div></div></div></div></div></div></div></div></div></div>
-`,
+` + signatureHTML,
       };
       return transporter.sendMail(mailOptions, (error, data) => {
         if (error) {
@@ -361,48 +368,46 @@ ${
   }
 };
 
-exports.emailApplicationStatus = async (req, res) => {
+exports.emailApplicationStatus = async (
+  email,
+  firstname,
+  fullname,
+  subject,
+  content,
+  hyperlink,
+  reminder
+) => {
   try {
-    if ("email" in req.body && "firstname" in req.body) {
-      const email = req.body.email;
-      const firstname = req.body.firstname;
-      const fullname = req.body.fullname;
-      const subject = req.body.subject;
-      const content = req.body.content;
-      const hyperlink = req.body.hyperlink;
-      const mailOptions = {
-        from: "onecademy@umich.edu",
-        to: email,
-        subject,
-        html: `<p>Hi ${firstname},</p>
+    const nWeek = nextWeek();
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject,
+      html:
+        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 <p>This is an auto-generated email to inform you that you have ${content}.</p>
 <p>You can continue your 1Cademy application using 
    <a href="${hyperlink}" target='_blank'>this link</a>.</p>
-<p>We'll send you a reminder about your application process on ${}. If you'd like to change the reminder date, click 
-   <a href="https://1cademy.us/reminderDate" target='_blank'>this link</a>.</p>
+<p>We'll send you a reminder about your application process on ${nWeek.toLocaleDateString()}. If you'd like to change the reminder date, click 
+   <a href="https://1cademy.us/ReminderDate" target='_blank'>this link</a>.</p>
 <p>If you prefer NOT to continue your 1Cademy application, click 
    <a href="https://1cademy.us/withdraw" target='_blank'>this link</a>.</p>
 <p>Please reply to this email if you have any questions or concerns.</p>
 <p></p>
 <p>Best regards,</p>
-<div dir="ltr" class="gmail_signature"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://1cademy.us/Home" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=12lQOGIsvgO45QTD4qlLxQ7_Y7NrHnbGx&amp;revid=0B8-wWhGFpGYCNzd4VFl6cTdxSUF2RnRkeS9RVGp0dUNqaENnPQ"></a>&nbsp;<a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a><img src="https://docs.google.com/uc?export=download&amp;id=1ud7zHiXzQC6VFyViSG7MUuqKb4t8Y75U&amp;revid=0B8-wWhGFpGYCSjM3WjVja2YzWGVPY1dKaSt0Y2tRM095VENnPQ"><img src="https://docs.google.com/uc?export=download&amp;id=1-G9ZAlwduWfEyrDzXWTZU1uuiuljMcWP&amp;revid=0B8-wWhGFpGYCS3dRMXl2U3Q0WTRsZE05SmMrSGtZWFRicENjPQ">&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17NADDvDZVvuHni-xM6Ej_IbBS9MHBZa-&amp;revid=0B8-wWhGFpGYCUkllWEtyTTMvL3IwcUp5cE1BRE16cnphSHJzPQ"></a>&nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a><a href="https://www.ifit.com/profile/5fab18836a996c03ad43af64" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1Iy3PATWUwaZ-hinGScGA5xxYT8maVHL0&amp;revid=0B8-wWhGFpGYCeUtBS2pSbFgzak1RQnpydXZHcUtaaEtnWkhFPQ"></a></span></div></div></div></div></div></div></div></div></div></div></div>
-`,
-      };
-      return transporter.sendMail(mailOptions, async (error, data) => {
-        if (error) {
-          console.log({ error });
-          return res.status(500).json({ error });
-        }
-        const userRef = db.collection("users").doc(fullname);
-        await userRef.update({
-          reminded: admin.firestore.Timestamp.fromDate(new Date())
-        });
-        return res.status(200).json({ done: true });
+` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, async (error, data) => {
+      if (error) {
+        console.log({ error });
+      }
+      const userRef = db.collection("users").doc(fullname);
+      await userRef.update({
+        reminder: admin.firestore.Timestamp.fromDate(nWeek),
       });
-    }
+    });
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
   }
 };

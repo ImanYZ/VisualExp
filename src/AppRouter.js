@@ -30,6 +30,7 @@ import Withdraw from "./Components/Home/Withdraw";
 import Communities from "./Components/Home/Communities";
 import communities from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
+import ReminderDate from "./Components/Home/ReminderDate";
 
 import "./App.css";
 
@@ -148,11 +149,16 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
-      {fullname && <Route path="/tutorial/*" element={<Tutorial />} />}
-      {fullname && leading.length > 0 && (
-        <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
+      {fullname && (
+        <>
+          <Route path="/tutorial/*" element={<Tutorial />} />
+          {leading.length > 0 && (
+            <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
+          )}
+          <Route path="/ReminderDate/*" element={<ReminderDate />} />
+          <Route path="/withdraw/*" element={<Withdraw />} />
+        </>
       )}
-      {fullname && <Route path="/withdraw/*" element={<Withdraw />} />}
       <Route path="/communities/" element={<Communities />} />
       {communities.map((communi, idx) => (
         <>

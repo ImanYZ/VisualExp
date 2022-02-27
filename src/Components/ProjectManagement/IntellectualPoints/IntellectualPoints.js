@@ -13,7 +13,6 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 
 import { DataGrid } from "@mui/x-data-grid";
@@ -39,6 +38,7 @@ import {
   otherActivityState,
 } from "../../../store/ProjectAtoms";
 
+import SnackbarComp from "../../SnackbarComp";
 import AdminIntellectualPoints from "./AdminIntellectualPoints";
 import GridCellToolTip from "../../GridCellToolTip";
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
@@ -232,10 +232,7 @@ const IntellectualPoints = (props) => {
   const [unvotedNum, setUnvotedNum] = useState(0);
   const [otherVoting, setOtherVoting] = useState(false);
   const [activitiesLoaded, setActivitiesLoaded] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(
-    "You successfully submitted your activity!"
-  );
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     const loadTags = async () => {
@@ -539,29 +536,6 @@ const IntellectualPoints = (props) => {
     }
   }, [activityDate, startTime, activityDescription]);
 
-  const openSnackbar = (message) => {
-    setSnackbarOpen(true);
-    setSnackbarMessage(message);
-  };
-
-  const closeSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
-  const snackbarAction = (
-    <IconButton
-      size="small"
-      aria-label="close"
-      color="inherit"
-      onClick={closeSnackbar}
-    >
-      <CloseIcon fontSize="small" />
-    </IconButton>
-  );
-
   const activityDescriptionChange = (event) => {
     setActivityDescription(event.target.value);
   };
@@ -680,7 +654,7 @@ const IntellectualPoints = (props) => {
       id: activityRef.id,
     });
     await firebase.commitBatch();
-    openSnackbar("You successfully submitted your activity!");
+    setSnackbarMessage("You successfully submitted your activity!");
     // }
   };
 
@@ -755,7 +729,9 @@ const IntellectualPoints = (props) => {
             activity: clickedCell.id,
             vote: clickedCell.field,
           });
-          openSnackbar("You successfully voted for others' activity!");
+          setSnackbarMessage(
+            "You successfully voted for someone else's activity!"
+          );
         }
       } catch (err) {
         console.error(err);
@@ -1158,12 +1134,9 @@ const IntellectualPoints = (props) => {
           </div>
         </>
       )}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2500}
-        onClose={closeSnackbar}
-        message={snackbarMessage}
-        action={snackbarAction}
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
       />
     </>
   );

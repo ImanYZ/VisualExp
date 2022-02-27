@@ -11,6 +11,7 @@ const {
   feedbackData,
   loadContacts,
   reassignAllPConditionNums,
+  applicationReminder,
 } = require("./users");
 const {
   voteEndpoint,
@@ -24,7 +25,6 @@ const {
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
   sendPersonalInvitations,
-  emailApplicationStatus,
 } = require("./emailing");
 const {
   schedule,
@@ -58,7 +58,6 @@ app.post("/deleteActivity", deleteActivity);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
 app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
-app.post("/emailApplicationStatus", emailApplicationStatus);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);
@@ -89,3 +88,7 @@ exports.updateNotTakenSessionsScheduler = functions.pubsub
 exports.assignExperimentSessionsPointsScheduler = functions.pubsub
   .schedule("every 4 hours")
   .onRun(assignExperimentSessionsPoints);
+
+exports.applicationReminder = functions.pubsub
+  .schedule("every 25 hours")
+  .onRun(applicationReminder);

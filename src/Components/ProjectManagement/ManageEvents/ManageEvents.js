@@ -219,6 +219,29 @@ const applicantsColumns = [
       );
     },
   },
+  {
+    field: "withdrew",
+    headerName: "Withdrew",
+    width: 100,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return cellValues.value ? "🚫" : "";
+    },
+  },
+  {
+    field: "withdrawExp",
+    headerName: "withdrawal Explanation",
+    width: 280,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
+  {
+    field: "reminder",
+    headerName: "Reminder",
+    type: "time",
+    width: 190,
+  },
 ];
 
 const errorAlert = (data) => {
@@ -356,6 +379,12 @@ const ManageEvents = (props) => {
             tutorial: false,
             applicationsStarted: [],
             applications: [],
+            withdrew: "withdrew" in userData && userData.withdrew,
+            withdrawExp: "withdrawExp" in userData && userData.withdrawExp,
+            reminder:
+              "reminder" in userData && userData.reminder
+                ? userData.reminder.toDate()
+                : null,
           };
           const tutorialDoc = await firebase.db
             .collection("tutorial")

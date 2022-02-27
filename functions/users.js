@@ -11,6 +11,7 @@ const {
   batchDelete,
 } = require("./admin");
 const { getFullname } = require("./utils");
+const { emailApplicationStatus } = require("./emailing");
 
 exports.deleteUser = async (snap, context) => {
   // Get an object representing the document prior to deletion
@@ -686,4 +687,96 @@ exports.feedbackData = async (req, res) => {
     return res.status(400).json({ err });
   }
   return res.status(200).json({ done: true });
+};
+
+exports.applicationReminder = async (context) => {
+  try {
+    const usersDocs = await db
+      .collection("users")
+      .where("projectDone", "==", true)
+      .get();
+    const reminders = [];
+    for (let userDoc of usersDocs.docs) {
+      const userData = userDoc.data();
+      if (
+        (!("withdrew" in userData) || !userData.withdrew) &&
+        (!("reminder" in userData) ||
+          userData.reminder.toDate() <= new Date()) &&
+        "createdAt" in userData &&
+        userData.createdAt.toDate() > new Date("1-14-2022")
+      ) {
+        const tutorialDoc = await db
+          .collection("tutorial")
+          .doc(userDoc.id)
+          .get();
+        if (tutorialDoc.exists) {
+          const tutorialData = tutorialDoc.data();
+          if ("ended" in tutorialData && tutorialData.ended) {
+            let submittedOne = false;
+            const applicationDocs = await db
+              .collection("applications")
+              .where("fullname", "==", userDoc.id)
+              .get();
+            for (let applicationDoc of applicationDocs.docs) {
+              const applicationData = applicationDoc.data();
+              if ("ended" in applicationData && applicationData.ended) {
+                submittedOne = true;
+              }
+            }
+            if (!submittedOne) {
+              reminders.push({
+                email: userData.email,
+                firstname: userData.firstname,
+                fullname: userDoc.id,
+                subject: "Your 1Cademy Application is Incomplete!",
+                content:
+                  "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
+                hyperlink: "https://1cademy.us/home#JoinUsSection",
+              });
+            }
+          } else {
+            reminders.push({
+              email: userData.email,
+              firstname: userData.firstname,
+              fullname: userDoc.id,
+              subject: "Your 1Cademy Application is Incomplete!",
+              content:
+                "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
+              hyperlink: "https://1cademy.us/home#JoinUsSection",
+            });
+          }
+        } else {
+          reminders.push({
+            email: userData.email,
+            firstname: userData.firstname,
+            fullname: userDoc.id,
+            subject: "Your 1Cademy Application is Incomplete!",
+            content:
+              "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
+            hyperlink: "https://1cademy.us/home#JoinUsSection",
+          });
+        }
+      }
+    }
+    let userIdx = 0;
+    if (reminders.length > 0) {
+      const userInterval = setInterval(async () => {
+        console.log({ email: reminders[userIdx].email });
+        await emailApplicationStatus(
+          reminders[userIdx].email,
+          reminders[userIdx].firstname,
+          reminders[userIdx].fullname,
+          reminders[userIdx].subject,
+          reminders[userIdx].content,
+          reminders[userIdx].hyperlink
+        );
+        userIdx += 1;
+        if (userIdx === reminders.length) {
+          clearInterval(userInterval);
+        }
+      }, Math.floor(Math.random() * (10000 - 1000)) + 1000);
+    }
+  } catch (err) {
+    console.log({ err });
+  }
 };

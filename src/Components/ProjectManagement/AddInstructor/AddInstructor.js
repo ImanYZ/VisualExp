@@ -16,13 +16,10 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
-import Snackbar from "@mui/material/Snackbar";
-import IconButton from "@mui/material/IconButton";
 
 import { DataGrid } from "@mui/x-data-grid";
 
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import CloseIcon from "@mui/icons-material/Close";
 
 import {
   firebaseState,
@@ -37,6 +34,7 @@ import {
   upvotedInstructorsTodayState,
 } from "../../../store/ProjectAtoms";
 
+import SnackbarComp from "../../SnackbarComp";
 import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
@@ -421,10 +419,7 @@ const AddInstructor = (props) => {
   const [otherInstructor, setOtherInstructor] = useState({});
   const [otherVoting, setOtherVoting] = useState(false);
   const [comment, setComment] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(
-    "You successfully submitted your instructor/administrator!"
-  );
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
@@ -481,29 +476,6 @@ const AddInstructor = (props) => {
       };
     }
   }, [firebase, project, fullname, instructorsLoaded]);
-
-  const openSnackbar = (message) => {
-    setSnackbarOpen(true);
-    setSnackbarMessage(message);
-  };
-
-  const closeSnackbar = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
-  const snackbarAction = (
-    <IconButton
-      size="small"
-      aria-label="close"
-      color="inherit"
-      onClick={closeSnackbar}
-    >
-      <CloseIcon fontSize="small" />
-    </IconButton>
-  );
 
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 16) {
@@ -821,7 +793,7 @@ const AddInstructor = (props) => {
             vote: clickedCell.field,
           });
           setComment("");
-          openSnackbar(
+          setSnackbarMessage(
             "You successfully voted for others' instructor/administrator!"
           );
         }
@@ -841,7 +813,7 @@ const AddInstructor = (props) => {
           vote: voteType,
           comment,
         });
-        openSnackbar(
+        setSnackbarMessage(
           "You successfully voted for others' instructor/administrator!"
         );
         setOtherVoting(false);
@@ -1054,7 +1026,7 @@ const AddInstructor = (props) => {
                 });
               }
             }
-            openSnackbar(
+            setSnackbarMessage(
               "You successfully submitted your instructor/administrator!"
             );
             clearInstructor("Nothing");
@@ -1587,12 +1559,9 @@ const AddInstructor = (props) => {
           />
         </div>
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2500}
-        onClose={closeSnackbar}
-        message={snackbarMessage}
-        action={snackbarAction}
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
       />
     </>
   );

@@ -91,6 +91,21 @@ const getDateString = (dateObj) => {
   );
 };
 
+const nextWeek = () => {
+  let nextWeek = new Date();
+  nextWeek = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+  nextWeek = new Date(
+    nextWeek.getFullYear(),
+    nextWeek.getMonth(),
+    nextWeek.getDate()
+  );
+  return nextWeek;
+};
+
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 module.exports = {
   strToBoolean,
   getFullname,
@@ -99,4 +114,6 @@ module.exports = {
   generateUID,
   isToday,
   getDateString,
+  nextWeek,
+  capitalizeFirstLetter,
 };
