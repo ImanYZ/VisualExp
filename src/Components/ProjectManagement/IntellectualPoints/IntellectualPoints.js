@@ -72,23 +72,12 @@ const othersActivitiesColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Up Vote" placement="top">
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Up Vote"
+          cellValues={cellValues}
+        />
       );
     },
   },
@@ -99,23 +88,12 @@ const othersActivitiesColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Skip" placement="top">
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Skip"
+          cellValues={cellValues}
+        />
       );
     },
   },
@@ -183,24 +161,12 @@ const activitiesColumns = [
     type: "actions",
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Delete" placement="top">
-          <div
-            style={{
-              color: "red",
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Delete"
+          cellValues={cellValues}
+        />
       );
     },
   },

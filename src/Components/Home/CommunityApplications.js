@@ -145,23 +145,12 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Accept" placement="top">
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Accept"
+          cellValues={cellValues}
+        />
       );
     },
   },
@@ -172,23 +161,12 @@ const applicantsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Reject" placement="top">
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Reject"
+          cellValues={cellValues}
+        />
       );
     },
   },

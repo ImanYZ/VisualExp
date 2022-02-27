@@ -46,23 +46,12 @@ const explanationsColumns = [
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
-        <Tooltip title="Click to check/uncheck!" placement="top">
-          <div
-            style={{
-              fontSize: 19,
-              fontWeight: "bold",
-              cursor: cellValues.value === "O" ? "default" : "pointer",
-              width: "100%",
-              textAlign: "center",
-            }}
-          >
-            {cellValues.value === "O" ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              cellValues.value
-            )}
-          </div>
-        </Tooltip>
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Click to check/uncheck!"
+          cellValues={cellValues}
+        />
       );
     },
   },

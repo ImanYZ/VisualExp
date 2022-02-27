@@ -33,7 +33,23 @@ const GridCellToolTip = (props) => {
       }
       placement="top"
     >
-      {"isLink" in props && props.isLink ? (
+      {"actionCell" in props && props.actionCell ? (
+        <div
+          style={{
+            fontSize: 19,
+            fontWeight: "bold",
+            cursor: props.cellValues.value === "O" ? "default" : "pointer",
+            width: "100%",
+            textAlign: "center",
+          }}
+        >
+          {props.cellValues.value === "O" ? (
+            <CircularProgress color="warning" size="16px" />
+          ) : (
+            props.cellValues.value
+          )}
+        </div>
+      ) : "isLink" in props && props.isLink ? (
         <a href={props.cellValues.value} target="_blank">
           <div
             style={{
