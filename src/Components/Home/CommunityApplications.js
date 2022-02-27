@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
-import Tooltip from "@mui/material/Tooltip";
-import CircularProgress from "@mui/material/CircularProgress";
-
 import { DataGrid } from "@mui/x-data-grid";
 
 import {
@@ -17,7 +14,7 @@ import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
 const applicantsColumns = [
-  { field: "createdAt", headerName: "Started", type: "dateTime", width: 178 },
+  { field: "createdAt", headerName: "Started", type: "dateTime", width: 190 },
   {
     field: "user",
     headerName: "Applicant",

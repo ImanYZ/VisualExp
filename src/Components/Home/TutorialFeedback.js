@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
-import Tooltip from "@mui/material/Tooltip";
-import CircularProgress from "@mui/material/CircularProgress";
-
 import { DataGrid } from "@mui/x-data-grid";
 
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
@@ -68,7 +65,7 @@ const explanationsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
-  { field: "posted", headerName: "Posted", type: "dateTime", width: 178 },
+  { field: "posted", headerName: "Posted", type: "dateTime", width: 190 },
 ];
 
 const TutorialFeedback = () => {

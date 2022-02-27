@@ -27,8 +27,8 @@ import { getISODateString } from "../../../utils/DateFunctions";
 import "./ExperimentPoints.css";
 
 const expSessionsColumns = [
-  { field: "start", headerName: "Start", type: "dateTime", width: 178 },
-  { field: "end", headerName: "End", type: "dateTime", width: 178 },
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
+  { field: "end", headerName: "End", type: "dateTime", width: 190 },
   {
     field: "attendees",
     headerName: "Attendees",
@@ -41,8 +41,8 @@ const expSessionsColumns = [
 ];
 
 const notTakenSessionsColumns = [
-  { field: "start", headerName: "Start", type: "dateTime", width: 178 },
-  { field: "end", headerName: "End", type: "dateTime", width: 178 },
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
+  { field: "end", headerName: "End", type: "dateTime", width: 190 },
   { field: "hoursLeft", headerName: "Hours Left", type: "number", width: 130 },
   { field: "points", headerName: "Points", type: "number", width: 130 },
 ];

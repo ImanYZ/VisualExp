@@ -13,7 +13,6 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
-import IconButton from "@mui/material/IconButton";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -21,8 +20,6 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import DatePicker from "@mui/lab/DatePicker";
 import TimePicker from "@mui/lab/TimePicker";
-
-import CloseIcon from "@mui/icons-material/Close";
 
 import {
   firebaseState,
@@ -46,8 +43,8 @@ import { isToday, getISODateString } from "../../../utils/DateFunctions";
 import "./IntellectualPoints.css";
 
 const othersActivitiesColumns = [
-  { field: "fullname", headerName: "Fullname", width: 178 },
-  { field: "start", headerName: "Start", type: "dateTime", width: 178 },
+  { field: "fullname", headerName: "Fullname", width: 190 },
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
   {
     field: "description",
     headerName: "Description",
@@ -117,8 +114,8 @@ const othersActivitiesColumns = [
 ];
 
 const activitiesColumns = [
-  { field: "start", headerName: "Start", type: "dateTime", width: 178 },
-  // { field: "end", headerName: "End", type: "dateTime", width: 178 },
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
+  // { field: "end", headerName: "End", type: "dateTime", width: 190 },
   {
     field: "description",
     headerName: "Description",

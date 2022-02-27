@@ -28,7 +28,7 @@ const rescheduleEventNotificationEmail = (params) => async (event) => {
 };
 
 const expSessionsColumns = [
-  { field: "start", headerName: "Start", type: "dateTime", width: 178 },
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
   {
     field: "participant",
     headerName: "Participant",
@@ -137,7 +137,7 @@ const expSessionsColumns = [
 ];
 
 const applicantsColumns = [
-  { field: "createdAt", headerName: "Created", type: "dateTime", width: 178 },
+  { field: "createdAt", headerName: "Created", type: "dateTime", width: 190 },
   {
     field: "user",
     headerName: "Applicant",
@@ -239,7 +239,7 @@ const applicantsColumns = [
   {
     field: "reminder",
     headerName: "Reminder",
-    type: "time",
+    type: "dateTime",
     width: 190,
   },
 ];

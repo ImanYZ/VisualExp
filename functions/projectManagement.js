@@ -860,7 +860,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
         if (pastEvent.attendees) {
-          let researcherObj = null;
+          let researcherObjs = [];
           let userObj = null;
           const attendees = [];
           for (let attendee of pastEvent.attendees) {
@@ -870,7 +870,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
                 researcher.email.toLowerCase() === attendee.email.toLowerCase()
             );
             if (rIdx !== -1) {
-              researcherObj = researchersInfo[rIdx];
+              researcherObjs.push(researchersInfo[rIdx]);
             }
             const uIdx = usersInfo.findIndex(
               (user) =>
@@ -880,81 +880,78 @@ exports.assignExperimentSessionsPoints = async (context) => {
               userObj = usersInfo[uIdx];
             }
           }
-          if (userObj && researcherObj) {
+          if (userObj && researcherObjs.length > 0) {
             const project = userObj.project;
-            if (researcherObj.projects.includes(project)) {
-              const sTime = new Date(pastEvent.start.dateTime);
-              const eTime = new Date(pastEvent.end.dateTime);
-              const { sTimestamp, eTimestamp } = getActivityTimeStamps(
-                sTime,
-                sTime,
-                eTime
-              );
-              const currentTime = admin.firestore.Timestamp.fromDate(
-                new Date()
-              );
-              const expSessionDocs = await db
-                .collection("expSessions")
-                .where("attendees", "==", attendees)
-                .where("sTime", "==", sTime)
-                .get();
-              if (expSessionDocs.docs.length === 0) {
-                console.log({ attendees, sTime });
-                let points = 7;
-                if (eTime.getTime() > sTime.getTime() + 40 * 60 * 1000) {
-                  points = 16;
-                }
-                try {
-                  await db.runTransaction(async (t) => {
-                    const researcherRef = db
-                      .collection("researchers")
-                      .doc(researcherObj.fullname);
-                    const researcherDoc = await t.get(researcherRef);
-                    const researcherData = researcherDoc.data();
-                    let researcherExpPoints = 0;
-                    if (researcherData.projects[project].expPoints) {
-                      researcherExpPoints =
-                        researcherData.projects[project].expPoints;
-                    }
-                    const researcherProjectUpdates = {
-                      projects: {
-                        ...researcherData.projects,
-                        [project]: {
-                          ...researcherData.projects[project],
-                          expPoints: researcherExpPoints + points,
+            for (let researcherObj of researcherObjs) {
+              if (researcherObj.projects.includes(project)) {
+                const sTime = new Date(pastEvent.start.dateTime);
+                const eTime = new Date(pastEvent.end.dateTime);
+                const { sTimestamp, eTimestamp } = getActivityTimeStamps(
+                  sTime,
+                  sTime,
+                  eTime
+                );
+                const currentTime = admin.firestore.Timestamp.fromDate(
+                  new Date()
+                );
+                const expSessionDocs = await db
+                  .collection("expSessions")
+                  .where("attendees", "==", attendees)
+                  .where("sTime", "==", sTime)
+                  .get();
+                if (expSessionDocs.docs.length === 0) {
+                  let points = 7;
+                  if (eTime.getTime() > sTime.getTime() + 40 * 60 * 1000) {
+                    points = 16;
+                  }
+                  try {
+                    await db.runTransaction(async (t) => {
+                      const researcherRef = db
+                        .collection("researchers")
+                        .doc(researcherObj.fullname);
+                      const researcherDoc = await t.get(researcherRef);
+                      const researcherData = researcherDoc.data();
+                      let researcherExpPoints = 0;
+                      if (researcherData.projects[project].expPoints) {
+                        researcherExpPoints =
+                          researcherData.projects[project].expPoints;
+                      }
+                      const researcherProjectUpdates = {
+                        projects: {
+                          ...researcherData.projects,
+                          [project]: {
+                            ...researcherData.projects[project],
+                            expPoints: researcherExpPoints + points,
+                          },
                         },
-                      },
-                    };
-                    t.update(researcherRef, researcherProjectUpdates);
-                    const researcherLogRef = db
-                      .collection("researcherLogs")
-                      .doc();
-                    t.set(researcherLogRef, {
-                      ...researcherProjectUpdates,
-                      id: researcherRef.id,
-                      updatedAt: currentTime,
+                      };
+                      t.update(researcherRef, researcherProjectUpdates);
+                      const researcherLogRef = db
+                        .collection("researcherLogs")
+                        .doc();
+                      t.set(researcherLogRef, {
+                        ...researcherProjectUpdates,
+                        id: researcherRef.id,
+                        updatedAt: currentTime,
+                      });
+                      const expSessionRef = db.collection("expSessions").doc();
+                      t.set(expSessionRef, {
+                        attendees,
+                        project,
+                        points,
+                        sTime: sTimestamp,
+                        eTime: eTimestamp,
+                        createdAt: currentTime,
+                      });
                     });
-                    const expSessionRef = db.collection("expSessions").doc();
-                    t.set(expSessionRef, {
-                      attendees,
-                      project,
-                      points,
-                      sTime: sTimestamp,
-                      eTime: eTimestamp,
-                      createdAt: currentTime,
-                    });
-                  });
-                } catch (e) {
-                  console.log("Transaction failure:", e);
+                  } catch (e) {
+                    console.log("Transaction failure:", e);
+                  }
                 }
               } else {
-                console.log({ exists: true, attendees, sTime });
+                console.log({ project, projects: researcherObj.projects });
               }
-            } else {
-              console.log({ project, projects: researcherObj.projects });
             }
-          } else {
-            console.log({ userObj, researcherObj });
           }
         }
       }
@@ -978,8 +975,8 @@ exports.updateNotTakenSessions = async (context) => {
         const notTakenSessionsRef = db
           .collection("notTakenSessions")
           .doc(ev.id);
-        const notTakenSessionsDoc = await notTakenSessionsRef.get();
         if (!("attendees" in ev) || ev.attendees.length < 2) {
+          const notTakenSessionsDoc = await notTakenSessionsRef.get();
           if (!notTakenSessionsDoc.exists) {
             const startTime = new Date(ev.start.dateTime).getTime();
             const endTime = new Date(ev.end.dateTime).getTime();
@@ -991,8 +988,8 @@ exports.updateNotTakenSessions = async (context) => {
               points = 16;
             }
             await batchSet(notTakenSessionsRef, {
-              start: ev.start.dateTime,
-              end: ev.end.dateTime,
+              start: new Date(ev.start.dateTime),
+              end: new Date(ev.end.dateTime),
               id: ev.id,
               hoursLeft,
               points,

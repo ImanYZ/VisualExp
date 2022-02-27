@@ -225,7 +225,15 @@ const RouterNav = (props) => {
           nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
           nTSessionsNum -= 1;
         } else {
-          nTSessions.push(change.doc.data());
+          const nTSessionData = change.doc.data();
+          console.log({ nTSessionData });
+          nTSessions.push({
+            start: nTSessionData.start.toDate(),
+            end: nTSessionData.end.toDate(),
+            id: nTSessionData.id,
+            hoursLeft: nTSessionData.hoursLeft,
+            points: nTSessionData.points,
+          });
           nTSessionsNum += 1;
         }
       }

@@ -171,7 +171,7 @@ const AdminIntellectualPoints = (props) => {
           data={dailyVotes}
           margin={{ top: 70, right: 100, bottom: 70, left: 55 }}
           xScale={{
-            type: "time",
+            type: "dateTime",
             format: "%Y-%m-%d",
             precision: "day",
           }}
