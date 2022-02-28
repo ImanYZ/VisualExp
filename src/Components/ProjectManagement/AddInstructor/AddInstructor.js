@@ -1027,6 +1027,7 @@ const AddInstructor = (props) => {
           }
         });
         if (gotUpdated) {
+          await firebase.idToken();
           await axios.post("/voteInstructorReset", {
             instructor: selectedRows[0],
           });
@@ -1131,9 +1132,6 @@ const AddInstructor = (props) => {
                 otherInstructor.email}
             </p>
             <p>
-              <i>Extra Info:</i> {otherInstructor.explanation}
-            </p>
-            <p>
               {otherInstructor.occupation +
                 "/" +
                 otherInstructor.position +
@@ -1154,6 +1152,9 @@ const AddInstructor = (props) => {
                 getStateId(otherInstructor.stateInfo) +
                 ", " +
                 otherInstructor.city}
+            </p>
+            <p>
+              <i>Extra Info:</i> {otherInstructor.explanation}
             </p>
             <TextareaAutosize
               aria-label="Comment Text box"

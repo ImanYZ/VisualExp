@@ -583,25 +583,13 @@ const IntellectualPoints = (props) => {
       description: activityDescription,
       tags: selectedTags,
     };
+    let activityUpdated = false;
     let activityRef;
     if (selectedRows.length > 0) {
       activityData.updatedAt = currentTime;
       activityRef = firebase.db.collection("activities").doc(selectedRows[0]);
       await firebase.batchUpdate(activityRef, activityData);
-
-      // const voteDocs = await firebase.db
-      //   .collection("votes")
-      //   .where("activity", "==", selectedRows[0])
-      //   .get();
-      // for (let voteDoc of voteDocs.docs) {
-      //   const voteRef = firebase.db.collection("votes").doc(voteDoc.id);
-      //   firebase.batchUpdate(voteRef, {
-      //     sTime: sTimestamp,
-      //     eTime: eTimestamp,
-      //     description: activityDescription,
-      //     tags: selectedTags,
-      //   });
-      // }
+      activityUpdated = true;
     } else {
       activityData.fullname = fullname;
       activityData.project = project;
@@ -617,6 +605,10 @@ const IntellectualPoints = (props) => {
       id: activityRef.id,
     });
     await firebase.commitBatch();
+    if (activityUpdated) {
+      await firebase.idToken();
+      await axios.post("/voteActivityReset", { activity: selectedRows[0] });
+    }
     setSnackbarMessage("You successfully submitted your activity!");
     // }
   };

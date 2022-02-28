@@ -15,11 +15,12 @@ const {
 } = require("./users");
 const {
   voteEndpoint,
-  voteInstructorEndpoint,
+  voteActivityReset,
   deleteActivity,
+  voteInstructorEndpoint,
+  voteInstructorReset,
   assignExperimentSessionsPoints,
   updateNotTakenSessions,
-  voteInstructorReset,
 } = require("./projectManagement");
 const {
   loadImage,
@@ -54,6 +55,7 @@ app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
 app.post("/vote", voteEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
+app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 // app.get("/loadfeedbackCodes", loadfeedbackCodes);
 
