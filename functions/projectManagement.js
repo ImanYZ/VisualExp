@@ -355,6 +355,64 @@ exports.voteInstructorEndpoint = async (req, res) => {
   }
 };
 
+exports.voteInstructorReset = async (req, res) => {
+  try {
+    const instructor = req.body.instructor;
+    if (instructor && vote) {
+      const authUser = await admin
+        .auth()
+        .verifyIdToken(req.headers.authorization);
+      const userDocs = await db
+        .collection("users")
+        .where("uid", "==", authUser.uid)
+        .limit(1)
+        .get();
+      if (userDocs.docs.length > 0) {
+        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        await db.runTransaction(async (t) => {
+          const instructorRef = db.collection("instructors").doc(instructor);
+          const instructorDoc = await t.get(instructorRef);
+          if (instructorDoc.exists) {
+            const voteQuery = db
+              .collection("instructorVotes")
+              .where("instructor", "==", instructor);
+            const voteDocs = await t.get(voteQuery);
+            for (let voteDoc of voteDocs.docs) {
+              const voteRef = db.collection("instructorVotes").doc(voteDoc.id);
+              const newVoteData = {
+                upVote: false,
+                downVote: false,
+                updatedAt: currentTime,
+              };
+              t.update(voteRef, newVoteData);
+              const voteLogRef = db.collection("instructorVoteLogs").doc();
+              t.set(voteLogRef, {
+                ...newVoteData,
+                id: voteRef.id,
+              });
+            }
+            const instructorUpdates = {
+              upVotes: 0,
+              downVotes: 0,
+            };
+            t.update(instructorRef, instructorUpdates);
+            const instructorLogRef = db.collection("instructorLogs").doc();
+            t.set(instructorLogRef, {
+              id: instructorRef.id,
+              updatedAt: currentTime,
+              ...instructorUpdates,
+            });
+          }
+        });
+      }
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};
+
 exports.deleteActivity = async (req, res) => {
   try {
     const activity = req.body.activity;
