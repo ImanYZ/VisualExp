@@ -914,6 +914,7 @@ const AddInstructor = (props) => {
     if (!invalidInstructor) {
       const updating = selectedRows.length > 0;
       try {
+        let gotUpdated = false;
         await firebase.db.runTransaction(async (t) => {
           const instructorDocs = await firebase.db
             .collection("instructors")
@@ -969,6 +970,7 @@ const AddInstructor = (props) => {
             if (updating) {
               instructorData.updatedAt = currentTime;
               t.update(instructorRef, instructorData);
+              gotUpdated = true;
             } else {
               instructorData.researcher = fullname;
               instructorData.createdAt = currentTime;
@@ -1024,6 +1026,11 @@ const AddInstructor = (props) => {
             clearInstructor("Nothing");
           }
         });
+        if (gotUpdated) {
+          await axios.post("/voteInstructorReset", {
+            instructor: selectedRows[0],
+          });
+        }
       } catch (e) {
         console.log("Transaction failure:", e);
       }

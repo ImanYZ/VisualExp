@@ -19,6 +19,7 @@ const {
   deleteActivity,
   assignExperimentSessionsPoints,
   updateNotTakenSessions,
+  voteInstructorReset,
 } = require("./projectManagement");
 const {
   loadImage,
@@ -52,6 +53,7 @@ app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
+app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/deleteActivity", deleteActivity);
 // app.get("/loadfeedbackCodes", loadfeedbackCodes);
 
