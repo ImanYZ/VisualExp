@@ -812,17 +812,17 @@ export default [
           },
         ],
       },
-      {
-        name: "Gail Grot",
-        image: "Gail_Grot.jpeg",
-        about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/gail-grot-264278219/",
-          },
-        ],
-      },
+      // {
+      //   name: "Gail Grot",
+      //   image: "Gail_Grot.jpeg",
+      //   about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/gail-grot-264278219/",
+      //     },
+      //   ],
+      // },
       {
         name: "Grace Victoria Ramstad",
         image: "Grace_Victoria_Ramstad.jpeg",
@@ -837,7 +837,7 @@ export default [
       {
         name: "Sarah B Licht",
         image: "Sarah_B_Licht.jpeg",
-        about: `I am a fourth-year student studying for a bachelor's in English and Psychology. I have experience in research, project management, and leadership, excellent written communication skills and technical editing skills as well as a drive to improve my current and future skills.`,
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
@@ -845,14 +845,32 @@ export default [
           },
         ],
       },
+      // {
+      //   name: "Stephanie Sandoval",
+      //   image: "Stephanie_Sandoval.jpeg",
+      //   about: ``,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/stephsand14/",
+      //     },
+      //   ],
+      // },
       {
-        name: "Stephanie Sandoval",
-        image: "Stephanie_Sandoval.jpeg",
-        about: ``,
+        name: "Viktoria Roshchin",
+        image: "Viktoria_Roshchin.jpeg",
+        about: `I currently am an undergraduate student attending Arizona State University for a
+        bachelor&#39;s in English and a minor in Anthropology. I have volunteered for both the Library of
+        Congress and the Smithsonian, where I transcribed and reviewed transcriptions to improve the
+        search, access, and discovery of historical and scientific documents. I also ensured these
+        transcribed documents are complete and accurate. My volunteer work also included digitizing a
+        variety of material to create accessibility for researchers and the public within a team-based
+        environment. My passion resides in research and editing. In my free time, I enjoy hiking,
+        reading, and writing.`,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/stephsand14/",
+            url: "https://www.linkedin.com/in/viktoria-r-b2a18314b/",
           },
         ],
       },

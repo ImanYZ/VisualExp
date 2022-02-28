@@ -975,8 +975,8 @@ exports.updateNotTakenSessions = async (context) => {
         const notTakenSessionsRef = db
           .collection("notTakenSessions")
           .doc(ev.id);
+        const notTakenSessionsDoc = await notTakenSessionsRef.get();
         if (!("attendees" in ev) || ev.attendees.length < 2) {
-          const notTakenSessionsDoc = await notTakenSessionsRef.get();
           if (!notTakenSessionsDoc.exists) {
             const startTime = new Date(ev.start.dateTime).getTime();
             const endTime = new Date(ev.end.dateTime).getTime();

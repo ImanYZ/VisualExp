@@ -123,7 +123,6 @@ const ExperimentPoints = (props) => {
     }
   }, [project, fullname]);
 
-  console.log({ dailyPoints });
   return (
     <>
       <Alert severity="success">
@@ -157,7 +156,7 @@ const ExperimentPoints = (props) => {
             </ul>
           </li>
           <li>
-            Click on the event that you’re available for, and click “edit”.
+            Click on the event that you're available for, and click “edit”.
           </li>
           <li>
             On the right-hand side, in the “guests” section, type your email

@@ -198,7 +198,7 @@ const applicantsColumns = [
         cellValues.value && cellValues.value.length > 0 ? (
           <ul>
             {cellValues.value.map((communiVal) => {
-              return <li>{communiVal}</li>;
+              return <li key={communiVal}>{communiVal}</li>;
             })}
           </ul>
         ) : (

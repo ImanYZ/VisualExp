@@ -24,6 +24,7 @@ import { Fireworks } from "fireworks-js/dist/react";
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { tutorialEndedState } from "../../store/AuthAtoms";
 
+import SnackbarComp from "../SnackbarComp";
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
 import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
@@ -43,6 +44,7 @@ const Tutorial = (props) => {
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     const instrs = [];
@@ -318,6 +320,9 @@ const Tutorial = (props) => {
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           });
         }
+        setSnackbarMessage(
+          "You successfully submitted your feedback about this question!"
+        );
       }
       if (tutorialDoc.exists) {
         await tutorialRef.update(tutorialData);
@@ -385,6 +390,9 @@ const Tutorial = (props) => {
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           });
         }
+        setSnackbarMessage(
+          "You successfully submitted your feedback about this question!"
+        );
       }
       if (tutorialDoc.exists) {
         await tutorialRef.update(tutorialData);
@@ -466,20 +474,33 @@ const Tutorial = (props) => {
           <Box sx={{ mb: "10px" }}>
             <Alert severity="success">
               <Box>
-                Welcome to the second step in the application process! Please go
-                through this tutorial to learn more about 1Cademy and how it
-                works. This tutorial takes on average an hour and a half. Please
-                carefully read{" "}
-                <a href="https://1cademy.us/home" target="_blank">
-                  the 1Cademy homepage
-                </a>{" "}
-                and watch the following videos before answering any of the
-                questions, and{" "}
-                <strong>select all the choices that apply</strong>.
+                <p>
+                  Welcome to the third step in the application process! Before
+                  moving forward, please create an account on{" "}
+                  <a href="https://1cademy.com/" target="_blank">
+                    1Cademy web app
+                  </a>
+                  , which is different from the account you created before on
+                  this web app. After creating your account, please go through
+                  this tutorial to learn more about 1Cademy and how it works.
+                  This tutorial takes on average an hour and a half. Make sure
+                  to have 1Cademy open in another tab on your browser, so you
+                  can practice on the platform and complete tasks as you go
+                  through this tutorial.
+                </p>
+                <p>
+                  <strong>Note</strong>: You will find all the answers you need
+                  on{" "}
+                  <a href="https://1cademy.us/home" target="_blank">
+                    the 1Cademy homepage
+                  </a>{" "}
+                  and in the tutorial videos and descriptions below.
+                </p>
               </Box>
               <Box sx={{ mt: "10px", fontSize: "19px" }}>
-                The community leaders will decide about your application based
-                on <strong>your total WRONG attempts.</strong>
+                Make sure to select all the choices that apply. The community
+                leaders will decide about your application based on{" "}
+                <strong>your total WRONG attempts.</strong>
               </Box>
             </Alert>
           </Box>
@@ -569,7 +590,7 @@ const Tutorial = (props) => {
                                       (choice, cIdx) => {
                                         return (
                                           <FormControlLabel
-                                            key={choice}
+                                            key={cIdx}
                                             control={
                                               <Checkbox
                                                 checked={
@@ -782,6 +803,10 @@ const Tutorial = (props) => {
           attemps so far!
         </Box>
       </Paper>
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
+      />
     </>
   );
 };

@@ -52,8 +52,12 @@ const TimePicker = (props) => {
     <div className="TimePickerContainer">
       <div className="DateText">{props.title}</div>
       <div className="TimeSlotsColumn">
-        {timeSlots.map((tSlot) => {
-          return <div className="TimeSlot">{tSlot}</div>;
+        {timeSlots.map((tSlot, tIdx) => {
+          return (
+            <div key={tIdx} className="TimeSlot">
+              {tSlot}
+            </div>
+          );
         })}
       </div>
     </div>

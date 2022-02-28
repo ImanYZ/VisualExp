@@ -526,7 +526,7 @@ const PaperTest = (props) => {
                                     (choice, cIdx) => {
                                       return (
                                         <FormControlLabel
-                                          key={choice}
+                                          key={cIdx}
                                           control={
                                             <Checkbox
                                               checked={question.checks[choice]}

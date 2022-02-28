@@ -106,7 +106,7 @@ const JoinForm = (props) => {
   }, [props.showSocial, props.showPrivateCond, props.showPublicCond]);
 
   //   const reasonList = userReasons.map((reason) => {
-  //     return <ul>- {reason}</ul>;
+  //     return <ul key={reason}>- {reason}</ul>;
   //   });
 
   return (

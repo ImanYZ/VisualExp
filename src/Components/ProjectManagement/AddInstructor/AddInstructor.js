@@ -251,6 +251,14 @@ let instructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
+  {
+    field: "comment",
+    headerName: "comment",
+    width: 250,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
   // {
   //   field: "deleteButton",
   //   headerName: "Delete",
@@ -295,14 +303,6 @@ let othersInstructorsColumns = [
           cellValues={cellValues}
         />
       );
-    },
-  },
-  {
-    field: "comment",
-    headerName: "comment",
-    width: 250,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
 ];
@@ -504,14 +504,27 @@ const AddInstructor = (props) => {
       for (let change of instructorsChanges) {
         const instructorData = change.doc.data();
         if (instructorData.deleted || change.type === "removed") {
-          insts.filter((instruct) => instruct.id === change.doc.id);
-          oInsts.filter((instruct) => instruct.id === change.doc.id);
+          if (instructorData.fullname === fullname) {
+            const instructorIdx = insts.findIndex(
+              (instruct) => instruct.id === change.doc.id
+            );
+            if (instructorIdx !== -1) {
+              insts.splice(instructorIdx, 1);
+            }
+          } else {
+            const instructorIdx = oInsts.findIndex(
+              (instruct) => instruct.id === change.doc.id
+            );
+            if (instructorIdx !== -1) {
+              oInsts.splice(instructorIdx, 1);
+            }
+          }
         } else {
           if (instructorData.fullname === fullname) {
             const newInstructor = {
               comments: [],
               ...instructorData,
-              deleteButton: "❌",
+              // deleteButton: "❌",
               id: change.doc.id,
             };
             const instructorIdx = insts.findIndex(
@@ -638,13 +651,14 @@ const AddInstructor = (props) => {
     let oInstsChanged = false;
     for (let oInstructor of othersInstructors) {
       if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-        if (!theInstructor) {
-          theInstructor = oInstructor;
-        }
-        uInstructorsNum += 1;
-        if (oInstructor.upVotes + oInstructor.downVotes < 3) {
+        if (oInstructor.upVotes + oInstructor.downVotes >= 3) {
           oInsts = oInsts.filter((instruct) => instruct.id !== oInstructor.id);
           oInstsChanged = true;
+        } else {
+          if (!theInstructor) {
+            theInstructor = oInstructor;
+          }
+          uInstructorsNum += 1;
         }
       }
     }
@@ -951,39 +965,41 @@ const AddInstructor = (props) => {
               id: instructorRef.id,
             });
 
-            if (instructorsToday === 6) {
-              if (dayInstructorsDocs.docs.length === 0) {
-                const dayInstructorRef = firebase.db
-                  .collection("dayInstructors")
-                  .doc();
-                await dayInstructorRef.set({
-                  project,
-                  fullname,
-                  date: today,
-                });
-                const researcherInstructors = {
-                  projects: {
-                    ...researcherData.projects,
-                    [project]: {
-                      ...researcherData.projects[project],
-                      instructors: 1,
-                    },
+            if (
+              !updating &&
+              instructorsToday === 6 &&
+              dayInstructorsDocs.docs.length === 0
+            ) {
+              const dayInstructorRef = firebase.db
+                .collection("dayInstructors")
+                .doc();
+              await dayInstructorRef.set({
+                project,
+                fullname,
+                date: today,
+              });
+              const researcherInstructors = {
+                projects: {
+                  ...researcherData.projects,
+                  [project]: {
+                    ...researcherData.projects[project],
+                    instructors: 1,
                   },
-                };
-                if ("instructors" in researcherData.projects[project]) {
-                  researcherInstructors.projects[project].instructors =
-                    researcherData.projects[project].instructors + 1;
-                }
-                t.update(researcherRef, researcherInstructors);
-                const researcherLogRef = firebase.db
-                  .collection("researcherLogs")
-                  .doc();
-                t.set(researcherLogRef, {
-                  ...researcherInstructors,
-                  id: researcherRef.id,
-                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
-                });
+                },
+              };
+              if ("instructors" in researcherData.projects[project]) {
+                researcherInstructors.projects[project].instructors =
+                  researcherData.projects[project].instructors + 1;
               }
+              t.update(researcherRef, researcherInstructors);
+              const researcherLogRef = firebase.db
+                .collection("researcherLogs")
+                .doc();
+              t.set(researcherLogRef, {
+                ...researcherInstructors,
+                id: researcherRef.id,
+                updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+              });
             }
             setSnackbarMessage(
               "You successfully submitted your instructor/administrator!"
@@ -1099,7 +1115,7 @@ const AddInstructor = (props) => {
                 ", from " +
                 otherInstructor.institution}
             </p>
-            {!(otherInstructor.major in majors) && (
+            {!majors.includes(otherInstructor.major) && (
               <Alert severity="error">
                 This researcher needs to update the 1Cademy Community for this
                 instructor!
@@ -1249,7 +1265,7 @@ const AddInstructor = (props) => {
                 citations to the input boxes on the right.
               </li>
             </ul>
-            <p>
+            <div>
               If they do not have a Google Scholar profile, report their
               ResearchGate info through the following instructions:
               <ul>
@@ -1297,7 +1313,7 @@ const AddInstructor = (props) => {
                   Copy the URL of this webpage in the corresponding input box.
                 </li>
               </ul>
-            </p>
+            </div>
             <p>
               <strong>Note:</strong> If they don't have have either a Google
               Scholar or a ResearchGate profile, leave the address empty and

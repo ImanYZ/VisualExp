@@ -43,13 +43,6 @@ export default {
           First, we will introduce 1Cademy, its objective, and how it works
           before digging into collaborating with others on 1Cademy.
         </p>
-        <p>
-          Before moving forward, please make an account on{" "}
-          <a href="https://1cademy.com/" target="_blank">
-            1Cademy web app
-          </a>
-          .
-        </p>
       </div>
     ),
     video: "vkNx-QUmbNI",
@@ -699,14 +692,37 @@ export default {
     video: "D_2A4s__SfM",
     questions: {
       How_can_you_change_your_default_tag_on_1Cademy: {
-        stem: quNum() + "How can you change your default tag on 1Cademy?",
-        answers: ["a"],
+        stem: (
+          <div>
+            <p>
+              {quNum()} What is the correct order for changing your default tag
+              on 1Cademy?
+            </p>
+            <ul>
+              <li>
+                <strong>Open Settings</strong>: open the user settings sidebar.
+              </li>
+              <li>
+                <strong>Click the Node</strong>: click the node corresponding to
+                your desired tag.
+              </li>
+              <li>
+                <strong>Open the Node</strong>: if the node corresponding to
+                your desired tag does not exist on your map view, open it.
+              </li>
+              <li>
+                <strong>Click the Tag Button</strong>: click the default tag
+                button.
+              </li>
+            </ul>
+          </div>
+        ),
+        answers: ["c"],
         choices: {
-          a: "Open the user settings sidebar ⇨ Click the default tag button ⇨ Click the node corresponding to your desired tag",
-          b: "Click the default tag in sidebar ⇨ Click the node corresponding to your desired tag",
-          c: "Open the node corresponding to your desired tag.",
-          d: "Tag the desired tag when proposing changes to current nodes.",
-          e: "Ask your community leaders to change your default tag.",
+          a: "Open Settings ⇨ Click the Node ⇨ Open the Node ⇨ Click the Tag Button",
+          b: "Click the Tag Button ⇨ Open Settings ⇨ Click the Node ⇨ Open the Node",
+          c: "Open the Node ⇨ Open Settings ⇨ Click the Tag Button ⇨ Click the Node",
+          d: "Click the Node ⇨ Open the Node ⇨ Open Settings ⇨ Click the Tag Button",
         },
       },
       Have_you_changed_your_tag_to_the_correct_community: {
