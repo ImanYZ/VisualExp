@@ -263,7 +263,7 @@ ${
       " target='_blank'>this link</a>.</p><p>" +
       "You can also reply to this email to reschedule this session for you." +
       (["2nd", "3rd"].includes(order)
-        ? " However, it does need to be today; otherwise, we must exclude your data from this study."
+        ? " However, it does need to be today; otherwise, we must exclude your data from this study and terminate your application."
         : "")
     : "<p>Your UX research experiment session will begin in " +
       hoursLeft +

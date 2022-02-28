@@ -251,14 +251,6 @@ let instructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
-  {
-    field: "comment",
-    headerName: "comment",
-    width: 250,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
   // {
   //   field: "deleteButton",
   //   headerName: "Delete",
@@ -305,6 +297,14 @@ let othersInstructorsColumns = [
       );
     },
   },
+  {
+    field: "comment",
+    headerName: "comment",
+    width: 250,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
 ];
 
 const extraColumns = [
@@ -336,6 +336,14 @@ const extraColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
+  {
+    field: "explanation",
+    headerName: "Extra Information",
+    width: 250,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
 ];
 
 instructorsColumns = [...instructorsColumns, ...extraColumns];
@@ -360,6 +368,7 @@ const AddInstructor = (props) => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
+  const [explanation, setExplanation] = useState("");
   const [alreadyExists, setAlreadyExists] = useState(false);
   const [CSCObj, setCSCObj] = useState(null);
   const [allCountries, setAllCountries] = useState([]);
@@ -621,6 +630,7 @@ const AddInstructor = (props) => {
               firstname: "",
               lastname: "",
               email: "",
+              explanation: "",
               institution: "",
               ...initialState,
               id: voteData.instructor,
@@ -820,6 +830,10 @@ const AddInstructor = (props) => {
     setEmail(event.target.value.toLowerCase());
   };
 
+  const explanationChange = (event) => {
+    setExplanation(event.target.value);
+  };
+
   const handleChange = (event) => {
     if ("persist" in event) {
       event.persist();
@@ -857,6 +871,7 @@ const AddInstructor = (props) => {
     setFirstname("");
     setLastname("");
     setEmail("");
+    setExplanation("");
     // setInstitution("University of Michigan - Ann Arbor");
     setValues({
       ...initialState,
@@ -876,6 +891,7 @@ const AddInstructor = (props) => {
       setFirstname(theRow.firstname);
       setLastname(theRow.lastname);
       setEmail(theRow.email);
+      setExplanation(theRow.explanation);
       setInstitution(theRow.institution);
       setValues({
         country: theRow.country,
@@ -946,6 +962,7 @@ const AddInstructor = (props) => {
               firstname,
               lastname,
               email,
+              explanation,
               institution,
               ...values,
             };
@@ -1105,6 +1122,9 @@ const AddInstructor = (props) => {
                 otherInstructor.lastname +
                 " at " +
                 otherInstructor.email}
+            </p>
+            <p>
+              <i>Extra Info:</i> {otherInstructor.explanation}
             </p>
             <p>
               {otherInstructor.occupation +
@@ -1485,6 +1505,14 @@ const AddInstructor = (props) => {
                 renderInput={renderInstitution}
               />
             )}
+            <TextareaAutosize
+              aria-label="Extra Information Text box"
+              minRows={4}
+              style={{ width: "100%", marginTop: "10px" }}
+              placeholder="You can enter extra information here."
+              onChange={explanationChange}
+              value={explanation}
+            />
             <div>
               {invalidInstructor && (
                 <div className="Error">{invalidInstructor}</div>
