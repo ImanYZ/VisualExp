@@ -891,7 +891,7 @@ const AddInstructor = (props) => {
       setFirstname(theRow.firstname);
       setLastname(theRow.lastname);
       setEmail(theRow.email);
-      setExplanation(theRow.explanation);
+      setExplanation(theRow.explanation ? theRow.explanation : "");
       setInstitution(theRow.institution);
       setValues({
         country: theRow.country,
