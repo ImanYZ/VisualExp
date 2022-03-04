@@ -590,7 +590,6 @@ const ManageEvents = (props) => {
             setSecondSession={setSecondSession}
             setThirdSession={setThirdSession}
             setSubmitable={setSubmitable}
-            setSubmitable={setSubmitable}
           />
         )}
       </div>

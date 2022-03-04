@@ -3,6 +3,8 @@
 *.env
 .env
 .firebase/*
+.firebase/
+.firebase
 *.cache
 
 # dependencies
