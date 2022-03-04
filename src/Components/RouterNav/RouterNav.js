@@ -226,7 +226,6 @@ const RouterNav = (props) => {
           nTSessionsNum -= 1;
         } else {
           const nTSessionData = change.doc.data();
-          console.log({ nTSessionData });
           nTSessions.push({
             start: nTSessionData.start.toDate(),
             end: nTSessionData.end.toDate(),
