@@ -50,7 +50,7 @@ export default [
       //   ],
       // },
     ],
-    YouTube: "2uM3EGYy5o4",
+    YouTube: "tmW31AEJRYg",
     description: `The Organizational/Educational Psychology community explores research on both the study of psychology in academia and the psychology utilized in productivity and task management. By using 1Cademy, interns learn how to break down articles into granular concepts, connect them within a larger context of research, communicate their findings to other community interns, and utilize information to write research studies. We value collaborative learning, and expect interns to participate in group discussions both to dive deeper into the content and regularly improve their own content.`,
     accomplishments: `We have explored topics such as: desirable difficulties, gender gap and Matthew effect in education, procrastination, collective intelligence, motivation, microtasking, and citizen science. We have summarized information from many academic research journals on our community topics, but we also allow interns to find specific topics that interest them, and encourage them to expand the map in that area.`,
     gains: [

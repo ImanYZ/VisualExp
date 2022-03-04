@@ -48,85 +48,6 @@ const WhoWeAre = (props) => {
               component="div"
               sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
             >
-              Accepted Research Papers
-            </Typography>
-            <List sx={{ width: "100%" }}>
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "success.main" }}>
-                    <VerifiedIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Accepted by ACM LAK 2022"
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp;
-                      Resnick, P. (2022). Semester-level Spacing but Not
-                      Procrastination Affected Student Exam Performance. In{" "}
-                      <Box component="span" sx={{ fontStyle: "italic" }}>
-                        Proceedings of the 12th International Conference on
-                        Learning Analytics and Knowledge (LAK&#8216;22) online,
-                        March 21-25, 2022. ACM.
-                      </Box>
-                    </Typography>
-                  }
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "success.main" }}>
-                    <VerifiedIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Accepted by ACM SIGCSE 2022"
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
-                      Retrieval-based Teaching Incentivizes Spacing and Improves
-                      Grades in Computer Science Education. In{" "}
-                      <Box component="span" sx={{ fontStyle: "italic" }}>
-                        Proceedings of the 53rd ACM Technical Symposium on
-                        Computer Science Education V. 1 (SIGCSE 2022), March
-                        3--5, 2022, Providence, RI, USA. ACM.
-                      </Box>
-                    </Typography>
-                  }
-                />
-              </ListItem>
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar sx={{ backgroundColor: "success.main" }}>
-                    <VerifiedIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Accepted by ACM SIGCSE 2022"
-                  secondary={
-                    <Typography variant="body2" color="text.secondary">
-                      YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K.,
-                      &amp; Fox, E. (2022). Another Victim of COVID-19: Computer
-                      Science Education. In{" "}
-                      <Box component="span" sx={{ fontStyle: "italic" }}>
-                        Proceedings of the 53rd ACM Technical Symposium on
-                        Computer Science Education V. 1 (SIGCSE 2022), March
-                        3--5, 2022, Providence, RI, USA. ACM.
-                      </Box>
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            </List>
-          </Paper>
-        </Grid>
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
-            >
               Recently Published Papers
             </Typography>
             <List sx={{ width: "100%" }}>
@@ -135,11 +56,11 @@ const WhoWeAre = (props) => {
                 target="_blank"
                 href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760"
               >
-                <ListItemAvatar>
+                {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primary="ACM ICER 2021"
                   secondary={
@@ -162,11 +83,11 @@ const WhoWeAre = (props) => {
                 target="_blank"
                 href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882"
               >
-                <ListItemAvatar>
+                {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primary="ACM CHI 2020"
                   secondary={
@@ -188,11 +109,11 @@ const WhoWeAre = (props) => {
                 target="_blank"
                 href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411"
               >
-                <ListItemAvatar>
+                {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primary="ACM ICER 2019"
                   secondary={
@@ -214,11 +135,11 @@ const WhoWeAre = (props) => {
                 target="_blank"
                 href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417"
               >
-                <ListItemAvatar>
+                {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primary="ACM SIGCSE 2019"
                   secondary={
@@ -239,11 +160,11 @@ const WhoWeAre = (props) => {
                 target="_blank"
                 href="https://www.researchgate.net/profile/Iman-Yeckehzaare/publication/341966650_Runestone_Interactive_Ebooks_A_Research_Platform_for_On-line_Computer_Science_Learning/links/5edb704945851529453ca208/Runestone-Interactive-Ebooks-A-Research-Platform-for-On-line-Computer-Science-Learning.pdf"
               >
-                <ListItemAvatar>
+                {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
                   </Avatar>
-                </ListItemAvatar>
+                </ListItemAvatar> */}
                 <ListItemText
                   primary="SPLICE 2019"
                   secondary={
@@ -261,6 +182,93 @@ const WhoWeAre = (props) => {
                   }
                 />
               </ListItemButton>
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <Paper>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+            >
+              2022 Published Papers
+            </Typography>
+            <List sx={{ width: "100%" }}>
+              <ListItemButton
+                component="a"
+                target="_blank"
+                href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408"
+              >
+                {/* <ListItemAvatar>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
+                    <MenuBookIcon />
+                  </Avatar>
+                </ListItemAvatar> */}
+                <ListItemText
+                  primary="ACM SIGCSE 2022"
+                  secondary={
+                    <Typography variant="body2" color="text.secondary">
+                      YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
+                      Retrieval-based Teaching Incentivizes Spacing and Improves
+                      Grades in Computer Science Education. In{" "}
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
+                        Proceedings of the 53rd ACM Technical Symposium on
+                        Computer Science Education V. 1 (SIGCSE 2022), March
+                        3--5, 2022, Providence, RI, USA. ACM.
+                      </Box>
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+              <ListItemButton
+                component="a"
+                target="_blank"
+                href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313"
+              >
+                {/* <ListItemAvatar>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
+                    <MenuBookIcon />
+                  </Avatar>
+                </ListItemAvatar> */}
+                <ListItemText
+                  primary="ACM SIGCSE 2022"
+                  secondary={
+                    <Typography variant="body2" color="text.secondary">
+                      YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K.,
+                      &amp; Fox, E. (2022). Another Victim of COVID-19: Computer
+                      Science Education. In{" "}
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
+                        Proceedings of the 53rd ACM Technical Symposium on
+                        Computer Science Education V. 1 (SIGCSE 2022), March
+                        3--5, 2022, Providence, RI, USA. ACM.
+                      </Box>
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+              <ListItem>
+                {/* <ListItemAvatar>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
+                    <VerifiedIcon />
+                  </Avatar>
+                </ListItemAvatar> */}
+                <ListItemText
+                  primary="Accepted by ACM LAK 2022"
+                  secondary={
+                    <Typography variant="body2" color="text.secondary">
+                      YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp;
+                      Resnick, P. (2022). Semester-level Spacing but Not
+                      Procrastination Affected Student Exam Performance. In{" "}
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
+                        Proceedings of the 12th International Conference on
+                        Learning Analytics and Knowledge (LAK&#8216;22) online,
+                        March 21-25, 2022. ACM.
+                      </Box>
+                    </Typography>
+                  }
+                />
+              </ListItem>
             </List>
           </Paper>
         </Grid>

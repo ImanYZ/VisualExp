@@ -170,7 +170,7 @@ export default {
         </ul>
       </div>
     ),
-    video: "NX2uJJ3RFsM",
+    video: "gXxIl7H5w8Q",
     questions: {
       What_is_all_knowledge_on_1Cademy_summarized_into: {
         stem: quNum() + "What is all knowledge on 1Cademy summarized into?",
