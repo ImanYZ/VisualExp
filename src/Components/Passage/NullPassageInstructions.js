@@ -4,6 +4,8 @@ import Button from "@mui/material/Button";
 
 import "./Passage.css";
 
+const doNothing = () => {};
+
 const NullPassageInstructions = (props) => {
   return (
     <div id="NullPassageInstructions">
@@ -35,10 +37,13 @@ const NullPassageInstructions = (props) => {
         <Button
           id="StartTestButton"
           className="Button"
-          onClick={props.nextStep}
+          onClick={props.minutes <= 3 ? props.nextStep : doNothing}
           variant="contained"
+          disabled={props.minutes > 3}
         >
-          START THE TEST!
+          {props.minutes > 3
+            ? "Navigate Through the Left Passage"
+            : "START THE TEST!"}
         </Button>
       </div>
 
