@@ -705,32 +705,50 @@ exports.applicationReminder = async (context) => {
         "createdAt" in userData &&
         userData.createdAt.toDate() > new Date("1-14-2022")
       ) {
-        const tutorialDoc = await db
-          .collection("tutorial")
-          .doc(userDoc.id)
-          .get();
-        if (tutorialDoc.exists) {
-          const tutorialData = tutorialDoc.data();
-          if ("ended" in tutorialData && tutorialData.ended) {
-            let submittedOne = false;
-            const applicationDocs = await db
-              .collection("applications")
-              .where("fullname", "==", userDoc.id)
-              .get();
-            for (let applicationDoc of applicationDocs.docs) {
-              const applicationData = applicationDoc.data();
-              if ("ended" in applicationData && applicationData.ended) {
-                submittedOne = true;
+        let remindersNum = 0;
+        if ("reminders" in userData && userData.reminders) {
+          remindersNum = userData.reminders;
+        }
+        if (remindersNum < 3) {
+          const tutorialDoc = await db
+            .collection("tutorial")
+            .doc(userDoc.id)
+            .get();
+          if (tutorialDoc.exists) {
+            const tutorialData = tutorialDoc.data();
+            if ("ended" in tutorialData && tutorialData.ended) {
+              let submittedOne = false;
+              const applicationDocs = await db
+                .collection("applications")
+                .where("fullname", "==", userDoc.id)
+                .get();
+              for (let applicationDoc of applicationDocs.docs) {
+                const applicationData = applicationDoc.data();
+                if ("ended" in applicationData && applicationData.ended) {
+                  submittedOne = true;
+                }
               }
-            }
-            if (!submittedOne) {
+              if (!submittedOne) {
+                reminders.push({
+                  email: userData.email,
+                  firstname: userData.firstname,
+                  fullname: userDoc.id,
+                  reminders: remindersNum,
+                  subject: "Your 1Cademy Application is Incomplete!",
+                  content:
+                    "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
+                  hyperlink: "https://1cademy.us/home#JoinUsSection",
+                });
+              }
+            } else {
               reminders.push({
                 email: userData.email,
                 firstname: userData.firstname,
                 fullname: userDoc.id,
+                reminders: remindersNum,
                 subject: "Your 1Cademy Application is Incomplete!",
                 content:
-                  "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
+                  "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
                 hyperlink: "https://1cademy.us/home#JoinUsSection",
               });
             }
@@ -739,22 +757,13 @@ exports.applicationReminder = async (context) => {
               email: userData.email,
               firstname: userData.firstname,
               fullname: userDoc.id,
+              reminders: remindersNum,
               subject: "Your 1Cademy Application is Incomplete!",
               content:
-                "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
+                "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
               hyperlink: "https://1cademy.us/home#JoinUsSection",
             });
           }
-        } else {
-          reminders.push({
-            email: userData.email,
-            firstname: userData.firstname,
-            fullname: userDoc.id,
-            subject: "Your 1Cademy Application is Incomplete!",
-            content:
-              "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
-            hyperlink: "https://1cademy.us/home#JoinUsSection",
-          });
         }
       }
     }
@@ -766,6 +775,7 @@ exports.applicationReminder = async (context) => {
           reminders[userIdx].email,
           reminders[userIdx].firstname,
           reminders[userIdx].fullname,
+          reminders[userIdx].reminders,
           reminders[userIdx].subject,
           reminders[userIdx].content,
           reminders[userIdx].hyperlink

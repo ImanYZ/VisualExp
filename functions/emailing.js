@@ -372,10 +372,10 @@ exports.emailApplicationStatus = async (
   email,
   firstname,
   fullname,
+  reminders,
   subject,
   content,
-  hyperlink,
-  reminder
+  hyperlink
 ) => {
   try {
     const nWeek = nextWeek();
@@ -403,7 +403,9 @@ exports.emailApplicationStatus = async (
         console.log({ error });
       }
       const userRef = db.collection("users").doc(fullname);
+      const userDoc = await userRef.get();
       await userRef.update({
+        reminders: reminders + 1,
         reminder: admin.firestore.Timestamp.fromDate(nWeek),
       });
     });
