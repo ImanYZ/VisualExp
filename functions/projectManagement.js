@@ -977,11 +977,11 @@ exports.assignExperimentSessionsPoints = async (context) => {
       for (let pastEvent of pastEvents) {
         if (pastEvent.attendees) {
           let researcherObjs = [];
-          let userObj = null;
+          let userObj, rIdx;
           const attendees = [];
           for (let attendee of pastEvent.attendees) {
             attendees.push(attendee.email);
-            const rIdx = researchersInfo.findIndex(
+            rIdx = researchersInfo.findIndex(
               (researcher) =>
                 researcher.email.toLowerCase() === attendee.email.toLowerCase()
             );
@@ -995,6 +995,18 @@ exports.assignExperimentSessionsPoints = async (context) => {
             if (uIdx !== -1) {
               userObj = usersInfo[uIdx];
             }
+          }
+          if (
+            researcherObjs.findIndex(
+              (researcher) =>
+                researcher.email.toLowerCase() === "oneweb@umich.edu"
+            ) === -1
+          ) {
+            rIdx = researchersInfo.findIndex(
+              (researcher) =>
+                researcher.email.toLowerCase() === "oneweb@umich.edu"
+            );
+            researcherObjs.push(researchersInfo[rIdx]);
           }
           if (userObj && researcherObjs.length > 0) {
             const project = userObj.project;
