@@ -1,0 +1,33 @@
+[debug] [2022-03-04T14:49:08.768Z] ----------------------------------------------------------------------
+[debug] [2022-03-04T14:49:08.770Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\onewe\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2022-03-04T14:49:08.770Z] CLI Version:   10.2.2
+[debug] [2022-03-04T14:49:08.770Z] Platform:      win32
+[debug] [2022-03-04T14:49:08.770Z] Node Version:  v16.7.0
+[debug] [2022-03-04T14:49:08.771Z] Time:          Fri Mar 04 2022 09:49:08 GMT-0500 (Eastern Standard Time)
+[debug] [2022-03-04T14:49:08.771Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2022-03-04T14:49:08.831Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2022-03-04T14:49:08.831Z] > authorizing via signed-in user (oneweb@umich.edu)
+[debug] [2022-03-04T14:49:08.831Z] [iam] checking project visualexp-a7d2c for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2022-03-04T14:49:08.833Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/visualexp-a7d2c:testIamPermissions [none]
+[debug] [2022-03-04T14:49:08.833Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/visualexp-a7d2c:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2022-03-04T14:49:09.094Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/visualexp-a7d2c:testIamPermissions 200
+[debug] [2022-03-04T14:49:09.095Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/visualexp-a7d2c:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2022-03-04T14:49:09.096Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/visualexp-a7d2c/serviceAccounts/visualexp-a7d2c@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2022-03-04T14:49:09.097Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/visualexp-a7d2c/serviceAccounts/visualexp-a7d2c@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2022-03-04T14:49:09.292Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/visualexp-a7d2c/serviceAccounts/visualexp-a7d2c@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2022-03-04T14:49:09.292Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/visualexp-a7d2c/serviceAccounts/visualexp-a7d2c@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2022-03-04T14:49:09.296Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/visualexp-a7d2c [none]
+[debug] [2022-03-04T14:49:09.486Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/visualexp-a7d2c 200
+[debug] [2022-03-04T14:49:09.487Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/visualexp-a7d2c {"projectId":"visualexp-a7d2c","projectNumber":"141114383555","displayName":"visualExp","name":"projects/visualexp-a7d2c","resources":{"hostingSite":"visualexp-a7d2c","storageBucket":"visualexp-a7d2c.appspot.com","locationId":"us-central"},"state":"ACTIVE"}
+[info] 
+[info] === Deploying to 'visualexp-a7d2c'...
+[info] 
+[info] i  deploying firestore, functions, hosting 
+[info] i  firestore: reading indexes from firestore.indexes.json... 
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2022-03-04T14:49:09.491Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/visualexp-a7d2c:test [none]
+[debug] [2022-03-04T14:49:09.491Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/visualexp-a7d2c:test [omitted]
+[debug] [2022-03-04T14:49:09.749Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/visualexp-a7d2c:test 200
+[debug] [2022-03-04T14:49:09.749Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/visualexp-a7d2c:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
