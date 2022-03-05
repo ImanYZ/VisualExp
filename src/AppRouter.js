@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import {
   firebaseState,
   emailState,
+  emailVerifiedState,
   fullnameState,
   isAdminState,
   themeState,
@@ -37,6 +38,7 @@ import "./App.css";
 const AppRouter = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
+  const emailVerified = useRecoilValue(emailVerifiedState);
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
   const leading = useRecoilValue(leadingState);
@@ -149,7 +151,7 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
-      {fullname && (
+      {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
           {leading.length > 0 && (
@@ -167,7 +169,7 @@ const AppRouter = (props) => {
             path={"/community/" + communi.id}
             element={<Communities commIdx={idx} />}
           />
-          {fullname && (
+          {fullname && emailVerified === "Verified" && (
             <Route
               key={communi.id + "Test"}
               path={"/paperTest/" + communi.id}
@@ -185,7 +187,7 @@ const AppRouter = (props) => {
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}
       >
-        {fullname && email ? (
+        {fullname && email && emailVerified === "Verified" ? (
           <>
             {duringAnExperiment ? (
               <Route path="*" element={<App />} />

@@ -715,10 +715,10 @@ const RouterNav = (props) => {
 
   const renderProfileMenu = (
     <Menu
-      id="ProfileMenu"
       anchorEl={profileMenuOpen}
       open={isProfileMenuOpen}
       onClose={handleProfileMenuClose}
+      style={{ float: "right" }}
     >
       {fullname && email && (
         <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>

@@ -12,6 +12,11 @@ export const emailState = atom({
   default: "",
 });
 
+export const emailVerifiedState = atom({
+  key: "emailVerifiedState",
+  default: "NotSent",
+});
+
 export const fullnameState = atom({
   key: "fullnameState",
   default: "",
