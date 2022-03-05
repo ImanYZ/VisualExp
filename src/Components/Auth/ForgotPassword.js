@@ -1,31 +1,20 @@
 import React, { useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
-import { Button } from "@material-ui/core";
-import { ArrowBack } from "@material-ui/icons";
+import Button from "@mui/material/Button";
+import TextField from "../components/TextField";
 
-import {
-  firebaseState,
-  openForgotPasswordState,
-  isSubmittingState,
-} from "../../../store/AuthAtoms";
-
-import "./ForgotPassword.css";
-
-const ValidatedInput = React.lazy(() =>
-  import("../../Editor/ValidatedInput/ValidatedInput")
-);
+import { firebaseState } from "../../store/AuthAtoms";
 
 const ForgotPassword = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  const setOpenForgotPassword = useSetRecoilState(openForgotPasswordState);
-  const [isSubmitting, setIsSubmitting] = useRecoilState(isSubmittingState);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState("");
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [passwordResetError, setPasswordResetError] = useState(null);
 
-  async function handleResetPassword() {
+  const handleResetPassword = async () => {
     setIsSubmitting(true);
     try {
       await firebase.resetPassword(resetPasswordEmail);
@@ -35,77 +24,39 @@ const ForgotPassword = (props) => {
       console.error("Error sending email", err);
       setPasswordResetError(err.message);
       setIsPasswordReset(false);
-      setOpenForgotPassword(false);
     }
     setIsSubmitting(false);
-  }
+  };
 
   return (
-    <div className="passwordResetContainer">
+    <div>
+      <h1>Forgot Password?</h1>
+      <p className="white-text">
+        Enter your account email below to receive a password reset link.
+      </p>
+      <ValidatedInput
+        identification="email"
+        name="email"
+        type="email"
+        placeholder="Email"
+        label="Email"
+        onChange={(event) => setResetPasswordEmail(event.target.value)}
+        value={resetPasswordEmail}
+        errorMessage={passwordResetError}
+        // autocomplete="off"
+      />
       <Button
-        variant="text"
-        onClick={() => setOpenForgotPassword(false)}
-        className="SignInUpButton close"
-        //  waves-effect waves-light btn-large red"
+        variant="contained"
+        onClick={handleResetPassword}
+        color={isSubmitting ? "white" : "success"}
+        disabled={isSubmitting}
       >
-        <ArrowBack /> Back
-        {/* <span className="SignInUpButtonText">Close</span> */}
+        Send Email
       </Button>
-      <div className="passwordResetContainerMain">
-        <h1>Forgot Password?</h1>
-        <p className="white-text">
-          Enter your account email below to receive a password reset link.
-        </p>
-        <ValidatedInput
-          identification="email"
-          name="email"
-          type="email"
-          placeholder="Email"
-          label="Email"
-          onChange={(event) => setResetPasswordEmail(event.target.value)}
-          value={resetPasswordEmail}
-          errorMessage={passwordResetError}
-          // autocomplete="off"
-        />
-        <Button
-          variant="contained"
-          onClick={handleResetPassword}
-          className={
-            isSubmitting
-              ? "disabled SignInUpButton reset"
-              : //  waves-effect waves-light btn-large orange"
-                "SignInUpButton reset"
-            //  waves-effect waves-light btn-large orange"
-          }
-          disabled={isSubmitting}
-        >
-          {/* <i className="material-icons left">create</i> */}
-          <span className="SignInUpButtonText">Reset</span>
-          {isSubmitting && (
-            <div
-              className="preloader-wrapper active small right"
-              style={{
-                margin: "10px",
-                marginLeft: "19px",
-                marginRight: "-10px",
-                postition: "relative",
-              }}
-            >
-              <div className="spinner-layer spinner-yellow-only">
-                <div className="circle-clipper left">
-                  <div className="circle"></div>
-                </div>
-              </div>
-            </div>
-          )}
-        </Button>
 
-        {isPasswordReset && (
-          <h4 className="white-text">
-            Check your email to reset the password.
-          </h4>
-        )}
-      </div>
+      {isPasswordReset && (
+        <h4 color="white">Check your email to reset the password.</h4>
+      )}
     </div>
   );
 };

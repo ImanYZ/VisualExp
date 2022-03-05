@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { firebase, firebaseOnecademy } from "../Components/firebase/firebase";
+import { firebase } from "../Components/firebase/firebase";
 
 export const firebaseState = atom({
   key: "firebaseState",

@@ -58,6 +58,11 @@ const Auth = (props) => {
   const [invalidAuth, setInvalidAuth] = useState(false);
   const [databaseAccountNotCreatedYet, setDatabaseAccountNotCreatedYet] =
     useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [resetPasswordEmail, setResetPasswordEmail] = useState("");
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
+  const [passwordResetError, setPasswordResetError] = useState(null);
 
   useEffect(() => {
     const getCourses = async () => {
@@ -352,7 +357,12 @@ const Auth = (props) => {
     setIsSignUp(newValue);
   };
 
+  const openForgotPassword = (event) => {
+    setForgotPassword((oldValue) => !oldValue);
+  };
+
   const signUp = async (event) => {
+    setIsSubmitting(true);
     try {
       const loweredEmail = email.toLowerCase();
       await firebase.login(loweredEmail, password);
@@ -372,6 +382,29 @@ const Auth = (props) => {
         }
       }
     }
+    setIsSubmitting(false);
+  };
+
+  const handleResetPassword = async () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        await firebase.resetPassword(resetPasswordEmail);
+        setIsPasswordReset(true);
+        setPasswordResetError(null);
+      } catch (err) {
+        console.error("Error sending email", err);
+        setPasswordResetError(err.message);
+        setIsPasswordReset(false);
+      }
+      setIsSubmitting(false);
+    }
+  };
+
+  const onKeyPress = (event) => {
+    if (event.key === "Enter" && submitable) {
+      signUp(event);
+    }
   };
 
   const validEmail = isEmail(email);
@@ -379,17 +412,12 @@ const Auth = (props) => {
   const validConfirmPassword = confirmPassword === password;
   const validFirstname = firstname.length > 1 && firstname.slice(-1) !== " ";
   const validlastname = lastname.length > 1 && lastname.slice(-1) !== " ";
-  const signInSubmitable = validEmail && validPassword && validConfirmPassword;
-  const signUpSubmitable = signInSubmitable && validFirstname && validlastname;
+  const signInSubmitable = validEmail && validPassword;
+  const signUpSubmitable =
+    signInSubmitable && validFirstname && validlastname && validConfirmPassword;
   const submitable =
     (isSignUp === 0 && signInSubmitable) ||
     (isSignUp === 1 && signUpSubmitable);
-
-  const onKeyPress = (event) => {
-    if (event.key === "Enter" && submitable) {
-      signUp(event);
-    }
-  };
 
   return (
     <div id="Auth">
@@ -542,13 +570,59 @@ const Auth = (props) => {
           <Button
             id="SignButton"
             onClick={signUp}
-            className={submitable ? "Button" : "Button Disabled"}
+            className={
+              submitable && !isSubmitting ? "Button" : "Button Disabled"
+            }
             variant="contained"
-            disabled={submitable ? null : true}
+            disabled={submitable && !isSubmitting ? null : true}
           >
-            Consent and Sign {isSignUp === 0 ? "In" : "Up"}
+            {isSignUp === 0
+              ? "Sign In"
+              : isSubmitting
+              ? "Creating your account..."
+              : "Consent and Sign Up"}
           </Button>
         </div>
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
+          <Button
+            onClick={openForgotPassword}
+            variant="contained"
+            color="warning"
+          >
+            Forgot Password?
+          </Button>
+        </div>
+        {forgotPassword && (
+          <>
+            <p>
+              Enter your account email below to receive a password reset link.
+            </p>
+            <ValidatedInput
+              identification="email"
+              name="email"
+              type="email"
+              placeholder="Email"
+              label="Email"
+              onChange={(event) => setResetPasswordEmail(event.target.value)}
+              value={resetPasswordEmail}
+              errorMessage={passwordResetError}
+              // autocomplete="off"
+            />
+            <Button
+              id="ForgotPasswordEmailButton"
+              variant="contained"
+              onClick={handleResetPassword}
+              className={!isSubmitting ? "Button" : "Button Disabled"}
+              disabled={isSubmitting}
+            >
+              Send Email
+            </Button>
+
+            {isPasswordReset && (
+              <h4 color="white">Check your email to reset the password.</h4>
+            )}
+          </>
+        )}
       </Box>
     </div>
   );
