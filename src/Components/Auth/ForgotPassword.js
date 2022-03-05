@@ -12,7 +12,9 @@ import {
 
 import "./ForgotPassword.css";
 
-const ValidatedInput = React.lazy(() => import("../../Editor/ValidatedInput/ValidatedInput"));
+const ValidatedInput = React.lazy(() =>
+  import("../../Editor/ValidatedInput/ValidatedInput")
+);
 
 const ForgotPassword = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -50,7 +52,7 @@ const ForgotPassword = (props) => {
         {/* <span className="SignInUpButtonText">Close</span> */}
       </Button>
       <div className="passwordResetContainerMain">
-        <h1>Forgot Password</h1>
+        <h1>Forgot Password?</h1>
         <p className="white-text">
           Enter your account email below to receive a password reset link.
         </p>
@@ -98,7 +100,11 @@ const ForgotPassword = (props) => {
           )}
         </Button>
 
-        {isPasswordReset && <h4 className="white-text">Check your email to reset the password.</h4>}
+        {isPasswordReset && (
+          <h4 className="white-text">
+            Check your email to reset the password.
+          </h4>
+        )}
       </div>
     </div>
   );

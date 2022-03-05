@@ -50,6 +50,7 @@ const Auth = (props) => {
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState("");
   const [isSignUp, setIsSignUp] = useState(0);
@@ -74,7 +75,7 @@ const Auth = (props) => {
     setParticipatedBefore(false);
     setInvalidAuth(false);
     setDatabaseAccountNotCreatedYet(false);
-  }, [firstname, lastname, email, password]);
+  }, [firstname, lastname, email]);
 
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async (user) => {
@@ -339,6 +340,10 @@ const Auth = (props) => {
     setPassword(event.target.value);
   };
 
+  const confirmPasswordChange = (event) => {
+    setConfirmPassword(event.target.value);
+  };
+
   const courseChange = (event) => {
     setCourse(event.target.value);
   };
@@ -357,9 +362,9 @@ const Auth = (props) => {
       if (err.code !== "auth/user-not-found") {
         setInvalidAuth(err.message);
       } else {
-        setInvalidAuth(
-          "There is no user record corresponding to this email address. Please create a new account!"
-        );
+        // setInvalidAuth(
+        //   "There is no user record corresponding to this email address. Please create a new account!"
+        // );
         setIsSignUp(1);
         if (signUpSubmitable) {
           const fname = getFullname(firstname, lastname);
@@ -371,9 +376,10 @@ const Auth = (props) => {
 
   const validEmail = isEmail(email);
   const validPassword = password.length >= 7;
+  const validConfirmPassword = confirmPassword === password;
   const validFirstname = firstname.length > 1 && firstname.slice(-1) !== " ";
   const validlastname = lastname.length > 1 && lastname.slice(-1) !== " ";
-  const signInSubmitable = validEmail && validPassword;
+  const signInSubmitable = validEmail && validPassword && validConfirmPassword;
   const signUpSubmitable = signInSubmitable && validFirstname && validlastname;
   const submitable =
     (isSignUp === 0 && signInSubmitable) ||
@@ -481,6 +487,21 @@ const Auth = (props) => {
               validPassword
                 ? null
                 : "Please enter your desired password with at least 7 characters!"
+            }
+            onKeyPress={onKeyPress}
+          />
+          <ValidatedInput
+            className="PleaseSpecify"
+            onChange={confirmPasswordChange}
+            name="ConfirmPassword"
+            type="password"
+            placeholder="Re-enter Password"
+            label="Confirm Password"
+            value={confirmPassword}
+            errorMessage={
+              validConfirmPassword
+                ? null
+                : "Your password and the re-entered password should match!"
             }
             onKeyPress={onKeyPress}
           />
