@@ -36,7 +36,7 @@ const NullPassageInstructions = (props) => {
       <div id="StartTestContainer">
         <Button
           id="StartTestButton"
-          className="Button"
+          className={props.minutes > 3 ? "Button Disabled" : "Button"}
           onClick={props.minutes <= 3 ? props.nextStep : doNothing}
           variant="contained"
           disabled={props.minutes > 3}
