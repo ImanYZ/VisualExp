@@ -67,14 +67,18 @@ const ConsentDocument = (props) => {
           <strong>Samuel Wood</strong>, Master of Science in Information,
           University of Michigan, School of Information
         </li>
-        <li>
+        {/* <li>
           <strong>Shabana Gupta</strong>, Undergraduate at Grinnell College
-        </li>
+        </li> */}
         <li>
           <strong>Sit Wai Phonn</strong>, Master's of Art in Applied Social
           Psychology, Division of Behavioral and Organizational Science, School
           of Social Science, Policy and Evaluation, Claremont Graduate
           University
+        </li>
+        <li>
+          <strong>Tirdad Barghi</strong>, Master's of Electrical Engineering,
+          School of Electrical Engineering, Shahid Beheshti University
         </li>
         <li>
           <strong>Victoria Mulligan</strong>, Bachelor of Arts in Psychology,
