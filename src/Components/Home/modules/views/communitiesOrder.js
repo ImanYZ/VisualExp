@@ -202,7 +202,7 @@ export default [
       the research team.`,
       `Improve the Mindfulness 1Cademy Map through minor and major updates to previous nodes.`,
       `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work and engage in discussion with other interns’ presentations.`,
+      `Contribute in meetings by presenting work and engage in discussion with other interns' presentations.`,
     ],
   },
   {
@@ -352,24 +352,24 @@ export default [
     width: "35%",
     leaders: [
       {
-        name: "Chiara Casiglia",
-        image: "Chiara_Casiglia.jpg",
-        about: `Chiara Casiglia graduated from Pepperdine University in 2020 with a BA in Psychology. She spent a semester as an intern for 1Cademy's Social Psychology community and now co-leads the Disability Studies community. She has a strong personal interest in studying the psychosocial impact of disability and decided to start the Disability Studies community to bring awareness to disability issues. Outside of 1Cademy, she works as a Research Assistant in Wayne State University's Neurology Department in which she assists with studies on MS.`,
+        name: "Keltie O'Malley",
+        image: "Keltie_O_Malley.jpg",
+        about: `Keltie O'Malley is a current undergraduate student at Michigan State University studying towards a BA in Political Science Pre-Law with a minor in Peace and Justice Studies. Before becoming a Co-Leader in the Disability Studies Community, she worked as an intern who focused on policy and law regarding disabilities. She has an interest in how legislation impacts individuals with disabilities and how it has evolved over time. Beyond 1Cademy, Keltie enjoys reading books, going on runs, and baking pastries.`,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/chiara-casiglia-171624191/",
+            url: "https://www.linkedin.com/in/keltie-o-b4036522a/",
           },
         ],
       },
       {
-        name: "Joe Casiglia",
-        image: "Joe_Casiglia.png",
-        about: `Joe Casiglia graduated from Pepperdine University with a degree in Economics in 2021 and is Co-leader of 1Cademy's Disability Studies Community. Within the group, Joe edits the Economics of Disability, Disability Law, and Culture of Disability, subtopics, along with working together with the liaison library team to improve cohesion between Disability Studies and the wider 1Cademy platform. He was led to researching disability after personal experiences navigating the complexity of college level disability services and hopes to illuminate the diversity of issues facing disabled individuals seeking an education. Outside of 1Cademy, Joe works as a Market Analytics Analyst at a top managed service provider, specializing in talent intelligence, labor economics, and providing market strategy. His hobbies include: importing tea, reading comic books, and thrifting vintage fashion.`,
+        name: "Rishabh Singh Verma",
+        image: "Rishabh_Singh_Verma.jpg",
+        about: `I am a sophomore currently pursuing a major in Informatics at the School of Information in the University of Michigan Ann Arbor, as well as a possible minor in Entrepreneurship and Computer Science. I am very interested in learning about technology and programming, and am planning to self teach myself certifications during this upcoming summer. I have always been interested in exploring different facets about the disability movement, including its roots, legislation that helped give more political and social representation, as well as becoming more well taught in the many different disabilities that are not discussed as often as the highly known ones. Personally, I have one of these conditions called “Hyperhidrosis”, which results in an individual sweating excessively when exposed to stress, temperatures warmer than room temperature, or any sort of physical movement. Through the Disability Studies group, I have been able to collaborate and deepen my understanding about hyperhidrosis and other aspects in Disability Studies.`,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/joseph-casiglia-996724160/",
+            url: "https://www.linkedin.com/in/rishabh-verma-3782691b7/",
           },
         ],
       },
