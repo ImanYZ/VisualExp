@@ -13,10 +13,10 @@ import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
-const applicantsColumns = [
+const applicationsColumns = [
   { field: "createdAt", headerName: "Started", type: "dateTime", width: 190 },
   {
-    field: "user",
+    field: "applicant",
     headerName: "Applicant",
     width: 190,
     renderCell: (cellValues) => {
@@ -136,8 +136,8 @@ const applicantsColumns = [
     },
   },
   {
-    field: "accept",
-    headerName: "Accept",
+    field: "accepted",
+    headerName: "Accepted",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
@@ -152,8 +152,8 @@ const applicantsColumns = [
     },
   },
   {
-    field: "reject",
-    headerName: "Reject",
+    field: "rejected",
+    headerName: "Rejected",
     width: 10,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
@@ -169,8 +169,8 @@ const applicantsColumns = [
   },
   {
     field: "leader",
-    headerName: "Leader",
-    width: 10,
+    headerName: "Decision Made By",
+    width: 190,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -182,111 +182,184 @@ const applicantsColumns = [
       );
     },
   },
+  {
+    field: "checkedAt",
+    headerName: "Decision Made On",
+    type: "dateTime",
+    width: 190,
+  },
 ];
 
-const CommunityApplications = () => {
+const CommunityApplications = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [explanations, setExplanations] = useState([]);
-  const [explanationsChanges, setExplanationsChanges] = useState([]);
-  const [explanationsLoaded, setExplanationsLoaded] = useState(false);
+  const [applications, setApplications] = useState([]);
+  const [applicationsChanges, setApplicationsChanges] = useState([]);
+  const [applicationsLoaded, setApplicationsLoaded] = useState(false);
 
   useEffect(() => {
     if (firebase) {
-      const explanationsQuery = firebase.db.collection("explanations");
-      const explanationsSnapshot = explanationsQuery.onSnapshot((snapshot) => {
+      const applicationsQuery = firebase.db
+        .collection("applications")
+        .where("communiId", "==", props.communiId);
+      const applicationsSnapshot = applicationsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
-        setExplanationsChanges((oldExplanationsChanges) => {
-          return [...oldExplanationsChanges, ...docChanges];
+        setApplicationsChanges((oldApplicationsChanges) => {
+          return [...oldApplicationsChanges, ...docChanges];
         });
-        setExplanationsLoaded(true);
+        setApplicationsLoaded(true);
       });
       return () => {
-        setExplanationsLoaded(false);
-        explanationsSnapshot();
+        setApplicationsLoaded(false);
+        applicationsSnapshot();
       };
     }
   }, [firebase]);
 
   useEffect(() => {
-    if (explanationsChanges.length > 0) {
-      let explans = [...explanations];
-      for (let change of explanationsChanges) {
+    const loadApplications = async () => {
+      let applics = [...applications];
+      for (let change of applicationsChanges) {
         if (change.type === "removed") {
-          explans = explans.filter((explan) => explan.id !== change.doc.id);
+          applics = applics.filter((applic) => applic.id !== change.doc.id);
         } else {
-          const explanData = change.doc.data();
-          if (explanData.instrId in instructs) {
-            const instr = instructs[explanData.instrId];
-            let question;
-            if ("qIdx" in explanData) {
-              question = Object.values(instr.questions)[explanData.qIdx].stem;
-            } else if ("qId" in explanData) {
-              question = instr.questions[explanData.qId].stem;
-            }
-            const newExplan = {
-              participant: explanData.fullname,
-              explanation: explanData.explanation,
-              posted: explanData.createdAt.toDate(),
-              section: instr.title,
-              question,
+          const applicData = change.doc.data();
+          if (applicData.ended) {
+            const newApplic = {
+              applicant: applicData.fullname,
+              createdAt: applicData.createdAt.toDate(),
+              explanation: applicData.explanation,
+              quizCorrects: applicData.corrects,
+              quizWrongs: applicData.wrongs,
+              checkedAt: null,
               id: change.doc.id,
             };
-            if ("checked" in explanData && explanData.checked) {
-              newExplan.checked = "✅";
-              newExplan.checkedBy = explanData.checkedBy;
-            } else {
-              newExplan.checked = "◻";
-              newExplan.checkedBy = "";
+            if ("leader" in applicData && applicData.leader) {
+              newApplic.leader = applicData.leader;
             }
-            const explanIdx = explanations.findIndex(
+            if ("checkedAt" in applicData && applicData.checkedAt) {
+              newApplic.checkedAt = applicData.checkedAt.toDate();
+            }
+            if ("accepted" in applicData && applicData.accepted) {
+              newApplic.accepted = "✅";
+            } else {
+              newApplic.accepted = "◻";
+            }
+            if ("rejected" in applicData && applicData.rejected) {
+              newApplic.rejected = "✅";
+            } else {
+              newApplic.rejected = "◻";
+            }
+            const userDoc = await firebase.db
+              .collection("users")
+              .doc(applicData.fullname)
+              .get();
+            const userData = userDoc.data();
+            if ("email" in applicData && applicData.email) {
+              newApplic.email = applicData.email;
+            } else {
+              newApplic.email = "";
+            }
+            if ("Transcript" in applicData && applicData.Transcript) {
+              newApplic.transcript = applicData.Transcript;
+            } else {
+              newApplic.transcript = "";
+            }
+            if ("Resume" in applicData && applicData.Resume) {
+              newApplic.resume = applicData.Resume;
+            } else {
+              newApplic.resume = "";
+            }
+            if ("Portfolio" in applicData && applicData.Portfolio) {
+              newApplic.portfolio = applicData.Portfolio;
+            } else {
+              newApplic.portfolio = "";
+            }
+            if ("pConditions" in applicData && applicData.pConditions) {
+              newApplic.readingImmediate = 0;
+              newApplic.reading3Days = 0;
+              newApplic.reading1Week = 0;
+              for (let pCondition of applicData.pConditions) {
+                if (
+                  "testScoreRatio" in pCondition &&
+                  pCondition.testScoreRatio
+                ) {
+                  newApplic.readingImmediate += applicData.testScoreRatio;
+                }
+                if (
+                  "test3DaysScoreRatio" in pCondition &&
+                  pCondition.test3DaysScoreRatio
+                ) {
+                  newApplic.reading3Days += applicData.test3DaysScoreRatio;
+                }
+                if (
+                  "test1WeekScoreRatio" in pCondition &&
+                  pCondition.test1WeekScoreRatio
+                ) {
+                  newApplic.reading1Week += applicData.test1WeekScoreRatio;
+                }
+              }
+              newApplic.readingImmediate /= 2;
+              newApplic.reading3Days /= 2;
+              newApplic.reading1Week /= 2;
+            } else {
+              newApplic.readingImmediate = 0;
+              newApplic.reading3Days = 0;
+              newApplic.reading1Week = 0;
+            }
+            const applicIdx = applications.findIndex(
               (acti) => acti.id === change.doc.id
             );
-            if (explanIdx !== -1) {
-              explans[explanIdx] = {
-                ...explans[explanIdx],
-                ...newExplan,
+            if (applicIdx !== -1) {
+              applics[applicIdx] = {
+                ...applics[applicIdx],
+                ...newApplic,
               };
             } else {
-              explans.push({
-                ...newExplan,
+              applics.push({
+                ...newApplic,
               });
             }
           }
         }
       }
-      setExplanationsChanges([]);
-      setExplanations(explans);
+      setApplicationsChanges([]);
+      setApplications(applics);
+    };
+    if (firebase && applicationsChanges.length > 0) {
+      loadApplications();
     }
-  }, [explanations, explanationsChanges]);
+  }, [firebase, applications, applicationsChanges]);
 
-  const checkExplanation = async (clickedCell) => {
-    if (clickedCell.field === "checked") {
+  const checkApplication = async (clickedCell) => {
+    if (["accepted", "rejected"].includes(clickedCell.field)) {
       try {
-        let explans = [...explanations];
-        const explanIdx = explans.findIndex(
+        let applics = [...applications];
+        const applicIdx = applics.findIndex(
           (acti) => acti.id === clickedCell.id
         );
-        const isChecked = explans[explanIdx][clickedCell.field] === "✅";
-        if (explanIdx !== -1 && explans[explanIdx][clickedCell.field] !== "O") {
-          explans[explanIdx] = {
-            ...explans[explanIdx],
+        const isChecked = applics[applicIdx][clickedCell.field] === "✅";
+        if (applicIdx !== -1 && applics[applicIdx][clickedCell.field] !== "O") {
+          applics[applicIdx] = {
+            ...applics[applicIdx],
             [clickedCell.field]: "O",
           };
-          setExplanations(explans);
-          const explanRef = firebase.db
-            .collection("explanations")
-            .doc(explans[explanIdx].id);
-          await explanRef.update({
-            checked: !isChecked,
-            checkedBy: fullname,
+          setApplications(applics);
+          const applicRef = firebase.db
+            .collection("applications")
+            .doc(applics[applicIdx].id);
+          await applicRef.update({
+            [clickedCell.field]: !isChecked,
+            leader: fullname,
+            checkedAt: firebase.firestore.Timestamp.fromDate(new Date()),
           });
-          explans[explanIdx] = {
-            ...explans[explanIdx],
+          applics[applicIdx] = {
+            ...applics[applicIdx],
             [clickedCell.field]: isChecked ? "◻" : "✅",
+            checkedAt: new Date(),
           };
-          setExplanations(explans);
+          setApplications(applics);
         }
       } catch (err) {
         console.error(err);
@@ -297,19 +370,19 @@ const CommunityApplications = () => {
   return (
     <PagesNavbar>
       <Typography variant="h3" gutterBottom marked="center" align="center">
-        1Cademy Tutorial Feedback
+        {props.communiId} Completed Applications
       </Typography>
       <DataGrid
-        rows={explanations}
-        columns={explanationsColumns}
+        rows={applications}
+        columns={applicationsColumns}
         pageSize={10}
         rowsPerPageOptions={[10]}
         autoPageSize
         autoHeight
         // checkboxSelection
         hideFooterSelectedRowCount
-        loading={!explanationsLoaded}
-        onCellClick={checkExplanation}
+        loading={!applicationsLoaded}
+        onCellClick={checkApplication}
       />
     </PagesNavbar>
   );
