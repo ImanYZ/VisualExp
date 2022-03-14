@@ -34,7 +34,8 @@ import ValidatedInput from "../ValidatedInput/ValidatedInput";
 import { isEmail, getFullname } from "../../utils/general";
 
 import "./ConsentDocument.css";
-import { SwitchAccount } from "@mui/icons-material";
+import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
+import EmailIcon from "@mui/icons-material/Email";
 
 const Auth = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -144,59 +145,56 @@ const Auth = (props) => {
         }
       }
       if (!userNotExists && !userData.uid) {
+        const userDataLog = {
+          uid,
+          project: currentProject,
+          course,
+        };
         if (userData.firstname && userData.lastname) {
-          await userRef.update({
-            uid,
-            project: currentProject,
-            course,
-          });
+          await userRef.update(userDataLog);
         } else if (firstname && lastname) {
-          await userRef.update({
-            uid,
-            firstname,
-            lastname,
-            project: currentProject,
-            course,
-          });
+          userDataLog.firstname = firstname;
+          userDataLog.lastname = lastname;
+          await userRef.update(userDataLog);
         } else {
           console.log({ firstname, lastname });
         }
         const userLogRef = firebase.db.collection("userLogs").doc();
         await userLogRef.set({
-          uid,
+          ...userDataLog,
           id: userRef.id,
-          project: currentProject,
-          course,
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
     } else {
-      // Only signed up:
       userNotExists = true;
-      fuName = getFullname(firstname, lastname);
-      let userD = await firebase.db.collection("users").doc(fuName).get();
-      let spaces = " ";
-      while (userD.exists) {
-        fuName = getFullname(firstname + spaces, lastname);
-        userD = await firebase.db.collection("users").doc(fuName).get();
-        spaces += " ";
-      }
-      userRef = firebase.db.collection("users").doc(fuName);
-      userData = {
-        uid,
-        email: uEmail,
-        firstname,
-        lastname,
-        project: currentProject,
-      };
-      if (course) {
-        userData.course = course;
+      // Only signed up:
+      if (isSignUp === 1) {
+        fuName = getFullname(firstname, lastname);
+        let userD = await firebase.db.collection("users").doc(fuName).get();
+        let spaces = " ";
+        while (userD.exists) {
+          fuName = getFullname(firstname + spaces, lastname);
+          userD = await firebase.db.collection("users").doc(fuName).get();
+          spaces += " ";
+        }
+        userRef = firebase.db.collection("users").doc(fuName);
+        userData = {
+          uid,
+          email: uEmail,
+          firstname,
+          lastname,
+          project: currentProject,
+        };
+        if (course) {
+          userData.course = course;
+        }
       }
     }
     if (userNotExists) {
-      const conditions = [];
-      const minPConditions = [{}, {}];
-      const minPassageNums = [10000, 10000];
+      const conditions = []; // ['H2', 'K2']
+      const minPConditions = [{}, {}]; // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
+      const minPassageNums = [10000, 10000]; // [166, 166]
       const passagesDocs = await firebase.db.collection("passages").get();
       for (let passageDoc of passagesDocs.docs) {
         const passageData = passageDoc.data();
@@ -221,7 +219,7 @@ const Auth = (props) => {
         }
       }
       let condIdx = Math.floor(Math.random() * conditions.length);
-      const previousCondIdxes = [];
+      const previousCondIdxes = []; // [1, 0]
       for (
         let minPConIdx = 0;
         minPConIdx < minPConditions.length;
@@ -335,15 +333,16 @@ const Auth = (props) => {
               authChangedVerified(user);
               clearInterval(emailVerificationInterval);
             }
-          }, 4000);
+          }, 1000);
         } else {
-          console.log("Email already Verified!");
           authChangedVerified(user);
         }
       } else {
         // User is signed out
         console.log("Signing out!");
         setEmailVerified("NotSent");
+        setFirstname("");
+        setLastname("");
         setFullname("");
         setEmail("");
         setPhase(0);
@@ -354,7 +353,7 @@ const Auth = (props) => {
         setChoices([]);
       }
     });
-  }, [firebase, firstname, lastname, currentProject, course]);
+  }, [firebase, firstname, lastname, currentProject, isSignUp, course]);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
@@ -407,19 +406,14 @@ const Auth = (props) => {
   const switchAccount = (event) => {
     event.preventDefault();
     setIsSubmitting(false);
-    setEmailVerified("NotSent");
-    setFullname("");
-    setEmail("");
-    setPhase(0);
-    setStep(0);
-    setPassage("");
-    setCondition("");
-    setNullPassage("");
-    setChoices([]);
     if (isSignUp === 1) {
       firebase.auth.delete();
     }
     firebase.logout();
+  };
+
+  const resendVerificationEmail = (event) => {
+    firebase.auth.currentUser.sendEmailVerification();
   };
 
   const firstnameChange = (event) => {
@@ -460,8 +454,8 @@ const Auth = (props) => {
 
   const signUp = async (event) => {
     setIsSubmitting(true);
+    const loweredEmail = email.toLowerCase();
     try {
-      const loweredEmail = email.toLowerCase();
       await firebase.login(loweredEmail, password);
     } catch (err) {
       console.log({ err });
@@ -475,7 +469,8 @@ const Auth = (props) => {
         setIsSignUp(1);
         if (signUpSubmitable) {
           const fname = getFullname(firstname, lastname);
-          firebase.register(email.toLowerCase(), password, fname);
+          console.log({ firstname, lastname, status: "Registration" });
+          await firebase.register(loweredEmail, password, fname);
         }
       }
     }
@@ -517,8 +512,16 @@ const Auth = (props) => {
             We just sent you a verification email. Please click the link in the
             email to verify and complete your sign-up.
           </p>
-          <Button variant="contained" color="warning" onClick={switchAccount}>
-            Switch Account
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={resendVerificationEmail}
+            style={{ marginRight: "19px" }}
+          >
+            <EmailIcon /> Resend Verification Email
+          </Button>
+          <Button variant="contained" color="error" onClick={switchAccount}>
+            <SwitchAccountIcon /> Switch Account
           </Button>
         </div>
       ) : (

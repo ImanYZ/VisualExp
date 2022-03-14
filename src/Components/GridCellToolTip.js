@@ -70,7 +70,9 @@ const GridCellToolTip = (props) => {
             overflow: "hidden",
           }}
         >
-          {props.cellValues.value}
+          {isNaN(props.cellValues.value)
+            ? props.cellValues.value
+            : Math.round((props.cellValues.value + Number.EPSILON) * 100) / 100}
         </div>
       )}
     </Tooltip>

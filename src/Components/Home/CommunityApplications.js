@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
+import Paper from "@mui/material/Paper";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+
+import MoreVert from "@mui/icons-material/MoreVert";
+
 import { DataGrid } from "@mui/x-data-grid";
 
 import {
@@ -12,8 +20,18 @@ import {
 import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
+import SnackbarComp from "../SnackbarComp";
+import PDFView from "./modules/components/PDFView";
 
 const applicationsColumns = [
+  {
+    field: "community",
+    headerName: "Community",
+    width: 190,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
   { field: "createdAt", headerName: "Started", type: "dateTime", width: 190 },
   {
     field: "applicant",
@@ -35,7 +53,7 @@ const applicationsColumns = [
     field: "readingImmediate",
     headerName: "ReImScore",
     type: "number",
-    width: 10,
+    width: 100,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -51,7 +69,7 @@ const applicationsColumns = [
     field: "reading3Days",
     headerName: "Re3DaysScore",
     type: "number",
-    width: 10,
+    width: 100,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -67,7 +85,7 @@ const applicationsColumns = [
     field: "reading1Week",
     headerName: "Re1WeekScore",
     type: "number",
-    width: 10,
+    width: 100,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -168,6 +186,14 @@ const applicationsColumns = [
     },
   },
   {
+    field: "explanation",
+    headerName: "Explanation",
+    width: 280,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
+  {
     field: "leader",
     headerName: "Decision Made By",
     width: 190,
@@ -195,27 +221,74 @@ const CommunityApplications = (props) => {
   const fullname = useRecoilValue(fullnameState);
 
   const [applications, setApplications] = useState([]);
+  const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [checkedFullname, setCheckedFullname] = useState(false);
+
+  useEffect(() => {
+    if (fullname === "Iman YeckehZaare") {
+      console.log({ fullname });
+      applicationsColumns.push({
+        field: "invited",
+        headerName: "Invited",
+        width: 10,
+        disableColumnMenu: true,
+        renderCell: (cellValues) => {
+          return (
+            <GridCellToolTip
+              isLink={false}
+              actionCell={true}
+              Tooltip="Invite"
+              cellValues={cellValues}
+            />
+          );
+        },
+      });
+    }
+    setCheckedFullname(true);
+  }, [fullname]);
 
   useEffect(() => {
     if (firebase) {
-      const applicationsQuery = firebase.db
-        .collection("applications")
-        .where("communiId", "==", props.communiId);
-      const applicationsSnapshot = applicationsQuery.onSnapshot((snapshot) => {
-        const docChanges = snapshot.docChanges();
-        setApplicationsChanges((oldApplicationsChanges) => {
-          return [...oldApplicationsChanges, ...docChanges];
-        });
-        setApplicationsLoaded(true);
-      });
+      const appliSnapshots = [];
+      for (
+        let communiBatch = 0;
+        communiBatch < props.communiIds.length / 10;
+        communiBatch++
+      ) {
+        const communiIds = [];
+        for (
+          let communiIdx = 10 * communiBatch;
+          communiIdx < 10 * (communiBatch + 1) &&
+          communiIdx < props.communiIds.length;
+          communiIdx++
+        ) {
+          communiIds.push(props.communiIds[communiIdx]);
+        }
+        const applicationsQuery = firebase.db
+          .collection("applications")
+          .where("communiId", "in", communiIds);
+        appliSnapshots.push(
+          applicationsQuery.onSnapshot((snapshot) => {
+            const docChanges = snapshot.docChanges();
+            setApplicationsChanges((oldApplicationsChanges) => {
+              return [...oldApplicationsChanges, ...docChanges];
+            });
+            setApplicationsLoaded(true);
+          })
+        );
+      }
       return () => {
         setApplicationsLoaded(false);
-        applicationsSnapshot();
+        for (let appliSnapshot of appliSnapshots) {
+          appliSnapshot();
+        }
       };
     }
-  }, [firebase]);
+  }, [firebase, props.communiIds]);
 
   useEffect(() => {
     const loadApplications = async () => {
@@ -227,6 +300,7 @@ const CommunityApplications = (props) => {
           const applicData = change.doc.data();
           if (applicData.ended) {
             const newApplic = {
+              community: applicData.communiId,
               applicant: applicData.fullname,
               createdAt: applicData.createdAt.toDate(),
               explanation: applicData.explanation,
@@ -247,66 +321,81 @@ const CommunityApplications = (props) => {
               newApplic.accepted = "◻";
             }
             if ("rejected" in applicData && applicData.rejected) {
-              newApplic.rejected = "✅";
+              newApplic.rejected = "🚫";
             } else {
               newApplic.rejected = "◻";
+            }
+            if ("invited" in applicData && applicData.invited) {
+              newApplic.invited = "✉️";
+            } else {
+              newApplic.invited = "◻";
             }
             const userDoc = await firebase.db
               .collection("users")
               .doc(applicData.fullname)
               .get();
             const userData = userDoc.data();
-            if ("email" in applicData && applicData.email) {
-              newApplic.email = applicData.email;
+            if ("email" in userData && userData.email) {
+              newApplic.email = userData.email;
             } else {
               newApplic.email = "";
             }
-            if ("Transcript" in applicData && applicData.Transcript) {
-              newApplic.transcript = applicData.Transcript;
+            if ("Transcript" in userData && userData.Transcript) {
+              newApplic.transcript = userData.Transcript;
             } else {
               newApplic.transcript = "";
             }
-            if ("Resume" in applicData && applicData.Resume) {
-              newApplic.resume = applicData.Resume;
+            if ("Resume" in userData && userData.Resume) {
+              newApplic.resume = userData.Resume;
             } else {
               newApplic.resume = "";
             }
-            if ("Portfolio" in applicData && applicData.Portfolio) {
-              newApplic.portfolio = applicData.Portfolio;
+            if ("Portfolio" in userData && userData.Portfolio) {
+              newApplic.portfolio = userData.Portfolio;
             } else {
               newApplic.portfolio = "";
             }
-            if ("pConditions" in applicData && applicData.pConditions) {
+            if ("pConditions" in userData && userData.pConditions) {
               newApplic.readingImmediate = 0;
               newApplic.reading3Days = 0;
               newApplic.reading1Week = 0;
-              for (let pCondition of applicData.pConditions) {
+              for (let pCondition of userData.pConditions) {
                 if (
                   "testScoreRatio" in pCondition &&
                   pCondition.testScoreRatio
                 ) {
-                  newApplic.readingImmediate += applicData.testScoreRatio;
+                  newApplic.readingImmediate += pCondition.testScoreRatio;
                 }
                 if (
                   "test3DaysScoreRatio" in pCondition &&
                   pCondition.test3DaysScoreRatio
                 ) {
-                  newApplic.reading3Days += applicData.test3DaysScoreRatio;
+                  newApplic.reading3Days += pCondition.test3DaysScoreRatio;
                 }
                 if (
                   "test1WeekScoreRatio" in pCondition &&
                   pCondition.test1WeekScoreRatio
                 ) {
-                  newApplic.reading1Week += applicData.test1WeekScoreRatio;
+                  newApplic.reading1Week += pCondition.test1WeekScoreRatio;
                 }
               }
-              newApplic.readingImmediate /= 2;
-              newApplic.reading3Days /= 2;
-              newApplic.reading1Week /= 2;
+              newApplic.readingImmediate = newApplic.readingImmediate / 2;
+              newApplic.reading3Days = newApplic.reading3Days / 2;
+              newApplic.reading1Week = newApplic.reading1Week / 2;
             } else {
               newApplic.readingImmediate = 0;
               newApplic.reading3Days = 0;
               newApplic.reading1Week = 0;
+            }
+            const tutorialDoc = await firebase.db
+              .collection("tutorial")
+              .doc(applicData.fullname)
+              .get();
+            const tutorialData = tutorialDoc.data();
+            if ("wrongs" in tutorialData && tutorialData.wrongs) {
+              newApplic.tutorialWrongs = tutorialData.wrongs;
+            } else {
+              newApplic.tutorialWrongs = 0;
             }
             const applicIdx = applications.findIndex(
               (acti) => acti.id === change.doc.id
@@ -332,57 +421,293 @@ const CommunityApplications = (props) => {
     }
   }, [firebase, applications, applicationsChanges]);
 
-  const checkApplication = async (clickedCell) => {
-    if (["accepted", "rejected"].includes(clickedCell.field)) {
-      try {
-        let applics = [...applications];
-        const applicIdx = applics.findIndex(
-          (acti) => acti.id === clickedCell.id
-        );
-        const isChecked = applics[applicIdx][clickedCell.field] === "✅";
-        if (applicIdx !== -1 && applics[applicIdx][clickedCell.field] !== "O") {
-          applics[applicIdx] = {
-            ...applics[applicIdx],
-            [clickedCell.field]: "O",
-          };
-          setApplications(applics);
-          const applicRef = firebase.db
-            .collection("applications")
-            .doc(applics[applicIdx].id);
-          await applicRef.update({
-            [clickedCell.field]: !isChecked,
-            leader: fullname,
-            checkedAt: firebase.firestore.Timestamp.fromDate(new Date()),
-          });
-          applics[applicIdx] = {
-            ...applics[applicIdx],
-            [clickedCell.field]: isChecked ? "◻" : "✅",
-            checkedAt: new Date(),
-          };
-          setApplications(applics);
-        }
-      } catch (err) {
-        console.error(err);
+  useEffect(() => {
+    let theApplicant;
+    for (let applic of applications) {
+      if (applic.accepted === "◻" && applic.rejected === "◻" && !theApplicant) {
+        theApplicant = applic;
       }
+    }
+    if (theApplicant) {
+      setApplication(theApplicant);
+    }
+  }, [applications]);
+
+  const applicationsRowClick = (clickedRow) => {
+    const theRow = clickedRow.row;
+    if (theRow) {
+      const applicIdx = applications.findIndex(
+        (applic) => applic.id === clickedRow.id
+      );
+      if (applicIdx !== -1) {
+        setApplication(applications[applicIdx]);
+      }
+    }
+  };
+
+  const checkApplicant = (applicId, voteType) => async () => {
+    try {
+      if (!submitting) {
+        setSubmitting(true);
+        try {
+          let applics = [...applications];
+          const applicIdx = applics.findIndex((acti) => acti.id === applicId);
+          const isChecked =
+            applics[applicIdx][voteType] === "✅" ||
+            applics[applicIdx][voteType] === "🚫" ||
+            applics[applicIdx][voteType] === "✉️";
+          if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
+            applics[applicIdx] = {
+              ...applics[applicIdx],
+              [voteType]: "O",
+              leader: fullname,
+            };
+            setApplications(applics);
+            const applicData = {
+              [voteType]: !isChecked,
+            };
+            if (fullname !== "Iman YeckehZaare") {
+              applicData.leader = fullname;
+              applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
+                new Date()
+              );
+            }
+            const applicRef = firebase.db
+              .collection("applications")
+              .doc(applics[applicIdx].id);
+            await applicRef.update(applicData);
+            applics[applicIdx] = {
+              ...applics[applicIdx],
+              [voteType]: isChecked
+                ? "◻"
+                : voteType === "accepted"
+                ? "✅"
+                : voteType === "invited"
+                ? "✉️"
+                : "🚫",
+              checkedAt: new Date(),
+            };
+            setApplications(applics);
+            if (voteType === "accepted") {
+              setSnackbarMessage("You successfully accepted this applicant!");
+            } else if (voteType === "rejected") {
+              setSnackbarMessage("You successfully rejected this applicant!");
+            } else if (voteType === "invited") {
+              setSnackbarMessage(
+                "You successfully invited this applicant to Microsoft Teams!"
+              );
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        setSubmitting(false);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const checkApplication = (clickedCell) => {
+    if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
+      checkApplicant(clickedCell.id, clickedCell.field)();
     }
   };
 
   return (
     <PagesNavbar>
       <Typography variant="h3" gutterBottom marked="center" align="center">
-        {props.communiId} Completed Applications
+        Applications to Your{" "}
+        {props.communiIds.length > 1 ? "Communityies" : "Community"}
       </Typography>
-      <DataGrid
-        rows={applications}
-        columns={applicationsColumns}
-        pageSize={10}
-        rowsPerPageOptions={[10]}
-        autoPageSize
-        autoHeight
-        // checkboxSelection
-        hideFooterSelectedRowCount
-        loading={!applicationsLoaded}
-        onCellClick={checkApplication}
+      <Alert severity="success">
+        <ul>
+          <li>
+            <strong>Expanding each row:</strong> by default, the expanded
+            version of one of the applications that you have not
+            accepted/rejected is shown below the table. If you click any row,
+            that application will be expanded below.
+          </li>
+          <li>
+            <strong>Reviewing:</strong> to review each application, BEFORE
+            clicking the accept ✅ or reject 🚫 buttons, please send the
+            applicant your community-specific acceptance/orientation or
+            rejection email through onecademy@umich.edu. Make sure you
+            coordinate with your co-leaders and do not double-contact applicants
+            (ex: you shouldn’t both email them to accept them, just one).
+          </li>
+          <li>
+            <strong>Accepting/rejecting:</strong> you can either click the
+            accept ✅ or reject 🚫 buttons to indicate that you completed the
+            review of each application.
+          </li>
+          <li>
+            <strong>Inviting to Microsoft Teams:</strong> you do NOT need to
+            add/remove your interns in the interns' spreadsheet anymore. By only
+            clicking the accept ✅ or reject 🚫 buttons, you notify Iman whether
+            to invite the applicant to Microsoft Teams.
+          </li>
+          <li>
+            <strong>Each row:</strong> shows you one of the applicants who have
+            completed every part of the application for your{" "}
+            {props.communiIds.length > 1 ? "communityies" : "community"}.
+          </li>
+          <li>
+            <strong>Each cell:</strong> hovering on each cell shows you the
+            content or its description as a tooltip.
+          </li>
+          <li>
+            <strong>Filtering and Sorting:</strong> by clicking each column
+            title, you can sort the table based on that column. Some columns
+            also give you an option to filter through their content by clicking{" "}
+            <MoreVert /> on the column title.
+          </li>
+          <li>
+            <strong>Wrong attempts:</strong> for the 1Cademy tutorial and
+            community-specific quiz, you can see the number of wrong attempts
+            for the 1cademy tutorial, and in a separate column the wrong
+            attempts. So, the lower the number, the better.
+          </li>
+          <li>
+            <strong>Click links:</strong> to open their transcripts, resume, or
+            portfolios in a new browser tab w/o downloading.
+          </li>
+          <li>
+            <strong>Multiple leaders:</strong> if a community has multiple
+            leaders, and accepts/rejects someone, you will be able to see who
+            accepted/rejected the applicant and when in the last two columns.
+          </li>
+          <li>
+            <strong>Notes:</strong>
+            <ul>
+              <li>
+                Community leaders should manually send the acceptance or
+                rejection emails through onecademy@umich.edu, it will not
+                automatically email.
+              </li>
+              <li>
+                After clicking the accept ✅ or reject 🚫 buttons, if you change
+                your decision, you should directly contact Iman on Microsoft
+                Teams.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </Alert>
+      {checkedFullname && (
+        <DataGrid
+          rows={applications}
+          columns={applicationsColumns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          // checkboxSelection
+          hideFooterSelectedRowCount
+          loading={!applicationsLoaded}
+          onCellClick={checkApplication}
+          onRowClick={applicationsRowClick}
+        />
+      )}
+      {Object.keys(application).length > 0 && (
+        <Paper>
+          <h3>You've not evaluated or clicked this application:</h3>
+          <p>
+            {application.applicant +
+              " at " +
+              application.email +
+              " applied on " +
+              application.createdAt.toLocaleString()}
+          </p>
+          <p>
+            Their immediate reading comprehension test score is:{" "}
+            {application.readingImmediate}
+          </p>
+          <p>
+            Their three days later reading comprehension test score is:{" "}
+            {application.reading3Days}
+          </p>
+          <p>
+            Their one week later reading comprehension test score is:{" "}
+            {application.reading1Week}
+          </p>
+          <p>
+            Their number of wrong attempts in 1Cademy tutorial is:{" "}
+            {application.tutorialWrongs}
+          </p>
+          <p>
+            Their number of wrong attempts in your community's quiz is:{" "}
+            {application.quizWrongs}
+          </p>
+          <div>
+            <p>
+              Their explanation for why they've applied to join this community:
+            </p>
+            <p style={{ marginLeft: "10px" }}>
+              <i>{application.explanation}</i>
+            </p>
+          </div>
+          <PDFView fileUrl={application.resume} height="400px" />
+          <PDFView fileUrl={application.transcript} height="400px" />
+          <PDFView fileUrl={application.portfolio} height="400px" />
+          {"leader" in application && application.leader && (
+            <p>
+              This application was reviewed by {application.leader} on{" "}
+              {application.checkedAt.toLocaleDateString()}
+            </p>
+          )}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: "19px",
+            }}
+          >
+            <Tooltip title="Skip" placement="top">
+              <Button
+                style={{
+                  backgroundColor: "rgb(129, 198, 255)",
+                  margin: 0,
+                }}
+                onClick={checkApplicant(application.id, "rejected")}
+                className="Button"
+                variant="contained"
+              >
+                {submitting ? (
+                  <CircularProgress color="warning" size="16px" />
+                ) : application.rejected === "🚫" ? (
+                  "◻"
+                ) : (
+                  "🚫"
+                )}
+              </Button>
+            </Tooltip>
+            <Tooltip title="Up Vote" placement="top">
+              <Button
+                style={{
+                  backgroundColor: "rgb(112, 187, 0)",
+                  margin: 0,
+                }}
+                onClick={checkApplicant(application.id, "accepted")}
+                className="Button"
+                variant="contained"
+              >
+                {submitting ? (
+                  <CircularProgress color="warning" size="16px" />
+                ) : application.accepted === "✅" ? (
+                  "◻"
+                ) : (
+                  "✅"
+                )}
+              </Button>
+            </Tooltip>
+          </div>
+        </Paper>
+      )}
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
       />
     </PagesNavbar>
   );

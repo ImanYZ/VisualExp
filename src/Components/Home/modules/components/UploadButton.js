@@ -9,6 +9,8 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 import { firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 
+import PDFView from "./PDFView";
+
 const UploadButton = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -93,30 +95,7 @@ const UploadButton = (props) => {
         </LoadingButton>
       </label>
       {uploadError && <Alert severity="warning">{uploadError}</Alert>}
-      {props.fileUrl && (
-        <Paper
-          sx={{
-            margin: "19px 0px 0px 0px",
-            padding: "10px",
-            height: "220px",
-          }}
-        >
-          <object
-            data={props.fileUrl}
-            type="application/pdf"
-            width="100%"
-            height="100%"
-          >
-            <iframe
-              src={
-                "https://docs.google.com/viewer?url=" +
-                props.fileUrl +
-                "&embedded=true"
-              }
-            ></iframe>
-          </object>
-        </Paper>
-      )}
+      <PDFView fileUrl={props.fileUrl} height="220px" />
     </>
   );
 };

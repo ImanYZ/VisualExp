@@ -28,6 +28,15 @@ const ConsentDocument = (props) => {
       <h3>Research Team</h3>
       <ul>
         <li>
+          <strong>Amelia Henriques</strong>, Bachelor of Arts in Psychological
+          Sciences and Human Development &amp; Family Sciences, University of
+          Connecticut, College of Liberal Arts and Sciences
+        </li>
+        <li>
+          <strong>Benjamin Brown</strong>, Graduate student at San Jose State
+          University, School of Information
+        </li>
+        <li>
           <strong>Catherine Grillo</strong>, Undergraduate at University of
           Michigan, School of Information
         </li>
@@ -78,7 +87,8 @@ const ConsentDocument = (props) => {
         </li>
         <li>
           <strong>Tirdad Barghi</strong>, Master's of Electrical Engineering,
-          School of Electrical Engineering, Shahid Beheshti University
+          School of Electrical Engineering, Shahid Beheshti University.
+          Independent researcher.
         </li>
         <li>
           <strong>Victoria Mulligan</strong>, Bachelor of Arts in Psychology,

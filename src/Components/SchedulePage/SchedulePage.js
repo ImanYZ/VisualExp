@@ -310,7 +310,6 @@ const SchedulePage = (props) => {
               setSecondSession={setSecondSession}
               setThirdSession={setThirdSession}
               setSubmitable={setSubmitable}
-              setSubmitable={setSubmitable}
             />
           </div>
           <div id="SignBtnContainer">

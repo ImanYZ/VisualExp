@@ -32,6 +32,7 @@ import Communities from "./Components/Home/Communities";
 import communities from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
+import CommunityApplications from "./Components/Home/CommunityApplications";
 
 import "./App.css";
 
@@ -155,7 +156,16 @@ const AppRouter = (props) => {
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
           {leading.length > 0 && (
-            <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
+            <>
+              <Route
+                path="/tutorialfeedback/*"
+                element={<TutorialFeedback />}
+              />
+              <Route
+                path="/CommunityApplications/*"
+                element={<CommunityApplications communiIds={leading} />}
+              />
+            </>
           )}
           <Route path="/ReminderDate/*" element={<ReminderDate />} />
           <Route path="/withdraw/*" element={<Withdraw />} />
