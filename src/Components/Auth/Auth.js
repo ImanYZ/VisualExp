@@ -341,10 +341,7 @@ const Auth = (props) => {
         // User is signed out
         console.log("Signing out!");
         setEmailVerified("NotSent");
-        setFirstname("");
-        setLastname("");
         setFullname("");
-        setEmail("");
         setPhase(0);
         setStep(0);
         setPassage("");
