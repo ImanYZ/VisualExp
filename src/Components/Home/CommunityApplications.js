@@ -652,8 +652,10 @@ const CommunityApplications = (props) => {
           <PDFView fileUrl={application.portfolio} height="400px" />
           {"leader" in application && application.leader && (
             <p>
-              This application was reviewed by {application.leader} on{" "}
-              {application.checkedAt.toLocaleDateString()}
+              This application was reviewed by {application.leader}{" "}
+              {"checkedAt" in application &&
+                application.checkedAt &&
+                "on " + application.checkedAt.toLocaleDateString()}
             </p>
           )}
           <div
