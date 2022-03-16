@@ -75,6 +75,19 @@ const TutorialFeedback = () => {
   const [explanations, setExplanations] = useState([]);
   const [explanationsChanges, setExplanationsChanges] = useState([]);
   const [explanationsLoaded, setExplanationsLoaded] = useState(false);
+  const [tutorials, setTutorials] = useState([]);
+  const [tutorialsColumns, setTutorialsColumns] = useState([
+    {
+      field: "applicant",
+      headerName: "Applicant",
+      width: 220,
+      renderCell: (cellValues) => {
+        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      },
+    },
+  ]);
+  const [tutorialsChanges, setTutorialsChanges] = useState([]);
+  const [tutorialsLoaded, setTutorialsLoaded] = useState(false);
 
   useEffect(() => {
     if (firebase) {
@@ -87,6 +100,7 @@ const TutorialFeedback = () => {
         setExplanationsLoaded(true);
       });
       return () => {
+        setExplanations([]);
         setExplanationsLoaded(false);
         explanationsSnapshot();
       };
@@ -153,6 +167,99 @@ const TutorialFeedback = () => {
     }
   }, [explanations, explanationsChanges]);
 
+  useEffect(() => {
+    if (firebase) {
+      const tutorialsQuery = firebase.db.collection("tutorial");
+      const tutorialsSnapshot = tutorialsQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        setTutorialsChanges((oldTutorialsChanges) => {
+          return [...oldTutorialsChanges, ...docChanges];
+        });
+      });
+      return () => {
+        setTutorials([]);
+        setTutorialsLoaded(false);
+        tutorialsSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  useEffect(() => {
+    if (tutorialsChanges.length > 0) {
+      let tutos = [...tutorials];
+      let tutosColumns = [...tutorialsColumns];
+      for (let change of tutorialsChanges) {
+        if (change.type === "removed") {
+          tutos = tutos.filter((tuto) => tuto.id !== change.doc.id);
+        } else {
+          const tutoData = change.doc.data();
+          const newTuto = {
+            id: change.doc.id,
+            applicant: change.doc.id,
+          };
+          for (let instrId in tutoData.attempts) {
+            if (instrId in instructs && instrId !== "Congratulations") {
+              const questions = tutoData.attempts[instrId].questions;
+              for (let questionId in questions) {
+                if (questionId in instructs[instrId].questions) {
+                  const qStem = instructs[instrId].questions[questionId].stem;
+                  if (
+                    tutosColumns.findIndex(
+                      (tutCol) => tutCol.field === questionId + "_Wrongs"
+                    ) === -1
+                  ) {
+                    tutosColumns.push({
+                      field: questionId + "_Wrongs",
+                      headerName: qStem,
+                      type: "number",
+                      width: 100,
+                      disableColumnMenu: true,
+                      renderCell: (cellValues) => {
+                        return (
+                          <GridCellToolTip
+                            isLink={false}
+                            cellValues={cellValues}
+                            Tooltip="# of Wrong Attempts"
+                          />
+                        );
+                      },
+                    });
+                    tutosColumns.push({
+                      field: questionId + "_Answers",
+                      headerName: qStem,
+                      width: 220,
+                      renderCell: (cellValues) => {
+                        return (
+                          <GridCellToolTip
+                            isLink={false}
+                            cellValues={cellValues}
+                            Tooltip="Final Attempt Answers"
+                          />
+                        );
+                      },
+                    });
+                  }
+                  newTuto[questionId + "_Wrongs"] =
+                    questions[questionId].wrongs;
+                  newTuto[questionId + "_Answers"] =
+                    questions[questionId].answers;
+                }
+              }
+            }
+          }
+          tutos.push(newTuto);
+        }
+      }
+      setTutorialsChanges([]);
+      setTutorials(tutos);
+      setTutorialsColumns(tutosColumns);
+      console.log({ tutosColumns, tutos });
+      setTimeout(() => {
+        setTutorialsLoaded(true);
+      }, 400);
+    }
+  }, [tutorials, tutorialsColumns, tutorialsChanges]);
+
   const checkExplanation = async (clickedCell) => {
     if (clickedCell.field === "checked") {
       try {
@@ -198,6 +305,22 @@ const TutorialFeedback = () => {
         loading={!explanationsLoaded}
         onCellClick={checkExplanation}
       />
+      <Typography variant="h3" gutterBottom marked="center" align="center">
+        1Cademy Tutorial # of Wrong Attempts &amp; Answers
+      </Typography>
+      {tutorialsLoaded && (
+        <DataGrid
+          rows={tutorials}
+          columns={tutorialsColumns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          // checkboxSelection
+          hideFooterSelectedRowCount
+          loading={!tutorialsLoaded}
+        />
+      )}
     </PagesNavbar>
   );
 };
