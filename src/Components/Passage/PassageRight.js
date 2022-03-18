@@ -423,6 +423,20 @@ const PassageRight = (props) => {
               CONTINUE
             </Button>
           </div>
+          <p>
+            If for any reason the passage on the left does not load, click the
+            "RELOAD" button and wait.
+          </p>
+          <div id="ReloadContainer">
+            <Button
+              id="ReloadButton"
+              className="Button"
+              onClick={props.changePConURL}
+              variant="contained"
+            >
+              RELOAD
+            </Button>
+          </div>
         </>
       ) : (
         <>
@@ -456,7 +470,6 @@ const PassageRight = (props) => {
                 If for any reason the passage on the left does not load, click
                 the "RELOAD" button and wait.
               </p>
-
               <div id="ReloadContainer">
                 <Button
                   id="ReloadButton"
