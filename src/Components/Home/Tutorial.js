@@ -493,14 +493,14 @@ const Tutorial = (props) => {
                   on{" "}
                   <a href="https://1cademy.us/home" target="_blank">
                     the 1Cademy homepage
-                  </a>{" "}
-                  and in the tutorial videos and descriptions below.
+                  </a>
+                  , in the tutorial videos, and the notes above each video.
                 </p>
               </Box>
               <Box sx={{ mt: "10px", fontSize: "19px" }}>
-                Make sure to select all the choices that apply. The community
-                leaders will decide about your application based on{" "}
-                <strong>your total WRONG attempts.</strong>
+                Make sure to select <strong>all the choices that apply.</strong>{" "}
+                The community leaders will decide about your application based
+                on <strong>your total WRONG attempts.</strong>
               </Box>
             </Alert>
           </Box>

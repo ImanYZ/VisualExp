@@ -100,6 +100,7 @@ const Auth = (props) => {
     const uid = user.uid;
     const uEmail = user.email.toLowerCase();
     let userNotExists = false;
+    let lName = lastname;
     let userData, userRef, fuName;
     const userDocs = await firebase.db
       .collection("users")
@@ -110,7 +111,7 @@ const Auth = (props) => {
       userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
       userData = userDocs.docs[0].data();
       const fName = !userData.firstname ? firstname : userData.firstname;
-      const lName = !userData.lastname ? lastname : userData.lastname;
+      lName = !userData.lastname ? lastname : userData.lastname;
       if (!fName || !lName) {
         console.log({ fName, lName });
       }
@@ -170,20 +171,19 @@ const Auth = (props) => {
       userNotExists = true;
       // Only signed up:
       if (isSignUp === 1) {
-        fuName = getFullname(firstname, lastname);
+        fuName = getFullname(firstname, lName);
         let userD = await firebase.db.collection("users").doc(fuName).get();
-        let spaces = " ";
         while (userD.exists) {
-          fuName = getFullname(firstname + spaces, lastname);
+          lName = " " + lName;
+          fuName = getFullname(firstname, lName);
           userD = await firebase.db.collection("users").doc(fuName).get();
-          spaces += " ";
         }
         userRef = firebase.db.collection("users").doc(fuName);
         userData = {
           uid,
           email: uEmail,
           firstname,
-          lastname,
+          lastname: lName,
           project: currentProject,
         };
         if (course) {
@@ -312,6 +312,7 @@ const Auth = (props) => {
       console.log("Committing batch!");
       await firebase.commitBatch();
     }
+    setLastname(lName);
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
   };
@@ -466,7 +467,6 @@ const Auth = (props) => {
         setIsSignUp(1);
         if (signUpSubmitable) {
           const fname = getFullname(firstname, lastname);
-          console.log({ firstname, lastname, status: "Registration" });
           await firebase.register(loweredEmail, password, fname);
         }
       }

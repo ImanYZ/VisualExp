@@ -767,26 +767,28 @@ const App = () => {
   };
 
   useEffect(() => {
-    const setUserStatus = async () => {
+    const setUserStatus = () => {
       if (secondSession || thirdSession) {
-        const userDoc = await firebase.db
-          .collection("users")
-          .doc(fullname)
-          .get();
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          if (
-            (userData.gender && userData.step < 11) ||
-            (thirdSession && userData.step === 20 && !userData.projectDone)
-          ) {
-            setPhase(0);
-            setStep(11);
-            const pConditions = userData.pConditions;
-            setPassage(pConditions[0].passage);
-            setCondition(pConditions[0].condition);
+        setTimeout(async () => {
+          const userDoc = await firebase.db
+            .collection("users")
+            .doc(fullname)
+            .get();
+          if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (
+              (userData.gender && userData.step < 11) ||
+              (thirdSession && userData.step === 20 && !userData.projectDone)
+            ) {
+              setPhase(0);
+              setStep(11);
+              const pConditions = userData.pConditions;
+              setPassage(pConditions[0].passage);
+              setCondition(pConditions[0].condition);
+            }
+            setTimer(10 * 60);
           }
-          setTimer(10 * 60);
-        }
+        }, 1000);
       }
     };
     if (fullname) {

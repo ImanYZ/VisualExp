@@ -173,26 +173,23 @@ const AppRouter = (props) => {
       )}
       <Route path="/communities/" element={<Communities />} />
       {communities.map((communi, idx) => (
-        <>
-          <Route
-            key={communi.id}
-            path={"/community/" + communi.id}
-            element={<Communities commIdx={idx} />}
-          />
-          {fullname && emailVerified === "Verified" && (
-            <Route
-              key={communi.id + "Test"}
-              path={"/paperTest/" + communi.id}
-              element={
-                <PaperTest
-                  communiId={communi.id}
-                  communiTitle={communi.title}
-                />
-              }
-            />
-          )}
-        </>
+        <Route
+          key={communi.id}
+          path={"/community/" + communi.id}
+          element={<Communities commIdx={idx} />}
+        />
       ))}
+      {fullname &&
+        emailVerified === "Verified" &&
+        communities.map((communi, idx) => (
+          <Route
+            key={communi.id + "Test"}
+            path={"/paperTest/" + communi.id}
+            element={
+              <PaperTest communiId={communi.id} communiTitle={communi.title} />
+            }
+          />
+        ))}
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}

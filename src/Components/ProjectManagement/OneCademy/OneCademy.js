@@ -4,13 +4,12 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 
-import { emailState } from "../../../store/AuthAtoms";
-
 import { isEmail } from "../../../utils/general";
 
 import {
   firebaseOnecademyState,
   usernameState,
+  emailState,
 } from "../../../store/OneCademyAtoms";
 
 import ValidatedInput from "../../ValidatedInput/ValidatedInput";

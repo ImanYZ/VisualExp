@@ -69,21 +69,20 @@ export default {
       How_can_1Cademy_help_our_society: {
         stem: (
           <div>
-            {quNum()}How can 1Cademy help our society? (Hint: find the answer
-            from{" "}
+            {quNum()}How does 1Cademy aim to help our society? (Hint: find the
+            answer from{" "}
             <a href="https://1cademy.us/home" target="_blank">
               the 1Cademy homepage
             </a>
             .)
           </div>
         ),
-        answers: ["a", "b", "c", "d", "e"],
+        answers: ["a", "b", "c", "d"],
         choices: {
           a: "Joining/forming multi-school research communities",
           b: "Collaboratively developing learning pathways to learn each concept",
           c: "Crowdsourcing learning",
           d: "Improving exploratory search",
-          e: "Collaboratively learning by comparing and contrasting alternative or even competing perspectives side-by-side.",
         },
       },
       // If_everything_is_explained_somewhere: {
@@ -422,6 +421,10 @@ export default {
             it'll open their user profile, where you can see their history of
             contributions.
           </li>
+          <li>
+            The notifications tab displays upvotes, downvotes, and proposed
+            edits on nodes you contributed to.
+          </li>
         </ul>
       </div>
     ),
@@ -506,8 +509,8 @@ export default {
         answers: ["c"],
         choices: {
           a: "Top contributors across the platform",
-          b: "All contributors",
-          c: "Top contributors in your community",
+          b: "Top 10 contributors in your community",
+          c: "All contributors in your community",
         },
       },
     },
@@ -1110,7 +1113,15 @@ export default {
   },
   Nodes_Question_Nodes: {
     title: newSec() + "1Cademy Nodes: Question Nodes",
-    description: "This video introduces question nodes on 1Cademy.",
+    description: (
+      <div>
+        <p>This video introduces question nodes on 1Cademy.</p>
+        <p>
+          We propose multiple-choice questions as "Question" type nodes to
+          improve others' learning through testing them.
+        </p>
+      </div>
+    ),
     video: "4lgJqIr1BJA",
     questions: {
       For_what_purpose_should_we_propose_a_question_node_on_1Cademy: {
@@ -1169,17 +1180,44 @@ export default {
       },
       Which_of_these_steps_are_needed_to_link_a_concept_node_to_a_reference_node:
         {
-          stem:
-            quNum() +
-            "Which of these steps are needed to link a concept node to a reference node?",
-          answers: ["a", "b", "c", "d", "f"],
+          stem: (
+            <div>
+              {quNum()}Which of these steps are needed to link a concept node to
+              a reference node?
+              <ul>
+                <li>
+                  <strong>Find reference node</strong>: find your desired
+                  reference node, or consult a liaison librarian to create it if
+                  the reference node does not exist.
+                </li>
+                <li>
+                  <strong>Click "Cite an existing reference"</strong>: click
+                  "Cite an existing reference" button on the node that you are
+                  proposing/improving.
+                </li>
+                <li>
+                  <strong>Click reference node</strong>: click the reference
+                  node that you want to cite.
+                </li>
+                <li>
+                  <strong>Add pages/URL/timeslot</strong>: depending on the type
+                  of the reference, add the corresponding chapter, page numbers,
+                  webpage URL, or video/audio timeslot.
+                </li>
+                <li>
+                  <strong>Click "Propose"</strong>: after finalizing everything,
+                  you need to click the "Propose" button to submit your
+                  proposal.
+                </li>
+              </ul>
+            </div>
+          ),
+          answers: ["a"],
           choices: {
-            a: "Create a reference node or find an existing one.",
-            b: "Consult a liaison librarian if the reference node does not exist.",
-            c: 'Click "Cite an existing reference."',
-            d: "Click the node that you want to cite.",
-            e: "Add the link to the website/textbook in the content of the concept node.",
-            f: "Depending on the type of the reference, add the corresponding chapter, page numbers, webpage URL, or video/audio timeslot.",
+            a: 'Find reference node ⇨ Click "Cite an existing reference" ⇨ Click reference node ⇨ Add pages/URL/timeslot ⇨ Click "Propose"',
+            b: 'Click "Cite an existing reference" ⇨ Find reference node ⇨ Click reference node ⇨ Add pages/URL/timeslot ⇨ Click "Propose"',
+            c: 'Find reference node ⇨ Add pages/URL/timeslot ⇨ Click "Propose" ⇨ Click "Cite an existing reference" ⇨ Click reference node',
+            d: 'Click reference node ⇨ Add pages/URL/timeslot ⇨ Find reference node ⇨ Click "Cite an existing reference" ⇨ Click "Propose"',
           },
         },
       How_can_one_figure_out_whether_a_node_they_want_to_propose_already_exists_on_the_map:
@@ -1206,8 +1244,7 @@ export default {
     video: "76MSksNQYN0",
     questions: {
       What_do_you_think_the_phrase_prerequisite_relation_means: {
-        stem:
-          quNum() + 'What do you think the phrase "prerequisite link" means?',
+        stem: quNum() + 'What does the phrase "prerequisite link" mean?',
         answers: ["b", "e"],
         choices: {
           a: "A relation of parallel concepts in different disciplines",

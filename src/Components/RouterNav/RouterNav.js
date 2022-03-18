@@ -17,7 +17,6 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import {
   firebaseState,
-  emailState,
   fullnameState,
   isAdminState,
 } from "../../store/AuthAtoms";
@@ -25,6 +24,7 @@ import {
 import {
   firebaseOnecademyState,
   usernameState,
+  emailState,
 } from "../../store/OneCademyAtoms";
 
 import {
@@ -338,21 +338,17 @@ const RouterNav = (props) => {
         } else {
           if (proposalData.proposer === username) {
             if (!(change.doc.id in propos)) {
-              propos[change.doc.id] = {
-                corrects: proposalData.corrects,
-                wrongs: proposalData.wrongs,
-              };
               netVotes += proposalData.corrects - proposalData.wrongs - 1;
             } else {
               netVotes +=
                 proposalData.corrects -
                 propos[change.doc.id].corrects -
                 (proposalData.wrongs - propos[change.doc.id].wrongs);
-              propos[change.doc.id] = {
-                corrects: proposalData.corrects,
-                wrongs: proposalData.wrongs,
-              };
             }
+            propos[change.doc.id] = {
+              corrects: proposalData.corrects,
+              wrongs: proposalData.wrongs,
+            };
           } else {
             oPropos[change.doc.id] = {
               accepted: proposalData.accepted,
@@ -436,16 +432,13 @@ const RouterNav = (props) => {
               }
             }
           } else {
+            if (!(voteDate in upVotes)) {
+              upVotes[voteDate] = 0;
+            }
             if (!(change.doc.id in uVersions)) {
               uVersions[change.doc.id] = userVersionData.correct;
-              if (!(voteDate in upVotes)) {
-                upVotes[voteDate] = 0;
-              }
               upVotes[voteDate] += userVersionData.correct;
             } else {
-              if (!(voteDate in upVotes)) {
-                upVotes[voteDate] = 0;
-              }
               upVotes[voteDate] +=
                 userVersionData.correct - uVersions[change.doc.id];
               uVersions[change.doc.id] = userVersionData.correct;
@@ -720,10 +713,8 @@ const RouterNav = (props) => {
       onClose={handleProfileMenuClose}
       style={{ float: "right" }}
     >
-      {fullname && email && (
-        <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>
-      )}
-      {fullname && email && (
+      {fullname && <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>}
+      {fullname && (
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
           <LogoutIcon /> <span id="LogoutText">Logout</span>
         </MenuItem>
