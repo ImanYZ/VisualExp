@@ -215,8 +215,12 @@ const Activities = (props) => {
                     <li key={resear.id} className="LeaderboardItem">
                       <Chip
                         icon={
+                          resear.expPoints >= 100 &&
+                          resear.onePoints >= 100 &&
                           resear.intellectualPoints >= 100 &&
-                          resear.autogradedPoints >= 100 ? (
+                          resear.instructorsPoints >= 100 &&
+                          resear.commentsPoints >= 100 &&
+                          resear.recallPoints >= 100 ? (
                             <span className="ChipContent">😊</span>
                           ) : (
                             <span className="ChipContent">😔</span>
@@ -224,8 +228,12 @@ const Activities = (props) => {
                         }
                         variant={resear.id === fullname ? "" : "outlined"}
                         color={
+                          resear.expPoints >= 100 &&
+                          resear.onePoints >= 100 &&
                           resear.intellectualPoints >= 100 &&
-                          resear.autogradedPoints >= 100
+                          resear.instructorsPoints >= 100 &&
+                          resear.commentsPoints >= 100 &&
+                          resear.recallPoints >= 100
                             ? "success"
                             : "error"
                         }

@@ -34,6 +34,8 @@ import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
 import CommunityApplications from "./Components/Home/CommunityApplications";
 
+import { isToday } from "./utils/DateFunctions";
+
 import "./App.css";
 
 const AppRouter = (props) => {
@@ -86,6 +88,24 @@ const AppRouter = (props) => {
       }
       setDuringAnExperiment(duringSession);
     };
+    const reloadIfNotLoadedToday = async () => {
+      const userRef = firebase.db.collection("users").doc(fullname);
+      const userDoc = await userRef.get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (!("lastLoad" in userData) || !isToday(userData.lastLoad.toDate())) {
+          await userRef.update({
+            lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+          window.location.reload(true);
+        }
+      }
+    };
+    if (firebase && fullname) {
+      setInterval(() => {
+        reloadIfNotLoadedToday();
+      }, 3600000);
+    }
     if (firebase && email && fullname) {
       areTheyDuringAnExperimentSession();
     }

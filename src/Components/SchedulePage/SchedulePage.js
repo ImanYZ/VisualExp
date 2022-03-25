@@ -134,10 +134,6 @@ const SchedulePage = (props) => {
             -1
         ) {
           setParticipatedBefore(true);
-          console.log({
-            projectDone: userData.projectDone,
-            attendees: event.attendees,
-          });
           return;
         }
       }

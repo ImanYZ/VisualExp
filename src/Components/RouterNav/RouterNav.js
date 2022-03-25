@@ -40,7 +40,7 @@ import {
 } from "../../store/ProjectAtoms";
 
 import { getTypedCollections } from "./getTypedCollections";
-import { isToday, getISODateString } from "../../utils/DateFunctions";
+import { getISODateString } from "../../utils/DateFunctions";
 
 import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
@@ -133,27 +133,8 @@ const RouterNav = (props) => {
         setNotAResearcher(true);
       }
     };
-    const reloadIfNotLoadedToday = async () => {
-      const researcherRef = firebase.db.collection("researchers").doc(fullname);
-      const researcherDoc = await researcherRef.get();
-      if (researcherDoc.exists) {
-        const researcherData = researcherDoc.data();
-        if (
-          !("lastLoad" in researcherData) ||
-          !isToday(researcherData.lastLoad.toDate())
-        ) {
-          await researcherRef.update({
-            lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
-          });
-          window.location.reload(true);
-        }
-      }
-    };
     if (firebase && fullname) {
       checkResearcher();
-      setInterval(() => {
-        reloadIfNotLoadedToday();
-      }, 3600000);
     }
   }, [firebase, fullname]);
 
@@ -271,7 +252,7 @@ const RouterNav = (props) => {
         }
       });
     }
-  }, [firebaseOnecademy, notAResearcher, email]);
+  }, [firebaseOnecademy, notAResearcher]);
 
   useEffect(() => {
     if (firebaseOnecademy && !notAResearcher) {

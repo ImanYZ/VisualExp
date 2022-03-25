@@ -476,18 +476,18 @@ const CommunityApplications = (props) => {
               .collection("applications")
               .doc(applics[applicIdx].id);
             await applicRef.update(applicData);
-            applics[applicIdx] = {
-              ...applics[applicIdx],
-              [voteType]: isChecked
-                ? "◻"
-                : voteType === "accepted"
-                ? "✅"
-                : voteType === "invited"
-                ? "✉️"
-                : "🚫",
-              checkedAt: new Date(),
-            };
-            setApplications(applics);
+            // applics[applicIdx] = {
+            //   ...applics[applicIdx],
+            //   [voteType]: isChecked
+            //     ? "◻"
+            //     : voteType === "accepted"
+            //     ? "✅"
+            //     : voteType === "invited"
+            //     ? "✉️"
+            //     : "🚫",
+            //   checkedAt: new Date(),
+            // };
+            // setApplications(applics);
             if (voteType === "accepted") {
               setSnackbarMessage("You successfully accepted this applicant!");
             } else if (voteType === "rejected") {

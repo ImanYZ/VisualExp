@@ -36,16 +36,18 @@ exports.schedule = async (req, res) => {
         const summary =
           "[1Cademy] UX Research Experiment - " + orderredSession + " Session";
         const description =
-          "This is your " +
+          "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +
+          req.body.email.toLowerCase() +
+          " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p><P>This is your " +
           orderredSession +
-          " session of the UX Research experiment. \n" +
+          " session of the UX Research experiment.</p>" +
           (session === 1
-            ? "We've also scheduled your 2nd session 3 days later, and 3rd session one week later. \n"
+            ? "<p>We've also scheduled your 2nd session 3 days later, and 3rd session one week later.</p>"
             : session === 2
-            ? "We've also scheduled your 3rd session 4 days later. \n"
+            ? "<p>We've also scheduled your 3rd session 4 days later.</p>"
             : "") +
-          "Please confirm your attendance in this session by accepting the invitation . \n" +
-          req.body.email.toLowerCase();
+          "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
+          "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
         const eventCreated = await insertEvent(
           start,
           end,
