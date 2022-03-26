@@ -277,7 +277,6 @@ const CommunityApplications = (props) => {
             setApplicationsChanges((oldApplicationsChanges) => {
               return [...oldApplicationsChanges, ...docChanges];
             });
-            setApplicationsLoaded(true);
           })
         );
       }
@@ -415,6 +414,7 @@ const CommunityApplications = (props) => {
       }
       setApplicationsChanges([]);
       setApplications(applics);
+      setApplicationsLoaded(true);
     };
     if (firebase && applicationsChanges.length > 0) {
       loadApplications();
