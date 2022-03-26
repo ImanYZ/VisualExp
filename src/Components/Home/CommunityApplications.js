@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 
 import Paper from "@mui/material/Paper";
@@ -114,6 +114,22 @@ const applicationsColumns = [
     },
   },
   {
+    field: "tutorialEnded",
+    headerName: "Completed Tutorial",
+    width: 40,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="Completed Tutorial"
+          cellValues={{ ...cellValues, value: cellValues.value ? "✅" : "" }}
+        />
+      );
+    },
+  },
+  {
     field: "quizWrongs",
     headerName: "Quiz-",
     type: "number",
@@ -156,7 +172,7 @@ const applicationsColumns = [
   {
     field: "accepted",
     headerName: "Accepted",
-    width: 10,
+    width: 40,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -172,7 +188,7 @@ const applicationsColumns = [
   {
     field: "rejected",
     headerName: "Rejected",
-    width: 10,
+    width: 40,
     disableColumnMenu: true,
     renderCell: (cellValues) => {
       return (
@@ -230,7 +246,6 @@ const CommunityApplications = (props) => {
 
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
-      console.log({ fullname });
       applicationsColumns.push({
         field: "invited",
         headerName: "Invited",
@@ -306,6 +321,18 @@ const CommunityApplications = (props) => {
               quizCorrects: applicData.corrects,
               quizWrongs: applicData.wrongs,
               checkedAt: null,
+              accepted: "◻",
+              rejected: "◻",
+              invited: "◻",
+              email: "",
+              transcript: "",
+              resume: "",
+              portfolio: "",
+              readingImmediate: 0,
+              reading3Days: 0,
+              reading1Week: 0,
+              tutorialWrongs: 0,
+              tutorialEnded: false,
               id: change.doc.id,
             };
             if ("leader" in applicData && applicData.leader) {
@@ -316,18 +343,12 @@ const CommunityApplications = (props) => {
             }
             if ("accepted" in applicData && applicData.accepted) {
               newApplic.accepted = "✅";
-            } else {
-              newApplic.accepted = "◻";
             }
             if ("rejected" in applicData && applicData.rejected) {
               newApplic.rejected = "🚫";
-            } else {
-              newApplic.rejected = "◻";
             }
             if ("invited" in applicData && applicData.invited) {
               newApplic.invited = "✉️";
-            } else {
-              newApplic.invited = "◻";
             }
             const userDoc = await firebase.db
               .collection("users")
@@ -336,28 +357,17 @@ const CommunityApplications = (props) => {
             const userData = userDoc.data();
             if ("email" in userData && userData.email) {
               newApplic.email = userData.email;
-            } else {
-              newApplic.email = "";
             }
             if ("Transcript" in userData && userData.Transcript) {
               newApplic.transcript = userData.Transcript;
-            } else {
-              newApplic.transcript = "";
             }
             if ("Resume" in userData && userData.Resume) {
               newApplic.resume = userData.Resume;
-            } else {
-              newApplic.resume = "";
             }
             if ("Portfolio" in userData && userData.Portfolio) {
               newApplic.portfolio = userData.Portfolio;
-            } else {
-              newApplic.portfolio = "";
             }
             if ("pConditions" in userData && userData.pConditions) {
-              newApplic.readingImmediate = 0;
-              newApplic.reading3Days = 0;
-              newApplic.reading1Week = 0;
               for (let pCondition of userData.pConditions) {
                 if (
                   "testScoreRatio" in pCondition &&
@@ -381,10 +391,6 @@ const CommunityApplications = (props) => {
               newApplic.readingImmediate = newApplic.readingImmediate / 2;
               newApplic.reading3Days = newApplic.reading3Days / 2;
               newApplic.reading1Week = newApplic.reading1Week / 2;
-            } else {
-              newApplic.readingImmediate = 0;
-              newApplic.reading3Days = 0;
-              newApplic.reading1Week = 0;
             }
             const tutorialDoc = await firebase.db
               .collection("tutorial")
@@ -394,11 +400,10 @@ const CommunityApplications = (props) => {
               const tutorialData = tutorialDoc.data();
               if ("wrongs" in tutorialData && tutorialData.wrongs) {
                 newApplic.tutorialWrongs = tutorialData.wrongs;
-              } else {
-                newApplic.tutorialWrongs = 0;
               }
-            } else {
-              newApplic.tutorialWrongs = 0;
+              if ("ended" in tutorialData && tutorialData.ended) {
+                newApplic.tutorialEnded = true;
+              }
             }
             const applicIdx = applications.findIndex(
               (acti) => acti.id === change.doc.id
@@ -409,9 +414,7 @@ const CommunityApplications = (props) => {
                 ...newApplic,
               };
             } else {
-              applics.push({
-                ...newApplic,
-              });
+              applics.push(newApplic);
             }
           }
         }
@@ -449,74 +452,90 @@ const CommunityApplications = (props) => {
     }
   };
 
-  const checkApplicant = (applicId, voteType) => async () => {
-    try {
-      if (!submitting) {
-        setSubmitting(true);
-        try {
-          let applics = [...applications];
-          const applicIdx = applics.findIndex((acti) => acti.id === applicId);
-          const isChecked =
-            applics[applicIdx][voteType] === "✅" ||
-            applics[applicIdx][voteType] === "🚫" ||
-            applics[applicIdx][voteType] === "✉️";
-          if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
-            applics[applicIdx] = {
-              ...applics[applicIdx],
-              [voteType]: "O",
-              leader: fullname,
-            };
-            setApplications(applics);
-            const applicData = {
-              [voteType]: !isChecked,
-            };
-            if (fullname !== "Iman YeckehZaare") {
-              applicData.leader = fullname;
-              applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
-                new Date()
-              );
-            }
-            const applicRef = firebase.db
-              .collection("applications")
-              .doc(applics[applicIdx].id);
-            await applicRef.update(applicData);
-            // applics[applicIdx] = {
-            //   ...applics[applicIdx],
-            //   [voteType]: isChecked
-            //     ? "◻"
-            //     : voteType === "accepted"
-            //     ? "✅"
-            //     : voteType === "invited"
-            //     ? "✉️"
-            //     : "🚫",
-            //   checkedAt: new Date(),
-            // };
-            // setApplications(applics);
-            if (voteType === "accepted") {
-              setSnackbarMessage("You successfully accepted this applicant!");
-            } else if (voteType === "rejected") {
-              setSnackbarMessage("You successfully rejected this applicant!");
-            } else if (voteType === "invited") {
-              setSnackbarMessage(
-                "You successfully invited this applicant to Microsoft Teams!"
-              );
-            }
-          }
-        } catch (err) {
-          console.error(err);
-        }
-        setSubmitting(false);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const checkApplicant = useCallback(
+    (applicId, voteType) => async () => {
+      try {
+        if (!submitting) {
+          setSubmitting(true);
+          try {
+            let applics = [...applications];
+            const applicIdx = applics.findIndex((acti) => acti.id === applicId);
+            if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
+              const applicData = {};
+              if (voteType === "accepted") {
+                applicData[voteType] = applics[applicIdx][voteType] !== "✅";
+              } else if (voteType === "rejected") {
+                applicData[voteType] = applics[applicIdx][voteType] !== "🚫";
+              } else if (voteType === "invited") {
+                applicData[voteType] = applics[applicIdx][voteType] !== "✉️";
+              }
+              if (fullname !== "Iman YeckehZaare") {
+                applicData.leader = fullname;
+                applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
+                  new Date()
+                );
+              }
+              console.log({
+                applics,
+                applicIdx,
+                voteType,
+                mark: applics[applicIdx][voteType],
+                applicData,
+              });
 
-  const checkApplication = (clickedCell) => {
-    if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
-      checkApplicant(clickedCell.id, clickedCell.field)();
-    }
-  };
+              applics[applicIdx] = {
+                ...applics[applicIdx],
+                [voteType]: "O",
+                leader: fullname,
+              };
+              setApplications(applics);
+
+              const applicRef = firebase.db
+                .collection("applications")
+                .doc(applics[applicIdx].id);
+              await applicRef.update(applicData);
+              // applics[applicIdx] = {
+              //   ...applics[applicIdx],
+              //   [voteType]: isChecked
+              //     ? "◻"
+              //     : voteType === "accepted"
+              //     ? "✅"
+              //     : voteType === "invited"
+              //     ? "✉️"
+              //     : "🚫",
+              //   checkedAt: new Date(),
+              // };
+              // setApplications(applics);
+              if (voteType === "accepted") {
+                setSnackbarMessage("You successfully accepted this applicant!");
+              } else if (voteType === "rejected") {
+                setSnackbarMessage("You successfully rejected this applicant!");
+              } else if (voteType === "invited") {
+                setSnackbarMessage(
+                  "You successfully invited this applicant to Microsoft Teams!"
+                );
+              }
+            }
+          } catch (err) {
+            console.error(err);
+          }
+          setSubmitting(false);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [applications]
+  );
+
+  const checkApplication = useCallback(
+    (clickedCell) => {
+      if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
+        checkApplicant(clickedCell.id, clickedCell.field)();
+      }
+    },
+    [checkApplicant]
+  );
 
   return (
     <PagesNavbar>
