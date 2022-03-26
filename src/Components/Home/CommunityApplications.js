@@ -420,6 +420,9 @@ const CommunityApplications = (props) => {
         }
       }
       setApplicationsChanges([]);
+      console.log({
+        applics,
+      });
       setApplications(applics);
       setApplicationsLoaded(true);
     };
@@ -534,7 +537,7 @@ const CommunityApplications = (props) => {
         checkApplicant(clickedCell.id, clickedCell.field)();
       }
     },
-    [checkApplicant]
+    [applications]
   );
 
   return (
