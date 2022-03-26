@@ -390,9 +390,13 @@ const CommunityApplications = (props) => {
               .collection("tutorial")
               .doc(applicData.fullname)
               .get();
-            const tutorialData = tutorialDoc.data();
-            if ("wrongs" in tutorialData && tutorialData.wrongs) {
-              newApplic.tutorialWrongs = tutorialData.wrongs;
+            if (tutorialDoc.exists) {
+              const tutorialData = tutorialDoc.data();
+              if ("wrongs" in tutorialData && tutorialData.wrongs) {
+                newApplic.tutorialWrongs = tutorialData.wrongs;
+              } else {
+                newApplic.tutorialWrongs = 0;
+              }
             } else {
               newApplic.tutorialWrongs = 0;
             }

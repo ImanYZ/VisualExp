@@ -42,8 +42,8 @@ export const leadingState = atom({
   default: [],
 });
 
-export const tutorialEndedState = atom({
-  key: "tutorialEndedState",
+export const applicationSubmittedState = atom({
+  key: "applicationSubmittedState",
   default: false,
 });
 

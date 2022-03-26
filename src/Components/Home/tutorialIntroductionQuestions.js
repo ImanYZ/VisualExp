@@ -1622,27 +1622,7 @@ export default {
   },
   Congratulations: {
     title: "Congratulations!",
-    description: (
-      <div>
-        <div>
-          You successfully completed the 1Cademy tutorial. You can now click the
-          following button to explore 1Cademy communities and complete the
-          requirements of whichever community you'd like to apply to.
-        </div>
-        <div>
-          <Button
-            variant="contained"
-            component="a"
-            href="/communities"
-            target="_blank"
-            color="secondary"
-            sx={{ mt: 1, ml: 1, color: "common.white" }}
-          >
-            1Cademy Communities
-          </Button>
-        </div>
-      </div>
-    ),
+    description: <div>You successfully completed the 1Cademy tutorial.</div>,
     video: "",
     questions: {},
   },

@@ -17,8 +17,8 @@ import {
   fullnameState,
   resumeUrlState,
   transcriptUrlState,
-  tutorialEndedState,
   communiTestsEndedState,
+  applicationSubmittedState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
@@ -41,12 +41,14 @@ const JoinUs = (props) => {
   const fullname = useRecoilValue(fullnameState);
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
-  const tutorialEnded = useRecoilValue(tutorialEndedState);
   const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(
     communiTestsEndedState
   );
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
+  const [applicationSubmitted, setApplicationSubmitted] = useRecoilState(
+    applicationSubmittedState
+  );
 
   const [activeStep, setActiveStep] = useState(0);
   const [checkedInnerStep, setCheckedInnerStep] = useState(0);
@@ -59,7 +61,7 @@ const JoinUs = (props) => {
   const [needsUpdate, setNeedsUpdate] = useState(false);
 
   useEffect(() => {
-    if (tutorialEnded) {
+    if (applicationSubmitted) {
       setActiveStep(3);
     } else if (completedExperiment) {
       setActiveStep(2);
@@ -68,7 +70,7 @@ const JoinUs = (props) => {
     } else {
       setActiveStep(0);
     }
-  }, [hasScheduled, completedExperiment, tutorialEnded]);
+  }, [hasScheduled, completedExperiment, applicationSubmitted]);
 
   useEffect(() => {
     if (needsUpdate) {
@@ -207,6 +209,13 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
+      if (
+        !props.community.coursera &&
+        !props.community.portfolio &&
+        !props.community.hasTest
+      ) {
+        setApplicationSubmitted(true);
+      }
       setNeedsUpdate(true);
     }
   };
@@ -230,6 +239,9 @@ const JoinUs = (props) => {
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
       }
+      if (!props.community.portfolio && !props.community.hasTest) {
+        setApplicationSubmitted(true);
+      }
       setNeedsUpdate(true);
     }
   };
@@ -252,6 +264,9 @@ const JoinUs = (props) => {
           portfolioUrl,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
         });
+      }
+      if (!props.community.hasTest) {
+        setApplicationSubmitted(true);
       }
       setNeedsUpdate(true);
     }
@@ -399,31 +414,6 @@ const JoinUs = (props) => {
               may affect our community leaders' decision in whether to accept
               your application.
             </Typography>
-          </StepContent>
-        </Step>
-        <Step>
-          <StepLabel>Complete the 1Cademy tutorial test.</StepLabel>
-          <StepContent>
-            <Typography>
-              Please go through the 1Cademy tutorial, carefully watch the short
-              videos, and answer the questions. Note that your test scores may
-              impact our community leaders' decision in whether to accept your
-              application. For effective participation in our communities, you
-              need to first learn how our system works.
-            </Typography>
-            <Box sx={{ mb: 2 }}>
-              <div>
-                <Button
-                  variant="contained"
-                  component="a"
-                  href="/tutorial"
-                  target="_blank"
-                  sx={{ mt: 1, mr: 1, color: "common.white" }}
-                >
-                  Start 1Cademy Tutorial
-                </Button>
-              </div>
-            </Box>
           </StepContent>
         </Step>
         <Step>
@@ -777,8 +767,8 @@ const JoinUs = (props) => {
                   </div>
                 </Box>
                 <Typography>
-                  You can always return and review the 1Cademy tutorial by
-                  clicking the following button:
+                  Meanwhile, you can go through the 1Cademy tutorial by clicking
+                  the following button:
                 </Typography>
                 <Box sx={{ mb: 2 }}>
                   <div>
@@ -789,7 +779,7 @@ const JoinUs = (props) => {
                       target="_blank"
                       sx={{ mt: 1, mr: 1, color: "common.white" }}
                     >
-                      Review 1Cademy Tutorial
+                      1Cademy Tutorial
                     </Button>
                   </div>
                 </Box>
@@ -797,8 +787,33 @@ const JoinUs = (props) => {
             )}
           </StepContent>
         </Step>
+        {/* <Step>
+          <StepLabel>Complete the 1Cademy tutorial test.</StepLabel>
+          <StepContent>
+            <Typography>
+              Please go through the 1Cademy tutorial, carefully watch the short
+              videos, and answer the questions. Note that your test scores may
+              impact our community leaders' decision in whether to accept your
+              application. For effective participation in our communities, you
+              need to first learn how our system works.
+            </Typography>
+            <Box sx={{ mb: 2 }}>
+              <div>
+                <Button
+                  variant="contained"
+                  component="a"
+                  href="/tutorial"
+                  target="_blank"
+                  sx={{ mt: 1, mr: 1, color: "common.white" }}
+                >
+                  Start 1Cademy Tutorial
+                </Button>
+              </div>
+            </Box>
+          </StepContent>
+        </Step> */}
       </Stepper>
-      {activeStep === 4 && (
+      {activeStep === 3 && (
         <Paper square elevation={0} sx={{ p: 3 }}>
           <Typography>
             All steps completed. After reviewing your application, our community

@@ -272,12 +272,12 @@ const PassageRight = (props) => {
             </>
           ) : (
             <h1>
-              You can now start the third step of your application process by
-              going through{" "}
-              <a href="https://1cademy.us/tutorial" target="_blank">
-                the 1Cademy tutorial
+              You can now click{" "}
+              <a href="https://1cademy.us/communities" target="_blank">
+                this link
               </a>{" "}
-              at your convenience.
+              to explore 1Cademy communities, at your convenience, and complete
+              the requirements of whichever community you'd like to apply to.
             </h1>
           )}
         </>

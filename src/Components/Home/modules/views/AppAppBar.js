@@ -23,7 +23,7 @@ import {
   fullnameState,
   resumeUrlState,
   transcriptUrlState,
-  tutorialEndedState,
+  applicationSubmittedState,
   colorModeState,
 } from "../../../../store/AuthAtoms";
 import {
@@ -59,8 +59,10 @@ const AppAppBar = (props) => {
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const setHasScheduled = useSetRecoilState(hasScheduledState);
-  const setCompletedExperiment = useSetRecoilState(completedExperimentState);
-  const setTutorialEnded = useSetRecoilState(tutorialEndedState);
+  const [completedExperiment, setCompletedExperiment] = useRecoilState(
+    completedExperimentState
+  );
+  const setApplicationSubmitted = useSetRecoilState(applicationSubmittedState);
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
 
@@ -85,8 +87,8 @@ const AppAppBar = (props) => {
             window.location.href = "/";
           }
           setFullname(getFullname(userData.firstname, userData.lastname));
-          if (userData.tutorialEnded) {
-            setTutorialEnded(true);
+          if (userData.applicationSubmitted) {
+            setApplicationSubmitted(true);
           }
           if ("Resume" in userData) {
             setResumeUrl(userData["Resume"]);
@@ -135,7 +137,7 @@ const AppAppBar = (props) => {
         setEmail("");
         setHasScheduled(false);
         setCompletedExperiment(false);
-        setTutorialEnded(false);
+        setApplicationSubmitted(false);
       }
     });
   }, [firebase]);
@@ -231,6 +233,17 @@ const AppAppBar = (props) => {
                 />
               );
             })}
+            {fullname && completedExperiment && (
+              <Tooltip title="1Cademy Tutorial">
+                <Tab
+                  component="a"
+                  href="/tutorial"
+                  target="_blank"
+                  label="Tutorial"
+                  color="inherit"
+                />
+              </Tooltip>
+            )}
           </Tabs>
           <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
             {/* <Box
