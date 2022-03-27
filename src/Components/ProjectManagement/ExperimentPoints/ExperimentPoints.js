@@ -62,9 +62,13 @@ const ExperimentPoints = (props) => {
 
   useEffect(() => {
     if (expSessionsChanges.length > 0) {
+      const tempExpSessionsChanges = [...expSessionsChanges];
+      setTimeout(() => {
+        setExpSessionsChanges([]);
+      }, 0);
       let eSessions = [...expSessions];
       let dPoints = [...dailyPoints];
-      for (let change of expSessionsChanges) {
+      for (let change of tempExpSessionsChanges) {
         if (change.type === "removed") {
           eSessions = eSessions.filter((eSe) => eSe.id !== change.doc.id);
         } else {
@@ -98,7 +102,6 @@ const ExperimentPoints = (props) => {
           }
         }
       }
-      setExpSessionsChanges([]);
       setExpSessions(eSessions);
       setDailyPoints(dPoints);
     }

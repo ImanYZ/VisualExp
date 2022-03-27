@@ -323,8 +323,12 @@ const CommunityApplications = (props) => {
 
   useEffect(() => {
     const loadApplications = async () => {
+      const tempApplicationsChanges = [...applicationsChanges];
+      setTimeout(() => {
+        setApplicationsChanges([]);
+      }, 0);
       let applics = [...applications];
-      for (let change of applicationsChanges) {
+      for (let change of tempApplicationsChanges) {
         if (change.type === "removed") {
           applics = applics.filter((applic) => applic.id !== change.doc.id);
         } else {
@@ -436,7 +440,6 @@ const CommunityApplications = (props) => {
           }
         }
       }
-      setApplicationsChanges([]);
       setApplications(applics);
       setSubmitting(false);
       setApplicationsLoaded(true);

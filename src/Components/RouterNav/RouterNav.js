@@ -199,6 +199,10 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (!notAResearcher && notTakenSessionsChanges.length > 0) {
+      const tempNotTakenSessionsChanges = [...notTakenSessionsChanges];
+      setTimeout(() => {
+        setNotTakenSessionsChanges([]);
+      }, 0);
       let nTSessions = [...notTakenSessions];
       let nTSessionsNum = notTakenSessionsNum;
       for (let change of notTakenSessionsChanges) {
@@ -217,7 +221,6 @@ const RouterNav = (props) => {
           nTSessionsNum += 1;
         }
       }
-      setNotTakenSessionsChanges([]);
       setNotTakenSessions(nTSessions);
       setNotTakenSessionsNum(nTSessionsNum);
     }
@@ -273,11 +276,13 @@ const RouterNav = (props) => {
             setProposalsChanges((oldProposalsChanges) => {
               return [...oldProposalsChanges, ...docChanges];
             });
+            if (nodeTypeIdx === nodeTypes.length) {
+              setProposalsLoaded(true);
+            }
           })
         );
         nodeTypeIdx += 1;
         if (nodeTypeIdx === nodeTypes.length) {
-          setProposalsLoaded(true);
           clearInterval(nodeTypesInterval);
         }
       }, 400);
@@ -297,10 +302,14 @@ const RouterNav = (props) => {
       username &&
       proposalsLoaded
     ) {
+      const tempProposalsChanges = [...proposalsChanges];
+      setTimeout(() => {
+        setProposalsChanges([]);
+      }, 0);
       let propos = { ...proposals };
       let oPropos = { ...othersProposals };
       let netVotes = oneCademyPoints;
-      for (let change of proposalsChanges) {
+      for (let change of tempProposalsChanges) {
         const proposalData = change.doc.data();
         if (change.type === "removed" || proposalData.deleted) {
           if (proposalData.proposer === username) {
@@ -335,7 +344,6 @@ const RouterNav = (props) => {
           }
         }
       }
-      setProposalsChanges([]);
       setProposals(propos);
       setOthersProposals(oPropos);
       setOneCademyPoints(netVotes);
@@ -373,11 +381,13 @@ const RouterNav = (props) => {
             setUserVersionsChanges((oldUserVersionsChanges) => {
               return [...oldUserVersionsChanges, ...docChanges];
             });
+            if (nodeTypeIdx === nodeTypes.length) {
+              setUserVersionsLoaded(true);
+            }
           })
         );
         nodeTypeIdx += 1;
         if (nodeTypeIdx === nodeTypes.length) {
-          setUserVersionsLoaded(true);
           clearInterval(nodeTypesInterval);
         }
       }, 400);
@@ -396,9 +406,13 @@ const RouterNav = (props) => {
       userVersionsChanges.length > 0 &&
       userVersionsLoaded
     ) {
+      const tempUserVersionsChanges = [...userVersionsChanges];
+      setTimeout(() => {
+        setUserVersionsChanges([]);
+      }, 0);
       let uVersions = { ...userVersions };
       let upVotes = { ...oneCademyUpvotes };
-      for (let change of userVersionsChanges) {
+      for (let change of tempUserVersionsChanges) {
         const userVersionData = change.doc.data();
         if (userVersionData.version in othersProposals) {
           const voteDate = getISODateString(userVersionData.updatedAt.toDate());
@@ -424,7 +438,6 @@ const RouterNav = (props) => {
           }
         }
       }
-      setUserVersionsChanges([]);
       setUserVersions(uVersions);
       setOneCademyUpvotes(upVotes);
       let today = getISODateString(new Date());
@@ -466,8 +479,12 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (!notAResearcher && nodesChanges.length > 0) {
+      const tempNodesChanges = [...nodesChanges];
+      setTimeout(() => {
+        setNodesChanges([]);
+      }, 0);
       let nds = [...nodes];
-      for (let change of nodesChanges) {
+      for (let change of tempNodesChanges) {
         const nodeData = change.doc.data();
         if (
           Object.keys(othersProposals).findIndex(
@@ -487,7 +504,6 @@ const RouterNav = (props) => {
           }
         }
       }
-      setNodesChanges([]);
       setNodes(nds);
       setNodesLoaded(true);
     }
@@ -513,9 +529,13 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (!notAResearcher && userNodesChanges.length > 0) {
+      const tempUserNodesChanges = [...userNodesChanges];
+      setTimeout(() => {
+        setUserNodesChanges([]);
+      }, 0);
       let uNodes = { ...userNodes };
       let upVotes = { ...oneCademyUpvotes };
-      for (let change of userNodesChanges) {
+      for (let change of tempUserNodesChanges) {
         const userNodeData = change.doc.data();
         if (nodes.includes(userNodeData.node)) {
           const voteDate = getISODateString(userNodeData.updatedAt.toDate());
@@ -543,7 +563,6 @@ const RouterNav = (props) => {
           }
         }
       }
-      setUserNodesChanges([]);
       setUserNodes(uNodes);
       setOneCademyUpvotes(upVotes);
       let today = getISODateString(new Date());
