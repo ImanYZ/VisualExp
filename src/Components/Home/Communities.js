@@ -191,7 +191,16 @@ const Communities = (props) => {
   };
 
   return (
-    <PagesNavbar communities={true} thisPage={communities[props.commIdx].title}>
+    <PagesNavbar
+      communities={true}
+      thisPage={
+        props.commIdx &&
+        communities[props.commIdx] &&
+        communities[props.commIdx].title
+          ? communities[props.commIdx].title
+          : "Communities"
+      }
+    >
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Communities
       </Typography>
