@@ -2,14 +2,14 @@ import React, { useState, useEffect, Suspense } from "react";
 
 import { useRecoilValue } from "recoil";
 
-import { firebaseOnecademyState } from "../../../store/OneCademyAtoms";
+import { firebaseOneState } from "../../../store/OneCademyAtoms";
 
 import "./UniversitiesMap.css";
 
 const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 
 const UniversitiesMap = (props) => {
-  const firebase = useRecoilValue(firebaseOnecademyState);
+  const firebase = useRecoilValue(firebaseOneState);
   const [institutions, setInstitutions] = useState([]);
 
   useEffect(() => {

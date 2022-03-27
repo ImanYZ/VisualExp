@@ -16,7 +16,7 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
 import EmailIcon from "@mui/icons-material/Email";
 
-import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
+import { firebaseOneState } from "../../store/OneCademyAtoms";
 
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
@@ -48,7 +48,7 @@ const accumulatePoints = (groups, reputationData, user, points) => {
 };
 
 const Communities = (props) => {
-  const firebase = useRecoilValue(firebaseOnecademyState);
+  const firebase = useRecoilValue(firebaseOneState);
 
   const [reputationsChanges, setReputationsChanges] = useState([]);
   const [reputations, setReputations] = useState({});
@@ -191,7 +191,7 @@ const Communities = (props) => {
   };
 
   return (
-    <PagesNavbar communities={true}>
+    <PagesNavbar communities={true} thisPage={communities[props.commIdx].title}>
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Communities
       </Typography>

@@ -5,7 +5,7 @@ import PagesNavbar from "./PagesNavbar";
 
 const CookiePolicy = () => {
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Cookie Policy">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Cookie Policy
       </Typography>

@@ -410,7 +410,7 @@ const PaperTest = (props) => {
 
   return (
     <>
-      <PagesNavbar tutorial={true}>
+      <PagesNavbar tutorial={true} thisPage="Test">
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
             Community Specific Test

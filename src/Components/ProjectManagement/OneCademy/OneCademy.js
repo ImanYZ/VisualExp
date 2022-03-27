@@ -7,9 +7,9 @@ import Button from "@mui/material/Button";
 import { isEmail } from "../../../utils/general";
 
 import {
-  firebaseOnecademyState,
+  firebaseOneState,
   usernameState,
-  emailState,
+  emailOneState,
 } from "../../../store/OneCademyAtoms";
 
 import ValidatedInput from "../../ValidatedInput/ValidatedInput";
@@ -19,9 +19,9 @@ import favicon from "../../../assets/favicon.png";
 import "./OneCademy.css";
 
 const OneCademy = (props) => {
-  const firebase = useRecoilValue(firebaseOnecademyState);
+  const firebase = useRecoilValue(firebaseOneState);
   const [username, setUsername] = useRecoilState(usernameState);
-  const [email, setEmail] = useRecoilState(emailState);
+  const [email, setEmail] = useRecoilState(emailOneState);
 
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);

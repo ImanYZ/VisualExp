@@ -241,6 +241,7 @@ const CommunityApplications = (props) => {
   const [applications, setApplications] = useState([]);
   const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
+  const [applicationsRetrieved, setApplicationsRetrieved] = useState(false);
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -248,6 +249,7 @@ const CommunityApplications = (props) => {
   const [rowHeight, setRowHeight] = React.useState(40);
 
   useEffect(() => {
+    console.log({ fullname });
     if (fullname === "Iman YeckehZaare") {
       setApplicationsColumns([
         ...applicationsColms,
@@ -282,40 +284,51 @@ const CommunityApplications = (props) => {
   }, [fullname]);
 
   useEffect(() => {
-    if (firebase) {
+    if (firebase && props.communiIds && props.communiIds.length > 0) {
       const appliSnapshots = [];
-      for (
-        let communiBatch = 0;
-        communiBatch < props.communiIds.length / 10;
-        communiBatch++
-      ) {
-        const communiIds = [];
-        for (
-          let communiIdx = 10 * communiBatch;
-          communiIdx < 10 * (communiBatch + 1) &&
-          communiIdx < props.communiIds.length;
-          communiIdx++
-        ) {
-          communiIds.push(props.communiIds[communiIdx]);
-        }
-        const applicationsQuery = firebase.db
-          .collection("applications")
-          .where("communiId", "in", communiIds);
-        appliSnapshots.push(
-          applicationsQuery.onSnapshot((snapshot) => {
-            const docChanges = snapshot.docChanges();
-            setApplicationsChanges((oldApplicationsChanges) => {
-              return [...oldApplicationsChanges, ...docChanges];
-            });
-          })
-        );
-      }
-      return () => {
-        setApplicationsLoaded(false);
-        for (let appliSnapshot of appliSnapshots) {
-          appliSnapshot();
-        }
-      };
+      console.log({ communiIds: props.communiIds });
+      // for (
+      //   let communiBatch = 0;
+      //   communiBatch < props.communiIds.length / 10;
+      //   communiBatch++
+      // ) {
+      //   const communiIds = [];
+      //   for (
+      //     let communiIdx = 10 * communiBatch;
+      //     communiIdx < 10 * (communiBatch + 1) &&
+      //     communiIdx < props.communiIds.length;
+      //     communiIdx++
+      //   ) {
+      //     communiIds.push(props.communiIds[communiIdx]);
+      //   }
+      //   console.log({
+      //     communiIds,
+      //     communiBatch,
+      //     changesLength: applicationsChanges.length,
+      //   });
+      //   // const applicationsQuery = firebase.db
+      //   //   .collection("applications")
+      //   //   .where("communiId", "in", communiIds);
+      //   // appliSnapshots.push(
+      //   //   applicationsQuery.onSnapshot((snapshot) => {
+      //   //     const docChanges = snapshot.docChanges();
+      //   //     setApplicationsChanges((oldApplicationsChanges) => {
+      //   //       return [...oldApplicationsChanges, ...docChanges];
+      //   //     });
+      //   //     if (communiBatch >= Math.floor(props.communiIds.length / 10)) {
+      //   //       setTimeout(() => {
+      //   //         setApplicationsRetrieved(true);
+      //   //       }, 1000);
+      //   //     }
+      //   //   })
+      //   // );
+      // }
+      // return () => {
+      //   setApplicationsLoaded(false);
+      //   for (let appliSnapshot of appliSnapshots) {
+      //     appliSnapshot();
+      //   }
+      // };
     }
   }, [firebase, props.communiIds]);
 
@@ -449,11 +462,17 @@ const CommunityApplications = (props) => {
         setApplicationsLoaded(true);
       }, 400);
     };
-    if (firebase && applicationsChanges.length > 0) {
+    if (firebase && applicationsRetrieved && applicationsChanges.length > 0) {
       console.log("Loading again!");
       loadApplications();
     }
-  }, [firebase, applications, applicationsChanges, rowHeight]);
+  }, [
+    firebase,
+    applications,
+    applicationsRetrieved,
+    applicationsChanges,
+    rowHeight,
+  ]);
 
   useEffect(() => {
     let theApplicant;
@@ -577,7 +596,7 @@ const CommunityApplications = (props) => {
     });
   }
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Dashboard">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         Applications to Your{" "}
         {props.communiIds.length > 1 ? "Communityies" : "Community"}

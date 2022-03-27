@@ -22,9 +22,9 @@ import {
 } from "../../store/AuthAtoms";
 
 import {
-  firebaseOnecademyState,
+  firebaseOneState,
   usernameState,
-  emailState,
+  emailOneState,
 } from "../../store/OneCademyAtoms";
 
 import {
@@ -58,9 +58,9 @@ const goToGCloud = (event) => {
 
 const RouterNav = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  const firebaseOnecademy = useRecoilValue(firebaseOnecademyState);
+  const firebaseOne = useRecoilValue(firebaseOneState);
   const [username, setUsername] = useRecoilState(usernameState);
-  const [email, setEmail] = useRecoilState(emailState);
+  const [email, setEmail] = useRecoilState(emailOneState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
   const [projects, setProjects] = useRecoilState(projectsState);
@@ -231,10 +231,10 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (!notAResearcher) {
-      return firebaseOnecademy.auth.onAuthStateChanged(async (user) => {
+      return firebaseOne.auth.onAuthStateChanged(async (user) => {
         if (user) {
           const uid = user.uid;
-          const userDocs = await firebaseOnecademy.db
+          const userDocs = await firebaseOne.db
             .collection("users")
             .where("userId", "==", uid)
             .get();
@@ -252,20 +252,17 @@ const RouterNav = (props) => {
         }
       });
     }
-  }, [firebaseOnecademy, notAResearcher]);
+  }, [firebaseOne, notAResearcher]);
 
   useEffect(() => {
-    if (firebaseOnecademy && !notAResearcher) {
+    if (firebaseOne && !notAResearcher) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
       let nodeType;
       const nodeTypesInterval = setInterval(() => {
         nodeType = nodeTypes[nodeTypeIdx];
-        const { versionsColl } = getTypedCollections(
-          firebaseOnecademy.db,
-          nodeType
-        );
+        const { versionsColl } = getTypedCollections(firebaseOne.db, nodeType);
         const versionsQuery = versionsColl.where("tags", "array-contains", {
           node: "WgF7yr5q7tJc54apVQSr",
           title: "Knowledge Visualization",
@@ -291,7 +288,7 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOnecademy, notAResearcher]);
+  }, [firebaseOne, notAResearcher]);
 
   useEffect(() => {
     if (
@@ -354,7 +351,7 @@ const RouterNav = (props) => {
   ]);
 
   useEffect(() => {
-    if (firebaseOnecademy && !notAResearcher && username && proposalsLoaded) {
+    if (firebaseOne && !notAResearcher && username && proposalsLoaded) {
       const userVersionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -362,7 +359,7 @@ const RouterNav = (props) => {
       const nodeTypesInterval = setInterval(() => {
         nodeType = nodeTypes[nodeTypeIdx];
         const { userVersionsColl } = getTypedCollections(
-          firebaseOnecademy.db,
+          firebaseOne.db,
           nodeType
         );
         const userVersionsQuery = userVersionsColl.where(
@@ -391,7 +388,7 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOnecademy, notAResearcher, username, proposalsLoaded]);
+  }, [firebaseOne, notAResearcher, username, proposalsLoaded]);
 
   useEffect(() => {
     if (
@@ -447,13 +444,8 @@ const RouterNav = (props) => {
   ]);
 
   useEffect(() => {
-    if (
-      firebaseOnecademy &&
-      !notAResearcher &&
-      username &&
-      userVersionsLoaded
-    ) {
-      const nodesQuery = firebaseOnecademy.db
+    if (firebaseOne && !notAResearcher && username && userVersionsLoaded) {
+      const nodesQuery = firebaseOne.db
         .collection("nodes")
         .where("tags", "array-contains", {
           node: "WgF7yr5q7tJc54apVQSr",
@@ -470,7 +462,7 @@ const RouterNav = (props) => {
         nodesSnapshot();
       };
     }
-  }, [firebaseOnecademy, notAResearcher, username, userVersionsLoaded]);
+  }, [firebaseOne, notAResearcher, username, userVersionsLoaded]);
 
   useEffect(() => {
     if (!notAResearcher && nodesChanges.length > 0) {
@@ -502,8 +494,8 @@ const RouterNav = (props) => {
   }, [notAResearcher, nodesChanges, othersProposals]);
 
   useEffect(() => {
-    if (firebaseOnecademy && !notAResearcher && username && nodesLoaded) {
-      const userNodesQuery = firebaseOnecademy.db
+    if (firebaseOne && !notAResearcher && username && nodesLoaded) {
+      const userNodesQuery = firebaseOne.db
         .collection("userNodes")
         .where("user", "==", username);
       const userNodesSnapshot = userNodesQuery.onSnapshot((snapshot) => {
@@ -517,7 +509,7 @@ const RouterNav = (props) => {
         userNodesSnapshot();
       };
     }
-  }, [firebaseOnecademy, notAResearcher, username, nodesLoaded]);
+  }, [firebaseOne, notAResearcher, username, nodesLoaded]);
 
   useEffect(() => {
     if (!notAResearcher && userNodesChanges.length > 0) {

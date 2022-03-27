@@ -60,7 +60,7 @@ const ReminderDate = () => {
   const renderDate = (params) => <TextField {...params} />;
 
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Reminder">
       {notLoggedIn ? (
         <Alert severity="error">
           <Typography variant="h3" gutterBottom marked="center" align="center">

@@ -5,7 +5,7 @@ import PagesNavbar from "./PagesNavbar";
 
 function Privacy() {
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Privacy Policy">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Privacy Policy
       </Typography>

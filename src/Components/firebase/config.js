@@ -9,7 +9,7 @@ export const firebaseConfig = {
   measurementId: "G-0BH5YRED86",
 };
 
-export const firebaseOnecademyConfig = {
+export const firebaseOneConfig = {
   apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",
   authDomain: "onecademy-1.firebaseapp.com",
   databaseURL: "https://onecademy-1.firebaseio.com",

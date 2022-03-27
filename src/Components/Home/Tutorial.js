@@ -463,7 +463,7 @@ const Tutorial = (props) => {
 
   return (
     <>
-      <PagesNavbar tutorial={true}>
+      <PagesNavbar tutorial={true} thisPage="Tutorial">
         <div id="TutorialHeader">
           <Typography variant="h3" gutterBottom marked="center" align="center">
             1Cademy Tutorial

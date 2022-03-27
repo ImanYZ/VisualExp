@@ -57,7 +57,7 @@ const Withdraw = () => {
   };
 
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Withdraw">
       {notLoggedIn ? (
         <Alert severity="error">
           <Typography variant="h3" gutterBottom marked="center" align="center">

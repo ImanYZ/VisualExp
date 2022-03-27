@@ -5,7 +5,7 @@ import PagesNavbar from "./PagesNavbar";
 
 function Terms() {
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Terms">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Terms of Use
       </Typography>

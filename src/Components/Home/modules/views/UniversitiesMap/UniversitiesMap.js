@@ -5,14 +5,14 @@ import { useRecoilValue } from "recoil";
 import Container from "@mui/material/Container";
 import Typography from "../../components/Typography";
 
-import { firebaseOnecademyState } from "../../../../../store/OneCademyAtoms";
+import { firebaseOneState } from "../../../../../store/OneCademyAtoms";
 
 import "./UniversitiesMap.css";
 
 const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 
 const UniversitiesMap = (props) => {
-  const firebase = useRecoilValue(firebaseOnecademyState);
+  const firebase = useRecoilValue(firebaseOneState);
   const [institutions, setInstitutions] = useState([]);
 
   useEffect(() => {

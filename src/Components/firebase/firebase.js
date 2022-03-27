@@ -5,7 +5,7 @@ import "firebase/compat/storage";
 
 import axios from "axios";
 
-import { firebaseConfig, firebaseOnecademyConfig } from "./config";
+import { firebaseConfig, firebaseOneConfig } from "./config";
 
 const MAX_TRANSACTION_WRITES = 499;
 
@@ -127,7 +127,4 @@ axios.defaults.baseURL =
   "https://us-central1-visualexp-a7d2c.cloudfunctions.net/api";
 
 export const firebase = new Firebase(firebaseConfig);
-export const firebaseOnecademy = new Firebase(
-  firebaseOnecademyConfig,
-  "onecademy"
-);
+export const firebaseOne = new Firebase(firebaseOneConfig, "onecademy");

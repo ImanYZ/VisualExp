@@ -14,7 +14,7 @@ import SelectSessions from "../../SchedulePage/SelectSessions";
 import "./ManageEvents.css";
 
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
-// import { firebaseOnecademyState } from "../../../store/OneCademyAtoms";
+// import { firebaseOneState } from "../../../store/OneCademyAtoms";
 
 const sendEventNotificationEmail = (params) => async (event) => {
   let responseObj = await axios.post("/sendEventNotificationEmail", params);
@@ -254,7 +254,7 @@ const errorAlert = (data) => {
 const ManageEvents = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  // const firebaseOnecademy = useRecoilValue(firebaseOnecademyState);
+  // const firebaseOne = useRecoilValue(firebaseOneState);
 
   const [events, setEvents] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
@@ -426,7 +426,7 @@ const ManageEvents = (props) => {
               //   hyperlink: "https://1cademy.us/home#JoinUsSection",
               // });
               // }
-              // const user1CademyDocs = await firebaseOnecademy.db
+              // const user1CademyDocs = await firebaseOne.db
               //   .collection("users")
               //   .where("email", "==", userData.email)
               //   .get();

@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 
 import { themeState, themeOSState } from "../../store/AuthAtoms";
 
-import { firebaseOnecademyState } from "../../store/OneCademyAtoms";
+import { firebaseOneState } from "../../store/OneCademyAtoms";
 
 import UniversitiesMap from "./UniversitiesMap/UniversitiesMap";
 import HomeNavbar from "./HomeNavbar/HomeNavbar";
@@ -16,7 +16,7 @@ import LightModeBackground from "../../assets/LightModeBackground.jpg";
 import "./Homepage.css";
 
 const Homepage = (props) => {
-  const firebase = useRecoilValue(firebaseOnecademyState);
+  const firebase = useRecoilValue(firebaseOneState);
   const [theme, setTheme] = useRecoilState(themeState);
   const [themeOS, setThemeOS] = useRecoilState(themeOSState);
   const [showMap, setShowMap] = useState(true);

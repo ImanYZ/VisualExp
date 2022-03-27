@@ -9,7 +9,9 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 
 const switchSection = (newValue) => (event) => {
-  window.location.replace("/Home#" + sectionsOrder[newValue + 1].id);
+  if (newValue > 0 && newValue < sectionsOrder.length - 1) {
+    window.location.replace("/Home#" + sectionsOrder[newValue + 1].id);
+  }
 };
 
 const homeClick = (event) => {
@@ -20,7 +22,7 @@ const joinUsClick = (event) => {
   window.location.replace("/Home#JoinUsSection");
 };
 
-const PagesNavbar = ({ children, tutorial, communities }) => {
+const PagesNavbar = ({ children, tutorial, communities, thisPage }) => {
   return (
     <Box
       id="ScrollableContainer"
@@ -36,6 +38,8 @@ const PagesNavbar = ({ children, tutorial, communities }) => {
         joinUsClick={joinUsClick}
         tutorial={tutorial}
         communities={communities}
+        thisPage={thisPage}
+        section={5}
       />
       <Box
         sx={{

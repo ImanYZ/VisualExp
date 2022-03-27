@@ -289,7 +289,7 @@ const TutorialFeedback = () => {
   };
 
   return (
-    <PagesNavbar>
+    <PagesNavbar thisPage="Tutorial Feedback">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Tutorial Feedback
       </Typography>
