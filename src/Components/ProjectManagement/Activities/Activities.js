@@ -64,8 +64,12 @@ const Activities = (props) => {
 
   useEffect(() => {
     if (researchersChanges.length > 0) {
+      const tempResearchersChanges = [...researchersChanges];
+      setTimeout(() => {
+        setResearchersChanges([]);
+      }, 0);
       let resears = [...researchers];
-      for (let change of researchersChanges) {
+      for (let change of tempResearchersChanges) {
         if (change.type === "removed") {
           resears = resears.filter((resear) => resear.id !== change.doc.id);
         } else {
@@ -136,7 +140,6 @@ const Activities = (props) => {
           }
         }
       }
-      setResearchersChanges([]);
       resears.sort((a, b) => b.totalPoints - a.totalPoints);
       setResearchers(resears);
     }

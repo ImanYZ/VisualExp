@@ -507,10 +507,14 @@ const AddInstructor = (props) => {
 
   useEffect(() => {
     if (instructorsChanges.length > 0) {
+      const tempInstructorsChanges = [...instructorsChanges];
+      setTimeout(() => {
+        setInstructorsChanges([]);
+      }, 0);
       let insts = [...instructors];
       let oInsts = [...othersInstructors];
       let instToday = instructorsToday;
-      for (let change of instructorsChanges) {
+      for (let change of tempInstructorsChanges) {
         const instructorData = change.doc.data();
         if (instructorData.deleted || change.type === "removed") {
           if (instructorData.fullname === fullname) {
@@ -575,15 +579,18 @@ const AddInstructor = (props) => {
           }
         }
       }
-      setInstructorsChanges([]);
       setInstructorsToday(instToday <= 7 ? instToday : 7);
       setInstructors(insts);
       setOthersInstructors(oInsts);
     }
     if (votesChanges.length > 0) {
+      const tempVotesChanges = [...votesChanges];
+      setTimeout(() => {
+        setVotesChanges([]);
+      }, 0);
       let oInsts = [...othersInstructors];
       let nUpVotedToday = upvotedInstructorsToday;
-      for (let change of votesChanges) {
+      for (let change of tempVotesChanges) {
         const voteData = change.doc.data();
         let didVoteToday = isToday(voteData.createdAt.toDate());
         if ("updatedAt" in voteData) {
@@ -639,7 +646,6 @@ const AddInstructor = (props) => {
         }
       }
       assignDayUpVotesPoint(nUpVotedToday);
-      setVotesChanges([]);
       setUpvotedInstructorsToday(nUpVotedToday <= 16 ? nUpVotedToday : 16);
       setOthersInstructors(oInsts);
     }

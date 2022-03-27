@@ -89,8 +89,12 @@ const Communities = (props) => {
 
   useEffect(() => {
     if (usersChanges.length > 0) {
+      const tempUsersChanges = [...usersChanges];
+      setTimeout(() => {
+        setUsersChanges([]);
+      }, 0);
       let members = { ...users };
-      for (let change of usersChanges) {
+      for (let change of tempUsersChanges) {
         const userData = change.doc.data();
         if (change.type === "removed" || userData.deleted) {
           if (change.doc.id in members) {
@@ -104,7 +108,6 @@ const Communities = (props) => {
           };
         }
       }
-      setUsersChanges([]);
       setUsers(members);
       setUsersLoaded(true);
     }
@@ -128,9 +131,13 @@ const Communities = (props) => {
 
   useEffect(() => {
     if (reputationsChanges.length > 0) {
+      const tempReputationsChanges = [...reputationsChanges];
+      setTimeout(() => {
+        setReputationsChanges([]);
+      }, 0);
       let rpts = { ...reputations };
       const groups = [...communities];
-      for (let change of reputationsChanges) {
+      for (let change of tempReputationsChanges) {
         const reputationData = change.doc.data();
         const points =
           reputationData.dCorrects +
@@ -167,7 +174,6 @@ const Communities = (props) => {
       for (let communi of groups) {
         communi.allTime.sort((a, b) => b.points - a.points);
       }
-      setReputationsChanges([]);
       setReputations(rpts);
       setCommunities(groups);
       setReputationsLoaded(true);

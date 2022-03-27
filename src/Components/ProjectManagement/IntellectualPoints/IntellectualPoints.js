@@ -309,9 +309,13 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     if (activitiesChanges.length > 0) {
+      const tempActivitiesChanges = [...activitiesChanges];
+      setTimeout(() => {
+        setActivitiesChanges([]);
+      }, 0);
       let aActivities = [...allActivities];
       let oActivities = [...othersActivities];
-      for (let change of activitiesChanges) {
+      for (let change of tempActivitiesChanges) {
         if (change.type === "removed") {
           aActivities = aActivities.filter((acti) => acti.id !== change.doc.id);
           oActivities = oActivities.filter((acti) => acti.id !== change.doc.id);
@@ -365,15 +369,18 @@ const IntellectualPoints = (props) => {
           }
         }
       }
-      setActivitiesChanges([]);
       setOthersActivities(oActivities);
       setAllActivities(aActivities);
     }
     if (votesChanges.length > 0) {
+      const tempVotesChanges = [...votesChanges];
+      setTimeout(() => {
+        setVotesChanges([]);
+      }, 0);
       let oActivities = [...othersActivities];
       let dPoints = [...dailyPoints];
       let nUpVotedToday = upVotedToday;
-      for (let change of votesChanges) {
+      for (let change of tempVotesChanges) {
         const voteData = change.doc.data();
         let voteDate = voteData.createdAt.toDate();
         if ("updatedAt" in voteData) {
@@ -449,7 +456,6 @@ const IntellectualPoints = (props) => {
         }
       }
       assignDayUpVotesPoint(nUpVotedToday);
-      setVotesChanges([]);
       setUpVotedToday(nUpVotedToday <= 25 ? nUpVotedToday : 25);
       setOthersActivities(oActivities);
       setDailyPoints(dPoints);

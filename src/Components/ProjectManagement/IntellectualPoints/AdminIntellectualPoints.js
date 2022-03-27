@@ -39,10 +39,14 @@ const AdminIntellectualPoints = (props) => {
 
   useEffect(() => {
     if (allVotesChanges.length > 0) {
+      const tempAllVotesChanges = [...allVotesChanges];
+      setTimeout(() => {
+        setAllVotesChanges([]);
+      }, 0);
       let aVotes = { ...allVotes };
       let dVotes = [...dailyVotes];
       const allVoteDates = [];
-      for (let change of allVotesChanges) {
+      for (let change of tempAllVotesChanges) {
         const voteData = change.doc.data();
         let voteDate = voteData.createdAt.toDate();
         // ******************************************************
@@ -147,7 +151,6 @@ const AdminIntellectualPoints = (props) => {
           }
         }
       }
-      setAllVotesChanges([]);
       setAllVotes(aVotes);
       for (let dVote of dVotes) {
         for (let voteDate of allVoteDates) {

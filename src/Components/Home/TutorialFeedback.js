@@ -109,8 +109,12 @@ const TutorialFeedback = () => {
 
   useEffect(() => {
     if (explanationsChanges.length > 0) {
+      const tempExplanationsChanges = [...explanationsChanges];
+      setTimeout(() => {
+        setExplanationsChanges([]);
+      }, 0);
       let explans = [...explanations];
-      for (let change of explanationsChanges) {
+      for (let change of tempExplanationsChanges) {
         if (change.type === "removed") {
           explans = explans.filter((explan) => explan.id !== change.doc.id);
         } else {
@@ -162,7 +166,6 @@ const TutorialFeedback = () => {
           }
         }
       }
-      setExplanationsChanges([]);
       setExplanations(explans);
     }
   }, [explanations, explanationsChanges]);
@@ -186,9 +189,13 @@ const TutorialFeedback = () => {
 
   useEffect(() => {
     if (tutorialsChanges.length > 0) {
+      const tempTutorialsChanges = [...tutorialsChanges];
+      setTimeout(() => {
+        setTutorialsChanges([]);
+      }, 0);
       let tutos = [...tutorials];
       let tutosColumns = [...tutorialsColumns];
-      for (let change of tutorialsChanges) {
+      for (let change of tempTutorialsChanges) {
         if (change.type === "removed") {
           tutos = tutos.filter((tuto) => tuto.id !== change.doc.id);
         } else {
@@ -250,7 +257,6 @@ const TutorialFeedback = () => {
           tutos.push(newTuto);
         }
       }
-      setTutorialsChanges([]);
       setTutorials(tutos);
       setTutorialsColumns(tutosColumns);
       console.log({ tutosColumns, tutos });
