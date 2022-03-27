@@ -455,90 +455,85 @@ const CommunityApplications = (props) => {
     }
   };
 
-  const checkApplicant = useCallback(
-    (applicId, voteType) => async () => {
-      try {
-        if (!submitting) {
-          setSubmitting(true);
-          try {
-            let applics = [...applications];
-            const applicIdx = applics.findIndex((acti) => acti.id === applicId);
-            if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
-              const applicData = {};
-              if (voteType === "accepted") {
-                applicData[voteType] = applics[applicIdx][voteType] !== "✅";
-              } else if (voteType === "rejected") {
-                applicData[voteType] = applics[applicIdx][voteType] !== "🚫";
-              } else if (voteType === "invited") {
-                applicData[voteType] = applics[applicIdx][voteType] !== "✉️";
-              }
-              if (fullname !== "Iman YeckehZaare") {
-                applicData.leader = fullname;
-                applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
-                  new Date()
-                );
-              }
-              console.log({
-                applics,
-                applicIdx,
-                voteType,
-                mark: applics[applicIdx][voteType],
-                applicData,
-              });
-
-              applics[applicIdx] = {
-                ...applics[applicIdx],
-                [voteType]: "O",
-                leader: fullname,
-              };
-              setApplications(applics);
-
-              const applicRef = firebase.db
-                .collection("applications")
-                .doc(applics[applicIdx].id);
-              await applicRef.update(applicData);
-              // applics[applicIdx] = {
-              //   ...applics[applicIdx],
-              //   [voteType]: isChecked
-              //     ? "◻"
-              //     : voteType === "accepted"
-              //     ? "✅"
-              //     : voteType === "invited"
-              //     ? "✉️"
-              //     : "🚫",
-              //   checkedAt: new Date(),
-              // };
-              // setApplications(applics);
-              if (voteType === "accepted") {
-                setSnackbarMessage("You successfully accepted this applicant!");
-              } else if (voteType === "rejected") {
-                setSnackbarMessage("You successfully rejected this applicant!");
-              } else if (voteType === "invited") {
-                setSnackbarMessage(
-                  "You successfully invited this applicant to Microsoft Teams!"
-                );
-              }
+  const checkApplicant = (applicId, voteType) => async () => {
+    try {
+      if (!submitting) {
+        setSubmitting(true);
+        try {
+          let applics = [...applications];
+          const applicIdx = applics.findIndex((appli) => appli.id === applicId);
+          if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
+            const applicData = {};
+            if (voteType === "accepted") {
+              applicData[voteType] = applics[applicIdx][voteType] !== "✅";
+            } else if (voteType === "rejected") {
+              applicData[voteType] = applics[applicIdx][voteType] !== "🚫";
+            } else if (voteType === "invited") {
+              applicData[voteType] = applics[applicIdx][voteType] !== "✉️";
             }
-          } catch (err) {
-            console.error(err);
-          }
-          setSubmitting(false);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    },
-    [applications]
-  );
+            if (fullname !== "Iman YeckehZaare") {
+              applicData.leader = fullname;
+              applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
+                new Date()
+              );
+            }
+            console.log({
+              applics,
+              applicIdx,
+              voteType,
+              mark: applics[applicIdx][voteType],
+              applicData,
+            });
 
-  const checkApplication = useCallback(
-    (clickedCell) => {
-      if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
-        checkApplicant(clickedCell.id, clickedCell.field)();
+            applics[applicIdx] = {
+              ...applics[applicIdx],
+              [voteType]: "O",
+              leader: fullname,
+            };
+            setApplications(applics);
+            setApplicationsLoaded(false);
+
+            const applicRef = firebase.db
+              .collection("applications")
+              .doc(applics[applicIdx].id);
+            await applicRef.update(applicData);
+            // applics[applicIdx] = {
+            //   ...applics[applicIdx],
+            //   [voteType]: isChecked
+            //     ? "◻"
+            //     : voteType === "accepted"
+            //     ? "✅"
+            //     : voteType === "invited"
+            //     ? "✉️"
+            //     : "🚫",
+            //   checkedAt: new Date(),
+            // };
+            // setApplications(applics);
+            if (voteType === "accepted") {
+              setSnackbarMessage("You successfully accepted this applicant!");
+            } else if (voteType === "rejected") {
+              setSnackbarMessage("You successfully rejected this applicant!");
+            } else if (voteType === "invited") {
+              setSnackbarMessage(
+                "You successfully invited this applicant to Microsoft Teams!"
+              );
+            }
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        setSubmitting(false);
       }
-    },
-    [applications]
-  );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const checkApplication = (clickedCell) => {
+    if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
+      checkApplicant(clickedCell.id, clickedCell.field)();
+    }
+  };
 
   return (
     <PagesNavbar>
