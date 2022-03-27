@@ -23,7 +23,7 @@ import PagesNavbar from "./PagesNavbar";
 import SnackbarComp from "../SnackbarComp";
 import PDFView from "./modules/components/PDFView";
 
-const applicationsColumns = [
+const applicationsColms = [
   {
     field: "community",
     headerName: "Community",
@@ -49,193 +49,195 @@ const applicationsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
-  {
-    field: "readingImmediate",
-    headerName: "ReImScore",
-    type: "number",
-    width: 100,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Reading Comprehension Immediate Score"
-        />
-      );
-    },
-  },
-  {
-    field: "reading3Days",
-    headerName: "Re3DaysScore",
-    type: "number",
-    width: 100,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Reading Comprehension After Three Days Score"
-        />
-      );
-    },
-  },
-  {
-    field: "reading1Week",
-    headerName: "Re1WeekScore",
-    type: "number",
-    width: 100,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Reading Comprehension After One Week Score"
-        />
-      );
-    },
-  },
-  {
-    field: "tutorialWrongs",
-    headerName: "Tut-",
-    type: "number",
-    width: 10,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Tutorial Wrong Attemps"
-        />
-      );
-    },
-  },
-  {
-    field: "tutorialEnded",
-    headerName: "Completed Tutorial",
-    width: 40,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Completed Tutorial"
-          cellValues={{ ...cellValues, value: cellValues.value ? "✅" : "" }}
-        />
-      );
-    },
-  },
-  {
-    field: "quizWrongs",
-    headerName: "Quiz-",
-    type: "number",
-    width: 10,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Quiz Wrong Attemps"
-        />
-      );
-    },
-  },
-  {
-    field: "transcript",
-    headerName: "Transcript",
-    width: 100,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
-  },
-  {
-    field: "resume",
-    headerName: "Resume",
-    width: 100,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
-  },
-  {
-    field: "portfolio",
-    headerName: "Portfolio",
-    width: 100,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
-  },
-  {
-    field: "accepted",
-    headerName: "Accepted",
-    width: 40,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Accept"
-          cellValues={cellValues}
-        />
-      );
-    },
-  },
-  {
-    field: "rejected",
-    headerName: "Rejected",
-    width: 40,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Reject"
-          cellValues={cellValues}
-        />
-      );
-    },
-  },
-  {
-    field: "explanation",
-    headerName: "Explanation",
-    width: 280,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
-  {
-    field: "leader",
-    headerName: "Decision Made By",
-    width: 190,
-    disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip={"Decision made by " + cellValues.value}
-        />
-      );
-    },
-  },
-  {
-    field: "checkedAt",
-    headerName: "Decision Made On",
-    type: "dateTime",
-    width: 190,
-  },
+  // {
+  //   field: "readingImmediate",
+  //   headerName: "ReImScore",
+  //   type: "number",
+  //   width: 100,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip="Reading Comprehension Immediate Score"
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "reading3Days",
+  //   headerName: "Re3DaysScore",
+  //   type: "number",
+  //   width: 100,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip="Reading Comprehension After Three Days Score"
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "reading1Week",
+  //   headerName: "Re1WeekScore",
+  //   type: "number",
+  //   width: 100,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip="Reading Comprehension After One Week Score"
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "tutorialWrongs",
+  //   headerName: "Tut-",
+  //   type: "number",
+  //   width: 10,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip="Tutorial Wrong Attemps"
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "tutorialEnded",
+  //   headerName: "Completed Tutorial",
+  //   width: 40,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         actionCell={true}
+  //         Tooltip="Completed Tutorial"
+  //         cellValues={{ ...cellValues, value: cellValues.value ? "✅" : "" }}
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "quizWrongs",
+  //   headerName: "Quiz-",
+  //   type: "number",
+  //   width: 10,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip="Quiz Wrong Attemps"
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "transcript",
+  //   headerName: "Transcript",
+  //   width: 100,
+  //   renderCell: (cellValues) => {
+  //     return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+  //   },
+  // },
+  // {
+  //   field: "resume",
+  //   headerName: "Resume",
+  //   width: 100,
+  //   renderCell: (cellValues) => {
+  //     return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+  //   },
+  // },
+  // {
+  //   field: "portfolio",
+  //   headerName: "Portfolio",
+  //   width: 100,
+  //   renderCell: (cellValues) => {
+  //     return <GridCellToolTip isLink={true} cellValues={cellValues} />;
+  //   },
+  // },
+  // {
+  //   field: "accepted",
+  //   headerName: "Accepted",
+  //   width: 40,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         actionCell={true}
+  //         Tooltip="Accept"
+  //         cellValues={cellValues}
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "rejected",
+  //   headerName: "Rejected",
+  //   width: 40,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         actionCell={true}
+  //         Tooltip="Reject"
+  //         cellValues={cellValues}
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "explanation",
+  //   headerName: "Explanation",
+  //   width: 280,
+  //   renderCell: (cellValues) => {
+  //     return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+  //   },
+  // },
+  // {
+  //   field: "leader",
+  //   headerName: "Decision Made By",
+  //   width: 190,
+  //   disableColumnMenu: true,
+  //   renderCell: (cellValues) => {
+  //     return (
+  //       <GridCellToolTip
+  //         isLink={false}
+  //         cellValues={cellValues}
+  //         Tooltip={"Decision made by " + cellValues.value}
+  //       />
+  //     );
+  //   },
+  // },
+  // {
+  //   field: "checkedAt",
+  //   headerName: "Decision Made On",
+  //   type: "dateTime",
+  //   width: 190,
+  // },
 ];
 
 const CommunityApplications = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
+  const [applicationsColumns, setApplicationsColumns] =
+    useState(applicationsColms);
   const [applications, setApplications] = useState([]);
   const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
@@ -243,25 +245,38 @@ const CommunityApplications = (props) => {
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [checkedFullname, setCheckedFullname] = useState(false);
+  const [rowHeight, setRowHeight] = React.useState(40);
 
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
-      applicationsColumns.push({
-        field: "invited",
-        headerName: "Invited",
-        width: 10,
-        disableColumnMenu: true,
-        renderCell: (cellValues) => {
-          return (
-            <GridCellToolTip
-              isLink={false}
-              actionCell={true}
-              Tooltip="Invite"
-              cellValues={cellValues}
-            />
-          );
+      setApplicationsColumns([
+        ...applicationsColms,
+        {
+          field: "invited",
+          headerName: "Invited",
+          width: 10,
+          disableColumnMenu: true,
+          renderCell: (cellValues) => {
+            return (
+              <div
+                style={{
+                  fontSize: 19,
+                  fontWeight: "bold",
+                  cursor: cellValues.value === "O" ? "default" : "pointer",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+              >
+                {cellValues.value === "O" ? (
+                  <CircularProgress color="warning" size="16px" />
+                ) : (
+                  cellValues.value
+                )}
+              </div>
+            );
+          },
         },
-      });
+      ]);
     }
     setCheckedFullname(true);
   }, [fullname]);
@@ -424,12 +439,21 @@ const CommunityApplications = (props) => {
         applics,
       });
       setApplications(applics);
-      setApplicationsLoaded(true);
+      // We should explicitly signal React to update the dataGrid:
+      setTimeout(() => {
+        if (rowHeight === 40) {
+          setRowHeight(41);
+        } else {
+          setRowHeight(40);
+        }
+        setApplicationsLoaded(true);
+      }, 400);
     };
     if (firebase && applicationsChanges.length > 0) {
+      console.log("Loading again!");
       loadApplications();
     }
-  }, [firebase, applications, applicationsChanges]);
+  }, [firebase, applications, applicationsChanges, rowHeight]);
 
   useEffect(() => {
     let theApplicant;
@@ -491,8 +515,15 @@ const CommunityApplications = (props) => {
               leader: fullname,
             };
             setApplications(applics);
-            setApplicationsLoaded(false);
-
+            // We should explicitly signal React to update the dataGrid:
+            setTimeout(() => {
+              if (rowHeight === 40) {
+                setRowHeight(41);
+              } else {
+                setRowHeight(40);
+              }
+              // setApplicationsLoaded(false);
+            }, 400);
             const applicRef = firebase.db
               .collection("applications")
               .doc(applics[applicIdx].id);
@@ -529,12 +560,22 @@ const CommunityApplications = (props) => {
     }
   };
 
-  const checkApplication = (clickedCell) => {
-    if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
-      checkApplicant(clickedCell.id, clickedCell.field)();
-    }
-  };
+  const checkApplication = useCallback(
+    (clickedCell) => {
+      if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
+        checkApplicant(clickedCell.id, clickedCell.field)();
+      }
+    },
+    [applications]
+  );
 
+  if (applications.length > 0) {
+    console.log({
+      invited: applications[0].invited,
+      applicant: applications[0].applicant,
+      applicationsChanges,
+    });
+  }
   return (
     <PagesNavbar>
       <Typography variant="h3" gutterBottom marked="center" align="center">
@@ -628,9 +669,10 @@ const CommunityApplications = (props) => {
           loading={!applicationsLoaded}
           onCellClick={checkApplication}
           onRowClick={applicationsRowClick}
+          rowHeight={rowHeight}
         />
       )}
-      {Object.keys(application).length > 0 && (
+      {/* {Object.keys(application).length > 0 && (
         <Paper>
           <h3>You've not evaluated or clicked this application:</h3>
           <p>
@@ -727,7 +769,7 @@ const CommunityApplications = (props) => {
             </Tooltip>
           </div>
         </Paper>
-      )}
+      )} */}
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}
