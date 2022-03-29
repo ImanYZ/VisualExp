@@ -66,3 +66,8 @@ export const colorModeState = atom({
   key: "colorModeState",
   default: "light",
 });
+
+export const fromIranState = atom({
+  key: "fromIranState",
+  default: false,
+});

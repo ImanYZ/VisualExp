@@ -53,6 +53,13 @@ const AppRouter = (props) => {
 
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedFirstSession, setStartedFirstSession] = useState(false);
+  const [fromIran, setfromIran] = useState(false);
+
+  useEffect(() => {
+    if (new Date().getTimezoneOffset() == -270) {
+      setfromIran(true);
+    }
+  }, []);
 
   useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {

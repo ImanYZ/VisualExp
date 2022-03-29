@@ -63,9 +63,7 @@ const ExperimentPoints = (props) => {
   useEffect(() => {
     if (expSessionsChanges.length > 0) {
       const tempExpSessionsChanges = [...expSessionsChanges];
-      setTimeout(() => {
-        setExpSessionsChanges([]);
-      }, 0);
+      setExpSessionsChanges([]);
       let eSessions = [...expSessions];
       let dPoints = [...dailyPoints];
       for (let change of tempExpSessionsChanges) {

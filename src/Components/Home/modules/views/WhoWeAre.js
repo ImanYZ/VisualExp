@@ -247,7 +247,11 @@ const WhoWeAre = (props) => {
                   }
                 />
               </ListItemButton>
-              <ListItem>
+              <ListItemButton
+                component="a"
+                target="_blank"
+                href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907"
+              >
                 {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <VerifiedIcon />
@@ -268,7 +272,7 @@ const WhoWeAre = (props) => {
                     </Typography>
                   }
                 />
-              </ListItem>
+              </ListItemButton>
             </List>
           </Paper>
         </Grid>

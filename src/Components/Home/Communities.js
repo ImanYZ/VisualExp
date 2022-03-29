@@ -90,9 +90,7 @@ const Communities = (props) => {
   useEffect(() => {
     if (usersChanges.length > 0) {
       const tempUsersChanges = [...usersChanges];
-      setTimeout(() => {
-        setUsersChanges([]);
-      }, 0);
+      setUsersChanges([]);
       let members = { ...users };
       for (let change of tempUsersChanges) {
         const userData = change.doc.data();
@@ -132,9 +130,7 @@ const Communities = (props) => {
   useEffect(() => {
     if (reputationsChanges.length > 0) {
       const tempReputationsChanges = [...reputationsChanges];
-      setTimeout(() => {
-        setReputationsChanges([]);
-      }, 0);
+      setReputationsChanges([]);
       let rpts = { ...reputations };
       const groups = [...communities];
       for (let change of tempReputationsChanges) {

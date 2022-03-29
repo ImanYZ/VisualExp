@@ -324,9 +324,7 @@ const CommunityApplications = (props) => {
   useEffect(() => {
     const loadApplications = async () => {
       const tempApplicationsChanges = [...applicationsChanges];
-      setTimeout(() => {
-        setApplicationsChanges([]);
-      }, 0);
+      setApplicationsChanges([]);
       let applics = [...applications];
       for (let change of tempApplicationsChanges) {
         if (change.type === "removed") {

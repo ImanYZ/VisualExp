@@ -200,12 +200,10 @@ const RouterNav = (props) => {
   useEffect(() => {
     if (!notAResearcher && notTakenSessionsChanges.length > 0) {
       const tempNotTakenSessionsChanges = [...notTakenSessionsChanges];
-      setTimeout(() => {
-        setNotTakenSessionsChanges([]);
-      }, 0);
+      setNotTakenSessionsChanges([]);
       let nTSessions = [...notTakenSessions];
       let nTSessionsNum = notTakenSessionsNum;
-      for (let change of notTakenSessionsChanges) {
+      for (let change of tempNotTakenSessionsChanges) {
         if (change.type === "removed") {
           nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
           nTSessionsNum -= 1;
@@ -255,10 +253,10 @@ const RouterNav = (props) => {
         }
       });
     }
-  }, [firebaseOne, notAResearcher]);
+  }, [firebaseOne, notAResearcher, email]);
 
   useEffect(() => {
-    if (firebaseOne && !notAResearcher) {
+    if (firebaseOne && !notAResearcher && username) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -293,7 +291,7 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOne, notAResearcher]);
+  }, [firebaseOne, notAResearcher, username]);
 
   useEffect(() => {
     if (
@@ -303,9 +301,7 @@ const RouterNav = (props) => {
       proposalsLoaded
     ) {
       const tempProposalsChanges = [...proposalsChanges];
-      setTimeout(() => {
-        setProposalsChanges([]);
-      }, 0);
+      setProposalsChanges([]);
       let propos = { ...proposals };
       let oPropos = { ...othersProposals };
       let netVotes = oneCademyPoints;
@@ -407,9 +403,7 @@ const RouterNav = (props) => {
       userVersionsLoaded
     ) {
       const tempUserVersionsChanges = [...userVersionsChanges];
-      setTimeout(() => {
-        setUserVersionsChanges([]);
-      }, 0);
+      setUserVersionsChanges([]);
       let uVersions = { ...userVersions };
       let upVotes = { ...oneCademyUpvotes };
       for (let change of tempUserVersionsChanges) {
@@ -480,9 +474,7 @@ const RouterNav = (props) => {
   useEffect(() => {
     if (!notAResearcher && nodesChanges.length > 0) {
       const tempNodesChanges = [...nodesChanges];
-      setTimeout(() => {
-        setNodesChanges([]);
-      }, 0);
+      setNodesChanges([]);
       let nds = [...nodes];
       for (let change of tempNodesChanges) {
         const nodeData = change.doc.data();
@@ -530,9 +522,7 @@ const RouterNav = (props) => {
   useEffect(() => {
     if (!notAResearcher && userNodesChanges.length > 0) {
       const tempUserNodesChanges = [...userNodesChanges];
-      setTimeout(() => {
-        setUserNodesChanges([]);
-      }, 0);
+      setUserNodesChanges([]);
       let uNodes = { ...userNodes };
       let upVotes = { ...oneCademyUpvotes };
       for (let change of tempUserNodesChanges) {
@@ -612,7 +602,13 @@ const RouterNav = (props) => {
         },
       });
     };
-    if (!notAResearcher) {
+    if (
+      firebase &&
+      fullname &&
+      project &&
+      !notAResearcher &&
+      Object.keys(oneCademyUpvotes).length > 0
+    ) {
       setProposalsVotes();
     }
   }, [

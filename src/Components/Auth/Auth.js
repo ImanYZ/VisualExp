@@ -9,6 +9,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import Alert from "@mui/material/Alert";
 
 import {
   firebaseState,
@@ -529,6 +530,11 @@ const Auth = (props) => {
             account or signing into this website, you sign the consent form and
             allow us to analyze this experiment session data.
           </p>
+          <Alert severity="error">
+            Please only use your Gmail address to create an account. You can
+            also use your school email address, only if your school email is
+            provided by Google.
+          </Alert>
           <Box sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs

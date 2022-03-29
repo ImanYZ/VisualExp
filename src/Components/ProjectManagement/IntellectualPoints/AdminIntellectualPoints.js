@@ -40,9 +40,7 @@ const AdminIntellectualPoints = (props) => {
   useEffect(() => {
     if (allVotesChanges.length > 0) {
       const tempAllVotesChanges = [...allVotesChanges];
-      setTimeout(() => {
-        setAllVotesChanges([]);
-      }, 0);
+      setAllVotesChanges([]);
       let aVotes = { ...allVotes };
       let dVotes = [...dailyVotes];
       const allVoteDates = [];

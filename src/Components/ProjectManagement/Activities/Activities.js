@@ -65,9 +65,7 @@ const Activities = (props) => {
   useEffect(() => {
     if (researchersChanges.length > 0) {
       const tempResearchersChanges = [...researchersChanges];
-      setTimeout(() => {
-        setResearchersChanges([]);
-      }, 0);
+      setResearchersChanges([]);
       let resears = [...researchers];
       for (let change of tempResearchersChanges) {
         if (change.type === "removed") {

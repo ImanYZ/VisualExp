@@ -508,9 +508,7 @@ const AddInstructor = (props) => {
   useEffect(() => {
     if (instructorsChanges.length > 0) {
       const tempInstructorsChanges = [...instructorsChanges];
-      setTimeout(() => {
-        setInstructorsChanges([]);
-      }, 0);
+      setInstructorsChanges([]);
       let insts = [...instructors];
       let oInsts = [...othersInstructors];
       let instToday = instructorsToday;
@@ -585,9 +583,7 @@ const AddInstructor = (props) => {
     }
     if (votesChanges.length > 0) {
       const tempVotesChanges = [...votesChanges];
-      setTimeout(() => {
-        setVotesChanges([]);
-      }, 0);
+      setVotesChanges([]);
       let oInsts = [...othersInstructors];
       let nUpVotedToday = upvotedInstructorsToday;
       for (let change of tempVotesChanges) {

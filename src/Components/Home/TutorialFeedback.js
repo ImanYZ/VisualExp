@@ -110,9 +110,7 @@ const TutorialFeedback = () => {
   useEffect(() => {
     if (explanationsChanges.length > 0) {
       const tempExplanationsChanges = [...explanationsChanges];
-      setTimeout(() => {
-        setExplanationsChanges([]);
-      }, 0);
+      setExplanationsChanges([]);
       let explans = [...explanations];
       for (let change of tempExplanationsChanges) {
         if (change.type === "removed") {
@@ -190,9 +188,7 @@ const TutorialFeedback = () => {
   useEffect(() => {
     if (tutorialsChanges.length > 0) {
       const tempTutorialsChanges = [...tutorialsChanges];
-      setTimeout(() => {
-        setTutorialsChanges([]);
-      }, 0);
+      setTutorialsChanges([]);
       let tutos = [...tutorials];
       let tutosColumns = [...tutorialsColumns];
       for (let change of tempTutorialsChanges) {

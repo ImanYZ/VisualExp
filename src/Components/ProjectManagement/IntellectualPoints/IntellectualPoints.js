@@ -310,9 +310,7 @@ const IntellectualPoints = (props) => {
   useEffect(() => {
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];
-      setTimeout(() => {
-        setActivitiesChanges([]);
-      }, 0);
+      setActivitiesChanges([]);
       let aActivities = [...allActivities];
       let oActivities = [...othersActivities];
       for (let change of tempActivitiesChanges) {
@@ -374,9 +372,7 @@ const IntellectualPoints = (props) => {
     }
     if (votesChanges.length > 0) {
       const tempVotesChanges = [...votesChanges];
-      setTimeout(() => {
-        setVotesChanges([]);
-      }, 0);
+      setVotesChanges([]);
       let oActivities = [...othersActivities];
       let dPoints = [...dailyPoints];
       let nUpVotedToday = upVotedToday;
