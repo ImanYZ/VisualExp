@@ -20,6 +20,7 @@ const {
   voteInstructorEndpoint,
   voteInstructorReset,
   assignExperimentSessionsPoints,
+  remindCalendarInvitations,
   updateNotTakenSessions,
 } = require("./projectManagement");
 const {
@@ -92,6 +93,10 @@ exports.updateNotTakenSessionsScheduler = functions.pubsub
 exports.assignExperimentSessionsPointsScheduler = functions.pubsub
   .schedule("every 4 hours")
   .onRun(assignExperimentSessionsPoints);
+
+exports.remindCalendarInvitationsScheduler = functions.pubsub
+  .schedule("every 4 hours")
+  .onRun(remindCalendarInvitations);
 
 exports.applicationReminder = functions.pubsub
   .schedule("every 25 hours")

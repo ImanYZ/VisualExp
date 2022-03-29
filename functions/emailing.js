@@ -205,55 +205,39 @@ ${
   }
 };
 
-exports.sendEventNotificationEmail = async (req, res) => {
+exports.eventNotificationEmail = async (
+  email,
+  firstname,
+  from1Cademy,
+  courseName,
+  hoursLeft,
+  weAreWaiting,
+  hangoutLink,
+  order,
+  httpReq
+) => {
   try {
-    if ("email" in req.body && "firstname" in req.body) {
-      const email = req.body.email;
-      const firstname = req.body.firstname;
-      let from1Cademy = false;
-      if ("from1Cademy" in req.body) {
-        from1Cademy = req.body.from1Cademy;
-      }
-      let order = "1st";
-      if ("order" in req.body) {
-        order = req.body.order;
-      }
-      let courseName = "";
-      if ("courseName" in req.body) {
-        courseName = req.body.courseName;
-      }
-      let weAreWaiting = false;
-      if ("weAreWaiting" in req.body) {
-        weAreWaiting = req.body.weAreWaiting;
-      }
-      let hangoutLink = "";
-      if ("hangoutLink" in req.body) {
-        hangoutLink = req.body.hangoutLink;
-      }
-      let hoursLeft = 0;
-      if ("hoursLeft" in req.body) {
-        hoursLeft = Math.floor(req.body.hoursLeft);
-        if (hoursLeft < 1) {
-          hoursLeft = "less than an hour";
-        } else if (hoursLeft === 1) {
-          hoursLeft = "an hour";
-        } else {
-          hoursLeft = hoursLeft + "  hours";
-        }
-      }
-      const mailOptions = {
-        from: "onecademy@umich.edu",
-        to: email,
-        subject:
-          "[1Cademy] " +
-          // (courseName ? "[" + courseName + "] " : "") +
-          (weAreWaiting
-            ? "We Are Waiting for You in the UX Research Experiment Session!"
-            : "Your UX Research Experiment Session Will Begin in " +
-              hoursLeft +
-              "!"),
-        html:
-          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+    hoursLeft = Math.floor(hoursLeft);
+    if (hoursLeft < 1) {
+      hoursLeft = "less than an hour";
+    } else if (hoursLeft === 1) {
+      hoursLeft = "an hour";
+    } else {
+      hoursLeft = hoursLeft + " hours";
+    }
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject:
+        "[1Cademy] " +
+        // (courseName ? "[" + courseName + "] " : "") +
+        (weAreWaiting
+          ? "We Are Waiting for You in the UX Research Experiment Session!"
+          : "Your UX Research Experiment Session Will Begin in " +
+            hoursLeft +
+            "!"),
+      html:
+        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
   weAreWaiting
@@ -276,40 +260,30 @@ ${
 <p></p>
 <p>Best regards,</p>
 ` + signatureHTML,
-      };
-      return transporter.sendMail(mailOptions, (error, data) => {
-        if (error) {
-          console.log({ error });
+    };
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        console.log({ error });
+        if (httpReq) {
           return res.status(500).json({ error });
         }
+      }
+      if (httpReq) {
         return res.status(200).json({ done: true });
-      });
-    }
+      }
+    });
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
+    if (httpReq) {
+      return res.status(500).json({ err });
+    }
   }
 };
 
-exports.rescheduleEventNotificationEmail = async (req, res) => {
+exports.sendEventNotificationEmail = (req, res) => {
   try {
     if ("email" in req.body && "firstname" in req.body) {
       const email = req.body.email;
-      const scheduleDocs = await db
-        .collection("schedule")
-        .where("email", "==", email)
-        .get();
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        if (scheduleData.id) {
-          await deleteEvent(scheduleData.id);
-          const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
-          await scheduleRef.update({
-            id: admin.firestore.FieldValue.delete(),
-            order: admin.firestore.FieldValue.delete(),
-          });
-        }
-      }
       const firstname = req.body.firstname;
       let from1Cademy = false;
       if ("from1Cademy" in req.body) {
@@ -321,26 +295,81 @@ exports.rescheduleEventNotificationEmail = async (req, res) => {
       }
       let hoursLeft = 0;
       if ("hoursLeft" in req.body) {
-        hoursLeft = Math.floor(req.body.hoursLeft);
-        if (hoursLeft < 1) {
-          hoursLeft = "less than an hour";
-        } else if (hoursLeft === 1) {
-          hoursLeft = "an hour";
-        } else {
-          hoursLeft = hoursLeft + " hours";
-        }
+        hoursLeft = req.body.hoursLeft;
       }
-      const mailOptions = {
-        from: "onecademy@umich.edu",
-        to: email,
-        subject:
-          "[1Cademy] " +
-          // (courseName ? "[" + courseName + "] " : "") +
-          ("You declined our invitation to the UX Research Experiment Session that will begin in " +
-            hoursLeft +
-            "!"),
-        html:
-          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+      let weAreWaiting = false;
+      if ("weAreWaiting" in req.body) {
+        weAreWaiting = req.body.weAreWaiting;
+      }
+      let hangoutLink = "";
+      if ("hangoutLink" in req.body) {
+        hangoutLink = req.body.hangoutLink;
+      }
+      let order = "1st";
+      if ("order" in req.body) {
+        order = req.body.order;
+      }
+      eventNotificationEmail(
+        email,
+        firstname,
+        from1Cademy,
+        courseName,
+        hoursLeft,
+        weAreWaiting,
+        hangoutLink,
+        order,
+        true
+      );
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.reschEventNotificationEmail = async (
+  email,
+  firstname,
+  from1Cademy,
+  courseName,
+  hoursLeft,
+  httpReq
+) => {
+  try {
+    hoursLeft = Math.floor(hoursLeft);
+    if (hoursLeft < 1) {
+      hoursLeft = "less than an hour";
+    } else if (hoursLeft === 1) {
+      hoursLeft = "an hour";
+    } else {
+      hoursLeft = hoursLeft + " hours";
+    }
+    const scheduleDocs = await db
+      .collection("schedule")
+      .where("email", "==", email)
+      .get();
+    for (let scheduleDoc of scheduleDocs.docs) {
+      const scheduleData = scheduleDoc.data();
+      if (scheduleData.id) {
+        await deleteEvent(scheduleData.id);
+        const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
+        await scheduleRef.update({
+          id: admin.firestore.FieldValue.delete(),
+          order: admin.firestore.FieldValue.delete(),
+        });
+      }
+    }
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject:
+        "[1Cademy] " +
+        // (courseName ? "[" + courseName + "] " : "") +
+        ("You declined our invitation to the UX Research Experiment Session that will begin in " +
+          hoursLeft +
+          "!"),
+      html:
+        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
   "<p>You declined our invitation to the UX Research Experiment Session that will begin in " +
@@ -353,14 +382,51 @@ ${
 <p></p>
 <p>Best regards,</p>
 ` + signatureHTML,
-      };
-      return transporter.sendMail(mailOptions, (error, data) => {
-        if (error) {
-          console.log({ error });
+    };
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        console.log({ error });
+        if (httpReq) {
           return res.status(500).json({ error });
         }
+      }
+      if (httpReq) {
         return res.status(200).json({ done: true });
-      });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+    if (httpReq) {
+      return res.status(500).json({ err });
+    }
+  }
+};
+
+exports.rescheduleEventNotificationEmail = (req, res) => {
+  try {
+    if ("email" in req.body && "firstname" in req.body) {
+      const email = req.body.email;
+      const firstname = req.body.firstname;
+      let from1Cademy = false;
+      if ("from1Cademy" in req.body) {
+        from1Cademy = req.body.from1Cademy;
+      }
+      let courseName = "";
+      if ("courseName" in req.body) {
+        courseName = req.body.courseName;
+      }
+      let hoursLeft = 0;
+      if ("hoursLeft" in req.body) {
+        hoursLeft = req.body.hoursLeft;
+      }
+      reschEventNotificationEmail(
+        email,
+        firstname,
+        from1Cademy,
+        courseName,
+        hoursLeft,
+        true
+      );
     }
   } catch (err) {
     console.log({ err });

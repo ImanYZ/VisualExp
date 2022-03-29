@@ -16,6 +16,10 @@ const {
   getIn30Minutes,
   getDateString,
 } = require("./utils");
+const {
+  reschEventNotificationEmail,
+  eventNotificationEmail,
+} = require("./emailing");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -1084,6 +1088,85 @@ exports.assignExperimentSessionsPoints = async (context) => {
       }
     }
     return null;
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
+
+exports.remindCalendarInvitations = async (context) => {
+  try {
+    const scheduleDocs = await db.collection("schedule").orderBy("id").get();
+    const schedule = [];
+    for (let scheduleDoc of scheduleDocs.docs) {
+      schedule.push(scheduleDoc.data());
+    }
+    let waitTime = 0;
+    const allEvents = await futureEvents(40);
+    const evs = [];
+    const currentTime = new Date().getTime();
+    // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+    for (let ev of allEvents) {
+      const startTime = new Date(ev.start.dateTime).getTime();
+      const endTime = new Date(ev.end.dateTime).getTime();
+      const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
+      const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
+      let participant, order, firstname, courseName;
+      if (scheduleIdx !== -1) {
+        participant = schedule[scheduleIdx].email.toLowerCase();
+        order = schedule[scheduleIdx].order;
+      }
+      if ("attendees" in ev) {
+        for (let attendee of ev.attendees) {
+          if (attendee.email.toLowerCase() === participant) {
+            const userDocs = await db
+              .collection("users")
+              .where("email", "==", attendee.email.toLowerCase())
+              .get();
+            if (userDocs.docs.length > 0) {
+              const userData = userDocs.docs[0].data();
+              firstname = userData.firstname;
+              if (userData.course) {
+                courseName = userData.course;
+              }
+            }
+          }
+          if (attendee.responseStatus !== "accepted") {
+            if (
+              attendee.responseStatus === "declined" ||
+              attendee.responseStatus === "tentative"
+            ) {
+              setTimeout(() => {
+                reschEventNotificationEmail(
+                  participant,
+                  firstname,
+                  false,
+                  "",
+                  hoursLeft,
+                  false
+                );
+              }, waitTime);
+              waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+            } else if (hoursLeft > 0 && hoursLeft <= 19) {
+              setTimeout(() => {
+                eventNotificationEmail(
+                  participant,
+                  firstname,
+                  false,
+                  "",
+                  hoursLeft,
+                  false,
+                  "",
+                  order,
+                  false
+                );
+              }, waitTime);
+              waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+            }
+          }
+        }
+      }
+    }
   } catch (err) {
     console.log({ err });
     return null;
