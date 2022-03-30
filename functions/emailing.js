@@ -249,7 +249,7 @@ ${
       (["2nd", "3rd"].includes(order)
         ? " However, it does need to be today; otherwise, we must exclude your data from this study and terminate your application."
         : "")
-    : "<p>Your UX research experiment session will begin in " +
+    : "<p>This is an auto-generated email to inform you that your UX research experiment session will begin in " +
       hoursLeft +
       "," +
       " but you've not accepted our invitation on Google Calendar yet!</p>" +
