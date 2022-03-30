@@ -205,7 +205,7 @@ ${
   }
 };
 
-exports.eventNotificationEmail = async (
+const eventNotificationEmail = async (
   email,
   firstname,
   from1Cademy,
@@ -279,6 +279,7 @@ ${
     }
   }
 };
+exports.eventNotificationEmail = eventNotificationEmail;
 
 exports.sendEventNotificationEmail = (req, res) => {
   try {
@@ -327,7 +328,7 @@ exports.sendEventNotificationEmail = (req, res) => {
   }
 };
 
-exports.reschEventNotificationEmail = async (
+const reschEventNotificationEmail = async (
   email,
   firstname,
   from1Cademy,
@@ -401,6 +402,7 @@ ${
     }
   }
 };
+exports.reschEventNotificationEmail = reschEventNotificationEmail;
 
 exports.rescheduleEventNotificationEmail = (req, res) => {
   try {

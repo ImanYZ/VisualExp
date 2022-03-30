@@ -1133,8 +1133,9 @@ exports.remindCalendarInvitations = async (context) => {
           }
           if (attendee.responseStatus !== "accepted") {
             if (
-              attendee.responseStatus === "declined" ||
-              attendee.responseStatus === "tentative"
+              (attendee.responseStatus === "declined" ||
+                attendee.responseStatus === "tentative") &&
+              order === "1st"
             ) {
               setTimeout(() => {
                 reschEventNotificationEmail(
