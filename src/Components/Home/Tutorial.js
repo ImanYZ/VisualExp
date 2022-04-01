@@ -472,18 +472,21 @@ const Tutorial = (props) => {
             <Alert severity="success">
               <Box>
                 <p>
-                  Welcome to the third step in the application process! Before
-                  moving forward, please create an account on{" "}
-                  <a href="https://1cademy.com/" target="_blank">
-                    1Cademy web app
-                  </a>
-                  , which is different from the account you created before on
-                  this web app. After creating your account, please go through
-                  this tutorial to learn more about 1Cademy and how it works.
-                  This tutorial takes on average an hour and a half. Make sure
-                  to have 1Cademy open in another tab on your browser, so you
-                  can practice on the platform and complete tasks as you go
-                  through this tutorial.
+                  Welcome to the third step in the application process!{" "}
+                  <strong>
+                    Before moving forward, please create an account on{" "}
+                    <a href="https://1cademy.com/" target="_blank">
+                      1Cademy web app
+                    </a>
+                    , which is different from the account you created before on
+                    this web app.
+                  </strong>{" "}
+                  After creating your account, please go through this tutorial
+                  to learn more about 1Cademy and how it works. This tutorial
+                  takes on average an hour and a half. Make sure to have 1Cademy
+                  open in another tab on your browser, so you can practice on
+                  the platform and complete tasks as you go through this
+                  tutorial.
                 </p>
                 <p>
                   <strong>Note</strong>: You will find all the answers you need

@@ -183,7 +183,10 @@ export default {
       What_kind_of_content_can_be_contained_in_a_node: {
         stem: (
           <div>
-            <p>{quNum()}What kind of content can be contained in a node?</p>
+            <p>
+              {quNum()}What kind of content can be contained in a{" "}
+              <strong>single</strong> node?
+            </p>
             <p>
               <strong>Note:</strong> "Idea" nodes do not require citations.
             </p>
@@ -949,7 +952,7 @@ export default {
         choices: {
           a: "Concept node because it is going over a single topic",
           b: "Relation node because it is comparing/discussing two topics",
-          c: "Concept node because it is not a bulleted list",
+          c: "Concept node because it is defining multiple topics",
           d: "Relation node because it has two parents",
         },
       },
@@ -964,7 +967,7 @@ export default {
         choices: {
           a: "Concept node because it is going over a single topic",
           b: "Relation node because it is comparing/discussing two topics",
-          c: "Concept node because it is not a bulleted list",
+          c: "Concept node because it is defining multiple topics",
           d: "Relation node because it has two parents",
         },
       },
@@ -1244,7 +1247,9 @@ export default {
     video: "76MSksNQYN0",
     questions: {
       What_do_you_think_the_phrase_prerequisite_relation_means: {
-        stem: quNum() + 'What does the phrase "prerequisite link" mean?',
+        stem:
+          quNum() +
+          'What does the phrase "prerequisite link" mean? (Please select all that apply.)',
         answers: ["b", "e"],
         choices: {
           a: "A relation of parallel concepts in different disciplines",
@@ -1323,7 +1328,7 @@ export default {
         answers: ["a"],
         choices: {
           a: "When it contains direct (immediate) prerequisite information to the information you would like to add",
-          b: "When it contains information a user needs to know to understand the information you would like to add",
+          b: "When it contains any sort of information a user needs to know to understand the information you would like to add",
           c: "When it contains unrelated information",
         },
       },
@@ -1467,10 +1472,10 @@ export default {
           answers: ["a", "c", "d"],
           choices: {
             a: "0 downvotes; 2 upvotes",
-            b: "3 downvotes; 6 upvotes",
+            b: "3 downvotes; 7 upvotes",
             c: "8 downvotes; 9 upvotes",
             d: "0 downvotes; 0 upvotes",
-            e: "0 downvotes; 3 upvotes",
+            e: "0 downvotes; 10 upvotes",
           },
         },
       Which_of_the_following_combinations_of_upvotes_and_downvotes_will_result_in_2_net_votes:
@@ -1536,7 +1541,8 @@ export default {
       },
       What_happens_to_a_node_with_more_downvotes_than_upvotes: {
         stem:
-          quNum() + "What happens to a node with more downvotes than upvotes?",
+          quNum() +
+          "What happens to a node with more downvotes than upvotes? HINT: A node is different from a proposal.",
         answers: ["a"],
         choices: {
           a: "It gets deleted from the whole knowledge graph.",

@@ -254,8 +254,8 @@ const TutorialFeedback = () => {
         }
       }
       setTutorials(tutos);
+      tutosColumns.sort((a, b) => a.field < b.field);
       setTutorialsColumns(tutosColumns);
-      console.log({ tutosColumns, tutos });
       setTimeout(() => {
         setTutorialsLoaded(true);
       }, 400);
