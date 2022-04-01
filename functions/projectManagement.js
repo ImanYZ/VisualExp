@@ -1116,7 +1116,7 @@ exports.remindCalendarInvitations = async (context) => {
         participant = schedule[scheduleIdx].email.toLowerCase();
         order = schedule[scheduleIdx].order;
       }
-      if ("attendees" in ev) {
+      if ("attendees" in ev && Array.isArray(ev.attendees)) {
         for (let attendee of ev.attendees) {
           if (attendee.email.toLowerCase() === participant) {
             const userDocs = await db
