@@ -700,6 +700,8 @@ exports.applicationReminder = async (context) => {
       const userData = userDoc.data();
       if (
         (!("withdrew" in userData) || !userData.withdrew) &&
+        (!("applicationSubmitted" in userData) ||
+          !userData.applicationSubmitted) &&
         (!("reminder" in userData) ||
           userData.reminder.toDate() <= new Date()) &&
         "createdAt" in userData &&
