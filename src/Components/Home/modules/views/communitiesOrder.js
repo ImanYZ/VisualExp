@@ -1,4 +1,177 @@
+import React from "react";
+
 export default [
+  {
+    id: "Cognitive_Psychology",
+    tags: [
+      {
+        title: "Cognitive Psychology",
+        node: "jTz0wx46dQsbPURkQ0cl",
+      },
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Cognitive_Psychology.jpeg",
+    title: "Cognitive Psychology of Learning",
+    width: "55%",
+    leaders: [
+      {
+        name: "Iman YeckehZaare",
+        image: "Iman_YeckehZaare.jpg",
+        about: `I am a Ph.D. Candidate at the University of Michigan School of Information.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/oneweb/",
+          },
+        ],
+      },
+    ],
+    YouTube: "tmW31AEJRYg",
+    description: `We study the cognitive psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    accomplishments: (
+      <div>
+        <p>
+          We have recently published the following papers in ACM conferences:
+        </p>
+        <ul>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907"
+              target="_blank"
+            >
+              YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P.
+              (2022). Semester-level Spacing but Not Procrastination Affected
+              Student Exam Performance. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 12th International Conference on Learning
+                Analytics and Knowledge (LAK&#8216;22) online, March 21-25,
+                2022. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408"
+              target="_blank"
+            >
+              YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
+              Retrieval-based Teaching Incentivizes Spacing and Improves Grades
+              in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer
+                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
+                Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313"
+              target="_blank"
+            >
+              YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K., &amp; Fox,
+              E. (2022). Another Victim of COVID-19: Computer Science Education.
+              In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer
+                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
+                Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760"
+              target="_blank"
+            >
+              YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak, C., Kwon,
+              K., ... &amp; Silverstein, N. (2021, August). Incentivized Spacing
+              and Gender in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 17th ACM Conference on International
+                Computing Education Research
+              </span>{" "}
+              (pp. 18-28).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882"
+              target="_blank"
+            >
+              Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020, April).
+              QMaps: Engaging Students in Voluntary Question Generation and
+              Linking. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2020 CHI Conference on Human Factors in
+                Computing Systems
+              </span>{" "}
+              (pp. 1-14).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411"
+              target="_blank"
+            >
+              YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019, July). A
+              spaced, interleaved retrieval practice tool that is motivating and
+              effective. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2019 ACM Conference on International
+                Computing Education Research
+              </span>{" "}
+              (pp. 71-79).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417"
+              target="_blank"
+            >
+              YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed and
+              Studying: Gendered Pathways to Success. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 50th ACM Technical Symposium on Computer
+                Science Education
+              </span>{" "}
+              (pp. 693-698).
+            </a>
+          </li>
+        </ul>
+      </div>
+    ),
+    gains: [
+      `Work remotely with an interdisciplinary community of talented students and researchers from different schools in the US.`,
+      `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
+      `Get involved in all aspects of conducting an online controlled experiment under the supervision of Iman YeckehZaare.`,
+      `Learn about a mixed-method study including both qualitative and quantitative data, and analysis to prepare for future Ph.D. programs in related disciplines.`,
+      `Work towards publishing research on cognitive psychology of learning and memory in reputable venues.`,
+      `Have opportunities to take on leadership roles within the community.`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+    // coursera: "https://www.coursera.org/learn/academicinfoseek",
+    hasTest: true,
+    qualifications: [
+      `Academic background and knowledge in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
+      `A minimum of a 3.5/4.0 GPA`,
+      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+      `Experience and willingness to remotely work in a collaborative environment`,
+    ],
+    responsibilities: [
+      `Dedicate 25 hours a week over the Summer break to engage in all aspects of the research project.`,
+      `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
+      `Conduct several experiment sessions and supervise participants through the session.`,
+      `Thematically code the qualitative data collected throughout our experiments.`,
+      `Be enthusiastic to engage in critical thinking to collaborate and publish research on the topics currently being explored in the community.`,
+      `Be excited to engage in the peer-review process on research proposed by other community members.`,
+      `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
+      `Must be prepared to adapt your schedule with the research team and the conference/journal deadlines.`,
+      `Present the essence of what you learn in weekly meetings for further discussion.`,
+      `Co-author the final research paper to submit to reputable conferences/journals.`,
+    ],
+  },
   {
     id: "Educational_Organizational_Psychology",
     tags: [
@@ -90,7 +263,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
-    width: "25%",
+    width: "28%",
     leaders: [
       {
         name: "Victoria Mulligan",
@@ -145,7 +318,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Mindfulness.jpg",
     title: "Mindfulness",
-    width: "30%",
+    width: "34%",
     leaders: [
       // {
       //   name: "Dallas Wilburn",
@@ -217,7 +390,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
-    width: "25%",
+    width: "38%",
     leaders: [
       {
         name: "Madeline Paige Jacoby",
@@ -278,7 +451,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
-    width: "40%",
+    width: "61%",
     leaders: [
       {
         name: "Victoria Mulligan",
@@ -349,7 +522,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
-    width: "35%",
+    width: "39%",
     leaders: [
       {
         name: "Keltie O'Malley",
@@ -610,183 +783,183 @@ export default [
       `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
-  {
-    id: "Graphic_Design",
-    tags: [
-      {
-        title: "Graphic Design",
-        node: "oLmj9pmrh2wtR0tPTnpb",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Graphic_Design.jpg",
-    title: "Graphic Design",
-    width: "25%",
-    leaders: [
-      {
-        name: "Samantha Wanamaker",
-        image: "Samantha_Wanamaker.jpg",
-        about: `I began my journey with an interest in healthcare and education, working with children with autism. During this time I developed skills on how to best present information and translate my thoughts in a way that will be understood by the children I taught, especially the non-verbal students. I transitioned to UX because I wanted to engage my creative side while leverage my skills in psychology and my desire to help people. I have always been curious about what makes people tick and I bring this curiosity with me in my work. Creating products through user research and brainstorming solutions is exciting and I love seeing a project come together.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/sswanamaker/",
-          },
-        ],
-      },
-    ],
-    YouTube: "FjgYobJ-W4A",
-    description: `The Graphic Design Team fills in the role of both graphic design and user interface design. We work in conjunction with the UX Team to create a consistent style throughout 1Cademy. This is a collaborative community where we share ideas, feedback, and critique so that we can better hone our skills to help the growth of 1Cademy. Interns are expected to participate in group meetings by showcasing current progress or deliverables and commenting on other interns' presentations. Design decisions must be supported by evidence.`,
-    accomplishments: `So far, we have recorded and took note of current design of 1Cademy and highlighted areas that needed improvements or change; created typographical hierarchies for new typefaces; created guide sheet for new icons; updating current 1Cademy informational video; began research on accessible colors; began transitioning components to the new Material Design 3.`,
-    gains: [
-      `All communications, task completion, and team activities will be online. `,
-      `Participants will work in a team-led environment under the leadership of Iman Yeckehzaare, a Ph.D. candidate at the School of Information, and will regularly report their accomplishments in weekly online team meetings.`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
-    portfolio: true,
-    hasTest: true,
-    qualifications: [
-      `Experience with creating online style guidelines, images and graphics using design software (e.g., Adobe Illustrator, Adobe Photoshop, Adobe After Effects and Adobe Premier and Figma. `,
-      `Strong understanding of the principles of UX, web information architecture, graphic design, web design, branding, composition, and typography.`,
-      `Experience with conceptualization, wireframing, and presenting your designs for online platforms.  `,
-      `Experience working in an agile development process. `,
-      `Excellent skills to solve problems creatively and effectively. `,
-      `Keep up with the latest design trends and technologies. `,
-    ],
-    responsibilities: [
-      `Conceptualizing consistent visuals based on requirements and amend designs after feedback. `,
-      `Creating graphic design guidelines to maintain consistency. `,
-      `Collaborating with user experience researchers and user interface designers to create visuals for the platform, including graphics and banners. `,
-      `Regularly updating visuals as the web app evolves. `,
-      `Ensure final visuals and layouts are visually appealing and on-brand. `,
-      `Ability to work methodically and meet deadlines.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
-  },
-  {
-    id: "UI_Design",
-    tags: [
-      {
-        title: "Design Science",
-        node: "y1GorOIkFb255Oiqm9k3",
-      },
-      {
-        title: "User Interface Design",
-        node: "1wyXrpreH942fh2MfnEd",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/UI_Design.jpg",
-    title: "UI Design",
-    width: "35%",
-    leaders: [
-      {
-        name: "Shannon Kenny",
-        image: "Shannon_Kenny.jpeg",
-        about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/shannon-kenny/",
-          },
-        ],
-      },
-    ],
-    YouTube: "3JZnwTXEq0g",
-    description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
-    accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
-    sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
-    We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
-    gains: [
-      `Gain user interface prototyping/design experience.`,
-      `Gain experience collaborating with an interdisciplinary group of people.`,
-      `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
-      `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
-      `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
-      `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
-      `Successful interns would continue with taking leadership roles.`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
-    portfolio: true,
-    qualifications: [
-      `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
-      `Instinct and intuition for good UI design.`,
-      `Experience creating and prototyping UI designs (using Figma).`,
-      `Understanding of key graphic design principles.`,
-      `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
-      `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`,
-    ],
-    responsibilities: [
-      `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
-      `Provide input on any/all UI designs/mockups.`,
-      `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
-      `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
-      `Attend weekly meetings.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
-  },
-  {
-    id: "UX_Research",
-    tags: [
-      {
-        title: "User experience (UX) research",
-        node: "0OcDwfPChQuXFRnNCH9G",
-      },
-      {
-        title: "Knowledge Visualization",
-        node: "WgF7yr5q7tJc54apVQSr",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/UX_Research.jpg",
-    title: "UX Research",
-    width: "40%",
-    leaders: [
-      {
-        name: "Catherine Grillo",
-        image: "Catherine_Grillo.jpeg",
-        about: `I am a senior studying Information Science in the School of Information at the University of Michigan. My interest in human-computer interaction and creating digital solutions for users in different online communities inspired me to pursue this major. I also have a strong interest in the intersection of psychology and technology that has led me to secure a research position with the goal of improving commitment and decreasing turnover in online communities. My research has not only supported my interests but it has taught me how I can apply my skills and education to improve the experience and functionality of online communities for businesses and organizations. I thrive in a collaborative environment and this research team has given me the necessary communication and leadership skills. I am passionate about user research, understanding user needs, and finding solutions to users' pain points. I would love to be part of an organization that is looking to create a better user experience.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/catherine-grillo-491717181/",
-          },
-        ],
-      },
-    ],
-    YouTube: "tAKMwhguTHc",
-    description: `The UX Research team's goal is to conduct research and develop insights that will improve the user experience of 1Cademy. We dive into UX literature and complete literature reviews using the platform to present to the team what we have learned. Another goal of the UX Research team is to collaborate on and submit papers to various academic conferences. Currently, many members of the team are collaborating on a paper and conducting a study. We also work with the UI design team to help them conduct research on design ideas and make informed decisions.`,
-    accomplishments: `The UX Research team has conducted 1Cademy user research that led to a new and improved onboarding experience for new interns, improved existing documentation, and led to the creation of tutorial videos. Members of the team have learned about many different research methods, from card sorting to affinity mapping, to ethnographic research. The team has also been working on a study and writing a paper, and the members working on this have learned so much about collaboration, learning, and proper ethics and research techniques. We are excited for new opportunities when we begin working with the UI design team to help improve 1Cademy's design.`,
-    gains: [
-      `Gain experience in various research methodologies including literature reviews, user interviews, usability testing, and affinity mapping`,
-      `Have opportunities to take on leadership positions within the team`,
-      `Gain experience collaborating with an interdisciplinary group of people`,
-      `Gain experience in presenting literature reviews and findings to a team`,
-      `Make a meaningful contribution to projects that will improve the usability of a collaborative learning platform`,
-      `Learn about various theories and contribute to novel research within the UX Research field`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in information science, psychology, or a related field.`,
-    hasTest: true,
-    qualifications: [
-      `Self-starter with a passion for improving user experience`,
-      `Strong interest in the user experience field`,
-      `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others)`,
-      `Some knowledge of different user research methods`,
-      `Some knowledge of qualitative/quantitative research`,
-      `Ability to synthesize information from literature to report to group members`,
-    ],
-    responsibilities: [
-      `Work towards a UX research paper to be submitted to ACM conferences`,
-      `Regularly collaborate with team members on projects that will improve 1Cademy`,
-      `Gather knowledge from books and papers regarding the best UX practices, summarize important ideas you find, and use 1Cademy to present these findings with the team in weekly meetings. This is how our team finds new projects to work on so we can iteratively improve the usability of 1Cademy.`,
-      `Attend and actively participate in all-team meetings twice a week`,
-      `Regularly communicate with team using Microsoft Teams`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
-  },
+  // {
+  //   id: "Graphic_Design",
+  //   tags: [
+  //     {
+  //       title: "Graphic Design",
+  //       node: "oLmj9pmrh2wtR0tPTnpb",
+  //     },
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Graphic_Design.jpg",
+  //   title: "Graphic Design",
+  //   width: "25%",
+  //   leaders: [
+  //     {
+  //       name: "Samantha Wanamaker",
+  //       image: "Samantha_Wanamaker.jpg",
+  //       about: `I began my journey with an interest in healthcare and education, working with children with autism. During this time I developed skills on how to best present information and translate my thoughts in a way that will be understood by the children I taught, especially the non-verbal students. I transitioned to UX because I wanted to engage my creative side while leverage my skills in psychology and my desire to help people. I have always been curious about what makes people tick and I bring this curiosity with me in my work. Creating products through user research and brainstorming solutions is exciting and I love seeing a project come together.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/sswanamaker/",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   YouTube: "FjgYobJ-W4A",
+  //   description: `The Graphic Design Team fills in the role of both graphic design and user interface design. We work in conjunction with the UX Team to create a consistent style throughout 1Cademy. This is a collaborative community where we share ideas, feedback, and critique so that we can better hone our skills to help the growth of 1Cademy. Interns are expected to participate in group meetings by showcasing current progress or deliverables and commenting on other interns' presentations. Design decisions must be supported by evidence.`,
+  //   accomplishments: `So far, we have recorded and took note of current design of 1Cademy and highlighted areas that needed improvements or change; created typographical hierarchies for new typefaces; created guide sheet for new icons; updating current 1Cademy informational video; began research on accessible colors; began transitioning components to the new Material Design 3.`,
+  //   gains: [
+  //     `All communications, task completion, and team activities will be online. `,
+  //     `Participants will work in a team-led environment under the leadership of Iman Yeckehzaare, a Ph.D. candidate at the School of Information, and will regularly report their accomplishments in weekly online team meetings.`,
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
+  //   portfolio: true,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Experience with creating online style guidelines, images and graphics using design software (e.g., Adobe Illustrator, Adobe Photoshop, Adobe After Effects and Adobe Premier and Figma. `,
+  //     `Strong understanding of the principles of UX, web information architecture, graphic design, web design, branding, composition, and typography.`,
+  //     `Experience with conceptualization, wireframing, and presenting your designs for online platforms.  `,
+  //     `Experience working in an agile development process. `,
+  //     `Excellent skills to solve problems creatively and effectively. `,
+  //     `Keep up with the latest design trends and technologies. `,
+  //   ],
+  //   responsibilities: [
+  //     `Conceptualizing consistent visuals based on requirements and amend designs after feedback. `,
+  //     `Creating graphic design guidelines to maintain consistency. `,
+  //     `Collaborating with user experience researchers and user interface designers to create visuals for the platform, including graphics and banners. `,
+  //     `Regularly updating visuals as the web app evolves. `,
+  //     `Ensure final visuals and layouts are visually appealing and on-brand. `,
+  //     `Ability to work methodically and meet deadlines.`,
+  //     `All interactions, task fulfillment, and communications will be remote.`,
+  //   ],
+  // },
+  // {
+  //   id: "UI_Design",
+  //   tags: [
+  //     {
+  //       title: "Design Science",
+  //       node: "y1GorOIkFb255Oiqm9k3",
+  //     },
+  //     {
+  //       title: "User Interface Design",
+  //       node: "1wyXrpreH942fh2MfnEd",
+  //     },
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/UI_Design.jpg",
+  //   title: "UI Design",
+  //   width: "35%",
+  //   leaders: [
+  //     {
+  //       name: "Shannon Kenny",
+  //       image: "Shannon_Kenny.jpeg",
+  //       about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/shannon-kenny/",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   YouTube: "3JZnwTXEq0g",
+  //   description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
+  //   accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
+  //   sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
+  //   We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
+  //   gains: [
+  //     `Gain user interface prototyping/design experience.`,
+  //     `Gain experience collaborating with an interdisciplinary group of people.`,
+  //     `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
+  //     `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
+  //     `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
+  //     `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
+  //     `Successful interns would continue with taking leadership roles.`,
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
+  //   portfolio: true,
+  //   qualifications: [
+  //     `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
+  //     `Instinct and intuition for good UI design.`,
+  //     `Experience creating and prototyping UI designs (using Figma).`,
+  //     `Understanding of key graphic design principles.`,
+  //     `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
+  //     `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`,
+  //   ],
+  //   responsibilities: [
+  //     `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
+  //     `Provide input on any/all UI designs/mockups.`,
+  //     `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
+  //     `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
+  //     `Attend weekly meetings.`,
+  //     `All interactions, task fulfillment, and communications will be remote.`,
+  //   ],
+  // },
+  // {
+  //   id: "UX_Research",
+  //   tags: [
+  //     {
+  //       title: "User experience (UX) research",
+  //       node: "0OcDwfPChQuXFRnNCH9G",
+  //     },
+  //     {
+  //       title: "Knowledge Visualization",
+  //       node: "WgF7yr5q7tJc54apVQSr",
+  //     },
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/UX_Research.jpg",
+  //   title: "UX Research",
+  //   width: "40%",
+  //   leaders: [
+  //     {
+  //       name: "Catherine Grillo",
+  //       image: "Catherine_Grillo.jpeg",
+  //       about: `I am a senior studying Information Science in the School of Information at the University of Michigan. My interest in human-computer interaction and creating digital solutions for users in different online communities inspired me to pursue this major. I also have a strong interest in the intersection of psychology and technology that has led me to secure a research position with the goal of improving commitment and decreasing turnover in online communities. My research has not only supported my interests but it has taught me how I can apply my skills and education to improve the experience and functionality of online communities for businesses and organizations. I thrive in a collaborative environment and this research team has given me the necessary communication and leadership skills. I am passionate about user research, understanding user needs, and finding solutions to users' pain points. I would love to be part of an organization that is looking to create a better user experience.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/catherine-grillo-491717181/",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   YouTube: "tAKMwhguTHc",
+  //   description: `The UX Research team's goal is to conduct research and develop insights that will improve the user experience of 1Cademy. We dive into UX literature and complete literature reviews using the platform to present to the team what we have learned. Another goal of the UX Research team is to collaborate on and submit papers to various academic conferences. Currently, many members of the team are collaborating on a paper and conducting a study. We also work with the UI design team to help them conduct research on design ideas and make informed decisions.`,
+  //   accomplishments: `The UX Research team has conducted 1Cademy user research that led to a new and improved onboarding experience for new interns, improved existing documentation, and led to the creation of tutorial videos. Members of the team have learned about many different research methods, from card sorting to affinity mapping, to ethnographic research. The team has also been working on a study and writing a paper, and the members working on this have learned so much about collaboration, learning, and proper ethics and research techniques. We are excited for new opportunities when we begin working with the UI design team to help improve 1Cademy's design.`,
+  //   gains: [
+  //     `Gain experience in various research methodologies including literature reviews, user interviews, usability testing, and affinity mapping`,
+  //     `Have opportunities to take on leadership positions within the team`,
+  //     `Gain experience collaborating with an interdisciplinary group of people`,
+  //     `Gain experience in presenting literature reviews and findings to a team`,
+  //     `Make a meaningful contribution to projects that will improve the usability of a collaborative learning platform`,
+  //     `Learn about various theories and contribute to novel research within the UX Research field`,
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in information science, psychology, or a related field.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Self-starter with a passion for improving user experience`,
+  //     `Strong interest in the user experience field`,
+  //     `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others)`,
+  //     `Some knowledge of different user research methods`,
+  //     `Some knowledge of qualitative/quantitative research`,
+  //     `Ability to synthesize information from literature to report to group members`,
+  //   ],
+  //   responsibilities: [
+  //     `Work towards a UX research paper to be submitted to ACM conferences`,
+  //     `Regularly collaborate with team members on projects that will improve 1Cademy`,
+  //     `Gather knowledge from books and papers regarding the best UX practices, summarize important ideas you find, and use 1Cademy to present these findings with the team in weekly meetings. This is how our team finds new projects to work on so we can iteratively improve the usability of 1Cademy.`,
+  //     `Attend and actively participate in all-team meetings twice a week`,
+  //     `Regularly communicate with team using Microsoft Teams`,
+  //     `All interactions, task fulfillment, and communications will be remote.`,
+  //   ],
+  // },
   {
     id: "Liaison_Librarians",
     tags: [

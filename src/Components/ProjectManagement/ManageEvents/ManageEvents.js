@@ -4,6 +4,7 @@ import { useRecoilValue } from "recoil";
 import axios from "axios";
 
 import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 
 import { DataGrid } from "@mui/x-data-grid";
@@ -268,6 +269,16 @@ const ManageEvents = (props) => {
   const [submitted, setSubmitted] = useState(false);
   const [applicants, setApplicants] = useState([]);
   const [applicantsLoaded, setApplicantsLoaded] = useState(false);
+  const [totalRegistered, setTotalRegistered] = useState(0);
+  const [completed1st, setCompleted1st] = useState(0);
+  const [completed2nd, setCompleted2nd] = useState(0);
+  const [completed3rd, setCompleted3rd] = useState(0);
+  const [recall1st, setRecall1st] = useState(0);
+  const [recall2nd, setRecall2nd] = useState(0);
+  const [recall3rd, setRecall3rd] = useState(0);
+  const [recall1stRatio, setRecall1stRatio] = useState(0);
+  const [recall2ndRatio, setRecall2ndRatio] = useState(0);
+  const [recall3rdRatio, setRecall3rdRatio] = useState(0);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -360,109 +371,171 @@ const ManageEvents = (props) => {
   useEffect(() => {
     const notifyApplicationStatuses = async () => {
       const appls = [];
-      const userDocs = await firebase.db
-        .collection("users")
-        .where("projectDone", "==", true)
-        .get();
+      let registered = 0;
+      let completedFirst = 0;
+      let completedSecond = 0;
+      let completedThird = 0;
+      let recallFirst = 0;
+      let recallSecond = 0;
+      let recallThird = 0;
+      let recallFirstRatio = 0;
+      let recallSecondRatio = 0;
+      let recallThirdRatio = 0;
+      const userDocs = await firebase.db.collection("users").get();
       for (let userDoc of userDocs.docs) {
         const userData = userDoc.data();
         if (
           "createdAt" in userData &&
           userData.createdAt.toDate() > new Date("1-14-2022")
         ) {
-          const appl = {
-            id: userDoc.id,
-            createdAt: userData.createdAt.toDate(),
-            user: userDoc.id,
-            email: userData.email,
-            tutStarted: false,
-            tutorial: false,
-            applicationsStarted: [],
-            applications: [],
-            withdrew: "withdrew" in userData && userData.withdrew,
-            withdrawExp: "withdrawExp" in userData && userData.withdrawExp,
-            reminder:
-              "reminder" in userData && userData.reminder
-                ? userData.reminder.toDate()
-                : null,
-          };
-          const tutorialDoc = await firebase.db
-            .collection("tutorial")
-            .doc(userDoc.id)
-            .get();
-          if (tutorialDoc.exists) {
-            appl.tutStarted = true;
-            const tutorialData = tutorialDoc.data();
-            if ("ended" in tutorialData && tutorialData.ended) {
-              appl.tutorial = true;
-              let submittedOne = false;
-              const applicationDocs = await firebase.db
-                .collection("applications")
-                .where("fullname", "==", userDoc.id)
-                .get();
-              for (let applicationDoc of applicationDocs.docs) {
-                const applicationData = applicationDoc.data();
-                appl.applicationsStarted.push(applicationData.communiId);
-                if ("ended" in applicationData && applicationData.ended) {
-                  submittedOne = true;
-                  appl.applications.push(
-                    applicationData.communiId +
-                      ": " +
-                      applicationData.corrects +
-                      " - " +
-                      applicationData.wrongs
-                  );
+          registered += 1;
+          if ("postQ2Choice" in userData) {
+            completedFirst += 1;
+            if (
+              "pConditions" in userData &&
+              userData.pConditions.length === 2
+            ) {
+              recallFirst +=
+                userData.pConditions[0].recallScore +
+                userData.pConditions[1].recallScore;
+              recallFirstRatio +=
+                userData.pConditions[0].recallScoreRatio +
+                userData.pConditions[1].recallScoreRatio;
+            }
+          }
+          if ("post3DaysQ2Choice" in userData) {
+            completedSecond += 1;
+            if (
+              "pConditions" in userData &&
+              userData.pConditions.length === 2
+            ) {
+              recallSecond +=
+                userData.pConditions[0].recall3DaysScore +
+                userData.pConditions[1].recall3DaysScore;
+              recallSecondRatio +=
+                userData.pConditions[0].recall3DaysScoreRatio +
+                userData.pConditions[1].recall3DaysScoreRatio;
+            }
+          }
+          if ("projectDone" in userData && userData.projectDone) {
+            completedThird += 1;
+            if (
+              "pConditions" in userData &&
+              userData.pConditions.length === 2
+            ) {
+              recallThird += userData.pConditions[0].recall1WeekScore
+                ? userData.pConditions[0].recall1WeekScore
+                : 0 + userData.pConditions[1].recall1WeekScore
+                ? userData.pConditions[1].recall1WeekScore
+                : 0;
+              recallThirdRatio +=
+                userData.pConditions[0].recall1WeekScoreRatio +
+                userData.pConditions[1].recall1WeekScoreRatio;
+            }
+            const appl = {
+              id: userDoc.id,
+              createdAt: userData.createdAt.toDate(),
+              user: userDoc.id,
+              email: userData.email,
+              tutStarted: false,
+              tutorial: false,
+              applicationsStarted: [],
+              applications: [],
+              withdrew: "withdrew" in userData && userData.withdrew,
+              withdrawExp: "withdrawExp" in userData && userData.withdrawExp,
+              reminder:
+                "reminder" in userData && userData.reminder
+                  ? userData.reminder.toDate()
+                  : null,
+            };
+            const tutorialDoc = await firebase.db
+              .collection("tutorial")
+              .doc(userDoc.id)
+              .get();
+            if (tutorialDoc.exists) {
+              appl.tutStarted = true;
+              const tutorialData = tutorialDoc.data();
+              if ("ended" in tutorialData && tutorialData.ended) {
+                appl.tutorial = true;
+                let submittedOne = false;
+                const applicationDocs = await firebase.db
+                  .collection("applications")
+                  .where("fullname", "==", userDoc.id)
+                  .get();
+                for (let applicationDoc of applicationDocs.docs) {
+                  const applicationData = applicationDoc.data();
+                  appl.applicationsStarted.push(applicationData.communiId);
+                  if ("ended" in applicationData && applicationData.ended) {
+                    submittedOne = true;
+                    appl.applications.push(
+                      applicationData.communiId +
+                        ": " +
+                        applicationData.corrects +
+                        " - " +
+                        applicationData.wrongs
+                    );
+                  }
                 }
+                // if (submittedOne) {
+                // console.log(userDoc.id + " SUBMITTED an APPLICATION.");
+                // } else {
+                // await axios.post("/emailApplicationStatus", {
+                //   email: userData.email,
+                //   firstname: userData.firstname,
+                //   subject: "Your 1Cademy Application is Incomplete!",
+                //   content:
+                //     "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
+                //   hyperlink: "https://1cademy.us/home#JoinUsSection",
+                // });
+                // }
+                // const user1CademyDocs = await firebaseOne.db
+                //   .collection("users")
+                //   .where("email", "==", userData.email)
+                //   .get();
+                // if (user1CademyDocs.docs.length > 0) {
+                // console.log(
+                //   userDoc.id + " has username: " + user1CademyDocs.docs[0].id
+                // );
+                // } else {
+                //   console.log(
+                //     userDoc.id +
+                //       " has completed the tutorial but has NO 1Cademy ACCOUNT!!!!!!!!!"
+                //   );
+                // }
+                // } else {
+                // await axios.post("/emailApplicationStatus", {
+                //   email: userData.email,
+                //   firstname: userData.firstname,
+                //   subject: "Your 1Cademy Application is Incomplete!",
+                //   content:
+                //     "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
+                //   hyperlink: "https://1cademy.us/home#JoinUsSection",
+                // });
               }
-              // if (submittedOne) {
-              // console.log(userDoc.id + " SUBMITTED an APPLICATION.");
               // } else {
               // await axios.post("/emailApplicationStatus", {
               //   email: userData.email,
               //   firstname: userData.firstname,
               //   subject: "Your 1Cademy Application is Incomplete!",
               //   content:
-              //     "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
-              //   hyperlink: "https://1cademy.us/home#JoinUsSection",
-              // });
-              // }
-              // const user1CademyDocs = await firebaseOne.db
-              //   .collection("users")
-              //   .where("email", "==", userData.email)
-              //   .get();
-              // if (user1CademyDocs.docs.length > 0) {
-              // console.log(
-              //   userDoc.id + " has username: " + user1CademyDocs.docs[0].id
-              // );
-              // } else {
-              //   console.log(
-              //     userDoc.id +
-              //       " has completed the tutorial but has NO 1Cademy ACCOUNT!!!!!!!!!"
-              //   );
-              // }
-              // } else {
-              // await axios.post("/emailApplicationStatus", {
-              //   email: userData.email,
-              //   firstname: userData.firstname,
-              //   subject: "Your 1Cademy Application is Incomplete!",
-              //   content:
-              //     "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
+              //     "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
               //   hyperlink: "https://1cademy.us/home#JoinUsSection",
               // });
             }
-            // } else {
-            // await axios.post("/emailApplicationStatus", {
-            //   email: userData.email,
-            //   firstname: userData.firstname,
-            //   subject: "Your 1Cademy Application is Incomplete!",
-            //   content:
-            //     "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
-            //   hyperlink: "https://1cademy.us/home#JoinUsSection",
-            // });
+            appls.push(appl);
           }
-          appls.push(appl);
         }
       }
+      setRecall1st(Math.floor(recallFirst / completedFirst));
+      setRecall2nd(Math.floor(recallSecond / completedSecond));
+      setRecall3rd(Math.floor(recallThird / completedThird));
+      setRecall1stRatio(Math.floor(recallFirstRatio / completedFirst));
+      setRecall2ndRatio(Math.floor(recallSecondRatio / completedSecond));
+      setRecall3rdRatio(Math.floor(recallThirdRatio / completedThird));
+      setTotalRegistered(registered);
+      setCompleted1st(completedFirst);
+      setCompleted2nd(completedSecond);
+      setCompleted3rd(completedThird);
       setApplicants(appls);
       setApplicantsLoaded(true);
     };
@@ -553,6 +626,35 @@ const ManageEvents = (props) => {
 
   return (
     <div id="ManageEventsContainer">
+      <Paper style={{ margin: "19px", padding: "4px" }}>
+        <p>{totalRegistered} total registered since 01/14/2022!</p>
+        <p>
+          {completed1st}
+          {", "}
+          {Math.round(
+            (completed1st / totalRegistered + Number.EPSILON) * 100
+          )}{" "}
+          % Completed the 1st Session!
+        </p>
+        <p>
+          {completed2nd}
+          {", "}
+          {Math.round((completed2nd / completed1st + Number.EPSILON) * 100)} %
+          Completed the 2nd Session!
+        </p>
+        <p>
+          {completed3rd}
+          {", "}
+          {Math.round((completed3rd / completed1st + Number.EPSILON) * 100)} %
+          Completed the 3rd Session!
+        </p>
+        <p>{recall1st} Free recall score average in 1st session!</p>
+        <p>{recall2nd} Free recall score average in 2nd session!</p>
+        <p>{recall3rd} Free recall score average in 3rd session!</p>
+        <p>{recall1stRatio} Free recall score ratio average in 1st session!</p>
+        <p>{recall2ndRatio} Free recall score ratio average in 2nd session!</p>
+        <p>{recall3rdRatio} Free recall score ratio average in 3rd session!</p>
+      </Paper>
       <div id="ApplicantsTable">
         <DataGrid
           rows={applicants}
