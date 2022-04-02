@@ -306,7 +306,7 @@ const Communities = (props) => {
                     </ul>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
+                {/* <Grid item xs={12} lg={6} xl={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Typography
                       variant="h5"
@@ -336,7 +336,7 @@ const Communities = (props) => {
                       )}
                     </Typography>
                   </Paper>
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} lg={6} xl={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Typography
@@ -354,6 +354,34 @@ const Communities = (props) => {
                         communi.qualifications.map((qualifi, qIdx) => {
                           return <li key={qIdx}>{qualifi}</li>;
                         })}
+                      <li>
+                        Complete the three online sessions of one of our ongoing
+                        research studies, as a participant, to better learn how
+                        we conduct our experiments.
+                      </li>
+                      <li>
+                        Submit most current resume and unofficial transcripts,
+                        indicating a GPA above 3.4/4.0
+                      </li>
+                      <li>
+                        Explain in a few paragraphs why you apply to this
+                        specific community.
+                      </li>
+                      <li>
+                        Complete our community-specific quiz by answering a set
+                        of questions about some research papers or book chapters
+                        and get a satisfying score.
+                      </li>
+                      {communi.coursera && (
+                        <li>
+                          Complete{" "}
+                          <a href={communi.coursera} target="_blank">
+                            this Coursera course
+                          </a>{" "}
+                          and upload your certificate as a part of the
+                          application.
+                        </li>
+                      )}
                     </ul>
                   </Paper>
                 </Grid>
