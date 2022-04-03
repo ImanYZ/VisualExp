@@ -667,7 +667,7 @@ const ManageEvents = (props) => {
           autoPageSize
           autoHeight
           hideFooterSelectedRowCount
-          loading={!expSessionsLoaded}
+          loading={!ongoingEventsLoaded}
           onRowClick={gridRowClick}
         />
       </div>

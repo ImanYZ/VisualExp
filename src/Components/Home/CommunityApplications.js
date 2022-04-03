@@ -187,6 +187,22 @@ const applicationsColms = [
     },
   },
   {
+    field: "confirmed",
+    headerName: "Confirmed",
+    width: 40,
+    disableColumnMenu: true,
+    renderCell: (cellValues) => {
+      return (
+        <GridCellToolTip
+          isLink={false}
+          actionCell={true}
+          Tooltip="The Applicant Confirmed"
+          cellValues={cellValues}
+        />
+      );
+    },
+  },
+  {
     field: "rejected",
     headerName: "Rejected",
     width: 40,
@@ -341,6 +357,7 @@ const CommunityApplications = (props) => {
               quizWrongs: applicData.wrongs,
               checkedAt: null,
               accepted: "◻",
+              confirmed: "◻",
               rejected: "◻",
               invited: "◻",
               email: "",
@@ -362,6 +379,9 @@ const CommunityApplications = (props) => {
             }
             if ("accepted" in applicData && applicData.accepted) {
               newApplic.accepted = "✅";
+            }
+            if ("confirmed" in applicData && applicData.confirmed) {
+              newApplic.confirmed = "👍";
             }
             if ("rejected" in applicData && applicData.rejected) {
               newApplic.rejected = "🚫";
@@ -450,7 +470,12 @@ const CommunityApplications = (props) => {
   useEffect(() => {
     let theApplicant;
     for (let applic of applications) {
-      if (applic.accepted === "◻" && applic.rejected === "◻" && !theApplicant) {
+      if (
+        applic.accepted === "◻" &&
+        applic.confirmed === "◻" &&
+        applic.rejected === "◻" &&
+        !theApplicant
+      ) {
         theApplicant = applic;
       }
     }
@@ -482,6 +507,8 @@ const CommunityApplications = (props) => {
             const applicData = {};
             if (voteType === "accepted") {
               applicData[voteType] = applics[applicIdx][voteType] !== "✅";
+            } else if (voteType === "confirmed") {
+              applicData[voteType] = applics[applicIdx][voteType] !== "👍";
             } else if (voteType === "rejected") {
               applicData[voteType] = applics[applicIdx][voteType] !== "🚫";
             } else if (voteType === "invited") {
@@ -505,6 +532,10 @@ const CommunityApplications = (props) => {
             await applicRef.update(applicData);
             if (voteType === "accepted") {
               setSnackbarMessage("You successfully accepted this applicant!");
+            } else if (voteType === "confirmed") {
+              setSnackbarMessage(
+                "You successfully marked this applicant who confirmed joining us!"
+              );
             } else if (voteType === "rejected") {
               setSnackbarMessage("You successfully rejected this applicant!");
             } else if (voteType === "invited") {
@@ -523,7 +554,11 @@ const CommunityApplications = (props) => {
   };
 
   const checkApplication = (clickedCell) => {
-    if (["accepted", "rejected", "invited"].includes(clickedCell.field)) {
+    if (
+      ["accepted", "confirmed", "rejected", "invited"].includes(
+        clickedCell.field
+      )
+    ) {
       checkApplicant(clickedCell.id, clickedCell.field)();
     }
   };
@@ -539,27 +574,27 @@ const CommunityApplications = (props) => {
           <li>
             <strong>Expanding each row:</strong> by default, the expanded
             version of one of the applications that you have not
-            accepted/rejected is shown below the table. If you click any row,
-            that application will be expanded below.
+            accepted/confirmed/rejected is shown below the table. If you click
+            any row, that application will be expanded below.
           </li>
           <li>
             <strong>Reviewing:</strong> to review each application, BEFORE
-            clicking the accept ✅ or reject 🚫 buttons, please send the
-            applicant your community-specific acceptance/orientation or
+            clicking the accept ✅, confirmed 👍, or reject 🚫 buttons, please
+            send the applicant your community-specific acceptance/orientation or
             rejection email through onecademy@umich.edu. Make sure you
             coordinate with your co-leaders and do not double-contact applicants
             (ex: you shouldn’t both email them to accept them, just one).
           </li>
           <li>
-            <strong>Accepting/rejecting:</strong> you can either click the
-            accept ✅ or reject 🚫 buttons to indicate that you completed the
-            review of each application.
+            <strong>Accepting/confirming/rejecting:</strong> you can either
+            click the accept ✅, confirmed 👍, or reject 🚫 buttons to indicate
+            that you completed the review of each application.
           </li>
           <li>
             <strong>Inviting to Microsoft Teams:</strong> you do NOT need to
             add/remove your interns in the interns' spreadsheet anymore. By only
-            clicking the accept ✅ or reject 🚫 buttons, you notify Iman whether
-            to invite the applicant to Microsoft Teams.
+            clicking the confirmed 👍 button, you notify Iman to invite the
+            applicant to Microsoft Teams.
           </li>
           <li>
             <strong>Each row:</strong> shows you one of the applicants who have
@@ -588,8 +623,9 @@ const CommunityApplications = (props) => {
           </li>
           <li>
             <strong>Multiple leaders:</strong> if a community has multiple
-            leaders, and accepts/rejects someone, you will be able to see who
-            accepted/rejected the applicant and when in the last two columns.
+            leaders, and accepts/confirms/rejects someone, you will be able to
+            see who accepted/confirmed/rejected the applicant and when in the
+            last two columns.
           </li>
           <li>
             <strong>Notes:</strong>
@@ -600,9 +636,9 @@ const CommunityApplications = (props) => {
                 automatically email.
               </li>
               <li>
-                After clicking the accept ✅ or reject 🚫 buttons, if you change
-                your decision, you should directly contact Iman on Microsoft
-                Teams.
+                After clicking the accept ✅, confirmed 👍, or reject 🚫
+                buttons, if you change your decision, you should directly
+                contact Iman on Microsoft Teams.
               </li>
             </ul>
           </li>
