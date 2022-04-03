@@ -107,6 +107,10 @@ const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
+const pad2Num = (number) => {
+  return (number < 10 ? "0" : "") + number;
+};
+
 module.exports = {
   strToBoolean,
   getFullname,
@@ -118,4 +122,5 @@ module.exports = {
   getDateString,
   nextWeek,
   capitalizeFirstLetter,
+  pad2Num,
 };

@@ -281,6 +281,57 @@ ${
 };
 exports.eventNotificationEmail = eventNotificationEmail;
 
+exports.notAttendedEmail = async (
+  email,
+  firstname,
+  from1Cademy,
+  courseName,
+  order
+) => {
+  try {
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject:
+        "[1Cademy] " +
+        // (courseName ? "[" + courseName + "] " : "") +
+        "You Missed the " +
+        order +
+        " UX Research Experiment Session Today!",
+      html:
+        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        <p></p>
+        <p>This is an auto-generated email to inform you that you missed your ${order} UX research experiment session!</p>
+        <p>Please respond to this email with only one of the following options to proceed with:</p>
+        <ul>
+          <li>Withdraw your application</li>
+          <li>Reschedule your session for another time TODAY to be able to continue with your application</li>
+        </ul>
+        <p>Note that because this is a 30-minute, ${order} session, our experiment protocol does not allow us to move it to another day. We can only reschedule it on the same day.</p>
+        <p>Please reply to this email if you have any questions or concerns.</p>
+<p></p>
+<p>Best regards,</p>
+` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        console.log({ error });
+        if (httpReq) {
+          return res.status(500).json({ error });
+        }
+      }
+      if (httpReq) {
+        return res.status(200).json({ done: true });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+    if (httpReq) {
+      return res.status(500).json({ err });
+    }
+  }
+};
+
 exports.sendEventNotificationEmail = (req, res) => {
   try {
     if ("email" in req.body && "firstname" in req.body) {
@@ -334,7 +385,8 @@ const reschEventNotificationEmail = async (
   from1Cademy,
   courseName,
   hoursLeft,
-  httpReq
+  httpReq,
+  declined
 ) => {
   try {
     hoursLeft = Math.floor(hoursLeft);
@@ -366,15 +418,19 @@ const reschEventNotificationEmail = async (
       subject:
         "[1Cademy] " +
         // (courseName ? "[" + courseName + "] " : "") +
-        ("You declined our invitation to the UX Research Experiment Session that will begin in " +
-          hoursLeft +
+        ("You " +
+          (declined ? "declined our invitation to" : "missed") +
+          " the UX Research Experiment Session" +
+          (declined ? " that will begin in " + hoursLeft : "") +
           "!"),
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
 <p></p>
 ${
-  "<p>You declined our invitation to the UX Research Experiment Session that will begin in " +
-  hoursLeft +
+  "<p>You " +
+  (declined ? "declined our invitation to" : "missed") +
+  " the UX Research Experiment Session" +
+  (declined ? " that will begin in " + hoursLeft : "") +
   "!</p><p>We deleted this session and the following sessions for you.</p>" +
   "<p>Please reschedule your experiment sessions on <a href='https://visualexp1.web.app/' target='_blank'>our research website</a> ASAP.</p>" +
   "<p>Please reply to this email if you have any questions or experience any difficulties scheduling your sessions."
@@ -427,6 +483,7 @@ exports.rescheduleEventNotificationEmail = (req, res) => {
         from1Cademy,
         courseName,
         hoursLeft,
+        true,
         true
       );
     }

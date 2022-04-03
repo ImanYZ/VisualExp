@@ -9,17 +9,21 @@ const {
   batchUpdate,
   batchDelete,
 } = require("./admin");
-const { allPastEvents, futureEvents } = require("./scheduling");
+const {
+  allPastEvents,
+  futureEvents,
+  todayPastEvents,
+} = require("./scheduling");
 const {
   strToBoolean,
   getActivityTimeStamps,
   getIn30Minutes,
   getDateString,
-  datesAreOnSameDay,
 } = require("./utils");
 const {
   reschEventNotificationEmail,
   eventNotificationEmail,
+  notAttendedEmail,
 } = require("./emailing");
 
 const researchers = [
@@ -1104,17 +1108,11 @@ exports.remindCalendarInvitations = async (context) => {
     }
     let waitTime = 0;
     const allEvents = await futureEvents(40);
-    const evs = [];
     const currentTime = new Date().getTime();
     // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
     for (let ev of allEvents) {
       const startTime = new Date(ev.start.dateTime).getTime();
-      const endTime = new Date(ev.end.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
-      const sameDay = datesAreOnSameDay(
-        new Date(ev.start.dateTime),
-        new Date()
-      );
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
         scheduleIdx !== -1 &&
@@ -1125,7 +1123,90 @@ exports.remindCalendarInvitations = async (context) => {
           email: schedule[scheduleIdx].email.toLowerCase(),
         };
         const order = schedule[scheduleIdx].order;
-        let someoneDeclined = false;
+        for (let attendee of ev.attendees) {
+          if (attendee.email.toLowerCase() === participant.email) {
+            const userDocs = await db
+              .collection("users")
+              .where("email", "==", attendee.email.toLowerCase())
+              .get();
+            if (userDocs.docs.length > 0) {
+              const userData = userDocs.docs[0].data();
+              participant.firstname = userData.firstname;
+              if (userData.course) {
+                participant.courseName = userData.course;
+              } else {
+                participant.courseName = "";
+              }
+              if (userData.postQ2Choice) {
+                participant.firstDone = true;
+              } else {
+                participant.firstDone = false;
+              }
+              if (userData.post3DaysQ2Choice) {
+                participant.secondDone = true;
+              } else {
+                participant.secondDone = false;
+              }
+              if (
+                attendee.responseStatus === "declined" ||
+                attendee.responseStatus === "tentative"
+              ) {
+                if (!participant.firstDone) {
+                  setTimeout(() => {
+                    reschEventNotificationEmail(
+                      participant.email,
+                      participant.firstname,
+                      false,
+                      participant.courseName,
+                      hoursLeft,
+                      false,
+                      true,
+                      true
+                    );
+                  }, waitTime);
+                  waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                }
+              } else if (
+                attendee.responseStatus !== "accepted" &&
+                hoursLeft <= 25
+              ) {
+                if (order === "3rd" && !participant.secondDone) {
+                  await deleteEvent(ev.id);
+                } else {
+                  setTimeout(() => {
+                    eventNotificationEmail(
+                      participant.email,
+                      participant.firstname,
+                      false,
+                      participant.courseName,
+                      hoursLeft,
+                      false,
+                      "",
+                      order,
+                      false
+                    );
+                  }, waitTime);
+                  waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    const todayPastEvs = await todayPastEvents();
+    // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+    for (let ev of todayPastEvs) {
+      const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
+      if (
+        scheduleIdx !== -1 &&
+        "attendees" in ev &&
+        Array.isArray(ev.attendees)
+      ) {
+        const participant = {
+          email: schedule[scheduleIdx].email.toLowerCase(),
+        };
+        const order = schedule[scheduleIdx].order;
         for (let attendee of ev.attendees) {
           if (attendee.email.toLowerCase() === participant.email) {
             participant.responseStatus = attendee.responseStatus;
@@ -1156,56 +1237,37 @@ exports.remindCalendarInvitations = async (context) => {
               } else {
                 participant.thirdDone = false;
               }
+              if (order === "1st" && !participant.firstDone) {
+                setTimeout(() => {
+                  reschEventNotificationEmail(
+                    participant.email,
+                    participant.firstname,
+                    false,
+                    participant.courseName,
+                    hoursLeft,
+                    false,
+                    attendee.responseStatus === "declined" ||
+                      attendee.responseStatus === "tentative"
+                  );
+                }, waitTime);
+                waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+              } else if (
+                (order === "2nd" && !participant.secondDone) ||
+                (order === "3rd" && !participant.thirdDone)
+              ) {
+                setTimeout(() => {
+                  notAttendedEmail(
+                    participant.email,
+                    participant.firstname,
+                    false,
+                    participant.courseName,
+                    order
+                  );
+                }, waitTime);
+                waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+              }
             }
           }
-          if (
-            attendee.responseStatus === "declined" ||
-            attendee.responseStatus === "tentative"
-          ) {
-            someoneDeclined = true;
-          }
-        }
-        if (someoneDeclined) {
-          if (!participant.firstDone) {
-            setTimeout(() => {
-              reschEventNotificationEmail(
-                participant.email,
-                participant.firstname,
-                false,
-                participant.courseName,
-                hoursLeft,
-                false
-              );
-            }, waitTime);
-            waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
-          }
-        }
-        if (
-          participant.responseStatus !== "accepted" &&
-          hoursLeft > 0 &&
-          hoursLeft <= 19
-        ) {
-          setTimeout(() => {
-            eventNotificationEmail(
-              participant.email,
-              participant.firstname,
-              false,
-              participant.courseName,
-              hoursLeft,
-              false,
-              "",
-              order,
-              false
-            );
-          }, waitTime);
-          waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
-        }
-        if (
-          sameDay &&
-          hoursLeft < -0.5 &&
-          ((order === "2nd" && !participant.secondDone) ||
-            (order === "3rd" && !participant.thirdDone))
-        ) {
         }
       }
     }

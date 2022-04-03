@@ -10,6 +10,8 @@ const {
   insertLifeLogEvent,
 } = require("./GoogleCalendar");
 
+const { pad2Num } = require("./utils");
+
 // Schedule UX Research appointments
 exports.schedule = async (req, res) => {
   try {
@@ -99,6 +101,26 @@ exports.futureEvents = async (nextDays) => {
     const start = new Date();
     let end = new Date();
     end = new Date(end.getTime() + nextDays * 24 * 60 * 60 * 1000);
+    return await getEvents(start, end, "America/Detroit");
+  } catch (err) {
+    console.log({ err });
+    return false;
+  }
+};
+
+// Get all the events that are concluded today.
+exports.todayPastEvents = async () => {
+  try {
+    let start = new Date();
+    start = new Date(
+      start.getFullYear() +
+        "-" +
+        pad2Num(start.getMonth() + 1) +
+        "-" +
+        pad2Num(start.getDate()) +
+        "T12:00:00.000Z"
+    );
+    let end = new Date();
     return await getEvents(start, end, "America/Detroit");
   } catch (err) {
     console.log({ err });
