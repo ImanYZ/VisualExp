@@ -243,8 +243,8 @@ const Communities = (props) => {
                     </Typography>
                     <YoutubeEmbed embedId={communi.YouTube} />
                   </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
+                  {/* </Grid>
+                <Grid item xs={12} lg={6} xl={4}> */}
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Typography
                       variant="h5"
@@ -265,27 +265,31 @@ const Communities = (props) => {
                     </Typography>
                   </Paper>
                 </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Accomplishments
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.accomplishments}
-                    </Typography>
-                  </Paper>
-                </Grid>
+                {typeof communi.accomplishments === "object" &&
+                  !Array.isArray(communi.accomplishments) &&
+                  communi.accomplishments !== null && (
+                    <Grid item xs={12} lg={6} xl={4}>
+                      <Paper sx={{ padding: "10px", mb: "19px" }}>
+                        <Typography
+                          variant="h5"
+                          component="div"
+                          sx={{
+                            pt: "19px",
+                            pb: "19px",
+                          }}
+                        >
+                          Community Accomplishments
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ textAlign: "left" }}
+                        >
+                          {communi.accomplishments}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  )}
                 <Grid item xs={12} lg={6} xl={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Typography
@@ -406,8 +410,7 @@ const Communities = (props) => {
                   </Paper>
                 </Grid>
                 <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
+                  {/* <Typography
                       variant="h5"
                       component="div"
                       sx={{
@@ -416,183 +419,176 @@ const Communities = (props) => {
                       }}
                     >
                       Community Members
+                    </Typography> */}
+                  <Paper
+                    sx={{
+                      m: "2.5px",
+                      minHeight: "130px",
+                    }}
+                  >
+                    <Typography
+                      variant="h5"
+                      component="div"
+                      sx={{
+                        display: "block",
+                        padding: "19px 0px 0px 19px",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Community Leader{communi.leaders.length > 1 ? "s" : ""}
                     </Typography>
-                    <Paper
+                    <Box
                       sx={{
-                        m: "2.5px",
-                        minHeight: "130px",
+                        display: "flex",
+                        justifyContent: "left",
+                        flexWrap: "wrap",
+                        listStyle: "none",
+                        p: 0.5,
+                        m: 0,
                       }}
+                      component="ul"
                     >
-                      <Typography
-                        variant="h5"
-                        component="div"
-                        sx={{
-                          display: "block",
-                          padding: "19px 0px 0px 19px",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Community Leaders
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "left",
-                          flexWrap: "wrap",
-                          listStyle: "none",
-                          p: 0.5,
-                          m: 0,
-                        }}
-                        component="ul"
-                      >
-                        {communi.leaders &&
-                          communi.leaders.map((leader, idx) => {
-                            return (
-                              <li key={leader.name}>
-                                <Chip
-                                  sx={{
-                                    height: "109px",
-                                    margin: "10px",
-                                    borderRadius: "58px",
-                                  }}
-                                  icon={
-                                    <Avatar
-                                      src={
-                                        "/static/CommunityLeaders/" +
-                                        leader.image
+                      {communi.leaders &&
+                        communi.leaders.map((leader, idx) => {
+                          return (
+                            <li key={leader.name}>
+                              <Chip
+                                sx={{
+                                  height: "109px",
+                                  margin: "10px",
+                                  borderRadius: "58px",
+                                }}
+                                icon={
+                                  <Avatar
+                                    src={
+                                      "/static/CommunityLeaders/" + leader.image
+                                    }
+                                    alt={leader.name}
+                                    sx={{
+                                      width: "100px",
+                                      height: "100px",
+                                      mr: 2.5,
+                                    }}
+                                  />
+                                }
+                                variant="outlined"
+                                label={
+                                  <>
+                                    <Typography variant="h5" component="div">
+                                      {leader.name}
+                                    </Typography>
+                                    {leader.websites &&
+                                      leader.websites.map((wSite, wIdx) => {
+                                        return (
+                                          <IconButton
+                                            key={wIdx}
+                                            component="a"
+                                            href={wSite.url}
+                                            target="_blank"
+                                            aria-label={wSite.name}
+                                          >
+                                            {wSite.name === "LinkedIn" ? (
+                                              <LinkedInIcon />
+                                            ) : (
+                                              <LinkIcon />
+                                            )}
+                                          </IconButton>
+                                        );
+                                      })}
+                                    <IconButton
+                                      component="a"
+                                      href={
+                                        "mailto:onecademy@umich.edu?subject=" +
+                                        communi.title +
+                                        " Question for " +
+                                        leader.name
                                       }
-                                      alt={leader.name}
-                                      sx={{
-                                        width: "100px",
-                                        height: "100px",
-                                        mr: 2.5,
-                                      }}
-                                    />
-                                  }
-                                  variant="outlined"
-                                  label={
-                                    <>
-                                      <Typography variant="h5" component="div">
-                                        {leader.name}
-                                      </Typography>
-                                      {leader.websites &&
-                                        leader.websites.map((wSite, wIdx) => {
-                                          return (
-                                            <IconButton
-                                              key={wIdx}
-                                              component="a"
-                                              href={wSite.url}
-                                              target="_blank"
-                                              aria-label={wSite.name}
-                                            >
-                                              {wSite.name === "LinkedIn" ? (
-                                                <LinkedInIcon />
-                                              ) : (
-                                                <LinkIcon />
-                                              )}
-                                            </IconButton>
-                                          );
-                                        })}
-                                      <IconButton
-                                        component="a"
-                                        href={
-                                          "mailto:onecademy@umich.edu?subject=" +
-                                          communi.title +
-                                          " Question for " +
-                                          leader.name
-                                        }
-                                        target="_blank"
-                                        aria-label="email"
-                                      >
-                                        <EmailIcon />
-                                      </IconButton>
-                                    </>
-                                  }
-                                />
-                              </li>
-                            );
-                          })}
-                      </Box>
-                    </Paper>
-                    <Paper
+                                      target="_blank"
+                                      aria-label="email"
+                                    >
+                                      <EmailIcon />
+                                    </IconButton>
+                                  </>
+                                }
+                              />
+                            </li>
+                          );
+                        })}
+                    </Box>
+                  </Paper>
+                  <Paper
+                    sx={{
+                      m: "2.5px",
+                      mt: "10px",
+                      minHeight: "130px",
+                    }}
+                  >
+                    <Typography
+                      variant="h5"
+                      component="div"
                       sx={{
-                        m: "2.5px",
-                        minHeight: "130px",
+                        display: "block",
+                        padding: "19px 0px 0px 19px",
+                        fontStyle: "italic",
                       }}
                     >
-                      <Typography
-                        variant="h5"
-                        component="div"
-                        sx={{
-                          display: "block",
-                          padding: "19px 0px 0px 19px",
-                          fontStyle: "italic",
-                        }}
-                      >
-                        Leaderboard (Only those with &gt; 25 points)
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "left",
-                          flexWrap: "wrap",
-                          listStyle: "none",
-                          p: 0.5,
-                          m: 0,
-                        }}
-                        component="ul"
-                      >
-                        {communi.allTime &&
-                          communi.allTime.map((member, idx) => {
-                            return member.points >= 25 ? (
-                              <li key={member.uname}>
-                                <Chip
-                                  sx={{
-                                    height: "49px",
-                                    margin: "4px",
-                                    borderRadius: "28px",
-                                  }}
-                                  icon={
-                                    <Avatar
-                                      src={member.imageUrl}
-                                      alt={member.fullname}
-                                      sx={{
-                                        width: "40px",
-                                        height: "40px",
-                                        mr: 2.5,
-                                      }}
-                                    />
-                                  }
-                                  variant="outlined"
-                                  label={
-                                    <>
-                                      <Typography
-                                        variant="body2"
-                                        component="div"
-                                      >
-                                        {member.fullname}
-                                      </Typography>
-                                      <Typography
-                                        variant="body2"
-                                        component="div"
-                                      >
-                                        {idx < 3 ? "🏆" : "✔️"}
-                                        {" " +
-                                          Math.round(
-                                            (member.points + Number.EPSILON) *
-                                              100
-                                          ) /
-                                            100}
-                                      </Typography>
-                                    </>
-                                  }
-                                />
-                              </li>
-                            ) : null;
-                          })}
-                      </Box>
-                    </Paper>
-                    {/* <Grid
+                      Leaderboard (Only those with &gt; 25 points)
+                    </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "left",
+                        flexWrap: "wrap",
+                        listStyle: "none",
+                        p: 0.5,
+                        m: 0,
+                      }}
+                      component="ul"
+                    >
+                      {communi.allTime &&
+                        communi.allTime.map((member, idx) => {
+                          return member.points >= 25 ? (
+                            <li key={member.uname}>
+                              <Chip
+                                sx={{
+                                  height: "49px",
+                                  margin: "4px",
+                                  borderRadius: "28px",
+                                }}
+                                icon={
+                                  <Avatar
+                                    src={member.imageUrl}
+                                    alt={member.fullname}
+                                    sx={{
+                                      width: "40px",
+                                      height: "40px",
+                                      mr: 2.5,
+                                    }}
+                                  />
+                                }
+                                variant="outlined"
+                                label={
+                                  <>
+                                    <Typography variant="body2" component="div">
+                                      {member.fullname}
+                                    </Typography>
+                                    <Typography variant="body2" component="div">
+                                      {idx < 3 ? "🏆" : "✔️"}
+                                      {" " +
+                                        Math.round(
+                                          (member.points + Number.EPSILON) * 100
+                                        ) /
+                                          100}
+                                    </Typography>
+                                  </>
+                                }
+                              />
+                            </li>
+                          ) : null;
+                        })}
+                    </Box>
+                  </Paper>
+                  {/* <Grid
                       container
                       spacing={2.5}
                       align="center"
@@ -671,7 +667,6 @@ const Communities = (props) => {
                           );
                         })}
                     </Grid> */}
-                  </Paper>
                 </Grid>
                 <Grid item xs={12} lg={6} xl={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
