@@ -34,6 +34,7 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
+  ongoingEvents,
 } = require("./scheduling");
 const { card, image } = require("./misinformationExp");
 
@@ -67,6 +68,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 // Schedule UX Research appointments
 app.post("/schedule", schedule);
 app.post("/allEvents", allEvents);
+app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
 

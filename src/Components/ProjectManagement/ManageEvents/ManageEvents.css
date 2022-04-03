@@ -3,11 +3,7 @@
   overflow-y: auto;
 }
 
-#ManageEventsContent {
-  height: 1900px;
-}
-
-#ApplicantsTable {
+.dataGridTable {
   height: 649px;
 }
 

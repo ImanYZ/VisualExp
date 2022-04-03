@@ -257,8 +257,12 @@ const ManageEvents = (props) => {
   const fullname = useRecoilValue(fullnameState);
   // const firebaseOne = useRecoilValue(firebaseOneState);
 
+  const [availabilities, setAvailabilities] = useState([]);
+  const [availabilitiesLoaded, setAvailabilitiesLoaded] = useState(false);
   const [events, setEvents] = useState([]);
+  const [ongoingEvents, setOngoingEvents] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
+  const [ongoingEventsLoaded, setOngoingEventsLoaded] = useState(false);
   const [participant, setParticipant] = useState("");
   const [schedule, setSchedule] = useState([]);
   const [firstSessions, setFirstSessions] = useState([]);
@@ -281,92 +285,120 @@ const ManageEvents = (props) => {
   const [recall3rdRatio, setRecall3rdRatio] = useState(0);
 
   useEffect(() => {
-    const loadEvents = async () => {
+    const loadAvailabilities = async () => {
       const scheduleDocs = await firebase.db
         .collection("schedule")
         .orderBy("id")
         .get();
-      const schedule = [];
+      const sched = [];
       for (let scheduleDoc of scheduleDocs.docs) {
-        schedule.push(scheduleDoc.data());
+        sched.push(scheduleDoc.data());
       }
+      setAvailabilities(sched);
+      setAvailabilitiesLoaded(true);
+    };
+    if (firebase) {
+      loadAvailabilities();
+    }
+  }, [firebase]);
 
-      let responseObj = await axios.post("/allEvents", {});
-      const allEvents = responseObj.data.events;
-      const evs = [];
-      const currentTime = new Date().getTime();
-      // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
-      for (let ev of allEvents) {
-        const startTime = new Date(ev.start.dateTime).getTime();
-        const endTime = new Date(ev.end.dateTime).getTime();
-        const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
-        let weAreWaiting = false;
-        if (hoursLeft <= 0 && currentTime < endTime + 30 * 60 * 1000) {
-          weAreWaiting = true;
-        }
-        const event = {
-          start: ev.start.dateTime,
-          end: ev.end.dateTime,
-          id: ev.id,
-          attendees: [],
-          attendeesNum: 0,
-          notAccepted: [],
-          acceptedNum: 0,
-          declined: [],
-          declinedNum: 0,
-          participant: "",
-          order: "",
-          firstname: "",
-          hangoutLink: ev.hangoutLink,
-          weAreWaiting,
-          hoursLeft,
-          courseName: "",
-        };
-        const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
-        if (scheduleIdx !== -1) {
-          event.participant = schedule[scheduleIdx].email.toLowerCase();
-          event.order = schedule[scheduleIdx].order;
-        }
-        if ("attendees" in ev) {
-          event.attendeesNum = ev.attendees.length;
-          for (let attendee of ev.attendees) {
-            event.attendees.push(attendee.email.toLowerCase());
-            if (attendee.email.toLowerCase() === event.participant) {
-              const userDocs = await firebase.db
-                .collection("users")
-                .where("email", "==", attendee.email.toLowerCase())
-                .get();
-              if (userDocs.docs.length > 0) {
-                const userData = userDocs.docs[0].data();
-                event.firstname = userData.firstname;
-                if (userData.course) {
-                  event.courseName = userData.course;
-                }
-              }
-            }
-            if (attendee.responseStatus === "accepted") {
-              event.acceptedNum += 1;
-            } else {
-              event.notAccepted.push(attendee.email.toLowerCase());
-              if (
-                attendee.responseStatus === "declined" ||
-                attendee.responseStatus === "tentative"
-              ) {
-                event.declined.push(attendee.email);
-                event.declinedNum += 1;
+  const retrieveEvents = async (relativeURL) => {
+    let responseObj = await axios.post(relativeURL, {});
+    const allEvents = responseObj.data.events;
+    const evs = [];
+    const currentTime = new Date().getTime();
+    // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+    for (let ev of allEvents) {
+      const startTime = new Date(ev.start.dateTime).getTime();
+      const endTime = new Date(ev.end.dateTime).getTime();
+      const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
+      let weAreWaiting = false;
+      if (hoursLeft <= 0 && currentTime < endTime + 30 * 60 * 1000) {
+        weAreWaiting = true;
+      }
+      const event = {
+        start: ev.start.dateTime,
+        end: ev.end.dateTime,
+        id: ev.id,
+        attendees: [],
+        attendeesNum: 0,
+        notAccepted: [],
+        acceptedNum: 0,
+        declined: [],
+        declinedNum: 0,
+        participant: "",
+        order: "",
+        firstname: "",
+        hangoutLink: ev.hangoutLink,
+        weAreWaiting,
+        hoursLeft,
+        courseName: "",
+      };
+      const availabilitiesIdx = availabilities.findIndex(
+        (sch) => sch.id === ev.id
+      );
+      if (availabilitiesIdx !== -1) {
+        event.participant =
+          availabilities[availabilitiesIdx].email.toLowerCase();
+        event.order = availabilities[availabilitiesIdx].order;
+      }
+      if ("attendees" in ev) {
+        event.attendeesNum = ev.attendees.length;
+        for (let attendee of ev.attendees) {
+          event.attendees.push(attendee.email.toLowerCase());
+          if (attendee.email.toLowerCase() === event.participant) {
+            const userDocs = await firebase.db
+              .collection("users")
+              .where("email", "==", attendee.email.toLowerCase())
+              .get();
+            if (userDocs.docs.length > 0) {
+              const userData = userDocs.docs[0].data();
+              event.firstname = userData.firstname;
+              if (userData.course) {
+                event.courseName = userData.course;
               }
             }
           }
+          if (attendee.responseStatus === "accepted") {
+            event.acceptedNum += 1;
+          } else {
+            event.notAccepted.push(attendee.email.toLowerCase());
+            if (
+              attendee.responseStatus === "declined" ||
+              attendee.responseStatus === "tentative"
+            ) {
+              event.declined.push(attendee.email);
+              event.declinedNum += 1;
+            }
+          }
         }
-        evs.push(event);
       }
+      evs.push(event);
+    }
+    return evs;
+  };
+
+  useEffect(() => {
+    const loadOngoingEvents = async () => {
+      const evs = await retrieveEvents("/ongoingEvents");
+      setOngoingEvents(evs);
+      setOngoingEventsLoaded(true);
+    };
+    if (firebase && availabilitiesLoaded && availabilities) {
+      loadOngoingEvents();
+    }
+  }, [firebase, availabilitiesLoaded, availabilities]);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      const evs = await retrieveEvents("/allEvents");
       setEvents(evs);
       setExpSessionsLoaded(true);
     };
-    if (firebase && fullname) {
+    if (firebase && ongoingEventsLoaded && availabilities) {
       loadEvents();
     }
-  }, [firebase, fullname]);
+  }, [firebase, ongoingEventsLoaded, availabilities]);
 
   useEffect(() => {
     const notifyApplicationStatuses = async () => {
@@ -626,6 +658,19 @@ const ManageEvents = (props) => {
 
   return (
     <div id="ManageEventsContainer">
+      <div className="dataGridTable">
+        <DataGrid
+          rows={ongoingEvents}
+          columns={expSessionsColumns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          hideFooterSelectedRowCount
+          loading={!expSessionsLoaded}
+          onRowClick={gridRowClick}
+        />
+      </div>
       <Paper style={{ margin: "19px", padding: "4px" }}>
         <p>{totalRegistered} total registered since 01/14/2022!</p>
         <p>
@@ -655,7 +700,7 @@ const ManageEvents = (props) => {
         <p>{recall2ndRatio} Free recall score ratio average in 2nd session!</p>
         <p>{recall3rdRatio} Free recall score ratio average in 3rd session!</p>
       </Paper>
-      <div id="ApplicantsTable">
+      <div className="dataGridTable">
         <DataGrid
           rows={applicants}
           columns={applicantsColumns}
@@ -667,7 +712,7 @@ const ManageEvents = (props) => {
           loading={!applicantsLoaded}
         />
       </div>
-      <div id="ManageEventsContent">
+      <div className="dataGridTable">
         <DataGrid
           rows={events}
           columns={expSessionsColumns}
