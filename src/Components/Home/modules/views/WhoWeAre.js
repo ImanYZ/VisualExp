@@ -321,7 +321,7 @@ const WhoWeAre = (props) => {
                 <ListItemAvatar>
                   <Avatar
                     alt="Iman YeckehZaare Picture"
-                    src="/static/Iman_YeckehZaare.jpeg"
+                    src="/static/Iman_YeckehZaare.jpg"
                     sx={{ width: 100, height: 130, mr: 2.5 }}
                   />
                 </ListItemAvatar>
