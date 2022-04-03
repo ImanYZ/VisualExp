@@ -15,6 +15,7 @@ const {
   getActivityTimeStamps,
   getIn30Minutes,
   getDateString,
+  datesAreOnSameDay,
 } = require("./utils");
 const {
   reschEventNotificationEmail,
@@ -1110,61 +1111,101 @@ exports.remindCalendarInvitations = async (context) => {
       const startTime = new Date(ev.start.dateTime).getTime();
       const endTime = new Date(ev.end.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
+      const sameDay = datesAreOnSameDay(
+        new Date(ev.start.dateTime),
+        new Date()
+      );
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
-      let participant, order, firstname, courseName;
-      if (scheduleIdx !== -1) {
-        participant = schedule[scheduleIdx].email.toLowerCase();
-        order = schedule[scheduleIdx].order;
-      }
-      if ("attendees" in ev && Array.isArray(ev.attendees)) {
+      if (
+        scheduleIdx !== -1 &&
+        "attendees" in ev &&
+        Array.isArray(ev.attendees)
+      ) {
+        const participant = {
+          email: schedule[scheduleIdx].email.toLowerCase(),
+        };
+        const order = schedule[scheduleIdx].order;
+        let someoneDeclined = false;
         for (let attendee of ev.attendees) {
-          if (attendee.email.toLowerCase() === participant) {
+          if (attendee.email.toLowerCase() === participant.email) {
+            participant.responseStatus = attendee.responseStatus;
             const userDocs = await db
               .collection("users")
               .where("email", "==", attendee.email.toLowerCase())
               .get();
             if (userDocs.docs.length > 0) {
               const userData = userDocs.docs[0].data();
-              firstname = userData.firstname;
+              participant.firstname = userData.firstname;
               if (userData.course) {
-                courseName = userData.course;
+                participant.courseName = userData.course;
+              } else {
+                participant.courseName = "";
+              }
+              if (userData.postQ2Choice) {
+                participant.firstDone = true;
+              } else {
+                participant.firstDone = false;
+              }
+              if (userData.post3DaysQ2Choice) {
+                participant.secondDone = true;
+              } else {
+                participant.secondDone = false;
+              }
+              if (userData.post1WeekQ2Choice) {
+                participant.thirdDone = true;
+              } else {
+                participant.thirdDone = false;
               }
             }
           }
-          if (attendee.responseStatus !== "accepted") {
-            if (
-              (attendee.responseStatus === "declined" ||
-                attendee.responseStatus === "tentative") &&
-              order === "1st"
-            ) {
-              setTimeout(() => {
-                reschEventNotificationEmail(
-                  participant,
-                  firstname,
-                  false,
-                  "",
-                  hoursLeft,
-                  false
-                );
-              }, waitTime);
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
-            } else if (hoursLeft > 0 && hoursLeft <= 19) {
-              setTimeout(() => {
-                eventNotificationEmail(
-                  participant,
-                  firstname,
-                  false,
-                  "",
-                  hoursLeft,
-                  false,
-                  "",
-                  order,
-                  false
-                );
-              }, waitTime);
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
-            }
+          if (
+            attendee.responseStatus === "declined" ||
+            attendee.responseStatus === "tentative"
+          ) {
+            someoneDeclined = true;
           }
+        }
+        if (someoneDeclined) {
+          if (!participant.firstDone) {
+            setTimeout(() => {
+              reschEventNotificationEmail(
+                participant.email,
+                participant.firstname,
+                false,
+                participant.courseName,
+                hoursLeft,
+                false
+              );
+            }, waitTime);
+            waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+          }
+        }
+        if (
+          participant.responseStatus !== "accepted" &&
+          hoursLeft > 0 &&
+          hoursLeft <= 19
+        ) {
+          setTimeout(() => {
+            eventNotificationEmail(
+              participant.email,
+              participant.firstname,
+              false,
+              participant.courseName,
+              hoursLeft,
+              false,
+              "",
+              order,
+              false
+            );
+          }, waitTime);
+          waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+        }
+        if (
+          sameDay &&
+          hoursLeft < -0.5 &&
+          ((order === "2nd" && !participant.secondDone) ||
+            (order === "3rd" && !participant.thirdDone))
+        ) {
         }
       }
     }

@@ -70,13 +70,14 @@ const generateUID = () => {
   );
 };
 
+const datesAreOnSameDay = (first, second) =>
+  first.getFullYear() === second.getFullYear() &&
+  first.getMonth() === second.getMonth() &&
+  first.getDate() === second.getDate();
+
 const isToday = (theDate) => {
   const now = new Date();
-  return (
-    theDate.getFullYear() === now.getFullYear() &&
-    theDate.getMonth() === now.getMonth() &&
-    theDate.getDate() === now.getDate()
-  );
+  return datesAreOnSameDay(now, theDate);
 };
 
 const getDateString = (dateObj) => {
@@ -113,6 +114,7 @@ module.exports = {
   getIn30Minutes,
   generateUID,
   isToday,
+  datesAreOnSameDay,
   getDateString,
   nextWeek,
   capitalizeFirstLetter,
