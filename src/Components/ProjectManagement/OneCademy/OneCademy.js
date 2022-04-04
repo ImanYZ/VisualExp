@@ -3,6 +3,10 @@ import { useRecoilValue, useRecoilState } from "recoil";
 
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
 
 import { isEmail } from "../../../utils/general";
 
@@ -12,6 +16,8 @@ import {
   emailOneState,
 } from "../../../store/OneCademyAtoms";
 
+import { notAResearcherState } from "../../../store/ProjectAtoms";
+
 import ValidatedInput from "../../ValidatedInput/ValidatedInput";
 
 import favicon from "../../../assets/favicon.png";
@@ -20,11 +26,65 @@ import "./OneCademy.css";
 
 const OneCademy = (props) => {
   const firebase = useRecoilValue(firebaseOneState);
+  const notAResearcher = useRecoilValue(notAResearcherState);
   const [username, setUsername] = useRecoilState(usernameState);
   const [email, setEmail] = useRecoilState(emailOneState);
 
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);
+  const [activeUsers, setActiveUsers] = useState({});
+  const [usersChanges, setUsersChanges] = useState([]);
+
+  useEffect(() => {
+    if (firebase && !notAResearcher && username) {
+      const usersQuery = firebase.db.collection("users").where("deTag", "==", {
+        node: "WgF7yr5q7tJc54apVQSr",
+        title: "Knowledge Visualization",
+      });
+      const usersSnapshot = usersQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        setUsersChanges((oldUsersChanges) => {
+          return [...oldUsersChanges, ...docChanges];
+        });
+      });
+      return () => {
+        setUsersChanges([]);
+        usersSnapshot();
+      };
+    }
+  }, [firebase, notAResearcher, username]);
+
+  useEffect(() => {
+    if (!notAResearcher && usersChanges.length > 0) {
+      const tempUsersChanges = [...usersChanges];
+      setUsersChanges([]);
+      let aUsers = { ...activeUsers };
+      for (let change of tempUsersChanges) {
+        const userData = change.doc.data();
+        if (
+          (change.type === "removed" || userData.deleted) &&
+          change.doc.id in aUsers
+        ) {
+          delete aUsers[change.doc.id];
+        } else {
+          if (!(change.doc.id in aUsers)) {
+            aUsers[change.doc.id] = {
+              fullname: userData.fName + " " + userData.lName,
+              imageUrl: userData.imageUrl,
+              sNode: userData.sNode,
+            };
+          } else {
+            aUsers[change.doc.id] = {
+              fullname: userData.fName + " " + userData.lName,
+              imageUrl: userData.imageUrl,
+              sNode: userData.sNode,
+            };
+          }
+        }
+      }
+      setActiveUsers(aUsers);
+    }
+  }, [notAResearcher, usersChanges, activeUsers]);
 
   const passwordChange = (event) => {
     setPassword(event.target.value);
@@ -64,6 +124,24 @@ const OneCademy = (props) => {
 
   return (
     <div id="OneCademy">
+      <Stack direction="row" spacing={1} style={{ margin: "19px" }}>
+        {Object.keys(activeUsers).map((aUId) => {
+          return (
+            <Tooltip key={aUId} title={activeUsers[aUId].fullname}>
+              <Chip
+                avatar={
+                  <Avatar
+                    alt={activeUsers[aUId].fullname}
+                    src={activeUsers[aUId].imageUrl}
+                  />
+                }
+                label={activeUsers[aUId].sNode}
+                variant="outlined"
+              />
+            </Tooltip>
+          );
+        })}
+      </Stack>
       {username ? (
         <div id="SignButtonContainer">
           <Button onClick={signOut} className="Button Red" variant="contained">
