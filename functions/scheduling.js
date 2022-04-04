@@ -121,6 +121,7 @@ exports.todayPastEvents = async () => {
         "T12:00:00.000Z"
     );
     let end = new Date();
+    end = new Date(end.getTime() - 60 * 60 * 1000);
     return await getEvents(start, end, "America/Detroit");
   } catch (err) {
     console.log({ err });

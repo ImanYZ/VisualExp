@@ -91,18 +91,20 @@ exports.getEvent = async (eventId) => {
 exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
   try {
     let items = [];
-    let response = { data: { nextPageToken: true } };
-    const params = {
-      calendarId,
-      timeMin: dateTimeStart,
-      timeMax: dateTimeEnd,
-      timeZone,
-    };
-    while (response.data.nextPageToken) {
-      response = await calendar.events.list(params);
-      items = [...items, ...response.data.items];
-      if (response.data.nextPageToken) {
-        params.pageToken = response.data.nextPageToken;
+    if (dateTimeEnd > dateTimeStart) {
+      let response = { data: { nextPageToken: true } };
+      const params = {
+        calendarId,
+        timeMin: dateTimeStart,
+        timeMax: dateTimeEnd,
+        timeZone,
+      };
+      while (response.data.nextPageToken) {
+        response = await calendar.events.list(params);
+        items = [...items, ...response.data.items];
+        if (response.data.nextPageToken) {
+          params.pageToken = response.data.nextPageToken;
+        }
       }
     }
     return items;

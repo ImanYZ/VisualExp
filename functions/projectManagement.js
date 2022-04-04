@@ -1197,6 +1197,8 @@ exports.remindCalendarInvitations = async (context) => {
     const todayPastEvs = await todayPastEvents();
     // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
     for (let ev of todayPastEvs) {
+      const startTime = new Date(ev.start.dateTime).getTime();
+      const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
         scheduleIdx !== -1 &&
