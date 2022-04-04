@@ -657,7 +657,7 @@ const ManageEvents = (props) => {
   };
 
   return (
-    <div id="ManageEventsContainer">
+    <div style={{ height: "100vh", overflowY: "auto" }}>
       <div className="dataGridTable">
         <DataGrid
           rows={ongoingEvents}
@@ -725,19 +725,21 @@ const ManageEvents = (props) => {
           onRowClick={gridRowClick}
         />
         {schedule.length > 0 && (
-          <SelectSessions
-            startDate={new Date()}
-            numDays={16}
-            schedule={schedule}
-            setSchedule={setSchedule}
-            firstSessions={firstSessions}
-            secondSession={secondSession}
-            thirdSession={thirdSession}
-            setFirstSessions={setFirstSessions}
-            setSecondSession={setSecondSession}
-            setThirdSession={setThirdSession}
-            setSubmitable={setSubmitable}
-          />
+          <div style={{ marginBottom: "40px" }}>
+            <SelectSessions
+              startDate={new Date()}
+              numDays={16}
+              schedule={schedule}
+              setSchedule={setSchedule}
+              firstSessions={firstSessions}
+              secondSession={secondSession}
+              thirdSession={thirdSession}
+              setFirstSessions={setFirstSessions}
+              setSecondSession={setSecondSession}
+              setThirdSession={setThirdSession}
+              setSubmitable={setSubmitable}
+            />
+          </div>
         )}
       </div>
       <div id="SignBtnContainer">
