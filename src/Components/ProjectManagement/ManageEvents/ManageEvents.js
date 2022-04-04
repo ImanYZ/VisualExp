@@ -373,6 +373,7 @@ const ManageEvents = (props) => {
           }
         }
       }
+      evs.sort((a, b) => b.start - a.start);
       evs.push(event);
     }
     return evs;
