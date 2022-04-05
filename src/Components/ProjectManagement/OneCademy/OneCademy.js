@@ -188,6 +188,34 @@ const OneCademy = (props) => {
 
   return (
     <div id="OneCademy">
+      <Alert severity="warning">
+        The chips below show the title of the last node each researcher
+        interacted with. Colors have the following meanings:
+        <ul>
+          <li>
+            <span style={{ fontWeight: "700", color: green[700] }}>
+              Dark Green
+            </span>
+            : is currently activity
+          </li>
+          <li>
+            <span style={{ fontWeight: "700", color: green[200] }}>
+              Light Green
+            </span>
+            : was activity a few seconds ago
+          </li>
+          <li>
+            <span style={{ fontWeight: "700", color: red[200] }}>
+              Light Red
+            </span>
+            : was activity a while ago
+          </li>
+          <li>
+            <span style={{ fontWeight: "700", color: red[700] }}>Dark Red</span>
+            : has not been active for a while
+          </li>
+        </ul>
+      </Alert>
       <Paper
         sx={{
           display: "flex",
