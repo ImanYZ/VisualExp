@@ -11,6 +11,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { red, green } from "@mui/material/colors";
 
 import { isEmail } from "../../../utils/general";
+import withRoot from "../../Home/modules/withRoot";
 
 import {
   firebaseOneState,
@@ -26,7 +27,10 @@ import favicon from "../../../assets/favicon.png";
 
 import "./OneCademy.css";
 
-const colorKeys = Object.keys(red);
+const colorKeys = [50];
+for (let colorKey = 100; colorKey < 800; colorKey += 100) {
+  colorKeys.push(colorKey);
+}
 
 const OneCademy = (props) => {
   const firebase = useRecoilValue(firebaseOneState);
@@ -80,7 +84,7 @@ const OneCademy = (props) => {
               title: "",
               redIdx: -1,
               greenIdx: colorKeys.length - 1,
-              color: green[colorKeys.lenght - 1],
+              color: green[colorKeys[colorKeys.length - 1]],
             };
           } else {
             aUsers[change.doc.id] = {
@@ -90,11 +94,12 @@ const OneCademy = (props) => {
               title: "",
               redIdx: -1,
               greenIdx: colorKeys.length - 1,
-              color: green[colorKeys.lenght - 1],
+              color: green[colorKeys[colorKeys.length - 1]],
             };
           }
         }
       }
+      console.log({ aUsers });
       setActiveUsers(aUsers);
       setSNodesChanged(true);
     }
@@ -123,22 +128,27 @@ const OneCademy = (props) => {
     }
   }, [firebase, sNodesChanged, activeUsers, usersChanges]);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setActiveUsers(oUsers => {
-  //       const aUsers = [...oUsers];
-  //       for (let uId in aUsers) {
-  //         if (aUsers[uId].greenIdx > 0) {
-  //           aUsers[uId].greenIdx += 1;
-  //         }
-  //       }
-  //       return aUsers;
-  //     });
-  //   }, 10000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [firebase]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveUsers((oUsers) => {
+        const aUsers = { ...oUsers };
+        for (let uId in aUsers) {
+          if (aUsers[uId].greenIdx > 0) {
+            aUsers[uId].greenIdx -= 1;
+            aUsers[uId].color = green[colorKeys[aUsers[uId].greenIdx]];
+          } else if (aUsers[uId].redIdx < colorKeys.length - 1) {
+            aUsers[uId].greenIdx = -1;
+            aUsers[uId].redIdx += 1;
+            aUsers[uId].color = red[colorKeys[aUsers[uId].redIdx]];
+          }
+        }
+        return aUsers;
+      });
+    }, 40000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [firebase]);
 
   const passwordChange = (event) => {
     setPassword(event.target.value);
@@ -190,6 +200,7 @@ const OneCademy = (props) => {
         component="ul"
       >
         {Object.keys(activeUsers).map((aUId) => {
+          console.log({ color: activeUsers[aUId].color });
           return (
             <li key={aUId} style={{ margin: "4px" }}>
               <Tooltip title={activeUsers[aUId].fullname}>
@@ -201,7 +212,7 @@ const OneCademy = (props) => {
                     />
                   }
                   label={activeUsers[aUId].title}
-                  // color={}
+                  style={{ border: "2.5px solid " + activeUsers[aUId].color }}
                   variant="outlined"
                 />
               </Tooltip>
@@ -309,4 +320,4 @@ const OneCademy = (props) => {
   );
 };
 
-export default OneCademy;
+export default withRoot(OneCademy);
