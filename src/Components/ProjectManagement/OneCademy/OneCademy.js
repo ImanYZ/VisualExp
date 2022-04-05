@@ -5,8 +5,10 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
+
+import { red, green } from "@mui/material/colors";
 
 import { isEmail } from "../../../utils/general";
 
@@ -24,6 +26,8 @@ import favicon from "../../../assets/favicon.png";
 
 import "./OneCademy.css";
 
+const colorKeys = Object.keys(red);
+
 const OneCademy = (props) => {
   const firebase = useRecoilValue(firebaseOneState);
   const notAResearcher = useRecoilValue(notAResearcherState);
@@ -34,6 +38,7 @@ const OneCademy = (props) => {
   const [invalidAuth, setInvalidAuth] = useState(false);
   const [activeUsers, setActiveUsers] = useState({});
   const [usersChanges, setUsersChanges] = useState([]);
+  const [sNodesChanged, setSNodesChanged] = useState(false);
 
   useEffect(() => {
     if (firebase && !notAResearcher && username) {
@@ -72,19 +77,68 @@ const OneCademy = (props) => {
               fullname: userData.fName + " " + userData.lName,
               imageUrl: userData.imageUrl,
               sNode: userData.sNode,
+              title: "",
+              redIdx: -1,
+              greenIdx: colorKeys.length - 1,
+              color: green[colorKeys.lenght - 1],
             };
           } else {
             aUsers[change.doc.id] = {
               fullname: userData.fName + " " + userData.lName,
               imageUrl: userData.imageUrl,
               sNode: userData.sNode,
+              title: "",
+              redIdx: -1,
+              greenIdx: colorKeys.length - 1,
+              color: green[colorKeys.lenght - 1],
             };
           }
         }
       }
       setActiveUsers(aUsers);
+      setSNodesChanged(true);
     }
   }, [notAResearcher, usersChanges, activeUsers]);
+
+  useEffect(() => {
+    const retrieveSNodes = async () => {
+      setSNodesChanged(false);
+      const aUsers = { ...activeUsers };
+      for (let uId in aUsers) {
+        if (aUsers[uId].sNode) {
+          const sNodeDoc = await firebase.db
+            .collection("nodes")
+            .doc(aUsers[uId].sNode)
+            .get();
+          if (sNodeDoc.exists) {
+            const sNodeData = sNodeDoc.data();
+            aUsers[uId].title = sNodeData.title;
+          }
+        }
+      }
+      setActiveUsers(aUsers);
+    };
+    if (firebase && sNodesChanged && usersChanges.length === 0) {
+      retrieveSNodes();
+    }
+  }, [firebase, sNodesChanged, activeUsers, usersChanges]);
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setActiveUsers(oUsers => {
+  //       const aUsers = [...oUsers];
+  //       for (let uId in aUsers) {
+  //         if (aUsers[uId].greenIdx > 0) {
+  //           aUsers[uId].greenIdx += 1;
+  //         }
+  //       }
+  //       return aUsers;
+  //     });
+  //   }, 10000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [firebase]);
 
   const passwordChange = (event) => {
     setPassword(event.target.value);
@@ -124,24 +178,37 @@ const OneCademy = (props) => {
 
   return (
     <div id="OneCademy">
-      <Stack direction="row" spacing={1} style={{ margin: "19px" }}>
+      <Paper
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
+          listStyle: "none",
+          p: 0.5,
+          m: 0,
+        }}
+        component="ul"
+      >
         {Object.keys(activeUsers).map((aUId) => {
           return (
-            <Tooltip key={aUId} title={activeUsers[aUId].fullname}>
-              <Chip
-                avatar={
-                  <Avatar
-                    alt={activeUsers[aUId].fullname}
-                    src={activeUsers[aUId].imageUrl}
-                  />
-                }
-                label={activeUsers[aUId].sNode}
-                variant="outlined"
-              />
-            </Tooltip>
+            <li key={aUId} style={{ margin: "4px" }}>
+              <Tooltip title={activeUsers[aUId].fullname}>
+                <Chip
+                  avatar={
+                    <Avatar
+                      alt={activeUsers[aUId].fullname}
+                      src={activeUsers[aUId].imageUrl}
+                    />
+                  }
+                  label={activeUsers[aUId].title}
+                  // color={}
+                  variant="outlined"
+                />
+              </Tooltip>
+            </li>
           );
         })}
-      </Stack>
+      </Paper>
       {username ? (
         <div id="SignButtonContainer">
           <Button onClick={signOut} className="Button Red" variant="contained">
