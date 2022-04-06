@@ -155,7 +155,6 @@ export default [
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
-      `A minimum of a 3.5/4.0 GPA`,
       `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
     ],
     responsibilities: [
