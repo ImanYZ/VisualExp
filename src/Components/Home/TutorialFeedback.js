@@ -344,18 +344,22 @@ const TutorialFeedback = () => {
         1Cademy Tutorial Question Ids Sorted by # of Wrong Attempts
       </Typography>
       {tutorialsLoaded && (
-        <ul>
-          {wrongAttempts.map((wAttempt) => {
-            return (
-              <li key={wAttempt.questionId}>
-                <p>
-                  <strong>{wAttempt.wrongs} Attemps</strong>
-                </p>
-                <div>{wAttempt.stem}</div>
-              </li>
-            );
-          })}
-        </ul>
+        <div
+          style={{ height: "400px", overflowX: "hidden", overflowY: "auto" }}
+        >
+          <ul>
+            {wrongAttempts.map((wAttempt) => {
+              return (
+                <li key={wAttempt.questionId}>
+                  <p>
+                    <strong>{wAttempt.wrongs} Attemps</strong>
+                  </p>
+                  <div>{wAttempt.stem}</div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Tutorial # of Wrong Attempts &amp; Answers
