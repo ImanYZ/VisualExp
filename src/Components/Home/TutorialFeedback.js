@@ -68,6 +68,58 @@ const explanationsColumns = [
   { field: "posted", headerName: "Posted", type: "dateTime", width: 190 },
 ];
 
+const tutorialsColumns = [
+  {
+    field: "applicant",
+    headerName: "Applicant",
+    width: 220,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
+];
+for (let instrId in instructs) {
+  for (let questionId in instructs[instrId].questions) {
+    const qStem = instructs[instrId].questions[questionId].stem;
+    if (
+      tutorialsColumns.findIndex(
+        (tutCol) => tutCol.field === questionId + "_Wrongs"
+      ) === -1
+    ) {
+      tutorialsColumns.push({
+        field: questionId + "_Wrongs",
+        headerName: qStem,
+        type: "number",
+        width: 100,
+        disableColumnMenu: true,
+        renderCell: (cellValues) => {
+          return (
+            <GridCellToolTip
+              isLink={false}
+              cellValues={cellValues}
+              Tooltip="# of Wrong Attempts"
+            />
+          );
+        },
+      });
+      tutorialsColumns.push({
+        field: questionId + "_Answers",
+        headerName: qStem,
+        width: 220,
+        renderCell: (cellValues) => {
+          return (
+            <GridCellToolTip
+              isLink={false}
+              cellValues={cellValues}
+              Tooltip="Final Attempt Answers"
+            />
+          );
+        },
+      });
+    }
+  }
+}
+
 const TutorialFeedback = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -76,16 +128,6 @@ const TutorialFeedback = () => {
   const [explanationsChanges, setExplanationsChanges] = useState([]);
   const [explanationsLoaded, setExplanationsLoaded] = useState(false);
   const [tutorials, setTutorials] = useState([]);
-  const [tutorialsColumns, setTutorialsColumns] = useState([
-    {
-      field: "applicant",
-      headerName: "Applicant",
-      width: 220,
-      renderCell: (cellValues) => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      },
-    },
-  ]);
   const [tutorialsChanges, setTutorialsChanges] = useState([]);
   const [tutorialsLoaded, setTutorialsLoaded] = useState(false);
 
@@ -190,7 +232,6 @@ const TutorialFeedback = () => {
       const tempTutorialsChanges = [...tutorialsChanges];
       setTutorialsChanges([]);
       let tutos = [...tutorials];
-      let tutosColumns = [...tutorialsColumns];
       for (let change of tempTutorialsChanges) {
         if (change.type === "removed") {
           tutos = tutos.filter((tuto) => tuto.id !== change.doc.id);
@@ -205,43 +246,6 @@ const TutorialFeedback = () => {
               const questions = tutoData.attempts[instrId].questions;
               for (let questionId in questions) {
                 if (questionId in instructs[instrId].questions) {
-                  const qStem = instructs[instrId].questions[questionId].stem;
-                  if (
-                    tutosColumns.findIndex(
-                      (tutCol) => tutCol.field === questionId + "_Wrongs"
-                    ) === -1
-                  ) {
-                    tutosColumns.push({
-                      field: questionId + "_Wrongs",
-                      headerName: qStem,
-                      type: "number",
-                      width: 100,
-                      disableColumnMenu: true,
-                      renderCell: (cellValues) => {
-                        return (
-                          <GridCellToolTip
-                            isLink={false}
-                            cellValues={cellValues}
-                            Tooltip="# of Wrong Attempts"
-                          />
-                        );
-                      },
-                    });
-                    tutosColumns.push({
-                      field: questionId + "_Answers",
-                      headerName: qStem,
-                      width: 220,
-                      renderCell: (cellValues) => {
-                        return (
-                          <GridCellToolTip
-                            isLink={false}
-                            cellValues={cellValues}
-                            Tooltip="Final Attempt Answers"
-                          />
-                        );
-                      },
-                    });
-                  }
                   newTuto[questionId + "_Wrongs"] =
                     questions[questionId].wrongs;
                   newTuto[questionId + "_Answers"] =
@@ -254,13 +258,11 @@ const TutorialFeedback = () => {
         }
       }
       setTutorials(tutos);
-      tutosColumns.sort((a, b) => a.field < b.field);
-      setTutorialsColumns(tutosColumns);
       setTimeout(() => {
         setTutorialsLoaded(true);
       }, 400);
     }
-  }, [tutorials, tutorialsColumns, tutorialsChanges]);
+  }, [tutorials, tutorialsChanges]);
 
   const checkExplanation = async (clickedCell) => {
     if (clickedCell.field === "checked") {
