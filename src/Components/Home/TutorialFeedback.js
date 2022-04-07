@@ -129,6 +129,7 @@ const TutorialFeedback = () => {
   const [explanationsLoaded, setExplanationsLoaded] = useState(false);
   const [tutorials, setTutorials] = useState([]);
   const [tutorialsChanges, setTutorialsChanges] = useState([]);
+  const [wrongAttempts, setWrongAttempts] = useState([]);
   const [tutorialsLoaded, setTutorialsLoaded] = useState(false);
 
   useEffect(() => {
@@ -230,6 +231,7 @@ const TutorialFeedback = () => {
   useEffect(() => {
     if (tutorialsChanges.length > 0) {
       const tempTutorialsChanges = [...tutorialsChanges];
+      const wAttempts = [...wrongAttempts];
       setTutorialsChanges([]);
       let tutos = [...tutorials];
       for (let change of tempTutorialsChanges) {
@@ -250,19 +252,48 @@ const TutorialFeedback = () => {
                     questions[questionId].wrongs;
                   newTuto[questionId + "_Answers"] =
                     questions[questionId].answers;
+                  const wAttemptsIdx = wAttempts.findIndex(
+                    (wAtt) => wAtt.questionId === questionId
+                  );
+                  const wAttemptsLoc = wAttempts.findIndex(
+                    (wAtt) => wAtt.wrongs < questions[questionId].wrongs
+                  );
+                  const newWAttempt = {
+                    applicant: change.doc.id,
+                    questionId,
+                    stem: instructs[instrId].questions[questionId].stem,
+                    wrongs: questions[questionId].wrongs,
+                  };
+                  if (wAttemptsIdx !== -1) {
+                    if (
+                      questions[questionId].wrongs >
+                      wAttempts[wAttemptsIdx].wrongs
+                    ) {
+                      wAttempts.splice(wAttemptsIdx, 1);
+                      wAttempts.splice(wAttemptsLoc, 0, newWAttempt);
+                    }
+                  } else {
+                    wAttempts.splice(wAttemptsLoc, 0, newWAttempt);
+                  }
                 }
               }
             }
           }
-          tutos.push(newTuto);
+          const tutosIdx = tutos.findIndex((tuto) => tuto.id === change.doc.id);
+          if (tutosIdx === -1) {
+            tutos.push(newTuto);
+          } else {
+            tutos.splice(tutosIdx, 1, newTuto);
+          }
         }
       }
       setTutorials(tutos);
+      setWrongAttempts(wAttempts);
       setTimeout(() => {
         setTutorialsLoaded(true);
       }, 400);
     }
-  }, [tutorials, tutorialsChanges]);
+  }, [tutorials, tutorialsChanges, wrongAttempts]);
 
   const checkExplanation = async (clickedCell) => {
     if (clickedCell.field === "checked") {
@@ -309,6 +340,23 @@ const TutorialFeedback = () => {
         loading={!explanationsLoaded}
         onCellClick={checkExplanation}
       />
+      <Typography variant="h3" gutterBottom marked="center" align="center">
+        1Cademy Tutorial Question Ids Sorted by # of Wrong Attempts
+      </Typography>
+      {tutorialsLoaded && (
+        <ul>
+          {wrongAttempts.map((wAttempt) => {
+            return (
+              <li key={wAttempt.questionId}>
+                <p>
+                  <strong>{wAttempt.wrongs} Attemps</strong>
+                </p>
+                <div>{wAttempt.stem}</div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Tutorial # of Wrong Attempts &amp; Answers
       </Typography>
