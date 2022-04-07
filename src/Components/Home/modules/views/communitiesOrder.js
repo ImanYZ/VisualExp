@@ -8,6 +8,10 @@ export default [
         title: "Cognitive Psychology",
         node: "jTz0wx46dQsbPURkQ0cl",
       },
+      {
+        title: "Knowledge Visualization",
+        node: "WgF7yr5q7tJc54apVQSr",
+      },
     ],
     allTime: [],
     weekly: [],
