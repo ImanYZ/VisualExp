@@ -543,7 +543,7 @@ export default [
         ],
       },
     ],
-    YouTube: "3nBM7JqrOQk",
+    YouTube: "otW11GyQ4dY",
     description: `The Disability Studies community explores past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
     accomplishments: `We have created a strong foundation of knowledge about a wide variety of topics and how they relate to disability.
     Some of the topics we have explored include:
