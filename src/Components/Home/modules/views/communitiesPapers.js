@@ -979,7 +979,7 @@ export default {
           },
         },
         Which_of_the_following_is_FALSE_about_the_NLTK_library_in_Python: {
-          stem: `12. Which of the following is FALSE about the NLTK library in Python?`,
+          stem: `12. Which of the following is TRUE about the NLTK library in Python?`,
           answers: ["d"],
           choices: {
             a: "It is the most commonly used library in Python for NLP",
