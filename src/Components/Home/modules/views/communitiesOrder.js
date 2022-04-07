@@ -16,7 +16,7 @@ export default [
     allTime: [],
     weekly: [],
     url: "/static/Communities/Cognitive_Psychology.jpeg",
-    title: "Cognitive Psychology of Learning",
+    title: "UX Research in Cognitive Psychology of Learning",
     width: "55%",
     leaders: [
       {
@@ -32,7 +32,7 @@ export default [
       },
     ],
     YouTube: "B6q-LYXvNCg",
-    description: `We study the cognitive psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    description: `We study the UX Research and Cognitive Psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
     accomplishments: (
       <div>
         <p>
