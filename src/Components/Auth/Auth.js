@@ -528,7 +528,7 @@ const Auth = (props) => {
           <p>
             Please read the consent form on the left carefully. By creating and
             account or signing into this website, you sign the consent form and
-            allow us to analyze this experiment session data.
+            allow us to analyze your data collected throughout this study.
           </p>
           <Alert severity="error">
             Please only use your Gmail address to create an account. You can
