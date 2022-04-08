@@ -151,7 +151,7 @@ const ConsentDocument = (props) => {
       <p>If you have questions about this research study, please contact:</p>
       <p>Principal Investigator: Iman YeckehZaare</p>
       <p>Email: oneweb@umich.edu</p>
-      <p>Phone: (+1) 734-556-5922</p>
+      <p>Phone: (+1) (734) 647-6333</p>
       <p>Faculty Advisor: Paul Resnick</p>
       <p>Email: presnick@umich.edu</p>
       <p>
