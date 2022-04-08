@@ -691,7 +691,41 @@ export default [
       },
     ],
     YouTube: "RBIRquj1dD8",
-    description: `The goal of the Cryptoeconomics Research Community is to conduct detailed and comprehensive research on the various applications of blockchain technology, as well as the underlying mechanisms that enable decentralized marketplaces and applications to function. Through 1Cademy, we aim to create and continuously improve upon a comprehensive map of cryptoeconomics knowledge, resulting in an ideal resource for learning about blockchain, cryptocurrencies, and their usage.`,
+    description: (
+      <div>
+        <p>
+          The goal of the Cryptoeconomics Research Community is to conduct
+          detailed and comprehensive research on the various applications of
+          blockchain technology, as well as the underlying mechanisms that
+          enable decentralized marketplaces and applications to function.
+          Through 1Cademy, we aim to create and continuously improve upon a
+          comprehensive map of cryptoeconomics knowledge, resulting in an ideal
+          resource for learning about blockchain, cryptocurrencies, and their
+          usage.
+        </p>
+        <p>
+          This position is a great opportunity for anyone desiring individual
+          research experience with a flexible schedule and the opportunity for
+          networking with others in your field. You will have the ability to
+          develop and improve your research skills through highly collaborative
+          group work and intercollegial/interdisciplinary interaction. While a
+          basic familiarity with blockchain technology and academic research is
+          preferred, anyone with a desire to learn more about the field of
+          cryptoeconomics and solid writing skills is qualified for the
+          position.
+        </p>
+        <p>
+          While this position is unpaid, we are very willing to work with your
+          academic institution so that you may receive some form of credit for
+          this internship. For anyone interested in pursuing their own
+          cryptoeconomics research in the future, this position is a great
+          opportunity to explore different areas in the field and gain a greater
+          familiarity with the existing academic literature. We strive to
+          provide interns with the skills and support they need to conduct
+          quality research independently in an area of their interest.
+        </p>
+      </div>
+    ),
     accomplishments: `We have covered a wide range of topics, from the mechanisms than enable individual cryptocurrencies to function, to the macroeconomic impacts of blockchain technology on different nations across the world. We have summarized information from multiple cryptocurrency whitepapers, as well as academic studies on the usage of blockchain in areas including health, music, international transfers, and global criminal activity. We allow individual interns to explore topics of their own interest, and collaborate with other interns to best utilize their talents and passions.`,
     gains: [
       `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
@@ -701,15 +735,14 @@ export default [
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts. We prefer our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
     hasTest: true,
     qualifications: [
-      `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy. `,
+      `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy.`,
       `Willingness to present work and engage in group discussions about research topics.`,
-      `Fluency in writing and reading in English (will have to summarize research articles). `,
-      `Must be able to attend weekly meetings on Thursdays at 8:30PM EST.`,
+      `Fluency in writing and reading in English (will have to summarize research articles).`,
+      `Must be able to attend weekly meetings on Thursdays from 8:30-9:30PM EST.`,
     ],
     responsibilities: [
       `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
       `Contribute in meetings by engaging in discussion with other interns about research topics.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
   {

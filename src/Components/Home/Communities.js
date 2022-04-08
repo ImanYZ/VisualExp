@@ -11,6 +11,8 @@ import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
 
+import Masonry from "@mui/lab/Masonry";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
@@ -228,88 +230,83 @@ const Communities = (props) => {
           </AccordionSummary>
           <AccordionDetails>
             {expanded === idx && (
-              <Grid container spacing={{ xs: 1, md: 2.2 }}>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Introduction
-                    </Typography>
-                    <YoutubeEmbed embedId={communi.YouTube} />
-                  </Paper>
-                  {/* </Grid>
-                <Grid item xs={12} lg={6} xl={4}> */}
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Description
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.description}
-                    </Typography>
-                  </Paper>
-                </Grid>
+              <Masonry
+                columns={{ xs: 1, md: 2, lg: 2, xl: 3 }}
+                spacing={{ xs: 1, md: 2.2 }}
+              >
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Introduction
+                  </Typography>
+                  <YoutubeEmbed embedId={communi.YouTube} />
+                </Paper>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Community Description
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "left" }}
+                  >
+                    {communi.description}
+                  </Typography>
+                </Paper>
                 {typeof communi.accomplishments === "object" &&
                   !Array.isArray(communi.accomplishments) &&
                   communi.accomplishments !== null && (
-                    <Grid item xs={12} lg={6} xl={4}>
-                      <Paper sx={{ padding: "10px", mb: "19px" }}>
-                        <Typography
-                          variant="h5"
-                          component="div"
-                          sx={{
-                            pt: "19px",
-                            pb: "19px",
-                          }}
-                        >
-                          Community Accomplishments
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ textAlign: "left" }}
-                        >
-                          {communi.accomplishments}
-                        </Typography>
-                      </Paper>
-                    </Grid>
+                    <Paper sx={{ padding: "10px", mb: "19px" }}>
+                      <Typography
+                        variant="h5"
+                        component="div"
+                        sx={{
+                          pt: "19px",
+                          pb: "19px",
+                        }}
+                      >
+                        Community Accomplishments
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: "left" }}
+                      >
+                        {communi.accomplishments}
+                      </Typography>
+                    </Paper>
                   )}
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      By Joining Us, You Will ...
-                    </Typography>
-                    <ul>
-                      {communi.gains &&
-                        communi.gains.map((gain, gIdx) => {
-                          return <li key={gIdx}>{gain}</li>;
-                        })}
-                    </ul>
-                  </Paper>
-                </Grid>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    By Joining Us, You Will ...
+                  </Typography>
+                  <ul>
+                    {communi.gains &&
+                      communi.gains.map((gain, gIdx) => {
+                        return <li key={gIdx}>{gain}</li>;
+                      })}
+                  </ul>
+                </Paper>
                 {/* <Grid item xs={12} lg={6} xl={4}>
                   <Paper sx={{ padding: "10px", mb: "19px" }}>
                     <Typography
@@ -341,75 +338,71 @@ const Communities = (props) => {
                     </Typography>
                   </Paper>
                 </Grid> */}
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Qualifications
-                    </Typography>
-                    <ul>
-                      {communi.qualifications &&
-                        communi.qualifications.map((qualifi, qIdx) => {
-                          return <li key={qIdx}>{qualifi}</li>;
-                        })}
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Qualifications
+                  </Typography>
+                  <ul>
+                    {communi.qualifications &&
+                      communi.qualifications.map((qualifi, qIdx) => {
+                        return <li key={qIdx}>{qualifi}</li>;
+                      })}
+                    <li>
+                      Complete the three online sessions of one of our ongoing
+                      research studies, as a participant, to better learn how we
+                      conduct our experiments.
+                    </li>
+                    <li>
+                      Submit your most current resume and unofficial
+                      transcripts, indicating a GPA above 3.4/4.0
+                    </li>
+                    <li>
+                      Explain in a few paragraphs why you apply to this specific
+                      community.
+                    </li>
+                    <li>
+                      Complete our community-specific quiz by answering a set of
+                      questions about some research papers or book chapters and
+                      get a satisfying score.
+                    </li>
+                    {communi.coursera && (
                       <li>
-                        Complete the three online sessions of one of our ongoing
-                        research studies, as a participant, to better learn how
-                        we conduct our experiments.
+                        Complete{" "}
+                        <a href={communi.coursera} target="_blank">
+                          this Coursera course
+                        </a>{" "}
+                        and upload your certificate as a part of the
+                        application.
                       </li>
-                      <li>
-                        Submit your most current resume and unofficial
-                        transcripts, indicating a GPA above 3.4/4.0
-                      </li>
-                      <li>
-                        Explain in a few paragraphs why you apply to this
-                        specific community.
-                      </li>
-                      <li>
-                        Complete our community-specific quiz by answering a set
-                        of questions about some research papers or book chapters
-                        and get a satisfying score.
-                      </li>
-                      {communi.coursera && (
-                        <li>
-                          Complete{" "}
-                          <a href={communi.coursera} target="_blank">
-                            this Coursera course
-                          </a>{" "}
-                          and upload your certificate as a part of the
-                          application.
-                        </li>
-                      )}
-                    </ul>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Responsibilities
-                    </Typography>
-                    <ul>
-                      {communi.responsibilities &&
-                        communi.responsibilities.map((responsibility, rIdx) => {
-                          return <li key={rIdx}>{responsibility}</li>;
-                        })}
-                    </ul>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
+                    )}
+                  </ul>
+                </Paper>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                    }}
+                  >
+                    Responsibilities
+                  </Typography>
+                  <ul>
+                    {communi.responsibilities &&
+                      communi.responsibilities.map((responsibility, rIdx) => {
+                        return <li key={rIdx}>{responsibility}</li>;
+                      })}
+                  </ul>
+                </Paper>
+                <Box>
                   {/* <Typography
                       variant="h5"
                       component="div"
@@ -588,7 +581,8 @@ const Communities = (props) => {
                         })}
                     </Box>
                   </Paper>
-                  {/* <Grid
+                </Box>
+                {/* <Grid
                       container
                       spacing={2.5}
                       align="center"
@@ -667,23 +661,20 @@ const Communities = (props) => {
                           );
                         })}
                     </Grid> */}
-                </Grid>
-                <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "0px",
-                      }}
-                    >
-                      Apply to Join this Community
-                    </Typography>
-                    <JoinUs community={communi} />
-                  </Paper>
-                </Grid>
-              </Grid>
+                <Paper sx={{ padding: "10px", mb: "19px" }}>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "0px",
+                    }}
+                  >
+                    Apply to Join this Community
+                  </Typography>
+                  <JoinUs community={communi} />
+                </Paper>
+              </Masonry>
             )}
           </AccordionDetails>
         </Accordion>
