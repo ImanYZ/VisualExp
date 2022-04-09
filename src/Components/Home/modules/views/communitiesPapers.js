@@ -30,7 +30,7 @@ export default {
           },
           What_do_titles_and_contents_of_nodes_in_Hybrid_maps_represent: {
             stem: "3. What do titles and contents of nodes in Hybrid maps represent?",
-            answers: ["b"],
+            answers: ["a"],
             choices: {
               a: "Each node title represents a key concept and the content explains it.",
               b: "Each node title represents any concept and the content explains it.",
@@ -39,13 +39,13 @@ export default {
             },
           },
           What_research_methods_are_used_in_this_study: {
-            stem: "4. What research method(s) are used in this study?:",
+            stem: "4. What research method(s) are used in this study?",
             answers: ["a", "c"],
             choices: {
               a: "Quantitative Research",
               b: "Theoretical Research",
               c: "Qualitative Research",
-              c: "Applied Research",
+              d: "Applied Research",
             },
           },
           What_are_the_research_questions_in_this_study: {

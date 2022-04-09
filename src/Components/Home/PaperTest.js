@@ -27,6 +27,7 @@ import {
   applicationSubmittedState,
 } from "../../store/AuthAtoms";
 
+import SnackbarComp from "../SnackbarComp";
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
 
@@ -57,6 +58,7 @@ const PaperTest = (props) => {
   const [attempts, setAttempts] = useState({});
   const [correctAttempts, setCorrectAttempts] = useState(0);
   const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     const paps = [];
@@ -219,7 +221,9 @@ const PaperTest = (props) => {
     if ("explanation" in question && question.explanation) {
       oAttempts[paperId].questions[question.id].explanation =
         question.explanation;
-      oAttempts[paperId].questions[question.id].explaId = question.explaId;
+      if ("explaId" in question && question.explaId) {
+        oAttempts[paperId].questions[question.id].explaId = question.explaId;
+      }
     }
     for (let choice in question.checks) {
       if (
@@ -314,9 +318,10 @@ const PaperTest = (props) => {
             .doc(question.explaId);
           explaDoc = await explaRef.get();
         } else {
+          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
           question.explaId = explaRef.id;
-          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
-          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
+          applData.attempts[paperId].questions[question.id].explaId =
+            explaRef.id;
         }
         const explaData = {
           fullname,
@@ -335,6 +340,9 @@ const PaperTest = (props) => {
             createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
           });
         }
+        setSnackbarMessage(
+          "You successfully submitted your feedback about this question!"
+        );
       }
       if (applDoc.exists) {
         await applRef.update(applData);
@@ -345,6 +353,74 @@ const PaperTest = (props) => {
         setApplicationSubmitted(true);
         const userRef = firebase.db.collection("users").doc(fullname);
         await userRef.update({ applicationSubmitted: true });
+      }
+    }
+  };
+
+  const submitExplanation = (paperId, qIdx) => async (event) => {
+    event.preventDefault();
+
+    if (expanded === false) {
+      return;
+    }
+    const question = questions[paperId][qIdx];
+    if (fullname && "explanation" in question && question.explanation) {
+      const oAttempts = { ...attempts };
+      oAttempts[paperId].submitted = firebase.firestore.Timestamp.fromDate(
+        new Date()
+      );
+      oAttempts[paperId].questions[question.id].explanation =
+        question.explanation;
+      if ("explaId" in question && question.explaId) {
+        oAttempts[paperId].questions[question.id].explaId = question.explaId;
+      }
+      setAttempts(oAttempts);
+      let applData = {
+        attempts: oAttempts,
+      };
+      const applRef = firebase.db
+        .collection("applications")
+        .doc(fullname + "_" + props.communiId);
+      const applDoc = await applRef.get();
+      if ("explanation" in question && question.explanation) {
+        let explaRef = firebase.db.collection("explanations").doc();
+        let explaDoc;
+        if ("explaId" in question && question.explaId) {
+          explaRef = firebase.db
+            .collection("explanations")
+            .doc(question.explaId);
+          explaDoc = await explaRef.get();
+        } else {
+          oAttempts[paperId].questions[question.id].explaId = explaRef.id;
+          question.explaId = explaRef.id;
+          applData.attempts[paperId].questions[question.id].explaId =
+            explaRef.id;
+        }
+        const explaData = {
+          fullname,
+          paperId,
+          qId: question.id,
+          explanation: question.explanation,
+        };
+        if (explaDoc && explaDoc.exists) {
+          await explaRef.update({
+            ...explaData,
+            updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        } else {
+          await explaRef.set({
+            ...explaData,
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          });
+        }
+        setSnackbarMessage(
+          "You successfully submitted your feedback about this question!"
+        );
+      }
+      if (applDoc.exists) {
+        await applRef.update(applData);
+      } else {
+        await applRef.set(applData);
       }
     }
   };
@@ -455,8 +531,8 @@ const PaperTest = (props) => {
                       sx={{
                         padding: "10px",
                         mb: "19px",
-                        height: "calc(100vh - 160px)",
-                        overflowY: "hidden",
+                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
+                        overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
                       {expanded !== papers.length - 1 ? (
@@ -509,101 +585,105 @@ const PaperTest = (props) => {
                     >
                       {idx === papers.length - 1 && (
                         <Box sx={{ mb: "10px", fontWeight: 700 }}>
-                          You had a total of {correctAttempts + wrongAttempts}{" "}
-                          attemps in answering the questions.
+                          You had a total of {wrongAttempts} wrong attemps in
+                          answering the questions.
                         </Box>
                       )}
                       {paper.id in questions &&
                         questions[paper.id].map((question, qIdx) => {
                           return (
-                            <form
-                              key={qIdx}
-                              onSubmit={handleSubmit(paper.id, qIdx)}
-                            >
-                              <FormControl
-                                error={question.error}
-                                component="fieldset"
-                                variant="standard"
-                                sx={{ mb: "19px" }}
+                            <>
+                              <form
+                                key={qIdx}
+                                onSubmit={handleSubmit(paper.id, qIdx)}
                               >
-                                <FormLabel component="legend">
-                                  {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
-                                  {question.stem}
-                                </FormLabel>
-                                <FormGroup>
-                                  {Object.keys(question.choices).map(
-                                    (choice, cIdx) => {
-                                      return (
-                                        <FormControlLabel
-                                          key={cIdx}
-                                          control={
-                                            <Checkbox
-                                              checked={question.checks[choice]}
-                                              onChange={checkChoice(
-                                                paper.id,
-                                                qIdx
-                                              )}
-                                              name={choice}
-                                            />
-                                          }
-                                          label={
-                                            <span>
-                                              {choice + ". "}
-                                              {question.choices[choice]}
-                                            </span>
-                                          }
-                                        />
-                                      );
-                                    }
-                                  )}
-                                </FormGroup>
-                                <FormHelperText>
-                                  <span
-                                    style={{
-                                      color: question.error ? "red" : "green",
+                                <FormControl
+                                  error={question.error}
+                                  component="fieldset"
+                                  variant="standard"
+                                  sx={{ mb: "19px" }}
+                                >
+                                  <FormLabel component="legend">
+                                    {/* {idx + 1 + "." + (qIdx + 1) + ". "} */}
+                                    {question.stem}
+                                  </FormLabel>
+                                  <FormGroup>
+                                    {Object.keys(question.choices).map(
+                                      (choice, cIdx) => {
+                                        return (
+                                          <FormControlLabel
+                                            key={cIdx}
+                                            control={
+                                              <Checkbox
+                                                checked={
+                                                  question.checks[choice]
+                                                }
+                                                onChange={checkChoice(
+                                                  paper.id,
+                                                  qIdx
+                                                )}
+                                                name={choice}
+                                              />
+                                            }
+                                            label={
+                                              <span>
+                                                {choice + ". "}
+                                                {question.choices[choice]}
+                                              </span>
+                                            }
+                                          />
+                                        );
+                                      }
+                                    )}
+                                  </FormGroup>
+                                  <FormHelperText>
+                                    <span
+                                      style={{
+                                        color: question.error ? "red" : "green",
+                                      }}
+                                    >
+                                      {question.helperText}
+                                    </span>
+                                  </FormHelperText>
+                                </FormControl>
+                                <Box
+                                  sx={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(2, 1fr)",
+                                    width: "100%",
+                                    margin: "-10px 0px 10px 0px",
+                                  }}
+                                >
+                                  <Button
+                                    sx={{
+                                      margin: "0px 7px 10px 7px",
+                                      color: "common.white",
                                     }}
+                                    type="submit"
+                                    color="success"
+                                    variant="contained"
+                                    disabled={
+                                      Object.values(question.checks).findIndex(
+                                        (chec) => chec
+                                      ) === -1 ||
+                                      question.helperText === "You got it!"
+                                    }
                                   >
-                                    {question.helperText}
-                                  </span>
-                                </FormHelperText>
-                              </FormControl>
-                              <Box
-                                sx={{
-                                  display: "grid",
-                                  gridTemplateColumns: "repeat(2, 1fr)",
-                                  width: "100%",
-                                  margin: "-10px 0px 10px 0px",
-                                }}
-                              >
-                                <Button
-                                  sx={{
-                                    margin: "0px 7px 10px 7px",
-                                    color: "common.white",
-                                  }}
-                                  type="submit"
-                                  color="success"
-                                  variant="contained"
-                                  disabled={
-                                    Object.values(question.checks).findIndex(
-                                      (chec) => chec
-                                    ) === -1 ||
-                                    question.helperText === "You got it!"
-                                  }
-                                >
-                                  Submit Answer
-                                </Button>
-                                <Button
-                                  onClick={openExplanation(paper.id, qIdx)}
-                                  sx={{
-                                    margin: "0px 7px 10px 7px",
-                                    color: "common.white",
-                                  }}
-                                  color="warning"
-                                  variant="contained"
-                                >
-                                  Report Difficulty
-                                </Button>
-                              </Box>
+                                    Submit Answer
+                                  </Button>
+                                  <Button
+                                    onClick={openExplanation(paper.id, qIdx)}
+                                    sx={{
+                                      margin: "0px 7px 10px 7px",
+                                      color: "common.white",
+                                    }}
+                                    color="warning"
+                                    variant="contained"
+                                  >
+                                    Report Difficulty
+                                  </Button>
+                                </Box>
+                              </form>
                               {question.explanationOpen && (
                                 <>
                                   <TextareaAutosize
@@ -622,7 +702,7 @@ const PaperTest = (props) => {
                                       margin: "10px 0px 25px 0px",
                                       color: "common.white",
                                     }}
-                                    type="submit"
+                                    onClick={submitExplanation(paper.id, qIdx)}
                                     color="success"
                                     variant="contained"
                                   >
@@ -630,7 +710,7 @@ const PaperTest = (props) => {
                                   </Button>
                                 </>
                               )}
-                            </form>
+                            </>
                           );
                         })}
                     </Paper>
@@ -713,6 +793,10 @@ const PaperTest = (props) => {
           attemps so far!
         </Box>
       </Paper>
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
+      />
     </>
   );
 };

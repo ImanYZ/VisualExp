@@ -564,7 +564,7 @@ const CommunityApplications = (props) => {
   };
 
   return (
-    <PagesNavbar thisPage="Dashboard">
+    <PagesNavbar thisPage="Applications">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         Applications to Your{" "}
         {props.communiIds.length > 1 ? "Communityies" : "Community"}
