@@ -6,7 +6,7 @@ export default {
       {
         title:
           "Hybrid Map: Visualizing Relations Between Paragraphs Improves Readability, Reading Comprehension, and Learning Compared to Novakian Concept Maps",
-        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
+        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FHybrid%20Map%20Visualizing%20Relations%20Between%20Paragraphs%20Improves%20Readability%2C%20Reading%20Comprehension%2C%20and%20Learning.pdf?alt=media&token=fbdab75a-c1b0-4deb-87eb-0082e7da8acd",
         questions: {
           What_do_nodes_in_Hybrid_maps_and_Novakian_concept_maps_include: {
             stem: "1. What do nodes in Hybrid maps and Novakian concept maps include?",
