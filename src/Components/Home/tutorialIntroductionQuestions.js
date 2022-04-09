@@ -732,7 +732,24 @@ export default {
         },
       },
       Have_you_changed_your_tag_to_the_correct_community: {
-        stem: quNum() + "Have you changed your tag to the correct community?",
+        stem: (
+          <div>
+            <p>{quNum()} Have you changed your tag to the correct community?</p>
+            <p>
+              Note that on top of this page, we asked you:{" "}
+              <strong>
+                Before moving forward, please create an account on{" "}
+                <a href="https://1cademy.com/" target="_blank">
+                  1Cademy web app
+                </a>
+                , which is different from the account you created before on this
+                web app.
+              </strong>{" "}
+              After creating your account, please go through this tutorial to
+              learn more about 1Cademy and how it works.
+            </p>
+          </div>
+        ),
         answers: ["b"],
         choices: {
           a: "No",
@@ -1253,7 +1270,7 @@ export default {
         answers: ["b", "e"],
         choices: {
           a: "A relation of parallel concepts in different disciplines",
-          b: "A relation between knowledge and what it helps to learn next",
+          b: "A relation in which a certain knowledge is required to learn another piece of information",
           c: "An example from a source related to a certain topic",
           d: "A relation of two similar principles",
           e: "If you need to learn concept A to be able to learn concept B, there is a prerequisite link from A to B.",

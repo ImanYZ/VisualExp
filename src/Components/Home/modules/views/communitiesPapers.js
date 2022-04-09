@@ -1,4 +1,318 @@
+import React from "react";
+
 export default {
+  ["Cognitive_Psychology"]: {
+    Hybrid_Map_Visualizing_Relations_Between_Paragraphs_Improves_Readability_Reading_Comprehension_and_Learning:
+      {
+        title:
+          "Hybrid Map: Visualizing Relations Between Paragraphs Improves Readability, Reading Comprehension, and Learning Compared to Novakian Concept Maps",
+        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
+        questions: {
+          What_do_nodes_in_Hybrid_maps_and_Novakian_concept_maps_include: {
+            stem: "1. What do nodes in Hybrid maps and Novakian concept maps include?",
+            answers: ["b"],
+            choices: {
+              a: "Hybrid nodes include only a few words; Nokavian nodes include a paragraph.",
+              b: "Nokavian nodes include only a few words; Hybrid nodes include a paragraph.",
+              c: "Both Hybrid and Nokavian nodes include multiple paragraph.",
+              d: "Both Hybrid and Nokavian nodes include only a few words.",
+            },
+          },
+          How_are_the_orientation_of_Hybrid_maps_and_Novakian_concept_maps: {
+            stem: "2. How are the orientation of Hybrid maps and Novakian concept maps?",
+            answers: ["a"],
+            choices: {
+              a: "Hybrid maps are left-to-right; Nokavian concept maps are top-down.",
+              b: "Nokavian concept maps are left-to-right; Hybrid maps are top-down.",
+              c: "Both Hybrid and Nokavian maps are left-to-right.",
+              d: "Both Hybrid and Nokavian maps are top-down.",
+            },
+          },
+          What_do_titles_and_contents_of_nodes_in_Hybrid_maps_represent: {
+            stem: "3. What do titles and contents of nodes in Hybrid maps represent?",
+            answers: ["b"],
+            choices: {
+              a: "Each node title represents a key concept and the content explains it.",
+              b: "Each node title represents any concept and the content explains it.",
+              c: "Each node content represents a key concept and the title explains it.",
+              d: "Each node content represents any concept and the title explains it.",
+            },
+          },
+          What_research_methods_are_used_in_this_study: {
+            stem: "4. What research method(s) are used in this study?:",
+            answers: ["a", "c"],
+            choices: {
+              a: "Quantitative Research",
+              b: "Theoretical Research",
+              c: "Qualitative Research",
+              c: "Applied Research",
+            },
+          },
+          What_are_the_research_questions_in_this_study: {
+            stem: "5. What are the research question(s) in this study",
+            answers: ["a", "b", "c", "d", "e", "f"],
+            choices: {
+              a: "Do Hybrid maps increase immediate reading comprehension test scores more/less than the corresponding Novakian Knowledge Models?",
+              b: "Do Hybrid maps increase immediate free recall test scores more/less than the corresponding Novakian Knowledge Models?",
+              c: "Do Hybrid maps increase delayed reading comprehension test scores more/less than the corresponding Novakian Knowledge Models?",
+              d: "Do Hybrid maps increase delayed free recall test scores more/less than the corresponding Novakian Knowledge Models?",
+              e: "Do students find Hybrid maps more/less easy-to-read than the corresponding Novakian Knowledge Models?",
+              f: "Do students find Hybrid maps more/less helpful for their learning than the corresponding Novakian Knowledge Models?",
+            },
+          },
+          What_are_the_results_of_this_study: {
+            stem: "6. What are the results of this study?",
+            answers: ["a", "b", "c", "d", "e", "f"],
+            choices: {
+              a: "Hybrid maps increased immediate reading comprehension test scores significantly more than the corresponding Novakian Knowledge Models.",
+              b: "Hybrid maps increased immediate free recall test scores significantly more than the corresponding Novakian Knowledge Models.",
+              c: "Hybrid map increased delayed reading comprehension test scores significantly more than the corresponding Novakian Knowledge Models.",
+              d: "Hybrid map did NOT increase delayed free recall test scores significantly more than the corresponding Novakian Knowledge Models.",
+              e: "Students found Hybrid maps easier-to-read than the corresponding Novakian Knowledge Models.",
+              f: "Students found Hybrid maps more helpful for their learning than the corresponding Novakian Knowledge Models.",
+            },
+          },
+          Which_of_the_following_can_be_a_rationale_for_using_ACT_passages_in_this_study:
+            {
+              stem: "7. Which of the following can be a rationale for using ACT passages in this study?",
+              answers: ["a", "b", "e", "f"],
+              choices: {
+                a: "Passages have standard difficulty level",
+                b: "Subjects are neutral",
+                c: "Passages are chosen from best-selling novels",
+                d: "ACT material are endorsed by US authorities",
+                e: "Students are familiarized with the structure",
+                f: "ACT exams consist of variety of topics",
+              },
+            },
+          What_type_of_experiment_design_is_used_in_this_study: {
+            stem: "8. What type of experiment design is used in this study?",
+            answers: ["a"],
+            choices: {
+              a: "Within-subject design: each participant gets exposed to both conditions.",
+              b: "Between-subject design: each participant gets exposed to both conditions.",
+              c: "Within-subject design: each participant gets exposed to only one condition.",
+              d: "Between-subject design: each participant gets exposed to only one condition.",
+            },
+          },
+          Why_did_each_participant_answer_the_pre_test_questions_before_reading_the_passages:
+            {
+              stem: "9. Why did each participant answer the pre-test questions before reading the passages?",
+              answers: ["c", "d"],
+              choices: {
+                a: 'To analyze the "generation effect"',
+                b: "To improve students' learning of the passages",
+                c: "To measure and control for their prior knowledge of the topic in regression analyses",
+                d: "To make sure, we only compare the two conditions across students with similar prior knowledge on each topic",
+              },
+            },
+          What_does_the_following_diagram_tell_us: {
+            stem: (
+              <div>
+                <p>10. What does the following diagram tell us?</p>
+                <img
+                  src="/static/CommunityQuizzes/EstimatedMarginalMeans.png"
+                  width="100%"
+                />
+              </div>
+            ),
+            answers: ["b", "d", "f", "g"],
+            choices: {
+              a: "Participants got on average 7.7% lower immediate reading comprehension scores in the Hybrid map condition compared to the Knowledge model condition.",
+              b: "Participants got on average 7.7% higher immediate reading comprehension scores in the Hybrid map condition compared to the Knowledge model condition.",
+              c: "Participants got on average 9.8% lower delayed reading comprehension scores in the Hybrid map condition compared to the Knowledge model condition.",
+              d: "Participants got on average 9.8% higher delayed reading comprehension scores in the Hybrid map condition compared to the Knowledge model condition.",
+              e: "Participants got on average 3.7% lower immediate free recall scores in the Hybrid map condition compared to the Knowledge model condition.",
+              f: "Participants got on average 3.7% higher immediate free recall scores in the Hybrid map condition compared to the Knowledge model condition.",
+              g: "On average, there was no significant difference between the delayed free recall scores across the Hybrid map condition and the Knowledge model condition.",
+            },
+          },
+          What_was_randomized_in_this_experiment: {
+            stem: "11. What was randomized in this experiment?",
+            answers: ["a", "b"],
+            choices: {
+              a: "ACT passages",
+              b: "Hybrid map and Novakian Knowledge model conditions",
+              c: "Order of reading comprehension questions",
+              d: "Order of free recall questions",
+            },
+          },
+          How_many_passages_were_used_in_this_study: {
+            stem: "12. How many passages were used in this study?",
+            answers: ["a", "c"],
+            choices: {
+              a: "Five real ACT reading comprehension passages and four practice ones",
+              b: "Four real ACT reading comprehension passages and five practice ones",
+              c: "Two Novakian knowledge models from IHMC",
+              d: "Four Novakian knowledge models from IHMC",
+            },
+          },
+          How_many_linear_mixed_effect_regression_models_were_used_in_the_analysis:
+            {
+              stem: "13. How many linear mixed-effect regression models were used in the analysis?",
+              answers: ["d"],
+              choices: {
+                a: "One",
+                b: "Two",
+                c: "Three",
+                d: "Four",
+              },
+            },
+          What_were_the_dependent_variables_in_the_regression_models: {
+            stem: "14. What were the dependent variables in the regression models?",
+            answers: ["a", "b", "c", "d"],
+            choices: {
+              a: "(Immediate) reading comprehension score",
+              b: "Delayed reading comprehension score",
+              c: "(Immediate) free recall score",
+              d: "Delayed free recall score",
+              e: "Pretest score",
+              f: "Second passage",
+            },
+          },
+          What_random_and_fixed_effects_were_controlled_for_in_the_regression_models:
+            {
+              stem: "15. What random and fixed effects were controlled for in the regression models?",
+              answers: ["a", "b", "c", "d"],
+              choices: {
+                a: "Fixed effect of pretest score",
+                b: "Fixed effect of the passage appearing as the second passage",
+                c: "Random effect of the participant",
+                d: "Random effect of the passage",
+              },
+            },
+          How_many_qualitative_questions_did_each_participant_answer: {
+            stem: "16. How many qualitative questions did each participant answer?",
+            answers: ["b"],
+            choices: {
+              a: "One",
+              b: "Two",
+              c: "Three",
+              d: "Four",
+            },
+          },
+          How_many_themes_were_retrieved_from_the_qualitative_feedback_provided_by_the_participants:
+            {
+              stem: "17. How many themes were retrieved from the qualitative feedback provided by the participants?",
+              answers: ["c"],
+              choices: {
+                a: "13",
+                b: "25",
+                c: "28",
+                d: "40",
+              },
+            },
+          When_did_the_participants_answer_the_demographic_questions_and_why: {
+            stem: "18. When did the participants answer the demographic questions and why?",
+            answers: ["a"],
+            choices: {
+              a: "At the conclusion of the first session, to prevent the effects of stereotype threat",
+              b: "After completing the second session to prevent the effects of stereotype threat",
+              c: "At the beginning of the first session, to prevent the effects of stereotype threat",
+              d: "Before completing the first session to prevent the effects of stereotype threat",
+            },
+          },
+          How_many_online_experiment_sessions_did_each_participant_attend: {
+            stem: "19. How many online experiment sessions did each participant attend?",
+            answers: ["b"],
+            choices: {
+              a: "One session",
+              b: "Two sessions, three days apart",
+              c: "Two sessions, four days apart",
+              d: "Three sessions, two days apart",
+            },
+          },
+          For_what_purpose_Cosine_similarity_was_used_in_this_study: {
+            stem: "20. For what purpose Cosine similarity was used in this study?",
+            answers: ["b"],
+            choices: {
+              a: "To code the qualitative data from participants’ feedback",
+              b: "To assess the free recall responses",
+              c: "To measure the difficulty level of the passage in each H/K condition",
+              d: "To assess reading comprehension score from multiple choice questions",
+            },
+          },
+          Which_of_the_following_is_NOT_advised_for_a_good_Novakian_concept_map:
+            {
+              stem: "21. Which of the following is NOT advised for a good Novakian concept map?",
+              answers: ["a"],
+              choices: {
+                a: "All nodes should be aligned in equally spaced columns.",
+                b: "Nodes should be as concise as possible.",
+                c: "Maps should have top-down orientation.",
+                d: "Each map should answer one focus question.",
+              },
+            },
+          Which_of_the_following_is_a_string_map: {
+            stem: (
+              <div>
+                <p>22. Which of the following is a string map?</p>
+                <p>
+                  a){" "}
+                  <img
+                    src="/static/CommunityQuizzes/Concept_Map_Tree.png"
+                    width="100%"
+                  />
+                </p>
+                <p>
+                  b){" "}
+                  <img
+                    src="/static/CommunityQuizzes/Concept_Map_String.png"
+                    width="100%"
+                  />
+                </p>
+                <p>
+                  c){" "}
+                  <img
+                    src="/static/CommunityQuizzes/Concept_Map_Network.png"
+                    width="100%"
+                  />
+                </p>
+              </div>
+            ),
+            answers: ["b"],
+            choices: {
+              a: "a",
+              b: "b",
+              c: "c",
+            },
+          },
+          Which_theory_is_behind_the_invention_of_concept_maps: {
+            stem: "23. Which theory is behind the invention of concept maps?",
+            answers: ["a"],
+            choices: {
+              a: "Ausubel’s assimilation theory of meaningful learning",
+              b: "Novak and Gowin theory of knowledge visualization",
+              c: "Cañas theory of affinity concept relation",
+            },
+          },
+          Which_of_the_followings_are_use_cases_of_concept_maps: {
+            stem: "24. Which of the followings are use cases of concept maps?",
+            answers: ["a", "b", "c", "d", "e", "f", "g"],
+            choices: {
+              a: "Facilitating learning",
+              b: "knowledge sharing and communication",
+              c: "Meaningful learning",
+              d: "Summarization",
+              e: "Visualizing relations between concepts",
+              f: "Developing metacognitive skills",
+              g: "Identifying existing understandings",
+            },
+          },
+          Which_options_are_encouraged_in_generating_a_Good_concept_map: {
+            stem: '25. Which option(s) are encouraged in generating a "Good" concept map?',
+            answers: ["d"],
+            choices: {
+              a: "Complete sentences are used as linking phrases.",
+              b: "Each node contains one focus question.",
+              c: "Cross-links are as few as possible.",
+              d: "Each node should include only a few words.",
+              e: "Larger dense maps are more favored than hyper linked smaller maps.",
+            },
+          },
+        },
+      },
+  },
   ["Educational_Organizational_Psychology"]: {
     The_psychology_of_task_management_The_smaller_tasks_trap: {
       title: "The Psychology of Task Management: The Smaller Tasks Trap",
@@ -33,7 +347,7 @@ export default {
           },
         },
         The_goal_of_the_first_study_is_to: {
-          stem: "4. The_goal_of_the_first_study_is_to:",
+          stem: "4. The goal of the first study is to:",
           answers: ["c"],
           choices: {
             a: "Examine whether participants were able to meet the deadlines of their assigned tasks.",
