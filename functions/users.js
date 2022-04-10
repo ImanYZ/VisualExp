@@ -712,49 +712,25 @@ exports.applicationReminder = async (context) => {
           remindersNum = userData.reminders;
         }
         if (remindersNum < 3) {
-          const tutorialDoc = await db
-            .collection("tutorial")
-            .doc(userDoc.id)
+          // const tutorialDoc = await db
+          //   .collection("tutorial")
+          //   .doc(userDoc.id)
+          //   .get();
+          // if (tutorialDoc.exists) {
+          //   const tutorialData = tutorialDoc.data();
+          //   if ("ended" in tutorialData && tutorialData.ended) {
+          let submittedOne = false;
+          const applicationDocs = await db
+            .collection("applications")
+            .where("fullname", "==", userDoc.id)
             .get();
-          if (tutorialDoc.exists) {
-            const tutorialData = tutorialDoc.data();
-            if ("ended" in tutorialData && tutorialData.ended) {
-              let submittedOne = false;
-              const applicationDocs = await db
-                .collection("applications")
-                .where("fullname", "==", userDoc.id)
-                .get();
-              for (let applicationDoc of applicationDocs.docs) {
-                const applicationData = applicationDoc.data();
-                if ("ended" in applicationData && applicationData.ended) {
-                  submittedOne = true;
-                }
-              }
-              if (!submittedOne) {
-                reminders.push({
-                  email: userData.email,
-                  firstname: userData.firstname,
-                  fullname: userDoc.id,
-                  reminders: remindersNum,
-                  subject: "Your 1Cademy Application is Incomplete!",
-                  content:
-                    "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
-                  hyperlink: "https://1cademy.us/home#JoinUsSection",
-                });
-              }
-            } else {
-              reminders.push({
-                email: userData.email,
-                firstname: userData.firstname,
-                fullname: userDoc.id,
-                reminders: remindersNum,
-                subject: "Your 1Cademy Application is Incomplete!",
-                content:
-                  "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
-                hyperlink: "https://1cademy.us/home#JoinUsSection",
-              });
+          for (let applicationDoc of applicationDocs.docs) {
+            const applicationData = applicationDoc.data();
+            if ("ended" in applicationData && applicationData.ended) {
+              submittedOne = true;
             }
-          } else {
+          }
+          if (!submittedOne) {
             reminders.push({
               email: userData.email,
               firstname: userData.firstname,
@@ -762,11 +738,35 @@ exports.applicationReminder = async (context) => {
               reminders: remindersNum,
               subject: "Your 1Cademy Application is Incomplete!",
               content:
-                "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
+                "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
               hyperlink: "https://1cademy.us/home#JoinUsSection",
             });
           }
+          // } else {
+          //   reminders.push({
+          //     email: userData.email,
+          //     firstname: userData.firstname,
+          //     fullname: userDoc.id,
+          //     reminders: remindersNum,
+          //     subject: "Your 1Cademy Application is Incomplete!",
+          //     content:
+          //       "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
+          //     hyperlink: "https://1cademy.us/home#JoinUsSection",
+          //   });
         }
+        // } else {
+        //   reminders.push({
+        //     email: userData.email,
+        //     firstname: userData.firstname,
+        //     fullname: userDoc.id,
+        //     reminders: remindersNum,
+        //     subject: "Your 1Cademy Application is Incomplete!",
+        //     content:
+        //       "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
+        //     hyperlink: "https://1cademy.us/home#JoinUsSection",
+        //   });
+        // }
+        // }
       }
     }
     let userIdx = 0;
