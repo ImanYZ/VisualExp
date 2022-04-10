@@ -6,6 +6,11 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
+import TextField from "@mui/material/TextField";
+
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -657,6 +662,22 @@ const ManageEvents = (props) => {
     setIsSubmitting(false);
   };
 
+  const changeFirstSession = (newDateTime) => {
+    setFirstSessions((oldFSessions) => {
+      const fSessions = [...oldFSessions];
+      fSessions[0] = newDateTime;
+      return fSessions;
+    });
+  };
+
+  const changeSecondSession = (newDateTime) => {
+    setSecondSession(newDateTime);
+  };
+
+  const changeThirdSession = (newDateTime) => {
+    setThirdSession(newDateTime);
+  };
+
   return (
     <div style={{ height: "100vh", overflowY: "auto" }}>
       <div className="dataGridTable">
@@ -713,6 +734,26 @@ const ManageEvents = (props) => {
           loading={!applicantsLoaded}
         />
       </div>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <TimePicker
+          label="First Session"
+          value={firstSessions[0]}
+          onChange={changeFirstSession}
+          renderInput={(params) => <TextField {...params} />}
+        />
+        <TimePicker
+          label="Second Session"
+          value={secondSession}
+          onChange={changeSecondSession}
+          renderInput={(params) => <TextField {...params} />}
+        />
+        <TimePicker
+          label="Third Session"
+          value={thirdSession}
+          onChange={changeThirdSession}
+          renderInput={(params) => <TextField {...params} />}
+        />
+      </LocalizationProvider>
       <div className="dataGridTable">
         <DataGrid
           rows={events}
