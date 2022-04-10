@@ -753,17 +753,35 @@ const ManageEvents = (props) => {
   const changeFirstSession = (newDateTime) => {
     setFirstSessions((oldFSessions) => {
       const fSessions = [...oldFSessions];
-      fSessions[0] = newDateTime;
+      fSessions[0].setHours(
+        newDateTime.getHours(),
+        newDateTime.getMinutes(),
+        newDateTime.getSeconds()
+      );
       return fSessions;
     });
   };
 
   const changeSecondSession = (newDateTime) => {
-    setSecondSession(newDateTime);
+    setSecondSession((oldSSession) => {
+      oldSSession.setHours(
+        newDateTime.getHours(),
+        newDateTime.getMinutes(),
+        newDateTime.getSeconds()
+      );
+      return oldSSession;
+    });
   };
 
   const changeThirdSession = (newDateTime) => {
-    setThirdSession(newDateTime);
+    setThirdSession((oldTSession) => {
+      oldTSession.setHours(
+        newDateTime.getHours(),
+        newDateTime.getMinutes(),
+        newDateTime.getSeconds()
+      );
+      return oldTSession;
+    });
   };
 
   return (
