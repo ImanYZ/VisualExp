@@ -531,7 +531,7 @@ const PaperTest = (props) => {
                       sx={{
                         padding: "10px",
                         mb: "19px",
-                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
+                        height: { sx: "400px", md: "calc(100vh - 160px)" },
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
@@ -579,7 +579,7 @@ const PaperTest = (props) => {
                       sx={{
                         padding: "10px",
                         mb: "19px",
-                        maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
+                        height: { sx: "none", md: "calc(100vh - 160px)" },
                         overflowY: { sx: "hidden", md: "auto" },
                       }}
                     >
@@ -613,6 +613,12 @@ const PaperTest = (props) => {
                                         return (
                                           <FormControlLabel
                                             key={cIdx}
+                                            sx={{
+                                              "&:hover": {
+                                                bgcolor:
+                                                  "rgba(100, 100, 100, 0.1) !important",
+                                              },
+                                            }}
                                             control={
                                               <Checkbox
                                                 checked={

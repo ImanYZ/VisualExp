@@ -591,6 +591,12 @@ const Tutorial = (props) => {
                                         return (
                                           <FormControlLabel
                                             key={cIdx}
+                                            sx={{
+                                              "&:hover": {
+                                                bgcolor:
+                                                  "rgba(100, 100, 100, 0.1) !important",
+                                              },
+                                            }}
                                             control={
                                               <Checkbox
                                                 checked={
