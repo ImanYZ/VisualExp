@@ -600,7 +600,7 @@ const ManageEvents = (props) => {
   };
 
   const setUpdateScheduleDocument = async (email, session, eventId, order) => {
-    scheduleDocs = await firebase.db
+    const scheduleDocs = await firebase.db
       .collection("schedule")
       .where("email", "==", email)
       .where("session", "==", session)
@@ -720,8 +720,8 @@ const ManageEvents = (props) => {
             .collection("schedule")
             .doc(scheduleDoc.id);
           await firebase.batchUpdate(scheduleRef, {
-            id: admin.firestore.FieldValue.delete(),
-            order: admin.firestore.FieldValue.delete(),
+            id: firebase.firestore.FieldValue.delete(),
+            order: firebase.firestore.FieldValue.delete(),
           });
         }
       }
