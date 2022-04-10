@@ -599,7 +599,32 @@ const ManageEvents = (props) => {
     }
   };
 
-  const submitData = async (event) => {
+  const setUpdateScheduleDocument = async (email, session, eventId, order) => {
+    scheduleDocs = await firebase.db
+      .collection("schedule")
+      .where("email", "==", email)
+      .where("session", "==", session)
+      .get();
+    if (scheduleDocs.docs.length > 0) {
+      const scheduleRef = firebase.db
+        .collection("schedule")
+        .doc(scheduleDocs.docs[0].id);
+      await firebase.batchUpdate(scheduleRef, {
+        id: eventId,
+        order,
+      });
+    } else {
+      const scheduleRef = firebase.db.collection("schedule").doc();
+      await firebase.batchSet(scheduleRef, {
+        email: participant,
+        session: firebase.firestore.Timestamp.fromDate(session),
+        id: eventId,
+        order,
+      });
+    }
+  };
+
+  const submitNewSessions = async (event) => {
     setIsSubmitting(true);
     const userDocs = await firebase.db
       .collection("users")
@@ -612,7 +637,7 @@ const ManageEvents = (props) => {
         window.alert("This user completed the experiment before!");
         return;
       }
-      const scheduleDocs = await firebase.db
+      let scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", participant)
         .get();
@@ -638,24 +663,87 @@ const ManageEvents = (props) => {
       });
       errorAlert(responseObj.data);
 
-      for (let session of schedule) {
-        const scheduleRef = firebase.db.collection("schedule").doc();
-        const theSession = {
-          email: participant,
-          session: firebase.firestore.Timestamp.fromDate(session),
-        };
-        if (session.getTime() === firstSessions[0].getTime()) {
-          theSession.id = responseObj.data.events[0].data.id;
-          theSession.order = "1st";
-        } else if (session.getTime() === secondSession.getTime()) {
-          theSession.id = responseObj.data.events[1].data.id;
-          theSession.order = "2nd";
-        } else if (session.getTime() === thirdSession.getTime()) {
-          theSession.id = responseObj.data.events[2].data.id;
-          theSession.order = "3rd";
-        }
-        await firebase.batchSet(scheduleRef, theSession);
+      await setUpdateScheduleDocument(
+        participant,
+        firstSessions[0],
+        responseObj.data.events[0].data.id,
+        "1st"
+      );
+      await setUpdateScheduleDocument(
+        participant,
+        secondSession,
+        responseObj.data.events[0].data.id,
+        "2nd"
+      );
+      await setUpdateScheduleDocument(
+        participant,
+        thirdSession,
+        responseObj.data.events[0].data.id,
+        "3rd"
+      );
+      await firebase.commitBatch();
+      setSubmitted(true);
+    }
+    setIsSubmitting(false);
+  };
+
+  const submitSingleSession = (order) => async (event) => {
+    setIsSubmitting(true);
+    const userDocs = await firebase.db
+      .collection("users")
+      .where("email", "==", participant)
+      .get();
+    if (userDocs.docs.length > 0) {
+      const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
+      const userData = userDocs.docs[0].data();
+      if (userData.projectDone) {
+        window.alert("This user completed the experiment before!");
+        return;
       }
+      const scheduleDocs = await firebase.db
+        .collection("schedule")
+        .where("email", "==", participant)
+        .get();
+      let responseObj;
+      for (let scheduleDoc of scheduleDocs.docs) {
+        const scheduleData = scheduleDoc.data();
+        if (
+          scheduleData.id &&
+          scheduleData.order &&
+          scheduleData.order === order
+        ) {
+          responseObj = await axios.post("/deleteEvent", {
+            eventId: scheduleData.id,
+          });
+          errorAlert(responseObj.data);
+          const scheduleRef = firebase.db
+            .collection("schedule")
+            .doc(scheduleDoc.id);
+          await firebase.batchUpdate(scheduleRef, {
+            id: admin.firestore.FieldValue.delete(),
+            order: admin.firestore.FieldValue.delete(),
+          });
+        }
+      }
+      let sessi = firstSessions[0];
+      if (order === "2nd") {
+        sessi = secondSession;
+      } else if (order === "3rd") {
+        sessi = thirdSession;
+      }
+      responseObj = await axios.post("/scheduleSingleSession", {
+        email: participant,
+        order,
+        session: sessi,
+      });
+      errorAlert(responseObj.data);
+
+      await setUpdateScheduleDocument(
+        participant,
+        sessi,
+        responseObj.data.events[0].data.id,
+        order
+      );
       await firebase.commitBatch();
       setSubmitted(true);
     }
@@ -735,24 +823,66 @@ const ManageEvents = (props) => {
         />
       </div>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <TimePicker
-          label="First Session"
-          value={firstSessions[0]}
-          onChange={changeFirstSession}
-          renderInput={(params) => <TextField {...params} />}
-        />
-        <TimePicker
-          label="Second Session"
-          value={secondSession}
-          onChange={changeSecondSession}
-          renderInput={(params) => <TextField {...params} />}
-        />
-        <TimePicker
-          label="Third Session"
-          value={thirdSession}
-          onChange={changeThirdSession}
-          renderInput={(params) => <TextField {...params} />}
-        />
+        <div>
+          <TimePicker
+            label="First Session"
+            value={firstSessions[0]}
+            onChange={changeFirstSession}
+            renderInput={(params) => <TextField {...params} />}
+          />
+          <Button
+            onClick={submitSingleSession("1st")}
+            className={
+              !isSubmitting
+                ? "Button SubmitButton"
+                : "Button SubmitButton Disabled"
+            }
+            variant="contained"
+            disabled={!isSubmitting ? null : true}
+          >
+            Update
+          </Button>
+        </div>
+        <div>
+          <TimePicker
+            label="Second Session"
+            value={secondSession}
+            onChange={changeSecondSession}
+            renderInput={(params) => <TextField {...params} />}
+          />
+          <Button
+            onClick={submitSingleSession("2nd")}
+            className={
+              !isSubmitting
+                ? "Button SubmitButton"
+                : "Button SubmitButton Disabled"
+            }
+            variant="contained"
+            disabled={!isSubmitting ? null : true}
+          >
+            Update
+          </Button>
+        </div>
+        <div>
+          <TimePicker
+            label="Third Session"
+            value={thirdSession}
+            onChange={changeThirdSession}
+            renderInput={(params) => <TextField {...params} />}
+          />
+          <Button
+            onClick={submitSingleSession("3rd")}
+            className={
+              !isSubmitting
+                ? "Button SubmitButton"
+                : "Button SubmitButton Disabled"
+            }
+            variant="contained"
+            disabled={!isSubmitting ? null : true}
+          >
+            Update
+          </Button>
+        </div>
       </LocalizationProvider>
       <div className="dataGridTable">
         <DataGrid
@@ -786,7 +916,7 @@ const ManageEvents = (props) => {
       </div>
       <div id="SignBtnContainer">
         <Button
-          onClick={submitData}
+          onClick={submitNewSessions}
           className={
             submitable && !isSubmitting
               ? "Button SubmitButton"

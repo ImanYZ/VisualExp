@@ -31,6 +31,7 @@ const {
 } = require("./emailing");
 const {
   schedule,
+  scheduleSingleSession,
   allEvents,
   deleteEvent,
   scheduleLifeLog,
@@ -67,6 +68,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);
+app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
