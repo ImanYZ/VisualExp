@@ -22,6 +22,18 @@ const daysLater = (d1, d2, days) => {
   );
 };
 
+const currentTime = new Date();
+const tZoneOffset = currentTime.getTimezoneOffset();
+const tZoneDiff = Math.floor((240 - tZoneOffset) / 60);
+let start = 6 + tZoneDiff;
+if (start < 6) {
+  start = 6;
+}
+let end = 23 + tZoneDiff;
+if (end > 23) {
+  end = 23;
+}
+
 const SelectSessions = (props) => {
   const [firstRender, setFirstRender] = useState(true);
 
@@ -108,8 +120,8 @@ const SelectSessions = (props) => {
       selectionScheme="linear"
       startDate={props.startDate}
       numDays={props.numDays}
-      minTime={8}
-      maxTime={22}
+      minTime={start}
+      maxTime={end}
       hourlyChunks={2}
       dateFormat="ddd MM/DD"
       timeFormat="hh:mma"
