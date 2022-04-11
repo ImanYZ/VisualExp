@@ -25,6 +25,7 @@ const {
   eventNotificationEmail,
   notAttendedEmail,
 } = require("./emailing");
+const { deleteEvent } = require("./GoogleCalendar");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
