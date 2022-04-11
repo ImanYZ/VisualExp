@@ -98,7 +98,7 @@ const SelectSessions = (props) => {
       >
         {scheduledSession
           ? "✅"
-          : datetime.toLocaleTimeString(navigator.language, {
+          : datetime.toLocaleTimeString("en-US", {
               hour: "2-digit",
               minute: "2-digit",
               hour12: false,
