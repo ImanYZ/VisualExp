@@ -205,6 +205,23 @@ ${
   }
 };
 
+const hoursToDaysHoursStr = (hoursLeft) => {
+  const days = 0;
+  hoursLeft = Math.floor(hoursLeft);
+  if (hoursLeft < 1) {
+    return "less than an hour";
+  }
+  if (hoursLeft === 1) {
+    return "an hour";
+  }
+  if (hoursLeft >= 24) {
+    days = Math.floor(hoursLeft / 24);
+    hours = hoursLeft % 24;
+    return days + " days and " + hoursLeft + " hours";
+  }
+  return hoursLeft + " hours";
+};
+
 const eventNotificationEmail = async (
   email,
   firstname,
@@ -217,14 +234,7 @@ const eventNotificationEmail = async (
   httpReq
 ) => {
   try {
-    hoursLeft = Math.floor(hoursLeft);
-    if (hoursLeft < 1) {
-      hoursLeft = "less than an hour";
-    } else if (hoursLeft === 1) {
-      hoursLeft = "an hour";
-    } else {
-      hoursLeft = hoursLeft + " hours";
-    }
+    hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
@@ -389,14 +399,7 @@ const reschEventNotificationEmail = async (
   declined
 ) => {
   try {
-    hoursLeft = Math.floor(hoursLeft);
-    if (hoursLeft < 1) {
-      hoursLeft = "less than an hour";
-    } else if (hoursLeft === 1) {
-      hoursLeft = "an hour";
-    } else {
-      hoursLeft = hoursLeft + " hours";
-    }
+    hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const scheduleDocs = await db
       .collection("schedule")
       .where("email", "==", email)
