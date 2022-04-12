@@ -27,6 +27,7 @@ const {
   loadImage,
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
+  inviteInstructors,
   sendPersonalInvitations,
 } = require("./emailing");
 const {
@@ -51,7 +52,7 @@ app.use(cors());
 
 app.get("/loadImage/:contactId/:randNum", loadImage);
 app.get("/loadContacts", loadContacts);
-app.get("/sendPersonalInvitations", sendPersonalInvitations);
+app.get("/inviteInstructors", inviteInstructors);
 app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);

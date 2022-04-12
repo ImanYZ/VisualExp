@@ -1,0 +1,127 @@
+<mxfile host="65bd71144e">
+    <diagram id="vwbJsP5kCBEH-EEFsKNK" name="Page-1">
+        <mxGraphModel dx="1136" dy="427" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="32" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;span&gt;&lt;b&gt;instructors&lt;br&gt;&lt;/b&gt;id&lt;br&gt;upVotes&lt;br&gt;downVotes&lt;br&gt;emailedAt&lt;br&gt;reminders&lt;br&gt;openedAt&lt;br&gt;yes&lt;br&gt;no&lt;br&gt;doNot&lt;br&gt;introduced&lt;br&gt;condition&lt;br&gt;&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=left;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="150" width="130" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="11" target="14">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="For every instructor" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="385" y="392" width="120" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="inviteInstructors()" style="swimlane;fontStyle=0" vertex="1" parent="1">
+                    <mxGeometry y="120" width="840" height="970" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" style="edgeStyle=none;html=1;" edge="1" parent="46" source="47" target="16">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="&lt;span&gt;&lt;b&gt;instructorConditions&lt;/b&gt;&lt;br&gt;condition&lt;br&gt;num&lt;br&gt;&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=left;" vertex="1" parent="46">
+                    <mxGeometry x="390" y="536" width="130" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="Send the email&lt;span&gt;(email, firstname, lastname, major, condition = minCondition)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="46">
+                    <mxGeometry x="310" y="871" width="270" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="46" source="16" target="52">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="131" y="646" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="16" value="Get all instructorConditions" style="shape=trapezoid;perimeter=trapezoidPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" parent="46" vertex="1">
+                    <mxGeometry x="62" y="561" width="138" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="65" style="edgeStyle=none;html=1;entryX=0.508;entryY=0.114;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="46" source="52" target="62">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" value="Set&lt;br&gt;minCondNum = instructorConditions[0].num;&lt;br&gt;minCondition = instructorConditions[0].condition" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="46">
+                    <mxGeometry x="36" y="636" width="190" height="84" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="Yes" style="edgeStyle=none;html=1;" edge="1" parent="46" source="54" target="59">
+                    <mxGeometry x="-0.2121" y="19" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54" value="condition[i].num &amp;lt; minCondNum" style="rhombus;whiteSpace=wrap;html=1;rounded=0;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" vertex="1" parent="46">
+                    <mxGeometry x="46.25" y="764" width="169.5" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" value="Set&lt;br&gt;minCondNum = instructorConditions[i].num;&lt;br&gt;minCondition = instructorConditions[i].condition" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="46">
+                    <mxGeometry x="36" y="837" width="190" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="For every condition, index i" style="swimlane;" vertex="1" parent="46">
+                    <mxGeometry x="31" y="736" width="200" height="183" as="geometry"/>
+                </mxCell>
+                <mxCell id="68" style="edgeStyle=none;html=1;" edge="1" parent="46" source="67" target="47">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="450" y="640" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="67" value="Set&lt;br&gt;num++&lt;br&gt;Where condition == minCondition" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="46">
+                    <mxGeometry x="460" y="676" width="200" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="upVotes - downVotes&lt;br&gt;&amp;gt;= 3 &amp;amp;&amp;amp;&lt;br&gt;(!reminders || reminders &amp;lt; 4) &amp;amp;&amp;amp;&lt;br&gt;!yes &amp;amp;&amp;amp; !no &amp;amp;&amp;amp; !doNot&lt;br&gt;&amp;amp;&amp;amp; !introduced &amp;amp;&amp;amp;&lt;br&gt;major in communites" style="rhombus;whiteSpace=wrap;html=1;rounded=0;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="46" vertex="1">
+                    <mxGeometry x="353.25" y="356" width="183.5" height="114" as="geometry"/>
+                </mxCell>
+                <mxCell id="57" style="edgeStyle=none;html=1;" edge="1" parent="46" source="14" target="16">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="408.9080459770114" y="502.80459770114953" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="58" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="57">
+                    <mxGeometry x="0.0011" relative="1" as="geometry">
+                        <mxPoint x="64" y="-51" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="Our Email address&lt;br&gt;Our Email Password" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;align=center;" parent="46" vertex="1">
+                    <mxGeometry x="374.87" y="747" width="160.25" height="57" as="geometry"/>
+                </mxCell>
+                <mxCell id="76" value="Set&lt;br&gt;waitTime = 0" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="46">
+                    <mxGeometry x="260" y="730" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="69" style="edgeStyle=none;html=1;startArrow=none;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="77" target="70">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="760" y="670" as="targetPoint"/>
+                        <mxPoint x="730" y="840" as="sourcePoint"/>
+                        <Array as="points">
+                            <mxPoint x="687" y="1040"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="71" style="edgeStyle=none;html=1;" edge="1" parent="1" source="70" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="70" value="&lt;span&gt;Set&lt;br&gt;condition = minCondition;&lt;br&gt;&lt;/span&gt;emailedAt&lt;br&gt;remonders++ || reminders = 1;&lt;span&gt;&lt;br&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;" vertex="1" parent="1">
+                    <mxGeometry x="637" y="592" width="100" height="118" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" target="67">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="455" y="1030" as="targetPoint"/>
+                        <mxPoint x="680" y="1040" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="77" value="setTimeout(, waitTime)" style="swimlane;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="951" width="310" height="129" as="geometry"/>
+                </mxCell>
+                <mxCell id="78" value="&lt;div style=&quot;color: rgb(212 , 212 , 212) ; background-color: rgb(30 , 30 , 30) ; font-family: &amp;#34;menlo&amp;#34; , &amp;#34;monaco&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; line-height: 18px&quot;&gt;&lt;span style=&quot;color: #9cdcfe&quot;&gt;waitTime&lt;/span&gt; += &lt;span style=&quot;color: #b5cea8&quot;&gt;1000&lt;/span&gt; * (&lt;span style=&quot;color: #b5cea8&quot;&gt;1&lt;/span&gt; + &lt;span style=&quot;color: #9cdcfe&quot;&gt;Math&lt;/span&gt;.&lt;span style=&quot;color: #dcdcaa&quot;&gt;floor&lt;/span&gt;(&lt;span style=&quot;color: #9cdcfe&quot;&gt;Math&lt;/span&gt;.&lt;span style=&quot;color: #dcdcaa&quot;&gt;random&lt;/span&gt;() * &lt;span style=&quot;color: #b5cea8&quot;&gt;40&lt;/span&gt;))&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="77">
+                    <mxGeometry x="20" y="89" width="270" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="75" style="edgeStyle=none;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="59" target="77">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" style="edgeStyle=none;html=1;entryX=0.376;entryY=0.001;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="7" target="77">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="385" y="534.9806126405583" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="79" style="edgeStyle=none;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="76" target="77">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

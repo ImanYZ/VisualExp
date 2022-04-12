@@ -151,53 +151,117 @@ exports.sendPersonalInvitations = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
-exports.sendInvitationEmail = async (req, res) => {
+const communityTitles = {
+  Cognitive_Psychology: "UX Research in Cognitive Psychology of Learning",
+  Educational_Organizational_Psychology:
+    "Educational/Organizational Psychology",
+  Clinical_Psychology: "Clinical Psychology",
+  Mindfulness: "Mindfulness",
+  Health_Psychology: "Health Psychology",
+  Neuroscience: "Neuroscience",
+  Disability_Studies: "Disability Studies",
+  Social_Political_Psychology: "Social/Political Psychology",
+  Cryptoeconomics: "Cryptoeconomics",
+  Deep_Learning: "Deep Learning",
+  Liaison_Librarians: "Liaison Librarians",
+};
+
+exports.inviteInstructors = async (req, res) => {
   try {
-    if ("email" in req.body && "firstname" in req.body) {
-      const email = req.body.email;
-      const firstname = req.body.firstname;
-      let from1Cademy = false;
-      if ("from1Cademy" in req.body) {
-        from1Cademy = req.body.from1Cademy;
-      }
-      const mailOptions = {
-        from: "onecademy@umich.edu",
-        to: email,
-        subject:
-          (from1Cademy ? "[1Cademy] " : "") +
-          "Learn Which Knowledge Visualization Method is Better For You by Participating in our Experiment!",
-        html:
-          `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
-<p></p>
-${
-  from1Cademy
-    ? "<p>Our UX research team at 1Cademy needs"
-    : "<p>We are a group of UX researchers at the University of Michigan, School of Information.</p><p>We need"
-}
-<p> your help with participating in our experiment to learn how to better design knowledge visualization to improve reading comprehension and learning. The experiment will be in three sessions:</p>
-<ol>
-<li>
-1<sup>st</sup> session for an hour
-</li>
-<li>
-2<sup>nd</sup> session, 3 days later, for 30 minutes
-</li>
-<li>
-3<sup>rd</sup> session, 1 week later, for 30 minutes
-</li>
-<ol>
-<p>Please fill out your availability in our scheduling website: <a href="https://visualexp1.web.app/schedule" target="_blank">https://visualexp1.web.app/schedule</a></p>
-<p></p>
-<p>Best regards,</p>
-` + signatureHTML,
-      };
-      return transporter.sendMail(mailOptions, (error, data) => {
-        if (error) {
-          console.log({ error });
-          return res.status(500).json({ error });
+    let waitTime = 0;
+    const instructorDocs = await db.collection("instructors").get();
+    for (let instructorDoc of instructorDocs.docs) {
+      const instructorData = instructorDoc.data();
+      if (
+        instructorData.upVotes - instructorData.downVotes >= 3 &&
+        (!instructorData.reminders || instructorData.reminders < 4) &&
+        !instructorData.yes &&
+        !instructorData.no &&
+        !instructorData.doNot &&
+        !instructorData.introduced &&
+        instructorData.major in communityTitles
+      ) {
+        let instructorConditionsDocs = await db
+          .collection("instructorConditions")
+          .get();
+        instructorConditionsDocs = instructorConditionsDocs.docs;
+        let minCondNum = instructorConditionsDocs[0].data().num;
+        let minCondition = instructorConditionsDocs[0].id;
+        for (let instructorConditionDoc of instructorConditionsDocs) {
+          let instructorConditionData = instructorConditionDoc.data();
+          if (instructorConditionData.num < minCondNum) {
+            minCondNum = instructorConditionData.num;
+            minCondition = instructorConditionDoc.id;
+          }
         }
-        return res.status(200).json({ done: true });
-      });
+        setTimeout(async () => {
+          console.log({
+            email: instructorData.email,
+            firstname: instructorData.firstname,
+            lastname: instructorData.lastname,
+            major: instructorData.major,
+            condition: minCondition,
+          });
+
+          const instructorConditionRef = db
+            .collection("instructorConditions")
+            .doc(minCondition);
+          await instructorConditionRef.update({
+            num: admin.firestore.FieldValue.increment(1),
+          });
+
+          const instructorRef = db
+            .collection("instructors")
+            .doc(instructorDoc.id);
+          await instructorRef.update({
+            condition: minCondition,
+            emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
+            reminders: admin.firestore.FieldValue.increment(1),
+          });
+        }, waitTime);
+        waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+        if (waitTime > 4000) {
+          break;
+        }
+        // const mailOptions = {
+        //   from: "onecademy@umich.edu",
+        //   to: email,
+        //   subject:
+        //     (from1Cademy ? "[1Cademy] " : "") +
+        //     "Learn Which Knowledge Visualization Method is Better For You by Participating in our Experiment!",
+        //   html:
+        //     `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        //   <p></p>
+        //   ${
+        //     from1Cademy
+        //       ? "<p>Our UX research team at 1Cademy needs"
+        //       : "<p>We are a group of UX researchers at the University of Michigan, School of Information.</p><p>We need"
+        //   }
+        //   <p> your help with participating in our experiment to learn how to better design knowledge visualization to improve reading comprehension and learning. The experiment will be in three sessions:</p>
+        //   <ol>
+        //   <li>
+        //   1<sup>st</sup> session for an hour
+        //   </li>
+        //   <li>
+        //   2<sup>nd</sup> session, 3 days later, for 30 minutes
+        //   </li>
+        //   <li>
+        //   3<sup>rd</sup> session, 1 week later, for 30 minutes
+        //   </li>
+        //   <ol>
+        //   <p>Please fill out your availability in our scheduling website: <a href="https://visualexp1.web.app/schedule" target="_blank">https://visualexp1.web.app/schedule</a></p>
+        //   <p></p>
+        //   <p>Best regards,</p>
+        //   ` + signatureHTML,
+        // };
+        // return transporter.sendMail(mailOptions, (error, data) => {
+        //   if (error) {
+        //     console.log({ error });
+        //     return res.status(500).json({ error });
+        //   }
+        //   return res.status(200).json({ done: true });
+        // });
+      }
     }
   } catch (err) {
     console.log({ err });
