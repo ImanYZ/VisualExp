@@ -319,15 +319,14 @@ const hoursToDaysHoursStr = (hoursLeft) => {
   }
   if (hoursLeft >= 24) {
     days = Math.floor(hoursLeft / 24);
-    hours = hoursLeft % 24;
+    hoursLeft = hoursLeft % 24;
     return (
       days +
       " day" +
       (days > 1 ? "s" : "") +
-      " and " +
-      hoursLeft +
-      " hour" +
-      (hoursLeft > 1 ? "s" : "")
+      (hoursLeft > 0
+        ? " and " + hoursLeft + " hour" + (hoursLeft > 1 ? "s" : "")
+        : "")
     );
   }
   return hoursLeft + " hour" + (hoursLeft > 1 ? "s" : "");
