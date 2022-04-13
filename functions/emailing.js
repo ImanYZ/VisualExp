@@ -320,9 +320,17 @@ const hoursToDaysHoursStr = (hoursLeft) => {
   if (hoursLeft >= 24) {
     days = Math.floor(hoursLeft / 24);
     hours = hoursLeft % 24;
-    return days + " days and " + hoursLeft + " hours";
+    return (
+      days +
+      " day" +
+      (days > 1 ? "s" : "") +
+      " and " +
+      hoursLeft +
+      " hour" +
+      (hoursLeft > 1 ? "s" : "")
+    );
   }
-  return hoursLeft + " hours";
+  return hoursLeft + " hour" + (hoursLeft > 1 ? "s" : "");
 };
 
 const eventNotificationEmail = async (
