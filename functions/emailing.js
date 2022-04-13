@@ -33,24 +33,39 @@ const getFullnameURI = (firstname, lastname) => {
     .replace("/", " ");
 };
 
-const emailOpened = async (fullname) => {
+const loadUmichLogo = () => {
+  const file = storage
+    .bucket("visualexp-a7d2c.appspot.com")
+    .file("UMSI_Logo.png");
+  let readStream = file.createReadStream();
+
+  res.setHeader("content-type", "image/png");
+  readStream.pipe(res);
+};
+
+const emailOpenedIndividual = async (fullname) => {
   const contactRef = db.collection("contacts").doc(fullname);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
   });
 };
 
-exports.loadImage = (req, res) => {
+exports.loadImageIndividual = (req, res) => {
   let fullname = req.params.contactId.replace("+", " ");
-  emailOpened(fullname);
+  emailOpenedIndividual(fullname);
+  loadUmichLogo();
+};
 
-  const file = storage
-    .bucket("visualexp-a7d2c.appspot.com")
-    .file("output-onlinepngtools (4).png");
-  let readStream = file.createReadStream();
+const emailOpenedInstructor = async (instructorId) => {
+  const contactRef = db.collection("contacts").doc(instructorId);
+  await contactRef.update({
+    openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
+  });
+};
 
-  res.setHeader("content-type", "image/png");
-  readStream.pipe(res);
+exports.loadImageProfessor = (req, res) => {
+  emailOpenedInstructor(req.params.instructorId);
+  loadUmichLogo();
 };
 
 exports.sendPersonalInvitations = async (req, res) => {
@@ -84,40 +99,37 @@ exports.sendPersonalInvitations = async (req, res) => {
                 ? "Help Improve 1Cademy by Participating in Our UX Research Study!"
                 : "Learn Which Knowledge Visualization Method is Better For You by Participating in Our UX Experiment!",
               html: `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
-  <p></p>
-  ${
-    from1Cademy
-      ? "<p>We need your help with improving the design of 1Cademy by participating in our UX research online experiment. I'd appreciate it if you let me know your first availability ASAP so that I can match you with one of our UX researchers to schedule the sessions. "
-      : "<p>We are a group of UX researchers at the University of Michigan, School of Information.</p><p>We need your help with participating in our experiment to learn how to better design knowledge visualization to improve reading comprehension and learning. "
-  }
-  The experiment will be in three sessions:</p>
-  <ul>
-  <li>
-  1<sup>st</sup> session for an hour
-  </li>
-  <li>
-  2<sup>nd</sup> session, 3 days later, for 30 minutes
-  </li>
-  <li>
-  3<sup>rd</sup> session, 1 week later, for 30 minutes
-  </li>
-  </ul>
-  <p>Please create an account and fill out your availability in <a href="https://visualexp1.web.app" target="_blank">our scheduling website</a>.</p>
-  ${
-    from1Cademy
-      ? "<p>Also, please turn on your notifications on Microsoft Teams to better collaborate with the community.</p>"
-      : ""
-  }
-  <p></p>
-  <p>Best regards,</p>
-  <div dir="ltr" class="gmail_signature"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">--</span></div><div dir="ltr"><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Iman YeckehZaare</span><div><span style="color: rgb(136, 136, 136); font-size: 12.8px; --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">Ph.D. Candidate</span></div><div><span><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">University of Michigan School of Information</span></font></span></div><div><font color="#888888" data-darkreader-inline-color="" style="--darkreader-inline-color:#7d756b;"><span style="font-size: 12.8px;">Outstanding Graduate Student Instructor of the Year 2018-2019</span></font><span><br></span></div><div><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""><a href="https://1cademy.us/Home" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=12lQOGIsvgO45QTD4qlLxQ7_Y7NrHnbGx&amp;revid=0B8-wWhGFpGYCNzd4VFl6cTdxSUF2RnRkeS9RVGp0dUNqaENnPQ"></a>&nbsp;<a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1x2fU9wvobcqM30Od779MVmeBQxWVXGfF&amp;revid=0B8-wWhGFpGYCckNhZUlHK250Tit3TGdVdlArajRGdlBsblFzPQ"></a><img src="https://docs.google.com/uc?export=download&amp;id=1ud7zHiXzQC6VFyViSG7MUuqKb4t8Y75U&amp;revid=0B8-wWhGFpGYCSjM3WjVja2YzWGVPY1dKaSt0Y2tRM095VENnPQ"><img src="https://docs.google.com/uc?export=download&amp;id=1-G9ZAlwduWfEyrDzXWTZU1uuiuljMcWP&amp;revid=0B8-wWhGFpGYCS3dRMXl2U3Q0WTRsZE05SmMrSGtZWFRicENjPQ">&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17NADDvDZVvuHni-xM6Ej_IbBS9MHBZa-&amp;revid=0B8-wWhGFpGYCUkllWEtyTTMvL3IwcUp5cE1BRE16cnphSHJzPQ"></a>&nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp;<a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a><a href="https://www.ifit.com/profile/5fab18836a996c03ad43af64" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1Iy3PATWUwaZ-hinGScGA5xxYT8maVHL0&amp;revid=0B8-wWhGFpGYCeUtBS2pSbFgzak1RQnpydXZHcUtaaEtnWkhFPQ"></a></span></div></div></div></div></div></div></div></div></div></div></div>
-  <a href="https://www.si.umich.edu/people/iman-yeckehzaare" target="_blank">
-  <img src="https://us-central1-visualexp-a7d2c.cloudfunctions.net/api/loadImage/${
-    getFullnameURI(firstname, lastname) + "/" + generateUID()
-  }">
-  </a>
-  &nbsp; &nbsp;&nbsp;<a href="https://stackoverflow.com/users/2521204/1man" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1tSnswSYHWxRGGh-u54uNxPWKWqqHhvdM&amp;revid=0B8-wWhGFpGYCdlRmU2xPVkxjTS9HWU9lbHJGdC92OGgxeTFzPQ"></a>&nbsp;&nbsp;<a href="https://github.com/ImanYZ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1ftgv8rj-ihFuA4ZE5mf9faXeNvz-F3vQ&amp;revid=0B8-wWhGFpGYCRVFGYjFDNGZRYnhMQ1dLU1lkNGZwT283UnFnPQ"></a>&nbsp;</span><a href="https://scholar.google.com/citations?user=zP9tLycAAAAJ" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=17-AQ6C9AoqN0pAqN3_4W07c8-ehTjZx-&amp;revid=0B8-wWhGFpGYCWHVhR1BjcnZraDNYMVdlRFcySytnRjkzOE9ZPQ" style="color: rgb(125, 117, 107); font-size: 12.8px; --darkreader-inline-color:#7f776d;" data-darkreader-inline-color=""></a>&nbsp;<span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; </span><a href="https://dl.acm.org/profile/99659352229" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1wFUjKEJK1FwS3jkePqy0tVO6_vrJsEI0&amp;revid=0B8-wWhGFpGYCblkvNUJsSkVkQnVjTmtUMmtUaEljSWJkMFJvPQ" style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color=""></a><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://en.wikipedia.org/wiki/User:I.yeckehzaare" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1E3DUxcWTrTw_tk357XSgzBGd6CgcyEOL&amp;revid=0B8-wWhGFpGYCR1ZmQ0YvaFg0NE9Nc2dTemhtemRMU00vWm9JPQ"></a></span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; &nbsp;<a href="https://twitter.com/Iman1Web" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1oqkF7mgDHoJ94GwkFG5qnikhbnJi6CCh&amp;revid=0B8-wWhGFpGYCQzI0d2ppWDlIZGp6czRsc2RLK1lwZUljWkNrPQ"></a>&nbsp;</span><span style="color: rgb(136, 136, 136); --darkreader-inline-color:#7d756b;" data-darkreader-inline-color="">&nbsp; <a href="https://www.linkedin.com/in/oneweb/" target="_blank"><img src="https://docs.google.com/uc?export=download&amp;id=1GorrsSKJS4xCSlqhlu2o4_xnAqms_Ncc&amp;revid=0B8-wWhGFpGYCQzdVN0RsUWtpb2s5TEpmVmFBZFVDT3hiOXc0PQ"></a></span></div></div></div></div></div></div></div></div></div></div></div></div>
-  `,
+                <p></p>
+                ${
+                  from1Cademy
+                    ? "<p>We need your help with improving the design of 1Cademy by participating in our UX research online experiment. I'd appreciate it if you let me know your first availability ASAP so that I can match you with one of our UX researchers to schedule the sessions. "
+                    : "<p>We are a group of UX researchers at the University of Michigan, School of Information.</p><p>We need your help with participating in our experiment to learn how to better design knowledge visualization to improve reading comprehension and learning. "
+                }
+                The experiment will be in three sessions:</p>
+                <ul>
+                <li>
+                1<sup>st</sup> session for an hour
+                </li>
+                <li>
+                2<sup>nd</sup> session, 3 days later, for 30 minutes
+                </li>
+                <li>
+                3<sup>rd</sup> session, 1 week later, for 30 minutes
+                </li>
+                </ul>
+                <p>Please create an account and fill out your availability in <a href="https://visualexp1.web.app" target="_blank">our scheduling website</a>.</p>
+                ${
+                  from1Cademy
+                    ? "<p>Also, please turn on your notifications on Microsoft Teams to better collaborate with the community.</p>"
+                    : ""
+                }
+                <p></p>
+                <p>Best regards,</p>
+                <br clear="all><br>--<br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><div><b><a href="https://youtu.be/-dQOuGeu0IQ" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Grace Ramstad, Sarah Licht, Viktoria Roshchin<br></div><div><b><a href="https://youtu.be/tmW31AEJRYg" target="_blank">Organization/Educational Psychology</a> - </b>Amelia Henriques, Desiree Mayrie Comer<b><br></b></div><div><div><a href="https://youtu.be/B6q-LYXvNCg" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare<br></div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b></b></a><b></b></div><div><b><a href="https://youtu.be/ImoaKx7uoII" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Talia Gillespie</div><div><a href="https://youtu.be/J0y0tZzzuQ0" target="_blank"><b>Machine Learning (Deep learning) </b></a>- Ge Zhang, Vatsal Chaudhari</div><div><b><a href="https://youtu.be/Mj45B59k4fo" target="_blank">Neuroscience Research</a></b> - Amrit Das Pradhan, Victoria Mulligan</div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b>Health Psychology</b></a> - Megan Rush, Madeline Paige Jacoby<div><a href="https://youtu.be/otW11GyQ4dY" target="_blank"><b>Disability Studies</b></a> - Keltie Malley, Rishabh Verma<br></div><div><b><a href="https://youtu.be/RBIRquj1dD8" target="_blank">Cryptoeconomics</a></b> - Isaac F Maruyama, Daniel Li</div><a href="https://youtu.be/FjgYobJ-W4A" target="_blank"><b>Graphic Design</b></a> - Samantha Wanamaker<br><div><b><a href="https://youtu.be/K5R17uFWINo" target="_blank">Clinical Psychology</a></b> - Victoria Mulligan<b><b><br></b></b></div><div><div><a href="https://youtu.be/Xaa1JnTHtSY" target="_blank"><b>Mindfulness Research</b></a> - Noor Jassim</div></div><div><a href="https://youtu.be/tAKMwhguTHc" target="_blank"><b>UX Research</b></a> - Catherine Grillo<br></div><div><a href="https://youtu.be/3JZnwTXEq0g" target="_blank"><b>UI Design</b></a> - Shannon Kenny</div><b>R&amp;D</b> - Iman YeckehZaare<br><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
+                <img src="https://us-central1-visualexp-a7d2c.cloudfunctions.net/api/loadImage/individual/${
+                  getFullnameURI(firstname, lastname) + "/" + generateUID()
+                }">
+                width="420" height="37"><br></div></div></div>`,
             };
             transporter.sendMail(mailOptions, async (error, data) => {
               if (error) {
@@ -166,6 +178,7 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians",
 };
 
+// This function should be called by a pubsub scheduler every 25 hours.
 exports.inviteInstructors = async (req, res) => {
   try {
     let waitTime = 0;
@@ -175,11 +188,16 @@ exports.inviteInstructors = async (req, res) => {
       if (
         instructorData.upVotes - instructorData.downVotes >= 3 &&
         (!instructorData.reminders || instructorData.reminders < 4) &&
+        (!instructorData.nextReminder ||
+          instructorData.nextReminder.toDate().getTime() <
+            new Date().getTime()) &&
         !instructorData.yes &&
         !instructorData.no &&
         !instructorData.doNot &&
         !instructorData.introduced &&
-        instructorData.major in communityTitles
+        instructorData.major in communityTitles &&
+        instructorData.email === "onecademy@umich.edu"
+        // pabbott@umich.edu
       ) {
         let instructorConditionsDocs = await db
           .collection("instructorConditions")
@@ -199,68 +217,89 @@ exports.inviteInstructors = async (req, res) => {
             email: instructorData.email,
             firstname: instructorData.firstname,
             lastname: instructorData.lastname,
+            prefix: instructorData.prefix,
+            reminders: instructorData.reminders,
+            nextReminder: instructorData.nextReminder,
             major: instructorData.major,
+            communityTitle: communityTitles[instructorData.major],
             condition: minCondition,
           });
+          const mailOptions = {
+            from: process.env.EMAIL,
+            to: email,
+            subject: `Inviting Your Students to ${
+              minCondition === "contribute"
+                ? "Contribute to"
+                : minCondition === "learn"
+                ? "Learn Collaboratively at"
+                : "Present Your Research at"
+            } Our Multi-School ${
+              communityTitles[instructorData.major]
+            } Community`,
+            html: `<p>Hello ${
+              instructorData.prefix +
+              " " +
+              capitalizeFirstLetter(instructorData.firstname) +
+              " " +
+              capitalizeFirstLetter(instructorData.lastname)
+            },</p>
+              <p></p>
+              <p>We are inviting your students to join and <strong>${
+                minCondition === "contribute"
+                  ? "contribute to"
+                  : minCondition === "learn"
+                  ? "learn collaboratively at"
+                  : "present your research at"
+              }</strong> our multi-school <a href="https://1cademy.us/community/${
+              instructorData.major
+            }" target="_blank">${
+              communityTitles[instructorData.major]
+            } community</a>. Several large communities of student researchers from different schools in the US are remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform. You can find more information about our communities and the application process at https://1cademy.us/home</p>
+              <p></p>
+              <p>Please choose one of the following options regarding your preference:</p>
+              <ul>
+                <li><a href="" target="_blank">Yes, I'd like to invite my students.</a></li>
+                <li><a href="" target="_blank">Not at this point, contact me in a few months.</a></li>
+                <li><a href="" target="_blank">No, do not contact me again.</a></li>
+              </ul>
+              <p>Reply to this email if you have any questions or concerns.</p>
+              <p>Please let us know if you are interested in assigning course/internship credits for your students. We can provide you with detailed assessment of their activities on 1Cademy.</p>
+              <p></p>
+              <p>Best regards,</p>
+              <br clear="all><br>--<br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><div><b><a href="https://youtu.be/-dQOuGeu0IQ" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Grace Ramstad, Sarah Licht, Viktoria Roshchin<br></div><div><b><a href="https://youtu.be/tmW31AEJRYg" target="_blank">Organization/Educational Psychology</a> - </b>Amelia Henriques, Desiree Mayrie Comer<b><br></b></div><div><div><a href="https://youtu.be/B6q-LYXvNCg" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare<br></div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b></b></a><b></b></div><div><b><a href="https://youtu.be/ImoaKx7uoII" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Talia Gillespie</div><div><a href="https://youtu.be/J0y0tZzzuQ0" target="_blank"><b>Machine Learning (Deep learning) </b></a>- Ge Zhang, Vatsal Chaudhari</div><div><b><a href="https://youtu.be/Mj45B59k4fo" target="_blank">Neuroscience Research</a></b> - Amrit Das Pradhan, Victoria Mulligan</div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b>Health Psychology</b></a> - Megan Rush, Madeline Paige Jacoby<div><a href="https://youtu.be/otW11GyQ4dY" target="_blank"><b>Disability Studies</b></a> - Keltie Malley, Rishabh Verma<br></div><div><b><a href="https://youtu.be/RBIRquj1dD8" target="_blank">Cryptoeconomics</a></b> - Isaac F Maruyama, Daniel Li</div><a href="https://youtu.be/FjgYobJ-W4A" target="_blank"><b>Graphic Design</b></a> - Samantha Wanamaker<br><div><b><a href="https://youtu.be/K5R17uFWINo" target="_blank">Clinical Psychology</a></b> - Victoria Mulligan<b><b><br></b></b></div><div><div><a href="https://youtu.be/Xaa1JnTHtSY" target="_blank"><b>Mindfulness Research</b></a> - Noor Jassim</div></div><div><a href="https://youtu.be/tAKMwhguTHc" target="_blank"><b>UX Research</b></a> - Catherine Grillo<br></div><div><a href="https://youtu.be/3JZnwTXEq0g" target="_blank"><b>UI Design</b></a> - Shannon Kenny</div><b>R&amp;D</b> - Iman YeckehZaare<br><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
+              <img src="https://us-central1-visualexp-a7d2c.cloudfunctions.net/api/loadImage/professor/${
+                instructorDoc.id + "/" + generateUID()
+              }">
+              width="420" height="37"><br></div></div></div>`,
+          };
+          transporter.sendMail(mailOptions, async (error, data) => {
+            if (error) {
+              console.log({ error });
+              return res.status(500).json({ error });
+            } else {
+              const instructorConditionRef = db
+                .collection("instructorConditions")
+                .doc(minCondition);
+              await instructorConditionRef.update({
+                num: admin.firestore.FieldValue.increment(1),
+              });
 
-          const instructorConditionRef = db
-            .collection("instructorConditions")
-            .doc(minCondition);
-          await instructorConditionRef.update({
-            num: admin.firestore.FieldValue.increment(1),
-          });
-
-          const instructorRef = db
-            .collection("instructors")
-            .doc(instructorDoc.id);
-          await instructorRef.update({
-            condition: minCondition,
-            emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
-            reminders: admin.firestore.FieldValue.increment(1),
+              const instructorRef = db
+                .collection("instructors")
+                .doc(instructorDoc.id);
+              await instructorRef.update({
+                condition: minCondition,
+                emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
+                reminders: admin.firestore.FieldValue.increment(1),
+                nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
+              });
+            }
           });
         }, waitTime);
         waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
         if (waitTime > 4000) {
           break;
         }
-        // const mailOptions = {
-        //   from: "onecademy@umich.edu",
-        //   to: email,
-        //   subject:
-        //     (from1Cademy ? "[1Cademy] " : "") +
-        //     "Learn Which Knowledge Visualization Method is Better For You by Participating in our Experiment!",
-        //   html:
-        //     `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
-        //   <p></p>
-        //   ${
-        //     from1Cademy
-        //       ? "<p>Our UX research team at 1Cademy needs"
-        //       : "<p>We are a group of UX researchers at the University of Michigan, School of Information.</p><p>We need"
-        //   }
-        //   <p> your help with participating in our experiment to learn how to better design knowledge visualization to improve reading comprehension and learning. The experiment will be in three sessions:</p>
-        //   <ol>
-        //   <li>
-        //   1<sup>st</sup> session for an hour
-        //   </li>
-        //   <li>
-        //   2<sup>nd</sup> session, 3 days later, for 30 minutes
-        //   </li>
-        //   <li>
-        //   3<sup>rd</sup> session, 1 week later, for 30 minutes
-        //   </li>
-        //   <ol>
-        //   <p>Please fill out your availability in our scheduling website: <a href="https://visualexp1.web.app/schedule" target="_blank">https://visualexp1.web.app/schedule</a></p>
-        //   <p></p>
-        //   <p>Best regards,</p>
-        //   ` + signatureHTML,
-        // };
-        // return transporter.sendMail(mailOptions, (error, data) => {
-        //   if (error) {
-        //     console.log({ error });
-        //     return res.status(500).json({ error });
-        //   }
-        //   return res.status(200).json({ done: true });
-        // });
       }
     }
   } catch (err) {
@@ -270,7 +309,7 @@ exports.inviteInstructors = async (req, res) => {
 };
 
 const hoursToDaysHoursStr = (hoursLeft) => {
-  const days = 0;
+  let days = 0;
   hoursLeft = Math.floor(hoursLeft);
   if (hoursLeft < 1) {
     return "less than an hour";
@@ -460,7 +499,8 @@ const reschEventNotificationEmail = async (
   courseName,
   hoursLeft,
   httpReq,
-  declined
+  declined,
+  res
 ) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
@@ -528,35 +568,31 @@ ${
 exports.reschEventNotificationEmail = reschEventNotificationEmail;
 
 exports.rescheduleEventNotificationEmail = (req, res) => {
-  try {
-    if ("email" in req.body && "firstname" in req.body) {
-      const email = req.body.email;
-      const firstname = req.body.firstname;
-      let from1Cademy = false;
-      if ("from1Cademy" in req.body) {
-        from1Cademy = req.body.from1Cademy;
-      }
-      let courseName = "";
-      if ("courseName" in req.body) {
-        courseName = req.body.courseName;
-      }
-      let hoursLeft = 0;
-      if ("hoursLeft" in req.body) {
-        hoursLeft = req.body.hoursLeft;
-      }
-      reschEventNotificationEmail(
-        email,
-        firstname,
-        from1Cademy,
-        courseName,
-        hoursLeft,
-        true,
-        true
-      );
+  if ("email" in req.body && "firstname" in req.body) {
+    const email = req.body.email;
+    const firstname = req.body.firstname;
+    let from1Cademy = false;
+    if ("from1Cademy" in req.body) {
+      from1Cademy = req.body.from1Cademy;
     }
-  } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ err });
+    let courseName = "";
+    if ("courseName" in req.body) {
+      courseName = req.body.courseName;
+    }
+    let hoursLeft = 0;
+    if ("hoursLeft" in req.body) {
+      hoursLeft = req.body.hoursLeft;
+    }
+    reschEventNotificationEmail(
+      email,
+      firstname,
+      from1Cademy,
+      courseName,
+      hoursLeft,
+      true,
+      true,
+      res
+    );
   }
 };
 

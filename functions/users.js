@@ -287,7 +287,7 @@ exports.changeTo3Days = async (req, res) => {
 exports.loadContacts = async (req, res) => {
   try {
     let rowIdx = 0;
-    const ws = fs.createReadStream("Contacts.csv");
+    const ws = fs.createReadStream("/datasets/Contacts.csv");
     csv
       .parseStream(ws, { headers: true })
       .on("error", (error) => {
@@ -606,9 +606,12 @@ exports.retrieveData = async (req, res) => {
         rowsData.push(row);
       }
     }
-    writeToPath("data.csv", rowsData, { headers: true }).on("finish", () => {
-      console.log("done process data!");
-    });
+    writeToPath("/datasets/data.csv", rowsData, { headers: true }).on(
+      "finish",
+      () => {
+        console.log("done process data!");
+      }
+    );
   } catch (err) {
     console.log({ err });
     return res.status(400).json({ err });
@@ -676,7 +679,7 @@ exports.feedbackData = async (req, res) => {
       }
       rowsData.push(row);
     }
-    writeToPath("feedbackData.csv", rowsData, { headers: true }).on(
+    writeToPath("/datasets/feedbackData.csv", rowsData, { headers: true }).on(
       "finish",
       () => {
         console.log("done process data!");

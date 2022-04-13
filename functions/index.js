@@ -24,7 +24,8 @@ const {
   updateNotTakenSessions,
 } = require("./projectManagement");
 const {
-  loadImage,
+  loadImageIndividual,
+  loadImageProfessor,
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
   inviteInstructors,
@@ -50,7 +51,8 @@ app.use(express.json());
 
 app.use(cors());
 
-app.get("/loadImage/:contactId/:randNum", loadImage);
+app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
+app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadContacts", loadContacts);
 app.get("/inviteInstructors", inviteInstructors);
 app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
