@@ -51,6 +51,14 @@ app.use(express.json());
 
 app.use(cors());
 
+const PREFIX = "api";
+app.use((req, res, next) => {
+  if (req.url.indexOf(`/${PREFIX}/`) === 0) {
+    req.url = req.url.substring(PREFIX.length + 1);
+  }
+  next();
+});
+
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadContacts", loadContacts);
