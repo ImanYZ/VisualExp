@@ -39,14 +39,15 @@ const SelectSessions = (props) => {
 
   useEffect(() => {
     const orderedSch = [...props.schedule];
-    orderedSch.sort((a, b) => a - b);
+    orderedSch.sort();
     const fSessions = [];
     let sSession, tSession;
     for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
       if (
         // startingTomorrow(orderedSch[sIdx]) &&
+        orderedSch[sIdx] > new Date() &&
         orderedSch[sIdx].getTime() + 30 * 60000 ===
-        orderedSch[sIdx + 1].getTime()
+          orderedSch[sIdx + 1].getTime()
         //    &&
         // orderedSch[sIdx + 1].getTime() + 30 * 60000 ===
         //   orderedSch[sIdx + 2].getTime()
