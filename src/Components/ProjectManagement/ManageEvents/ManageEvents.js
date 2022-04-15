@@ -915,7 +915,7 @@ const ManageEvents = (props) => {
           onRowClick={gridRowClick}
         />
         {schedule.length > 0 && (
-          <div style={{ marginBottom: "280px" }}>
+          <div style={{ marginBottom: "700px" }}>
             <SelectSessions
               startDate={new Date()}
               numDays={16}
