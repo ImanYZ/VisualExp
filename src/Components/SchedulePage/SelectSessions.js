@@ -39,7 +39,7 @@ const SelectSessions = (props) => {
 
   useEffect(() => {
     const orderedSch = [...props.schedule];
-    orderedSch.sort((a, b) => b.getTime() - a.getTime());
+    orderedSch.sort((a, b) => a - b);
     const fSessions = [];
     let sSession, tSession;
     for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
