@@ -81,6 +81,10 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 app.get("/card", card);
 app.get("/image*", image);
 
+app.get("/", (req, res) => {
+  return res.status(200).json({ api: true });
+});
+
 // https://baseurl.com/api/
 exports.api = functions
   .runWith({
