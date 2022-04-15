@@ -108,18 +108,8 @@ exports.scheduleSingleSession = async (req, res) => {
 // Get all the events from the beginning of the experiment until next year!
 exports.allEvents = async (req, res) => {
   try {
-<<<<<<< HEAD
-<<<<<<< HEAD
     let end = new Date();
     const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000);
-=======
-    const start = new Date(2021, 10, 1);
-    let end = new Date();
->>>>>>> eb2985c3715c18e22a6037b7d976d3be83dc0324
-=======
-    const start = new Date(2021, 10, 1);
-    let end = new Date();
->>>>>>> eb2985c3715c18e22a6037b7d976d3be83dc0324
     end = new Date(end.getTime() + 365 * 24 * 60 * 60 * 1000);
     const allEvents = await getEvents(start, end, "America/Detroit");
     if (allEvents) {
