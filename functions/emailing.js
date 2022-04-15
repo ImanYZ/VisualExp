@@ -33,7 +33,7 @@ const getFullnameURI = (firstname, lastname) => {
     .replace("/", " ");
 };
 
-const loadUmichLogo = () => {
+const loadUmichLogo = (res) => {
   const file = storage
     .bucket("visualexp-a7d2c.appspot.com")
     .file("UMSI_Logo.png");
@@ -53,11 +53,11 @@ const emailOpenedIndividual = async (fullname) => {
 exports.loadImageIndividual = (req, res) => {
   let fullname = req.params.contactId.replace("+", " ");
   emailOpenedIndividual(fullname);
-  loadUmichLogo();
+  loadUmichLogo(res);
 };
 
 const emailOpenedInstructor = async (instructorId) => {
-  const contactRef = db.collection("contacts").doc(instructorId);
+  const contactRef = db.collection("instructors").doc(instructorId);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
   });
@@ -65,7 +65,7 @@ const emailOpenedInstructor = async (instructorId) => {
 
 exports.loadImageProfessor = (req, res) => {
   emailOpenedInstructor(req.params.instructorId);
-  loadUmichLogo();
+  loadUmichLogo(res);
 };
 
 exports.sendPersonalInvitations = async (req, res) => {

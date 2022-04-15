@@ -64,6 +64,7 @@ const SelectSessions = (props) => {
             }
             sSession = sSession ? sSession : orderedSch[secondSIdx];
             tSession = tSession ? tSession : orderedSch[thirdSIdx];
+            break;
           }
         }
       }

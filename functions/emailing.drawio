@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="vwbJsP5kCBEH-EEFsKNK" name="Page-1">
-        <mxGraphModel dx="968" dy="392" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="968" dy="354" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -10,7 +10,7 @@
                 <mxCell id="81" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="82" target="84">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="82" value="&lt;span&gt;&lt;b&gt;instructors&lt;br&gt;&lt;/b&gt;id&lt;br&gt;upVotes&lt;br&gt;downVotes&lt;br&gt;emailedAt&lt;br&gt;reminders&lt;br&gt;nextR&lt;/span&gt;eminder&lt;span&gt;&lt;br&gt;emailOpened&lt;br&gt;yes&lt;br&gt;no&lt;br&gt;doNot&lt;br&gt;introduced&lt;br&gt;condition&lt;br&gt;&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=left;" vertex="1" parent="1">
+                <mxCell id="82" value="&lt;span&gt;&lt;b&gt;instructors&lt;br&gt;&lt;/b&gt;id&lt;br&gt;upVotes&lt;br&gt;downVotes&lt;br&gt;emailedAt&lt;br&gt;reminders&lt;br&gt;nextR&lt;/span&gt;eminder&lt;span&gt;&lt;br&gt;&lt;/span&gt;&lt;div style=&quot;color: rgb(212 , 212 , 212) ; background-color: rgb(30 , 30 , 30) ; font-family: &amp;#34;menlo&amp;#34; , &amp;#34;monaco&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; line-height: 18px&quot;&gt;&lt;span style=&quot;color: #9cdcfe&quot;&gt;openedEmail&lt;/span&gt;&lt;/div&gt;&lt;span&gt;yes&lt;br&gt;no&lt;br&gt;doNot&lt;br&gt;introduced&lt;br&gt;condition&lt;br&gt;&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=left;" vertex="1" parent="1">
                     <mxGeometry x="380" y="120" width="130" height="240" as="geometry"/>
                 </mxCell>
                 <mxCell id="83" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="84" target="98">
