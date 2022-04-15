@@ -140,6 +140,11 @@ const expSessionsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
   },
+  {
+    field: "id",
+    headerName: "Event Id",
+    width: 190,
+  },
 ];
 
 const applicantsColumns = [
@@ -270,7 +275,7 @@ const ManageEvents = (props) => {
   const [ongoingEventsLoaded, setOngoingEventsLoaded] = useState(false);
   const [participant, setParticipant] = useState("");
   const [schedule, setSchedule] = useState([]);
-  const [firstSessions, setFirstSessions] = useState([]);
+  const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
   const [submitable, setSubmitable] = useState(false);
@@ -599,29 +604,36 @@ const ManageEvents = (props) => {
     }
   };
 
-  const setUpdateScheduleDocument = async (email, session, eventId, order) => {
-    const scheduleDocs = await firebase.db
-      .collection("schedule")
-      .where("email", "==", email)
-      .where("session", "==", session)
-      .get();
-    if (scheduleDocs.docs.length > 0) {
-      const scheduleRef = firebase.db
+  const setUpdateScheduleDocument = async (
+    email,
+    session,
+    eventId,
+    order,
+    action
+  ) => {
+    if (action === "Update") {
+      const scheduleDocs = await firebase.db
         .collection("schedule")
-        .doc(scheduleDocs.docs[0].id);
-      await firebase.batchUpdate(scheduleRef, {
-        id: eventId,
-        order,
-      });
-    } else {
-      const scheduleRef = firebase.db.collection("schedule").doc();
-      await firebase.batchSet(scheduleRef, {
-        email: participant,
-        session: firebase.firestore.Timestamp.fromDate(session),
-        id: eventId,
-        order,
-      });
+        .where("email", "==", email)
+        .where("session", "==", session)
+        .get();
+      if (scheduleDocs.docs.length > 0) {
+        const scheduleRef = firebase.db
+          .collection("schedule")
+          .doc(scheduleDocs.docs[0].id);
+        return await firebase.batchUpdate(scheduleRef, {
+          id: eventId,
+          order,
+        });
+      }
     }
+    const scheduleRef = firebase.db.collection("schedule").doc();
+    return await firebase.batchSet(scheduleRef, {
+      email: participant,
+      session: firebase.firestore.Timestamp.fromDate(session),
+      id: eventId,
+      order,
+    });
   };
 
   const submitNewSessions = async (event) => {
@@ -657,7 +669,7 @@ const ManageEvents = (props) => {
       }
       responseObj = await axios.post("/schedule", {
         email: participant,
-        first: firstSessions[0],
+        first: firstSession,
         second: secondSession,
         third: thirdSession,
       });
@@ -665,21 +677,24 @@ const ManageEvents = (props) => {
 
       await setUpdateScheduleDocument(
         participant,
-        firstSessions[0],
+        firstSession,
         responseObj.data.events[0].data.id,
-        "1st"
+        "1st",
+        "Set"
       );
       await setUpdateScheduleDocument(
         participant,
         secondSession,
         responseObj.data.events[0].data.id,
-        "2nd"
+        "2nd",
+        "Set"
       );
       await setUpdateScheduleDocument(
         participant,
         thirdSession,
         responseObj.data.events[0].data.id,
-        "3rd"
+        "3rd",
+        "Set"
       );
       await firebase.commitBatch();
       setSubmitted(true);
@@ -725,7 +740,7 @@ const ManageEvents = (props) => {
           });
         }
       }
-      let sessi = firstSessions[0];
+      let sessi = firstSession;
       if (order === "2nd") {
         sessi = secondSession;
       } else if (order === "3rd") {
@@ -742,7 +757,8 @@ const ManageEvents = (props) => {
         participant,
         sessi,
         responseObj.data.events[0].data.id,
-        order
+        order,
+        "Update"
       );
       await firebase.commitBatch();
       setSubmitted(true);
@@ -751,14 +767,14 @@ const ManageEvents = (props) => {
   };
 
   const changeFirstSession = (newDateTime) => {
-    setFirstSessions((oldFSessions) => {
-      const fSessions = [...oldFSessions];
-      fSessions[0].setHours(
+    setFirstSession((oldFSession) => {
+      const fSession = [...oldFSession];
+      fSession.setHours(
         newDateTime.getHours(),
         newDateTime.getMinutes(),
         newDateTime.getSeconds()
       );
-      return fSessions;
+      return fSession;
     });
   };
 
@@ -844,7 +860,7 @@ const ManageEvents = (props) => {
         <div>
           <TimePicker
             label="First Session"
-            value={firstSessions[0]}
+            value={firstSession}
             onChange={changeFirstSession}
             renderInput={(params) => <TextField {...params} />}
           />
@@ -902,7 +918,7 @@ const ManageEvents = (props) => {
           </Button>
         </div>
       </LocalizationProvider>
-      <div className="dataGridTable">
+      <div className="dataGridTable" style={{ marginBottom: "700px" }}>
         <DataGrid
           rows={events}
           columns={expSessionsColumns}
@@ -915,16 +931,16 @@ const ManageEvents = (props) => {
           onRowClick={gridRowClick}
         />
         {schedule.length > 0 && (
-          <div style={{ marginBottom: "700px", height: "1300px" }}>
+          <div style={{ height: "1300px" }}>
             <SelectSessions
               startDate={new Date()}
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
-              firstSessions={firstSessions}
+              firstSession={firstSession}
               secondSession={secondSession}
               thirdSession={thirdSession}
-              setFirstSessions={setFirstSessions}
+              setFirstSession={setFirstSession}
               setSecondSession={setSecondSession}
               setThirdSession={setThirdSession}
               setSubmitable={setSubmitable}

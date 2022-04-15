@@ -39,9 +39,8 @@ const SelectSessions = (props) => {
 
   useEffect(() => {
     const orderedSch = [...props.schedule];
-    orderedSch.sort();
-    const fSessions = [];
-    let sSession, tSession;
+    orderedSch.sort((a, b) => a.getTime() - b.getTime());
+    let fSession, sSession, tSession;
     for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
       if (
         // startingTomorrow(orderedSch[sIdx]) &&
@@ -60,9 +59,7 @@ const SelectSessions = (props) => {
             daysLater(orderedSch[sIdx], s, 7)
           );
           if (thirdSIdx !== -1) {
-            if (!fSessions.includes(orderedSch[sIdx])) {
-              fSessions.push(orderedSch[sIdx]);
-            }
+            fSession = fSession ? fSession : orderedSch[sIdx];
             sSession = sSession ? sSession : orderedSch[secondSIdx];
             tSession = tSession ? tSession : orderedSch[thirdSIdx];
             break;
@@ -70,7 +67,7 @@ const SelectSessions = (props) => {
         }
       }
     }
-    props.setFirstSessions(fSessions);
+    props.setFirstSession(fSession);
     props.setSecondSession(sSession);
     props.setThirdSession(tSession);
     if (sSession && tSession) {
@@ -82,10 +79,9 @@ const SelectSessions = (props) => {
 
   const renderDateCell = (datetime, selected, refSetter) => {
     const scheduledSession =
-      (props.firstSessions &&
-        props.firstSessions.length > 0 &&
-        (props.firstSessions[0].getTime() === datetime.getTime() ||
-          props.firstSessions[0].getTime() ===
+      (props.firstSession &&
+        (props.firstSession.getTime() === datetime.getTime() ||
+          props.firstSession.getTime() ===
             new Date(datetime.getTime() - 30 * 60000).getTime())) ||
       (props.secondSession &&
         props.secondSession.getTime() === datetime.getTime()) ||
@@ -136,7 +132,7 @@ const SelectSessions = (props) => {
 export default React.memo(SelectSessions, (prevProps, nextProps) => {
   return (
     prevProps.schedule.length === nextProps.schedule.length &&
-    prevProps.firstSessions === nextProps.firstSessions &&
+    prevProps.firstSession === nextProps.firstSession &&
     prevProps.secondSession === nextProps.secondSession &&
     prevProps.thirdSession === nextProps.thirdSession &&
     prevProps.startDate === nextProps.startDate &&

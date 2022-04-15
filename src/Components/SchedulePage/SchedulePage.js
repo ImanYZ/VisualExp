@@ -70,7 +70,7 @@ const SchedulePage = (props) => {
 
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
-  const [firstSessions, setFirstSessions] = useState([]);
+  const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
   const [submitable, setSubmitable] = useState(false);
@@ -156,7 +156,7 @@ const SchedulePage = (props) => {
       }
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
-        first: firstSessions[0],
+        first: firstSession,
         second: secondSession,
         third: thirdSession,
       });
@@ -168,7 +168,7 @@ const SchedulePage = (props) => {
           email: email.toLowerCase(),
           session: firebase.firestore.Timestamp.fromDate(session),
         };
-        if (session.getTime() === firstSessions[0].getTime()) {
+        if (session.getTime() === firstSession.getTime()) {
           theSession.id = responseObj.data.events[0].data.id;
           theSession.order = "1st";
         } else if (session.getTime() === secondSession.getTime()) {
@@ -299,10 +299,10 @@ const SchedulePage = (props) => {
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
-              firstSessions={firstSessions}
+              firstSession={firstSession}
               secondSession={secondSession}
               thirdSession={thirdSession}
-              setFirstSessions={setFirstSessions}
+              setFirstSession={setFirstSession}
               setSecondSession={setSecondSession}
               setThirdSession={setThirdSession}
               setSubmitable={setSubmitable}
@@ -337,11 +337,11 @@ const SchedulePage = (props) => {
               Press "Confirm" if you'd like to schedule the following three
               sessions, or press "Cancel" to revise your sessions.
             </div>
-            {firstSessions[0] && secondSession && thirdSession && (
+            {firstSession && secondSession && thirdSession && (
               <ul>
                 <li>
                   1<sup>st</sup>
-                  {sessionFormatter(firstSessions[0], 60)}
+                  {sessionFormatter(firstSession, 60)}
                 </li>
                 <li>
                   2<sup>nd</sup>
