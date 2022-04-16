@@ -23,8 +23,9 @@ import {
   fullnameState,
   resumeUrlState,
   transcriptUrlState,
-  applicationSubmittedState,
+  applicationsSubmittedState,
   colorModeState,
+  leadingState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
@@ -62,9 +63,12 @@ const AppAppBar = (props) => {
   const [completedExperiment, setCompletedExperiment] = useRecoilState(
     completedExperimentState
   );
-  const setApplicationSubmitted = useSetRecoilState(applicationSubmittedState);
+  const setApplicationsSubmitted = useSetRecoilState(
+    applicationsSubmittedState
+  );
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const leading = useRecoilValue(leadingState);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -87,8 +91,8 @@ const AppAppBar = (props) => {
             window.location.href = "/";
           }
           setFullname(getFullname(userData.firstname, userData.lastname));
-          if (userData.applicationSubmitted) {
-            setApplicationSubmitted(true);
+          if (userData.applicationsSubmitted) {
+            setApplicationsSubmitted(userData.applicationsSubmitted);
           }
           if ("Resume" in userData) {
             setResumeUrl(userData["Resume"]);
@@ -137,7 +141,7 @@ const AppAppBar = (props) => {
         setEmail("");
         setHasScheduled(false);
         setCompletedExperiment(false);
-        setApplicationSubmitted(false);
+        setApplicationsSubmitted({});
       }
     });
   }, [firebase]);
@@ -233,12 +237,20 @@ const AppAppBar = (props) => {
                 />
               );
             })}
-            {props.thisPage && (
+            {leading ? (
               <LinkTab
                 onClick={props.switchSection(5)}
                 label={props.thisPage}
                 titl={props.thisPage}
               />
+            ) : (
+              props.thisPage && (
+                <LinkTab
+                  onClick={props.switchSection(5)}
+                  label={props.thisPage}
+                  titl={props.thisPage}
+                />
+              )
             )}
             {fullname && !props.tutorial && completedExperiment && (
               <Tooltip title="1Cademy Tutorial">

@@ -24,7 +24,7 @@ import {
   firebaseState,
   fullnameState,
   communiTestsEndedState,
-  applicationSubmittedState,
+  applicationsSubmittedState,
 } from "../../store/AuthAtoms";
 
 import SnackbarComp from "../SnackbarComp";
@@ -46,8 +46,8 @@ const PaperTest = (props) => {
   const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(
     communiTestsEndedState
   );
-  const [applicationSubmitted, setApplicationSubmitted] = useRecoilState(
-    applicationSubmittedState
+  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(
+    applicationsSubmittedState
   );
 
   const [papers, setPapers] = useState([]);
@@ -350,9 +350,16 @@ const PaperTest = (props) => {
         await applRef.set(applData);
       }
       if (applData.ended) {
-        setApplicationSubmitted(true);
+        setApplicationsSubmitted((oldApplicatonsSubmitted) => {
+          return { ...oldApplicatonsSubmitted, [props.communiId]: true };
+        });
         const userRef = firebase.db.collection("users").doc(fullname);
-        await userRef.update({ applicationSubmitted: true });
+        await userRef.update({
+          applicationsSubmitted: {
+            ...applicationsSubmitted,
+            [props.communiId]: true,
+          },
+        });
       }
     }
   };

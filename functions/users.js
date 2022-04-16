@@ -704,7 +704,9 @@ exports.applicationReminder = async (context) => {
       if (
         (!("withdrew" in userData) || !userData.withdrew) &&
         (!("applicationSubmitted" in userData) ||
-          !userData.applicationSubmitted) &&
+          !userData.applicationSubmitted ||
+          !("applicationsSubmitted" in userData) ||
+          Object.keys(userData.applicationsSubmitted).length === 0) &&
         (!("reminder" in userData) ||
           userData.reminder.toDate() <= new Date()) &&
         "createdAt" in userData &&

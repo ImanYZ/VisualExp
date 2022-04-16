@@ -42,9 +42,9 @@ export const leadingState = atom({
   default: [],
 });
 
-export const applicationSubmittedState = atom({
-  key: "applicationSubmittedState",
-  default: false,
+export const applicationsSubmittedState = atom({
+  key: "applicationsSubmittedState",
+  default: {},
 });
 
 export const communiTestsEndedState = atom({

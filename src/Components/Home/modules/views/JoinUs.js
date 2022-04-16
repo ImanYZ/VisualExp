@@ -18,7 +18,7 @@ import {
   resumeUrlState,
   transcriptUrlState,
   communiTestsEndedState,
-  applicationSubmittedState,
+  applicationsSubmittedState,
 } from "../../../../store/AuthAtoms";
 import {
   hasScheduledState,
@@ -46,8 +46,8 @@ const JoinUs = (props) => {
   );
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
-  const [applicationSubmitted, setApplicationSubmitted] = useRecoilState(
-    applicationSubmittedState
+  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(
+    applicationsSubmittedState
   );
 
   const [activeStep, setActiveStep] = useState(0);
@@ -61,7 +61,11 @@ const JoinUs = (props) => {
   const [needsUpdate, setNeedsUpdate] = useState(false);
 
   useEffect(() => {
-    if (applicationSubmitted) {
+    if (
+      applicationsSubmitted &&
+      Object.keys(applicationsSubmitted).length > 0 &&
+      applicationsSubmitted[props.community.id]
+    ) {
       setActiveStep(3);
     } else if (completedExperiment) {
       setActiveStep(2);
@@ -70,7 +74,12 @@ const JoinUs = (props) => {
     } else {
       setActiveStep(0);
     }
-  }, [hasScheduled, completedExperiment, applicationSubmitted]);
+  }, [
+    hasScheduled,
+    completedExperiment,
+    applicationsSubmitted,
+    props.community,
+  ]);
 
   useEffect(() => {
     if (needsUpdate) {
@@ -214,7 +223,9 @@ const JoinUs = (props) => {
         !props.community.portfolio &&
         !props.community.hasTest
       ) {
-        setApplicationSubmitted(true);
+        setApplicationsSubmitted((oldApplicatonsSubmitted) => {
+          return { ...oldApplicatonsSubmitted, [props.community.id]: true };
+        });
       }
       setNeedsUpdate(true);
     }
@@ -240,7 +251,9 @@ const JoinUs = (props) => {
         });
       }
       if (!props.community.portfolio && !props.community.hasTest) {
-        setApplicationSubmitted(true);
+        setApplicationsSubmitted((oldApplicatonsSubmitted) => {
+          return { ...oldApplicatonsSubmitted, [props.community.id]: true };
+        });
       }
       setNeedsUpdate(true);
     }
@@ -266,7 +279,9 @@ const JoinUs = (props) => {
         });
       }
       if (!props.community.hasTest) {
-        setApplicationSubmitted(true);
+        setApplicationsSubmitted((oldApplicatonsSubmitted) => {
+          return { ...oldApplicatonsSubmitted, [props.community.id]: true };
+        });
       }
       setNeedsUpdate(true);
     }
