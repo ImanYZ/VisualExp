@@ -1469,7 +1469,7 @@ export default {
         </p>
       </div>
     ),
-    video: "4JKsI0zIEzU",
+    video: "zyj3mE3x1TY",
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
         stem:
