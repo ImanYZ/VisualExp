@@ -346,15 +346,20 @@ const hoursToDaysHoursStr = (hoursLeft) => {
     days = Math.floor(hoursLeft / 24);
     hoursLeft = hoursLeft % 24;
     return (
-      days +
+      (days > 1 ? days : "a") +
       " day" +
       (days > 1 ? "s" : "") +
       (hoursLeft > 0
-        ? " and " + hoursLeft + " hour" + (hoursLeft > 1 ? "s" : "")
+        ? " and " +
+          (hoursLeft > 1 ? hoursLeft : "an") +
+          " hour" +
+          (hoursLeft > 1 ? "s" : "")
         : "")
     );
   }
-  return hoursLeft + " hour" + (hoursLeft > 1 ? "s" : "");
+  return (
+    (hoursLeft > 1 ? hoursLeft : "an") + " hour" + (hoursLeft > 1 ? "s" : "")
+  );
 };
 
 const eventNotificationEmail = async (
