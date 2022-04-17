@@ -8,6 +8,7 @@ const storage = new Storage();
 const admin = require("firebase-admin");
 admin.initializeApp();
 
+// Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
 const isFirestoreDeadlineError = (err) => {
@@ -20,15 +21,20 @@ const isFirestoreDeadlineError = (err) => {
 };
 
 const db = admin.firestore();
+
+// How many transactions/batchWrites out of 500 so far.
+// I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
 let batch = db.batch();
 let writeCounts = 0;
 
+// Commit and reset batchWrites and the counter.
 const makeCommitBatch = async () => {
   await batch.commit();
   batch = db.batch();
   writeCounts = 0;
 };
 
+// Commit the batchWrite; if you got a Firestore Deadline Error try again every 4 seconds until it gets resolved.
 const commitBatch = async () => {
   try {
     await makeCommitBatch();
@@ -51,6 +57,7 @@ const commitBatch = async () => {
   }
 };
 
+//  If the batchWrite exeeds 499 possible writes, commit and rest the batch object and the counter.
 const checkRestartBatchWriteCounts = async () => {
   writeCounts += 1;
   if (writeCounts >= MAX_TRANSACTION_WRITES) {
