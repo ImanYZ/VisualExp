@@ -25,14 +25,18 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// To personalize the email tracking links, we need to inclue the fullname as a part of the URL.
+// Also, we're using fullname as id in some Firestore collections.
+// For these purposes, we need to escape some characters.
 const getFullnameURI = (firstname, lastname) => {
   return (firstname + "+" + lastname)
-    .replace(" ", "+")
-    .replace(".", "")
-    .replace("__", " ")
-    .replace("/", " ");
+    .replace(" ", "+") // For URI
+    .replace(".", "") // For Firestore
+    .replace("__", " ") // For Firestore
+    .replace("/", " "); // For Firestore
 };
 
+// Return the UMSI logo as a response stream.
 const loadUmichLogo = (res) => {
   const file = storage
     .bucket("visualexp-a7d2c.appspot.com")
@@ -43,6 +47,7 @@ const loadUmichLogo = (res) => {
   readStream.pipe(res);
 };
 
+// When an individual opens their email, we should log it in contacts collection.
 const emailOpenedIndividual = async (fullname) => {
   const contactRef = db.collection("contacts").doc(fullname);
   await contactRef.update({
@@ -50,12 +55,16 @@ const emailOpenedIndividual = async (fullname) => {
   });
 };
 
+// When an individual opens their email, we should:
+// 1) Log it in contacts collection
+// 2) Return the UMSI logo as a response stream.
 exports.loadImageIndividual = (req, res) => {
   let fullname = req.params.contactId.replace("+", " ");
   emailOpenedIndividual(fullname);
   loadUmichLogo(res);
 };
 
+// When an instructor opens their email, we should log it in instructors collection.
 const emailOpenedInstructor = async (instructorId) => {
   const contactRef = db.collection("instructors").doc(instructorId);
   await contactRef.update({
@@ -63,6 +72,9 @@ const emailOpenedInstructor = async (instructorId) => {
   });
 };
 
+// When an instructor opens their email, we should:
+// 1) Log it in instructors collection
+// 2) Return the UMSI logo as a response stream.
 exports.loadImageProfessor = (req, res) => {
   emailOpenedInstructor(req.params.instructorId);
   loadUmichLogo(res);
