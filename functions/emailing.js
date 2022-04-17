@@ -80,6 +80,10 @@ exports.loadImageProfessor = (req, res) => {
   loadUmichLogo(res);
 };
 
+// Depricated
+// This function was used to invite 1Cademy interns to paricipate in our experiments.
+// The basic algoritm is very similar to inviteInstructors, but instead of the
+// instructors collection, it reads from contacts.
 exports.sendPersonalInvitations = async (req, res) => {
   try {
     const contactDocs = await db.collection("contacts").get();
@@ -175,6 +179,8 @@ exports.sendPersonalInvitations = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
+// Every time we make changes to the major communities, we should modify this object.
+// This is the only dictionary in the backend that maps community id and titles.
 const communityTitles = {
   Cognitive_Psychology: "UX Research in Cognitive Psychology of Learning",
   Educational_Organizational_Psychology:
@@ -191,6 +197,11 @@ const communityTitles = {
 };
 
 // This function should be called by a pubsub scheduler every 25 hours.
+// It reads all the documents from the instructors collection.
+// For each of them that meet the criteria, randomizes them into one of
+// our experimental conditions and sends them personalized invitation
+// and reminder emails.
+// The algorithm is explained at emailing.drawio
 exports.inviteInstructors = async (req, res) => {
   try {
     let waitTime = 0;
@@ -320,6 +331,8 @@ exports.inviteInstructors = async (req, res) => {
   }
 };
 
+// Convert hoursLeft to days and hours left writen in English for the
+// reminder email subject lines.
 const hoursToDaysHoursStr = (hoursLeft) => {
   let days = 0;
   hoursLeft = Math.floor(hoursLeft);
