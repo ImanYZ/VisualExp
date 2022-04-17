@@ -275,6 +275,7 @@ const ManageEvents = (props) => {
   const [ongoingEventsLoaded, setOngoingEventsLoaded] = useState(false);
   const [participant, setParticipant] = useState("");
   const [schedule, setSchedule] = useState([]);
+  const [scheduleLoaded, setScheduleLoaded] = useState(false);
   const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
@@ -591,6 +592,7 @@ const ManageEvents = (props) => {
     const theRow = clickedRow.row;
     if (theRow.participant) {
       setParticipant(theRow.participant);
+      setScheduleLoaded(false);
       const scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", theRow.participant)
@@ -601,6 +603,9 @@ const ManageEvents = (props) => {
         sessions.push(sessionData.session.toDate());
       }
       setSchedule(sessions);
+      setTimeout(() => {
+        setScheduleLoaded(true);
+      }, 400);
     }
   };
 
@@ -930,7 +935,7 @@ const ManageEvents = (props) => {
           loading={!expSessionsLoaded}
           onRowClick={gridRowClick}
         />
-        {schedule.length > 0 && (
+        {scheduleLoaded && (
           <div style={{ height: "1300px" }}>
             <SelectSessions
               startDate={new Date()}

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
-import axios from "axios";
 import { ResponsiveCalendar } from "@nivo/calendar";
 
-import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
 import { DataGrid } from "@mui/x-data-grid";
@@ -20,7 +19,9 @@ import {
   notTakenSessionsLoadedState,
 } from "../../../store/ProjectAtoms";
 
+import SnackbarComp from "../../SnackbarComp";
 import GridCellToolTip from "../../GridCellToolTip";
+import ResearcherAvailabilities from "./ResearcherAvailabilities";
 
 import { getISODateString } from "../../../utils/DateFunctions";
 
@@ -47,6 +48,14 @@ const notTakenSessionsColumns = [
   { field: "points", headerName: "Points", type: "number", width: 130 },
 ];
 
+let tomorrow = new Date();
+tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
+tomorrow = new Date(
+  tomorrow.getFullYear(),
+  tomorrow.getMonth(),
+  tomorrow.getDate()
+);
+
 const ExperimentPoints = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -55,6 +64,10 @@ const ExperimentPoints = (props) => {
   const notTakenSessions = useRecoilValue(notTakenSessionsState);
   const notTakenSessionsLoaded = useRecoilValue(notTakenSessionsLoadedState);
 
+  const [schedule, setSchedule] = useState([]);
+  const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [expSessionsChanges, setExpSessionsChanges] = useState([]);
   const [expSessions, setExpSessions] = useState([]);
   const [dailyPoints, setDailyPoints] = useState([]);
@@ -124,8 +137,104 @@ const ExperimentPoints = (props) => {
     }
   }, [project, fullname]);
 
+  useEffect(() => {
+    const loadSchedule = async () => {
+      setScheduleLoaded(false);
+      const scheduleDocs = await firebase.db
+        .collection("resSchedule")
+        .where("session", ">=", tomorrow)
+        .get();
+      const sch = [];
+      for (let scheduleDoc of scheduleDocs.docs) {
+        const scheduleData = scheduleDoc.data();
+        if (
+          scheduleData.project === project &&
+          scheduleData.fullname === fullname
+        ) {
+          sch.push(scheduleData.session.toDate());
+        }
+      }
+      console.log({ sch });
+      if (sch.length > 0) {
+        setSchedule(sch);
+        setTimeout(() => {
+          setScheduleLoaded(true);
+        }, 400);
+      }
+    };
+    if (project && fullname) {
+      loadSchedule();
+    }
+  }, [project, fullname]);
+
+  const submitData = async () => {
+    setIsSubmitting(true);
+    for (let session of schedule) {
+      const scheduleRef = firebase.db.collection("resSchedule").doc();
+      const theSession = {
+        fullname,
+        project,
+        session: firebase.firestore.Timestamp.fromDate(session),
+      };
+      await firebase.batchSet(scheduleRef, theSession);
+    }
+    await firebase.commitBatch();
+    setIsSubmitting(false);
+    setSnackbarMessage(
+      "Your availability is successfully saved in the database!"
+    );
+  };
+
   return (
     <>
+      <Alert severity="success">
+        <h2>Specify Your Weekly Availability:</h2>
+        <p>
+          Please specify your availability in the table below on a weekly basis.
+        </p>
+        <p>
+          This way, when participants schedule their new sessions, our system
+          will only let them choose time-slots when we have at least one
+          available researcher.
+        </p>
+      </Alert>
+      <Alert severity="error">
+        <h2>Notes:</h2>
+        <p>
+          Until all our researchers specify their availabilities, we cannot
+          deploy this new scheduling system for the participants, so please keep
+          taking the sessions on Google Calendar.
+        </p>
+        <p>
+          This system is smart enough to know in which sessions you are running
+          experiments. So, please do not remove your experiment sessions from
+          your availabilities below.
+        </p>
+      </Alert>
+      {scheduleLoaded && (
+        <>
+          <ResearcherAvailabilities
+            startDate={tomorrow}
+            numDays={16}
+            schedule={schedule}
+            setSchedule={setSchedule}
+          />
+          <div style={{ margin: "19px", textAlign: "center" }}>
+            <Button
+              onClick={submitData}
+              className={
+                !isSubmitting
+                  ? "Button SubmitButton"
+                  : "Button SubmitButton Disabled"
+              }
+              variant="contained"
+              disabled={!isSubmitting ? null : true}
+            >
+              Schedule
+            </Button>
+          </div>
+        </>
+      )}
       <Alert severity="success">
         <h2>Scheduling:</h2>
         <p>
@@ -285,6 +394,10 @@ const ExperimentPoints = (props) => {
           loading={!expSessionsLoaded}
         />
       </div>
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
+      />
     </>
   );
 };

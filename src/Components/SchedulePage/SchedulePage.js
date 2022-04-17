@@ -70,6 +70,7 @@ const SchedulePage = (props) => {
 
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
+  const [scheduleLoaded, setScheduleLoaded] = useState(false);
   const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
@@ -80,6 +81,7 @@ const SchedulePage = (props) => {
 
   useEffect(() => {
     const loadSchedule = async () => {
+      setScheduleLoaded(false);
       const scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", email.toLowerCase())
@@ -94,6 +96,9 @@ const SchedulePage = (props) => {
       }
       if (sch.length > 0) {
         setSchedule(sch);
+        setTimeout(() => {
+          setScheduleLoaded(true);
+        }, 400);
       }
     };
     if (isEmail(email)) {
@@ -293,35 +298,39 @@ const SchedulePage = (props) => {
               </ul>
             </Alert>
           )}
-          <div id="ScheduleSelectorContainer">
-            <SelectSessions
-              startDate={tomorrow}
-              numDays={16}
-              schedule={schedule}
-              setSchedule={setSchedule}
-              firstSession={firstSession}
-              secondSession={secondSession}
-              thirdSession={thirdSession}
-              setFirstSession={setFirstSession}
-              setSecondSession={setSecondSession}
-              setThirdSession={setThirdSession}
-              setSubmitable={setSubmitable}
-            />
-          </div>
-          <div id="SignBtnContainer">
-            <Button
-              onClick={confirmClickOpen}
-              className={
-                submitable && !isSubmitting
-                  ? "Button SubmitButton"
-                  : "Button SubmitButton Disabled"
-              }
-              variant="contained"
-              disabled={submitable && !isSubmitting ? null : true}
-            >
-              Schedule
-            </Button>
-          </div>
+          {scheduleLoaded && (
+            <>
+              <div id="ScheduleSelectorContainer">
+                <SelectSessions
+                  startDate={tomorrow}
+                  numDays={16}
+                  schedule={schedule}
+                  setSchedule={setSchedule}
+                  firstSession={firstSession}
+                  secondSession={secondSession}
+                  thirdSession={thirdSession}
+                  setFirstSession={setFirstSession}
+                  setSecondSession={setSecondSession}
+                  setThirdSession={setThirdSession}
+                  setSubmitable={setSubmitable}
+                />
+              </div>
+              <div id="SignBtnContainer">
+                <Button
+                  onClick={confirmClickOpen}
+                  className={
+                    submitable && !isSubmitting
+                      ? "Button SubmitButton"
+                      : "Button SubmitButton Disabled"
+                  }
+                  variant="contained"
+                  disabled={submitable && !isSubmitting ? null : true}
+                >
+                  Schedule
+                </Button>
+              </div>
+            </>
+          )}
         </>
       )}
       <Dialog
