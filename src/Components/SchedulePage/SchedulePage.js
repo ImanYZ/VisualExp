@@ -96,10 +96,10 @@ const SchedulePage = (props) => {
       }
       if (sch.length > 0) {
         setSchedule(sch);
-        setTimeout(() => {
-          setScheduleLoaded(true);
-        }, 400);
       }
+      setTimeout(() => {
+        setScheduleLoaded(true);
+      }, 400);
     };
     if (isEmail(email)) {
       loadSchedule();

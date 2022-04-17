@@ -157,10 +157,10 @@ const ExperimentPoints = (props) => {
       console.log({ sch });
       if (sch.length > 0) {
         setSchedule(sch);
-        setTimeout(() => {
-          setScheduleLoaded(true);
-        }, 400);
       }
+      setTimeout(() => {
+        setScheduleLoaded(true);
+      }, 400);
     };
     if (project && fullname) {
       loadSchedule();
