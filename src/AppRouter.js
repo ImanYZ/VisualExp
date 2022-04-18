@@ -33,6 +33,7 @@ import communities from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
 import CommunityApplications from "./Components/Home/CommunityApplications";
+import InstructorYes from "./Components/Home/InstructorYes";
 
 import { isToday } from "./utils/DateFunctions";
 
@@ -179,6 +180,10 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
+      <Route
+        path="/approved/:condition/:community"
+        element={<InstructorYes />}
+      />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
