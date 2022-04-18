@@ -101,6 +101,7 @@ exports.api = functions
   })
   .https.onRequest(app);
 
+// Deleting a user document should trigger this function:
 exports.deleteUser = functions.firestore
   .document("users/{fullname}")
   .onDelete(deleteUser);
