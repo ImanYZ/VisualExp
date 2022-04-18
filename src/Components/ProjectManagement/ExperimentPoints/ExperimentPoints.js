@@ -146,18 +146,29 @@ const ExperimentPoints = (props) => {
         .where("session", ">=", tomorrow)
         .get();
       const sch = [];
+      let lastSession = new Date();
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
+        const session = scheduleData.session.toDate();
         if (
           scheduleData.project === project &&
           scheduleData.fullname === fullname
         ) {
-          sch.push(scheduleData.session.toDate());
+          sch.push(session);
+          if (session > lastSession) {
+            lastSession = session;
+          }
         }
       }
-      console.log({ sch });
       if (sch.length > 0) {
         setSchedule(sch);
+        let eightDaysLater = new Date();
+        eightDaysLater = new Date(
+          eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
+        );
+        if (lastSession.getTime() < eightDaysLater.getTime()) {
+          setScheduleError(true);
+        }
       }
       setTimeout(() => {
         setScheduleLoaded(true);
