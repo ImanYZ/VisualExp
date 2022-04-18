@@ -678,17 +678,17 @@ export default [
           },
         ],
       },
-      {
-        name: "Daniel Li",
-        image: "Daniel_Li.jpeg",
-        about: `I am junior at NYU Stern concentrating in quantitative economics. I have experience working at startups and in financial roles. I'm interested in a career in investing in venture and growth companies. I also like analyzing data and have experience with Python and R.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/daniel-x-li/",
-          },
-        ],
-      },
+      // {
+      //   name: "Daniel Li",
+      //   image: "Daniel_Li.jpeg",
+      //   about: `I am junior at NYU Stern concentrating in quantitative economics. I have experience working at startups and in financial roles. I'm interested in a career in investing in venture and growth companies. I also like analyzing data and have experience with Python and R.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/daniel-x-li/",
+      //     },
+      //   ],
+      // },
     ],
     YouTube: "RBIRquj1dD8",
     description: (
