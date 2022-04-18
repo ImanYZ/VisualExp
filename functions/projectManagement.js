@@ -24,6 +24,7 @@ const {
   reschEventNotificationEmail,
   eventNotificationEmail,
   notAttendedEmail,
+  remindResearcherToSpecifyAvailability,
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
 
@@ -975,9 +976,24 @@ exports.assignExperimentSessionsPoints = async (context) => {
             .where("project", "==", researcherData.project)
             .where("fullname", "==", researcherDoc.id)
             .get();
-          let lastAvailability;
+          let lastAvailability = new Date();
           for (let resScheduleDoc of resScheduleDocs.docs) {
             const resScheduleData = resScheduleDoc.data();
+            const theSession = resScheduleData.session.toDate();
+            if (theSession.getTime() > lastAvailability.getTime()) {
+              lastAvailability = theSession;
+            }
+          }
+          let eightDaysLater = new Date();
+          eightDaysLater = new Date(
+            eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
+          );
+          if (lastAvailability.getTime() < eightDaysLater.getTime()) {
+            remindResearcherToSpecifyAvailability(
+              researcherData.email,
+              researcherDoc.id,
+              "ten"
+            );
           }
         }
       }

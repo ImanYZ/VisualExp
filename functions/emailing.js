@@ -678,3 +678,30 @@ exports.emailApplicationStatus = async (
     console.log({ err });
   }
 };
+
+exports.remindResearcherToSpecifyAvailability = (email, fullname, days) => {
+  try {
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject:
+        "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
+      html:
+        `<p>Hi ${capitalizeFirstLetter(fullname)},</p>
+        <p></p>
+        <p>This is an auto-generated email to remind you that you have not specified your availability for the next 16 days.</p>
+        <p>We need to specify as much of our availability as possible, so that we get more participants who schedule only for the the sessions that they can really attend.</p>
+        <p>Please open <a href="https://1cademy.us/ReminderDate" target='_blank'>our experiments scheduling page</a> and specify your availability in the next ${days} days.</p>
+        <p></p>
+        <p>Best regards,</p>
+        ` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, async (error, data) => {
+      if (error) {
+        console.log({ error });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+  }
+};
