@@ -969,7 +969,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
-      for (let project in projectsData) {
+      for (let project in researcherData.projects) {
         if (researcherData.email === "oneweb@umich.edu") {
           // if (researcherData.projectsData[project].active) {
           const resScheduleDocs = await db
