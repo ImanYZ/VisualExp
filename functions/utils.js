@@ -103,8 +103,11 @@ const nextWeek = () => {
   return nextWeek;
 };
 
+// Removes leading and trailing whitespace from the string and capitalize its first character.
 const capitalizeFirstLetter = (string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  return (
+    string.trim().charAt(0).toUpperCase() + string.trim().slice(1).toLowerCase()
+  );
 };
 
 const pad2Num = (number) => {
