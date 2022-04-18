@@ -190,7 +190,8 @@ const ExperimentPoints = (props) => {
       <Alert severity="success">
         <h2>Specify Your Weekly Availability:</h2>
         <p>
-          Please specify your availability in the table below on a weekly basis.
+          Please specify your availability in YOUR TIMEZONE in the table below
+          on a weekly basis.
         </p>
         <p>
           This way, when participants schedule their new sessions, our system
