@@ -170,6 +170,17 @@ const ExperimentPoints = (props) => {
 
   const submitData = async () => {
     setIsSubmitting(true);
+    const scheduleDocs = await firebase.db
+      .collection("resSchedule")
+      .where("fullname", "==", fullname)
+      .where("project", "==", project)
+      .get();
+    for (let scheduleDoc of scheduleDocs.docs) {
+      const scheduleRef = firebase.db
+        .collection("resSchedule")
+        .doc(scheduleDoc.id);
+      await firebase.batchDelete(scheduleRef);
+    }
     let lastSession = new Date();
     for (let session of schedule) {
       if (session > lastSession) {
