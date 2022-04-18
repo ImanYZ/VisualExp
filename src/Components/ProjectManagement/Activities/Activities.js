@@ -27,16 +27,6 @@ import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
 
-const currentResearchers = [
-  "Amelia Henriques",
-  "Benjamin Brown",
-  "Jeffery Phonn",
-  "Jessica Cai",
-  "Tirdad Barghi",
-  "Victoria Mulligan",
-  "Yi Cui",
-];
-
 const Activities = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -84,7 +74,7 @@ const Activities = (props) => {
           const researData = change.doc.data();
           if (
             project in researData.projects &&
-            currentResearchers.includes(change.doc.id)
+            researData.projects[project].active
           ) {
             const projectData = researData.projects[project];
             let totalPoints = 0;

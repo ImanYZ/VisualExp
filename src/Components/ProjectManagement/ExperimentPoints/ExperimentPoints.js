@@ -210,6 +210,10 @@ const ExperimentPoints = (props) => {
           experiments. So, please do not remove your experiment sessions from
           your availabilities below.
         </p>
+        <p>
+          Don't forget to click the "Submit" button after specifying your
+          availability.
+        </p>
       </Alert>
       {scheduleLoaded && (
         <>
@@ -219,7 +223,14 @@ const ExperimentPoints = (props) => {
             schedule={schedule}
             setSchedule={setSchedule}
           />
-          <div style={{ margin: "19px", textAlign: "center" }}>
+          <div
+            style={{
+              position: "fixed",
+              bottom: "0px",
+              left: "46%",
+              marginBottom: "10px",
+            }}
+          >
             <Button
               onClick={submitData}
               className={
@@ -230,7 +241,7 @@ const ExperimentPoints = (props) => {
               variant="contained"
               disabled={!isSubmitting ? null : true}
             >
-              Schedule
+              Submit
             </Button>
           </div>
         </>

@@ -968,6 +968,19 @@ exports.assignExperimentSessionsPoints = async (context) => {
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
+      for (let project in projectsData) {
+        if (researcherData.email === "onecademy@umich.edu") {
+          const resScheduleDocs = await db
+            .collection("resSchedule")
+            .where("project", "==", researcherData.project)
+            .where("fullname", "==", researcherDoc.id)
+            .get();
+          let lastAvailability;
+          for (let resScheduleDoc of resScheduleDocs.docs) {
+            const resScheduleData = resScheduleDoc.data();
+          }
+        }
+      }
       researchersInfo.push({
         fullname: researcherDoc.id,
         email: researcherData.email,
