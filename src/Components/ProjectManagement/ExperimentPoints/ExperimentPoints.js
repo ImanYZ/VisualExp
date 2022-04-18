@@ -66,6 +66,7 @@ const ExperimentPoints = (props) => {
 
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const [scheduleError, setScheduleError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [expSessionsChanges, setExpSessionsChanges] = useState([]);
@@ -169,7 +170,11 @@ const ExperimentPoints = (props) => {
 
   const submitData = async () => {
     setIsSubmitting(true);
+    let lastSession = new Date();
     for (let session of schedule) {
+      if (session > lastSession) {
+        lastSession = session;
+      }
       const scheduleRef = firebase.db.collection("resSchedule").doc();
       const theSession = {
         fullname,
@@ -180,9 +185,21 @@ const ExperimentPoints = (props) => {
     }
     await firebase.commitBatch();
     setIsSubmitting(false);
-    setSnackbarMessage(
-      "Your availability is successfully saved in the database!"
+    let eightDaysLater = new Date();
+    eightDaysLater = new Date(
+      eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
     );
+    if (lastSession.getTime() < eightDaysLater.getTime()) {
+      setScheduleError(true);
+      setSnackbarMessage(
+        "Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their 3rd session!"
+      );
+    } else {
+      setScheduleError(false);
+      setSnackbarMessage(
+        "Your availability is successfully saved in the database!"
+      );
+    }
   };
 
   return (
@@ -215,6 +232,13 @@ const ExperimentPoints = (props) => {
           Don't forget to click the "Submit" button after specifying your
           availability.
         </p>
+        {scheduleError && (
+          <h2>
+            Please specify your availability for at least the next 10 days,
+            otherwise there will not be enough available sessions for the
+            participants to schedule their 3rd session!
+          </h2>
+        )}
       </Alert>
       {scheduleLoaded && (
         <>

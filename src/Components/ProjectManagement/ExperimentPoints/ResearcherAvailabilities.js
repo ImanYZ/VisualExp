@@ -6,13 +6,13 @@ const currentTime = new Date();
 const tZoneOffset = currentTime.getTimezoneOffset();
 const tZoneDiff = Math.floor((240 - tZoneOffset) / 60);
 let start = 6 + tZoneDiff;
-if (start < 6) {
-  start = 6;
-}
+// if (start < 6) {
+//   start = 6;
+// }
 let end = 23 + tZoneDiff;
-if (end > 23) {
-  end = 23;
-}
+// if (end > 23) {
+//   end = 23;
+// }
 
 const renderDateCell = (datetime, selected, refSetter) => {
   return (
