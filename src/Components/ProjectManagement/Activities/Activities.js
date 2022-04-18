@@ -164,8 +164,8 @@ const Activities = (props) => {
               <h2>Inclusion and Order of Authors Criteria:</h2>
               <div>
                 <strong>Inclusion:</strong> To be an author,{" "}
-                <span id="GreenText">in green</span>, one needs to earn at
-                least:
+                <span className="GreenText">in green</span>, one needs to earn
+                at least:
                 <ul>
                   <li>
                     <strong>100</strong> 1Cademy points{" "}
@@ -247,17 +247,61 @@ const Activities = (props) => {
                             {expanded ? (
                               <>
                                 <img src={favicon} width="15.1" />{" "}
-                                {resear.onePoints +
-                                  " - 🎓 " +
-                                  resear.intellectualPoints +
-                                  " - 👨‍🏫 " +
-                                  resear.instructorsPoints +
-                                  " - 👨‍🔬 " +
-                                  resear.expPoints +
-                                  " - 💬 " +
-                                  resear.commentsPoints +
-                                  " - 🧠 " +
-                                  resear.recallPoints}
+                                <span
+                                  className={
+                                    resear.onePoints >= 100 ? "GreenText" : ""
+                                  }
+                                >
+                                  {resear.onePoints}
+                                </span>
+                                {" - "}
+                                <span
+                                  className={
+                                    resear.intellectualPoints >= 100
+                                      ? "GreenText"
+                                      : ""
+                                  }
+                                >
+                                  {"🎓 " + resear.intellectualPoints}
+                                </span>
+                                {" - "}
+                                <span
+                                  className={
+                                    resear.instructorsPoints >= 100
+                                      ? "GreenText"
+                                      : ""
+                                  }
+                                >
+                                  {"👨‍🏫 " + resear.instructorsPoints}
+                                </span>
+                                {" - "}
+                                <span
+                                  className={
+                                    resear.expPoints >= 100 ? "GreenText" : ""
+                                  }
+                                >
+                                  {"👨‍🔬 " + resear.expPoints}
+                                </span>
+                                {" - "}
+                                <span
+                                  className={
+                                    resear.commentsPoints >= 100
+                                      ? "GreenText"
+                                      : ""
+                                  }
+                                >
+                                  {"💬 " + resear.commentsPoints}
+                                </span>
+                                {" - "}
+                                <span
+                                  className={
+                                    resear.recallPoints >= 100
+                                      ? "GreenText"
+                                      : ""
+                                  }
+                                >
+                                  {"🧠 " + resear.recallPoints}
+                                </span>
                               </>
                             ) : (
                               resear.totalPoints
