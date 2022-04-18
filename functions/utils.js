@@ -1,5 +1,7 @@
 const { admin, db } = require("./admin");
 
+// We're using fullname as id in some Firestore collections.
+// For these purposes, we need to escape some characters.
 const getFullname = (firstname, lastname) => {
   return (firstname + " " + lastname)
     .replace(".", "")
