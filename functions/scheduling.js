@@ -109,7 +109,7 @@ exports.scheduleSingleSession = async (req, res) => {
 exports.allEvents = async (req, res) => {
   try {
     let end = new Date();
-    const start = new Date(end.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const start = new Date(end.getTime() - 31 * 24 * 60 * 60 * 1000);
     end = new Date(end.getTime() + 365 * 24 * 60 * 60 * 1000);
     const allEvents = await getEvents(start, end, "America/Detroit");
     if (allEvents) {
