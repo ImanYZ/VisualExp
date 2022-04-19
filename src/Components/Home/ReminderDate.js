@@ -70,7 +70,7 @@ const ReminderDate = () => {
       ) : (
         <div style={{ textAlign: "center" }}>
           <Typography variant="h3" gutterBottom marked="center" align="center">
-            Choose your preferred date for the reminder:
+            Choose your preferred date for the reminder email:
           </Typography>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker

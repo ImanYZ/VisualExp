@@ -34,6 +34,8 @@ import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
 import CommunityApplications from "./Components/Home/CommunityApplications";
 import InstructorYes from "./Components/Home/InstructorYes";
+import InstructorNo from "./Components/Home/InstructorNo";
+import InstructorLater from "./Components/Home/InstructorLater";
 
 import { isToday } from "./utils/DateFunctions";
 
@@ -201,19 +203,27 @@ const AppRouter = (props) => {
       )}
       <Route path="/communities/" element={<Communities />} />
       {communitiesOrder.map((communi, idx) => (
-        <Route
-          key={communi.id + "Community"}
-          path={"/community/" + communi.id}
-          element={<Communities commIdx={idx} />}
-        />
+        <React.Fragment key={communi.id}>
+          <Route
+            path={"/community/" + communi.id}
+            element={<Communities commIdx={idx} />}
+          />
+          <Route
+            path={
+              "/interestedFaculty/" + communi.id + "/:condition/:instructorId"
+            }
+            element={<InstructorYes community={communitiesOrder[idx].title} />}
+          />
+        </React.Fragment>
       ))}
-      {communitiesOrder.map((communi, idx) => (
-        <Route
-          key={communi.id + "Approved"}
-          path={"/approved/" + communi.id + "/:condition"}
-          element={<InstructorYes community={communitiesOrder[idx].title} />}
-        />
-      ))}
+      <Route
+        path={"/notInterestedFaculty/:instructorId"}
+        element={<InstructorNo />}
+      />
+      <Route
+        path={"/interestedFacultyLater/:instructorId"}
+        element={<InstructorLater />}
+      />
       {fullname &&
         emailVerified === "Verified" &&
         communitiesOrder.map((communi, idx) => (

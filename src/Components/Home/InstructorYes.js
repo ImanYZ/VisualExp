@@ -1,13 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
+
+import axios from "axios";
 
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
 const InstructorYes = (props) => {
-  const { condition } = useParams();
+  const { condition, instructorId } = useParams();
+
+  useEffect(() => {
+    axios.post("/instructorYes", {
+      id: instructorId,
+    });
+  }, []);
+
   return (
-    <PagesNavbar thisPage="Cookie Policy">
+    <PagesNavbar thisPage="Inviting Students">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         Thank You for Your Interest in Our Communities!
       </Typography>

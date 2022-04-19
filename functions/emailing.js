@@ -12,6 +12,7 @@ const {
 } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
+const { SignalCellularNullOutlined } = require("@mui/icons-material");
 
 require("dotenv").config();
 
@@ -52,6 +53,7 @@ const emailOpenedIndividual = async (fullname) => {
   const contactRef = db.collection("contacts").doc(fullname);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
+    updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
   });
 };
 
@@ -69,6 +71,7 @@ const emailOpenedInstructor = async (instructorId) => {
   const contactRef = db.collection("instructors").doc(instructorId);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
+    updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
   });
 };
 
@@ -208,7 +211,10 @@ exports.inviteInstructors = async (req, res) => {
     // WaitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
-    const instructorDocs = await db.collection("instructors").get();
+    const instructorDocs = await db
+      .collection("instructors")
+      .where("email", "==", "oneweb@umich.edu")
+      .get();
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
       if (
@@ -223,12 +229,9 @@ exports.inviteInstructors = async (req, res) => {
         // They have not already clicked any of the options in their email.
         !instructorData.yes &&
         !instructorData.no &&
-        !instructorData.doNot &&
         !instructorData.introduced &&
         // There exists a community corresponding to the one wechose for them.
-        instructorData.major in communityTitles &&
-        instructorData.email === "onecademy@umich.edu"
-        // pabbott@umich.edu
+        instructorData.major in communityTitles
       ) {
         // To assign an experimental condition to this instructor, we have to find
         // the condition that is assigned to the fewest number of instructors so far.
@@ -296,10 +299,12 @@ exports.inviteInstructors = async (req, res) => {
               <p></p>
               <p>Please choose one of the following options regarding your preference:</p>
               <ul>
-                <li><a href="https://1cademy.us/approved/${
+                <li><a href="https://1cademy.us/interestedFaculty/${
                   instructorData.major
-                }/${minCondition}" target="_blank">Yes, I'd like to invite my students.</a></li>
-                <li><a href="https://1cademy.us/" target="_blank">Not at this point, contact me in a few months.</a></li>
+                }/${minCondition}/${
+              instructorDoc.id
+            }" target="_blank">Yes, I'd like to invite my students.</a></li>
+                <li><a href="https://1cademy.us/" target="_blank">Not at this point, contact me in a few weeks.</a></li>
                 <li><a href="https://1cademy.us/" target="_blank">No, do not contact me again.</a></li>
               </ul>
               <p>Reply to this email if you have any questions or concerns.</p>
@@ -336,6 +341,7 @@ exports.inviteInstructors = async (req, res) => {
                 reminders: admin.firestore.FieldValue.increment(1),
                 // The next remoinder should be sent one week later.
                 nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
+                updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
               });
             }
           });
@@ -346,6 +352,73 @@ exports.inviteInstructors = async (req, res) => {
         if (waitTime > 4000) {
           break;
         }
+      }
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+// Logs that the instructor clicked Yes in their email.
+// We should not do this directly in the front-end because i
+exports.instructorYes = async (req, res) => {
+  try {
+    if ("id" in req.params && req.params.id) {
+      const instructorId = req.params.id;
+      const instructorDoc = db.collection("instructors").doc(instructorId);
+      await instructorDoc.update({
+        yes: true,
+        no: false,
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+// Logs that the instructor clicked No in their email.
+// We should not do this directly in the front-end because i
+exports.instructorNo = async (req, res) => {
+  try {
+    if ("id" in req.params && req.params.id) {
+      const instructorId = req.params.id;
+      const instructorDoc = db.collection("instructors").doc(instructorId);
+      await instructorDoc.update({
+        yes: false,
+        no: true,
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+// Logs the instructor's preferred date for their reminder email.
+// We should not do this directly in the front-end because i
+exports.instructorLater = async (req, res) => {
+  try {
+    if ("id" in req.params && req.params.id) {
+      const instructorId = req.params.id;
+      const instructorDoc = db.collection("instructors").doc(instructorId);
+      if ("reminder" in req.params) {
+        const reminder = req.params.reminder;
+        await instructorDoc.update({
+          yes: true,
+          later: true,
+          reminder: admin.firestore.Timestamp.fromDate(reminder),
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+        });
+      } else {
+        await instructorDoc.update({
+          yes: true,
+          later: true,
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+        });
       }
     }
   } catch (err) {
