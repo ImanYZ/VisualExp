@@ -609,38 +609,6 @@ const ManageEvents = (props) => {
     }
   };
 
-  const setUpdateScheduleDocument = async (
-    email,
-    session,
-    eventId,
-    order,
-    action
-  ) => {
-    if (action === "Update") {
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", email)
-        .where("session", "==", session)
-        .get();
-      if (scheduleDocs.docs.length > 0) {
-        const scheduleRef = firebase.db
-          .collection("schedule")
-          .doc(scheduleDocs.docs[0].id);
-        return await firebase.batchUpdate(scheduleRef, {
-          id: eventId,
-          order,
-        });
-      }
-    }
-    const scheduleRef = firebase.db.collection("schedule").doc();
-    return await firebase.batchSet(scheduleRef, {
-      email: participant,
-      session: firebase.firestore.Timestamp.fromDate(session),
-      id: eventId,
-      order,
-    });
-  };
-
   const submitNewSessions = async (event) => {
     setIsSubmitting(true);
     const userDocs = await firebase.db
@@ -680,27 +648,24 @@ const ManageEvents = (props) => {
       });
       errorAlert(responseObj.data);
 
-      await setUpdateScheduleDocument(
-        participant,
-        firstSession,
-        responseObj.data.events[0].data.id,
-        "1st",
-        "Set"
-      );
-      await setUpdateScheduleDocument(
-        participant,
-        secondSession,
-        responseObj.data.events[0].data.id,
-        "2nd",
-        "Set"
-      );
-      await setUpdateScheduleDocument(
-        participant,
-        thirdSession,
-        responseObj.data.events[0].data.id,
-        "3rd",
-        "Set"
-      );
+      for (let session of schedule) {
+        const scheduleRef = firebase.db.collection("schedule").doc();
+        const theSession = {
+          email: participant,
+          session: firebase.firestore.Timestamp.fromDate(session),
+        };
+        if (session.getTime() === firstSession.getTime()) {
+          theSession.id = responseObj.data.events[0].data.id;
+          theSession.order = "1st";
+        } else if (session.getTime() === secondSession.getTime()) {
+          theSession.id = responseObj.data.events[1].data.id;
+          theSession.order = "2nd";
+        } else if (session.getTime() === thirdSession.getTime()) {
+          theSession.id = responseObj.data.events[2].data.id;
+          theSession.order = "3rd";
+        }
+        await firebase.batchSet(scheduleRef, theSession);
+      }
       await firebase.commitBatch();
       setSubmitted(true);
     }
@@ -720,7 +685,7 @@ const ManageEvents = (props) => {
         window.alert("This user completed the experiment before!");
         return;
       }
-      const scheduleDocs = await firebase.db
+      let scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", participant)
         .get();
@@ -758,13 +723,28 @@ const ManageEvents = (props) => {
       });
       errorAlert(responseObj.data);
 
-      await setUpdateScheduleDocument(
-        participant,
-        sessi,
-        responseObj.data.events[0].data.id,
-        order,
-        "Update"
-      );
+      scheduleDocs = await firebase.db
+        .collection("schedule")
+        .where("email", "==", participant)
+        .where("session", "==", sessi)
+        .get();
+      if (scheduleDocs.docs.length > 0) {
+        const scheduleRef = firebase.db
+          .collection("schedule")
+          .doc(scheduleDocs.docs[0].id);
+        await firebase.batchUpdate(scheduleRef, {
+          id: responseObj.data.events[0].data.id,
+          order,
+        });
+      } else {
+        const scheduleRef = firebase.db.collection("schedule").doc();
+        await firebase.batchSet(scheduleRef, {
+          email: participant,
+          session: firebase.firestore.Timestamp.fromDate(sessi),
+          id: responseObj.data.events[0].data.id,
+          order,
+        });
+      }
       await firebase.commitBatch();
       setSubmitted(true);
     }
