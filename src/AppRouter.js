@@ -29,7 +29,7 @@ import Tutorial from "./Components/Home/Tutorial";
 import TutorialFeedback from "./Components/Home/TutorialFeedback";
 import Withdraw from "./Components/Home/Withdraw";
 import Communities from "./Components/Home/Communities";
-import communities from "./Components/Home/modules/views/communitiesOrder";
+import communitiesOrder from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
 import CommunityApplications from "./Components/Home/CommunityApplications";
@@ -180,10 +180,6 @@ const AppRouter = (props) => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
-      <Route
-        path="/approved/:condition/:community"
-        element={<InstructorYes />}
-      />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
@@ -204,16 +200,23 @@ const AppRouter = (props) => {
         </>
       )}
       <Route path="/communities/" element={<Communities />} />
-      {communities.map((communi, idx) => (
+      {communitiesOrder.map((communi, idx) => (
         <Route
-          key={communi.id}
+          key={communi.id + "Community"}
           path={"/community/" + communi.id}
           element={<Communities commIdx={idx} />}
         />
       ))}
+      {communitiesOrder.map((communi, idx) => (
+        <Route
+          key={communi.id + "Approved"}
+          path={"/approved/" + communi.id + "/:condition"}
+          element={<InstructorYes community={communitiesOrder[idx].title} />}
+        />
+      ))}
       {fullname &&
         emailVerified === "Verified" &&
-        communities.map((communi, idx) => (
+        communitiesOrder.map((communi, idx) => (
           <Route
             key={communi.id + "Test"}
             path={"/paperTest/" + communi.id}

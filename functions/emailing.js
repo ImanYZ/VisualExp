@@ -196,7 +196,7 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians",
 };
 
-// This function should be called by a pubsub scheduler every 25 hours.
+// This should be called by a pubsub scheduler every 25 hours.
 // It reads all the documents from the instructors collection.
 // For each of them that meet the criteria, randomizes them into one of
 // our experimental conditions and sends them personalized invitation
@@ -204,24 +204,34 @@ const communityTitles = {
 // The algorithm is explained at emailing.drawio
 exports.inviteInstructors = async (req, res) => {
   try {
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // WaitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     const instructorDocs = await db.collection("instructors").get();
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
       if (
+        // Only those instructors whose information is verified by at least 3 other researchers.
         instructorData.upVotes - instructorData.downVotes >= 3 &&
+        // We have not sent them any emails or less than 4 reminders
         (!instructorData.reminders || instructorData.reminders < 4) &&
+        // Their next reminder is not scheduled yet, or it should have been sent before now.
         (!instructorData.nextReminder ||
           instructorData.nextReminder.toDate().getTime() <
             new Date().getTime()) &&
+        // They have not already clicked any of the options in their email.
         !instructorData.yes &&
         !instructorData.no &&
         !instructorData.doNot &&
         !instructorData.introduced &&
+        // There exists a community corresponding to the one wechose for them.
         instructorData.major in communityTitles &&
         instructorData.email === "onecademy@umich.edu"
         // pabbott@umich.edu
       ) {
+        // To assign an experimental condition to this instructor, we have to find
+        // the condition that is assigned to the fewest number of instructors so far.
         let instructorConditionsDocs = await db
           .collection("instructorConditions")
           .get();
@@ -235,6 +245,9 @@ exports.inviteInstructors = async (req, res) => {
             minCondition = instructorConditionDoc.id;
           }
         }
+        // We don't want to send many emails at once, because it may drive Gmail crazy.
+        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
+        // postpones sending the next email until the next waitTime.
         setTimeout(async () => {
           console.log({
             email: instructorData.email,
@@ -249,7 +262,7 @@ exports.inviteInstructors = async (req, res) => {
           });
           const mailOptions = {
             from: process.env.EMAIL,
-            to: email,
+            to: instructorData.email,
             subject: `Inviting Your Students to ${
               minCondition === "contribute"
                 ? "Contribute to"
@@ -277,16 +290,21 @@ exports.inviteInstructors = async (req, res) => {
               instructorData.major
             }" target="_blank">${
               communityTitles[instructorData.major]
-            } community</a>. Several large communities of student researchers from different schools in the US are remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform. You can find more information about our communities and the application process at https://1cademy.us/home</p>
+            } community</a>. Several large communities of student researchers from different schools in the US are 
+            remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform. 
+            You can find more information about our communities and the application process at https://1cademy.us/home</p>
               <p></p>
               <p>Please choose one of the following options regarding your preference:</p>
               <ul>
-                <li><a href="" target="_blank">Yes, I'd like to invite my students.</a></li>
-                <li><a href="" target="_blank">Not at this point, contact me in a few months.</a></li>
-                <li><a href="" target="_blank">No, do not contact me again.</a></li>
+                <li><a href="https://1cademy.us/approved/${
+                  instructorData.major
+                }/${minCondition}" target="_blank">Yes, I'd like to invite my students.</a></li>
+                <li><a href="https://1cademy.us/" target="_blank">Not at this point, contact me in a few months.</a></li>
+                <li><a href="https://1cademy.us/" target="_blank">No, do not contact me again.</a></li>
               </ul>
               <p>Reply to this email if you have any questions or concerns.</p>
-              <p>Please let us know if you are interested in assigning course/internship credits for your students. We can provide you with detailed assessment of their activities on 1Cademy.</p>
+              <p>Please let us know if you are interested in assigning course/internship credits for your students. We can 
+              provide you with detailed assessment of their activities on 1Cademy.</p>
               <p></p>
               <p>Best regards,</p>
               <br clear="all"><br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><div><b><a href="https://youtu.be/-dQOuGeu0IQ" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Grace Ramstad, Sarah Licht, Viktoria Roshchin<br></div><div><b><a href="https://youtu.be/tmW31AEJRYg" target="_blank">Organization/Educational Psychology</a> - </b>Amelia Henriques, Desiree Mayrie Comer<b><br></b></div><div><div><a href="https://youtu.be/B6q-LYXvNCg" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare<br></div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b></b></a><b></b></div><div><b><a href="https://youtu.be/ImoaKx7uoII" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Talia Gillespie</div><div><a href="https://youtu.be/J0y0tZzzuQ0" target="_blank"><b>Machine Learning (Deep learning) </b></a>- Ge Zhang, Vatsal Chaudhari</div><div><b><a href="https://youtu.be/Mj45B59k4fo" target="_blank">Neuroscience Research</a></b> - Amrit Das Pradhan, Victoria Mulligan</div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b>Health Psychology</b></a> - Megan Rush, Madeline Paige Jacoby<div><a href="https://youtu.be/otW11GyQ4dY" target="_blank"><b>Disability Studies</b></a> - Keltie Malley, Rishabh Verma<br></div><div><b><a href="https://youtu.be/RBIRquj1dD8" target="_blank">Cryptoeconomics</a></b> - Isaac F Maruyama</div><b><a href="https://youtu.be/K5R17uFWINo" target="_blank">Clinical Psychology</a></b> - Victoria Mulligan<b><b><br></b></b><div><div><a href="https://youtu.be/Xaa1JnTHtSY" target="_blank"><b>Mindfulness Research</b></a> - Noor Jassim</div></div><b>R&amp;D</b> - Iman YeckehZaare<br><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
@@ -300,13 +318,15 @@ exports.inviteInstructors = async (req, res) => {
               console.log({ error });
               return res.status(500).json({ error });
             } else {
+              // If the email is successfully sent:
+              // 1) Update the num value in the corresponding instructorConditions document;
               const instructorConditionRef = db
                 .collection("instructorConditions")
                 .doc(minCondition);
               await instructorConditionRef.update({
                 num: admin.firestore.FieldValue.increment(1),
               });
-
+              // 2) Update the corresponding instructor document.
               const instructorRef = db
                 .collection("instructors")
                 .doc(instructorDoc.id);
@@ -314,12 +334,15 @@ exports.inviteInstructors = async (req, res) => {
                 condition: minCondition,
                 emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
+                // The next remoinder should be sent one week later.
                 nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
               });
             }
           });
         }, waitTime);
+        // Increase waitTime by a random integer between 1 to 4 seconds.
         waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+        // Temporarily, for TESTING, only send the email to a single instructor, MYSELF.
         if (waitTime > 4000) {
           break;
         }

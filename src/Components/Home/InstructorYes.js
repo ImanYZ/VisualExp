@@ -1,9 +1,11 @@
 import React from "react";
+import { useParams } from "react-router-dom";
 
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
 const InstructorYes = (props) => {
+  const { condition } = useParams();
   return (
     <PagesNavbar thisPage="Cookie Policy">
       <Typography variant="h3" gutterBottom marked="center" align="center">
@@ -16,11 +18,11 @@ const InstructorYes = (props) => {
       <p>Hello [Your class name goes here] students,</p>
       <p>
         You are invited to join and{" "}
-        {props.condition === "contribute"
+        {condition === "contribute"
           ? "contribute to"
-          : props.condition === "learn"
+          : condition === "learn"
           ? "learn collaboratively at"
-          : props.condition === "present"
+          : condition === "present"
           ? "present your research at"
           : ""}{" "}
         1Cademy {props.community} community. Several large communities of
