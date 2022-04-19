@@ -714,7 +714,7 @@ exports.remindResearcherToSpecifyAvailability = (email, fullname, days) => {
         <p></p>
         <p>This is an auto-generated email to remind you that you have not specified your availability for the next 16 days.</p>
         <p>We need to specify as much of our availability as possible, so that we get more participants who schedule only for the the sessions that they can really attend.</p>
-        <p>Please open <a href="https://1cademy.us/ReminderDate" target='_blank'>our experiments scheduling page</a> and specify your availability in the next ${days} days.</p>
+        <p>Please open <a href="https://1cademy.us/Activities/Experiments" target='_blank'>our experiments scheduling page</a> and specify your availability in the next ${days} days.</p>
         <p></p>
         <p>Best regards,</p>
         ` + signatureHTML,
