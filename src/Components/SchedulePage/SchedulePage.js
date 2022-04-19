@@ -90,7 +90,7 @@ const SchedulePage = (props) => {
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         const session = scheduleData.session.toDate();
-        if (session > new Date()) {
+        if (session > tomorrow) {
           sch.push(session);
         }
       }
