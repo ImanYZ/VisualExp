@@ -974,7 +974,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
           // if (researcherData.projectsData[project].active) {
           const resScheduleDocs = await db
             .collection("resSchedule")
-            .where("project", "==", researcherData.projectsData[project])
+            .where("project", "==", researcherData.projects[project])
             .where("fullname", "==", researcherDoc.id)
             .get();
           let lastAvailability = new Date();
