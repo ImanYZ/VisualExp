@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 
 import axios from "axios";
 
+import TextField from "@mui/material/TextField";
+
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import DatePicker from "@mui/lab/DatePicker";
@@ -39,6 +41,8 @@ const InstructorLater = (props) => {
     setReminder(newValue);
     setSnackbarMessage("You successfully updated your reminder date!");
   };
+
+  const renderDate = (params) => <TextField {...params} />;
 
   return (
     <PagesNavbar thisPage="Interested, Later">
