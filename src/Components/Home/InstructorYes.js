@@ -10,6 +10,7 @@ const InstructorYes = (props) => {
   const { condition, instructorId } = useParams();
 
   useEffect(() => {
+    console.log({ instructorId });
     axios.post("/instructorYes", {
       id: instructorId,
     });
@@ -36,9 +37,10 @@ const InstructorYes = (props) => {
           : ""}{" "}
         1Cademy {props.community} community. Several large communities of
         student researchers from different schools in the US are remotely
-        collaborating through the 1Cademy platform. You can find more
-        information about these communities and the application process on
-        <a href="https://1cademy.us/home">our homepage</a>.
+        collaborating through the 1Cademy platform at the University of Michigan
+        School of Information. You can find more information about these
+        communities and the application process on
+        <a href="https://1cademy.us/home">1Cademy homepage</a>.
       </p>
       <p>
         [OPTIONAL: You can earn ____ points in this course by participating in

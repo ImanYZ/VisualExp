@@ -31,6 +31,7 @@ const {
   inviteInstructors,
   instructorYes,
   instructorNo,
+  instructorLater,
   sendPersonalInvitations,
 } = require("./emailing");
 const {
@@ -66,6 +67,7 @@ app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadContacts", loadContacts);
 app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
+app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
 // app.get("/retrieveData", retrieveData);
