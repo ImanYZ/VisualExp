@@ -300,11 +300,11 @@ exports.inviteInstructors = async (req, res) => {
                 }/${minCondition}/${
               instructorDoc.id
             }" target="_blank">Yes, I'd like to invite my students.</a></li>
-                <li><a href="https://1cademy.us/notInterestedFaculty/${
+                <li><a href="https://1cademy.us/interestedFacultyLater/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
-                <li><a href="https://1cademy.us/interestedFacultyLater/${
+                <li><a href="https://1cademy.us/notInterestedFaculty/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank">No, do not contact me again.</a></li>
