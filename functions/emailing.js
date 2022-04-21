@@ -384,6 +384,7 @@ exports.instructorYes = async (req, res) => {
       await instructorDoc.update({
         yes: true,
         no: false,
+        later: false,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
       });
     }
@@ -404,8 +405,9 @@ exports.instructorNo = async (req, res) => {
       const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
-        yes: false,
         no: true,
+        yes: false,
+        later: false,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
       });
     }
@@ -435,8 +437,9 @@ exports.instructorLater = async (req, res) => {
       if ("reminder" in req.body) {
         const reminder = req.body.reminder;
         await instructorDoc.update({
-          yes: true,
           later: true,
+          no: false,
+          yes: false,
           reminder: admin.firestore.Timestamp.fromDate(reminder),
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
@@ -444,8 +447,9 @@ exports.instructorLater = async (req, res) => {
         // If reminder does not exist, we should still log that the instructor
         // clicked the remind me later link in their email.
         await instructorDoc.update({
-          yes: true,
           later: true,
+          no: false,
+          yes: false,
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
       }
