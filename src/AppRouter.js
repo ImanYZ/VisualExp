@@ -212,7 +212,12 @@ const AppRouter = (props) => {
             path={
               "/interestedFaculty/" + communi.id + "/:condition/:instructorId"
             }
-            element={<InstructorYes community={communitiesOrder[idx].title} />}
+            element={
+              <InstructorYes
+                community={communitiesOrder[idx].title}
+                leader={communitiesOrder[idx].leaders[0].name}
+              />
+            }
           />
         </React.Fragment>
       ))}

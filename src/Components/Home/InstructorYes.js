@@ -26,7 +26,7 @@ const InstructorYes = (props) => {
       <Paper style={{ padding: "10px 19px 10px 19px" }}>
         <p>
           Please email the following message to your students whom you'd like to
-          invite to apply to join our communities.
+          invite to apply to join 1Cademy {props.community} community.
         </p>
         <Paper style={{ padding: "10px 19px 10px 19px" }}>
           <p>Hello [Your class name goes here] students,</p>
@@ -42,16 +42,31 @@ const InstructorYes = (props) => {
             1Cademy {props.community} community. Several large communities of
             student researchers from different schools in the US are remotely
             collaborating through the 1Cademy platform at the University of
-            Michigan School of Information. You can find more information about
-            these communities and the application process on
+            Michigan, School of Information. You can find more information about
+            these communities and the application process on{" "}
             <a href="https://1cademy.us/home">1Cademy homepage</a>.
+          </p>
+          <p>
+            You can email your questions to{" "}
+            <a
+              href={
+                "mailto:onecademy@umich.edu?subject=" +
+                props.community +
+                " Question for " +
+                props.leader
+              }
+              target="_blank"
+            >
+              1Cademy {props.community} community leader
+            </a>
+            .
           </p>
           <p>
             [OPTIONAL: You can earn ____ points in this course by participating
             in these research communities.]
           </p>
           <p></p>
-          <p>Best regards,</p>
+          <p>Good luck with your application,</p>
           <p>[Your signature goes here]</p>
         </Paper>
         <p></p>
