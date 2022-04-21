@@ -377,9 +377,9 @@ exports.inviteInstructors = async (req, res) => {
 // && request.resource.data.fullname == request.auth.token.name;
 exports.instructorYes = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.params
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: true,
@@ -399,9 +399,9 @@ exports.instructorYes = async (req, res) => {
 // && request.resource.data.fullname == request.auth.token.name;
 exports.instructorNo = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.params
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: false,
@@ -421,9 +421,9 @@ exports.instructorNo = async (req, res) => {
 // && request.resource.data.fullname == request.auth.token.name;
 exports.instructorLater = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.params
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
 
       // In addition to setting later = true, we should also set yes = true so that if
@@ -432,8 +432,8 @@ exports.instructorLater = async (req, res) => {
 
       // If reminder exists, its value would be the date that the instructor wants to
       // receive a reminder email.
-      if ("reminder" in req.params) {
-        const reminder = req.params.reminder;
+      if ("reminder" in req.body) {
+        const reminder = req.body.reminder;
         await instructorDoc.update({
           yes: true,
           later: true,
