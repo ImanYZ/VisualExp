@@ -435,7 +435,7 @@ exports.instructorLater = async (req, res) => {
       // If reminder exists, its value would be the date that the instructor wants to
       // receive a reminder email.
       if ("reminder" in req.body) {
-        const reminder = req.body.reminder;
+        const reminder = new Date(req.body.reminder);
         await instructorDoc.update({
           later: true,
           no: false,

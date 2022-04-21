@@ -35,7 +35,7 @@ const InstructorLater = (props) => {
   }, []);
 
   const changeDate = async (newValue) => {
-    axios.post("/InstructorLater", {
+    await axios.post("/InstructorLater", {
       id: instructorId,
       reminder: newValue,
     });
@@ -51,9 +51,7 @@ const InstructorLater = (props) => {
         Thank You for Your Interest in Our Communities!
       </Typography>
       <Paper style={{ padding: "10px 19px 10px 19px", textAlign: "center" }}>
-        <Typography variant="h3" gutterBottom marked="center" align="center">
-          Please choose your preferred date for the reminder email:
-        </Typography>
+        <h3>Please choose your preferred date for the reminder email:</h3>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
             label="Reminder Date"
