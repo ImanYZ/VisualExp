@@ -969,39 +969,41 @@ exports.assignExperimentSessionsPoints = async (context) => {
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
-      for (let project in researcherData.projects) {
-        if (researcherData.projectsData[project].active) {
-          const resScheduleDocs = await db
-            .collection("resSchedule")
-            .where("project", "==", researcherData.projects[project])
-            .where("fullname", "==", researcherDoc.id)
-            .get();
-          let lastAvailability = new Date();
-          for (let resScheduleDoc of resScheduleDocs.docs) {
-            const resScheduleData = resScheduleDoc.data();
-            const theSession = resScheduleData.session.toDate();
-            if (theSession.getTime() > lastAvailability.getTime()) {
-              lastAvailability = theSession;
+      if ("projects" in researcherData) {
+        for (let project in researcherData.projects) {
+          if (researcherData.projects[project].active) {
+            const resScheduleDocs = await db
+              .collection("resSchedule")
+              .where("project", "==", project)
+              .where("fullname", "==", researcherDoc.id)
+              .get();
+            let lastAvailability = new Date();
+            for (let resScheduleDoc of resScheduleDocs.docs) {
+              const resScheduleData = resScheduleDoc.data();
+              const theSession = resScheduleData.session.toDate();
+              if (theSession.getTime() > lastAvailability.getTime()) {
+                lastAvailability = theSession;
+              }
+            }
+            let eightDaysLater = new Date();
+            eightDaysLater = new Date(
+              eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
+            );
+            if (lastAvailability.getTime() < eightDaysLater.getTime()) {
+              remindResearcherToSpecifyAvailability(
+                researcherData.email,
+                researcherDoc.id,
+                "ten"
+              );
             }
           }
-          let eightDaysLater = new Date();
-          eightDaysLater = new Date(
-            eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
-          );
-          if (lastAvailability.getTime() < eightDaysLater.getTime()) {
-            remindResearcherToSpecifyAvailability(
-              researcherData.email,
-              researcherDoc.id,
-              "ten"
-            );
-          }
         }
+        researchersInfo.push({
+          fullname: researcherDoc.id,
+          email: researcherData.email,
+          projects: Object.keys(researcherData.projects),
+        });
       }
-      researchersInfo.push({
-        fullname: researcherDoc.id,
-        email: researcherData.email,
-        projects: Object.keys(researcherData.projects),
-      });
     }
     const oneWebIdx = researchersInfo.findIndex(
       (researcher) => researcher.email.toLowerCase() === "oneweb@umich.edu"
@@ -1133,7 +1135,10 @@ exports.assignExperimentSessionsPoints = async (context) => {
 
 exports.remindCalendarInvitations = async (context) => {
   try {
-    const scheduleDocs = await db.collection("schedule").orderBy("id").get();
+    const scheduleDocs = await db
+      .collection("schedule")
+      .orderBy("id")
+      .get();
     const schedule = [];
     for (let scheduleDoc of scheduleDocs.docs) {
       schedule.push(scheduleDoc.data());

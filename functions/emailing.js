@@ -12,7 +12,6 @@ const {
 } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
-const { SignalCellularNullOutlined } = require("@mui/icons-material");
 
 require("dotenv").config();
 
@@ -147,7 +146,7 @@ exports.sendPersonalInvitations = async (req, res) => {
                 <br clear="all"><br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><div><b><a href="https://youtu.be/-dQOuGeu0IQ" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Grace Ramstad, Sarah Licht, Viktoria Roshchin<br></div><div><b><a href="https://youtu.be/tmW31AEJRYg" target="_blank">Organization/Educational Psychology</a> - </b>Amelia Henriques, Desiree Mayrie Comer<b><br></b></div><div><div><a href="https://youtu.be/B6q-LYXvNCg" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare<br></div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b></b></a><b></b></div><div><b><a href="https://youtu.be/ImoaKx7uoII" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Talia Gillespie</div><div><a href="https://youtu.be/J0y0tZzzuQ0" target="_blank"><b>Machine Learning (Deep learning) </b></a>- Ge Zhang, Vatsal Chaudhari</div><div><b><a href="https://youtu.be/Mj45B59k4fo" target="_blank">Neuroscience Research</a></b> - Amrit Das Pradhan, Victoria Mulligan</div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b>Health Psychology</b></a> - Megan Rush, Madeline Paige Jacoby<div><a href="https://youtu.be/otW11GyQ4dY" target="_blank"><b>Disability Studies</b></a> - Keltie Malley, Rishabh Verma<br></div><div><b><a href="https://youtu.be/RBIRquj1dD8" target="_blank">Cryptoeconomics</a></b> - Isaac F Maruyama</div><b><a href="https://youtu.be/K5R17uFWINo" target="_blank">Clinical Psychology</a></b> - Victoria Mulligan<b><b><br></b></b><div><div><a href="https://youtu.be/Xaa1JnTHtSY" target="_blank"><b>Mindfulness Research</b></a> - Noor Jassim</div></div><b>R&amp;D</b> - Iman YeckehZaare<br><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
                 <img src="https://1cademy.us/api/loadImage/individual/${
                   getFullnameURI(firstname, lastname) + "/" + generateUID()
-                }">
+                }"
                 width="420" height="37"><br></div></div></div>`,
             };
             transporter.sendMail(mailOptions, async (error, data) => {
@@ -213,7 +212,7 @@ exports.inviteInstructors = async (req, res) => {
     let waitTime = 0;
     const instructorDocs = await db
       .collection("instructors")
-      .where("email", "==", "oneweb@umich.edu")
+      .where("email", "==", "onecademy@umich.edu")
       .get();
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
@@ -233,36 +232,31 @@ exports.inviteInstructors = async (req, res) => {
         // There exists a community corresponding to the one wechose for them.
         instructorData.major in communityTitles
       ) {
-        // To assign an experimental condition to this instructor, we have to find
-        // the condition that is assigned to the fewest number of instructors so far.
-        let instructorConditionsDocs = await db
-          .collection("instructorConditions")
-          .get();
-        instructorConditionsDocs = instructorConditionsDocs.docs;
-        let minCondNum = instructorConditionsDocs[0].data().num;
-        let minCondition = instructorConditionsDocs[0].id;
-        for (let instructorConditionDoc of instructorConditionsDocs) {
-          let instructorConditionData = instructorConditionDoc.data();
-          if (instructorConditionData.num < minCondNum) {
-            minCondNum = instructorConditionData.num;
-            minCondition = instructorConditionDoc.id;
+        let minCondition,
+          minCondNum = -1;
+        if (instructorData.condition) {
+          minCondition = instructorData.condition;
+        } else {
+          // To assign an experimental condition to this instructor, we have to find
+          // the condition that is assigned to the fewest number of instructors so far.
+          let instructorConditionsDocs = await db
+            .collection("instructorConditions")
+            .get();
+          instructorConditionsDocs = instructorConditionsDocs.docs;
+          minCondNum = instructorConditionsDocs[0].data().num;
+          minCondition = instructorConditionsDocs[0].id;
+          for (let instructorConditionDoc of instructorConditionsDocs) {
+            let instructorConditionData = instructorConditionDoc.data();
+            if (instructorConditionData.num < minCondNum) {
+              minCondNum = instructorConditionData.num;
+              minCondition = instructorConditionDoc.id;
+            }
           }
         }
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
         // postpones sending the next email until the next waitTime.
         setTimeout(async () => {
-          console.log({
-            email: instructorData.email,
-            firstname: instructorData.firstname,
-            lastname: instructorData.lastname,
-            prefix: instructorData.prefix,
-            reminders: instructorData.reminders,
-            nextReminder: instructorData.nextReminder,
-            major: instructorData.major,
-            communityTitle: communityTitles[instructorData.major],
-            condition: minCondition,
-          });
           const mailOptions = {
             from: process.env.EMAIL,
             to: instructorData.email,
@@ -277,7 +271,7 @@ exports.inviteInstructors = async (req, res) => {
             } Community`,
             html: `<p>Hello ${
               instructorData.prefix +
-              " " +
+              ". " +
               capitalizeFirstLetter(instructorData.firstname) +
               " " +
               capitalizeFirstLetter(instructorData.lastname)
@@ -294,18 +288,26 @@ exports.inviteInstructors = async (req, res) => {
             }" target="_blank">${
               communityTitles[instructorData.major]
             } community</a>. Several large communities of student researchers from different schools in the US are 
-            remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform. 
+            remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform
+            at the University of Michigan School of Information. 
             You can find more information about our communities and the application process at https://1cademy.us/home</p>
               <p></p>
               <p>Please choose one of the following options regarding your preference:</p>
               <ul>
                 <li><a href="https://1cademy.us/interestedFaculty/${
+                  // These are all sending requests to the client side.
                   instructorData.major
                 }/${minCondition}/${
               instructorDoc.id
             }" target="_blank">Yes, I'd like to invite my students.</a></li>
-                <li><a href="https://1cademy.us/" target="_blank">Not at this point, contact me in a few weeks.</a></li>
-                <li><a href="https://1cademy.us/" target="_blank">No, do not contact me again.</a></li>
+                <li><a href="https://1cademy.us/notInterestedFaculty/${
+                  // These are all sending requests to the client side.
+                  instructorDoc.id
+                }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
+                <li><a href="https://1cademy.us/interestedFacultyLater/${
+                  // These are all sending requests to the client side.
+                  instructorDoc.id
+                }" target="_blank">No, do not contact me again.</a></li>
               </ul>
               <p>Reply to this email if you have any questions or concerns.</p>
               <p>Please let us know if you are interested in assigning course/internship credits for your students. We can 
@@ -314,8 +316,11 @@ exports.inviteInstructors = async (req, res) => {
               <p>Best regards,</p>
               <br clear="all"><br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><div><b><a href="https://youtu.be/-dQOuGeu0IQ" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Grace Ramstad, Sarah Licht, Viktoria Roshchin<br></div><div><b><a href="https://youtu.be/tmW31AEJRYg" target="_blank">Organization/Educational Psychology</a> - </b>Amelia Henriques, Desiree Mayrie Comer<b><br></b></div><div><div><a href="https://youtu.be/B6q-LYXvNCg" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare<br></div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b></b></a><b></b></div><div><b><a href="https://youtu.be/ImoaKx7uoII" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Talia Gillespie</div><div><a href="https://youtu.be/J0y0tZzzuQ0" target="_blank"><b>Machine Learning (Deep learning) </b></a>- Ge Zhang, Vatsal Chaudhari</div><div><b><a href="https://youtu.be/Mj45B59k4fo" target="_blank">Neuroscience Research</a></b> - Amrit Das Pradhan, Victoria Mulligan</div><a href="https://youtu.be/gJUMN4vIxN4" target="_blank"><b>Health Psychology</b></a> - Megan Rush, Madeline Paige Jacoby<div><a href="https://youtu.be/otW11GyQ4dY" target="_blank"><b>Disability Studies</b></a> - Keltie Malley, Rishabh Verma<br></div><div><b><a href="https://youtu.be/RBIRquj1dD8" target="_blank">Cryptoeconomics</a></b> - Isaac F Maruyama</div><b><a href="https://youtu.be/K5R17uFWINo" target="_blank">Clinical Psychology</a></b> - Victoria Mulligan<b><b><br></b></b><div><div><a href="https://youtu.be/Xaa1JnTHtSY" target="_blank"><b>Mindfulness Research</b></a> - Noor Jassim</div></div><b>R&amp;D</b> - Iman YeckehZaare<br><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
               <img src="https://1cademy.us/api/loadImage/professor/${
+                // For tracking when they open their email.
+                // Note that the email clients that cache emails like those on iPad or Outlook open the content
+                // of the emails without the user's knowlege, so those would be false positives for us.
                 instructorDoc.id + "/" + generateUID()
-              }">
+              }"
               width="420" height="37"><br></div></div></div>`,
           };
           transporter.sendMail(mailOptions, async (error, data) => {
@@ -323,14 +328,18 @@ exports.inviteInstructors = async (req, res) => {
               console.log({ error });
               return res.status(500).json({ error });
             } else {
-              // If the email is successfully sent:
-              // 1) Update the num value in the corresponding instructorConditions document;
-              const instructorConditionRef = db
-                .collection("instructorConditions")
-                .doc(minCondition);
-              await instructorConditionRef.update({
-                num: admin.firestore.FieldValue.increment(1),
-              });
+              // minCondNum === -1 signals that we had previously assigned a condition to
+              // the instructor and we do not need to assign any experimental conditions again.
+              if (minCondNum !== -1) {
+                // If the email is successfully sent:
+                // 1) Update the num value in the corresponding instructorConditions document;
+                const instructorConditionRef = db
+                  .collection("instructorConditions")
+                  .doc(minCondition);
+                await instructorConditionRef.update({
+                  num: admin.firestore.FieldValue.increment(1),
+                });
+              }
               // 2) Update the corresponding instructor document.
               const instructorRef = db
                 .collection("instructors")
@@ -339,7 +348,7 @@ exports.inviteInstructors = async (req, res) => {
                 condition: minCondition,
                 emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
-                // The next remoinder should be sent one week later.
+                // The next reminder should be sent one week later.
                 nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
                 updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
               });
@@ -348,10 +357,12 @@ exports.inviteInstructors = async (req, res) => {
         }, waitTime);
         // Increase waitTime by a random integer between 1 to 4 seconds.
         waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+        // ****************************************************************************
         // Temporarily, for TESTING, only send the email to a single instructor, MYSELF.
         if (waitTime > 4000) {
           break;
         }
+        // ****************************************************************************
       }
     }
   } catch (err) {
@@ -361,15 +372,19 @@ exports.inviteInstructors = async (req, res) => {
 };
 
 // Logs that the instructor clicked Yes in their email.
-// We should not do this directly in the front-end because i
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
 exports.instructorYes = async (req, res) => {
   try {
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: true,
         no: false,
+        later: false,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
       });
     }
@@ -380,15 +395,19 @@ exports.instructorYes = async (req, res) => {
 };
 
 // Logs that the instructor clicked No in their email.
-// We should not do this directly in the front-end because i
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
 exports.instructorNo = async (req, res) => {
   try {
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
-        yes: false,
         no: true,
+        yes: false,
+        later: false,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
       });
     }
@@ -399,24 +418,38 @@ exports.instructorNo = async (req, res) => {
 };
 
 // Logs the instructor's preferred date for their reminder email.
-// We should not do this directly in the front-end because i
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
 exports.instructorLater = async (req, res) => {
   try {
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
-      if ("reminder" in req.params) {
-        const reminder = req.params.reminder;
+
+      // In addition to setting later = true, we should also set yes = true so that if
+      // they previously declined and then changed their mind, we still send them a reminder
+      // email one week later, or at the reminder date that they spedcified.
+
+      // If reminder exists, its value would be the date that the instructor wants to
+      // receive a reminder email.
+      if ("reminder" in req.body) {
+        const reminder = req.body.reminder;
         await instructorDoc.update({
-          yes: true,
           later: true,
+          no: false,
+          yes: false,
           reminder: admin.firestore.Timestamp.fromDate(reminder),
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
       } else {
+        // If reminder does not exist, we should still log that the instructor
+        // clicked the remind me later link in their email.
         await instructorDoc.update({
-          yes: true,
           later: true,
+          no: false,
+          yes: false,
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
       }
