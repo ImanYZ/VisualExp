@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
 
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
@@ -49,7 +50,7 @@ const InstructorLater = (props) => {
       <Typography variant="h3" gutterBottom marked="center" align="center">
         Thank You for Your Interest in Our Communities!
       </Typography>
-      <div style={{ textAlign: "center" }}>
+      <Paper style={{ padding: "10px 19px 10px 19px", textAlign: "center" }}>
         <Typography variant="h3" gutterBottom marked="center" align="center">
           Please choose your preferred date for the reminder email:
         </Typography>
@@ -61,7 +62,7 @@ const InstructorLater = (props) => {
             renderInput={renderDate}
           />
         </LocalizationProvider>
-      </div>
+      </Paper>
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}

@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 import Paper from "@mui/material/Paper";
-import Button from "@mui/material/Button";
 
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
