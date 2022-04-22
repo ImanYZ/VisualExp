@@ -703,6 +703,10 @@ exports.feedbackData = async (req, res) => {
 // sessions, but have not withdrawn or submitted any complete applications.
 exports.applicationReminder = async (context) => {
   try {
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
+    let waitTime = 0;
     // Retrieve all the applicants who have completed the 3 experiment sessions.
     const usersDocs = await db
       .collection("users")
@@ -835,24 +839,30 @@ exports.applicationReminder = async (context) => {
           const communityLeaderData = communityLeaderDoc.data();
           // Because I am considered a leader in all communities.
           // if (communityLeaderData.email !== "oneweb@umich.edu") {
-          await emailCommunityLeader(
-            communityLeaderData.email,
-            communityLeaderData.firstname,
-            communiId,
-            needReview[communiId]
-          );
+          setTimeout(() => {
+            emailCommunityLeader(
+              communityLeaderData.email,
+              communityLeaderData.firstname,
+              communiId,
+              needReview[communiId]
+            );
+          }, waitTime);
+          // Increase waitTime by a random integer between 1 to 4 seconds.
+          waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
           // }
         }
       }
     }
     // Send reminder emails to to Iman to invite the confirmed applicants to
     // Microsoft Teams.
-    await emailImanToInviteApplicants(needInvite);
-    let userIdx = 0;
+    setTimeout(() => {
+      emailImanToInviteApplicants(needInvite);
+    }, waitTime);
+    // Increase waitTime by a random integer between 1 to 4 seconds.
+    waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
     if (reminders.length > 0) {
-      const userInterval = setInterval(async () => {
-        console.log({ email: reminders[userIdx].email });
-        await emailApplicationStatus(
+      setTimeout(() => {
+        emailApplicationStatus(
           reminders[userIdx].email,
           reminders[userIdx].firstname,
           reminders[userIdx].fullname,
@@ -861,11 +871,9 @@ exports.applicationReminder = async (context) => {
           reminders[userIdx].content,
           reminders[userIdx].hyperlink
         );
-        userIdx += 1;
-        if (userIdx === reminders.length) {
-          clearInterval(userInterval);
-        }
-      }, Math.floor(Math.random() * (10000 - 1000)) + 1000);
+      }, waitTime);
+      // Increase waitTime by a random integer between 1 to 4 seconds.
+      waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
     }
   } catch (err) {
     console.log({ err });

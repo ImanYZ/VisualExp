@@ -207,13 +207,10 @@ const communityTitles = {
 exports.inviteInstructors = async (req, res) => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
-    // WaitTime keeps increasing for every email that should be sent and in a setTimeout
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
-    const instructorDocs = await db
-      .collection("instructors")
-      .where("email", "==", "onecademy@umich.edu")
-      .get();
+    const instructorDocs = await db.collection("instructors").get();
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
       if (
@@ -357,12 +354,6 @@ exports.inviteInstructors = async (req, res) => {
         }, waitTime);
         // Increase waitTime by a random integer between 1 to 4 seconds.
         waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
-        // ****************************************************************************
-        // Temporarily, for TESTING, only send the email to a single instructor, MYSELF.
-        if (waitTime > 4000) {
-          break;
-        }
-        // ****************************************************************************
       }
     }
   } catch (err) {
