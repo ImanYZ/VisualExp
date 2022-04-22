@@ -793,80 +793,83 @@ exports.loadfeedbackCodes = async (req, res) => {
     const project = "H2K2";
     const coders = ["Zoe Dunnum", "Jasmine Wu"];
     const session = "1st";
-    const expIdx = 0;
-    const ws = fs.createReadStream(
-      "/datasets/Experiment Data - Copy of Coding Q1 Phase 1.csv"
-    );
-    let rowIdx = 0;
-    const parser = csv
-      .parseStream(ws, { headers: true })
-      .on("error", (error) => {
-        console.error(error);
-        return res.status(500).json({ error });
-      })
-      .on("data", async (row) => {
-        console.log(rowIdx);
-        // We need to pause reading from the CSV file to process the row
-        // before continuing with the next row.
-        parser.pause();
-        if (row["explanation1"]) {
-          const explanation = row["explanation1"].replace(
-            /(\r\n|\n|\r|[ ])/gm,
-            ""
-          );
-          // We should iterate through all the users to figure out which user this
-          // explanation belongs to.
-          let userIndex = -1;
-          for (let userIdx = 0; userIdx < userDocs.length; userIdx++) {
-            const userDoc = userDocs[userIdx];
-            const userData = userDoc.data();
-            if (userData.explanations) {
-              if (
-                userData.explanations[expIdx].replace(
-                  /(\r\n|\n|\r|[ ])/gm,
-                  ""
-                ) === explanation
-              ) {
-                userIndex = userIdx;
-                break;
+    const expParameters = [
+      {
+        expIdx: 0,
+        columnName: "explanation1",
+        fieldName: "explanations",
+        filePath: "datasets/Experiment Data - Copy of Coding Q1 Phase 1.csv",
+      },
+      {
+        expIdx: 0,
+        columnName: "explanation2",
+        fieldName: "explanations3Days",
+        filePath: "datasets/Experiment Data - Copy of Coding Q1 Phase 2.csv",
+      },
+      {
+        expIdx: 1,
+        columnName: "explanation2",
+        fieldName: "explanations",
+        filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 1.csv",
+      },
+      {
+        expIdx: 1,
+        columnName: "explanation2",
+        fieldName: "explanation2-3Days",
+        filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 2.csv",
+      },
+    ];
+    for (let { expIdx, columnName, fieldName, filePath } of expParameters) {
+      const ws = fs.createReadStream(filePath);
+      let rowIdx = 0;
+      const parser = csv
+        .parseStream(ws, { headers: true })
+        .on("error", (error) => {
+          console.error(error);
+          return res.status(500).json({ error });
+        })
+        .on("data", async (row) => {
+          console.log(rowIdx);
+          // We need to pause reading from the CSV file to process the row
+          // before continuing with the next row.
+          parser.pause();
+          if (row[columnName]) {
+            const explanation = row[columnName].replace(
+              /(\r\n|\n|\r|[ ])/gm,
+              ""
+            );
+            // We should iterate through all the users to figure out which user this
+            // explanation belongs to and identify their userIndex.
+            let userIndex = -1;
+            for (let userIdx = 0; userIdx < userDocs.length; userIdx++) {
+              const userDoc = userDocs[userIdx];
+              const userData = userDoc.data();
+              if (userData[fieldName]) {
+                if (
+                  userData[fieldName][expIdx].replace(
+                    /(\r\n|\n|\r|[ ])/gm,
+                    ""
+                  ) === explanation
+                ) {
+                  userIndex = userIdx;
+                  break;
+                }
               }
             }
-          }
-          if (userIndex === -1) {
-            console.log({ explanation: row["explanation1"] });
-          } else {
-            // if (userDocs[userIndex].id in foundUserExplanantions) {
-            //   foundUserExplanantions[userDocs[userIndex].id].push(
-            //     row["explanation1"]
-            //   );
-            // } else {
-            //   foundUserExplanantions[userDocs[userIndex].id] = [
-            //     row["explanation1"],
-            //   ];
-            // }
-            const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-            for (let coder of coders) {
+            if (userIndex === -1) {
+              console.log({ explanation: row[columnName] });
+            } else {
+              console.log("Found");
+              // const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+              // for (let coder of coders) {
+              // }
             }
           }
-        }
-        rowIdx += 1;
-        parser.resume();
-      })
-      .on("end", async (row) => {
-        // for (let uid in foundUserExplanantions) {
-        //   if (foundUserExplanantions[uid].length < 1) {
-        //     console.log({
-        //       uid,
-        //       explanations: foundUserExplanantions[uid],
-        //     });
-        //   } else if (foundUserExplanantions[uid].length > 1) {
-        //     console.log({
-        //       uid,
-        //       explanations: foundUserExplanantions[uid],
-        //     });
-        //   }
-        // }
-      });
+          rowIdx += 1;
+          parser.resume();
+        })
+        .on("end", async (row) => {});
+    }
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
@@ -886,7 +889,7 @@ exports.loadTimesheetVotes = async (req, res) => {
           const fullname = researchers[researcherIdx].fullname;
           let rowIdx = 0;
           const ws = fs.createReadStream(
-            "/datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " +
+            "datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " +
               fullname +
               ".csv"
           );

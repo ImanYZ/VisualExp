@@ -775,7 +775,8 @@ const ManageEvents = (props) => {
   };
 
   const changeThirdSession = (newDateTime) => {
-    setThirdSession((oldTSession) => {
+    setThirdSession((oTSession) => {
+      const oldTSession = new Date(oTSession);
       oldTSession.setHours(
         newDateTime.getHours(),
         newDateTime.getMinutes(),

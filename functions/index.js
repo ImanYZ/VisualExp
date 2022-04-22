@@ -22,6 +22,7 @@ const {
   assignExperimentSessionsPoints,
   remindCalendarInvitations,
   updateNotTakenSessions,
+  loadfeedbackCodes,
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -77,7 +78,7 @@ app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
-// app.get("/loadfeedbackCodes", loadfeedbackCodes);
+app.get("/loadfeedbackCodes", loadfeedbackCodes);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
