@@ -762,6 +762,77 @@ exports.rescheduleEventNotificationEmail = (req, res) => {
   }
 };
 
+exports.emailCommunityLeader = async (
+  email,
+  firstname,
+  communiId,
+  applicants
+) => {
+  try {
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: email,
+      subject: `[1Cademy] You Have ${applicants.length} Complete Applications to Review in ${communiId}`,
+      html:
+        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        <p></p>
+        <p>This is an auto-generated email to inform you that you have ${
+          applicants.length
+        } complete applications to review in your ${communiId} community:</p>
+        <ul>
+        ${applicants.map((applicant) => {
+          return `<li>${applicant}</li>`;
+        })}
+        </ul>
+        <p>Please review these applications ASAP at
+          <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
+        <p></p>
+        <p>Best regards,</p>
+        ` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, async (error, data) => {
+      if (error) {
+        console.log({ error });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+  }
+};
+
+exports.emailImanToInviteApplicants = async (needInvite) => {
+  try {
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: "oneweb@umich.edu",
+      subject: `[1Cademy] You Have ${needInvite.length} Confirmed Applications to Invite to Microsoft Teams!`,
+      html:
+        `<p>Hi Iman,</p>
+        <p></p>
+        <p>This is an auto-generated email to inform you that you have ${
+          needInvite.length
+        } Confirmed applications to Invite to Microsoft Teams:</p>
+        <ul>
+        ${needInvite.map((application) => {
+          return `<li>${application.communiId}, ${application.applicant}</li>`;
+        })}
+        </ul>
+        <p>You can find these applications at
+          <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
+        <p></p>
+        <p>Best regards,</p>
+        ` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, async (error, data) => {
+      if (error) {
+        console.log({ error });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+  }
+};
+
 exports.emailApplicationStatus = async (
   email,
   firstname,

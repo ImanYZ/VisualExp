@@ -11,7 +11,11 @@ const {
   batchDelete,
 } = require("./admin");
 const { getFullname } = require("./utils");
-const { emailApplicationStatus } = require("./emailing");
+const {
+  emailApplicationStatus,
+  emailCommunityLeader,
+  emailImanToInviteApplicants,
+} = require("./emailing");
 
 exports.deleteUser = async (snap, context) => {
   // Get an object representing the document prior to deletion
@@ -692,15 +696,60 @@ exports.feedbackData = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
+// Call this in a PubSub every 25 hours.
+// Email reminder to community leaders of the applicants who have completed the
+// application and waiting for their response.
+// Email reminder emails to those applicatns who have completed the 3 experiment
+// sessions, but have not withdrawn or submitted any complete applications.
 exports.applicationReminder = async (context) => {
   try {
+    // Retrieve all the applicants who have completed the 3 experiment sessions.
     const usersDocs = await db
       .collection("users")
       .where("projectDone", "==", true)
       .get();
+    // Array of information to be emailed to every applicant whose application
+    // is incomplete.
     const reminders = [];
+    // Object of arrays of applicants' information to be sent to the community
+    // leaders to review, where each key is a communityId and the corresponding value is
+    // an array of the fullnames of the applicants under the review.
+    const needReview = {};
+    // Array of objects of applicants' information and their communities to be sent to
+    // Iman to invite to Microsoft Teams:
+    const needInvite = [];
     for (let userDoc of usersDocs.docs) {
       const userData = userDoc.data();
+      // If the applicant has not withdrawn their application, retrieve all the completed
+      // applications for this applicant.
+      if (!("withdrew" in userData) || !userData.withdrew) {
+        const applicationDocs = await db
+          .collection("applications")
+          .where("fullname", "==", userDoc.id)
+          .where("ended", "==", true)
+          .get();
+        for (let applicationDoc of applicationDocs.docs) {
+          const applicationData = applicationDoc.data();
+          // If the application is completed but the community leader has neither
+          // accpeted or rejected it:
+          if (!applicationData.accepted && !applicationData.rejected) {
+            if (applicationData.communiId in needReview) {
+              needReview[applicationData.communiId].push(
+                applicationData.fullname
+              );
+            } else {
+              needReview[applicationData.communiId] = [
+                applicationData.fullname,
+              ];
+            }
+          } else if (applicationData.confirmed && !applicationData.invited) {
+            needInvite.push({
+              applicant: applicationData.fullname,
+              communiId: applicationData.communiId,
+            });
+          }
+        }
+      }
       if (
         (!("withdrew" in userData) || !userData.withdrew) &&
         (!("applicationSubmitted" in userData) ||
@@ -774,6 +823,31 @@ exports.applicationReminder = async (context) => {
         // }
       }
     }
+    // Send reminder emails to community leaders about the completed applications
+    // that they have not responded to yet.
+    for (let communiId in needReview) {
+      if (needReview[communiId].length > 0) {
+        const communityLeaderDocs = await db
+          .collection("users")
+          .where("leading", "array-contains", communiId)
+          .get();
+        for (let communityLeaderDoc of communityLeaderDocs.docs) {
+          const communityLeaderData = communityLeaderDoc.data();
+          // Because I am considered a leader in all communities.
+          // if (communityLeaderData.email !== "oneweb@umich.edu") {
+          await emailCommunityLeader(
+            communityLeaderData.email,
+            communityLeaderData.firstname,
+            communiId,
+            needReview[communiId]
+          );
+          // }
+        }
+      }
+    }
+    // Send reminder emails to to Iman to invite the confirmed applicants to
+    // Microsoft Teams.
+    await emailImanToInviteApplicants(needInvite);
     let userIdx = 0;
     if (reminders.length > 0) {
       const userInterval = setInterval(async () => {
