@@ -38,42 +38,48 @@ const SelectSessions = (props) => {
   const [firstRender, setFirstRender] = useState(true);
 
   useEffect(() => {
-    const orderedSch = [...props.schedule];
-    orderedSch.sort((a, b) => a.getTime() - b.getTime());
-    let fSession, sSession, tSession;
-    for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
-      if (
-        // startingTomorrow(orderedSch[sIdx]) &&
-        orderedSch[sIdx] > new Date() &&
-        orderedSch[sIdx].getTime() + 30 * 60000 ===
-          orderedSch[sIdx + 1].getTime()
-        //    &&
-        // orderedSch[sIdx + 1].getTime() + 30 * 60000 ===
-        //   orderedSch[sIdx + 2].getTime()
-      ) {
-        const secondSIdx = orderedSch.findIndex((s) =>
-          daysLater(orderedSch[sIdx], s, 3)
-        );
-        if (secondSIdx !== -1) {
-          const thirdSIdx = orderedSch.findIndex((s) =>
-            daysLater(orderedSch[sIdx], s, 7)
+    if (props.schedule && props.schedule.length > 0) {
+      const orderedSch = [...props.schedule];
+      orderedSch.sort((a, b) => a.getTime() - b.getTime());
+      let fSession = null;
+      let sSession = null;
+      let tSession = null;
+      for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
+        if (
+          // startingTomorrow(orderedSch[sIdx]) &&
+          orderedSch[sIdx] > new Date() &&
+          orderedSch[sIdx].getTime() + 30 * 60000 ===
+            orderedSch[sIdx + 1].getTime()
+          //    &&
+          // orderedSch[sIdx + 1].getTime() + 30 * 60000 ===
+          //   orderedSch[sIdx + 2].getTime()
+        ) {
+          const secondSIdx = orderedSch.findIndex((s) =>
+            daysLater(orderedSch[sIdx], s, 3)
           );
-          if (thirdSIdx !== -1) {
-            fSession = fSession ? fSession : orderedSch[sIdx];
-            sSession = sSession ? sSession : orderedSch[secondSIdx];
-            tSession = tSession ? tSession : orderedSch[thirdSIdx];
-            break;
+          if (secondSIdx !== -1) {
+            const thirdSIdx = orderedSch.findIndex((s) =>
+              daysLater(orderedSch[sIdx], s, 7)
+            );
+            if (thirdSIdx !== -1) {
+              fSession = orderedSch[sIdx];
+              sSession = orderedSch[secondSIdx];
+              tSession = orderedSch[thirdSIdx];
+              break;
+            }
           }
         }
       }
-    }
-    props.setFirstSession(fSession);
-    props.setSecondSession(sSession);
-    props.setThirdSession(tSession);
-    if (sSession && tSession) {
-      props.setSubmitable(true);
-    } else {
-      props.setSubmitable(false);
+      if (fSession && sSession && tSession) {
+        props.setFirstSession(fSession);
+        props.setSecondSession(sSession);
+        props.setThirdSession(tSession);
+      }
+      if (sSession && tSession) {
+        props.setSubmitable(true);
+      } else {
+        props.setSubmitable(false);
+      }
     }
   }, [props.schedule]);
 

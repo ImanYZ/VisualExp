@@ -764,7 +764,8 @@ const ManageEvents = (props) => {
   };
 
   const changeSecondSession = (newDateTime) => {
-    setSecondSession((oldSSession) => {
+    setSecondSession((oSSession) => {
+      const oldSSession = new Date(oSSession);
       oldSSession.setHours(
         newDateTime.getHours(),
         newDateTime.getMinutes(),
@@ -782,6 +783,7 @@ const ManageEvents = (props) => {
         newDateTime.getMinutes(),
         newDateTime.getSeconds()
       );
+      console.log({ oTSession, oldTSession });
       return oldTSession;
     });
   };

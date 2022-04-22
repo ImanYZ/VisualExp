@@ -68,6 +68,7 @@ const SchedulePage = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
 
+  const [allEvents, setAllEvents] = useState([]);
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
@@ -82,6 +83,19 @@ const SchedulePage = (props) => {
   useEffect(() => {
     const loadSchedule = async () => {
       setScheduleLoaded(false);
+      const responseObj = await axios.post("/allEvents", {});
+      errorAlert(responseObj.data);
+      const events = responseObj.data.events;
+      for (let event of events) {
+        if (
+          event.attendees &&
+          event.attendees.findIndex((attendee) => attendee.email === email) !==
+            -1
+        ) {
+          setParticipatedBefore(true);
+          return;
+        }
+      }
       const scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", email.toLowerCase())
@@ -123,24 +137,12 @@ const SchedulePage = (props) => {
     setIsSubmitting(true);
     const userRef = firebase.db.collection("users").doc(fullname);
     const userDoc = await userRef.get();
+    let responseObj = null;
     if (userDoc.exists) {
       const userData = userDoc.data();
       if (userData.projectDone) {
         setParticipatedBefore(true);
         return;
-      }
-      let responseObj = await axios.post("/allEvents", {});
-      errorAlert(responseObj.data);
-      const events = responseObj.data.events;
-      for (let event of events) {
-        if (
-          event.attendees &&
-          event.attendees.findIndex((attendee) => attendee.email === email) !==
-            -1
-        ) {
-          setParticipatedBefore(true);
-          return;
-        }
       }
       const scheduleDocs = await firebase.db
         .collection("schedule")
