@@ -778,6 +778,17 @@ exports.emailCommunityLeader = async (
         <p>Please review these applications ASAP at
           <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
         <p></p>
+        <h3>Notes:</h3>
+        <ul>
+          <li>When sending emails to your applicants, please include your community name in the 
+          subject line of the emails so that Gmail correctly labels their replies to your community.</li>
+          <li>To signal Iman to invite your new interns to Microsoft Teams, first ask your new interns
+          to complete the 1Cademy tutorial. You can check whether they completed it in the same table
+          under the column "Completed Tutorial."</li>
+          <li>If you reject any applicant, please let them know that they can still apply to other 
+          1Cademy communities.</li>
+        </ul>
+        <p></p>
         <p>Best regards,</p>
         ` + signatureHTML,
     };

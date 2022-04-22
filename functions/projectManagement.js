@@ -775,22 +775,24 @@ exports.voteInstructorReset = async (req, res) => {
 //   }
 // };
 
+// Load the existing codes for qualitative feedback from the CSV files to the
+// database, fill in the feedbackCodeBooks and feedbackCodes collections and
+// assign points to these old researchers in researchers.
+// The pseudocode is illustrated in
 exports.loadfeedbackCodes = async (req, res) => {
   try {
+    // The issue with our CSV files is that we do not have the users' identifiers.
+    // So, we need to retrieve all the users, then for each explanations, we should
+    // check which user it belongs to and get the index of that user to continue with.
     let userDocs = await db.collection("users").get();
     userDocs = userDocs.docs;
-    // for (let userDoc of userDocs) {
-    //   if (userDoc.data().explanations) {
-    //     console.log({
-    //       uid: userDoc.id,
-    //       explanation: userDoc.data().explanations[0],
-    //     });
-    //   }
-    // }
-    // const foundUserExplanantions = {};
+
+    // Because the CSV files are specific to a question from a session, coder, and project,
+    // before opening each, we should specify the following parameter names that the CSV
+    // file is associated with.
     const project = "H2K2";
     const coders = ["Zoe Dunnum", "Jasmine Wu"];
-    const columnName = "explanations";
+    const session = "1st";
     const expIdx = 0;
     const ws = fs.createReadStream(
       "/datasets/Experiment Data - Copy of Coding Q1 Phase 1.csv"
@@ -804,12 +806,16 @@ exports.loadfeedbackCodes = async (req, res) => {
       })
       .on("data", async (row) => {
         console.log(rowIdx);
+        // We need to pause reading from the CSV file to process the row
+        // before continuing with the next row.
         parser.pause();
         if (row["explanation1"]) {
           const explanation = row["explanation1"].replace(
             /(\r\n|\n|\r|[ ])/gm,
             ""
           );
+          // We should iterate through all the users to figure out which user this
+          // explanation belongs to.
           let userIndex = -1;
           for (let userIdx = 0; userIdx < userDocs.length; userIdx++) {
             const userDoc = userDocs[userIdx];
@@ -827,7 +833,7 @@ exports.loadfeedbackCodes = async (req, res) => {
             }
           }
           if (userIndex === -1) {
-            console.log({ [columnName]: row["explanation1"] });
+            console.log({ explanation: row["explanation1"] });
           } else {
             // if (userDocs[userIndex].id in foundUserExplanantions) {
             //   foundUserExplanantions[userDocs[userIndex].id].push(
