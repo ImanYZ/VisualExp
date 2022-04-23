@@ -43,6 +43,13 @@ export default {
           First, we will introduce 1Cademy, its objective, and how it works
           before digging into collaborating with others on 1Cademy.
         </p>
+        <p>
+          Before moving forward, please make an account on{" "}
+          <a href="https://1cademy.com/" target="_blank">
+            1Cademy web app
+          </a>
+          .
+        </p>
       </div>
     ),
     video: "vkNx-QUmbNI",
@@ -512,8 +519,8 @@ export default {
         answers: ["c"],
         choices: {
           a: "Top contributors across the platform",
-          b: "Top 10 contributors in your community",
-          c: "All contributors in your community",
+          b: "All contributors",
+          c: "Top contributors in your community",
         },
       },
     },
@@ -1345,7 +1352,7 @@ export default {
         answers: ["a"],
         choices: {
           a: "When it contains direct (immediate) prerequisite information to the information you would like to add",
-          b: "When it contains any sort of information a user needs to know to understand the information you would like to add",
+          b: "When it contains information a user needs to know to understand the information you would like to add",
           c: "When it contains unrelated information",
         },
       },
@@ -1469,7 +1476,7 @@ export default {
         </p>
       </div>
     ),
-    video: "zyj3mE3x1TY",
+    video: "4JKsI0zIEzU",
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
         stem:
@@ -1489,10 +1496,10 @@ export default {
           answers: ["a", "c", "d"],
           choices: {
             a: "0 downvotes; 2 upvotes",
-            b: "3 downvotes; 7 upvotes",
+            b: "3 downvotes; 6 upvotes",
             c: "8 downvotes; 9 upvotes",
             d: "0 downvotes; 0 upvotes",
-            e: "0 downvotes; 10 upvotes",
+            e: "0 downvotes; 3 upvotes",
           },
         },
       Which_of_the_following_combinations_of_upvotes_and_downvotes_will_result_in_2_net_votes:
