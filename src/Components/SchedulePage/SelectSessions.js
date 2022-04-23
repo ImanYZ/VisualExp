@@ -29,9 +29,9 @@ const daysLater = (d1, d2, days) => {
 const currentTime = new Date();
 const tZoneOffset = currentTime.getTimezoneOffset();
 const tZoneDiff = Math.floor((240 - tZoneOffset) / 60);
-let start = 6 + tZoneDiff;
-if (start < 6) {
-  start = 6;
+let start = 8 + tZoneDiff;
+if (start < 8) {
+  start = 8;
 }
 let end = 23 + tZoneDiff;
 if (end > 23) {

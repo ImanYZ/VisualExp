@@ -9,11 +9,7 @@ const {
   batchUpdate,
   batchDelete,
 } = require("./admin");
-const {
-  allPastEvents,
-  futureEvents,
-  todayPastEvents,
-} = require("./scheduling");
+const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
 const {
   strToBoolean,
   getActivityTimeStamps,
@@ -1144,10 +1140,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
 
 exports.remindCalendarInvitations = async (context) => {
   try {
-    const scheduleDocs = await db
-      .collection("schedule")
-      .orderBy("id")
-      .get();
+    const scheduleDocs = await db.collection("schedule").orderBy("id").get();
     const schedule = [];
     for (let scheduleDoc of scheduleDocs.docs) {
       schedule.push(scheduleDoc.data());
@@ -1241,9 +1234,9 @@ exports.remindCalendarInvitations = async (context) => {
         }
       }
     }
-    const todayPastEvs = await todayPastEvents();
+    const pastEvs = await pastEvents(40);
     // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
-    for (let ev of todayPastEvs) {
+    for (let ev of pastEvs) {
       const startTime = new Date(ev.start.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
