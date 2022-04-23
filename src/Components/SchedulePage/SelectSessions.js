@@ -118,6 +118,8 @@ const SelectSessions = (props) => {
     }
   }, [props.schedule]);
 
+  // ScheduleSelector calls this function for every cell that changes,
+  // every time the user makes any changes to the schedule.
   const renderDateCell = (datetime, selected, refSetter) => {
     const datetimeStr = datetime.toLocaleString();
     // We should enable the sessions for the user to select only
@@ -163,6 +165,8 @@ const SelectSessions = (props) => {
     );
   };
 
+  // Every time the user makes any changes, ScheduleSelector calls this function
+  // with the new value for the schedule array.
   const scheduleChange = (newSchedule) => {
     // There is a bug in ScheduleSelector that unreasonably calls this function
     // when the component is just rendered. Obviously at that point props.schedule
