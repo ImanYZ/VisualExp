@@ -103,7 +103,8 @@ const SchedulePage = (props) => {
         }
       }
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
-      // Each key is a researcher's email, i.e., id, and the corresponding value is an array of their availabilities.
+      // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
+      // that may include 0 to many researchers who are available at that session.
       const availSessions = {};
       // Retrieve all the researchers' avaialbilities in this project.
       const resScheduleDocs = await firebase.db
@@ -112,29 +113,22 @@ const SchedulePage = (props) => {
         .get();
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
-        const resSession = resScheduleData.session.toDate();
+        const resSession = resScheduleData.session.toDate().getTime();
         // Only if the researcher is active in this project AND their availability is in the future:
         if (
           resScheduleData.fullname in researchers &&
-          resSession.getTime() > new Date().getTime()
+          resSession > new Date().getTime()
         ) {
           // Add the available slots for the researcher's email.
-          if (researchers[resScheduleData.fullname] in availSessions) {
-            availSessions[researchers[resScheduleData.fullname]].push(
-              resSession
+          if (resSession in availSessions) {
+            availSessions[resSession].push(
+              researchers[resScheduleData.fullname]
             );
           } else {
-            availSessions[researchers[resScheduleData.fullname]] = [resSession];
+            availSessions[resSession] = [researchers[resScheduleData.fullname]];
           }
         }
       }
-      // Sort all the availabilities for every researcher.
-      // We need this because in the next step, when we want to remove the taken sessions,
-      // we should be able to efficiently identify consecutive sessions to match with the
-      // 1st sessions.
-      // for (let resEmail in availSessions) {
-      //   availSessions[resEmail].sort((a, b) => a.getTime() - b.getTime());
-      // }
       // Retieve all the Calendar events from last month to the end of time.
       const responseObj = await axios.post("/allEvents", {});
       errorAlert(responseObj.data);
@@ -155,29 +149,24 @@ const SchedulePage = (props) => {
           }
         } else {
           // Only future events
-          // If the event has some attendees
-          if (event.attendees && event.attendees.length > 0) {
-            // If one of the attendees is a researcher in this project:
+          const startTime = new Date(event.start.dateTime).getTime();
+          // If the event has some attendees and the start timestamp is a key in availSessions:
+          if (
+            event.attendees &&
+            event.attendees.length > 0 &&
+            startTime in availSessions
+          ) {
+            // We should remove all the attendees who are available researchers at this timestamp:
             for (let attendee of event.attendees) {
-              if (attendee.email in availSessions) {
-                // then, we should remove this session from their list of availabilities.
-                // Define a new array of this researcher's availabilities
-                const newAvailabilities = [];
-                for (let availSession of availSessions[attendee.email]) {
-                  // If the session time is not the same, add it to newAvailabilities.
-                  if (
-                    new Date(event.start.dateTime).getTime() !==
-                    availSession.getTime()
-                  ) {
-                    newAvailabilities.push(availSession);
-                  }
-                }
-                availSessions[attendee.email] = newAvailabilities;
-              }
+              availSessions[startTime] = availSessions[startTime].filter(
+                (resea) => resea !== attendee.email
+              );
             }
           }
         }
       }
+      // Retrieve all the available time slots that the participant previously specified,
+      // just to start from. They are supposed to modify these.
       const scheduleDocs = await firebase.db
         .collection("schedule")
         .where("email", "==", email.toLowerCase())
@@ -186,7 +175,13 @@ const SchedulePage = (props) => {
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         const session = scheduleData.session.toDate();
-        if (session > tomorrow) {
+        // We should only show the availble timeslots that are:
+        // 1) after tomorrow, so the researchers don't get surprized by newly added sessions
+        // 2) at least a researcher is available to take that session.
+        if (
+          session > tomorrow &&
+          availSessions[startTime.getTime()].length > 0
+        ) {
           sch.push(session);
         }
       }
