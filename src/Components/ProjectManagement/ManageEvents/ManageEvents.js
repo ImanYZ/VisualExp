@@ -8,9 +8,9 @@ import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
 import TextField from "@mui/material/TextField";
 
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import TimePicker from "@mui/lab/TimePicker";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -22,10 +22,16 @@ import "./ManageEvents.css";
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 // import { firebaseOneState } from "../../../store/OneCademyAtoms";
 
+// Call this for sessions that the participant has not accepted the Google
+// Calendar invite yet, or should have been in the session but they have not
+// shown up yet.
 const sendEventNotificationEmail = (params) => async (event) => {
   let responseObj = await axios.post("/sendEventNotificationEmail", params);
 };
 
+// Call this for only 1st sessions that the participant declined the Google
+// Calendar invite. In addition to emailing them the notification, it also
+// deletes all their sessions and asks them to reschedule.
 const rescheduleEventNotificationEmail = (params) => async (event) => {
   let responseObj = await axios.post(
     "/rescheduleEventNotificationEmail",
@@ -33,10 +39,11 @@ const rescheduleEventNotificationEmail = (params) => async (event) => {
   );
 };
 
+// Characteristics of the columns of the experiment sessions table.
 const expSessionsColumns = [
   { field: "start", headerName: "Start", type: "dateTime", width: 190 },
   {
-    field: "participant",
+    field: "participant", // email address
     headerName: "Participant",
     width: 190,
   },
@@ -55,6 +62,8 @@ const expSessionsColumns = [
     type: "number",
     width: 70,
     renderCell: (cellValues) => {
+      // If we're waiting for this participant, clicking this button
+      // would email them a notification.
       return cellValues.row.weAreWaiting ? (
         <Button
           onClick={sendEventNotificationEmail({
@@ -70,7 +79,9 @@ const expSessionsColumns = [
         >
           {cellValues.value + " A"}
         </Button>
-      ) : cellValues.row.notAccepted.length > 0 &&
+      ) : // If the participant has not accepted the Google Calendar
+      // invite yet, clicking this button would email them a notification.
+      cellValues.row.notAccepted.length > 0 &&
         cellValues.row.hoursLeft <= 19 &&
         cellValues.row.hoursLeft > 0 ? (
         <Button
@@ -113,6 +124,9 @@ const expSessionsColumns = [
     type: "number",
     width: 70,
     renderCell: (cellValues) => {
+      // Only if this is a 1st session and the participant has declined
+      // the Google Calendar ivite, clicking this button
+      // would email them a notification and deletes all their sessions.
       return cellValues.value > 0 && cellValues.row.order === "1st" ? (
         <Button
           onClick={rescheduleEventNotificationEmail({
@@ -141,7 +155,7 @@ const expSessionsColumns = [
     },
   },
   {
-    field: "id",
+    field: "id", // Event id comming from Google Calendar
     headerName: "Event Id",
     width: 190,
   },
@@ -150,7 +164,7 @@ const expSessionsColumns = [
 const applicantsColumns = [
   { field: "createdAt", headerName: "Created", type: "dateTime", width: 190 },
   {
-    field: "user",
+    field: "user", // Their fullname
     headerName: "Applicant",
     width: 190,
     renderCell: (cellValues) => {
@@ -175,7 +189,7 @@ const applicantsColumns = [
   //   },
   // },
   {
-    field: "tutStarted",
+    field: "tutStarted", //They have started the tutorial
     headerName: "Tut Started",
     width: 130,
     disableColumnMenu: true,
@@ -184,7 +198,7 @@ const applicantsColumns = [
     },
   },
   {
-    field: "tutorial",
+    field: "tutorial", //They have completed the tutorial
     headerName: "Tutorial",
     width: 100,
     disableColumnMenu: true,
@@ -248,7 +262,7 @@ const applicantsColumns = [
     },
   },
   {
-    field: "reminder",
+    field: "reminder", // The last time the system sent them an automated reminder
     headerName: "Reminder",
     type: "dateTime",
     width: 190,
@@ -262,6 +276,8 @@ const errorAlert = (data) => {
   }
 };
 
+// This is an admin interface, only for Iman, to monitor and manage
+// experiment sessions and applicants' status in the application process.
 const ManageEvents = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -295,6 +311,9 @@ const ManageEvents = (props) => {
   const [recall2ndRatio, setRecall2ndRatio] = useState(0);
   const [recall3rdRatio, setRecall3rdRatio] = useState(0);
 
+  // Retrieves all the available timeslots specified by all the
+  // participnats so far that are associated with Google Calendar
+  // events.
   useEffect(() => {
     const loadAvailabilities = async () => {
       const scheduleDocs = await firebase.db
@@ -313,17 +332,24 @@ const ManageEvents = (props) => {
     }
   }, [firebase]);
 
+  // Get events from Google Calendar based on relativeURL.
+  // return the data for the states corresponding to each table.
   const retrieveEvents = async (relativeURL) => {
     let responseObj = await axios.post(relativeURL, {});
     const allEvents = responseObj.data.events;
     const evs = [];
     const currentTime = new Date().getTime();
-    // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+    // Each Google Calendar event has {start, end, attendees}.
+    // Each attendee has {email, responseStatus}
+    // attendee.responseStatus can take one of these possible values:
+    // 'accepted', 'needsAction', 'tentative', 'declined'
     for (let ev of allEvents) {
       const startTime = new Date(ev.start.dateTime).getTime();
       const endTime = new Date(ev.end.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       let weAreWaiting = false;
+      //  If the event is already started and less than 30 minutes from
+      // its endTime is passed:
       if (hoursLeft <= 0 && currentTime < endTime + 30 * 60 * 1000) {
         weAreWaiting = true;
       }
@@ -345,10 +371,13 @@ const ManageEvents = (props) => {
         hoursLeft,
         courseName: "",
       };
+      // If this event id is in one of the scheduled sessions (availabilities),
       const availabilitiesIdx = availabilities.findIndex(
         (sch) => sch.id === ev.id
       );
       if (availabilitiesIdx !== -1) {
+        // Then, specify its participant email and the order of the
+        // experiment session.
         event.participant =
           availabilities[availabilitiesIdx].email.toLowerCase();
         event.order = availabilities[availabilitiesIdx].order;
@@ -357,6 +386,7 @@ const ManageEvents = (props) => {
         event.attendeesNum = ev.attendees.length;
         for (let attendee of ev.attendees) {
           event.attendees.push(attendee.email.toLowerCase());
+          // If the attendee is the partcipiant in this session,
           if (attendee.email.toLowerCase() === event.participant) {
             const userDocs = await firebase.db
               .collection("users")
@@ -364,6 +394,7 @@ const ManageEvents = (props) => {
               .get();
             if (userDocs.docs.length > 0) {
               const userData = userDocs.docs[0].data();
+              // then, assign their firstname, and courseName, if exists.
               event.firstname = userData.firstname;
               if (userData.course) {
                 event.courseName = userData.course;
@@ -390,6 +421,7 @@ const ManageEvents = (props) => {
     return evs;
   };
 
+  // If availabilitiesLoaded, retrieve the ongoing events.
   useEffect(() => {
     const loadOngoingEvents = async () => {
       const evs = await retrieveEvents("/ongoingEvents");
@@ -401,6 +433,11 @@ const ManageEvents = (props) => {
     }
   }, [firebase, availabilitiesLoaded, availabilities]);
 
+  // If ongoingEventsLoaded, retrieve allEvents.
+  // I first retieved the ongoingEvents, which was obviously a subset
+  // of this because it would load much faster and we can see the
+  // complete table on top while waiting for the tables below the
+  // page to be loaded.
   useEffect(() => {
     const loadEvents = async () => {
       const evs = await retrieveEvents("/allEvents");
@@ -412,6 +449,8 @@ const ManageEvents = (props) => {
     }
   }, [firebase, ongoingEventsLoaded, availabilities]);
 
+  // Load data from applications to populate the content of the
+  // application statuses table.
   useEffect(() => {
     const notifyApplicationStatuses = async () => {
       const appls = [];
