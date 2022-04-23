@@ -134,23 +134,17 @@ exports.allPastEvents = async () => {
 };
 
 // Get all the events in the past specified number of days.
-exports.pastEvents = async (req, res) => {
+exports.pastEvents = async (previousDays) => {
   try {
-    if ("previousDays" in req.body && req.body.previousDays) {
-      let end = new Date();
-      const start = new Date(
-        end.getTime() - parseInt(req.body.previousDays) * 24 * 60 * 60 * 1000
-      );
-      const allEvents = await getEvents(start, end, "America/Detroit");
-      if (allEvents) {
-        return res.status(200).json({ events: allEvents });
-      }
-    }
+    let end = new Date();
+    const start = new Date(
+      end.getTime() - parseInt(previousDays) * 24 * 60 * 60 * 1000
+    );
+    return await getEvents(start, end, "America/Detroit");
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
+    return false;
   }
-  return res.status(200).json({ message: "Event NOT Retrieved!" });
 };
 
 // Get all the events in the next specified number of days.
