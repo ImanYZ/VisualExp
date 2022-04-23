@@ -771,9 +771,11 @@ exports.emailCommunityLeader = async (
           applicants.length
         } complete applications to review in your ${communiId} community:</p>
         <ul>
-        ${applicants.map((applicant) => {
-          return `<li>${applicant}</li>`;
-        })}
+        ${applicants
+          .map((applicant) => {
+            return `<li>${applicant}</li>`;
+          })
+          .join("")}
         </ul>
         <p>Please review these applications ASAP at
           <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
@@ -815,9 +817,11 @@ exports.emailImanToInviteApplicants = async (needInvite) => {
           needInvite.length
         } Confirmed applications to Invite to Microsoft Teams:</p>
         <ul>
-        ${needInvite.map((application) => {
-          return `<li>${application.communiId}, ${application.applicant}</li>`;
-        })}
+        ${needInvite
+          .map((application) => {
+            return `<li>${application.communiId}, ${application.applicant}</li>`;
+          })
+          .join("")}
         </ul>
         <p>You can find these applications at
           <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
