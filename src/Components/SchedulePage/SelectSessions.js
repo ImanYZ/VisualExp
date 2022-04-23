@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import ScheduleSelector from "react-schedule-selector";
 
+// Checks whther d1 is at any time after 12:00 am tomorrow local time.
 const startingTomorrow = (d1) => {
   let d = new Date();
   d = new Date(d.getTime() + 24 * 60 * 60 * 1000);
@@ -12,6 +13,7 @@ const startingTomorrow = (d1) => {
   );
 };
 
+// Checks if d2 is days later than d1.
 const daysLater = (d1, d2, days) => {
   let d = new Date(d1);
   d = new Date(d.getTime() + days * 24 * 60 * 60 * 1000);
@@ -22,6 +24,8 @@ const daysLater = (d1, d2, days) => {
   );
 };
 
+// We want the participants to only choose timeslots that are between 6am to 11pm
+// in both their timezone and EST.
 const currentTime = new Date();
 const tZoneOffset = currentTime.getTimezoneOffset();
 const tZoneDiff = Math.floor((240 - tZoneOffset) / 60);
@@ -65,21 +69,33 @@ const SelectSessions = (props) => {
       let tSession = null;
       for (let sIdx = 0; sIdx < orderedSch.length - 2; sIdx++) {
         if (
+          // Because in scheduleSelector we have already specified
+          // props.startDate as tomorrow, we should just make sure that
+          // when they update their availability, we do not select 1st,
+          // 2nd, or 3rd sessions for them that start before now.
           // startingTomorrow(orderedSch[sIdx]) &&
           orderedSch[sIdx] > new Date() &&
+          // Check whether they're available for the full hour at this session.
           orderedSch[sIdx].getTime() + 30 * 60000 ===
             orderedSch[sIdx + 1].getTime()
-          //    &&
-          // orderedSch[sIdx + 1].getTime() + 30 * 60000 ===
-          //   orderedSch[sIdx + 2].getTime()
+          // We don't need th efollowing anymore, because we shortened our
+          // first sessions to an hour, instead of an hour and a half.
+          // && orderedSch[sIdx + 1].getTime() + 30 * 60000 ===
+          // orderedSch[sIdx + 2].getTime()
         ) {
+          // Is there a 2nd session available 3 days after this session?
           const secondSIdx = orderedSch.findIndex((s) =>
             daysLater(orderedSch[sIdx], s, 3)
           );
           if (secondSIdx !== -1) {
+            // Is there a 3rd session available 7 days after this session?
             const thirdSIdx = orderedSch.findIndex((s) =>
               daysLater(orderedSch[sIdx], s, 7)
             );
+            // As soon as we find three sessions that satisfy all these
+            // criteria, we should set props.setFirstSession,
+            // props.setSecondSession, and props.setThirdSession, and
+            // stop iterating through the remainng sessions.
             if (thirdSIdx !== -1) {
               fSession = orderedSch[sIdx];
               sSession = orderedSch[secondSIdx];
