@@ -860,16 +860,16 @@ exports.applicationReminder = async (context) => {
     }, waitTime);
     // Increase waitTime by a random integer between 1 to 4 seconds.
     waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
-    if (reminders.length > 0) {
+    for (let reminder of reminders) {
       setTimeout(() => {
         emailApplicationStatus(
-          reminders[userIdx].email,
-          reminders[userIdx].firstname,
-          reminders[userIdx].fullname,
-          reminders[userIdx].reminders,
-          reminders[userIdx].subject,
-          reminders[userIdx].content,
-          reminders[userIdx].hyperlink
+          reminder.email,
+          reminder.firstname,
+          reminder.fullname,
+          reminder.reminders,
+          reminder.subject,
+          reminder.content,
+          reminder.hyperlink
         );
       }, waitTime);
       // Increase waitTime by a random integer between 1 to 4 seconds.
