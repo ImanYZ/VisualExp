@@ -68,7 +68,7 @@ const SchedulePage = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [availableSessions, setAvailableSessions] = useState([]);
+  const [availableSessions, setAvailableSessions] = useState({});
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
@@ -113,19 +113,22 @@ const SchedulePage = (props) => {
         .get();
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
-        const resSession = resScheduleData.session.toDate().getTime();
+        const resSession = resScheduleData.session.toDate();
+        const resSessionStr = resSession.toLocaleString();
         // Only if the researcher is active in this project AND their availability is in the future:
         if (
           resScheduleData.fullname in researchers &&
-          resSession > new Date().getTime()
+          resSession.getTime() > new Date().getTime()
         ) {
           // Add the available slots for the researcher's email.
-          if (resSession in availSessions) {
-            availSessions[resSession].push(
+          if (resSessionStr in availSessions) {
+            availSessions[resSessionStr].push(
               researchers[resScheduleData.fullname]
             );
           } else {
-            availSessions[resSession] = [researchers[resScheduleData.fullname]];
+            availSessions[resSessionStr] = [
+              researchers[resScheduleData.fullname],
+            ];
           }
         }
       }
@@ -149,7 +152,7 @@ const SchedulePage = (props) => {
           }
         } else {
           // Only future events
-          const startTime = new Date(event.start.dateTime).getTime();
+          const startTime = new Date(event.start.dateTime).toLocaleString();
           // If the event has some attendees and the start timestamp is a key in availSessions:
           if (
             event.attendees &&
@@ -165,6 +168,7 @@ const SchedulePage = (props) => {
           }
         }
       }
+      setAvailableSessions(availSessions);
       // Retrieve all the available time slots that the participant previously specified,
       // just to start from. They are supposed to modify these.
       const scheduleDocs = await firebase.db
@@ -175,12 +179,14 @@ const SchedulePage = (props) => {
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         const session = scheduleData.session.toDate();
+        const sessionStr = session.toLocaleString();
         // We should only show the availble timeslots that are:
         // 1) after tomorrow, so the researchers don't get surprized by newly added sessions
         // 2) at least a researcher is available to take that session.
         if (
-          session > tomorrow &&
-          availSessions[startTime.getTime()].length > 0
+          session.getTime() > tomorrow.getTime() &&
+          sessionStr in availSessions &&
+          availSessions[sessionStr].length > 0
         ) {
           sch.push(session);
         }
@@ -192,7 +198,7 @@ const SchedulePage = (props) => {
         setScheduleLoaded(true);
       }, 400);
     };
-    if (isEmail(email)) {
+    if (fullname && isEmail(email)) {
       loadSchedule();
     }
   }, [fullname, email]);
@@ -385,6 +391,7 @@ const SchedulePage = (props) => {
                   numDays={16}
                   schedule={schedule}
                   setSchedule={setSchedule}
+                  availableSessions={availableSessions}
                   firstSession={firstSession}
                   secondSession={secondSession}
                   thirdSession={thirdSession}
