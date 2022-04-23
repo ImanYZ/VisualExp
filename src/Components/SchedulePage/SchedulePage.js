@@ -68,7 +68,7 @@ const SchedulePage = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [allEvents, setAllEvents] = useState([]);
+  const [availableSessions, setAvailableSessions] = useState([]);
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
@@ -82,18 +82,100 @@ const SchedulePage = (props) => {
 
   useEffect(() => {
     const loadSchedule = async () => {
+      // Set the flag that we're loading data.
       setScheduleLoaded(false);
+      // We need to first retrieve which project this user belongs to.
+      const userDoc = await firebase.db.collection("users").doc(fullname).get();
+      const userData = userDoc.data();
+      const project = userData.project;
+      // researchers = an object of fullnames as keys and the corresponding email addresses as values.
+      const researchers = {};
+      const researcherDocs = await firebase.db.collection("researchers").get();
+      for (let researcherDoc of researcherDocs.docs) {
+        const researcherData = researcherDoc.data();
+        // We only need the researchers who are active in the project that the user belongs to.
+        if (
+          "projects" in researcherData &&
+          project in researcherData.projects &&
+          researcherData.projects[project].active
+        ) {
+          researchers[researcherDoc.id] = researcherData.email;
+        }
+      }
+      // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
+      // Each key is a researcher's email, i.e., id, and the corresponding value is an array of their availabilities.
+      const availSessions = {};
+      // Retrieve all the researchers' avaialbilities in this project.
+      const resScheduleDocs = await firebase.db
+        .collection("resSchedule")
+        .where("project", "==", project)
+        .get();
+      for (let resScheduleDoc of resScheduleDocs.docs) {
+        const resScheduleData = resScheduleDoc.data();
+        const resSession = resScheduleData.session.toDate();
+        // Only if the researcher is active in this project AND their availability is in the future:
+        if (
+          resScheduleData.fullname in researchers &&
+          resSession.getTime() > new Date().getTime()
+        ) {
+          // Add the available slots for the researcher's email.
+          if (researchers[resScheduleData.fullname] in availSessions) {
+            availSessions[researchers[resScheduleData.fullname]].push(
+              resSession
+            );
+          } else {
+            availSessions[researchers[resScheduleData.fullname]] = [resSession];
+          }
+        }
+      }
+      // Sort all the availabilities for every researcher.
+      // We need this because in the next step, when we want to remove the taken sessions,
+      // we should be able to efficiently identify consecutive sessions to match with the
+      // 1st sessions.
+      // for (let resEmail in availSessions) {
+      //   availSessions[resEmail].sort((a, b) => a.getTime() - b.getTime());
+      // }
+      // Retieve all the Calendar events from last month to the end of time.
       const responseObj = await axios.post("/allEvents", {});
       errorAlert(responseObj.data);
       const events = responseObj.data.events;
       for (let event of events) {
-        if (
-          event.attendees &&
-          event.attendees.findIndex((attendee) => attendee.email === email) !==
-            -1
-        ) {
-          setParticipatedBefore(true);
-          return;
+        // We divide the events into two sets: 1) past events (if) 2) future events (else)
+        if (new Date(event.start.dateTime) < new Date()) {
+          // Only if one of the attendees of the event is this user:
+          if (
+            event.attendees &&
+            event.attendees.length > 0 &&
+            event.attendees.findIndex(
+              (attendee) => attendee.email === email
+            ) !== -1
+          ) {
+            setParticipatedBefore(true);
+            return;
+          }
+        } else {
+          // Only future events
+          // If the event has some attendees
+          if (event.attendees && event.attendees.length > 0) {
+            // If one of the attendees is a researcher in this project:
+            for (let attendee of event.attendees) {
+              if (attendee.email in availSessions) {
+                // then, we should remove this session from their list of availabilities.
+                // Define a new array of this researcher's availabilities
+                const newAvailabilities = [];
+                for (let availSession of availSessions[attendee.email]) {
+                  // If the session time is not the same, add it to newAvailabilities.
+                  if (
+                    new Date(event.start.dateTime).getTime() !==
+                    availSession.getTime()
+                  ) {
+                    newAvailabilities.push(availSession);
+                  }
+                }
+                availSessions[attendee.email] = newAvailabilities;
+              }
+            }
+          }
         }
       }
       const scheduleDocs = await firebase.db
@@ -118,7 +200,7 @@ const SchedulePage = (props) => {
     if (isEmail(email)) {
       loadSchedule();
     }
-  }, [email]);
+  }, [fullname, email]);
 
   const confirmClickOpen = (event) => {
     setOpenConfirm(true);

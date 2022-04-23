@@ -39,6 +39,7 @@ const {
   schedule,
   scheduleSingleSession,
   allEvents,
+  pastEvents,
   deleteEvent,
   scheduleLifeLog,
   ongoingEvents,
@@ -88,6 +89,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 app.post("/schedule", schedule);
 app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
+app.post("/pastEvents", pastEvents);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
