@@ -1212,7 +1212,7 @@ exports.remindCalendarInvitations = async (context) => {
                 hoursLeft <= 25
               ) {
                 if (order === "3rd" && !participant.secondDone) {
-                  await deleteEvent(ev.id);
+                  deleteEvent(ev.id);
                 } else {
                   setTimeout(() => {
                     eventNotificationEmail(
@@ -1312,7 +1312,7 @@ exports.remindCalendarInvitations = async (context) => {
                   waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
                 }
               } else if (order === "3rd" && !participant.secondDone) {
-                await deleteEvent(ev.id);
+                deleteEvent(ev.id);
               }
             }
           }
