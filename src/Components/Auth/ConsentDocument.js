@@ -33,52 +33,29 @@ const ConsentDocument = (props) => {
           Connecticut, College of Liberal Arts and Sciences
         </li>
         <li>
+          <strong>Amy Deng</strong>, Undergraduate at University of Michigan,
+          School of Information
+        </li>
+        <li>
           <strong>Benjamin Brown</strong>, Graduate student at San Jose State
           University, School of Information
         </li>
         <li>
-          <strong>Catherine Grillo</strong>, Undergraduate at University of
-          Michigan, School of Information
-        </li>
-        <li>
-          <strong>Grace Ramstad</strong>, Bachelor's of Arts in Sociology,
-          Georgetown University, College of Arts and Sciences
-        </li>
-        <li>
-          <strong>Jasmine Wu</strong>, Undergraduate at Boston University,
-          College of Arts and Sciences
+          <strong>Ember Shan</strong>, Undergraduate at University of Michigan,
+          School of Information
         </li>
         <li>
           <strong>Jinjin Cai</strong>, Undergraduate at Indiana University
           Bloomington, Department of Psychology, and The Media School
         </li>
         <li>
-          <strong>Jonathan E. Croft</strong>, Bachelor's of Art in
-          Multidisciplinary Studies from Boise State University
-        </li>
-        <li>
-          <strong>Josephine Robinson</strong>, Bachelor of Arts in Psychology
-          and Economics, Stony Brook University, College of Arts and Sciences
-        </li>
-        <li>
-          <strong>Molly Kraine</strong>, Undergraduate at University of
-          Michigan, School of Information, and School of Art and Design
-        </li>
-        <li>
-          <strong>Pritha Gangapur</strong>, Undergraduate at Michigan State
-          University
+          <strong>Nandini Valluru</strong>, Undergraduate at University of
+          Michigan, Cognitive Science
         </li>
         <li>
           <strong>Qiaochu Kang</strong>, Master of Science in Information at New
           York University, Tandon School of Engineering
         </li>
-        <li>
-          <strong>Samuel Wood</strong>, Master of Science in Information,
-          University of Michigan, School of Information
-        </li>
-        {/* <li>
-          <strong>Shabana Gupta</strong>, Undergraduate at Grinnell College
-        </li> */}
         <li>
           <strong>Sit Wai Phonn</strong>, Master's of Art in Applied Social
           Psychology, Division of Behavioral and Organizational Science, School
@@ -87,19 +64,18 @@ const ConsentDocument = (props) => {
         </li>
         <li>
           <strong>Tirdad Barghi</strong>, Master's of Electrical Engineering,
-          School of Electrical Engineering, Shahid Beheshti University.
-          Independent researcher.
+          Independent researcher
         </li>
         <li>
-          <strong>Victoria Mulligan</strong>, Bachelor of Arts in Psychology,
-          Syracuse University, College of Arts and Sciences
+          <strong>Xiaowen Yuan</strong>, Undergraduate in Cognitive Science and
+          Computer Science at University of California, Berkeley
         </li>
         <li>
-          <strong>Winnifer Chen</strong>, Undergraduate at University of
-          Michigan, School of Literature, Science, and the Arts
+          <strong>Yi Cui</strong>, Master's student at the University of
+          Michigan, School of Information
         </li>
         <li>
-          <strong>Yi Cui</strong>, Graduate student at the University of
+          <strong>Ziyi Wang</strong>, Master's student at the University of
           Michigan, School of Information
         </li>
         <li>
