@@ -1139,26 +1139,52 @@ exports.assignExperimentSessionsPoints = async (context) => {
   }
 };
 
+// This is called in a pubsub every 4 hours.
+// Email reminders to researchers and participants to do the following:
+// For future Google Calendar events, to:
+// - Accept their invitations
+// - Reschedule if they have declined them
+// For passed Google Calendar events, to:
+// - Reschedule if they have missed or declined them.
 exports.remindCalendarInvitations = async (context) => {
   try {
+    // researchers = an object of emails as keys and the corresponding fullnames as values.
+    const researchers = {};
+    const researcherDocs = await db.collection("researchers").get();
+    for (let researcherDoc of researcherDocs.docs) {
+      const researcherData = researcherDoc.data();
+      researchers[researcherData.email] = researcherDoc.id;
+    }
+    // Retrieve all the scheduled sessions.
+    // Having an id means the document is not just an availability, but there
+    // is a corresponding Google Calendar event with the specified id.
     const scheduleDocs = await db.collection("schedule").orderBy("id").get();
+    // Collect all the data for these documents in an array.
     const schedule = [];
     for (let scheduleDoc of scheduleDocs.docs) {
       schedule.push(scheduleDoc.data());
     }
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     const allEvents = await futureEvents(40);
     const currentTime = new Date().getTime();
-    // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+    // Each Google Calendar event has {start, end, attendees}.
+    // Each attendee has {email, responseStatus}
+    // attendee.responseStatus can take one of these possible values:
+    // 'accepted', 'needsAction', 'tentative', 'declined'
     for (let ev of allEvents) {
       const startTime = new Date(ev.start.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
+      // Find the scheduled session corresponding to this event.
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
         scheduleIdx !== -1 &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
       ) {
+        // Get the participant's email and order through the scheduled session.
         const participant = {
           email: schedule[scheduleIdx].email.toLowerCase(),
         };
