@@ -11,6 +11,7 @@ const {
 } = require("./admin");
 const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
 const {
+  isToday,
   strToBoolean,
   getActivityTimeStamps,
   getIn30Minutes,
@@ -1237,8 +1238,8 @@ exports.remindCalendarInvitations = async (context) => {
     const pastEvs = await pastEvents(40);
     // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
     for (let ev of pastEvs) {
-      const startTime = new Date(ev.start.dateTime).getTime();
-      const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
+      const startTime = new Date(ev.start.dateTime);
+      const hoursLeft = (currentTime - startTime.getTime()) / (60 * 60 * 1000);
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
         scheduleIdx !== -1 &&
@@ -1294,20 +1295,24 @@ exports.remindCalendarInvitations = async (context) => {
                   );
                 }, waitTime);
                 waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
-              } else if (
-                (order === "2nd" && !participant.secondDone) ||
-                (order === "3rd" && !participant.thirdDone)
-              ) {
-                setTimeout(() => {
-                  notAttendedEmail(
-                    participant.email,
-                    participant.firstname,
-                    false,
-                    participant.courseName,
-                    order
-                  );
-                }, waitTime);
-                waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+              } else if (isToday(startTime)) {
+                if (
+                  (order === "2nd" && !participant.secondDone) ||
+                  (order === "3rd" && !participant.thirdDone)
+                ) {
+                  setTimeout(() => {
+                    notAttendedEmail(
+                      participant.email,
+                      participant.firstname,
+                      false,
+                      participant.courseName,
+                      order
+                    );
+                  }, waitTime);
+                  waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                }
+              } else if (order === "3rd" && !participant.secondDone) {
+                await deleteEvent(ev.id);
               }
             }
           }
