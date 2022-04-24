@@ -74,10 +74,9 @@ const SelectSessions = (props) => {
           // when they update their availability, we do not select 1st,
           // 2nd, or 3rd sessions for them that start before now.
           // startingTomorrow(orderedSch[sIdx]) &&
-          orderedSch[sIdx] > new Date() &&
           // Check whether they're available for the full hour at this session.
           orderedSch[sIdx].getTime() + 30 * 60000 ===
-            orderedSch[sIdx + 1].getTime()
+          orderedSch[sIdx + 1].getTime()
           // We don't need th efollowing anymore, because we shortened our
           // first sessions to an hour, instead of an hour and a half.
           // && orderedSch[sIdx + 1].getTime() + 30 * 60000 ===

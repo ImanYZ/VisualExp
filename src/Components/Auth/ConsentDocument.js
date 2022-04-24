@@ -41,7 +41,7 @@ const ConsentDocument = (props) => {
           Michigan, School of Information
         </li>
         <li>
-          <strong>Grace Ramstad</strong>, Bachelor’s of Arts in Sociology,
+          <strong>Grace Ramstad</strong>, Bachelor's of Arts in Sociology,
           Georgetown University, College of Arts and Sciences
         </li>
         <li>
@@ -53,7 +53,7 @@ const ConsentDocument = (props) => {
           Bloomington, Department of Psychology, and The Media School
         </li>
         <li>
-          <strong>Jonathan E. Croft</strong>, Bachelor’s of Art in
+          <strong>Jonathan E. Croft</strong>, Bachelor's of Art in
           Multidisciplinary Studies from Boise State University
         </li>
         <li>
