@@ -22,7 +22,7 @@ oAuth2Client.setCredentials({
 const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
 // Insert new event to UX Google Calendar
-exports.insertEvent = async (start, end, summary, description) => {
+exports.insertEvent = async (start, end, summary, description, attendees) => {
   const event = {
     summary,
     description,
@@ -38,6 +38,7 @@ exports.insertEvent = async (start, end, summary, description) => {
       timeZone: new Intl.DateTimeFormat().resolvedOptions(end).timeZone,
     },
     // attendees: [{ email: "oneweb@umich.edu" }],
+    attendees,
     reminders: {
       useDefault: false,
       overrides: [
@@ -59,6 +60,7 @@ exports.insertEvent = async (start, end, summary, description) => {
       calendarId: calendarId,
       conferenceDataVersion: 1,
       resource: event,
+      sendUpdates: "all",
     });
 
     if (response["status"] == 200 && response["statusText"] === "OK") {

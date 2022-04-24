@@ -247,8 +247,11 @@ const SchedulePage = (props) => {
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         first: firstSession,
+        researcher1st: availableSessions[firstSession][0],
         second: secondSession,
+        researcher2nd: availableSessions[secondSession][0],
         third: thirdSession,
+        researcher3rd: availableSessions[thirdSession][0],
       });
       errorAlert(responseObj.data);
 
@@ -281,16 +284,16 @@ const SchedulePage = (props) => {
       {submitted ? (
         <div className="DateDescription">
           <p>
-            Based on your specified availability, we'll match you with one of
-            our UX researchers and will send you Google Calendar invites in the
-            following days. After receiving the Calendar invites, please accept
-            them as soon as possible. If any of the Calendar invites do not work
-            for you, please contact Iman at oneweb@umich.edu
+            Based on your specified availability, we just matched you with one
+            of our UX researchers for each session and sent you three Google
+            Calendar invitations. Please accept them as soon as possible. If any
+            of the sessions do not work for you, you can return to this page to
+            reschedule them only before your first session.
           </p>
           <p>
-            For this purpose, please open the Google Calendar invitation email,
-            scroll all the way down to find the options to respond to the
-            Calendar invite, and click "Yes."
+            For accepting the Google Calendar invites, please open each
+            invitation email, scroll all the way down to find the options to
+            respond to the Calendar invite, and click "Yes."
           </p>
           <p>
             Note that accepting/declining the invitation through Outlook does
@@ -329,14 +332,9 @@ const SchedulePage = (props) => {
           <Alert severity="warning">
             <ul id="WarningPoints">
               <li>
-                Due to having a limited number of UX researchers in our team, we
-                need you to specify as many time slots as possible in the table
-                below. Please convey your questions or concerns to Iman
-                YeckehZaare at oneweb@umich.edu
-              </li>
-              <li>
-                Based on your availability, we will match you with one of our UX
-                researchers and will schedule three sessions for you:
+                Please specify your availability for our three UX experiment
+                sessions <strong>in your timezone</strong> to satisfy the
+                following criteria:
                 <ul>
                   <li>
                     <strong>
@@ -359,12 +357,15 @@ const SchedulePage = (props) => {
                 </ul>
               </li>
               <li>
-                Please specify your availability{" "}
-                <strong>in your timezone</strong> to satisfy the above criteria.
-                As soon as you meet them, the SCHEDULE button will be enabled
-                and the time slots with ✅ will indicate your possible sessions.
-                You should click the SCHEDULE button and get the confirmation
-                message, otherwise, your available time slots will not be saved.
+                As soon as you meet all the criteria, the SCHEDULE button will
+                be enabled and the time slots with ✅ will indicate your
+                sessions. You should click the SCHEDULE button and get the
+                confirmation message, otherwise, your sessions will not be
+                scheduled.
+              </li>
+              <li>
+                There is no UX researcher available to take the time slots
+                labeled with UNAVBL! You can only take the light blue ones.
               </li>
             </ul>
           </Alert>
