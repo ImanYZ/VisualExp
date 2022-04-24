@@ -746,7 +746,8 @@ exports.applicationReminder = async (context) => {
                 applicationData.fullname,
               ];
             }
-          } else if (applicationData.confirmed && !applicationData.invited) {
+          }
+          if (applicationData.confirmed && !applicationData.invited) {
             needInvite.push({
               applicant: applicationData.fullname,
               communiId: applicationData.communiId,
