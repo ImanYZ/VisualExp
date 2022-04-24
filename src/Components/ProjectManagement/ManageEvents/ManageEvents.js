@@ -367,6 +367,7 @@ const ManageEvents = (props) => {
         participant: "",
         order: "",
         firstname: "",
+        fullname: "",
         hangoutLink: ev.hangoutLink,
         weAreWaiting,
         hoursLeft,
@@ -396,6 +397,7 @@ const ManageEvents = (props) => {
             if (userDocs.docs.length > 0) {
               const userData = userDocs.docs[0].data();
               // then, assign their firstname, and courseName, if exists.
+              event.fullname = userDocs.docs[0].id;
               event.firstname = userData.firstname;
               if (userData.course) {
                 event.courseName = userData.course;
@@ -637,7 +639,7 @@ const ManageEvents = (props) => {
       // We need to first retrieve which project this user belongs to.
       const userDoc = await firebase.db
         .collection("users")
-        .doc(theRow.user)
+        .doc(theRow.fullname)
         .get();
       const userData = userDoc.data();
       const project = userData.project;
