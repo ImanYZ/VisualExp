@@ -383,27 +383,24 @@ const ManageEvents = (props) => {
         event.participant =
           availabilities[availabilitiesIdx].email.toLowerCase();
         event.order = availabilities[availabilitiesIdx].order;
+        const userDocs = await firebase.db
+          .collection("users")
+          .where("email", "==", event.participant)
+          .get();
+        if (userDocs.docs.length > 0) {
+          const userData = userDocs.docs[0].data();
+          // then, assign their firstname, and courseName, if exists.
+          event.fullname = userDocs.docs[0].id;
+          event.firstname = userData.firstname;
+          if (userData.course) {
+            event.courseName = userData.course;
+          }
+        }
       }
       if ("attendees" in ev) {
         event.attendeesNum = ev.attendees.length;
         for (let attendee of ev.attendees) {
           event.attendees.push(attendee.email.toLowerCase());
-          // If the attendee is the partcipiant in this session,
-          if (attendee.email.toLowerCase() === event.participant) {
-            const userDocs = await firebase.db
-              .collection("users")
-              .where("email", "==", attendee.email.toLowerCase())
-              .get();
-            if (userDocs.docs.length > 0) {
-              const userData = userDocs.docs[0].data();
-              // then, assign their firstname, and courseName, if exists.
-              event.fullname = userDocs.docs[0].id;
-              event.firstname = userData.firstname;
-              if (userData.course) {
-                event.courseName = userData.course;
-              }
-            }
-          }
           if (attendee.responseStatus === "accepted") {
             event.acceptedNum += 1;
           } else {
