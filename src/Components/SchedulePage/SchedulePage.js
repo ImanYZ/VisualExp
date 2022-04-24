@@ -247,11 +247,11 @@ const SchedulePage = (props) => {
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         first: firstSession,
-        researcher1st: availableSessions[firstSession][0],
+        researcher1st: availableSessions[firstSession.toLocaleString()][0],
         second: secondSession,
-        researcher2nd: availableSessions[secondSession][0],
+        researcher2nd: availableSessions[secondSession.toLocaleString()][0],
         third: thirdSession,
-        researcher3rd: availableSessions[thirdSession][0],
+        researcher3rd: availableSessions[thirdSession.toLocaleString()][0],
       });
       errorAlert(responseObj.data);
 

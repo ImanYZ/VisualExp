@@ -44,7 +44,7 @@ exports.schedule = async (req, res) => {
       "second" in req.body &&
       "researcher2nd" in req.body &&
       "third" in req.body &&
-      "researcher3d" in req.body
+      "researcher3rd" in req.body
     ) {
       const events = [];
       const email = req.body.email;

@@ -770,11 +770,11 @@ const ManageEvents = (props) => {
       responseObj = await axios.post("/schedule", {
         email: participant,
         first: firstSession,
-        researcher1st: availableSessions[firstSession][0],
+        researcher1st: availableSessions[firstSession.toLocaleString()][0],
         second: secondSession,
-        researcher2nd: availableSessions[secondSession][0],
+        researcher2nd: availableSessions[secondSession.toLocaleString()][0],
         third: thirdSession,
-        researcher3rd: availableSessions[thirdSession][0],
+        researcher3rd: availableSessions[thirdSession.toLocaleString()][0],
       });
       errorAlert(responseObj.data);
 
@@ -848,7 +848,7 @@ const ManageEvents = (props) => {
       }
       responseObj = await axios.post("/scheduleSingleSession", {
         email: participant,
-        researcher: availableSessions[sessi][0],
+        researcher: availableSessions[sessi.toLocaleString()][0],
         order,
         session: sessi,
       });
