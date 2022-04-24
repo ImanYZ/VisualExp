@@ -438,7 +438,7 @@ export default {
         </ul>
       </div>
     ),
-    video: "xEdNDQDImEM",
+    video: "vedBocVh0hk",
     questions: {
       What_tools_are_accessible_through_the_sidebar: {
         stem: quNum() + "What tools are accessible through the sidebar?",

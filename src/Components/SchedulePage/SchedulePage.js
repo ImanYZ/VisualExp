@@ -132,12 +132,14 @@ const SchedulePage = (props) => {
           }
         }
       }
+      // We need to retrieve all the currently scheduled events to figure
+      // out which sessions are already taken and exclude them from availSessions.
       // Retieve all the Calendar events from last month to the end of time.
       const responseObj = await axios.post("/allEvents", {});
       errorAlert(responseObj.data);
       const events = responseObj.data.events;
       for (let event of events) {
-        // We divide the events into two sets: 1) past events (if) 2) future events (else)
+        // First, we should figure out whether the user participated in the past:
         if (new Date(event.start.dateTime) < new Date()) {
           // Only if one of the attendees of the event is this user:
           if (
@@ -150,26 +152,40 @@ const SchedulePage = (props) => {
             setParticipatedBefore(true);
             return;
           }
-        } else {
-          // Only future events
-          const startTime = new Date(event.start.dateTime).toLocaleString();
-          // If the event has some attendees and the start timestamp is a key in availSessions,
-          // we should remove all the attendees who are available researchers at this timestamp,
-          // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
-          // this participnat and the participant is rescheduling their sessions.
-          if (
-            event.attendees &&
-            event.attendees.length > 0 &&
-            startTime in availSessions &&
-            event.attendees.findIndex(
-              (attendee) => attendee.email !== email
-            ) !== -1
-          ) {
-            for (let attendee of event.attendees) {
-              availSessions[startTime] = availSessions[startTime].filter(
-                (resea) => resea !== attendee.email
-              );
-            }
+        }
+        // Only future events
+        const startTime = new Date(event.start.dateTime).toLocaleString();
+        const startMinus30Min = new Date(
+          new Date(event.start.dateTime).getTime() - 30 * 60 * 1000
+        );
+        // If the event has some attendees and the start timestamp is a key in availSessions,
+        // we should remove all the attendees who are available researchers at this timestamp,
+        // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
+        // this participnat and the participant is rescheduling their sessions.
+        // OR 30 minutes before this session was the 1st session for this participant,
+        // This latter check is necessary to handle the exception where there is a second
+        // session staring 30 minutes after this session. We should not remove that second
+        // time slot, otherwise the system would not show this as an available slot and the
+        // participant would not be able to take this one-hour slot for their 1st session.
+        if (
+          event.attendees &&
+          event.attendees.length > 0 &&
+          startTime in availSessions &&
+          event.attendees.findIndex((attendee) => attendee.email === email) ===
+            -1 &&
+          events.findIndex(
+            (eve) =>
+              new Date(eve.start.dateTime).getTime() ===
+                startMinus30Min.getTime() &&
+              new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 ===
+                new Date(eve.end.dateTime).getTime() &&
+              eve.attendees.includes(email)
+          ) === -1
+        ) {
+          for (let attendee of event.attendees) {
+            availSessions[startTime] = availSessions[startTime].filter(
+              (resea) => resea !== attendee.email
+            );
           }
         }
       }

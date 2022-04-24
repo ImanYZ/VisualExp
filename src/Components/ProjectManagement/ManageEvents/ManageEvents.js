@@ -6,11 +6,11 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Tooltip from "@mui/material/Tooltip";
-import TextField from "@mui/material/TextField";
+// import TextField from "@mui/material/TextField";
 
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import TimePicker from "@mui/lab/TimePicker";
+// import LocalizationProvider from "@mui/lab/LocalizationProvider";
+// import AdapterDateFns from "@mui/lab/AdapterDateFns";
+// import TimePicker from "@mui/lab/TimePicker";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -26,17 +26,14 @@ import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 // Calendar invite yet, or should have been in the session but they have not
 // shown up yet.
 const sendEventNotificationEmail = (params) => async (event) => {
-  let responseObj = await axios.post("/sendEventNotificationEmail", params);
+  await axios.post("/sendEventNotificationEmail", params);
 };
 
 // Call this for only 1st sessions that the participant declined the Google
 // Calendar invite. In addition to emailing them the notification, it also
 // deletes all their sessions and asks them to reschedule.
 const rescheduleEventNotificationEmail = (params) => async (event) => {
-  let responseObj = await axios.post(
-    "/rescheduleEventNotificationEmail",
-    params
-  );
+  await axios.post("/rescheduleEventNotificationEmail", params);
 };
 
 // Characteristics of the columns of the experiment sessions table.
@@ -293,6 +290,7 @@ const ManageEvents = (props) => {
   const [participant, setParticipant] = useState("");
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const [scheduleStart, setScheduleStart] = useState(new Date());
   const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
@@ -355,8 +353,8 @@ const ManageEvents = (props) => {
         weAreWaiting = true;
       }
       const event = {
-        start: ev.start.dateTime,
-        end: ev.end.dateTime,
+        start: new Date(ev.start.dateTime),
+        end: new Date(ev.end.dateTime),
         id: ev.id,
         attendees: [],
         attendeesNum: 0,
@@ -627,6 +625,8 @@ const ManageEvents = (props) => {
     }
   }, [firebase, fullname]);
 
+  // Chooses a participant from the table to load their schedule
+  // to be able to update one of their scheduled sessions.
   const gridRowClick = async (clickedRow) => {
     const theRow = clickedRow.row;
     if (theRow.participant) {
@@ -667,11 +667,8 @@ const ManageEvents = (props) => {
         const resScheduleData = resScheduleDoc.data();
         const resSession = resScheduleData.session.toDate();
         const resSessionStr = resSession.toLocaleString();
-        // Only if the researcher is active in this project AND their availability is in the future:
-        if (
-          resScheduleData.fullname in researchers &&
-          resSession.getTime() > new Date().getTime()
-        ) {
+        // Only if the researcher is active in this project:
+        if (resScheduleData.fullname in researchers) {
           // Add the available slots for the researcher's email.
           if (resSessionStr in availSessions) {
             availSessions[resSessionStr].push(
@@ -684,30 +681,42 @@ const ManageEvents = (props) => {
           }
         }
       }
+      // We need to retrieve all the currently scheduled events to figure
+      // out which sessions are already taken and exclude them from availSessions.
       // We don't need to retrieve the events from Google Calendar again,
       // because we've already retrieved and saved them in `events` state.
       for (let event of events) {
-        // We only consider the future events
-        if (new Date(event.start) > new Date()) {
-          const startTime = new Date(event.start).toLocaleString();
-          // If the event has some attendees and the start timestamp is a key in availSessions,
-          // we should remove all the attendees who are available researchers at this timestamp,
-          // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
-          // this participnat and the participant is rescheduling their sessions.
-          if (
-            event.attendees &&
-            event.attendees.length > 0 &&
-            startTime in availSessions &&
-            event.attendees.findIndex(
-              (attendee) => attendee.email !== email
-            ) !== -1
-          ) {
-            // We should remove all the attendees who are available researchers at this timestamp:
-            for (let attendee of event.attendees) {
-              availSessions[startTime] = availSessions[startTime].filter(
-                (resea) => resea !== attendee
-              );
-            }
+        const startTime = new Date(event.start).toLocaleString();
+        const startMinus30Min = new Date(
+          event.start.getTime() - 30 * 60 * 1000
+        );
+        // If the event has some attendees and the start timestamp is a key in availSessions,
+        // we should remove all the attendees who are available researchers at this timestamp,
+        // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
+        // this participnat and the participant is rescheduling their sessions,
+        // OR 30 minutes before this session was the 1st session for this participant.
+        // This latter check is necessary to handle the exception where there is a second
+        // session staring 30 minutes after this session. We should not remove that second
+        // time slot, otherwise the system would not show this as an available slot and the
+        // participant would not be able to take this one-hour slot for their 1st session.
+        if (
+          event.attendees &&
+          event.attendees.length > 0 &&
+          startTime in availSessions &&
+          availSessions[startTime].length > 0 &&
+          !event.attendees.includes(email) &&
+          events.findIndex(
+            (eve) =>
+              eve.start.getTime() === startMinus30Min.getTime() &&
+              eve.order === "1st" &&
+              eve.attendees.includes(email)
+          ) === -1
+        ) {
+          // We should remove all the attendees who are available researchers at this timestamp:
+          for (let attendee of event.attendees) {
+            availSessions[startTime] = availSessions[startTime].filter(
+              (resea) => resea !== attendee
+            );
           }
         }
       }
@@ -719,21 +728,20 @@ const ManageEvents = (props) => {
         .where("email", "==", email.toLowerCase())
         .get();
       const sch = [];
+      // Define a copy of scheduleStart to find the earliest session for this participant.
+      let sStart = scheduleStart;
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         const session = scheduleData.session.toDate();
         const sessionStr = session.toLocaleString();
-        // We should only show the availble timeslots that are:
-        // at least a researcher is available to take that session.
-        if (
-          sessionStr in availSessions &&
-          availSessions[sessionStr].length > 0
-        ) {
-          sch.push(session);
+        sch.push(session);
+        if (session.getTime() < sStart.getTime()) {
+          sStart = session;
         }
       }
       if (sch.length > 0) {
         setSchedule(sch);
+        setScheduleStart(sStart);
       }
       setTimeout(() => {
         setScheduleLoaded(true);
@@ -741,8 +749,11 @@ const ManageEvents = (props) => {
     }
   };
 
+  // Updates only one of the scheduled sessions for this participant.
   const submitNewSessions = async (event) => {
     setIsSubmitting(true);
+    // First, we get the user's data to make sure they had not previously
+    // completed all the three experiment sessions.
     const userDocs = await firebase.db
       .collection("users")
       .where("email", "==", participant)
@@ -750,136 +761,91 @@ const ManageEvents = (props) => {
     if (userDocs.docs.length > 0) {
       const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
       const userData = userDocs.docs[0].data();
+      // If the user had previously completed all the three experiment sessions,
+      // We just alert it and do nothing.
       if (userData.projectDone) {
         window.alert("This user completed the experiment before!");
         return;
       }
-      let scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", participant)
-        .get();
-      let responseObj;
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        if (scheduleData.id) {
-          responseObj = await axios.post("/deleteEvent", {
-            eventId: scheduleData.id,
-          });
-          errorAlert(responseObj.data);
+      // Otherwise,
+      let scheduleDocs, scheduleRef, responseObj;
+      // We should check which of their scheduled sessions we'd like to change.
+      // For each of the 1st, 2nd, and 3rd sessions:
+      for (let order of ["1st", "2nd", "3rd"]) {
+        // sessi points to the state variable corresponding to the scheduled session.
+        let sessi = firstSession;
+        if (order === "2nd") {
+          sessi = secondSession;
+        } else if (order === "3rd") {
+          sessi = thirdSession;
         }
-        const scheduleRef = firebase.db
-          .collection("schedule")
-          .doc(scheduleDoc.id);
-        await firebase.batchDelete(scheduleRef);
-      }
-      responseObj = await axios.post("/schedule", {
-        email: participant,
-        first: firstSession,
-        researcher1st: availableSessions[firstSession.toLocaleString()][0],
-        second: secondSession,
-        researcher2nd: availableSessions[secondSession.toLocaleString()][0],
-        third: thirdSession,
-        researcher3rd: availableSessions[thirdSession.toLocaleString()][0],
-      });
-      errorAlert(responseObj.data);
-
-      for (let session of schedule) {
-        const scheduleRef = firebase.db.collection("schedule").doc();
-        const theSession = {
-          email: participant,
-          session: firebase.firestore.Timestamp.fromDate(session),
-        };
-        if (session.getTime() === firstSession.getTime()) {
-          theSession.id = responseObj.data.events[0].data.id;
-          theSession.order = "1st";
-        } else if (session.getTime() === secondSession.getTime()) {
-          theSession.id = responseObj.data.events[1].data.id;
-          theSession.order = "2nd";
-        } else if (session.getTime() === thirdSession.getTime()) {
-          theSession.id = responseObj.data.events[2].data.id;
-          theSession.order = "3rd";
-        }
-        await firebase.batchSet(scheduleRef, theSession);
-      }
-      await firebase.commitBatch();
-      setSubmitted(true);
-    }
-    setIsSubmitting(false);
-  };
-
-  const submitSingleSession = (order) => async (event) => {
-    setIsSubmitting(true);
-    const userDocs = await firebase.db
-      .collection("users")
-      .where("email", "==", participant)
-      .get();
-    if (userDocs.docs.length > 0) {
-      const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
-      const userData = userDocs.docs[0].data();
-      if (userData.projectDone) {
-        window.alert("This user completed the experiment before!");
-        return;
-      }
-      let scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", participant)
-        .get();
-      let responseObj;
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
+        // Find the index of the event for the participant's corresponding session
+        const eventIdx = events.findIndex(
+          (eve) => eve.order === order && eve.participant === participant
+        );
+        // If we found their 1st/2nd/3rd session, but its start time is different
+        // from the new firstSession/secondSession/thirdSession:
         if (
-          scheduleData.id &&
-          scheduleData.order &&
-          scheduleData.order === order
+          eventIdx !== -1 &&
+          events[eventIdx].start.getTime() !== sessi.getTime()
         ) {
-          responseObj = await axios.post("/deleteEvent", {
-            eventId: scheduleData.id,
-          });
-          errorAlert(responseObj.data);
-          const scheduleRef = firebase.db
+          // Find this session in schedule collection.
+          scheduleDocs = await firebase.db
             .collection("schedule")
-            .doc(scheduleDoc.id);
-          await firebase.batchUpdate(scheduleRef, {
-            id: firebase.firestore.FieldValue.delete(),
-            order: firebase.firestore.FieldValue.delete(),
-          });
+            .where("email", "==", participant)
+            .where("order", "==", order)
+            .get();
+          // If it exists:
+          if (scheduleDocs.docs.length > 0) {
+            // 1) Get rid of the event "id" and "order" from the document.
+            scheduleRef = firebase.db
+              .collection("schedule")
+              .doc(scheduleDocs.docs[0].id);
+            await firebase.batchUpdate(scheduleRef, {
+              id: firebase.firestore.FieldValue.delete(),
+              order: firebase.firestore.FieldValue.delete(),
+            });
+            // 2) Delete the event from Google Calendar.
+            responseObj = await axios.post("/deleteEvent", {
+              eventId: events[eventIdx].id,
+            });
+            errorAlert(responseObj.data);
+            // 3) Schedule the new session on Google Calendar.
+            responseObj = await axios.post("/scheduleSingleSession", {
+              email: participant,
+              researcher: availableSessions[sessi.toLocaleString()][0],
+              order,
+              session: sessi,
+            });
+            errorAlert(responseObj.data);
+            // Figure out whether the new session already exists in schedule
+            // for this participant.
+            scheduleDocs = await firebase.db
+              .collection("schedule")
+              .where("email", "==", participant)
+              .where("session", "==", sessi)
+              .get();
+            // If it exists, update it with the new event id and order.
+            if (scheduleDocs.docs.length > 0) {
+              scheduleRef = firebase.db
+                .collection("schedule")
+                .doc(scheduleDocs.docs[0].id);
+              await firebase.batchUpdate(scheduleRef, {
+                id: responseObj.data.events[0].data.id,
+                order,
+              });
+            } else {
+              // Otherwise, create a new one.
+              scheduleRef = firebase.db.collection("schedule").doc();
+              await firebase.batchSet(scheduleRef, {
+                email: participant,
+                session: firebase.firestore.Timestamp.fromDate(sessi),
+                id: responseObj.data.events[0].data.id,
+                order,
+              });
+            }
+          }
         }
-      }
-      let sessi = firstSession;
-      if (order === "2nd") {
-        sessi = secondSession;
-      } else if (order === "3rd") {
-        sessi = thirdSession;
-      }
-      responseObj = await axios.post("/scheduleSingleSession", {
-        email: participant,
-        researcher: availableSessions[sessi.toLocaleString()][0],
-        order,
-        session: sessi,
-      });
-      errorAlert(responseObj.data);
-
-      scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", participant)
-        .where("session", "==", sessi)
-        .get();
-      if (scheduleDocs.docs.length > 0) {
-        const scheduleRef = firebase.db
-          .collection("schedule")
-          .doc(scheduleDocs.docs[0].id);
-        await firebase.batchUpdate(scheduleRef, {
-          id: responseObj.data.events[0].data.id,
-          order,
-        });
-      } else {
-        const scheduleRef = firebase.db.collection("schedule").doc();
-        await firebase.batchSet(scheduleRef, {
-          email: participant,
-          session: firebase.firestore.Timestamp.fromDate(sessi),
-          id: responseObj.data.events[0].data.id,
-          order,
-        });
       }
       await firebase.commitBatch();
       setSubmitted(true);
@@ -887,42 +853,121 @@ const ManageEvents = (props) => {
     setIsSubmitting(false);
   };
 
-  const changeFirstSession = (newDateTime) => {
-    setFirstSession((oldFSession) => {
-      const fSession = [...oldFSession];
-      fSession.setHours(
-        newDateTime.getHours(),
-        newDateTime.getMinutes(),
-        newDateTime.getSeconds()
-      );
-      return fSession;
-    });
-  };
-
-  const changeSecondSession = (newDateTime) => {
-    setSecondSession((oSSession) => {
-      const oldSSession = new Date(oSSession);
-      oldSSession.setHours(
-        newDateTime.getHours(),
-        newDateTime.getMinutes(),
-        newDateTime.getSeconds()
-      );
-      return oldSSession;
-    });
-  };
-
-  const changeThirdSession = (newDateTime) => {
-    setThirdSession((oTSession) => {
-      const oldTSession = new Date(oTSession);
-      oldTSession.setHours(
-        newDateTime.getHours(),
-        newDateTime.getMinutes(),
-        newDateTime.getSeconds()
-      );
-      console.log({ oTSession, oldTSession });
-      return oldTSession;
-    });
-  };
+  // Depricated
+  {
+    // const submitSingleSession = (order) => async (event) => {
+    //   setIsSubmitting(true);
+    //   const userDocs = await firebase.db
+    //     .collection("users")
+    //     .where("email", "==", participant)
+    //     .get();
+    //   if (userDocs.docs.length > 0) {
+    //     const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
+    //     const userData = userDocs.docs[0].data();
+    //     if (userData.projectDone) {
+    //       window.alert("This user completed the experiment before!");
+    //       return;
+    //     }
+    //     let scheduleDocs = await firebase.db
+    //       .collection("schedule")
+    //       .where("email", "==", participant)
+    //       .get();
+    //     let responseObj;
+    //     for (let scheduleDoc of scheduleDocs.docs) {
+    //       const scheduleData = scheduleDoc.data();
+    //       if (
+    //         scheduleData.id &&
+    //         scheduleData.order &&
+    //         scheduleData.order === order
+    //       ) {
+    //         responseObj = await axios.post("/deleteEvent", {
+    //           eventId: scheduleData.id,
+    //         });
+    //         errorAlert(responseObj.data);
+    //         const scheduleRef = firebase.db
+    //           .collection("schedule")
+    //           .doc(scheduleDoc.id);
+    //         await firebase.batchUpdate(scheduleRef, {
+    //           id: firebase.firestore.FieldValue.delete(),
+    //           order: firebase.firestore.FieldValue.delete(),
+    //         });
+    //       }
+    //     }
+    //     let sessi = firstSession;
+    //     if (order === "2nd") {
+    //       sessi = secondSession;
+    //     } else if (order === "3rd") {
+    //       sessi = thirdSession;
+    //     }
+    //     responseObj = await axios.post("/scheduleSingleSession", {
+    //       email: participant,
+    //       researcher: availableSessions[sessi.toLocaleString()][0],
+    //       order,
+    //       session: sessi,
+    //     });
+    //     errorAlert(responseObj.data);
+    //     scheduleDocs = await firebase.db
+    //       .collection("schedule")
+    //       .where("email", "==", participant)
+    //       .where("session", "==", sessi)
+    //       .get();
+    //     if (scheduleDocs.docs.length > 0) {
+    //       const scheduleRef = firebase.db
+    //         .collection("schedule")
+    //         .doc(scheduleDocs.docs[0].id);
+    //       await firebase.batchUpdate(scheduleRef, {
+    //         id: responseObj.data.events[0].data.id,
+    //         order,
+    //       });
+    //     } else {
+    //       const scheduleRef = firebase.db.collection("schedule").doc();
+    //       await firebase.batchSet(scheduleRef, {
+    //         email: participant,
+    //         session: firebase.firestore.Timestamp.fromDate(sessi),
+    //         id: responseObj.data.events[0].data.id,
+    //         order,
+    //       });
+    //     }
+    //     await firebase.commitBatch();
+    //     setSubmitted(true);
+    //   }
+    //   setIsSubmitting(false);
+    // };
+    // const changeFirstSession = (newDateTime) => {
+    //   setFirstSession((oldFSession) => {
+    //     const fSession = [...oldFSession];
+    //     fSession.setHours(
+    //       newDateTime.getHours(),
+    //       newDateTime.getMinutes(),
+    //       newDateTime.getSeconds()
+    //     );
+    //     return fSession;
+    //   });
+    // };
+    // const changeSecondSession = (newDateTime) => {
+    //   setSecondSession((oSSession) => {
+    //     const oldSSession = new Date(oSSession);
+    //     oldSSession.setHours(
+    //       newDateTime.getHours(),
+    //       newDateTime.getMinutes(),
+    //       newDateTime.getSeconds()
+    //     );
+    //     return oldSSession;
+    //   });
+    // };
+    // const changeThirdSession = (newDateTime) => {
+    //   setThirdSession((oTSession) => {
+    //     const oldTSession = new Date(oTSession);
+    //     oldTSession.setHours(
+    //       newDateTime.getHours(),
+    //       newDateTime.getMinutes(),
+    //       newDateTime.getSeconds()
+    //     );
+    //     console.log({ oTSession, oldTSession });
+    //     return oldTSession;
+    //   });
+    // };
+  }
 
   return (
     <div style={{ height: "100vh", overflowY: "auto" }}>
@@ -980,7 +1025,8 @@ const ManageEvents = (props) => {
           loading={!applicantsLoaded}
         />
       </div>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      {/* Depricated! */}
+      {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
         <div>
           <TimePicker
             label="First Session"
@@ -1041,7 +1087,7 @@ const ManageEvents = (props) => {
             Update
           </Button>
         </div>
-      </LocalizationProvider>
+      </LocalizationProvider> */}
       <div className="dataGridTable" style={{ marginBottom: "700px" }}>
         <DataGrid
           rows={events}
@@ -1057,7 +1103,7 @@ const ManageEvents = (props) => {
         {scheduleLoaded && (
           <div style={{ height: "1300px" }}>
             <SelectSessions
-              startDate={new Date()}
+              startDate={scheduleStart}
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
