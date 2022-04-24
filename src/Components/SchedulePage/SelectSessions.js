@@ -105,11 +105,9 @@ const SelectSessions = (props) => {
           }
         }
       }
-      if (fSession && sSession && tSession) {
-        props.setFirstSession(fSession);
-        props.setSecondSession(sSession);
-        props.setThirdSession(tSession);
-      }
+      props.setFirstSession(fSession);
+      props.setSecondSession(sSession);
+      props.setThirdSession(tSession);
       if (sSession && tSession) {
         props.setSubmitable(true);
       } else {
@@ -144,7 +142,7 @@ const SelectSessions = (props) => {
       <div
         className={
           "ScheduleCell " +
-          (availableSess
+          (!availableSess
             ? "UnavailableCell"
             : selected
             ? "SelectedCell"

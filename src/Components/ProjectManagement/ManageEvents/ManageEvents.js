@@ -285,6 +285,7 @@ const ManageEvents = (props) => {
 
   const [availabilities, setAvailabilities] = useState([]);
   const [availabilitiesLoaded, setAvailabilitiesLoaded] = useState(false);
+  const [availableSessions, setAvailableSessions] = useState({});
   const [events, setEvents] = useState([]);
   const [ongoingEvents, setOngoingEvents] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
@@ -630,18 +631,105 @@ const ManageEvents = (props) => {
   const gridRowClick = async (clickedRow) => {
     const theRow = clickedRow.row;
     if (theRow.participant) {
-      setParticipant(theRow.participant);
+      const email = theRow.participant;
+      setParticipant(email);
       setScheduleLoaded(false);
+      // We need to first retrieve which project this user belongs to.
+      const userDoc = await firebase.db
+        .collection("users")
+        .doc(theRow.user)
+        .get();
+      const userData = userDoc.data();
+      const project = userData.project;
+      // researchers = an object of fullnames as keys and the corresponding email addresses as values.
+      const researchers = {};
+      const researcherDocs = await firebase.db.collection("researchers").get();
+      for (let researcherDoc of researcherDocs.docs) {
+        const researcherData = researcherDoc.data();
+        // We only need the researchers who are active in the project that the user belongs to.
+        if (
+          "projects" in researcherData &&
+          project in researcherData.projects &&
+          researcherData.projects[project].active
+        ) {
+          researchers[researcherDoc.id] = researcherData.email;
+        }
+      }
+      // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
+      // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
+      // that may include 0 to many researchers who are available at that session.
+      const availSessions = {};
+      // Retrieve all the researchers' avaialbilities in this project.
+      const resScheduleDocs = await firebase.db
+        .collection("resSchedule")
+        .where("project", "==", project)
+        .get();
+      for (let resScheduleDoc of resScheduleDocs.docs) {
+        const resScheduleData = resScheduleDoc.data();
+        const resSession = resScheduleData.session.toDate();
+        const resSessionStr = resSession.toLocaleString();
+        // Only if the researcher is active in this project AND their availability is in the future:
+        if (
+          resScheduleData.fullname in researchers &&
+          resSession.getTime() > new Date().getTime()
+        ) {
+          // Add the available slots for the researcher's email.
+          if (resSessionStr in availSessions) {
+            availSessions[resSessionStr].push(
+              researchers[resScheduleData.fullname]
+            );
+          } else {
+            availSessions[resSessionStr] = [
+              researchers[resScheduleData.fullname],
+            ];
+          }
+        }
+      }
+      // We don't need to retrieve the events from Google Calendar again,
+      // because we've already retrieved and saved them in `events` state.
+      for (let event of events) {
+        // We only consider the future events
+        if (new Date(event.start) > new Date()) {
+          const startTime = new Date(event.start).toLocaleString();
+          // If the event has some attendees and the start timestamp is a key in availSessions:
+          if (
+            event.attendees &&
+            event.attendees.length > 0 &&
+            startTime in availSessions
+          ) {
+            // We should remove all the attendees who are available researchers at this timestamp:
+            for (let attendee of event.attendees) {
+              availSessions[startTime] = availSessions[startTime].filter(
+                (resea) => resea !== attendee
+              );
+            }
+          }
+        }
+      }
+      setAvailableSessions(availSessions);
+      // Retrieve all the available time slots that the participant previously specified,
+      // just to start from. They are supposed to modify these.
       const scheduleDocs = await firebase.db
         .collection("schedule")
-        .where("email", "==", theRow.participant)
+        .where("email", "==", email.toLowerCase())
         .get();
-      const sessions = [];
+      const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
-        const sessionData = scheduleDoc.data();
-        sessions.push(sessionData.session.toDate());
+        const scheduleData = scheduleDoc.data();
+        const session = scheduleData.session.toDate();
+        const sessionStr = session.toLocaleString();
+        // We should only show the availble timeslots that are:
+        // at least a researcher is available to take that session.
+        if (
+          sessionStr in availSessions &&
+          availSessions[sessionStr].length > 0
+        ) {
+          sch.push(session);
+        }
       }
-      setSchedule(sessions);
+      if (sch.length > 0) {
+        setSchedule(sch);
+      }
       setTimeout(() => {
         setScheduleLoaded(true);
       }, 400);
@@ -682,8 +770,11 @@ const ManageEvents = (props) => {
       responseObj = await axios.post("/schedule", {
         email: participant,
         first: firstSession,
+        researcher1st: availableSessions[firstSession][0],
         second: secondSession,
+        researcher2nd: availableSessions[secondSession][0],
         third: thirdSession,
+        researcher3rd: availableSessions[thirdSession][0],
       });
       errorAlert(responseObj.data);
 
@@ -757,6 +848,7 @@ const ManageEvents = (props) => {
       }
       responseObj = await axios.post("/scheduleSingleSession", {
         email: participant,
+        researcher: availableSessions[sessi][0],
         order,
         session: sessi,
       });
@@ -964,6 +1056,7 @@ const ManageEvents = (props) => {
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
+              availableSessions={availableSessions}
               firstSession={firstSession}
               secondSession={secondSession}
               thirdSession={thirdSession}

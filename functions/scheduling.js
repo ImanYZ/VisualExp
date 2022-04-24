@@ -12,7 +12,7 @@ const {
 
 const { pad2Num } = require("./utils");
 
-const createExperimentEvent = async (email, order, start, end) => {
+const createExperimentEvent = async (email, researcher, order, start, end) => {
   const summary = "[1Cademy] UX Research Experiment - " + order + " Session";
   const description =
     "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +
@@ -27,7 +27,10 @@ const createExperimentEvent = async (email, order, start, end) => {
       : "") +
     "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
     "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
-  const eventCreated = await insertEvent(start, end, summary, description);
+  const eventCreated = await insertEvent(start, end, summary, description, [
+    { email },
+    { email: researcher },
+  ]);
   return eventCreated;
 };
 
@@ -37,26 +40,36 @@ exports.schedule = async (req, res) => {
     if (
       "email" in req.body &&
       "first" in req.body &&
+      "researcher1st" in req.body &&
       "second" in req.body &&
-      "third" in req.body
+      "researcher2nd" in req.body &&
+      "third" in req.body &&
+      "researcher3d" in req.body
     ) {
       const events = [];
       const email = req.body.email;
+      const researcher1st = req.body.researcher1st;
+      const researcher2nd = req.body.researcher2nd;
+      const researcher3rd = req.body.researcher3rd;
       let order = "1st";
+      let researcher = researcher1st;
       let start = new Date(req.body.first);
       let end = new Date(start.getTime() + 60 * 60000);
       for (let session = 1; session < 4; session++) {
         if (session === 2) {
           order = "2nd";
+          researcher = researcher2nd;
           start = new Date(req.body.second);
           end = new Date(start.getTime() + 30 * 60000);
         } else if (session === 3) {
           order = "3rd";
+          researcher = researcher3rd;
           start = new Date(req.body.third);
           end = new Date(start.getTime() + 30 * 60000);
         }
         const eventCreated = await createExperimentEvent(
           email,
+          researcher,
           order,
           start,
           end
@@ -77,11 +90,14 @@ exports.scheduleSingleSession = async (req, res) => {
     if (
       "email" in req.body &&
       req.body.email &&
+      "researcher" in req.body &&
+      req.body.researcher &&
       "order" in req.body &&
       req.body.order &&
       "session" in req.body
     ) {
       const email = req.body.email;
+      const researcher = req.body.researcher;
       const order = req.body.order;
       const start = new Date(req.body.session);
       let end;
@@ -92,6 +108,7 @@ exports.scheduleSingleSession = async (req, res) => {
       }
       const eventCreated = await createExperimentEvent(
         email,
+        researcher,
         order,
         start,
         end

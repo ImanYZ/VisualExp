@@ -59,6 +59,7 @@
   width: 100%;
   height: 25px;
   text-align: center;
+  cursor: pointer;
 }
 .SelectedCell {
   background-color: rgba(89, 154, 242, 1);
