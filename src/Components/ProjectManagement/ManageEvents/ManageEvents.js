@@ -693,11 +693,17 @@ const ManageEvents = (props) => {
         // We only consider the future events
         if (new Date(event.start) > new Date()) {
           const startTime = new Date(event.start).toLocaleString();
-          // If the event has some attendees and the start timestamp is a key in availSessions:
+          // If the event has some attendees and the start timestamp is a key in availSessions,
+          // we should remove all the attendees who are available researchers at this timestamp,
+          // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
+          // this participnat and the participant is rescheduling their sessions.
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            startTime in availSessions
+            startTime in availSessions &&
+            event.attendees.findIndex(
+              (attendee) => attendee.email !== email
+            ) !== -1
           ) {
             // We should remove all the attendees who are available researchers at this timestamp:
             for (let attendee of event.attendees) {
