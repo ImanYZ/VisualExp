@@ -1,6 +1,6 @@
 {
-  "name": "functions",
-  "description": "Cloud Functions for Firebase",
+  "name": "onecademy",
+  "description": "A Collaborative Knoweledge Synthesis and Visualization Platform for Students and Researchers",
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
@@ -26,5 +26,6 @@
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"
   },
-  "private": true
+  "private": true,
+  "license": "Apache-2.0"
 }
