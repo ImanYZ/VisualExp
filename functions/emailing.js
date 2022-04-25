@@ -491,7 +491,8 @@ const eventNotificationEmail = async (
   weAreWaiting,
   hangoutLink,
   order,
-  httpReq
+  httpReq,
+  declined
 ) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
@@ -503,33 +504,52 @@ const eventNotificationEmail = async (
         // (courseName ? "[" + courseName + "] " : "") +
         (weAreWaiting
           ? "We Are Waiting for You in the UX Research Experiment Session!"
+          : declined
+          ? "You Have Declined Your " +
+            order +
+            " Session of the UX Research Experiment Which Will Begin in " +
+            hoursLeft +
+            "!"
           : "Your UX Research Experiment Session Will Begin in " +
             hoursLeft +
             "!"),
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
-<p></p>
-${
-  weAreWaiting
-    ? "<p>Our UX researchers have been waiting for you in the UX research experiment session. " +
-      "Please join the session at <a href=" +
-      hangoutLink +
-      " target='_blank'>this link</a>.</p><p>" +
-      "You can also reply to this email to reschedule this session for you." +
-      (["2nd", "3rd"].includes(order)
-        ? " However, it does need to be today; otherwise, we must exclude your data from this study and terminate your application."
-        : "")
-    : "<p>This is an auto-generated email to inform you that your UX research experiment session will begin in " +
-      hoursLeft +
-      "," +
-      " but you've not accepted our invitation on Google Calendar yet!</p>" +
-      '<p>Please open the Google Calendar invitation email, scroll all the way down to find the options to respond to the Calendar invite, and click "Yes."</p>' +
-      "<p>Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject the invitation through the Yes/No links at the bottom of the Google Calendar invitation email."
-}
-</p>
-<p></p>
-<p>Best regards,</p>
-` + signatureHTML,
+      <p></p>
+      ${
+        weAreWaiting
+          ? "<p>Our UX researchers have been waiting for you in the UX research experiment session. " +
+            "Please join the session at <a href=" +
+            hangoutLink +
+            " target='_blank'>this link</a>.</p><p>" +
+            "You can also reply to this email to reschedule this session for you." +
+            (["2nd", "3rd"].includes(order)
+              ? " However, it does need to be today; otherwise, we must exclude your data from this study and terminate your application."
+              : "")
+          : declined
+          ? "<p>This is an auto-generated email to inform you that you have declined your " +
+            order +
+            " session of the UX research experiment which will begin in " +
+            hoursLeft +
+            "!</p>" +
+            `<p>Please respond to this email with only one of the following options to proceed with:</p>
+          <ul>
+            <li>Withdraw your application</li>
+            <li>Reschedule your session for another time on the same day to be able to continue with your application</li>
+          </ul>
+          <p>Note that because this is a 30-minute, ${order} session, our experiment protocol does not allow us to move it to another day. We can only reschedule it on the same day.</p>
+          <p>Please reply to this email if you have any questions or concerns.</p>`
+          : "<p>This is an auto-generated email to inform you that your UX research experiment session will begin in " +
+            hoursLeft +
+            "," +
+            " but you've not accepted our invitation on Google Calendar yet!</p>" +
+            '<p>Please open the Google Calendar invitation email, scroll all the way down to find the options to respond to the Calendar invite, and click "Yes."</p>' +
+            "<p>Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject the invitation through the Yes/No links at the bottom of the Google Calendar invitation email."
+      }
+      </p>
+      <p></p>
+      <p>Best regards,</p>
+      ` + signatureHTML,
     };
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
@@ -550,6 +570,87 @@ ${
   }
 };
 exports.eventNotificationEmail = eventNotificationEmail;
+
+// Sends a reminder email to a researcher that they have not accepted
+// or even declined the Google Calendar invitation and asks them to
+// accept it or ask someone else to take it.
+exports.researcherEventNotificationEmail = async (
+  email,
+  fullname,
+  participant,
+  hoursLeft,
+  order,
+  declined
+) => {
+  try {
+    hoursLeft = hoursToDaysHoursStr(hoursLeft);
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: [email, "oneweb@umich.edu"],
+      subject:
+        "[1Cademy] " + declined
+          ? "You've Declined Your " +
+            order +
+            " Session with " +
+            participant +
+            " Which Will Begin in " +
+            hoursLeft +
+            "!"
+          : "Please Accept Your " +
+            order +
+            " Session with " +
+            participant +
+            " Which Will Begin in " +
+            hoursLeft +
+            "!",
+      html:
+        `<p>Hi ${fullname},</p>
+      <p></p>
+      ${
+        declined
+          ? "<p>This is an auto-generated email to inform you that you have declined your " +
+            order +
+            " session with " +
+            participant +
+            " which will begin in " +
+            hoursLeft +
+            "!</p>" +
+            `<p>This session was scheduled based on your specified availability.</p>
+            <p>Please never mark your Google Calendar invitations as decline/tentative.</p>
+            <p>Instead, send an announcement to our Microsoft Teams research channel to look for another researcher to take the session on your behalf.</p>
+            <p>Keep in mind that we are the one who invited the participant and we are not supposed to decline our own invitations.</p>
+            <p>Let me know if you have any questions or concerns.</p>`
+          : "<p>This is an auto-generated email to inform you that your UX research experiment session with " +
+            participant +
+            " will begin in " +
+            hoursLeft +
+            "," +
+            " but you've not accepted the Google Calendar invitation yet!</p>" +
+            "<p>Please accept it ASAP; otherwise, the participant may get demotivated and not attend the session."
+      }
+      </p>
+      <p></p>
+      <p>Best regards,</p>
+      ` + signatureHTML,
+    };
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        console.log({ error });
+        if (httpReq) {
+          return res.status(500).json({ error });
+        }
+      }
+      if (httpReq) {
+        return res.status(200).json({ done: true });
+      }
+    });
+  } catch (err) {
+    console.log({ err });
+    if (httpReq) {
+      return res.status(500).json({ err });
+    }
+  }
+};
 
 exports.notAttendedEmail = async (
   email,
@@ -640,7 +741,8 @@ exports.sendEventNotificationEmail = (req, res) => {
         weAreWaiting,
         hangoutLink,
         order,
-        true
+        true,
+        false
       );
     }
   } catch (err) {
