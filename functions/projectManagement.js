@@ -1159,16 +1159,13 @@ exports.remindCalendarInvitations = async (context) => {
     // Retrieve all the scheduled sessions.
     // Having an id means the document is not just an availability, but there
     // is a corresponding Google Calendar event with the specified id.
-    const scheduleDocs = await db
-      .collection("schedule")
-      .orderBy("id")
-      .get();
+    const scheduleDocs = await db.collection("schedule").orderBy("id").get();
     // Collect all the data for these documents in an array.
     const schedule = [];
     for (let scheduleDoc of scheduleDocs.docs) {
       schedule.push({
         ...scheduleDoc.data(),
-        id: scheduleDoc.id,
+        schId: scheduleDoc.id,
       });
     }
     // We don't want to send many emails at once, because it may drive Gmail crazy.
@@ -1215,7 +1212,7 @@ exports.remindCalendarInvitations = async (context) => {
                 );
               }, waitTime);
               // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
             }
             // Find the attendee who corresponds to this participant:
             else if (attendee.email.toLowerCase() === participant.email) {
@@ -1279,7 +1276,7 @@ exports.remindCalendarInvitations = async (context) => {
                       );
                     }, waitTime);
                     // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
                   } else if (
                     (order === "2nd" && !participant.secondDone) ||
                     (order === "3rd" && !participant.thirdDone)
@@ -1304,7 +1301,7 @@ exports.remindCalendarInvitations = async (context) => {
                       );
                     }, waitTime);
                     // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
                   }
                 } else if (
                   // If they have not declined, but did not accept either, and
@@ -1319,7 +1316,7 @@ exports.remindCalendarInvitations = async (context) => {
                     // Also, remove the Calendar event id and order from their schedule doc.
                     const scheduleRef = db
                       .collection("schedule")
-                      .doc(schedule[scheduleIdx].id);
+                      .doc(schedule[scheduleIdx].schId);
                     await scheduleRef.update({
                       id: admin.firestore.FieldValue.delete(),
                       order: admin.firestore.FieldValue.delete(),
@@ -1342,7 +1339,7 @@ exports.remindCalendarInvitations = async (context) => {
                       );
                     }, waitTime);
                     // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
                   }
                 }
               }
@@ -1418,7 +1415,7 @@ exports.remindCalendarInvitations = async (context) => {
                     null
                   );
                 }, waitTime);
-                waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
               } else if (order === "3rd" && !participant.secondDone) {
                 // If it's their 3rd session, but they did not complete their 2nd session:
                 // Delete the 3rd session, because logically they should not go through
@@ -1427,7 +1424,7 @@ exports.remindCalendarInvitations = async (context) => {
                 // Also, remove the Calendar event id and order from their schedule doc.
                 const scheduleRef = db
                   .collection("schedule")
-                  .doc(schedule[scheduleIdx].id);
+                  .doc(schedule[scheduleIdx].schId);
                 await scheduleRef.update({
                   id: admin.firestore.FieldValue.delete(),
                   order: admin.firestore.FieldValue.delete(),
@@ -1449,7 +1446,7 @@ exports.remindCalendarInvitations = async (context) => {
                       order
                     );
                   }, waitTime);
-                  waitTime += 1000 * (1 + Math.floor(Math.random() * 40));
+                  waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
                 }
               }
             }
