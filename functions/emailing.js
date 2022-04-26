@@ -588,7 +588,8 @@ exports.researcherEventNotificationEmail = async (
       from: "onecademy@umich.edu",
       to: [email, "oneweb@umich.edu"],
       subject:
-        "[1Cademy] " + declined
+        "[1Cademy] " +
+        (declined
           ? "You've Declined Your " +
             order +
             " Session with " +
@@ -602,7 +603,7 @@ exports.researcherEventNotificationEmail = async (
             participant +
             " Which Will Begin in " +
             hoursLeft +
-            "!",
+            "!"),
       html:
         `<p>Hi ${fullname},</p>
       <p></p>
