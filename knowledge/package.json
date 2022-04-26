@@ -1,0 +1,36 @@
+{
+  "name": "knative-serving-1cademy-server",
+  "version": "1.0.0",
+  "description": "1Cademy Knowledge Server",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "start": "node index.js",
+    "deploy": "firebase deploy",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:database": "firebase deploy --only database",
+    "deploy:firestore": "firebase deploy --only firestore",
+    "deploy:storage": "firebase deploy --only storage",
+    "deploy:functions": "firebase deploy --only functions"
+  },
+  "author": "Iman YeckehZaare",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "csv-parser": "^2.3.2",
+    "csv-writer": "^1.6.0",
+    "express": "^4.17.1",
+    "express-ip": "^1.0.4",
+    "express-robots-txt": "^0.5.0",
+    "firebase-admin": "^10.1.0",
+    "firebase-functions": "^3.13.0",
+    "next": "^12.1.5",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^7.1.1"
+  }
+}
