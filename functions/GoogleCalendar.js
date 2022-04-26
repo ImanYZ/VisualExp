@@ -22,7 +22,14 @@ oAuth2Client.setCredentials({
 const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
 // Insert new event to UX Google Calendar
-exports.insertEvent = async (start, end, summary, description, attendees) => {
+exports.insertEvent = async (
+  start,
+  end,
+  summary,
+  description,
+  attendees,
+  colorId
+) => {
   const event = {
     summary,
     description,
@@ -39,6 +46,7 @@ exports.insertEvent = async (start, end, summary, description, attendees) => {
     },
     // attendees: [{ email: "oneweb@umich.edu" }],
     attendees,
+    colorId,
     reminders: {
       useDefault: false,
       overrides: [
