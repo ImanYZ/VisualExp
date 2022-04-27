@@ -853,7 +853,7 @@ const ManageEvents = (props) => {
     setIsSubmitting(false);
   };
 
-  // Depricated
+  // Deprecated
   {
     // const submitSingleSession = (order) => async (event) => {
     //   setIsSubmitting(true);
@@ -1025,7 +1025,7 @@ const ManageEvents = (props) => {
           loading={!applicantsLoaded}
         />
       </div>
-      {/* Depricated! */}
+      {/* Deprecated! */}
       {/* <LocalizationProvider dateAdapter={AdapterDateFns}>
         <div>
           <TimePicker

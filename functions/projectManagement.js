@@ -972,7 +972,13 @@ exports.loadTimesheetVotes = async (req, res) => {
 
 exports.assignExperimentSessionsPoints = async (context) => {
   try {
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
+    let waitTime = 0;
     const researchersInfo = [];
+    // Retrieve all the researchers to check availabilities per researcher,
+    // per project, only if the researcher is active in that project.
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
@@ -992,16 +998,22 @@ exports.assignExperimentSessionsPoints = async (context) => {
                 lastAvailability = theSession;
               }
             }
-            let eightDaysLater = new Date();
-            eightDaysLater = new Date(
-              eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
+            let tenDaysLater = new Date();
+            tenDaysLater = new Date(
+              tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000
             );
-            if (lastAvailability.getTime() < eightDaysLater.getTime()) {
-              remindResearcherToSpecifyAvailability(
-                researcherData.email,
-                researcherDoc.id,
-                "ten"
-              );
+            if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+              // Send a reminder email to a researcher that they have not specified
+              // their availability for the next ten days and ask them to specify it.
+              setTimeout(() => {
+                remindResearcherToSpecifyAvailability(
+                  researcherData.email,
+                  researcherDoc.id,
+                  "ten"
+                );
+              }, waitTime);
+              // Increase waitTime by a random integer between 1 to 4 seconds.
+              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
             }
           }
         }
@@ -1128,6 +1140,71 @@ exports.assignExperimentSessionsPoints = async (context) => {
               } else {
                 console.log({ project, projects: researcherObj.projects });
               }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
+
+// This is called in a pubsub every 25 hours.
+// Email reminders to researchers that they have not added/voted any instructors
+// over the past week and ask them to add/vote instructors and administrators.
+exports.remindAddingInstructorsAdministrators = async (context) => {
+  try {
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
+    let waitTime = 0;
+    // Retrieve all the researchers to check daily contributions per researcher,
+    // per project, only if the researcher is active in that project.
+    const researchersDocs = await db.collection("researchers").get();
+    for (let researcherDoc of researchersDocs.docs) {
+      const researcherData = researcherDoc.data();
+      if ("projects" in researcherData) {
+        for (let project in researcherData.projects) {
+          if (researcherData.projects[project].active) {
+            // A sorted array of days where the researcher
+            // got the point for adding new instrutors/administrators.
+            const dayInstructors = [];
+            const resScheduleDocs = await db
+              .collection("dayInstructors")
+              .where("project", "==", project)
+              .where("fullname", "==", researcherDoc.id)
+              .get();
+            for (let resScheduleDoc of resScheduleDocs.docs) {
+              const resScheduleData = resScheduleDoc.data();
+              const theSession = resScheduleData.session.toDate();
+              if (theSession.getTime() > lastAvailability.getTime()) {
+                lastAvailability = theSession;
+              }
+            }
+            let tenDaysLater = new Date();
+            tenDaysLater = new Date(
+              tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000
+            );
+            if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+              // Send a reminder email to a researcher that they have not accepted
+              // or even declined the Google Calendar invitation and asks them to
+              // accept it or ask someone else to take it.
+              setTimeout(() => {
+                researcherEventNotificationEmail(
+                  attendee.email,
+                  researchers[attendee.email],
+                  participant.email,
+                  hoursLeft,
+                  order,
+                  attendee.responseStatus === "declined" ||
+                    attendee.responseStatus === "tentative"
+                );
+              }, waitTime);
+              // Increase waitTime by a random integer between 1 to 4 seconds.
+              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
             }
           }
         }
@@ -1460,57 +1537,58 @@ exports.remindCalendarInvitations = async (context) => {
   }
 };
 
-exports.updateNotTakenSessions = async (context) => {
-  try {
-    const eventIds = [];
-    const allEvents = await futureEvents(40);
-    if (allEvents) {
-      const currentTime = new Date().getTime();
-      // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
-      for (let ev of allEvents) {
-        eventIds.push(ev.id);
-        const notTakenSessionsRef = db
-          .collection("notTakenSessions")
-          .doc(ev.id);
-        const notTakenSessionsDoc = await notTakenSessionsRef.get();
-        if (!("attendees" in ev) || ev.attendees.length < 2) {
-          if (!notTakenSessionsDoc.exists) {
-            const startTime = new Date(ev.start.dateTime).getTime();
-            const endTime = new Date(ev.end.dateTime).getTime();
-            const hoursLeft = Math.floor(
-              (startTime - currentTime) / (60 * 60 * 1000)
-            );
-            let points = 7;
-            if (endTime > startTime + 40 * 60 * 1000) {
-              points = 16;
-            }
-            await batchSet(notTakenSessionsRef, {
-              start: new Date(ev.start.dateTime),
-              end: new Date(ev.end.dateTime),
-              id: ev.id,
-              hoursLeft,
-              points,
-            });
-          }
-        } else {
-          if (notTakenSessionsDoc.exists) {
-            await batchDelete(notTakenSessionsRef);
-          }
-        }
-      }
-    }
-    const notTakenSessionsDocs = await db.collection("notTakenSessions").get();
-    for (let notTakenSessionDoc of notTakenSessionsDocs.docs) {
-      if (!eventIds.includes(notTakenSessionDoc.id)) {
-        const notTakenSessionsRef = db
-          .collection("notTakenSessions")
-          .doc(notTakenSessionDoc.id);
-        await batchDelete(notTakenSessionsRef);
-      }
-    }
-    await commitBatch();
-  } catch (err) {
-    console.log({ err });
-  }
-  return null;
-};
+// Deprecated
+// exports.updateNotTakenSessions = async (context) => {
+//   try {
+//     const eventIds = [];
+//     const allEvents = await futureEvents(40);
+//     if (allEvents) {
+//       const currentTime = new Date().getTime();
+//       // attendee.responseStatus: 'accepted', 'needsAction', 'tentative', 'declined'
+//       for (let ev of allEvents) {
+//         eventIds.push(ev.id);
+//         const notTakenSessionsRef = db
+//           .collection("notTakenSessions")
+//           .doc(ev.id);
+//         const notTakenSessionsDoc = await notTakenSessionsRef.get();
+//         if (!("attendees" in ev) || ev.attendees.length < 2) {
+//           if (!notTakenSessionsDoc.exists) {
+//             const startTime = new Date(ev.start.dateTime).getTime();
+//             const endTime = new Date(ev.end.dateTime).getTime();
+//             const hoursLeft = Math.floor(
+//               (startTime - currentTime) / (60 * 60 * 1000)
+//             );
+//             let points = 7;
+//             if (endTime > startTime + 40 * 60 * 1000) {
+//               points = 16;
+//             }
+//             await batchSet(notTakenSessionsRef, {
+//               start: new Date(ev.start.dateTime),
+//               end: new Date(ev.end.dateTime),
+//               id: ev.id,
+//               hoursLeft,
+//               points,
+//             });
+//           }
+//         } else {
+//           if (notTakenSessionsDoc.exists) {
+//             await batchDelete(notTakenSessionsRef);
+//           }
+//         }
+//       }
+//     }
+//     const notTakenSessionsDocs = await db.collection("notTakenSessions").get();
+//     for (let notTakenSessionDoc of notTakenSessionsDocs.docs) {
+//       if (!eventIds.includes(notTakenSessionDoc.id)) {
+//         const notTakenSessionsRef = db
+//           .collection("notTakenSessions")
+//           .doc(notTakenSessionDoc.id);
+//         await batchDelete(notTakenSessionsRef);
+//       }
+//     }
+//     await commitBatch();
+//   } catch (err) {
+//     console.log({ err });
+//   }
+//   return null;
+// };

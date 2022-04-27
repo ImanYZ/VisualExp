@@ -21,7 +21,7 @@ const {
   voteInstructorReset,
   assignExperimentSessionsPoints,
   remindCalendarInvitations,
-  updateNotTakenSessions,
+  // updateNotTakenSessions,
   loadfeedbackCodes,
 } = require("./projectManagement");
 const {
@@ -113,9 +113,9 @@ exports.deleteUser = functions.firestore
   .document("users/{fullname}")
   .onDelete(deleteUser);
 
-exports.updateNotTakenSessionsScheduler = functions.pubsub
-  .schedule("every 40 minutes")
-  .onRun(updateNotTakenSessions);
+// exports.updateNotTakenSessionsScheduler = functions.pubsub
+//   .schedule("every 40 minutes")
+//   .onRun(updateNotTakenSessions);
 
 exports.assignExperimentSessionsPointsScheduler = functions.pubsub
   .schedule("every 4 hours")
