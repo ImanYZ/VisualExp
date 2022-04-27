@@ -82,7 +82,7 @@ exports.loadImageProfessor = (req, res) => {
   loadUmichLogo(res);
 };
 
-// Depricated
+// Deprecated
 // This function was used to invite 1Cademy interns to paricipate in our experiments.
 // The basic algoritm is very similar to inviteInstructors, but instead of the
 // instructors collection, it reads from contacts.
