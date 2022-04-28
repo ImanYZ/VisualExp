@@ -856,11 +856,13 @@ exports.applicationReminder = async (context) => {
     }
     // Send reminder emails to to Iman to invite the confirmed applicants to
     // Microsoft Teams.
-    setTimeout(() => {
-      emailImanToInviteApplicants(needInvite);
-    }, waitTime);
-    // Increase waitTime by a random integer between 1 to 4 seconds.
-    waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+    if (needInvite.length > 0) {
+      setTimeout(() => {
+        emailImanToInviteApplicants(needInvite);
+      }, waitTime);
+      // Increase waitTime by a random integer between 1 to 4 seconds.
+      waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+    }
     for (let reminder of reminders) {
       setTimeout(() => {
         emailApplicationStatus(
