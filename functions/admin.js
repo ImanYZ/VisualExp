@@ -24,14 +24,31 @@ const db = admin.firestore();
 
 // How many transactions/batchWrites out of 500 so far.
 // I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
-let batch = db.batch();
 let writeCounts = 0;
+let batch = db.batch();
+let isCommitting = false;
 
 // Commit and reset batchWrites and the counter.
 const makeCommitBatch = async () => {
-  await batch.commit();
-  batch = db.batch();
-  writeCounts = 0;
+  console.log("makeCommitBatch");
+  if (!isCommitting) {
+    isCommitting = true;
+    await batch.commit();
+    writeCounts = 0;
+    batch = db.batch();
+    isCommitting = false;
+  } else {
+    const batchWaitInterval = setInterval(async () => {
+      if (!isCommitting) {
+        isCommitting = true;
+        await batch.commit();
+        writeCounts = 0;
+        batch = db.batch();
+        isCommitting = false;
+        clearInterval(batchWaitInterval);
+      }
+    }, 400);
+  }
 };
 
 // Commit the batchWrite; if you got a Firestore Deadline Error try again every 4 seconds until it gets resolved.
@@ -66,18 +83,48 @@ const checkRestartBatchWriteCounts = async () => {
 };
 
 const batchSet = async (docRef, docData) => {
-  batch.set(docRef, docData);
-  await checkRestartBatchWriteCounts();
+  if (!isCommitting) {
+    batch.set(docRef, docData);
+    await checkRestartBatchWriteCounts();
+  } else {
+    const batchWaitInterval = setInterval(async () => {
+      if (!isCommitting) {
+        batch.set(docRef, docData);
+        await checkRestartBatchWriteCounts();
+        clearInterval(batchWaitInterval);
+      }
+    }, 400);
+  }
 };
 
 const batchUpdate = async (docRef, docData) => {
-  batch.update(docRef, docData);
-  await checkRestartBatchWriteCounts();
+  if (!isCommitting) {
+    batch.update(docRef, docData);
+    await checkRestartBatchWriteCounts();
+  } else {
+    const batchWaitInterval = setInterval(async () => {
+      if (!isCommitting) {
+        batch.update(docRef, docData);
+        await checkRestartBatchWriteCounts();
+        clearInterval(batchWaitInterval);
+      }
+    }, 400);
+  }
 };
 
 const batchDelete = async (docRef) => {
-  batch.delete(docRef);
-  await checkRestartBatchWriteCounts();
+  if (!isCommitting) {
+    batch.delete(docRef);
+    await checkRestartBatchWriteCounts();
+  } else {
+    const batchWaitInterval = setInterval(async () => {
+      if (!isCommitting) {
+        batch.delete(docRef);
+        await checkRestartBatchWriteCounts();
+        clearInterval(batchWaitInterval);
+      }
+    }, 400);
+  }
 };
 
 module.exports = {
