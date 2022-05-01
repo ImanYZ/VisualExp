@@ -68,3 +68,7 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 .next
+
+# Firebase stuff
+onecademy-dev-firebase-adminsdk-91m0g-fa9db28e23.json
+onecademy-1-firebase-adminsdk-x7tpw-442a7d8605.json
