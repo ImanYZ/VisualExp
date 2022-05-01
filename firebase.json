@@ -4,7 +4,6 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "target": "visualexp1",
     "public": "build",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
@@ -16,7 +15,7 @@
         "source": "/knowledge{,/**}",
         "run": {
           "serviceId": "knowledge",
-          "region": "us-east1"
+          "region": "us-central1"
         }
       },
       {

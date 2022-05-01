@@ -1,24 +1,21 @@
-# Use the official lightweight Node.js 12 image.
-# https://hub.docker.com/_/node
-FROM node:12-slim
+# base image
+FROM node:14.15.4-alpine
 
 # Create and change to the app directory.
-WORKDIR /usr/src/app
+WORKDIR /usr/app
 
 # Copy application dependency manifests to the container image.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this separately prevents re-running npm install on every code change.
-COPY package*.json ./
+# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
+# Copying this first prevents re-running npm install on every code change.
+COPY . .
 
 # Install production dependencies.
-RUN npm install --only=production
+# If you add a package-lock.json, speed your build by switching to 'npm ci'.
+RUN npm ci --only=production
 
 # Copy local code to the container image.
-COPY . ./
 
-# Service must listen to $PORT environment variable.
-# This default value facilitates local development.
-ENV PORT 8080
+RUN npm run build
 
 # Run the web service on container startup.
 CMD [ "npm", "start" ]

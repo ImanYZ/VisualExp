@@ -1379,7 +1379,7 @@ export default {
       What_is_the_first_step_in_finding_a_parent_node_on_1Cademy: {
         stem:
           quNum() +
-          "What is the first step in finding a parent node on 1Cademy?",
+          "When proposing a new node, what is the first step to find a potential parent node?",
         answers: ["a"],
         choices: {
           a: "Using the search tool",
@@ -1476,7 +1476,7 @@ export default {
         </p>
       </div>
     ),
-    video: "4JKsI0zIEzU",
+    video: "zyj3mE3x1TY",
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
         stem:

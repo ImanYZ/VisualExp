@@ -144,5 +144,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+    match /messages/{messageId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    match /mVotes/{mVoteId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

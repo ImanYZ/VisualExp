@@ -7,10 +7,14 @@ import axios from "axios";
 
 import { firebaseConfig, firebaseOneConfig } from "./config";
 
+// Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
 const isFirestoreDeadlineError = (err) => {
-  return err.message.includes("DEADLINE_EXCEEDED");
+  return (
+    err.message.includes("DEADLINE_EXCEEDED") ||
+    err.message.includes("Received RST_STREAM")
+  );
 };
 
 class Firebase {
@@ -28,17 +32,36 @@ class Firebase {
     this.firestore = app.firestore;
     this.storage = app.storage();
     this.storageBucket = firebaseConfig.storageBucket;
-    this.batch = this.db.batch();
+    // How many transactions/batchWrites out of 500 so far.
+    // I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
     this.writeCounts = 0;
+    this.batch = this.db.batch();
   }
 
-  async makeCommitBatch(batch) {
+  // Commit and reset batchWrites and the counter.
+  async makeCommitBatch() {
     console.log("makeCommitBatch");
-    await this.batch.commit();
-    this.batch = this.db.batch();
-    this.writeCounts = 0;
+    if (!this.isCommitting) {
+      this.isCommitting = true;
+      await this.batch.commit();
+      this.writeCounts = 0;
+      this.batch = this.db.batch();
+      this.isCommitting = false;
+    } else {
+      const batchWaitInterval = setInterval(async () => {
+        if (!this.isCommitting) {
+          this.isCommitting = true;
+          await this.batch.commit();
+          this.writeCounts = 0;
+          this.batch = this.db.batch();
+          this.isCommitting = false;
+          clearInterval(batchWaitInterval);
+        }
+      }, 400);
+    }
   }
 
+  // Commit the batchWrite; if you got a Firestore Deadline Error try again every 4 seconds until it gets resolved.
   async commitBatch() {
     try {
       await this.makeCommitBatch();
@@ -61,6 +84,7 @@ class Firebase {
     }
   }
 
+  //  If the batchWrite exeeds 499 possible writes, commit and rest the batch object and the counter.
   async checkRestartBatchWriteCounts() {
     this.writeCounts += 1;
     if (this.writeCounts >= MAX_TRANSACTION_WRITES) {
@@ -69,18 +93,48 @@ class Firebase {
   }
 
   async batchSet(docRef, docData) {
-    this.batch.set(docRef, docData);
-    await this.checkRestartBatchWriteCounts();
+    if (!this.isCommitting) {
+      this.batch.set(docRef, docData);
+      await this.checkRestartBatchWriteCounts();
+    } else {
+      const batchWaitInterval = setInterval(async () => {
+        if (!this.isCommitting) {
+          this.batch.set(docRef, docData);
+          await this.checkRestartBatchWriteCounts();
+          clearInterval(batchWaitInterval);
+        }
+      }, 400);
+    }
   }
 
   async batchUpdate(docRef, docData) {
-    this.batch.update(docRef, docData);
-    await this.checkRestartBatchWriteCounts();
+    if (!this.isCommitting) {
+      this.batch.update(docRef, docData);
+      await this.checkRestartBatchWriteCounts();
+    } else {
+      const batchWaitInterval = setInterval(async () => {
+        if (!this.isCommitting) {
+          this.batch.update(docRef, docData);
+          await this.checkRestartBatchWriteCounts();
+          clearInterval(batchWaitInterval);
+        }
+      }, 400);
+    }
   }
 
   async batchDelete(docRef) {
-    this.batch.delete(docRef);
-    await this.checkRestartBatchWriteCounts();
+    if (!this.isCommitting) {
+      this.batch.delete(docRef);
+      await this.checkRestartBatchWriteCounts();
+    } else {
+      const batchWaitInterval = setInterval(async () => {
+        if (!this.isCommitting) {
+          this.batch.delete(docRef);
+          await this.checkRestartBatchWriteCounts();
+          clearInterval(batchWaitInterval);
+        }
+      }, 400);
+    }
   }
 
   // creating a new id token for current user on firebase auth database
