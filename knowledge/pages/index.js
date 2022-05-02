@@ -10,7 +10,6 @@ import { getSortedPostsData } from "../lib/posts";
 
 export async function getServerSideProps() {
   const allPostsData = await getSortedPostsData();
-  console.log({ allPostsData });
   return {
     props: {
       allPostsData,
