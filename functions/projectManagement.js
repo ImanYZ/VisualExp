@@ -1429,10 +1429,12 @@ exports.remindCalendarInvitations = async (context) => {
     const pastEvs = await pastEvents(40);
     for (let ev of pastEvs) {
       const startTime = new Date(ev.start.dateTime);
+      const endTimeStamp = new Date(ev.end.dateTime).getTime() + 60 * 60 * 1000;
       const hoursLeft = (currentTime - startTime.getTime()) / (60 * 60 * 1000);
       // Find the scheduled session corresponding to this event.
       const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
+        endTimeStamp < currentTime &&
         scheduleIdx !== -1 &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
