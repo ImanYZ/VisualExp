@@ -2,6 +2,7 @@
 
 *.env
 .env
+.env*.local
 .firebase/*
 .firebase/
 .firebase
@@ -68,6 +69,8 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 .next
+
+next.config.js
 
 # Firebase stuff
 onecademy-dev-firebase-adminsdk-91m0g-fa9db28e23.json

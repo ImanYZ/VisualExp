@@ -1,22 +1,19 @@
-import { initializeApp, getApp, cert } from "firebase-admin/app";
+import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 // For production:
 // admin.initializeApp();
 
-//  For development:
-const serviceAccount = require("./onecademy-dev-firebase-adminsdk-91m0g-fa9db28e23.json");
-
-let admin, app;
-try {
-  app = getApp();
-} catch (err) {
-  console.log(err);
-  admin = initializeApp({
-    credential: cert(serviceAccount),
+const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
+const admin =
+  global.firebaseApp ??
+  initializeApp({
+    credential: cert(CREDENTIALS),
   });
-}
 
+// store on global object so we can reuse it if we attempt
+// to initialize the app again
+global.firebaseApp = admin;
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
@@ -29,7 +26,7 @@ const isFirestoreDeadlineError = (err) => {
   );
 };
 
-const db = getFirestore(app);
+const db = getFirestore(admin);
 
 // How many transactions/batchWrites out of 500 so far.
 // I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
