@@ -43,6 +43,7 @@ const {
   scheduleLifeLog,
   ongoingEvents,
 } = require("./scheduling");
+const { assignNodeContributorsAndInstitutions } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -79,6 +80,10 @@ app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.get("/loadfeedbackCodes", loadfeedbackCodes);
+app.get(
+  "/assignNodeContributorsAndInstitutions",
+  assignNodeContributorsAndInstitutions
+);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
@@ -117,14 +122,26 @@ exports.deleteUser = functions.firestore
 //   .schedule("every 40 minutes")
 //   .onRun(updateNotTakenSessions);
 
-exports.assignExperimentSessionsPointsScheduler = functions.pubsub
-  .schedule("every 4 hours")
+exports.assignExperimentSessionsPointsScheduler = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520,
+  })
+  .pubsub.schedule("every 4 hours")
   .onRun(assignExperimentSessionsPoints);
 
-exports.remindCalendarInvitationsScheduler = functions.pubsub
-  .schedule("every 4 hours")
+exports.remindCalendarInvitationsScheduler = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520,
+  })
+  .pubsub.schedule("every 4 hours")
   .onRun(remindCalendarInvitations);
 
-exports.applicationReminder = functions.pubsub
-  .schedule("every 25 hours")
+exports.applicationReminder = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520,
+  })
+  .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);

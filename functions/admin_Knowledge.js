@@ -5,9 +5,15 @@ const { Storage } = require("@google-cloud/storage");
 const storage = new Storage();
 
 // The Firebase Admin SDK to access Firestore.
-const admin = require("firebase-admin");
+let admin = require("firebase-admin");
 
-admin.initializeApp();
+const CREDENTIALS = JSON.parse(process.env.OneCademy_CREDENTIALS);
+admin = admin.initializeApp(
+  {
+    credential: admin.credential.cert(CREDENTIALS),
+  },
+  "onecademy"
+);
 
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
