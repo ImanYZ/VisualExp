@@ -193,7 +193,7 @@ const communityTitles = {
   Neuroscience: "Neuroscience",
   Disability_Studies: "Disability Studies",
   Social_Political_Psychology: "Social/Political Psychology",
-  Cryptoeconomics: "Cryptoeconomics",
+  // Cryptoeconomics: "Cryptoeconomics",
   Deep_Learning: "Deep Learning",
   Liaison_Librarians: "Liaison Librarians",
 };
