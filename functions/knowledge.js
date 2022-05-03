@@ -24,6 +24,12 @@ exports.assignNodeContributorsAndInstitutions = async (req, res) => {
     const nodeTypes = ["Concept", "Relation", "Question", "Reference", "Idea"];
     for (let nodeType of nodeTypes) {
       console.log("Started nodeType: ", nodeType);
+      // We cannot update the reputations on nodes only looking at the
+      // versions (proposals) that are not considerred yet, because the
+      // pervious versions may get new votes. So, we accumulate all the
+      // votes on all accepted proposals every time we run this function.
+      // So, we need to create a nodes object to keep track of all the
+      // updates and finally batch write all of them into nodes collection.
       const { versionsColl } = getTypedCollections(db, nodeType);
       const versionDocs = await versionsColl
         .where("accepted", "==", true)
@@ -31,58 +37,54 @@ exports.assignNodeContributorsAndInstitutions = async (req, res) => {
       for (let versionDoc of versionDocs.docs) {
         const versionRef = versionsColl.doc(versionDoc.id);
         const versionData = versionDoc.data();
-        // Only for those accepted versions that we previously did not add their
-        // institution and contriputor to the node:
-        if (
-          !("addedInstitContris" in versionData) ||
-          !versionData.addedInstitContris
-        ) {
-          // We should add the proposer's id and institution
-          // to the contributors and institutions arrays in the corresponding node.
-          const nodeRef = db.collection("nodes").doc(versionData.node);
-          const nodeDoc = await nodeRef.get();
-          const nodeData = nodeDoc.data();
-          let institutions = [];
-          if ("institutions" in nodeData) {
-            institutions = nodeData.institutions;
-          } else {
-            institutions = [];
-          }
-          let contributors = [];
-          if ("contributors" in nodeData) {
-            contributors = nodeData.contributors;
-          } else {
-            contributors = [];
-          }
-          // Only update the nodes for which we have not already added this proposer
-          // as a contributor. Note that a user may have multiple accepted proposals
-          // on a node.
-          if (!contributors.includes(versionData.fullname)) {
-            contributors.push(versionData.fullname);
-            if (
-              !institutions.includes(userInstitutions[versionData.proposer])
-            ) {
-              institutions.push(userInstitutions[versionData.proposer]);
-            }
-            console.log({
-              versionId: versionDoc.id,
-              contributors,
-              institutions,
-            });
-            // Because in every iteration we have to check whether the proposer and
-            // their institution exist in the node document, we cannot use batch
-            // writes here.
-            await nodeRef.update({
-              institutions,
-              contributors,
-            });
-          }
-          // Mark in the version doc that we already added the institutions
-          // and contributors.
-          await versionRef.update({
-            addedInstitContris: true,
-          });
+        // We should add the proposer's id and institution
+        // to the contributors and institutions arrays in the corresponding node.
+        const nodeRef = db.collection("nodes").doc(versionData.node);
+        const nodeDoc = await nodeRef.get();
+        const nodeData = nodeDoc.data();
+        // In institutions and contributors, each key represents an
+        // institution or contributor and the corresponding value is
+        // the reputation of the institution or contributor on the node.
+        // For the contributors, it also includes the fullname.
+        let institutions = {};
+        if ("institutions" in nodeData) {
+          institutions = nodeData.institutions;
+        } else {
+          institutions = {};
         }
+        let contributors = {};
+        if ("contributors" in nodeData) {
+          contributors = nodeData.contributors;
+        } else {
+          contributors = {};
+        }
+        // A user may have multiple accepted proposals on a node. However,
+        // We have to update the node multiple times for such a user because
+        // we should update their reputation points on the node.
+        if (!(versionData.proposer in contributors)) {
+          contributors[versionData.proposer] = {
+            fullname: versionData.fullname,
+            reputation: 0,
+          };
+          if (!(userInstitutions[versionData.proposer] in institutions)) {
+            institutions[userInstitutions[versionData.proposer]] = {
+              reputation: 0,
+            };
+          }
+        }
+        contributors[versionData.proposer].reputation +=
+          versionData.corrects - versionData.wrongs;
+        institutions[userInstitutions[versionData.proposer]].reputation +=
+          versionData.corrects - versionData.wrongs;
+        console.log({
+          versionId: versionDoc.id,
+          contributors,
+          institutions,
+        });
+        await nodeRef.update({
+          institutions,
+          contributors,
+        });
       }
     }
 
