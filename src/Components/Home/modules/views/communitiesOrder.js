@@ -186,17 +186,17 @@ export default [
     title: "Educational/Organizational Psychology",
     width: "45%",
     leaders: [
-      {
-        name: "Amelia Henriques",
-        image: "Amelia_Henriques.jpg",
-        about: `I am currently a fourth-year student at the University of Connecticut, working on my BA with a double major in the Psychological Sciences and Human Development & Family Sciences. I am specifically interested in the field of counseling and hope to go into a counseling therapy career where I can work hands-on with children and adolescents.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/ameliahenriques/",
-          },
-        ],
-      },
+      // {
+      //   name: "Amelia Henriques",
+      //   image: "Amelia_Henriques.jpg",
+      //   about: `I am currently a fourth-year student at the University of Connecticut, working on my BA with a double major in the Psychological Sciences and Human Development & Family Sciences. I am specifically interested in the field of counseling and hope to go into a counseling therapy career where I can work hands-on with children and adolescents.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/ameliahenriques/",
+      //     },
+      //   ],
+      // },
       {
         name: "Desiree Mayrie Comer",
         image: "Desiree_Mayrie_Comer.jpeg",
@@ -524,17 +524,17 @@ export default [
     title: "Disability Studies",
     width: "39%",
     leaders: [
-      {
-        name: "Keltie O'Malley",
-        image: "Keltie_O_Malley.jpg",
-        about: `Keltie O'Malley is a current undergraduate student at Michigan State University studying towards a BA in Political Science Pre-Law with a minor in Peace and Justice Studies. Before becoming a Co-Leader in the Disability Studies Community, she worked as an intern who focused on policy and law regarding disabilities. She has an interest in how legislation impacts individuals with disabilities and how it has evolved over time. Beyond 1Cademy, Keltie enjoys reading books, going on runs, and baking pastries.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/keltie-o-b4036522a/",
-          },
-        ],
-      },
+      // {
+      //   name: "Keltie O'Malley",
+      //   image: "Keltie_O_Malley.jpg",
+      //   about: `Keltie O'Malley is a current undergraduate student at Michigan State University studying towards a BA in Political Science Pre-Law with a minor in Peace and Justice Studies. Before becoming a Co-Leader in the Disability Studies Community, she worked as an intern who focused on policy and law regarding disabilities. She has an interest in how legislation impacts individuals with disabilities and how it has evolved over time. Beyond 1Cademy, Keltie enjoys reading books, going on runs, and baking pastries.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/keltie-o-b4036522a/",
+      //     },
+      //   ],
+      // },
       {
         name: "Rishabh Singh Verma",
         image: "Rishabh_Singh_Verma.jpg",
@@ -599,7 +599,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Social_Political_Psychology.jpg",
     title: "Social/Political Psychology",
-    width: "35%",
+    width: "50%",
     leaders: [
       {
         name: "Talia Gillespie",
@@ -654,98 +654,6 @@ export default [
     ],
   },
   {
-    id: "Cryptoeconomics",
-    tags: [
-      {
-        title: "Cryptoeconomics",
-        node: "SAbEQzSxChSJWnpiSAmX",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Cryptoeconomics.jpg",
-    title: "Cryptoeconomics",
-    width: "35%",
-    leaders: [
-      {
-        name: "Isaac F Maruyama",
-        image: "Isaac_F_Maruyama.jpeg",
-        about: `I'm a sophomore studying political science and economics at the University of Minnesota. I started working with 1Cademy's Interdisciplinary Community in the summer of 2021, and founded the Cryptoeconomics Community in the fall of 2021. I'm particularly interested in the ways in which different countries regulate their economies, and how those strategies can be used to minimize inequality and maximize social welfare. Outside of 1Cademy, I'm currently interning for Minnesota Senator Steve Cwodzinski, and I'm also the history reporter for Radio K's Real College Podcast. In my spare time, I love to run, cross-country ski, and play the piano, guitar, and mandolin.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/isaac-maruyama-0273a91b7/",
-          },
-        ],
-      },
-      // {
-      //   name: "Daniel Li",
-      //   image: "Daniel_Li.jpeg",
-      //   about: `I am junior at NYU Stern concentrating in quantitative economics. I have experience working at startups and in financial roles. I'm interested in a career in investing in venture and growth companies. I also like analyzing data and have experience with Python and R.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/daniel-x-li/",
-      //     },
-      //   ],
-      // },
-    ],
-    YouTube: "RBIRquj1dD8",
-    description: (
-      <div>
-        <p>
-          The goal of the Cryptoeconomics Research Community is to conduct
-          detailed and comprehensive research on the various applications of
-          blockchain technology, as well as the underlying mechanisms that
-          enable decentralized marketplaces and applications to function.
-          Through 1Cademy, we aim to create and continuously improve upon a
-          comprehensive map of cryptoeconomics knowledge, resulting in an ideal
-          resource for learning about blockchain, cryptocurrencies, and their
-          usage.
-        </p>
-        <p>
-          This position is a great opportunity for anyone desiring individual
-          research experience with a flexible schedule and the opportunity for
-          networking with others in your field. You will have the ability to
-          develop and improve your research skills through highly collaborative
-          group work and intercollegial/interdisciplinary interaction. While a
-          basic familiarity with blockchain technology and academic research is
-          preferred, anyone with a desire to learn more about the field of
-          cryptoeconomics and solid writing skills is qualified for the
-          position.
-        </p>
-        <p>
-          While this position is unpaid, we are very willing to work with your
-          academic institution so that you may receive some form of credit for
-          this internship. For anyone interested in pursuing their own
-          cryptoeconomics research in the future, this position is a great
-          opportunity to explore different areas in the field and gain a greater
-          familiarity with the existing academic literature. We strive to
-          provide interns with the skills and support they need to conduct
-          quality research independently in an area of their interest.
-        </p>
-      </div>
-    ),
-    accomplishments: `We have covered a wide range of topics, from the mechanisms than enable individual cryptocurrencies to function, to the macroeconomic impacts of blockchain technology on different nations across the world. We have summarized information from multiple cryptocurrency whitepapers, as well as academic studies on the usage of blockchain in areas including health, music, international transfers, and global criminal activity. We allow individual interns to explore topics of their own interest, and collaborate with other interns to best utilize their talents and passions.`,
-    gains: [
-      `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
-      `Collaborate with other interns to summarize existing research and brainstorm new research ideas.`,
-      `Have a flexible schedule and work remotely with all interactions, task fulfillment, and communications.`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts. We prefer our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
-    hasTest: true,
-    qualifications: [
-      `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy.`,
-      `Willingness to present work and engage in group discussions about research topics.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`,
-      `Must be able to attend weekly meetings on Thursdays from 8:30-9:30PM EST.`,
-    ],
-    responsibilities: [
-      `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
-      `Contribute in meetings by engaging in discussion with other interns about research topics.`,
-    ],
-  },
-  {
     id: "Deep_Learning",
     tags: [
       {
@@ -761,7 +669,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
-    width: "30%",
+    width: "50%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -816,6 +724,225 @@ export default [
       `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
+  {
+    id: "Liaison_Librarians",
+    tags: [
+      {
+        title: "Library Science",
+        node: "gRRpc1O61kMszcrW07lW",
+      },
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/LibraryBackground.jpg",
+    title: "Liaison Librarians",
+    width: "100%",
+    leaders: [
+      {
+        name: "Ben Brown",
+        image: "Ben_Brown.jpeg",
+        about: `I am in my second year studying library and information science at SJSU and I serve as a content editor for my school's Student Research Journal. I have excellent communication skills which include written and verbal communication. I enjoy learning about information searching, organization, and retrieval, and look forward to more opportunities to apply what I have learned so far.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/benjamin-brown-b8b5611a7/",
+          },
+        ],
+      },
+      // {
+      //   name: "Gail Grot",
+      //   image: "Gail_Grot.jpeg",
+      //   about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/gail-grot-264278219/",
+      //     },
+      //   ],
+      // },
+      {
+        name: "Grace Victoria Ramstad",
+        image: "Grace_Victoria_Ramstad.jpeg",
+        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/grace-ramstad-05342099/",
+          },
+        ],
+      },
+      {
+        name: "Sarah B Licht",
+        image: "Sarah_B_Licht.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/sarah-licht-84343316b/",
+          },
+        ],
+      },
+      // {
+      //   name: "Stephanie Sandoval",
+      //   image: "Stephanie_Sandoval.jpeg",
+      //   about: ``,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/stephsand14/",
+      //     },
+      //   ],
+      // },
+      {
+        name: "Viktoria Roshchin",
+        image: "Viktoria_Roshchin.jpeg",
+        about: `I currently am an undergraduate student attending Arizona State University for a
+        bachelor&#39;s in English and a minor in Anthropology. I have volunteered for both the Library of
+        Congress and the Smithsonian, where I transcribed and reviewed transcriptions to improve the
+        search, access, and discovery of historical and scientific documents. I also ensured these
+        transcribed documents are complete and accurate. My volunteer work also included digitizing a
+        variety of material to create accessibility for researchers and the public within a team-based
+        environment. My passion resides in research and editing. In my free time, I enjoy hiking,
+        reading, and writing.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/viktoria-r-b2a18314b/",
+          },
+        ],
+      },
+    ],
+    YouTube: "-dQOuGeu0IQ",
+    description: `The 1Cademy Librarian community supports the information processes of all the communities on the 1Cademy platform. We do this by liaising with the co-leaders and interns from each community to help them develop their area of the map and information literacy skills. This work supports communities across all fields of focus in three ways:
+    1) Embedded Liaison: We work directly with other communities and attend meetings to help create, edit, and arrange their content
+    2) Asynchronous Support: We review a portion of a community's map during Librarian meetings
+    3) Consultations: We give feedback directly to co-leaders of other communities when they attend our weekly meetings
+    Through each of these efforts communities receive the support they need to locate, interpret, abstract, disseminate, and organize knowledge clearly, comprehensively, and accurately on the 1Cademy Platform.
+    `,
+    accomplishments: `We've had the opportunity to learn about the different information processes of scholars across many different disciplines, as well as harness the power of cognitive diversity to develop best information practices on the 1Cademy platform. Out of this collective experience, we have been able to build a comprehensive liaison or embedded librarian program that supports communities and academic focuses across the entire platform. Our team has worked with more than 10 communities and coleaders to develop their knowledge map based on their subject of focus.`,
+    gains: [
+      `Organize information on an innovative knowledge mapping platform `,
+      `Support communities in disseminating content according to their focus`,
+      `Give guidance on best practices in knowledge organization and information literacy`,
+      `Work with our development team on improving online research/learning `,
+      `Collaboratively identify and resolve content gaps on the knowledge map`,
+      `Connect with a team of passionate researchers from different fields and schools`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. Interns applying for this position should have a passion for helping other's develop their information processes.`,
+    qualifications: [
+      `Enthusiasm for topics related to information/knowledge building`,
+      `Strong information literacy skills`,
+      `Fluency in writing and reading in English`,
+      `Ability to verbally communicate effectively and moderate team meetings`,
+      `Experience and willingness to work in collaborative environments `,
+      `Students in the field of Library Science, Information Science, or related disciplines`,
+      `Critical thinking and problem-solving skills `,
+      `Ability to engage in group discourse to ideate and resolve complex issues`,
+      `Motivated to complete tasks asynchronously`,
+    ],
+    responsibilities: [
+      `Use the 1Cademy platform to organize and manage information `,
+      `Work with a team to develop and improve the Library Science area of the map `,
+      `Support research projects by summarizing background literature`,
+      `Support communities in their information abstraction, organization, and dissemination`,
+      `Work with a team of UX designers to develop tutorials and guides for platform use`,
+      `Develop Information Search Process (ISP) and Information Literacy Instruction (ILI) guides`,
+      `Work remotely for all interactions, task fulfillment, and communications `,
+      `All interactions, task fulfillment, and communications will be remote.`,
+    ],
+  },
+  // {
+  //   id: "Cryptoeconomics",
+  //   tags: [
+  //     {
+  //       title: "Cryptoeconomics",
+  //       node: "SAbEQzSxChSJWnpiSAmX",
+  //     },
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Cryptoeconomics.jpg",
+  //   title: "Cryptoeconomics",
+  //   width: "35%",
+  //   leaders: [
+  //     {
+  //       name: "Isaac F Maruyama",
+  //       image: "Isaac_F_Maruyama.jpeg",
+  //       about: `I'm a sophomore studying political science and economics at the University of Minnesota. I started working with 1Cademy's Interdisciplinary Community in the summer of 2021, and founded the Cryptoeconomics Community in the fall of 2021. I'm particularly interested in the ways in which different countries regulate their economies, and how those strategies can be used to minimize inequality and maximize social welfare. Outside of 1Cademy, I'm currently interning for Minnesota Senator Steve Cwodzinski, and I'm also the history reporter for Radio K's Real College Podcast. In my spare time, I love to run, cross-country ski, and play the piano, guitar, and mandolin.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/isaac-maruyama-0273a91b7/",
+  //         },
+  //       ],
+  //     },
+  //     // {
+  //     //   name: "Daniel Li",
+  //     //   image: "Daniel_Li.jpeg",
+  //     //   about: `I am junior at NYU Stern concentrating in quantitative economics. I have experience working at startups and in financial roles. I'm interested in a career in investing in venture and growth companies. I also like analyzing data and have experience with Python and R.`,
+  //     //   websites: [
+  //     //     {
+  //     //       name: "LinkedIn",
+  //     //       url: "https://www.linkedin.com/in/daniel-x-li/",
+  //     //     },
+  //     //   ],
+  //     // },
+  //   ],
+  //   YouTube: "RBIRquj1dD8",
+  //   description: (
+  //     <div>
+  //       <p>
+  //         The goal of the Cryptoeconomics Research Community is to conduct
+  //         detailed and comprehensive research on the various applications of
+  //         blockchain technology, as well as the underlying mechanisms that
+  //         enable decentralized marketplaces and applications to function.
+  //         Through 1Cademy, we aim to create and continuously improve upon a
+  //         comprehensive map of cryptoeconomics knowledge, resulting in an ideal
+  //         resource for learning about blockchain, cryptocurrencies, and their
+  //         usage.
+  //       </p>
+  //       <p>
+  //         This position is a great opportunity for anyone desiring individual
+  //         research experience with a flexible schedule and the opportunity for
+  //         networking with others in your field. You will have the ability to
+  //         develop and improve your research skills through highly collaborative
+  //         group work and intercollegial/interdisciplinary interaction. While a
+  //         basic familiarity with blockchain technology and academic research is
+  //         preferred, anyone with a desire to learn more about the field of
+  //         cryptoeconomics and solid writing skills is qualified for the
+  //         position.
+  //       </p>
+  //       <p>
+  //         While this position is unpaid, we are very willing to work with your
+  //         academic institution so that you may receive some form of credit for
+  //         this internship. For anyone interested in pursuing their own
+  //         cryptoeconomics research in the future, this position is a great
+  //         opportunity to explore different areas in the field and gain a greater
+  //         familiarity with the existing academic literature. We strive to
+  //         provide interns with the skills and support they need to conduct
+  //         quality research independently in an area of their interest.
+  //       </p>
+  //     </div>
+  //   ),
+  //   accomplishments: `We have covered a wide range of topics, from the mechanisms than enable individual cryptocurrencies to function, to the macroeconomic impacts of blockchain technology on different nations across the world. We have summarized information from multiple cryptocurrency whitepapers, as well as academic studies on the usage of blockchain in areas including health, music, international transfers, and global criminal activity. We allow individual interns to explore topics of their own interest, and collaborate with other interns to best utilize their talents and passions.`,
+  //   gains: [
+  //     `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
+  //     `Collaborate with other interns to summarize existing research and brainstorm new research ideas.`,
+  //     `Have a flexible schedule and work remotely with all interactions, task fulfillment, and communications.`,
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts. We prefer our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. We need individuals who are interested in gaining experience with collaborative research and expanding the body of knowledge on Cryptoeconomics.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Interest and enthusiasm for topics related to blockchain, decentralized networks, economics, and political economy.`,
+  //     `Willingness to present work and engage in group discussions about research topics.`,
+  //     `Fluency in writing and reading in English (will have to summarize research articles).`,
+  //     `Must be able to attend weekly meetings on Thursdays from 8:30-9:30PM EST.`,
+  //   ],
+  //   responsibilities: [
+  //     `Read through textbooks and research papers, summarize content on our knowledge visualization platform, 1Cademy, and publicly share summaries with the research team.`,
+  //     `Contribute in meetings by engaging in discussion with other interns about research topics.`,
+  //   ],
+  // },
   // {
   //   id: "Graphic_Design",
   //   tags: [
@@ -993,131 +1120,4 @@ export default [
   //     `All interactions, task fulfillment, and communications will be remote.`,
   //   ],
   // },
-  {
-    id: "Liaison_Librarians",
-    tags: [
-      {
-        title: "Library Science",
-        node: "gRRpc1O61kMszcrW07lW",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/LibraryBackground.jpg",
-    title: "Liaison Librarians",
-    width: "100%",
-    leaders: [
-      {
-        name: "Ben Brown",
-        image: "Ben_Brown.jpeg",
-        about: `I am in my second year studying library and information science at SJSU and I serve as a content editor for my school's Student Research Journal. I have excellent communication skills which include written and verbal communication. I enjoy learning about information searching, organization, and retrieval, and look forward to more opportunities to apply what I have learned so far.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/benjamin-brown-b8b5611a7/",
-          },
-        ],
-      },
-      // {
-      //   name: "Gail Grot",
-      //   image: "Gail_Grot.jpeg",
-      //   about: `I am an information professional with a master's degree in Library & Information Science and bachelor's in Comparative Cultural Studies. I have experience in research, grant writing, and project management as well as excellent written and verbal communication skills, solid data management and search abilities, and a strong desire to learn.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/gail-grot-264278219/",
-      //     },
-      //   ],
-      // },
-      {
-        name: "Grace Victoria Ramstad",
-        image: "Grace_Victoria_Ramstad.jpeg",
-        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/grace-ramstad-05342099/",
-          },
-        ],
-      },
-      {
-        name: "Sarah B Licht",
-        image: "Sarah_B_Licht.jpeg",
-        about: ``,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/sarah-licht-84343316b/",
-          },
-        ],
-      },
-      // {
-      //   name: "Stephanie Sandoval",
-      //   image: "Stephanie_Sandoval.jpeg",
-      //   about: ``,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/stephsand14/",
-      //     },
-      //   ],
-      // },
-      {
-        name: "Viktoria Roshchin",
-        image: "Viktoria_Roshchin.jpeg",
-        about: `I currently am an undergraduate student attending Arizona State University for a
-        bachelor&#39;s in English and a minor in Anthropology. I have volunteered for both the Library of
-        Congress and the Smithsonian, where I transcribed and reviewed transcriptions to improve the
-        search, access, and discovery of historical and scientific documents. I also ensured these
-        transcribed documents are complete and accurate. My volunteer work also included digitizing a
-        variety of material to create accessibility for researchers and the public within a team-based
-        environment. My passion resides in research and editing. In my free time, I enjoy hiking,
-        reading, and writing.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/viktoria-r-b2a18314b/",
-          },
-        ],
-      },
-    ],
-    YouTube: "-dQOuGeu0IQ",
-    description: `The 1Cademy Librarian community supports the information processes of all the communities on the 1Cademy platform. We do this by liaising with the co-leaders and interns from each community to help them develop their area of the map and information literacy skills. This work supports communities across all fields of focus in three ways:
-    1) Embedded Liaison: We work directly with other communities and attend meetings to help create, edit, and arrange their content
-    2) Asynchronous Support: We review a portion of a community's map during Librarian meetings
-    3) Consultations: We give feedback directly to co-leaders of other communities when they attend our weekly meetings
-    Through each of these efforts communities receive the support they need to locate, interpret, abstract, disseminate, and organize knowledge clearly, comprehensively, and accurately on the 1Cademy Platform.
-    `,
-    accomplishments: `We've had the opportunity to learn about the different information processes of scholars across many different disciplines, as well as harness the power of cognitive diversity to develop best information practices on the 1Cademy platform. Out of this collective experience, we have been able to build a comprehensive liaison or embedded librarian program that supports communities and academic focuses across the entire platform. Our team has worked with more than 10 communities and coleaders to develop their knowledge map based on their subject of focus.`,
-    gains: [
-      `Organize information on an innovative knowledge mapping platform `,
-      `Support communities in disseminating content according to their focus`,
-      `Give guidance on best practices in knowledge organization and information literacy`,
-      `Work with our development team on improving online research/learning `,
-      `Collaboratively identify and resolve content gaps on the knowledge map`,
-      `Connect with a team of passionate researchers from different fields and schools`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. Interns applying for this position should have a passion for helping other's develop their information processes.`,
-    qualifications: [
-      `Enthusiasm for topics related to information/knowledge building`,
-      `Strong information literacy skills`,
-      `Fluency in writing and reading in English`,
-      `Ability to verbally communicate effectively and moderate team meetings`,
-      `Experience and willingness to work in collaborative environments `,
-      `Students in the field of Library Science, Information Science, or related disciplines`,
-      `Critical thinking and problem-solving skills `,
-      `Ability to engage in group discourse to ideate and resolve complex issues`,
-      `Motivated to complete tasks asynchronously`,
-    ],
-    responsibilities: [
-      `Use the 1Cademy platform to organize and manage information `,
-      `Work with a team to develop and improve the Library Science area of the map `,
-      `Support research projects by summarizing background literature`,
-      `Support communities in their information abstraction, organization, and dissemination`,
-      `Work with a team of UX designers to develop tutorials and guides for platform use`,
-      `Develop Information Search Process (ISP) and Information Literacy Instruction (ILI) guides`,
-      `Work remotely for all interactions, task fulfillment, and communications `,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
-  },
 ];
