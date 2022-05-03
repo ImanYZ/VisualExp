@@ -67,8 +67,11 @@ jspm_packages
 .npm
 
 # Optional REPL history
+# next.js
 .node_repl_history
 .next
+*/.next/*
+/out/
 
 next.config.js
 

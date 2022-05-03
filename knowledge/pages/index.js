@@ -1,12 +1,14 @@
 import Head from "next/head";
 import Link from "next/link";
 
+import Paper from "@mui/material/Paper";
+
 // import Date from "../components/date";
 import Layout, { siteTitle } from "../components/layout";
 
 import utilStyles from "../styles/utils.module.css";
 
-import { getSortedPostsData } from "../lib/posts";
+import { getSortedPostsData } from "../lib/nodes";
 
 export async function getServerSideProps() {
   const allPostsData = await getSortedPostsData();
@@ -31,18 +33,20 @@ export default function Home({ allPostsData }) {
         </p>
       </section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Blog</h2>
-        <ul className={utilStyles.list}>
-          {allPostsData.map(({ id, date, title }) => (
-            <li className={utilStyles.listItem} key={id}>
-              <Link href={`/knowledge/${id}`}>
-                <a>{title}</a>
-              </Link>
-              <br />
-              <small className={utilStyles.lightText}>{date}</small>
-            </li>
-          ))}
-        </ul>
+        <Paper>
+          <h2 className={utilStyles.headingLg}>Blog</h2>
+          <ul className={utilStyles.list}>
+            {allPostsData.map(({ id, date, title }) => (
+              <li className={utilStyles.listItem} key={id}>
+                <Link href={`/knowledge/${id}`}>
+                  <a>{title}</a>
+                </Link>
+                <br />
+                <small className={utilStyles.lightText}>{date}</small>
+              </li>
+            ))}
+          </ul>
+        </Paper>
       </section>
     </Layout>
   );
