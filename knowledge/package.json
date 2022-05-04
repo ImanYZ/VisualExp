@@ -28,6 +28,7 @@
     "csv-parser": "^2.3.2",
     "csv-writer": "^1.6.0",
     "date-fns": "^2.28.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.1",
     "express-ip": "^1.0.4",
     "express-robots-txt": "^0.5.0",
