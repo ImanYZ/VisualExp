@@ -35,7 +35,7 @@ const getNodeHTMLContent = async (content) => {
 };
 
 const retrieveNode = async (nodeId) => {
-  const nodeDoc = await db.collection("nodes").doc(id).get();
+  const nodeDoc = await db.collection("nodes").doc(nodeId).get();
   if (!nodeDoc.exists) {
     return null;
   }
