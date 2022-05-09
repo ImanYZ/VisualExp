@@ -44,70 +44,82 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
         .get();
       for (let versionDoc of versionDocs.docs) {
         const versionData = versionDoc.data();
-        // We should add the proposer's id and institution
-        // to the contributors and institutions arrays in the corresponding node.
-        const nodeRef = db.collection("nodes").doc(versionData.node);
-        if (versionData.node in nodesData) {
-          // We need to add the nodeRef to be able to update the node at the end.
-          nodesUpdates[versionData.node] = {
-            nodeRef,
-          };
-          // In institutions and contributors, each key represents an
-          // institution or contributor and the corresponding value is
-          // the reputation of the institution or contributor on the node.
-          // For the contributors, it also includes the fullname.
-          // A user may have multiple accepted proposals on a node. However,
-          // We have to update the node multiple times for such a user because
-          // we should update their reputation points on the node.
-          if (!("contributors" in nodesUpdates[versionData.node])) {
-            nodesUpdates[versionData.node].contributors = {};
-          }
-          if (!("institutions" in nodesUpdates[versionData.node])) {
-            nodesUpdates[versionData.node].institutions = {};
-          }
-          if (
-            !(
-              versionData.proposer in
-              nodesUpdates[versionData.node].contributors
-            ) &&
-            "fullname" in versionData &&
-            "imageUrl" in versionData
-          ) {
-            nodesUpdates[versionData.node].contributors[versionData.proposer] =
-              {
+        // Only if the version has never been deleted, i.e., deleted attribute does not
+        // exist or it's false:
+        if (!versionData.deleted) {
+          // We should add the proposer's id and institution
+          // to the contributors and institutions arrays in the corresponding node.
+          const nodeRef = db.collection("nodes").doc(versionData.node);
+          if (versionData.node in nodesData) {
+            // Only if the node does not exist in nodesUpdates, we need to create it,
+            // and add the nodeRef to be able to update the node at the end.
+            if (!(versionData.node in nodesUpdates)) {
+              nodesUpdates[versionData.node] = {
+                nodeRef,
+              };
+            }
+            // In institutions and contributors, each key represents an
+            // institution or contributor and the corresponding value is
+            // the reputation of the institution or contributor on the node.
+            // For the contributors, it also includes the fullname.
+            // A user may have multiple accepted proposals on a node. However,
+            // We have to update the node multiple times for such a user because
+            // we should update their reputation points on the node.
+            if (!("contributors" in nodesUpdates[versionData.node])) {
+              nodesUpdates[versionData.node].contributors = {};
+            }
+            if (!("institutions" in nodesUpdates[versionData.node])) {
+              nodesUpdates[versionData.node].institutions = {};
+            }
+            if (
+              !(
+                versionData.proposer in
+                nodesUpdates[versionData.node].contributors
+              ) &&
+              "fullname" in versionData &&
+              "imageUrl" in versionData
+            ) {
+              nodesUpdates[versionData.node].contributors[
+                versionData.proposer
+              ] = {
                 fullname: versionData.fullname,
                 imageUrl: versionData.imageUrl,
+                chooseUname: versionData.chooseUname
+                  ? versionData.chooseUname
+                  : false,
                 reputation: 0,
               };
+              if (
+                versionData.proposer in userInstitutions &&
+                !(
+                  userInstitutions[versionData.proposer] in
+                  nodesUpdates[versionData.node].institutions
+                )
+              ) {
+                nodesUpdates[versionData.node].institutions[
+                  userInstitutions[versionData.proposer]
+                ] = {
+                  reputation: 0,
+                };
+              }
+            }
+            if (
+              versionData.proposer in
+              nodesUpdates[versionData.node].contributors
+            ) {
+              nodesUpdates[versionData.node].contributors[
+                versionData.proposer
+              ].reputation += versionData.corrects - versionData.wrongs;
+            }
             if (
               versionData.proposer in userInstitutions &&
-              !(
-                userInstitutions[versionData.proposer] in
+              userInstitutions[versionData.proposer] in
                 nodesUpdates[versionData.node].institutions
-              )
             ) {
               nodesUpdates[versionData.node].institutions[
                 userInstitutions[versionData.proposer]
-              ] = {
-                reputation: 0,
-              };
+              ].reputation += versionData.corrects - versionData.wrongs;
             }
-          }
-          if (
-            versionData.proposer in nodesUpdates[versionData.node].contributors
-          ) {
-            nodesUpdates[versionData.node].contributors[
-              versionData.proposer
-            ].reputation += versionData.corrects - versionData.wrongs;
-          }
-          if (
-            versionData.proposer in userInstitutions &&
-            userInstitutions[versionData.proposer] in
-              nodesUpdates[versionData.node].institutions
-          ) {
-            nodesUpdates[versionData.node].institutions[
-              userInstitutions[versionData.proposer]
-            ].reputation += versionData.corrects - versionData.wrongs;
           }
         }
       }
