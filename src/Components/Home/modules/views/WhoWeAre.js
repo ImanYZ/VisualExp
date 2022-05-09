@@ -21,6 +21,7 @@ import EditIcon from "@mui/icons-material/Edit";
 
 import UMLogo from "../../../../assets/umsi-logo-vert-u.png";
 import GoogleCloud from "../../../../assets/GoogleCloud.svg";
+import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
 
 const WhoWeAre = (props) => {
   return (
@@ -340,6 +341,36 @@ const WhoWeAre = (props) => {
                       {
                         " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                       }
+                    </React.Fragment>
+                  }
+                />
+              </ListItemButton>
+              <Divider variant="inset" component="li" />
+              <ListItemButton
+                alignItems="flex-start"
+                component="a"
+                target="_blank"
+                href="https://www.honor.education/"
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt="Honor Education"
+                    src={HonorEducation}
+                    sx={{ width: 100, height: 100, mr: 2.5 }}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary="Supported by Honor Education"
+                  secondary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{ display: "inline" }}
+                        component="span"
+                        variant="body2"
+                        color="text.primary"
+                      >
+                        Honor Education
+                      </Typography>
                     </React.Fragment>
                   }
                 />
