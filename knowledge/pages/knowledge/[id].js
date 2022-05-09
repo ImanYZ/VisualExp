@@ -7,6 +7,8 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Avatar from "@mui/material/Avatar";
 
 import CodeIcon from "@mui/icons-material/Code";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
@@ -25,9 +27,48 @@ import { getNodeData } from "../../lib/nodes";
 
 export async function getServerSideProps({ params }) {
   const nodeData = await getNodeData(params.id);
+  if (!nodeData) {
+    return {
+      // returns the default 404 page with a status code of 404
+      notFound: true,
+    };
+  }
+  const contributors = [];
+  for (let contriId in nodeData.contributors) {
+    const contriIdx = contributors.findIndex(
+      (contri) => contri.reputation < nodeData.contributors[contriId].reputation
+    );
+    const theContributor = {
+      ...nodeData.contributors[contriId],
+      username: contriId,
+    };
+    contributors.splice(contriIdx, 0, theContributor);
+  }
+  const institutions = [];
+  for (let institId in nodeData.institutions) {
+    const institIdx = institutions.findIndex(
+      (instit) => instit.reputation < nodeData.institutions[institId].reputation
+    );
+    const theInstitution = {
+      ...nodeData.institutions[institId],
+      name: institId,
+    };
+    institutions.splice(institIdx, 0, theInstitution);
+  }
+  console.log({
+    nodeData: {
+      ...nodeData,
+      contributors,
+      institutions,
+    },
+  });
   return {
     props: {
-      nodeData,
+      nodeData: {
+        ...nodeData,
+        contributors,
+        institutions,
+      },
     },
   };
 }
@@ -43,7 +84,7 @@ const Node = ({ nodeData }) => {
           <Typography variant="h4" component="div">
             {nodeData.title}
           </Typography>
-          <div dangerouslySetInnerHTML={{ __html: nodeData.contentHtml }} />
+          <div dangerouslySetInnerHTML={{ __html: nodeData.contentHTML }} />
           <Box style={{ display: "inline-block", color: "#ff9100" }}>
             {nodeData.nodeType === "Code" ? (
               <CodeIcon />
@@ -82,6 +123,59 @@ const Node = ({ nodeData }) => {
             >
               {nodeData.date}
             </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "left",
+              flexWrap: "wrap",
+              listStyle: "none",
+              p: 0.5,
+              m: 0,
+            }}
+            component="ul"
+          >
+            {nodeData.contributors &&
+              nodeData.contributors.map((contributor, idx) => {
+                return (
+                  <li key={contributor.username}>
+                    <Chip
+                      sx={{
+                        height: "49px",
+                        margin: "4px",
+                        borderRadius: "28px",
+                      }}
+                      icon={
+                        <Avatar
+                          src={contributor.imageUrl}
+                          alt={contributor.fullname}
+                          sx={{
+                            width: "40px",
+                            height: "40px",
+                            mr: 2.5,
+                          }}
+                        />
+                      }
+                      variant="outlined"
+                      label={
+                        <>
+                          <Typography variant="body2" component="div">
+                            {contributor.fullname}
+                          </Typography>
+                          <Typography variant="body2" component="div">
+                            {idx === 0 ? "🏆" : "✔️"}
+                            {" " +
+                              Math.round(
+                                (contributor.reputation + Number.EPSILON) * 100
+                              ) /
+                                100}
+                          </Typography>
+                        </>
+                      }
+                    />
+                  </li>
+                );
+              })}
           </Box>
         </CardContent>
         <CardActions>
