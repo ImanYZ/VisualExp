@@ -1,9 +1,9 @@
 module.exports = {
-  async rewrites() {
+  async redirects() {
     return [
       {
-        source: "/knowledge",
-        destination: "/",
+        source: "/knowledge*",
+        destination: "/*",
       },
     ];
   },
