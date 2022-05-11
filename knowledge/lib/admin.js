@@ -6,9 +6,9 @@ import { getFirestore } from "firebase-admin/firestore";
 
 require("dotenv").config();
 
-console.log("***************************************");
-console.log({ ENV: process.env });
-console.log("***************************************");
+// console.log("***************************************");
+// console.log({ ENV: process.env });
+// console.log("***************************************");
 const admin = global.firebaseApp
   ? global.firebaseApp
   : initializeApp(
