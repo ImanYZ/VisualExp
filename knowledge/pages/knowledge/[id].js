@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from "react";
+
 // Add this import
 import Head from "next/head";
 
@@ -9,6 +11,12 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import List from "@mui/material/List";
+import Divider from "@mui/material/Divider";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton from "@mui/material/ListItemButton";
 
 import CodeIcon from "@mui/icons-material/Code";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
@@ -25,7 +33,17 @@ import LockIcon from "@mui/icons-material/Lock";
 import Layout from "../../components/layout";
 import { getNodeData } from "../../lib/nodes";
 
-export async function getServerSideProps({ params }) {
+// This value is considered fresh for ten seconds (s-maxage=10).
+// If a request is repeated within the next 10 seconds, the previously
+// cached value will still be fresh. If the request is repeated before 59 seconds,
+// the cached value will be stale but still render (stale-while-revalidate=59).
+//
+// In the background, a revalidation request will be made to populate the cache
+// with a fresh value. If you refresh the page, you will see the new value.
+export async function getServerSideProps({ res, params }) {
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "-1");
+  res.setHeader("Cache-Control", "no-cache");
   const nodeData = await getNodeData(params.id);
   if (!nodeData) {
     return {
@@ -33,156 +51,196 @@ export async function getServerSideProps({ params }) {
       notFound: true,
     };
   }
-  const contributors = [];
-  for (let contriId in nodeData.contributors) {
-    const contriIdx = contributors.findIndex(
-      (contri) => contri.reputation < nodeData.contributors[contriId].reputation
-    );
-    const theContributor = {
-      ...nodeData.contributors[contriId],
-      username: contriId,
-    };
-    contributors.splice(contriIdx, 0, theContributor);
-  }
-  const institutions = [];
-  for (let institId in nodeData.institutions) {
-    const institIdx = institutions.findIndex(
-      (instit) => instit.reputation < nodeData.institutions[institId].reputation
-    );
-    const theInstitution = {
-      ...nodeData.institutions[institId],
-      name: institId,
-    };
-    institutions.splice(institIdx, 0, theInstitution);
-  }
-  console.log({
-    nodeData: {
-      ...nodeData,
-      contributors,
-      institutions,
-    },
-  });
   return {
-    props: {
-      nodeData: {
-        ...nodeData,
-        contributors,
-        institutions,
-      },
-    },
+    props: nodeData,
   };
 }
 
-const Node = ({ nodeData }) => {
+const Node = ({ nodeData, children, parents }) => {
+  console.log({ nodeData, children, parents });
   return (
     <Layout>
       <Head>
         <title>{nodeData.title}</title>
       </Head>
-      <Card sx={{ minWidth: "340px" }}>
-        <CardContent>
-          <Typography variant="h4" component="div">
-            {nodeData.title}
-          </Typography>
-          <div dangerouslySetInnerHTML={{ __html: nodeData.contentHTML }} />
-          <Box style={{ display: "inline-block", color: "#ff9100" }}>
-            {nodeData.nodeType === "Code" ? (
-              <CodeIcon />
-            ) : nodeData.nodeType === "Concept" ? (
-              <LocalLibraryIcon />
-            ) : nodeData.nodeType === "Relation" ? (
-              <ShareIcon />
-            ) : nodeData.nodeType === "Question" ? (
-              <HelpOutlineIcon />
-            ) : nodeData.nodeType === "Profile" ? (
-              <PersonIcon />
-            ) : nodeData.nodeType === "Sequel" ? (
-              <MoreHorizIcon />
-            ) : nodeData.nodeType === "Advertisement" ? (
-              <EventIcon />
-            ) : nodeData.nodeType === "Reference" ? (
-              <MenuBookIcon />
-            ) : nodeData.nodeType === "Idea" ? (
-              <EmojiObjectsIcon />
-            ) : nodeData.nodeType === "News" ? (
-              <ArticleIcon />
-            ) : nodeData.nodeType === "Private" ? (
-              <LockIcon />
-            ) : (
-              <LockIcon />
-            )}
-            <Typography
-              sx={{
-                fontSize: 13,
-                padding: "0px 0px 0px 19px",
-                verticalAlign: "5.5px",
-              }}
-              component="span"
-              color="text.secondary"
-              gutterBottom
-            >
-              {nodeData.date}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "left",
-              flexWrap: "wrap",
-              listStyle: "none",
-              p: 0.5,
-              m: 0,
-            }}
-            component="ul"
-          >
-            {nodeData.contributors &&
-              nodeData.contributors.map((contributor, idx) => {
+      <Grid container spacing={2}>
+        <Grid item sm={12} md={3}>
+          <Paper sx={{ mt: "40px" }}>
+            <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "28px" }}>
+              Learn Before
+            </Box>
+            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+              {parents.map((parent) => {
                 return (
-                  <li key={contributor.username}>
-                    <Chip
-                      sx={{
-                        height: "49px",
-                        margin: "4px",
-                        borderRadius: "28px",
-                      }}
-                      icon={
-                        <Avatar
-                          src={contributor.imageUrl}
-                          alt={contributor.fullname}
-                          sx={{
-                            width: "40px",
-                            height: "40px",
-                            mr: 2.5,
-                          }}
-                        />
-                      }
-                      variant="outlined"
-                      label={
-                        <>
-                          <Typography variant="body2" component="div">
-                            {contributor.fullname}
-                          </Typography>
-                          <Typography variant="body2" component="div">
-                            {idx === 0 ? "🏆" : "✔️"}
-                            {" " +
-                              Math.round(
-                                (contributor.reputation + Number.EPSILON) * 100
-                              ) /
-                                100}
-                          </Typography>
-                        </>
-                      }
-                    />
-                  </li>
+                  <React.Fragment key={parent.nodeId}>
+                    <Divider />
+                    <ListItemButton
+                      alignItems="flex-start"
+                      component="a"
+                      target="_blank"
+                      href={parent.nodeId}
+                    >
+                      <ListItemText
+                        primary={parent.title}
+                        // secondary={
+                        //   <div
+                        //     dangerouslySetInnerHTML={{
+                        //       __html: parent.contentHTML,
+                        //     }}
+                        //   />
+                        // }
+                        disableTypography={true}
+                      />
+                    </ListItemButton>
+                  </React.Fragment>
                 );
               })}
-          </Box>
-        </CardContent>
-        <CardActions>
-          <Button size="small">Learn More</Button>
-        </CardActions>
-      </Card>
-      {/* <div className={utilStyles.lightText}>{nodeData.date}</div> */}
+            </List>
+          </Paper>
+        </Grid>
+        <Grid item sm={12} md={6}>
+          <Card sx={{ minWidth: "340px", mt: "40px" }}>
+            <CardContent>
+              <Typography variant="h4" component="div">
+                {nodeData.title}
+              </Typography>
+              <div
+                style={{ fontSize: "19px" }}
+                dangerouslySetInnerHTML={{ __html: nodeData.contentHTML }}
+              />
+              <Box style={{ display: "inline-block", color: "#ff9100" }}>
+                {nodeData.nodeType === "Code" ? (
+                  <CodeIcon />
+                ) : nodeData.nodeType === "Concept" ? (
+                  <LocalLibraryIcon />
+                ) : nodeData.nodeType === "Relation" ? (
+                  <ShareIcon />
+                ) : nodeData.nodeType === "Question" ? (
+                  <HelpOutlineIcon />
+                ) : nodeData.nodeType === "Profile" ? (
+                  <PersonIcon />
+                ) : nodeData.nodeType === "Sequel" ? (
+                  <MoreHorizIcon />
+                ) : nodeData.nodeType === "Advertisement" ? (
+                  <EventIcon />
+                ) : nodeData.nodeType === "Reference" ? (
+                  <MenuBookIcon />
+                ) : nodeData.nodeType === "Idea" ? (
+                  <EmojiObjectsIcon />
+                ) : nodeData.nodeType === "News" ? (
+                  <ArticleIcon />
+                ) : nodeData.nodeType === "Private" ? (
+                  <LockIcon />
+                ) : (
+                  <LockIcon />
+                )}
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    padding: "0px 0px 0px 19px",
+                    verticalAlign: "5.5px",
+                  }}
+                  component="span"
+                  color="text.secondary"
+                  gutterBottom
+                >
+                  {nodeData.date}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "left",
+                  flexWrap: "wrap",
+                  listStyle: "none",
+                  p: 0.5,
+                  m: 0,
+                }}
+                component="ul"
+              >
+                {nodeData.contributors &&
+                  nodeData.contributors.map((contributor, idx) => {
+                    return (
+                      <li key={contributor.username}>
+                        <Chip
+                          sx={{
+                            height: "49px",
+                            margin: "4px",
+                            borderRadius: "28px",
+                          }}
+                          icon={
+                            <Avatar
+                              src={contributor.imageUrl}
+                              alt={contributor.fullname}
+                              sx={{
+                                width: "40px",
+                                height: "40px",
+                                mr: 2.5,
+                              }}
+                            />
+                          }
+                          variant="outlined"
+                          label={
+                            <>
+                              <Typography variant="body2" component="div">
+                                {contributor.fullname}
+                              </Typography>
+                              <Typography variant="body2" component="div">
+                                {idx === 0 ? "🏆" : "✔️"}
+                                {" " +
+                                  Math.round(
+                                    (contributor.reputation + Number.EPSILON) *
+                                      100
+                                  ) /
+                                    100}
+                              </Typography>
+                            </>
+                          }
+                        />
+                      </li>
+                    );
+                  })}
+              </Box>
+            </CardContent>
+            <CardActions>
+              <Button size="small">Learn More</Button>
+            </CardActions>
+          </Card>
+          {/* <div className={utilStyles.lightText}>{nodeData.date}</div> */}
+        </Grid>
+        <Grid item sm={12} md={3}>
+          <Paper>
+            <h2>Learn After</h2>
+            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+              {children.map((child) => {
+                return (
+                  <React.Fragment key={child.nodeId}>
+                    <Divider />
+                    <ListItemButton
+                      alignItems="flex-start"
+                      component="a"
+                      target="_blank"
+                      href={child.nodeId}
+                    >
+                      <ListItemText
+                        primary={child.title}
+                        // secondary={
+                        //   <div
+                        //     dangerouslySetInnerHTML={{
+                        //       __html: child.contentHTML,
+                        //     }}
+                        //   />
+                        // }
+                        disableTypography={true}
+                      />
+                    </ListItemButton>
+                  </React.Fragment>
+                );
+              })}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
     </Layout>
   );
 };
