@@ -34,6 +34,7 @@ const getNodeHTMLContent = async (content) => {
   return processedContent.toString();
 };
 
+// Retrieve all helpful data about the node corresponding to nodeId.
 const retrieveNode = async (nodeId) => {
   const nodeDoc = await db.collection("nodes").doc(nodeId).get();
   if (!nodeDoc.exists) {
@@ -41,44 +42,126 @@ const retrieveNode = async (nodeId) => {
   }
   const nodeData = nodeDoc.data();
   const contentHTML = await getNodeHTMLContent(nodeData.content);
-  return { nodeData, contentHTML };
-};
-
-export const getNodeData = async (id) => {
-  const nodeObj = await retrieveNode(id);
-  if (!nodeObj) {
-    return null;
+  // In onecademy database, we have:
+  // "references" with the structure {node: ..., title: ..., label: ...}
+  // and "tags" with the structure {node: ..., title: ...}.
+  // In onecademy-dev database, we refactorred the structure of references and tags.
+  // There, we have the following arrays for references and tags; in each set of
+  // arrays, there is a one-to-one correspondance between the items with the same index:
+  // references: an array of reference node titles that this node is citing
+  // referenceIds: an array of reference node ids that this node is citing
+  // referenceLabels: an array lables indicating how this reference node is veing cited
+  // tags: an array of tag node titles that this node is citing
+  // tagIds: an array of tag node ids that this node is citing
+  // Because we have not migrated 1Cademy.com in production to the new data structure
+  // yet, we should cover both structures for now. Later, after deploying the new
+  // version of 1Cademy.com, we will rewrite this part of the code.
+  const references = [];
+  if ("referenceIds" in nodeData) {
+    for (let refIdx = 0; refIdx < nodeData.referenceIds.length; refIdx++) {
+      references.push({
+        node: nodeData.referenceIds[refIdx],
+        title: nodeData.references[refIdx],
+      });
+    }
+  } else {
+    for (let reference of nodeData.references) {
+      if (reference.node && reference.title) {
+        references.push({
+          node: reference.node,
+          title: reference.title,
+        });
+      }
+    }
   }
-  const { nodeData, contentHTML } = nodeObj;
-
-  const children = [];
-  for (let child of nodeData.children) {
-    const childObj = await retrieveNode(child.node);
-    children.push(childObj);
+  const tags = [];
+  if ("tagIds" in nodeData) {
+    for (let tagIdx = 0; tagIdx < nodeData.tagIds.length; tagIdx++) {
+      tags.push({
+        node: nodeData.tagIds[tagIdx],
+        title: nodeData.tags[tagIdx],
+      });
+    }
+  } else {
+    for (let tag of nodeData.tags) {
+      if (tag.node && tag.title) {
+        tags.push({
+          node: tag.node,
+          title: tag.title,
+        });
+      }
+    }
   }
-  const parents = [];
-  for (let parent of nodeData.parents) {
-    const parentObj = await retrieveNode(parent.node);
-    parents.push(parentObj);
-  }
-
-  // nodeData.institutions
-  // const institutionsCollection = await firebase.db
-  // .collection("institutions")
-  // .get();
-
-  // Combine the data with the id and contentHTML
   return {
-    id,
+    nodeId,
     contentHTML,
     nodeType: nodeData.nodeType,
     title: nodeData.title,
+    nodeImage: nodeData.nodeImage,
     contributors: nodeData.contributors,
     institutions: nodeData.institutions,
     children: nodeData.children,
     parents: nodeData.parents,
+    references,
+    tags,
     corrects: nodeData.corrects,
     wrongs: nodeData.wrongs,
     date: nodeData.updatedAt.toDate().toLocaleString(),
+  };
+};
+
+// Endpoint retrieving the node data and its direct parents and children
+// data based on the id requested.
+export const getNodeData = async (id) => {
+  const nodeData = await retrieveNode(id);
+  if (!nodeData) {
+    return null;
+  }
+
+  // Retrieve the content of all the direct children of the node.
+  const children = [];
+  for (let child of nodeData.children) {
+    const childData = await retrieveNode(child.node);
+    children.push(childData);
+  }
+  // Retrieve the content of all the direct parents of the node.
+  const parents = [];
+  for (let parent of nodeData.parents) {
+    const parentData = await retrieveNode(parent.node);
+    parents.push(parentData);
+  }
+
+  // Descendingly sort the contributors array based on the reputation points.
+  const contributors = [];
+  for (let contriId in nodeData.contributors) {
+    const contriIdx = contributors.findIndex(
+      (contri) => contri.reputation < nodeData.contributors[contriId].reputation
+    );
+    const theContributor = {
+      ...nodeData.contributors[contriId],
+      username: contriId,
+    };
+    contributors.splice(contriIdx, 0, theContributor);
+  }
+  // Descendingly sort the contributors array based on the reputation points.
+  const institutions = [];
+  for (let institId in nodeData.institutions) {
+    const institIdx = institutions.findIndex(
+      (instit) => instit.reputation < nodeData.institutions[institId].reputation
+    );
+    const theInstitution = {
+      ...nodeData.institutions[institId],
+      name: institId,
+    };
+    institutions.splice(institIdx, 0, theInstitution);
+  }
+  return {
+    nodeData: {
+      ...nodeData,
+      contributors,
+      institutions,
+    },
+    children,
+    parents,
   };
 };
