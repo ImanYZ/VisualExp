@@ -237,20 +237,12 @@ const AppAppBar = (props) => {
                 />
               );
             })}
-            {leading ? (
+            {(leading || props.thisPage) && (
               <LinkTab
                 onClick={props.switchSection(5)}
                 label={props.thisPage}
                 titl={props.thisPage}
               />
-            ) : (
-              props.thisPage && (
-                <LinkTab
-                  onClick={props.switchSection(5)}
-                  label={props.thisPage}
-                  titl={props.thisPage}
-                />
-              )
             )}
             {fullname && !props.tutorial && completedExperiment && (
               <Tooltip title="1Cademy Tutorial">
