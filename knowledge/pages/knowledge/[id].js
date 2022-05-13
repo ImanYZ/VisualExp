@@ -105,9 +105,9 @@ const Node = ({ nodeData, children, parents }) => {
         <Grid item sm={12} md={6}>
           <Card sx={{ minWidth: "340px", mt: "40px" }}>
             <CardContent>
-              <Typography variant="h4" component="div">
+              <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "40px" }}>
                 {nodeData.title}
-              </Typography>
+              </Box>
               <div
                 style={{ fontSize: "19px" }}
                 dangerouslySetInnerHTML={{ __html: nodeData.contentHTML }}
@@ -214,7 +214,9 @@ const Node = ({ nodeData, children, parents }) => {
         </Grid>
         <Grid item sm={12} md={3}>
           <Paper>
-            <h2>Learn After</h2>
+            <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "28px" }}>
+              Learn After
+            </Box>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
               {children.map((child) => {
                 return (
