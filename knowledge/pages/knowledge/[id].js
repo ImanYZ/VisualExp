@@ -30,8 +30,8 @@ import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
 import LockIcon from "@mui/icons-material/Lock";
 
-import Layout from "../../components/layout";
-import { getNodeData } from "../../lib/nodes";
+import PagesNavbar from "../../components/PagesNavbar";
+import { getNodeData, logViews } from "../../lib/nodes";
 
 // This value is considered fresh for ten seconds (s-maxage=10).
 // If a request is repeated within the next 10 seconds, the previously
@@ -40,7 +40,8 @@ import { getNodeData } from "../../lib/nodes";
 //
 // In the background, a revalidation request will be made to populate the cache
 // with a fresh value. If you refresh the page, you will see the new value.
-export async function getServerSideProps({ res, params }) {
+export const getServerSideProps = async ({ req, res, params }) => {
+  logViews(req);
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "-1");
   res.setHeader("Cache-Control", "no-cache");
@@ -51,15 +52,18 @@ export async function getServerSideProps({ res, params }) {
       notFound: true,
     };
   }
+  // const nodeRef = db.collection("nodes").doc(params.id);
+  // await nodeRef.update({
+  //   opened,
+  // });
   return {
     props: nodeData,
   };
-}
+};
 
 const Node = ({ nodeData, children, parents }) => {
-  console.log({ nodeData, children, parents });
   return (
-    <Layout>
+    <PagesNavbar thisPage="Node">
       <Head>
         <title>{nodeData.title}</title>
       </Head>
@@ -241,7 +245,7 @@ const Node = ({ nodeData, children, parents }) => {
           </Paper>
         </Grid>
       </Grid>
-    </Layout>
+    </PagesNavbar>
   );
 };
 

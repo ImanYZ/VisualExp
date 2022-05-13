@@ -98,6 +98,7 @@ function Index() {
         switchSection={switchSection}
         homeClick={homeClick}
         joinUsClick={joinUsClick}
+        thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       />
       <Landing />
       <HowItWorks section={section} />
