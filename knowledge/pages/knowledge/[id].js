@@ -41,7 +41,7 @@ import { getNodeData, logViews } from "../../lib/nodes";
 // In the background, a revalidation request will be made to populate the cache
 // with a fresh value. If you refresh the page, you will see the new value.
 export const getServerSideProps = async ({ req, res, params }) => {
-  logViews(req);
+  logViews(req, params.id);
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "-1");
   res.setHeader("Cache-Control", "no-cache");

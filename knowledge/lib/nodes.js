@@ -168,25 +168,52 @@ export const getNodeData = async (id) => {
 };
 
 // Get the user's useragent and location and log views in the database.
-export const logViews = async (req) => {
-  // let userAgent;
-  // if (req) {
-  //   // if you are on the server and you get a 'req' property from your context
-  //   userAgent = req.headers["user-agent"]; // get the user-agent from the headers
-  // } else {
-  //   userAgent = navigator.userAgent; // if you are on the client you can access the navigator from the window object
-  // }
-  // const forwarded = req.headers["x-forwarded-for"];
-  // const ip = forwarded
-  //   ? forwarded.split(/, /)[0]
-  //   : req.connection.remoteAddress;
-  // const geo = geoip.lookup(ip);
-  // const viewerRef = db.collection("viewers").doc();
-  // await viewerRef.update({
-  //   ip,
-  //   userAgent,
-  //   country: geo.country,
-  //   region: geo.region,
-  //   city: geo.city,
-  // });
+export const logViews = async (req, nodeId) => {
+  let userAgent;
+  if (req) {
+    // if you are on the server and you get a 'req' property from your context
+    userAgent = req.headers["user-agent"]; // get the user-agent from the headers
+  } else {
+    userAgent = navigator.userAgent; // if you are on the client you can access the navigator from the window object
+  }
+  const forwarded = req.headers["x-forwarded-for"];
+  const ip = forwarded
+    ? forwarded.split(/, /)[0]
+    : req.connection.remoteAddress;
+  const geo = geoip.lookup(ip);
+  const viewerRef = db.collection("viewers").doc();
+  await batchSet(viewerRef, {
+    nodeId,
+    ip,
+    userAgent,
+    country: geo.country,
+    state: geo.region,
+    city: geo.city,
+  });
+  const viewNumRef = db.collection("viewNums").doc();
+  await batchSet(viewNumRef, {
+    nodeId,
+    num: admin.firestore.FieldValue.increment(1),
+  });
+  const countryViewRef = db.collection("countryViews").doc();
+  await batchSet(countryViewRef, {
+    country: geo.country,
+    num: admin.firestore.FieldValue.increment(1),
+  });
+  const stateViewRef = db.collection("stateViews").doc();
+  await batchSet(stateViewRef, {
+    state: geo.region,
+    num: admin.firestore.FieldValue.increment(1),
+  });
+  const cityViewRef = db.collection("cityViews").doc();
+  await batchSet(cityViewRef, {
+    city: geo.city,
+    num: admin.firestore.FieldValue.increment(1),
+  });
+  const userAgentViewRef = db.collection("userAgentViews").doc();
+  await batchSet(userAgentViewRef, {
+    userAgent,
+    num: admin.firestore.FieldValue.increment(1),
+  });
+  await commitBatch();
 };
