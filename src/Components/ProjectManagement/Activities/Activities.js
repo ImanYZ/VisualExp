@@ -22,6 +22,7 @@ import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
+import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 
 import favicon from "../../../assets/favicon.png";
 
@@ -83,7 +84,7 @@ const Activities = (props) => {
             let intellectualPoints = 0;
             let instructorsPoints = 0;
             let commentsPoints = 0;
-            let recallPoints = 0;
+            let gradingPoints = 0;
             if (projectData.expPoints) {
               totalPoints += projectData.expPoints;
               expPoints = projectData.expPoints;
@@ -112,6 +113,10 @@ const Activities = (props) => {
               totalPoints += projectData.dayInstructorUpVotes;
               instructorsPoints += projectData.dayInstructorUpVotes;
             }
+            if (projectData.gradingPoints) {
+              totalPoints += projectData.gradingPoints;
+              instructorsPoints += projectData.gradingPoints;
+            }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
               if (resears[reIdx].id === change.doc.id) {
@@ -121,7 +126,7 @@ const Activities = (props) => {
                 resears[reIdx].intellectualPoints = intellectualPoints;
                 resears[reIdx].instructorsPoints = instructorsPoints;
                 resears[reIdx].commentsPoints = commentsPoints;
-                resears[reIdx].recallPoints = recallPoints;
+                resears[reIdx].gradingPoints = gradingPoints;
                 foundResear = true;
                 break;
               }
@@ -135,7 +140,7 @@ const Activities = (props) => {
                 intellectualPoints,
                 instructorsPoints,
                 commentsPoints,
-                recallPoints,
+                gradingPoints,
               });
             }
           }
@@ -224,7 +229,7 @@ const Activities = (props) => {
                           resear.intellectualPoints >= 100 &&
                           resear.instructorsPoints >= 100 &&
                           resear.commentsPoints >= 100 &&
-                          resear.recallPoints >= 100 ? (
+                          resear.gradingPoints >= 100 ? (
                             <span className="ChipContent">😊</span>
                           ) : (
                             <span className="ChipContent">😔</span>
@@ -237,7 +242,7 @@ const Activities = (props) => {
                           resear.intellectualPoints >= 100 &&
                           resear.instructorsPoints >= 100 &&
                           resear.commentsPoints >= 100 &&
-                          resear.recallPoints >= 100
+                          resear.gradingPoints >= 100
                             ? "success"
                             : "error"
                         }
@@ -295,12 +300,12 @@ const Activities = (props) => {
                                 {" - "}
                                 <span
                                   className={
-                                    resear.recallPoints >= 100
+                                    resear.gradingPoints >= 100
                                       ? "GreenText"
                                       : ""
                                   }
                                 >
-                                  {"🧠 " + resear.recallPoints}
+                                  {"🧠 " + resear.gradingPoints}
                                 </span>
                               </>
                             ) : (
@@ -351,6 +356,8 @@ const Activities = (props) => {
             <AddInstructor />
           ) : activePage === "1Cademy" ? (
             <OneCademy />
+          ) : activePage === "FreeRecallGrading" ? (
+            <FreeRecallGrading />
           ) : (
             <IntellectualPoints />
           )}
