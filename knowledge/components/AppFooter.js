@@ -74,7 +74,7 @@ export default function AppFooter() {
           </Grid>
           <Grid item xs={6} sm={3}>
             <Box
-              sx={{ display: "block", height: "40px", mt: "0px" }}
+              sx={{ display: "block", height: "40px", mt: "-40px" }}
               component="a"
               target="_blank"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
@@ -82,7 +82,9 @@ export default function AppFooter() {
               <Image
                 src={YouTubeLogo}
                 alt="1Cademy YouTube Channel"
+                layout="fixed"
                 width="100px"
+                height="100px"
               />
             </Box>
           </Grid>
