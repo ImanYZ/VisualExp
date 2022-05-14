@@ -104,6 +104,8 @@ const RouterNav = (props) => {
   const [oneCademyUpvotes, setOneCademyUpvotes] = useState({});
   const [proposalUpvotesToday, setProposalUpvotesToday] = useState(0);
   const [dayOneUpVotes, setDayOneUpVotes] = useState(0);
+  const [gradingPoints, setGradingPoints] = useState(0);
+  const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -181,6 +183,16 @@ const RouterNav = (props) => {
         } else {
           setDayInstructorUpVotes(0);
         }
+        if (theProject.gradingPoints) {
+          setGradingPoints(theProject.gradingPoints);
+        } else {
+          setGradingPoints(0);
+        }
+        if (theProject.negativeGradingPoints) {
+          setNegativeGradingPoints(theProject.negativeGradingPoints);
+        } else {
+          setNegativeGradingPoints(0);
+        }
       });
       return () => {
         setNotTakenSessionsChanges([]);
@@ -192,6 +204,8 @@ const RouterNav = (props) => {
         setExpPoints(0);
         setInstructorPoints(0);
         setDayInstructorUpVotes(0);
+        setGradingPoints(0);
+        setNegativeGradingPoints(0);
         researcherSnapshot();
       };
     }
@@ -650,6 +664,8 @@ const RouterNav = (props) => {
     setUserVersions({});
     setOneCademyUpvotes({});
     setDayOneUpVotes(0);
+    setGradingPoints(0);
+    setNegativeGradingPoints(0);
     await firebase.logout();
   };
 
@@ -891,6 +907,47 @@ const RouterNav = (props) => {
                       👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
                       {instructorsToday} / 7
                       <br /> ✅ {upvotedInstructorsToday} / 16
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      <div>
+                        <div>
+                          You've earned {gradingPoints} total 🧠 free-recall
+                          grading points.
+                        </div>
+                        <div>
+                          This means, {gradingPoints} times at least two other
+                          researchers have identified a specific phrase in a
+                          free-recall response that you also identified.
+                        </div>
+                        <div>
+                          We've already excluded your LOST{" "}
+                          {negativeGradingPoints} total 🧟 free-recall grading
+                          points.
+                        </div>
+                        <div>
+                          This means, {negativeGradingPoints} times you've
+                          identified a phrase in a free-recall response and the
+                          other three researchers, who evaluated the same
+                          free-recall response, have not identified this phrase
+                          in the free-recall response.
+                        </div>
+                      </div>
+                    }
+                  >
+                    <Button
+                      id="FreeRecallGrading"
+                      className={
+                        activePage === "FreeRecallGrading"
+                          ? "ActiveNavLink"
+                          : "NavLink"
+                      }
+                      onClick={(event) =>
+                        navigate("/Activities/FreeRecallGrading")
+                      }
+                    >
+                      🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
                     </Button>
                   </Tooltip>
                   {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>

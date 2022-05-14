@@ -269,6 +269,10 @@ const AppRouter = (props) => {
                   element={<Activities activityName="1Cademy" />}
                 />
                 <Route
+                  path="Activities/FreeRecallGrading"
+                  element={<Activities activityName="FreeRecallGrading" />}
+                />
+                <Route
                   path="Activities/*"
                   element={<Activities activityName="Intellectual" />}
                 />
