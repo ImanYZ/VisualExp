@@ -69,8 +69,14 @@ const Node = ({ nodeData, children, parents }) => {
       </Head>
       <Grid container spacing={2}>
         <Grid item sm={12} md={3}>
-          <Paper sx={{ mt: "40px" }}>
-            <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "28px" }}>
+          <Paper sx={{ pt: "25px" }}>
+            <Box
+              sx={{
+                margin: "0px 19px 7px 19px",
+                fontSize: "19px",
+                fontStyle: "italic",
+              }}
+            >
               Learn Before
             </Box>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
@@ -103,9 +109,9 @@ const Node = ({ nodeData, children, parents }) => {
           </Paper>
         </Grid>
         <Grid item sm={12} md={6}>
-          <Card sx={{ minWidth: "340px", mt: "40px" }}>
+          <Card sx={{ minWidth: "340px" }}>
             <CardContent>
-              <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "40px" }}>
+              <Box sx={{ margin: "4px 19px 7px 19px", fontSize: "40px" }}>
                 {nodeData.title}
               </Box>
               <div
@@ -213,8 +219,14 @@ const Node = ({ nodeData, children, parents }) => {
           {/* <div className={utilStyles.lightText}>{nodeData.date}</div> */}
         </Grid>
         <Grid item sm={12} md={3}>
-          <Paper>
-            <Box sx={{ margin: "19px 19px 7px 19px", fontSize: "28px" }}>
+          <Paper sx={{ pt: "25px" }}>
+            <Box
+              sx={{
+                margin: "0px 19px 7px 19px",
+                fontSize: "19px",
+                fontStyle: "italic",
+              }}
+            >
               Learn After
             </Box>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
