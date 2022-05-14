@@ -3,14 +3,15 @@
 *.env
 .env
 .env*.local
-.firebase/*
-.firebase/
+.firebase/**
 .firebase
 *.cache
 firebase-debug.log
 
 # dependencies
-/node_modules
+node_modules
+/node_modules/**
+jspm_packages
 /.pnp
 .pnp.js
 
@@ -59,10 +60,6 @@ coverage
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
-node_modules
-jspm_packages
-
 # Optional npm cache directory
 .npm
 
@@ -70,8 +67,7 @@ jspm_packages
 # next.js
 .node_repl_history
 .next
-*/.next/*
-knowledge/.next/*
+*/.next/**
 /out/
 
 next.config.js
