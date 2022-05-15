@@ -918,20 +918,21 @@ const RouterNav = (props) => {
                         </div>
                         <div>
                           This means, {gradingPoints} times at least two other
-                          researchers have identified a specific phrase in a
-                          free-recall response that you also identified.
+                          researchers have agreed with you on existance or
+                          non-existance of a specific phrase in a free-recall
+                          response.
                         </div>
                         <div>
-                          We've already excluded your LOST{" "}
-                          {negativeGradingPoints} total 🧟 free-recall grading
-                          points.
+                          From that total 🧠 points, we've already excluded your
+                          negative {negativeGradingPoints} 🧟 points.
                         </div>
                         <div>
-                          This means, {negativeGradingPoints} times you've
-                          identified a phrase in a free-recall response and the
-                          other three researchers, who evaluated the same
-                          free-recall response, have not identified this phrase
-                          in the free-recall response.
+                          This means, {negativeGradingPoints} times exactly 3
+                          out of 4 researchers agreed on existance
+                          (non-existance) of a specific key phrase in a
+                          free-recall response by a participant, but you opposed
+                          their majority of votes. So, you got a 🧟 negative
+                          point for each of those cases.
                         </div>
                       </div>
                     }
