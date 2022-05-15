@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
+import axios from "axios";
+
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -15,6 +17,8 @@ import {
 } from "../../../store/AuthAtoms";
 
 import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
+
+import SnackbarComp from "../../SnackbarComp";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -48,12 +52,14 @@ const FreeRecallGrading = (props) => {
   const [user, setUser] = useState(null);
   const [condition, setCondition] = useState(null);
   const [passage, setPassage] = useState(null);
+  const [passageId, setPassageId] = useState(null);
   const [passageIdx, setPassageIdx] = useState(null);
   const [session, setSession] = useState(null);
   const [phrase, setPhrase] = useState(null);
+  const [phraseNum, setPhraseNum] = useState(0);
   const [response, setResponse] = useState(null);
-  const [othersGrades, setOthersGrades] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
@@ -68,7 +74,8 @@ const FreeRecallGrading = (props) => {
         .get();
       for (let userDoc of userDocs.docs) {
         const userData = userDoc.data();
-        // Because some researchers had previously been participants, we should not let them grade their own free-recall responses.
+        // Because some researchers had previously been participants, we should
+        // not let them grade their own free-recall responses.
         if (userDoc.id !== fullname) {
           // Get the free-recall responses of this participant for all passages,
           // for now they are two because each participant goes through only two
@@ -125,22 +132,41 @@ const FreeRecallGrading = (props) => {
                     // response before:
                     if (
                       freeRecallGradeDocs.docs.length < 4 &&
+                      // If there are no more researchers who graded this, we
+                      // should take it.
                       (freeRecallGradeDocs.docs.length === 0 ||
+                        // If there is at least one other researcher who graded
+                        // this, the 1st researcher should not be the same as
+                        // the authenticated researcher.
                         (freeRecallGradeDocs.docs[0].data().researcher !==
                           fullname &&
+                          // If there are at least two other researchers who graded
+                          // this, the 2nd researcher should not be the same as
+                          // the authenticated researcher.
                           (freeRecallGradeDocs.docs.length < 2 ||
                             freeRecallGradeDocs.docs[1].data().researcher !==
                               fullname) &&
+                          // If there are at least three other researchers who graded
+                          // this, the 3rd researcher should not be the same as
+                          // the authenticated researcher.
                           (freeRecallGradeDocs.docs.length < 3 ||
                             freeRecallGradeDocs.docs[2].data().researcher !==
                               fullname)))
                     ) {
                       foundFreeRecallResponse = true;
+                      // We need to set these states to identify which phrase is
+                      // assigned to which participant's free-recall response by
+                      // which researcher, ... to be able to assign these values
+                      // to the corresponding freeRecallGrades document when
+                      // submitting the researcher's evaluation of this phrase
+                      // in this free-recall response.
                       setUser(userDoc.id);
                       setCondition(userData.pConditions[passaIdx].condition);
                       setPassage(passageData.text);
                       setPassageIdx(passaIdx);
+                      setPassageId(passageDoc.id);
                       setPhrase(phras);
+                      setPhraseNum(passageData.phrases.length);
                       setResponse(
                         userData.pConditions[passaIdx][recallResponse]
                       );
@@ -156,15 +182,6 @@ const FreeRecallGrading = (props) => {
                           break;
                         default:
                         // code block
-                      }
-                      if (freeRecallGradeDocs.docs.length === 0) {
-                        setOthersGrades([]);
-                      } else {
-                        const oGrades = [];
-                        for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
-                          oGrades.push(freeRecallGradeDoc.data().grade);
-                        }
-                        setOthersGrades(oGrades);
                       }
                       break;
                     }
@@ -188,11 +205,40 @@ const FreeRecallGrading = (props) => {
     if (firebase && !notAResearcher) {
       retrieveFreeRecallResponse();
     }
+    // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
+    // should be called regardless of its value.
   }, [firebase, notAResearcher, retrieveNext]);
 
-  const gradeIt = (grade = async (event) => {
-    const freeRecallGradeRef = firebase.db.collection("freeRecallGrades").doc();
-  });
+  // Clicking the Yes or No buttons would trigger this function. grade can be
+  // either true, meaning the researcher responded Yes, or false if they
+  // responded No.
+  const gradeIt = (grade) => async (event) => {
+    setSubmitting(true);
+    try {
+      await firebase.idToken();
+      await axios.post("/gradeFreeRecall", {
+        grade,
+        fullname,
+        project,
+        user,
+        passageId,
+        condition,
+        phrase,
+        session,
+        phraseNum,
+        response,
+      });
+      // Increment retrieveNext to get the next free-recall response to grade.
+      setRetrieveNext((oldValue) => oldValue + 1);
+      setSnackbarMessage("You successfully submitted your evaluation!");
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage(
+        "Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!"
+      );
+    }
+    setSubmitting(false);
+  };
 
   return (
     <div id="FreeRecallGrading">
@@ -203,8 +249,8 @@ const FreeRecallGrading = (props) => {
             mentioned in each free-recall response.
           </li>
           <li>
-            If 3 out of 4 researchers identify a specific key phrase in a
-            free-recall response by a participant:
+            If at least 3 out of 4 researchers identify a specific key phrase in
+            a free-recall response by a participant:
             <ul>
               <li>
                 The participant receives a point for recalling that key phrase
@@ -217,17 +263,20 @@ const FreeRecallGrading = (props) => {
             </ul>
           </li>
           <li>
-            If a researcher has identified a key phrase in a specific
-            free-recall response, but the other three researchers have not
-            identified the phrase, the former researcher gets a 🧟 negative
-            point.
+            If exactly 3 out of 4 researchers agree on existance (non-existance)
+            of a specific key phrase in a free-recall response by a participant,
+            but the 4th researcher opposes their majority of votes, the opposing
+            researcher gets a 🧟 negative point. Note that you don't know the
+            grades that others have cast, but if the 3 other researchers give
+            this case a Yes (or No) and you give it a No (or Yes), you'll get a
+            🧟 negative point.
           </li>
         </ul>
       </Alert>
       <Paper style={{ paddingBottom: "19px" }}>
         <p>
           Please identify whether this participant has mentioned the following
-          key phrase that was mentioned in the original passage:
+          key phrase from the original passage:
         </p>
         <Paper style={{ padding: "4px 19px 4px 19px", margin: "19px" }}>
           <p style={{ fontStyle: "italic" }}>{phrase}</p>
@@ -245,7 +294,7 @@ const FreeRecallGrading = (props) => {
           }}
         >
           <Button
-            onClick={gradeIt("No")}
+            onClick={gradeIt(false)}
             className="Button"
             variant="contained"
             color="error"
@@ -257,7 +306,7 @@ const FreeRecallGrading = (props) => {
             )}
           </Button>
           <Button
-            onClick={gradeIt("Yes")}
+            onClick={gradeIt(true)}
             className="Button"
             variant="contained"
             color="success"
@@ -279,6 +328,10 @@ const FreeRecallGrading = (props) => {
           <p style={{ fontStyle: "italic" }}>{passage}</p>
         </Paper>
       </Paper>
+      <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
+      />
     </div>
   );
 };
