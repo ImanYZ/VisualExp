@@ -1214,7 +1214,7 @@ exports.gradeFreeRecall = async (req, res) => {
     console.log({ err });
     return res.status(500).json({ err });
   }
-  return res.status(500).json({ done: true });
+  return res.status(200).json({ done: true });
 };
 
 exports.assignExperimentSessionsPoints = async (context) => {
