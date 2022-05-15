@@ -58,7 +58,7 @@ const FreeRecallGrading = (props) => {
   const [phrase, setPhrase] = useState(null);
   const [phraseNum, setPhraseNum] = useState(0);
   const [response, setResponse] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Retrieve a free-recall response that is not evaluated by four
@@ -183,6 +183,9 @@ const FreeRecallGrading = (props) => {
                         default:
                         // code block
                       }
+                      setTimeout(() => {
+                        setSubmitting(false);
+                      }, 10000);
                       break;
                     }
                   }
@@ -213,31 +216,42 @@ const FreeRecallGrading = (props) => {
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = (grade) => async (event) => {
-    setSubmitting(true);
-    try {
-      await firebase.idToken();
-      await axios.post("/gradeFreeRecall", {
-        grade,
-        fullname,
-        project,
-        user,
-        passageId,
-        condition,
-        phrase,
-        session,
-        phraseNum,
-        response,
-      });
-      // Increment retrieveNext to get the next free-recall response to grade.
-      setRetrieveNext((oldValue) => oldValue + 1);
-      setSnackbarMessage("You successfully submitted your evaluation!");
-    } catch (err) {
-      console.error(err);
-      setSnackbarMessage(
-        "Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!"
-      );
+    if (
+      !submitting &&
+      fullname &&
+      passageId &&
+      condition &&
+      phrase &&
+      session &&
+      phraseNum &&
+      response
+    ) {
+      setSubmitting(true);
+      try {
+        await firebase.idToken();
+        await axios.post("/gradeFreeRecall", {
+          grade,
+          fullname,
+          project,
+          user,
+          passageId,
+          passageIdx,
+          condition,
+          phrase,
+          session,
+          phraseNum,
+          response,
+        });
+        // Increment retrieveNext to get the next free-recall response to grade.
+        setRetrieveNext((oldValue) => oldValue + 1);
+        setSnackbarMessage("You successfully submitted your evaluation!");
+      } catch (err) {
+        console.error(err);
+        setSnackbarMessage(
+          "Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!"
+        );
+      }
     }
-    setSubmitting(false);
   };
 
   return (
@@ -257,7 +271,7 @@ const FreeRecallGrading = (props) => {
                 about the passage.
               </li>
               <li>
-                Each of those 3 or 4 researchers receives a 🧠 point towards
+                Each of those 3 or 4 researchers receives a 0.5 🧠 point towards
                 this research activity.
               </li>
             </ul>
@@ -265,11 +279,11 @@ const FreeRecallGrading = (props) => {
           <li>
             If exactly 3 out of 4 researchers agree on existance (non-existance)
             of a specific key phrase in a free-recall response by a participant,
-            but the 4th researcher opposes their majority of votes, the opposing
-            researcher gets a 🧟 negative point. Note that you don't know the
-            grades that others have cast, but if the 3 other researchers give
-            this case a Yes (or No) and you give it a No (or Yes), you'll get a
-            🧟 negative point.
+            but the 4th researcher opposes their majority of vote, the opposing
+            researcher gets a 0.5 🧟 negative point. Note that you don't know
+            the grades that others have cast, but if the 3 other researchers
+            give this case a Yes (or No) and you give it a No (or Yes), you'll
+            get a 0.5 🧟 negative point.
           </li>
         </ul>
       </Alert>
@@ -278,12 +292,12 @@ const FreeRecallGrading = (props) => {
           Please identify whether this participant has mentioned the following
           key phrase from the original passage:
         </p>
-        <Paper style={{ padding: "4px 19px 4px 19px", margin: "19px" }}>
-          <p style={{ fontStyle: "italic" }}>{phrase}</p>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+          {phrase}
         </Paper>
         <p>Here is their free-recall response:</p>
-        <Paper style={{ padding: "4px 19px 4px 19px", margin: "19px" }}>
-          <p style={{ fontStyle: "italic" }}>{response}</p>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+          {response}
         </Paper>
         <div
           style={{
@@ -298,6 +312,7 @@ const FreeRecallGrading = (props) => {
             className="Button"
             variant="contained"
             color="error"
+            disabled={submitting}
           >
             {submitting ? (
               <CircularProgress color="warning" size="16px" />
@@ -310,6 +325,7 @@ const FreeRecallGrading = (props) => {
             className="Button"
             variant="contained"
             color="success"
+            disabled={submitting}
           >
             {submitting ? (
               <CircularProgress color="warning" size="16px" />
@@ -321,11 +337,11 @@ const FreeRecallGrading = (props) => {
         <p>The original passage is:</p>
         <Paper
           style={{
-            padding: "4px 19px 4px 19px",
+            padding: "10px 19px 10px 19px",
             margin: "19px 19px 70px 19px",
           }}
         >
-          <p style={{ fontStyle: "italic" }}>{passage}</p>
+          {passage}
         </Paper>
       </Paper>
       <SnackbarComp

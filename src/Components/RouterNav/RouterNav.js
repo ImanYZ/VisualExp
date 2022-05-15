@@ -917,7 +917,7 @@ const RouterNav = (props) => {
                           grading points.
                         </div>
                         <div>
-                          This means, {gradingPoints} times at least two other
+                          This means, {gradingPoints} times at least 3 other
                           researchers have agreed with you on existance or
                           non-existance of a specific phrase in a free-recall
                           response.
@@ -927,11 +927,11 @@ const RouterNav = (props) => {
                           negative {negativeGradingPoints} 🧟 points.
                         </div>
                         <div>
-                          This means, {negativeGradingPoints} times exactly 3
-                          out of 4 researchers agreed on existance
+                          This means, 2 x {negativeGradingPoints} times exactly
+                          3 out of 4 researchers agreed on existance
                           (non-existance) of a specific key phrase in a
                           free-recall response by a participant, but you opposed
-                          their majority of votes. So, you got a 🧟 negative
+                          their majority of votes. So, you got a 0.5 🧟 negative
                           point for each of those cases.
                         </div>
                       </div>
