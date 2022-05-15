@@ -970,6 +970,253 @@ exports.loadTimesheetVotes = async (req, res) => {
   return res.status(500).json({ done: true });
 };
 
+// Clicking the Yes or No buttons in FreeRecallGrading.js under
+// ProjectManagement would trigger this function. grade can be either true,
+// meaning the researcher responded Yes, or false if they responded No.
+exports.gradeFreeRecall = async (req, res) => {
+  try {
+    if (
+      "grade" in req.body &&
+      "fullname" in req.body &&
+      "project" in req.body &&
+      "user" in req.body &&
+      "passageId" in req.body &&
+      "condition" in req.body &&
+      "phrase" in req.body &&
+      "session" in req.body &&
+      "phraseNum" in req.body &&
+      "response" in req.body
+    ) {
+      const grade = req.body.grade;
+      const fullname = req.body.fullname;
+      const project = req.body.project;
+      const user = req.body.user;
+      const passageId = req.body.passageId;
+      const condition = req.body.condition;
+      const phrase = req.body.phrase;
+      const session = req.body.session;
+      const phraseNum = req.body.phraseNum;
+      const response = req.body.response;
+      await db.runTransaction(async (t) => {
+        // Accumulate all the transaction writes in an array to commit all of them
+        // after all the reads to abide by the Firestore transaction law
+        // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
+        const transactionWrites = [];
+        // Because there will be multiple places to update this researcher data,
+        // we should accumulate all the updates for this researcher to commit them
+        // at the end of the transaction.
+        const thisResearcherRef = db.collection("researchers").doc(fullname);
+        const thisResearcherDoc = await t.get(thisResearcherRef);
+        const thisResearcherData = thisResearcherDoc.data();
+        const thisResearcherUpdates = thisResearcherData.projects[project];
+        // The very first update we need to apply is to increment the number of
+        // times they have graded a free-recall response.
+        thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum
+          ? thisResearcherUpdates.gradingNum + 1
+          : 1;
+        // We need to check whether each of the other researchers have identified
+        // the phrase in this free-recall response.
+        const freeRecallGradeQuery = db
+          .collection("freeRecallGrades")
+          .where("user", "==", user)
+          .where("project", "==", project)
+          .where("passage", "==", passageId)
+          .where("phrase", "==", phrase);
+        const freeRecallGradeDocs = await freeRecallGradeQuery.get();
+        // We need to figure out whether at least 3 out of 4 researchers marked it
+        // as: (Yes), then it should be approved and we should give points to the
+        // reseachers and the user; (No), then it should be approved and we should
+        // give points to the researchers, but not the user.
+        let identified = 0;
+        let notIdentified = 0;
+        for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
+          identified += freeRecallGradeDoc.data().grade;
+          notIdentified += !freeRecallGradeDoc.data().grade;
+        }
+        identified += grade;
+        notIdentified += !grade;
+        // It should be approved if more than or equal to 3 researchers have
+        // unanimously identified/not identified this phrase in this free-recall
+        // response.
+        let approved = identified >= 3 || notIdentified >= 3;
+        if (approved) {
+          // If identified >= 3, we should give the participant their free-recall
+          // point.
+          if (identified >= 3) {
+            const userRef = db.collection("users").doc(user);
+            const userDoc = await t.get(userRef);
+            const userData = userDoc.data();
+            // Because the participant answers the free-recall questions for each
+            // passage 3 time, in the 1st, 2nd, and 3rd sessions, we should
+            // differentiate them when assigning their grades.
+            let recallResponse;
+            switch (session) {
+              case "1st":
+                recallResponse = "recallreGrade";
+                break;
+              case "2nd":
+                recallResponse = "recall3DaysreGrade";
+                break;
+              case "3rd":
+                recallResponse = "recall1WeekreGrade";
+                break;
+              default:
+              // code block
+            }
+            // The only piece of the user data that should be modified is
+            // pCondition based on the point received.
+            const userUpdates = { pConditions: userData.pConditions };
+            let theGrade = 1;
+            if (userUpdates.pConditions[passageIdx][recallResponse]) {
+              // We should add up points here because each free recall response
+              // may get multiple points from each of the key phrases identified
+              // in it.
+              theGrade += userUpdates.pConditions[passageIdx][recallResponse];
+            }
+            userUpdates.pConditions[passageIdx][recallResponse] = theGrade;
+            // Depending on how many key phrases were in the passage, we should
+            // calculate the free-recall response ratio.
+            userUpdates.pConditions[passageIdx][recallResponse + "Ratio"] =
+              theGrade / phraseNum;
+            transactionWrites.push({
+              type: "update",
+              refObj: userRef,
+              updateObj: userUpdates,
+            });
+          }
+          // For both identified >= 3 AND notIdentified >= 3 cases, we should give
+          // a point to each of the researchers who unanimously
+          // identified/notIdentified this phrase in this free recall response.
+          for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
+            const freeRecallGradeData = freeRecallGradeDoc.data();
+            const researcherRef = db
+              .collection("researchers")
+              .doc(freeRecallGradeData.researcher);
+            const researcherDoc = await t.get(researcherRef);
+            const researcherData = researcherDoc.data();
+            if (
+              (identified >= 3 && freeRecallGradeData.grade) ||
+              (notIdentified >= 3 && !freeRecallGradeData.grade)
+            ) {
+              // Approve the freeRecallGrade for all the researchers who
+              // unanimously identified/notIdentified this phrase in this free
+              // recall response.
+              const freeRecallGradeRef = db
+                .collection("freeRecallGrades")
+                .doc(freeRecallGradeDoc.id);
+              transactionWrites.push({
+                type: "update",
+                refObj: freeRecallGradeRef,
+                updateObj: { approved },
+              });
+              researcherData.projects[project].gradingPoints = researcherData
+                .projects[project].gradingPoints
+                ? researcherData.projects[project].gradingPoints + 1
+                : 1;
+              transactionWrites.push({
+                type: "update",
+                refObj: researcherRef,
+                updateObj: {
+                  projects: researcherData.projects,
+                },
+              });
+            }
+            // If there are exactly 3 researchers who graded the same, but only
+            // this researcher's grade (Yes/No) is different from the majority of
+            // grades; we should give the opposing researcher a negative point.
+            else if (
+              (identified === 3 && !freeRecallGradeData.grade) ||
+              (notIdentified === 3 && freeRecallGradeData.grade)
+            ) {
+              researcherData.projects[project].gradingPoints = researcherData
+                .projects[project].gradingPoints
+                ? researcherData.projects[project].gradingPoints - 1
+                : -1;
+              researcherData.projects[project].negativeGradingPoints =
+                researcherData.projects[project].negativeGradingPoints
+                  ? researcherData.projects[project].negativeGradingPoints + 1
+                  : 1;
+              transactionWrites.push({
+                type: "update",
+                refObj: researcherRef,
+                updateObj: {
+                  projects: researcherData.projects,
+                },
+              });
+            }
+          }
+          // If the authenticated researcher has graded the same as the majority
+          // of grades:
+          if ((identified >= 3 && grade) || (notIdentified >= 3 && !grade)) {
+            // Because it's approved, we should also give the authenticated
+            // researcher a point. We should update thisResearcherUpdates and
+            // commit all the updates at the end to their document.
+            thisResearcherUpdates.gradingPoints =
+              thisResearcherUpdates.gradingPoints
+                ? thisResearcherUpdates.gradingPoints + 1
+                : 1;
+          }
+          // If there are exactly 3 researchers who graded the same, but only the
+          // authenticated researcher's grade (Yes/No) is different from the
+          // majority of grades; we should give the the authenticated researcher a
+          // negative point.
+          else if (
+            (identified === 3 && !grade) ||
+            (notIdentified === 3 && grade)
+          ) {
+            thisResearcherUpdates.gradingPoints =
+              thisResearcherUpdates.gradingPoints
+                ? thisResearcherUpdates.gradingPoints - 1
+                : -1;
+            thisResearcherUpdates.negativeGradingPoints =
+              thisResearcherUpdates.negativeGradingPoints
+                ? thisResearcherUpdates.negativeGradingPoints + 1
+                : 1;
+          }
+        }
+        transactionWrites.push({
+          type: "update",
+          refObj: thisResearcherRef,
+          updateObj: {
+            projects: {
+              ...thisResearcherData.projects,
+              [project]: thisResearcherUpdates,
+            },
+          },
+        });
+        for (let transactionWrite of transactionWrites) {
+          if (transactionWrite.type === "update") {
+            t.update(transactionWrite.refObj, transactionWrite.updateObj);
+          } else if (transactionWrite.type === "set") {
+            t.set(transactionWrite.refObj, transactionWrite.updateObj);
+          } else if (transactionWrite.type === "delete") {
+            t.delete(transactionWrite.refObj);
+          }
+        }
+        // Finally, we should create the freeRecallGrades doc for this new grade.
+        const freeRecallGradeRef = db.collection("freeRecallGrades").doc();
+        t.set(freeRecallGradeRef, {
+          researcher: fullname,
+          user,
+          project,
+          passage: passageId,
+          phrase,
+          condition,
+          approved,
+          session,
+          response,
+          grade,
+          createdAt: admin.firestore.Timestamp.fromDate(new Date()),
+        });
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+  return res.status(500).json({ done: true });
+};
+
 exports.assignExperimentSessionsPoints = async (context) => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
@@ -1539,7 +1786,6 @@ exports.remindCalendarInvitations = async (context) => {
     return null;
   }
 };
-
 // Deprecated
 // exports.updateNotTakenSessions = async (context) => {
 //   try {

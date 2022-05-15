@@ -115,7 +115,7 @@ const Activities = (props) => {
             }
             if (projectData.gradingPoints) {
               totalPoints += projectData.gradingPoints;
-              instructorsPoints += projectData.gradingPoints;
+              gradingPoints += projectData.gradingPoints;
             }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
