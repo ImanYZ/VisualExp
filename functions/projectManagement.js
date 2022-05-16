@@ -1024,7 +1024,7 @@ exports.gradeFreeRecall = async (req, res) => {
           .where("project", "==", project)
           .where("passage", "==", passageId)
           .where("phrase", "==", phrase);
-        const freeRecallGradeDocs = await freeRecallGradeQuery.get();
+        const freeRecallGradeDocs = await t.get(freeRecallGradeQuery);
         // Only if all the 4 researchers (this one and 3 others) have graded
         // this case, then check whether it should be approved and assign the
         // points to the researchers and the participants.
