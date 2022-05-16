@@ -52,7 +52,7 @@ export default function AppFooter() {
       component="footer"
       sx={{ display: "flex", bgcolor: "secondary.light" }}
     >
-      <Container sx={{ my: 8, display: "flex" }}>
+      <Container sx={{ my: 4, display: "flex" }}>
         <Grid container spacing={5}>
           <Grid item xs={6} sm={3}>
             <Copyright />
@@ -82,7 +82,7 @@ export default function AppFooter() {
               <Image
                 src={YouTubeLogo}
                 alt="1Cademy YouTube Channel"
-                layout="fixed"
+                layout="intrinsic"
                 width="100px"
                 height="100px"
               />
