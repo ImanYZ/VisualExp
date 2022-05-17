@@ -30,6 +30,7 @@ import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
 import LockIcon from "@mui/icons-material/Lock";
 
+import MarkdownRender from "../../components/Markdown/MarkdownRender";
 import PagesNavbar from "../../components/PagesNavbar";
 import { getNodeData, logViews } from "../../lib/nodes";
 
@@ -91,7 +92,7 @@ const Node = ({ nodeData, children, parents }) => {
                       href={parent.nodeId}
                     >
                       <ListItemText
-                        primary={parent.title}
+                        primary={<MarkdownRender children={parent.title} />}
                         // secondary={
                         //   <div
                         //     dangerouslySetInnerHTML={{
@@ -112,12 +113,9 @@ const Node = ({ nodeData, children, parents }) => {
           <Card sx={{ minWidth: "340px" }}>
             <CardContent>
               <Box sx={{ margin: "4px 19px 7px 19px", fontSize: "40px" }}>
-                {nodeData.title}
+                <MarkdownRender children={nodeData.title} />
               </Box>
-              <div
-                style={{ fontSize: "19px" }}
-                dangerouslySetInnerHTML={{ __html: nodeData.contentHTML }}
-              />
+              <MarkdownRender children={nodeData.content} />
               <Box style={{ display: "inline-block", color: "#ff9100" }}>
                 {nodeData.nodeType === "Code" ? (
                   <CodeIcon />
@@ -241,7 +239,7 @@ const Node = ({ nodeData, children, parents }) => {
                       href={child.nodeId}
                     >
                       <ListItemText
-                        primary={child.title}
+                        primary={<MarkdownRender children={child.title} />}
                         // secondary={
                         //   <div
                         //     dangerouslySetInnerHTML={{

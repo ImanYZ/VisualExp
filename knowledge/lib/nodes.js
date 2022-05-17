@@ -42,7 +42,7 @@ const retrieveNode = async (nodeId) => {
     return null;
   }
   const nodeData = nodeDoc.data();
-  const contentHTML = await getNodeHTMLContent(nodeData.content);
+  // const contentHTML = await getNodeHTMLContent(nodeData.content);
   // In onecademy database, we have:
   // "references" with the structure {node: ..., title: ..., label: ...}
   // and "tags" with the structure {node: ..., title: ...}.
@@ -95,7 +95,7 @@ const retrieveNode = async (nodeId) => {
   }
   return {
     nodeId,
-    contentHTML,
+    content: nodeData.content,
     nodeType: nodeData.nodeType,
     title: nodeData.title,
     nodeImage: nodeData.nodeImage,
