@@ -63,13 +63,14 @@ export const getServerSideProps = async ({ req, res, params }) => {
 };
 
 const Node = ({ nodeData, children, parents }) => {
+  console.log({ nodeData });
   return (
     <PagesNavbar thisPage="Node">
       <Head>
         <title>{nodeData.title}</title>
       </Head>
       <Grid container spacing={2}>
-        <Grid item sm={12} md={3}>
+        <Grid item xs={12} sm={12} md={3}>
           <Paper sx={{ pt: "25px" }}>
             <Box
               sx={{
@@ -109,10 +110,10 @@ const Node = ({ nodeData, children, parents }) => {
             </List>
           </Paper>
         </Grid>
-        <Grid item sm={12} md={6}>
+        <Grid item xs={12} sm={12} md={6}>
           <Card sx={{ minWidth: "340px" }}>
             <CardContent>
-              <Box sx={{ margin: "4px 19px 7px 19px", fontSize: "40px" }}>
+              <Box sx={{ margin: "-10px 19px 7px 19px", fontSize: "40px" }}>
                 <MarkdownRender children={nodeData.title} />
               </Box>
               <MarkdownRender children={nodeData.content} />
@@ -145,14 +146,24 @@ const Node = ({ nodeData, children, parents }) => {
                 <Typography
                   sx={{
                     fontSize: 13,
-                    padding: "0px 0px 0px 19px",
+                    padding: "0px 0px 0px 5.5px",
+                    verticalAlign: "5.5px",
+                  }}
+                  component="span"
+                >
+                  {nodeData.nodeType} Type
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    padding: "0px 0px 0px 25px",
                     verticalAlign: "5.5px",
                   }}
                   component="span"
                   color="text.secondary"
                   gutterBottom
                 >
-                  {nodeData.date}
+                  Last updated: {nodeData.date}
                 </Typography>
               </Box>
               <Box
@@ -210,13 +221,10 @@ const Node = ({ nodeData, children, parents }) => {
                   })}
               </Box>
             </CardContent>
-            <CardActions>
-              <Button size="small">Learn More</Button>
-            </CardActions>
           </Card>
           {/* <div className={utilStyles.lightText}>{nodeData.date}</div> */}
         </Grid>
-        <Grid item sm={12} md={3}>
+        <Grid item xs={12} sm={12} md={3}>
           <Paper sx={{ pt: "25px" }}>
             <Box
               sx={{
