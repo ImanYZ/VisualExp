@@ -29,7 +29,6 @@ const Leaderboard = ({ data, objType }) => {
                 : obj.fullname;
             const imageUrl =
               objType === "Institutions" ? obj.logoURL : obj.imageUrl;
-            console.log({ imageUrl });
             return (
               <LeaderboardChip
                 key={obj.name + idx}
