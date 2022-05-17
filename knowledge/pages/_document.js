@@ -11,9 +11,9 @@ export default class MyDocument extends Document {
         <Head>
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
-          <meta httpEquiv="Pragma" content="no-cache" />
+          {/* <meta httpEquiv="Pragma" content="no-cache" />
           <meta httpEquiv="Expires" content="-1" />
-          <meta httpEquiv="CACHE-CONTROL" content="NO-CACHE" />
+          <meta httpEquiv="CACHE-CONTROL" content="NO-CACHE" /> */}
           <link rel="shortcut icon" href="/public/favicon.ico" />
           <link
             rel="stylesheet"
