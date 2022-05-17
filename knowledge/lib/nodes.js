@@ -107,7 +107,7 @@ const retrieveNode = async (nodeId) => {
     tags,
     corrects: nodeData.corrects,
     wrongs: nodeData.wrongs,
-    date: nodeData.updatedAt.toDate().toLocaleString(),
+    date: nodeData.updatedAt.toDate().toUTCString(),
   };
 };
 
@@ -120,30 +120,31 @@ export const getNodeData = async (id) => {
   }
 
   // Retrieve the content of all the direct children of the node.
-  const children = [];
-  for (let child of nodeData.children) {
-    const childData = await retrieveNode(child.node);
-    children.push(childData);
-  }
+  // const children = [];
+  // for (let child of nodeData.children) {
+  //   const childData = await retrieveNode(child.node);
+  //   children.push(childData);
+  // }
   // Retrieve the content of all the direct parents of the node.
-  const parents = [];
-  for (let parent of nodeData.parents) {
-    const parentData = await retrieveNode(parent.node);
-    parents.push(parentData);
-  }
+  // const parents = [];
+  // for (let parent of nodeData.parents) {
+  //   const parentData = await retrieveNode(parent.node);
+  //   parents.push(parentData);
+  // }
 
   // Descendingly sort the contributors array based on the reputation points.
   const contributors = [];
-  for (let contriId in nodeData.contributors) {
+  for (let username in nodeData.contributors) {
     const contriIdx = contributors.findIndex(
-      (contri) => contri.reputation < nodeData.contributors[contriId].reputation
+      (contri) => contri.reputation < nodeData.contributors[username].reputation
     );
     const theContributor = {
-      ...nodeData.contributors[contriId],
-      username: contriId,
+      ...nodeData.contributors[username],
+      username,
     };
-    contributors.splice(contriIdx, 0, theContributor);
+    contributors.splice(contriIdx + 1, 0, theContributor);
   }
+  console.log({ contributors });
   // Descendingly sort the contributors array based on the reputation points.
   const institutions = [];
   for (let institId in nodeData.institutions) {
@@ -154,16 +155,12 @@ export const getNodeData = async (id) => {
       ...nodeData.institutions[institId],
       name: institId,
     };
-    institutions.splice(institIdx, 0, theInstitution);
+    institutions.splice(institIdx + 1, 0, theInstitution);
   }
   return {
-    nodeData: {
-      ...nodeData,
-      contributors,
-      institutions,
-    },
-    children,
-    parents,
+    ...nodeData,
+    contributors,
+    institutions,
   };
 };
 

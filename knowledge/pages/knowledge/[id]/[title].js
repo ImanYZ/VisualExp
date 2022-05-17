@@ -30,9 +30,9 @@ import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
 import LockIcon from "@mui/icons-material/Lock";
 
-import MarkdownRender from "../../components/Markdown/MarkdownRender";
-import PagesNavbar from "../../components/PagesNavbar";
-import { getNodeData, logViews } from "../../lib/nodes";
+import MarkdownRender from "../../../components/Markdown/MarkdownRender";
+import PagesNavbar from "../../../components/PagesNavbar";
+import { getNodeData, logViews } from "../../../lib/nodes";
 
 // This value is considered fresh for ten seconds (s-maxage=10).
 // If a request is repeated within the next 10 seconds, the previously
@@ -43,9 +43,9 @@ import { getNodeData, logViews } from "../../lib/nodes";
 // with a fresh value. If you refresh the page, you will see the new value.
 export const getServerSideProps = async ({ req, res, params }) => {
   logViews(req, params.id);
-  res.setHeader("Pragma", "no-cache");
-  res.setHeader("Expires", "-1");
-  res.setHeader("Cache-Control", "no-cache");
+  // res.setHeader("Pragma", "no-cache");
+  // res.setHeader("Expires", "-1");
+  // res.setHeader("Cache-Control", "no-cache");
   const nodeData = await getNodeData(params.id);
   if (!nodeData) {
     return {
@@ -62,12 +62,12 @@ export const getServerSideProps = async ({ req, res, params }) => {
   };
 };
 
-const Node = ({ nodeData, children, parents }) => {
-  console.log({ nodeData });
+const Node = (props) => {
+  console.log({ props });
   return (
     <PagesNavbar thisPage="Node">
       <Head>
-        <title>{nodeData.title}</title>
+        <title>{props.title}</title>
       </Head>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={3}>
@@ -82,15 +82,14 @@ const Node = ({ nodeData, children, parents }) => {
               Learn Before
             </Box>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {parents.map((parent) => {
+              {props.parents.map((parent) => {
                 return (
-                  <React.Fragment key={parent.nodeId}>
+                  <React.Fragment key={parent.node}>
                     <Divider />
                     <ListItemButton
                       alignItems="flex-start"
                       component="a"
-                      target="_blank"
-                      href={parent.nodeId}
+                      href={parent.node}
                     >
                       <ListItemText
                         primary={<MarkdownRender children={parent.title} />}
@@ -114,31 +113,31 @@ const Node = ({ nodeData, children, parents }) => {
           <Card sx={{ minWidth: "340px" }}>
             <CardContent>
               <Box sx={{ margin: "-10px 19px 7px 19px", fontSize: "40px" }}>
-                <MarkdownRender children={nodeData.title} />
+                <MarkdownRender children={props.title} />
               </Box>
-              <MarkdownRender children={nodeData.content} />
+              <MarkdownRender children={props.content} />
               <Box style={{ display: "inline-block", color: "#ff9100" }}>
-                {nodeData.nodeType === "Code" ? (
+                {props.nodeType === "Code" ? (
                   <CodeIcon />
-                ) : nodeData.nodeType === "Concept" ? (
+                ) : props.nodeType === "Concept" ? (
                   <LocalLibraryIcon />
-                ) : nodeData.nodeType === "Relation" ? (
+                ) : props.nodeType === "Relation" ? (
                   <ShareIcon />
-                ) : nodeData.nodeType === "Question" ? (
+                ) : props.nodeType === "Question" ? (
                   <HelpOutlineIcon />
-                ) : nodeData.nodeType === "Profile" ? (
+                ) : props.nodeType === "Profile" ? (
                   <PersonIcon />
-                ) : nodeData.nodeType === "Sequel" ? (
+                ) : props.nodeType === "Sequel" ? (
                   <MoreHorizIcon />
-                ) : nodeData.nodeType === "Advertisement" ? (
+                ) : props.nodeType === "Advertisement" ? (
                   <EventIcon />
-                ) : nodeData.nodeType === "Reference" ? (
+                ) : props.nodeType === "Reference" ? (
                   <MenuBookIcon />
-                ) : nodeData.nodeType === "Idea" ? (
+                ) : props.nodeType === "Idea" ? (
                   <EmojiObjectsIcon />
-                ) : nodeData.nodeType === "News" ? (
+                ) : props.nodeType === "News" ? (
                   <ArticleIcon />
-                ) : nodeData.nodeType === "Private" ? (
+                ) : props.nodeType === "Private" ? (
                   <LockIcon />
                 ) : (
                   <LockIcon />
@@ -151,7 +150,7 @@ const Node = ({ nodeData, children, parents }) => {
                   }}
                   component="span"
                 >
-                  {nodeData.nodeType} Type
+                  {props.nodeType} Type
                 </Typography>
                 <Typography
                   sx={{
@@ -163,7 +162,7 @@ const Node = ({ nodeData, children, parents }) => {
                   color="text.secondary"
                   gutterBottom
                 >
-                  Last updated: {nodeData.date}
+                  Last updated: {new Date(props.date).toLocaleString()}
                 </Typography>
               </Box>
               <Box
@@ -177,8 +176,8 @@ const Node = ({ nodeData, children, parents }) => {
                 }}
                 component="ul"
               >
-                {nodeData.contributors &&
-                  nodeData.contributors.map((contributor, idx) => {
+                {props.contributors &&
+                  props.contributors.map((contributor, idx) => {
                     return (
                       <li key={contributor.username}>
                         <Chip
@@ -222,7 +221,7 @@ const Node = ({ nodeData, children, parents }) => {
               </Box>
             </CardContent>
           </Card>
-          {/* <div className={utilStyles.lightText}>{nodeData.date}</div> */}
+          {/* <div className={utilStyles.lightText}>{props.date}</div> */}
         </Grid>
         <Grid item xs={12} sm={12} md={3}>
           <Paper sx={{ pt: "25px" }}>
@@ -236,15 +235,14 @@ const Node = ({ nodeData, children, parents }) => {
               Learn After
             </Box>
             <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {children.map((child) => {
+              {props.children.map((child) => {
                 return (
-                  <React.Fragment key={child.nodeId}>
+                  <React.Fragment key={child.node}>
                     <Divider />
                     <ListItemButton
                       alignItems="flex-start"
                       component="a"
-                      target="_blank"
-                      href={child.nodeId}
+                      href={child.node}
                     >
                       <ListItemText
                         primary={<MarkdownRender children={child.title} />}
