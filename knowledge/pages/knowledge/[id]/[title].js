@@ -89,7 +89,9 @@ const Node = (props) => {
                     <ListItemButton
                       alignItems="flex-start"
                       component="a"
-                      href={parent.node}
+                      href={`../${parent.node}/${encodeURIComponent(
+                        parent.title
+                      )}`}
                     >
                       <ListItemText
                         primary={<MarkdownRender children={parent.title} />}
@@ -242,7 +244,9 @@ const Node = (props) => {
                     <ListItemButton
                       alignItems="flex-start"
                       component="a"
-                      href={child.node}
+                      href={`../${child.node}/${encodeURIComponent(
+                        child.title
+                      )}`}
                     >
                       <ListItemText
                         primary={<MarkdownRender children={child.title} />}
