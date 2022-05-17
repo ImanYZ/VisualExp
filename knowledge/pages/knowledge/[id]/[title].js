@@ -5,16 +5,10 @@ import Head from "next/head";
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemButton from "@mui/material/ListItemButton";
 
 import CodeIcon from "@mui/icons-material/Code";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
@@ -31,6 +25,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import MarkdownRender from "../../../components/Markdown/MarkdownRender";
 import PagesNavbar from "../../../components/PagesNavbar";
 import Leaderboard from "../../../components/leaderboards/Leaderboard";
+import LinkedNode from "../../../components/linkedNodes/LinkedNode";
 
 import { getNodeData, logViews } from "../../../lib/nodes";
 
@@ -71,45 +66,7 @@ const Node = (props) => {
       </Head>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={3}>
-          <Paper sx={{ pt: "25px" }}>
-            <Box
-              sx={{
-                margin: "0px 19px 7px 19px",
-                fontSize: "19px",
-                fontStyle: "italic",
-              }}
-            >
-              Learn Before
-            </Box>
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {props.parents.map((parent) => {
-                return (
-                  <React.Fragment key={parent.node}>
-                    <Divider />
-                    <ListItemButton
-                      alignItems="flex-start"
-                      component="a"
-                      href={`../${parent.node}/${encodeURIComponent(
-                        parent.title
-                      )}`}
-                    >
-                      <ListItemText
-                        primary={<MarkdownRender children={parent.title} />}
-                        // secondary={
-                        //   <div
-                        //     dangerouslySetInnerHTML={{
-                        //       __html: parent.contentHTML,
-                        //     }}
-                        //   />
-                        // }
-                        disableTypography={true}
-                      />
-                    </ListItemButton>
-                  </React.Fragment>
-                );
-              })}
-            </List>
-          </Paper>
+          <LinkedNode header="Learn Before" data={props.parents} />
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
           <Card sx={{ minWidth: "340px" }}>
@@ -174,45 +131,7 @@ const Node = (props) => {
           {/* <div className={utilStyles.lightText}>{props.date}</div> */}
         </Grid>
         <Grid item xs={12} sm={12} md={3}>
-          <Paper sx={{ pt: "25px" }}>
-            <Box
-              sx={{
-                margin: "0px 19px 7px 19px",
-                fontSize: "19px",
-                fontStyle: "italic",
-              }}
-            >
-              Learn After
-            </Box>
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-              {props.children.map((child) => {
-                return (
-                  <React.Fragment key={child.node}>
-                    <Divider />
-                    <ListItemButton
-                      alignItems="flex-start"
-                      component="a"
-                      href={`../${child.node}/${encodeURIComponent(
-                        child.title
-                      )}`}
-                    >
-                      <ListItemText
-                        primary={<MarkdownRender children={child.title} />}
-                        // secondary={
-                        //   <div
-                        //     dangerouslySetInnerHTML={{
-                        //       __html: child.contentHTML,
-                        //     }}
-                        //   />
-                        // }
-                        disableTypography={true}
-                      />
-                    </ListItemButton>
-                  </React.Fragment>
-                );
-              })}
-            </List>
-          </Paper>
+          <LinkedNode header="Learn After" data={props.children} />
         </Grid>
       </Grid>
     </PagesNavbar>
