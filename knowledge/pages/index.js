@@ -4,7 +4,6 @@ import Link from "next/link";
 import Paper from "@mui/material/Paper";
 
 // import Date from "../components/date";
-import Layout, { siteTitle } from "../components/layout";
 
 import utilStyles from "../styles/utils.module.css";
 
