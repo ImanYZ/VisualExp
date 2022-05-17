@@ -151,6 +151,16 @@ export const getNodeData = async (id) => {
   // Descendingly sort the contributors array based on the reputation points.
   const institutions = [];
   for (let institId in nodeData.institutions) {
+    const institutionDocs = await db
+      .collection("institutions")
+      .where("name", "==", institId)
+      .get();
+    if (institutionDocs.docs.length > 0) {
+      nodeData.institutions[institId].logoURL =
+        institutionDocs.docs[0].data().logoURL;
+    } else {
+      nodeData.institutions[institId].logoURL = "";
+    }
     const institIdx = institutions.findIndex(
       (instit) => instit.reputation < nodeData.institutions[institId].reputation
     );

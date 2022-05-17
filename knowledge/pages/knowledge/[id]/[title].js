@@ -9,8 +9,6 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import Chip from "@mui/material/Chip";
-import Avatar from "@mui/material/Avatar";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import List from "@mui/material/List";
@@ -32,6 +30,8 @@ import LockIcon from "@mui/icons-material/Lock";
 
 import MarkdownRender from "../../../components/Markdown/MarkdownRender";
 import PagesNavbar from "../../../components/PagesNavbar";
+import Leaderboard from "../../../components/leaderboards/Leaderboard";
+
 import { getNodeData, logViews } from "../../../lib/nodes";
 
 // This value is considered fresh for ten seconds (s-maxage=10).
@@ -167,60 +167,8 @@ const Node = (props) => {
                   Last updated: {new Date(props.date).toLocaleString()}
                 </Typography>
               </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "left",
-                  flexWrap: "wrap",
-                  listStyle: "none",
-                  p: 0.5,
-                  m: 0,
-                }}
-                component="ul"
-              >
-                {props.contributors &&
-                  props.contributors.map((contributor, idx) => {
-                    return (
-                      <li key={contributor.username}>
-                        <Chip
-                          sx={{
-                            height: "49px",
-                            margin: "4px",
-                            borderRadius: "28px",
-                          }}
-                          icon={
-                            <Avatar
-                              src={contributor.imageUrl}
-                              alt={contributor.fullname}
-                              sx={{
-                                width: "40px",
-                                height: "40px",
-                                mr: 2.5,
-                              }}
-                            />
-                          }
-                          variant="outlined"
-                          label={
-                            <>
-                              <Typography variant="body2" component="div">
-                                {contributor.fullname}
-                              </Typography>
-                              <Typography variant="body2" component="div">
-                                {idx === 0 ? "🏆" : "✔️"}
-                                {" " +
-                                  Math.round(
-                                    (contributor.reputation + Number.EPSILON) *
-                                      100
-                                  ) /
-                                    100}
-                              </Typography>
-                            </>
-                          }
-                        />
-                      </li>
-                    );
-                  })}
-              </Box>
+              <Leaderboard data={props.contributors} objType="Contributors" />
+              <Leaderboard data={props.institutions} objType="Institutions" />
             </CardContent>
           </Card>
           {/* <div className={utilStyles.lightText}>{props.date}</div> */}
