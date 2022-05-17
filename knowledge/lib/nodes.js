@@ -142,9 +142,12 @@ export const getNodeData = async (id) => {
       ...nodeData.contributors[username],
       username,
     };
-    contributors.splice(contriIdx + 1, 0, theContributor);
+    if (contriIdx === -1) {
+      contributors.push(theContributor);
+    } else {
+      contributors.splice(contriIdx + 1, 0, theContributor);
+    }
   }
-  console.log({ contributors });
   // Descendingly sort the contributors array based on the reputation points.
   const institutions = [];
   for (let institId in nodeData.institutions) {
@@ -155,7 +158,11 @@ export const getNodeData = async (id) => {
       ...nodeData.institutions[institId],
       name: institId,
     };
-    institutions.splice(institIdx + 1, 0, theInstitution);
+    if (institIdx === -1) {
+      institutions.push(theInstitution);
+    } else {
+      institutions.splice(institIdx + 1, 0, theInstitution);
+    }
   }
   return {
     ...nodeData,
