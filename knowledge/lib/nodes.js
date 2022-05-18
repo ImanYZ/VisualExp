@@ -175,6 +175,7 @@ export const getNodeData = async (id) => {
     });
   }
 
+  console.log({ nodeData });
   // Descendingly sort the contributors array based on the reputation points.
   const contributors = Object.entries(nodeData.contributors)
     .sort(([aId, aObj], [bId, bObj]) => {
