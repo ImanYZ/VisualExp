@@ -78,6 +78,14 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
             if (!("institutions" in nodesUpdates[versionData.node])) {
               nodesUpdates[versionData.node].institutions = {};
             }
+            // We also need to add the names of contributors and institutions in
+            // separate fields to be able to directly query them.
+            if (!("contribNames" in nodesUpdates[versionData.node])) {
+              nodesUpdates[versionData.node].contribNames = [];
+            }
+            if (!("institNames" in nodesUpdates[versionData.node])) {
+              nodesUpdates[versionData.node].institNames = [];
+            }
             if (
               !(
                 versionData.proposer in
@@ -86,6 +94,9 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
               "fullname" in versionData &&
               "imageUrl" in versionData
             ) {
+              nodesUpdates[versionData.node].contribNames.push(
+                versionData.proposer
+              );
               nodesUpdates[versionData.node].contributors[
                 versionData.proposer
               ] = {
@@ -103,6 +114,9 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
                   nodesUpdates[versionData.node].institutions
                 )
               ) {
+                nodesUpdates[versionData.node].institNames.push(
+                  userInstitutions[versionData.proposer]
+                );
                 nodesUpdates[versionData.node].institutions[
                   userInstitutions[versionData.proposer]
                 ] = {
@@ -134,6 +148,8 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
         await batchUpdate(nodesUpdates[nodeId].nodeRef, {
           contributors: nodesUpdates[nodeId].contributors,
           institutions: nodesUpdates[nodeId].institutions,
+          contribNames: nodesUpdates[nodeId].contribNames,
+          institNames: nodesUpdates[nodeId].institNames,
         });
       }
     }
