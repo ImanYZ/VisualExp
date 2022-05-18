@@ -7,8 +7,13 @@ import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
+import Link from "@mui/material/Link";
+
+import LinkIcon from "@mui/icons-material/Link";
 
 import MarkdownRender from "../Markdown/MarkdownRender";
+
+import { isValidHttpUrl } from "../../lib/utils";
 
 const LinkedNode = ({ header, data }) => {
   return (
@@ -33,7 +38,17 @@ const LinkedNode = ({ header, data }) => {
                 href={`../${obj.node}/${encodeURIComponent(obj.title)}`}
               >
                 <ListItemText
-                  primary={<MarkdownRender children={obj.title} />}
+                  primary={
+                    <MarkdownRender
+                      children={
+                        header === "References"
+                          ? !isValidHttpUrl(obj.label)
+                            ? obj.title + ": " + obj.label
+                            : obj.title
+                          : obj.title
+                      }
+                    />
+                  }
                   // secondary={
                   //   <div
                   //     dangerouslySetInnerHTML={{
@@ -44,6 +59,22 @@ const LinkedNode = ({ header, data }) => {
                   disableTypography={true}
                 />
               </ListItemButton>
+              {isValidHttpUrl(obj.label) && (
+                <Box sx={{ ml: 1.9 }}>
+                  <Link
+                    href={obj.label}
+                    target="_blank"
+                    sx={{
+                      display: "flex",
+                      direction: "row",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <LinkIcon sx={{ mr: 1 }} />
+                    Open the URL in new tab
+                  </Link>
+                </Box>
+              )}
             </React.Fragment>
           );
         })}

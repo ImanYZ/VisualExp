@@ -58,11 +58,13 @@ const retrieveNode = async (nodeId) => {
   // yet, we should cover both structures for now. Later, after deploying the new
   // version of 1Cademy.com, we will rewrite this part of the code.
   const references = [];
-  if ("referenceIds" in nodeData) {
+  if (typeof nodeData.references[0] !== "object") {
     for (let refIdx = 0; refIdx < nodeData.referenceIds.length; refIdx++) {
       references.push({
         node: nodeData.referenceIds[refIdx],
         title: nodeData.references[refIdx],
+        label:
+          "referenceLabels" in nodeData ? nodeData.referenceLabels[refIdx] : "",
       });
     }
   } else {
@@ -71,6 +73,7 @@ const retrieveNode = async (nodeId) => {
         references.push({
           node: reference.node,
           title: reference.title,
+          label: reference.label,
         });
       }
     }
