@@ -58,7 +58,6 @@ export const getServerSideProps = async ({ req, res, params }) => {
 };
 
 const Node = (props) => {
-  console.log({ props });
   return (
     <PagesNavbar thisPage="Node">
       <Head>
@@ -68,11 +67,12 @@ const Node = (props) => {
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNode header="Learn Before" data={props.parents} />
           <LinkedNode header="Tags" data={props.tags} />
+          <LinkedNode header="References" data={props.references} />
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
           <Card sx={{ minWidth: "340px" }}>
             <CardContent>
-              <Box sx={{ margin: "-10px 19px 7px 19px", fontSize: "40px" }}>
+              <Box sx={{ margin: "-10px 19px 7px 19px", fontSize: "31px" }}>
                 <MarkdownRender children={props.title} />
               </Box>
               <MarkdownRender children={props.content} />
