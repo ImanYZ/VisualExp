@@ -23,7 +23,10 @@ export const getSortedPostsData = async () => {
       id: nodeDoc.id,
       title: nodeData.title,
       nodeType: nodeData.nodeType,
-      date: nodeData.createdAt.toDate().toLocaleString(),
+      createdAt: nodeData.createdAt.toDate().toISOString(),
+      nodeImage: nodeData.nodeImage,
+      content: nodeData.content,
+      viewers: nodeData.viewers,
     });
   }
   return nodes;
