@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 
 import axios from "axios";
 
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import Dialog from "@mui/material/Dialog";
