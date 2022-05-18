@@ -133,47 +133,28 @@ export const getNodeData = async (id) => {
   // }
 
   // Descendingly sort the contributors array based on the reputation points.
-  const contributors = [];
-  for (let username in nodeData.contributors) {
-    const contriIdx = contributors.findIndex(
-      (contri) => contri.reputation < nodeData.contributors[username].reputation
-    );
-    const theContributor = {
-      ...nodeData.contributors[username],
-      username,
-    };
-    if (contriIdx === -1) {
-      contributors.push(theContributor);
-    } else {
-      contributors.splice(contriIdx + 1, 0, theContributor);
-    }
-  }
+  const contributors = Object.entries(nodeData.contributors)
+    .sort(([aId, aObj], [bId, bObj]) => {
+      return bObj.reputation - aObj.reputation;
+    })
+    .reduce((r, [name, obj]) => [...r, { ...obj, fullname: name }], []);
   // Descendingly sort the contributors array based on the reputation points.
-  const institutions = [];
-  for (let institId in nodeData.institutions) {
-    const institutionDocs = await db
-      .collection("institutions")
-      .where("name", "==", institId)
-      .get();
-    if (institutionDocs.docs.length > 0) {
-      nodeData.institutions[institId].logoURL =
-        institutionDocs.docs[0].data().logoURL;
-    } else {
-      nodeData.institutions[institId].logoURL = "";
-    }
-    const institIdx = institutions.findIndex(
-      (instit) => instit.reputation < nodeData.institutions[institId].reputation
-    );
-    const theInstitution = {
-      ...nodeData.institutions[institId],
-      name: institId,
-    };
-    if (institIdx === -1) {
-      institutions.push(theInstitution);
-    } else {
-      institutions.splice(institIdx + 1, 0, theInstitution);
-    }
-  }
+  const institutions = await Object.entries(nodeData.institutions)
+    .sort(([aId, aObj], [bId, bObj]) => {
+      return bObj.reputation - aObj.reputation;
+    })
+    .reduce(async (r, [name, obj]) => {
+      const institutionDocs = await db
+        .collection("institutions")
+        .where("name", "==", name)
+        .get();
+      if (institutionDocs.docs.length > 0) {
+        obj.logoURL = institutionDocs.docs[0].data().logoURL;
+      } else {
+        obj.logoURL = "";
+      }
+      return [...r, { ...obj, name }];
+    }, []);
   return {
     ...nodeData,
     contributors,
