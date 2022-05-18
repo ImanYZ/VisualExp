@@ -67,7 +67,7 @@ build/Release
 # next.js
 .node_repl_history
 .next
-*/.next/**
+**/.next/**
 knowledge/.next/**
 /out/
 
