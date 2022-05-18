@@ -1,13 +1,16 @@
 import React from "react";
 
 import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 import LeaderboardChip from "./LeaderboardChip";
 
-const Leaderboard = ({ data, objType }) => {
+const Leaderboard = ({ data, objType, header }) => {
   return (
     <>
-      <Box component="h4">{objType}</Box>
+      <Typography variant="h5" sx={{ mt: 2.5, mb: 2.5 }}>
+        {header}
+      </Typography>
       <Box
         sx={{
           display: "flex",

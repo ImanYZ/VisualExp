@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 // Add this import
 import Head from "next/head";
+import Image from "next/image";
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -9,23 +10,14 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-
-import CodeIcon from "@mui/icons-material/Code";
-import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
-import ShareIcon from "@mui/icons-material/Share";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import PersonIcon from "@mui/icons-material/Person";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import EventIcon from "@mui/icons-material/Event";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
-import ArticleIcon from "@mui/icons-material/Article";
-import LockIcon from "@mui/icons-material/Lock";
+import Tooltip from "@mui/material/Tooltip";
 
 import MarkdownRender from "../../../components/Markdown/MarkdownRender";
 import PagesNavbar from "../../../components/PagesNavbar";
 import Leaderboard from "../../../components/leaderboards/Leaderboard";
 import LinkedNode from "../../../components/linkedNodes/LinkedNode";
+import NodeTypeIcon from "../../../components/NodeTypeIcon";
+import FullScreenImage from "../../../components/FullScreenImage";
 
 import { getNodeData, logViews } from "../../../lib/nodes";
 
@@ -58,15 +50,20 @@ export const getServerSideProps = async ({ req, res, params }) => {
 };
 
 const Node = (props) => {
+  const [imageFullScreen, setImageFullScreen] = useState(false);
+
+  const handleClickImageFullScreen = () => {
+    setImageFullScreen(true);
+  };
+
   return (
     <PagesNavbar thisPage="Node">
       <Head>
         <title>{props.title}</title>
       </Head>
-      <Grid container spacing={2}>
+      <Grid container spacing={3.1}>
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNode header="Learn Before" data={props.parents} />
-          <LinkedNode header="Tags" data={props.tags} />
           <LinkedNode header="References" data={props.references} />
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
@@ -75,33 +72,28 @@ const Node = (props) => {
               <Box sx={{ margin: "-10px 19px 7px 19px", fontSize: "31px" }}>
                 <MarkdownRender children={props.title} />
               </Box>
-              <MarkdownRender children={props.content} />
-              <Box style={{ display: "inline-block", color: "#ff9100" }}>
-                {props.nodeType === "Code" ? (
-                  <CodeIcon />
-                ) : props.nodeType === "Concept" ? (
-                  <LocalLibraryIcon />
-                ) : props.nodeType === "Relation" ? (
-                  <ShareIcon />
-                ) : props.nodeType === "Question" ? (
-                  <HelpOutlineIcon />
-                ) : props.nodeType === "Profile" ? (
-                  <PersonIcon />
-                ) : props.nodeType === "Sequel" ? (
-                  <MoreHorizIcon />
-                ) : props.nodeType === "Advertisement" ? (
-                  <EventIcon />
-                ) : props.nodeType === "Reference" ? (
-                  <MenuBookIcon />
-                ) : props.nodeType === "Idea" ? (
-                  <EmojiObjectsIcon />
-                ) : props.nodeType === "News" ? (
-                  <ArticleIcon />
-                ) : props.nodeType === "Private" ? (
-                  <LockIcon />
-                ) : (
-                  <LockIcon />
-                )}
+              <Box sx={{ fontSize: "19px", mb: 3.4 }}>
+                <MarkdownRender children={props.content} />
+              </Box>
+              {props.nodeImage && (
+                <Tooltip title="Click to view image in full-screen!">
+                  <Box
+                    onClick={handleClickImageFullScreen}
+                    sx={{
+                      display: "block",
+                      width: "100%",
+                      mb: 3.4,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <img src={props.nodeImage} width="100%" height="100%" />
+                  </Box>
+                </Tooltip>
+              )}
+              <Box
+                sx={{ display: "inline-block", color: "#ff9100", mb: "19px" }}
+              >
+                <NodeTypeIcon nodeType={props.nodeType} />
                 <Typography
                   sx={{
                     fontSize: 13,
@@ -125,16 +117,32 @@ const Node = (props) => {
                   Last updated: {new Date(props.date).toLocaleString()}
                 </Typography>
               </Box>
-              <Leaderboard data={props.contributors} objType="Contributors" />
-              <Leaderboard data={props.institutions} objType="Institutions" />
+              <Leaderboard
+                data={props.contributors}
+                header="Contributors are:"
+                objType="Contributors"
+              />
+              <Leaderboard
+                data={props.institutions}
+                objType="Institutions"
+                header="Who are from:"
+              />
             </CardContent>
           </Card>
           {/* <div className={utilStyles.lightText}>{props.date}</div> */}
         </Grid>
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNode header="Learn After" data={props.children} />
+          <LinkedNode header="Tags" data={props.tags} />
         </Grid>
       </Grid>
+      {props.nodeImage && (
+        <FullScreenImage
+          src={props.nodeImage}
+          open={imageFullScreen}
+          setOpen={setImageFullScreen}
+        />
+      )}
     </PagesNavbar>
   );
 };

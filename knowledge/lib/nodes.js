@@ -123,17 +123,57 @@ export const getNodeData = async (id) => {
   }
 
   // Retrieve the content of all the direct children of the node.
-  // const children = [];
-  // for (let child of nodeData.children) {
-  //   const childData = await retrieveNode(child.node);
-  //   children.push(childData);
-  // }
+  const children = [];
+  for (let child of nodeData.children) {
+    const childData = await retrieveNode(child.node);
+    children.push({
+      node: child.node,
+      title: childData.title,
+      content: childData.content,
+      nodeImage: childData.nodeImage,
+      nodeType: childData.nodeType,
+    });
+  }
   // Retrieve the content of all the direct parents of the node.
-  // const parents = [];
-  // for (let parent of nodeData.parents) {
-  //   const parentData = await retrieveNode(parent.node);
-  //   parents.push(parentData);
-  // }
+  const parents = [];
+  for (let parent of nodeData.parents) {
+    const parentData = await retrieveNode(parent.node);
+    parents.push({
+      node: parent.node,
+      title: parentData.title,
+      content: parentData.content,
+      nodeImage: parentData.nodeImage,
+      nodeImage: parentData.nodeImage,
+      nodeType: parentData.nodeType,
+    });
+  }
+  // Retrieve the content of all the tags of the node.
+  const tags = [];
+  for (let tag of nodeData.tags) {
+    const tagData = await retrieveNode(tag.node);
+    tags.push({
+      node: tag.node,
+      title: tagData.title,
+      content: tagData.content,
+      nodeImage: tagData.nodeImage,
+      nodeImage: tagData.nodeImage,
+      nodeType: tagData.nodeType,
+    });
+  }
+  // Retrieve the content of all the references of the node.
+  const references = [];
+  for (let reference of nodeData.references) {
+    const referenceData = await retrieveNode(reference.node);
+    references.push({
+      label: reference.label,
+      node: reference.node,
+      title: referenceData.title,
+      content: referenceData.content,
+      nodeImage: referenceData.nodeImage,
+      nodeImage: referenceData.nodeImage,
+      nodeType: referenceData.nodeType,
+    });
+  }
 
   // Descendingly sort the contributors array based on the reputation points.
   const contributors = Object.entries(nodeData.contributors)
@@ -160,6 +200,10 @@ export const getNodeData = async (id) => {
     }, []);
   return {
     ...nodeData,
+    children,
+    parents,
+    tags,
+    references,
     contributors,
     institutions,
   };
