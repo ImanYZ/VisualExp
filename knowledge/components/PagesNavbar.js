@@ -43,7 +43,8 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage }) => {
       />
       <Box
         sx={{
-          margin: { xs: 0, sm: "4px", md: "10px", lg: "16px", xl: "25px" },
+          backgroundColor: "#f2f2f2",
+          padding: { xs: 0, sm: 1, md: 2 },
         }}
       >
         {children}
