@@ -67,6 +67,7 @@ const Node = (props) => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNode header="Learn Before" data={props.parents} />
+          <LinkedNode header="Tags" data={props.tags} />
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
           <Card sx={{ minWidth: "340px" }}>
