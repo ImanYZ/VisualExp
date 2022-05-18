@@ -2,26 +2,28 @@ import React from "react";
 
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
+import TypographyUnderlined from "../TypographyUnderlined";
 
 import MarkdownRender from "../Markdown/MarkdownRender";
 
 const LinkedNode = ({ header, data }) => {
   return (
     <Paper sx={{ pt: "25px" }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        marked="center"
-        align="center"
-        sx={{ fontSize: "25px" }}
-      >
-        {header}
-      </Typography>
+      <Box sx={{ textAlign: "center" }}>
+        <TypographyUnderlined
+          variant="h5"
+          gutterBottom
+          marked="center"
+          align="center"
+        >
+          {header}
+        </TypographyUnderlined>
+      </Box>
+
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
         {data.map((obj) => {
           return (
