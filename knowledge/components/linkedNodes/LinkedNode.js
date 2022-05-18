@@ -12,7 +12,7 @@ import MarkdownRender from "../Markdown/MarkdownRender";
 
 const LinkedNode = ({ header, data }) => {
   return (
-    <Paper sx={{ pt: "25px" }}>
+    <Paper sx={{ pt: "25px", mb: "25px" }}>
       <Box sx={{ textAlign: "center" }}>
         <TypographyUnderlined
           variant="h5"
