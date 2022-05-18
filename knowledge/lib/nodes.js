@@ -58,11 +58,13 @@ const retrieveNode = async (nodeId) => {
   // yet, we should cover both structures for now. Later, after deploying the new
   // version of 1Cademy.com, we will rewrite this part of the code.
   const references = [];
-  if ("referenceIds" in nodeData) {
+  if (typeof nodeData.references[0] !== "object") {
     for (let refIdx = 0; refIdx < nodeData.referenceIds.length; refIdx++) {
       references.push({
         node: nodeData.referenceIds[refIdx],
         title: nodeData.references[refIdx],
+        label:
+          "referenceLabels" in nodeData ? nodeData.referenceLabels[refIdx] : "",
       });
     }
   } else {
@@ -71,6 +73,7 @@ const retrieveNode = async (nodeId) => {
         references.push({
           node: reference.node,
           title: reference.title,
+          label: reference.label,
         });
       }
     }
@@ -107,7 +110,7 @@ const retrieveNode = async (nodeId) => {
     tags,
     corrects: nodeData.corrects,
     wrongs: nodeData.wrongs,
-    date: nodeData.updatedAt.toDate().toLocaleString(),
+    date: nodeData.updatedAt.toDate().toUTCString(),
   };
 };
 
@@ -123,47 +126,86 @@ export const getNodeData = async (id) => {
   const children = [];
   for (let child of nodeData.children) {
     const childData = await retrieveNode(child.node);
-    children.push(childData);
+    children.push({
+      node: child.node,
+      title: childData.title,
+      content: childData.content,
+      nodeImage: childData.nodeImage,
+      nodeType: childData.nodeType,
+    });
   }
   // Retrieve the content of all the direct parents of the node.
   const parents = [];
   for (let parent of nodeData.parents) {
     const parentData = await retrieveNode(parent.node);
-    parents.push(parentData);
+    parents.push({
+      node: parent.node,
+      title: parentData.title,
+      content: parentData.content,
+      nodeImage: parentData.nodeImage,
+      nodeImage: parentData.nodeImage,
+      nodeType: parentData.nodeType,
+    });
+  }
+  // Retrieve the content of all the tags of the node.
+  const tags = [];
+  for (let tag of nodeData.tags) {
+    const tagData = await retrieveNode(tag.node);
+    tags.push({
+      node: tag.node,
+      title: tagData.title,
+      content: tagData.content,
+      nodeImage: tagData.nodeImage,
+      nodeImage: tagData.nodeImage,
+      nodeType: tagData.nodeType,
+    });
+  }
+  // Retrieve the content of all the references of the node.
+  const references = [];
+  for (let reference of nodeData.references) {
+    const referenceData = await retrieveNode(reference.node);
+    references.push({
+      label: reference.label,
+      node: reference.node,
+      title: referenceData.title,
+      content: referenceData.content,
+      nodeImage: referenceData.nodeImage,
+      nodeImage: referenceData.nodeImage,
+      nodeType: referenceData.nodeType,
+    });
   }
 
   // Descendingly sort the contributors array based on the reputation points.
-  const contributors = [];
-  for (let contriId in nodeData.contributors) {
-    const contriIdx = contributors.findIndex(
-      (contri) => contri.reputation < nodeData.contributors[contriId].reputation
-    );
-    const theContributor = {
-      ...nodeData.contributors[contriId],
-      username: contriId,
-    };
-    contributors.splice(contriIdx, 0, theContributor);
-  }
+  const contributors = Object.entries(nodeData.contributors)
+    .sort(([aId, aObj], [bId, bObj]) => {
+      return bObj.reputation - aObj.reputation;
+    })
+    .reduce((r, [name, obj]) => [...r, { ...obj, fullname: name }], []);
   // Descendingly sort the contributors array based on the reputation points.
-  const institutions = [];
-  for (let institId in nodeData.institutions) {
-    const institIdx = institutions.findIndex(
-      (instit) => instit.reputation < nodeData.institutions[institId].reputation
-    );
-    const theInstitution = {
-      ...nodeData.institutions[institId],
-      name: institId,
-    };
-    institutions.splice(institIdx, 0, theInstitution);
-  }
+  const institutions = await Object.entries(nodeData.institutions)
+    .sort(([aId, aObj], [bId, bObj]) => {
+      return bObj.reputation - aObj.reputation;
+    })
+    .reduce(async (r, [name, obj]) => {
+      const institutionDocs = await db
+        .collection("institutions")
+        .where("name", "==", name)
+        .get();
+      if (institutionDocs.docs.length > 0) {
+        obj.logoURL = institutionDocs.docs[0].data().logoURL;
+      } else {
+        obj.logoURL = "";
+      }
+      return [...r, { ...obj, name }];
+    }, []);
   return {
-    nodeData: {
-      ...nodeData,
-      contributors,
-      institutions,
-    },
+    ...nodeData,
     children,
     parents,
+    tags,
+    references,
+    contributors,
+    institutions,
   };
 };
 
