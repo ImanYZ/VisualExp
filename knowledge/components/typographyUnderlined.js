@@ -3,8 +3,9 @@ import { styled } from "@mui/material/styles";
 
 const TypographyUnderlined = styled(Typography)(() => ({
   display: "inline-block",
-  paddingBottom: "5px",
+  paddingBottom: "7px",
   position: "relative",
+  color: "white",
   "&::before": {
     content: '""',
     position: "absolute",

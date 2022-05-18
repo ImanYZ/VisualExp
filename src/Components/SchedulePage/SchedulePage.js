@@ -10,6 +10,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import LinearProgress from "@mui/material/LinearProgress";
 
 import {
   firebaseState,
@@ -405,7 +406,7 @@ const SchedulePage = (props) => {
               </ul>
             </Alert>
           )}
-          {scheduleLoaded && (
+          {scheduleLoaded ? (
             <>
               <div id="ScheduleSelectorContainer">
                 <SelectSessions
@@ -438,6 +439,10 @@ const SchedulePage = (props) => {
                 </Button>
               </div>
             </>
+          ) : (
+            <Box sx={{ width: "100%" }}>
+              <LinearProgress />
+            </Box>
           )}
         </>
       )}
