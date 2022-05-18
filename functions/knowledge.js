@@ -28,7 +28,14 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
       nodesData[nodeDoc.id] = nodeDoc.data();
     }
     // We should retrieve all the accepted versions for all types of nodes.
-    const nodeTypes = ["Concept", "Relation", "Question", "Reference", "Idea"];
+    const nodeTypes = [
+      "Concept",
+      "Code",
+      "Relation",
+      "Question",
+      "Reference",
+      "Idea",
+    ];
     for (let nodeType of nodeTypes) {
       console.log("Started nodeType: ", nodeType);
       // We cannot update the reputations on nodes only looking at the
