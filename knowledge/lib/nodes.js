@@ -185,22 +185,24 @@ export const getNodeData = async (id) => {
     })
     .reduce((r, [name, obj]) => [...r, { ...obj, fullname: name }], []);
   // Descendingly sort the contributors array based on the reputation points.
-  const institutions = await Object.entries(nodeData.institutions)
-    .sort(([aId, aObj], [bId, bObj]) => {
+  const institObjs = Object.entries(nodeData.institutions).sort(
+    ([aId, aObj], [bId, bObj]) => {
       return bObj.reputation - aObj.reputation;
-    })
-    .reduce(async (r, [name, obj]) => {
-      const institutionDocs = await db
-        .collection("institutions")
-        .where("name", "==", name)
-        .get();
-      if (institutionDocs.docs.length > 0) {
-        obj.logoURL = institutionDocs.docs[0].data().logoURL;
-      } else {
-        obj.logoURL = "";
-      }
-      return [...r, { ...obj, name }];
-    }, []);
+    }
+  );
+  const institutions = [];
+  for (let [name, obj] of institObjs) {
+    const institutionDocs = await db
+      .collection("institutions")
+      .where("name", "==", name)
+      .get();
+    if (institutionDocs.docs.length > 0) {
+      obj.logoURL = institutionDocs.docs[0].data().logoURL;
+    } else {
+      obj.logoURL = "";
+    }
+    institutions.push({ ...obj, name });
+  }
   return {
     ...nodeData,
     children,
