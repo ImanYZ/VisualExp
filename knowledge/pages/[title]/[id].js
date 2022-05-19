@@ -120,8 +120,7 @@ const Node = ({
         (nodeImage ? " \nImage: " + nodeImage : "")
     ),
     "@id": nodeId,
-    url:
-      "https://1cademy.us/knowledge/node/" + encodeTitle(title) + "/" + nodeId,
+    url: "https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + nodeId,
     nodeType: nodeType,
     author: {
       "@type": "Organization",
@@ -154,7 +153,7 @@ const Node = ({
     jsonObj["prerequisites"].push({
       "@type": "parent",
       link:
-        "https://1cademy.us/knowledge/node/" +
+        "https://1cademy.us/knowledge/" +
         encodeTitle(parent.title) +
         "/" +
         parent.node,
@@ -166,7 +165,7 @@ const Node = ({
     jsonObj["followUps"].push({
       "@type": "child",
       link:
-        "https://1cademy.us/knowledge/node/" +
+        "https://1cademy.us/knowledge/" +
         encodeTitle(child.title) +
         "/" +
         child.node,
@@ -178,7 +177,7 @@ const Node = ({
     jsonObj["tags"].push({
       "@type": "tag",
       link:
-        "https://1cademy.us/knowledge/node/" +
+        "https://1cademy.us/knowledge/" +
         encodeTitle(tag.title) +
         "/" +
         tag.node,
@@ -190,7 +189,7 @@ const Node = ({
     jsonObj["references"].push({
       "@type": "reference",
       link:
-        "https://1cademy.us/knowledge/node/" +
+        "https://1cademy.us/knowledge/" +
         encodeTitle(reference.title) +
         "/" +
         reference.node,
@@ -214,10 +213,7 @@ const Node = ({
         <link
           rel="canonical"
           href={
-            "https://1cademy.us/knowledge/node/" +
-            encodeTitle(title) +
-            "/" +
-            nodeId
+            "https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + nodeId
           }
           key="canonical"
         />

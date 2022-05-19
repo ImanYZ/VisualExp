@@ -33,9 +33,9 @@ export async function getServerSideProps({ res }) {
         const nodeData = nodeDoc.data();
         xmlContent += `
           <url>
-            <loc>https://1cademy.us/knowledge/node/${encodeTitle(
-              nodeData.title
-            )}/${nodeDoc.id}</loc>
+            <loc>https://1cademy.us/knowledge/${encodeTitle(nodeData.title)}/${
+          nodeDoc.id
+        }</loc>
             <lastmod>${nodeData.updatedAt.toDate().toISOString()}</lastmod>
             <changefreq>hourly</changefreq>
           </url>`;
