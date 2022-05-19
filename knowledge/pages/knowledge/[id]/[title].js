@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 
 // Add this import
 import Head from "next/head";
-import Image from "next/image";
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -11,6 +10,9 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 import MarkdownRender from "../../../components/Markdown/MarkdownRender";
 import PagesNavbar from "../../../components/PagesNavbar";
@@ -30,9 +32,9 @@ import { getNodeData, logViews } from "../../../lib/nodes";
 // with a fresh value. If you refresh the page, you will see the new value.
 export const getServerSideProps = async ({ req, res, params }) => {
   logViews(req, params.id);
-  // res.setHeader("Pragma", "no-cache");
-  // res.setHeader("Expires", "-1");
-  // res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "-1");
+  res.setHeader("Cache-Control", "no-cache");
   const nodeData = await getNodeData(params.id);
   if (!nodeData) {
     return {
@@ -48,6 +50,8 @@ export const getServerSideProps = async ({ req, res, params }) => {
     props: nodeData,
   };
 };
+
+dayjs.extend(relativeTime);
 
 const Node = (props) => {
   const [imageFullScreen, setImageFullScreen] = useState(false);
@@ -93,8 +97,11 @@ const Node = (props) => {
               <Box
                 sx={{ display: "inline-block", color: "#ff9100", mb: "19px" }}
               >
-                <NodeTypeIcon nodeType={props.nodeType} />
-                <Typography
+                <Tooltip title={`This node is of type ${props.nodeType}.`}>
+                  <Box sx={{ display: "inline" }}>
+                    <NodeTypeIcon nodeType={props.nodeType} />
+                  </Box>
+                  {/* <Typography
                   sx={{
                     fontSize: 13,
                     padding: "0px 0px 0px 5.5px",
@@ -103,19 +110,26 @@ const Node = (props) => {
                   component="span"
                 >
                   {props.nodeType} Type
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: 13,
-                    padding: "0px 0px 0px 25px",
-                    verticalAlign: "5.5px",
-                  }}
-                  component="span"
-                  color="text.secondary"
-                  gutterBottom
+                </Typography> */}
+                </Tooltip>
+                <Tooltip
+                  title={`Last updated on ${new Date(
+                    props.date
+                  ).toLocaleString()}`}
                 >
-                  Last updated: {new Date(props.date).toLocaleString()}
-                </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: 13,
+                      padding: "0px 0px 0px 25px",
+                      verticalAlign: "5.5px",
+                    }}
+                    component="span"
+                    color="text.secondary"
+                    gutterBottom
+                  >
+                    {dayjs(new Date(props.date)).fromNow()}
+                  </Typography>
+                </Tooltip>
               </Box>
               <Leaderboard
                 data={props.contributors}
