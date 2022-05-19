@@ -34,7 +34,7 @@ const Leaderboard = ({ data, objType, header }) => {
               objType === "Institutions" ? obj.logoURL : obj.imageUrl;
             return (
               <LeaderboardChip
-                key={obj.name + idx}
+                key={obj.name + idx.toString()}
                 idx={idx}
                 objType={objType}
                 name={name}
