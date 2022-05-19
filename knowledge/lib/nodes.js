@@ -110,7 +110,9 @@ const retrieveNode = async (nodeId) => {
     tags,
     corrects: nodeData.corrects,
     wrongs: nodeData.wrongs,
-    date: nodeData.updatedAt.toDate().toUTCString(),
+    updatedAt: nodeData.updatedAt.toDate().toUTCString(),
+    changedAt: nodeData.changedAt.toDate().toUTCString(),
+    createdAt: nodeData.createdAt.toDate().toUTCString(),
   };
 };
 

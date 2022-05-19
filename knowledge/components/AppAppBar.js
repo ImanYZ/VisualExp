@@ -47,7 +47,7 @@ const AppAppBar = (props) => {
   return (
     <div>
       <Head>
-        <link rel="icon" href="/public/favicon.ico" />
+        <link rel="icon" href="/public/favicon.png" />
         <meta
           name="description"
           content="1Cademy Knowledge Graph Public Interface!"

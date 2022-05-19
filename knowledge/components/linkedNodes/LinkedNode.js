@@ -18,7 +18,7 @@ import TypographyUnderlined from "../TypographyUnderlined";
 import MarkdownRender from "../Markdown/MarkdownRender";
 import NodeTypeIcon from "../NodeTypeIcon";
 
-import { isValidHttpUrl } from "../../lib/utils";
+import { isValidHttpUrl, encodeTitle } from "../../lib/utils";
 
 // import Orange_animated_right_arrow from "../../public/Orange_animated_right_arrow.gif";
 
@@ -67,9 +67,23 @@ const LinkedNode = ({ header, data }) => {
     // code block
   }
   return (
-    <Paper sx={{ pt: "19px", mb: "25px", backgroundColor: "#28282a" }}>
+    <Paper
+      sx={{
+        pt: "19px",
+        mb: "25px",
+        backgroundColor: ["References", "Tags"].includes(header)
+          ? "#F8F8F8"
+          : "#28282a",
+      }}
+    >
       <Tooltip title={headerTooltip}>
-        <Box sx={{ textAlign: "center", pb: "10px" }}>
+        <Box
+          sx={{
+            textAlign: "center",
+            pb: "10px",
+            color: ["References", "Tags"].includes(header) ? "black" : "white",
+          }}
+        >
           <TypographyUnderlined
             variant="h5"
             gutterBottom
@@ -116,7 +130,7 @@ const LinkedNode = ({ header, data }) => {
                   <ListItemButton
                     alignItems="flex-start"
                     component="a"
-                    href={`../${obj.node}/${encodeURIComponent(obj.title)}`}
+                    href={`../${encodeTitle(obj.title)}/${obj.node}`}
                     sx={{
                       position: "relative",
                       "&:hover": { textDecoration: "underline" },
