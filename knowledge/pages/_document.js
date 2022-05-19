@@ -9,11 +9,28 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <meta
+            name="google-site-verification"
+            content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y"
+          />
+          <meta charSet="UTF-8" />
+          <meta name="robots" content="index, follow" />
+          <meta name="googlebot" content="index, follow" />
+          <meta name="language" content="ENG" />
+          <meta name="copyright" content="1Cademy" />
+          <meta name="reply-to" content="onecademy@umich.edu" />
+          <meta name="coverage" content="Worldwide" />
+          <meta name="distribution" content="Global" />
+          <meta name="rating" content="General" />
+          <meta name="target" content="all" />
+          <meta name="HandheldFriendly" content="False" />
+          <meta name="author" content="1Cademy" />
+          <meta httpEquiv="Expires" content="-1" />
+          <meta httpEquiv="Pragma" content="no-cache" />
+          <meta httpEquiv="Cache-Control" content="no-cache" />
+          <meta httpEquiv="x-dns-prefetch-control" content="off" />
           {/* PWA primary color */}
           <meta name="theme-color" content={theme.palette.primary.main} />
-          <meta httpEquiv="Pragma" content="no-cache" />
-          <meta httpEquiv="Expires" content="-1" />
-          <meta httpEquiv="CACHE-CONTROL" content="NO-CACHE" />
           <link rel="shortcut icon" href="/public/favicon.ico" />
           <link
             rel="stylesheet"

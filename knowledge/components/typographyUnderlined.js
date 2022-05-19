@@ -5,7 +5,7 @@ const TypographyUnderlined = styled(Typography)(() => ({
   display: "inline-block",
   paddingBottom: "7px",
   position: "relative",
-  color: "white",
+  color: "inherit",
   "&::before": {
     content: '""',
     position: "absolute",
