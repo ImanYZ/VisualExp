@@ -7,8 +7,8 @@ import LeaderboardChip from "./LeaderboardChip";
 
 const Leaderboard = ({ data, objType, header }) => {
   return (
-    <>
-      <Typography variant="h5" sx={{ mt: 2.5, mb: 2.5 }}>
+    <Box>
+      <Typography variant="h7" sx={{ mt: 2.5, mb: 2.5 }}>
         {header}
       </Typography>
       <Box
@@ -44,7 +44,7 @@ const Leaderboard = ({ data, objType, header }) => {
             );
           })}
       </Box>
-    </>
+    </Box>
   );
 };
 
