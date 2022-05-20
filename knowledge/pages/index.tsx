@@ -3,7 +3,7 @@ import PagesNavbar from "../components/PagesNavbar";
 import { GetServerSideProps, NextPage } from "next";
 import { KnowledgeNode } from "../src/knowledgeTypes";
 import Masonry from "@mui/lab/Masonry";
-import MasonryNodeItem from "../components/MasonryNodeItem";
+import MasonryNodeItem from "../components/NodeItem";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import SearchInput from "../components/SearchInput";
