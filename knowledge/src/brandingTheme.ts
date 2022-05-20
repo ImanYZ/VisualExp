@@ -6,7 +6,7 @@ const common = {
   white: "#ffffff",
   orange: "#ff8a33",
   orangeDark: "#ff6d00",
-  textBlack: "#28282A",
+  darkGrayBackground: "#28282A",
 };
 
 const systemFont = [
@@ -43,7 +43,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
         main: "#ffc071",
         dark: "#ffb25e",
       },
-      divider: mode === "dark" ? grey[400] : grey[200],
+      divider: mode === "dark" ? grey[400] : grey[400],
       mode,
       background: {
         default: "#f2f2f2",
@@ -98,7 +98,7 @@ export function getThemedComponents(theme: Theme) {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backgroundColor: common.textBlack,
+            backgroundColor: common.darkGrayBackground,
           },
         },
       },
