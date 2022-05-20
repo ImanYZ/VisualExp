@@ -17,7 +17,7 @@ type Props = {
 };
 const AppAppBar: FC<Props> = ({ showApply = true }) => {
   return (
-    <AppBar>
+    <AppBar sx={{ maxHeight: "var(--navbar-height)" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
