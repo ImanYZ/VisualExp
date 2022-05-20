@@ -70,6 +70,7 @@ build/Release
 **/.next/**
 knowledge/.next/**
 /out/
+package-lock.json
 
 next.config.js
 
