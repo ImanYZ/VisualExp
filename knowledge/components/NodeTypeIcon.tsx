@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 
 import CodeIcon from "@mui/icons-material/Code";
 import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
@@ -12,8 +12,13 @@ import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
 import LockIcon from "@mui/icons-material/Lock";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import { NodeTypes } from "../src/knowledgeTypes";
 
-const NodeTypeIcon = ({ nodeType }) => {
+type Props = {
+  nodeType: NodeTypes;
+};
+
+const NodeTypeIcon: FC<Props> = ({ nodeType }) => {
   return nodeType === "Code" ? (
     <CodeIcon />
   ) : nodeType === "Concept" ? (
