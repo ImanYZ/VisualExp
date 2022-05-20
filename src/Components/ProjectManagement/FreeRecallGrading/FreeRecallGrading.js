@@ -185,7 +185,7 @@ const FreeRecallGrading = (props) => {
                       }
                       setTimeout(() => {
                         setSubmitting(false);
-                      }, 10000);
+                      }, 1000);
                       break;
                     }
                   }
