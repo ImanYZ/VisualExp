@@ -168,18 +168,18 @@ const LifeLogger = () => {
         summary,
         backwards,
       });
-      //   if (taskId) {
-      //     const tDTasks = await axios.post(
-      //       "https://api.todoist.com/rest/v1/tasks/" + taskId + "/close",
-      //       {
-      //         headers: {
-      //           Authorization: `Bearer ${tDApiToken}`,
-      //           ["X-Request-Id"]: uuidv4(),
-      //           ["Content-Type"]: "application/json",
-      //         },
-      //       }
-      //     );
-      //   }
+      if (taskId) {
+        const tDTasks = await axios.post(
+          "https://api.todoist.com/rest/v1/tasks/" + taskId + "/close",
+          {
+            headers: {
+              Authorization: `Bearer ${tDApiToken}`,
+              ["X-Request-Id"]: uuidv4(),
+              ["Content-Type"]: "application/json",
+            },
+          }
+        );
+      }
       setSent(true);
     } catch (err) {
       console.error(err);
