@@ -1,14 +1,30 @@
 import * as React from "react";
 import Document, { Html, Head, Main, NextScript } from "next/document";
 import createEmotionServer from "@emotion/server/create-instance";
-import theme from "../src/theme";
 import createEmotionCache from "../src/createEmotionCache";
+import { getMetaThemeColor } from "../src/brandingTheme";
 
 export default class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
         <Head>
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor("light")}
+            media="(prefers-color-scheme: light)"
+          />
+          <meta
+            name="theme-color"
+            content={getMetaThemeColor("dark")}
+            media="(prefers-color-scheme: dark)"
+          />
+          <meta httpEquiv="Pragma" content="no-cache" />
+          <meta httpEquiv="Expires" content="-1" />
+          <meta httpEquiv="CACHE-CONTROL" content="NO-CACHE" />
+          <link rel="shortcut icon" href="/favicon.ico" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
           <meta
             name="google-site-verification"
             content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y"
@@ -33,9 +49,9 @@ export default class MyDocument extends Document {
           <meta name="theme-color" content={theme.palette.primary.main} />
           <link rel="shortcut icon" href="/public/favicon.ico" />
           <link
+            href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-          />
+          ></link>
           {/* Inject MUI styles first to match with the prepend: true configuration. */}
           {this.props.emotionStyleTags}
         </Head>
