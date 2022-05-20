@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 // Add this import
 import Head from "next/head";
-import Script from "next/script";
-
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
@@ -38,10 +35,7 @@ import { escapeBreaksQuotes, encodeTitle } from "../../lib/utils";
 // with a fresh value. If you refresh the page, you will see the new value.
 export const getServerSideProps = async ({ req, res, params }) => {
   logViews(req, params.id);
-  // res.setHeader("Pragma", "no-cache");
-  // res.setHeader("Expires", "-1");
-  // res.setHeader("Cache-Control", "no-cache");
-  const nodeData = await getNodeData(params.id);
+  const nodeData = (await getNodeData(params.id)) as any;
   if (!nodeData) {
     return {
       // returns the default 404 page with a status code of 404
@@ -206,10 +200,14 @@ const Node = ({
       keywords +
       (nodeImage ? " \nImage: " + nodeImage : "")
   );
+
+  const handleOnCloseFullScreenImage = () => {
+    setImageFullScreen(false);
+  };
+
   return (
-    <PagesNavbar thisPage="Node">
+    <PagesNavbar title={`1Cademy - ${title}`}>
       <Head>
-        <title>1Cademy - {title}</title>
         <link
           rel="canonical"
           href={
@@ -391,7 +389,7 @@ const Node = ({
         <FullScreenImage
           src={nodeImage}
           open={imageFullScreen}
-          setOpen={setImageFullScreen}
+          onClose={handleOnCloseFullScreenImage}
         />
       )}
     </PagesNavbar>
