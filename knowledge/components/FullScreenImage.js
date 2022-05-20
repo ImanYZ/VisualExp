@@ -38,7 +38,11 @@ const FullScreenImage = ({ src, open, setOpen }) => {
           >
             <CloseIcon />
           </IconButton>
-          <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
+          <Typography
+            sx={{ ml: 2, flex: 1, color: "white" }}
+            variant="h6"
+            component="div"
+          >
             Full-screen View
           </Typography>
         </Toolbar>
