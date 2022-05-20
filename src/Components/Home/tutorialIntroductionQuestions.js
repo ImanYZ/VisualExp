@@ -111,15 +111,6 @@ export default {
           b: "No",
         },
       },
-      How_can_you_learn_like_a_researcher_on_1Cademy: {
-        stem: quNum() + "How can you learn like a researcher on 1Cademy?",
-        answers: ["a"],
-        choices: {
-          a: "Find complex topics and learn backwards",
-          b: "Start from the highest-level concept and move to more advanced topics",
-          c: "Start from the easiest topic and move up",
-        },
-      },
       What_kind_of_content_should_be_added_to_1Cademy: {
         stem: (
           <div>
@@ -409,8 +400,7 @@ export default {
     description: (
       <div>
         <p>
-          In this next section, you will be introduced to the sidebar on
-          1Cademy.
+          In this section, you will be introduced to the sidebar on 1Cademy.
         </p>
         <p>
           <strong>Notes:</strong>
@@ -1144,8 +1134,12 @@ export default {
       <div>
         <p>This video introduces question nodes on 1Cademy.</p>
         <p>
-          We propose multiple-choice questions as "Question" type nodes to
-          improve others' learning through testing them.
+          We propose multiple-choice questions as "Question" type nodes to test,
+          and improve others' learning through testing them.
+        </p>
+        <p>
+          We only propose multiple-choice questions about topics that we have
+          already learned, and we'd like to help others learn them.
         </p>
       </div>
     ),
@@ -1470,9 +1464,20 @@ export default {
           one up/down-votes nodes and proposals.
         </p>
         <p>
-          <strong>Note:</strong> if the number of down-votes on a node gets
-          greater than its number of up-votes, the node will be deleted from the
-          whole knowledge graph and no one will be able to retrieve it.
+          <strong>Note:</strong>
+          <ul>
+            <li>
+              Any proposed change to a node gets implemented as soon as it
+              receives net-votes (number of upvotes minus downvotes) greater
+              than or equal to half the net-votes that the corresponding node
+              has received.
+            </li>
+            <li>
+              If the number of down-votes on a node gets greater than its number
+              of up-votes, the node will be deleted from the whole knowledge
+              graph and no one will be able to retrieve it.
+            </li>
+          </ul>
         </p>
       </div>
     ),
