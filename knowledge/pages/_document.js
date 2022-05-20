@@ -19,7 +19,7 @@ export default class MyDocument extends Document {
             content={getMetaThemeColor("dark")}
             media="(prefers-color-scheme: dark)"
           />
-          <link rel="shortcut icon" href="/favicon.png" />
+          <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
             rel="preconnect"
