@@ -21,7 +21,11 @@ export default class MyDocument extends Document {
           />
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="true"
+          />
           <meta
             name="google-site-verification"
             content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y"
