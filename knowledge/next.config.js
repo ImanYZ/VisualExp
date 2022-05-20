@@ -1,12 +1,6 @@
 module.exports = {
-  async rewrite() {
-    return [
-      {
-        source: "/knowledge",
-        destination: "/",
-      },
-    ];
-  },
+  basePath: "/knowledge",
+  assetPrefix: "/knowledge/", // assetPrefix requires the trailing slash    ];
   async headers() {
     return [
       {
