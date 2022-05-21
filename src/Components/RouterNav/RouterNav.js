@@ -32,8 +32,6 @@ import {
   projectsState,
   activePageState,
   notAResearcherState,
-  notTakenSessionsState,
-  notTakenSessionsLoadedState,
   upVotedTodayState,
   instructorsTodayState,
   upvotedInstructorsTodayState,
@@ -68,12 +66,6 @@ const RouterNav = (props) => {
   const activePage = useRecoilValue(activePageState);
   const [notAResearcher, setNotAResearcher] =
     useRecoilState(notAResearcherState);
-  const [notTakenSessions, setNotTakenSessions] = useRecoilState(
-    notTakenSessionsState
-  );
-  const [notTakenSessionsLoaded, setNotTakenSessionsLoaded] = useRecoilState(
-    notTakenSessionsLoadedState
-  );
   const [upVotedToday, setUpVotedToday] = useRecoilState(upVotedTodayState);
   const [instructorsToday, setInstructorsToday] = useRecoilState(
     instructorsTodayState
@@ -92,11 +84,10 @@ const RouterNav = (props) => {
   const [expPoints, setExpPoints] = useState(0);
   const [instructorPoints, setInstructorPoints] = useState(0);
   const [dayInstructorUpVotes, setDayInstructorUpVotes] = useState(0);
-  const [notTakenSessionsChanges, setNotTakenSessionsChanges] = useState([]);
-  const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
   const [othersProposals, setOthersProposals] = useState({});
+  const [proposalsNums, setProposalsNums] = useState({});
   const [oneCademyPoints, setOneCademyPoints] = useState(0);
   const [proposalsLoaded, setProposalsLoaded] = useState(false);
   const [userVersionsChanges, setUserVersionsChanges] = useState([]);
@@ -105,6 +96,7 @@ const RouterNav = (props) => {
   const [proposalUpvotesToday, setProposalUpvotesToday] = useState(0);
   const [dayOneUpVotes, setDayOneUpVotes] = useState(0);
   const [gradingPoints, setGradingPoints] = useState(0);
+  const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
@@ -142,107 +134,65 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
-      const notTakenSessionsQuery = firebase.db.collection("notTakenSessions");
-      const notTakenSessionsSnapshot = notTakenSessionsQuery.onSnapshot(
-        (snapshot) => {
-          const docChanges = snapshot.docChanges();
-          setNotTakenSessionsChanges((oldNotTakenSessionsChanges) => {
-            return [...oldNotTakenSessionsChanges, ...docChanges];
-          });
-          setNotTakenSessionsLoaded(true);
-        }
-      );
-      const researcherQuery = firebase.db
-        .collection("researchers")
-        .doc(fullname);
+      const researcherQuery = firebase.db.collection("researchers");
       const researcherSnapshot = researcherQuery.onSnapshot((doc) => {
         const researcherData = doc.data();
         const theProject = researcherData.projects[project];
-        if (theProject.points) {
-          setIntellectualPoints(theProject.points);
-        } else {
-          setIntellectualPoints(0);
+        if (doc.id === fullname) {
+          if (theProject.points) {
+            setIntellectualPoints(theProject.points);
+          } else {
+            setIntellectualPoints(0);
+          }
+          if (theProject.dayUpVotePoints) {
+            setUpVotedDays(theProject.dayUpVotePoints);
+          } else {
+            setUpVotedDays(0);
+          }
+          if (theProject.expPoints) {
+            setExpPoints(theProject.expPoints);
+          } else {
+            setExpPoints(0);
+          }
+          if (theProject.instructors) {
+            setInstructorPoints(theProject.instructors);
+          } else {
+            setInstructorPoints(0);
+          }
+          if (theProject.dayInstructorUpVotes) {
+            setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
+          } else {
+            setDayInstructorUpVotes(0);
+          }
+          if (theProject.gradingPoints) {
+            setGradingPoints(theProject.gradingPoints);
+          } else {
+            setGradingPoints(0);
+          }
+          if (theProject.negativeGradingPoints) {
+            setNegativeGradingPoints(theProject.negativeGradingPoints);
+          } else {
+            setNegativeGradingPoints(0);
+          }
         }
-        if (theProject.dayUpVotePoints) {
-          setUpVotedDays(theProject.dayUpVotePoints);
-        } else {
-          setUpVotedDays(0);
-        }
-        if (theProject.expPoints) {
-          setExpPoints(theProject.expPoints);
-        } else {
-          setExpPoints(0);
-        }
-        if (theProject.instructors) {
-          setInstructorPoints(theProject.instructors);
-        } else {
-          setInstructorPoints(0);
-        }
-        if (theProject.dayInstructorUpVotes) {
-          setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
-        } else {
-          setDayInstructorUpVotes(0);
-        }
-        if (theProject.gradingPoints) {
-          setGradingPoints(theProject.gradingPoints);
-        } else {
-          setGradingPoints(0);
-        }
-        if (theProject.negativeGradingPoints) {
-          setNegativeGradingPoints(theProject.negativeGradingPoints);
-        } else {
-          setNegativeGradingPoints(0);
-        }
+        setGradingNums((gNums) => {
+          gNums[doc.id] = theProject.gradingNums;
+          return gNums;
+        });
       });
       return () => {
-        setNotTakenSessionsChanges([]);
-        setNotTakenSessions([]);
-        setNotTakenSessionsNum(0);
-        notTakenSessionsSnapshot();
         setIntellectualPoints(0);
         setUpVotedDays(0);
         setExpPoints(0);
         setInstructorPoints(0);
         setDayInstructorUpVotes(0);
         setGradingPoints(0);
+        setGradingNums({});
         setNegativeGradingPoints(0);
         researcherSnapshot();
       };
     }
   }, [firebase, fullname, notAResearcher, project]);
-
-  useEffect(() => {
-    if (!notAResearcher && notTakenSessionsChanges.length > 0) {
-      const tempNotTakenSessionsChanges = [...notTakenSessionsChanges];
-      setNotTakenSessionsChanges([]);
-      let nTSessions = [...notTakenSessions];
-      let nTSessionsNum = notTakenSessionsNum;
-      for (let change of tempNotTakenSessionsChanges) {
-        if (change.type === "removed") {
-          nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
-          nTSessionsNum -= 1;
-        } else {
-          const nTSessionData = change.doc.data();
-          nTSessions.push({
-            start: nTSessionData.start.toDate(),
-            end: nTSessionData.end.toDate(),
-            id: nTSessionData.id,
-            hoursLeft: nTSessionData.hoursLeft,
-            points: nTSessionData.points,
-          });
-          nTSessionsNum += 1;
-        }
-      }
-      setNotTakenSessions(nTSessions);
-      setNotTakenSessionsNum(nTSessionsNum);
-    }
-  }, [
-    firebase,
-    notAResearcher,
-    notTakenSessionsChanges,
-    notTakenSessions,
-    notTakenSessionsNum,
-  ]);
 
   useEffect(() => {
     if (!notAResearcher) {
@@ -318,6 +268,7 @@ const RouterNav = (props) => {
       setProposalsChanges([]);
       let propos = { ...proposals };
       let oPropos = { ...othersProposals };
+      let proposNums = { ...proposalsNums };
       let netVotes = oneCademyPoints;
       for (let change of tempProposalsChanges) {
         const proposalData = change.doc.data();
@@ -333,6 +284,11 @@ const RouterNav = (props) => {
             }
           }
         } else {
+          if (proposalData.proposer in proposNums) {
+            proposNums[proposalData.proposer] += 1;
+          } else {
+            proposNums[proposalData.proposer] = 1;
+          }
           if (proposalData.proposer === username) {
             if (!(change.doc.id in propos)) {
               netVotes += proposalData.corrects - proposalData.wrongs - 1;
@@ -354,8 +310,15 @@ const RouterNav = (props) => {
           }
         }
       }
+      const maxProposNums = Math.max(...Object.values(proposNums));
+      for (let proposer in proposNums) {
+        proposNums[proposer] =
+          Math.round(((proposNums[proposer] * 100.0) / maxProposNums) * 100) /
+          100;
+      }
       setProposals(propos);
       setOthersProposals(oPropos);
+      setProposalsNums(proposNums);
       setOneCademyPoints(netVotes);
     }
   }, [
@@ -363,6 +326,7 @@ const RouterNav = (props) => {
     proposalsChanges,
     proposals,
     othersProposals,
+    proposalsNums,
     oneCademyPoints,
     username,
     proposalsLoaded,
@@ -643,8 +607,6 @@ const RouterNav = (props) => {
     setProjects([]);
     setProject("");
     setNotAResearcher(true);
-    setNotTakenSessions([]);
-    setNotTakenSessionsLoaded(false);
     setUpVotedToday(0);
     setInstructorsToday(0);
     setUpvotedInstructorsToday(0);
@@ -654,17 +616,17 @@ const RouterNav = (props) => {
     setExpPoints(0);
     setInstructorPoints(0);
     setDayInstructorUpVotes(0);
-    setNotTakenSessionsChanges([]);
-    setNotTakenSessionsNum(0);
     setProposalsChanges([]);
     setProposals({});
     setOthersProposals([]);
+    setProposalsNums({});
     setOneCademyPoints(0);
     setUserVersionsChanges([]);
     setUserVersions({});
     setOneCademyUpvotes({});
     setDayOneUpVotes(0);
     setGradingPoints(0);
+    setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
   };
@@ -765,7 +727,95 @@ const RouterNav = (props) => {
                   </div>
                 </IconButton>
               </Tooltip>
-              <Box sx={{ flexGrow: 1 }} />
+              <Box
+                sx={{ mr: "10px", display: "flex", flexDirection: "column" }}
+              >
+                <Tooltip
+                  title={`You've submitted ${proposalsNums[username]} proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                >
+                  <Box>
+                    # of{" "}
+                    <img
+                      src={favicon}
+                      width="15.1"
+                      style={{ margin: "0px 4px 0px 4px" }}
+                    />
+                    :
+                  </Box>
+                </Tooltip>
+                <Tooltip
+                  title={`You've collected ${gradingNums[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                >
+                  <Box># of 👨‍🏫:</Box>
+                </Tooltip>
+                <Tooltip
+                  title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                >
+                  <Box># of 🧠:</Box>
+                </Tooltip>
+              </Box>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  position: "relative",
+                }}
+              >
+                <Box></Box>
+                <Box>
+                  <Box
+                    sx={{
+                      backgroundColor: "yellow",
+                      width: "100%",
+                      height: "1px",
+                      borderRadius: "50%",
+                      mt: "7px",
+                    }}
+                  ></Box>
+                  {Object.keys(proposalsNums).map((proposer) => (
+                    <Box
+                      key={proposer}
+                      sx={{
+                        height: proposer === username ? "19px" : "10px",
+                        width: proposer === username ? "19px" : "10px",
+                        backgroundColor:
+                          proposer === username ? "#f28500" : "yellow",
+                        borderRadius: "50%",
+                        position: "absolute",
+                        left: proposalsNums[proposer] + "%",
+                        top: proposer === username ? "-1px" : "2.5px",
+                      }}
+                    ></Box>
+                  ))}
+                </Box>
+                <Box>
+                  <Box
+                    sx={{
+                      backgroundColor: "yellow",
+                      width: "100%",
+                      height: "1px",
+                      borderRadius: "50%",
+                      mt: "7px",
+                    }}
+                  ></Box>
+                  {Object.keys(proposalsNums).map((proposer) => (
+                    <Box
+                      key={proposer}
+                      sx={{
+                        height: proposer === username ? "19px" : "10px",
+                        width: proposer === username ? "19px" : "10px",
+                        backgroundColor:
+                          proposer === username ? "#f28500" : "yellow",
+                        borderRadius: "50%",
+                        position: "absolute",
+                        left: proposalsNums[proposer] + "%",
+                        top: proposer === username ? "-1px" : "2.5px",
+                      }}
+                    ></Box>
+                  ))}
+                </Box>
+              </Box>
               {projects.length > 0 && (
                 <>
                   <Tooltip
@@ -774,10 +824,6 @@ const RouterNav = (props) => {
                         <div>
                           You've earned {expPoints} points from running
                           experiments.
-                        </div>
-                        <div>
-                          There are {notTakenSessionsNum} experiment sessions
-                          available to take.
                         </div>
                       </div>
                     }
@@ -790,12 +836,10 @@ const RouterNav = (props) => {
                           : "NavLink"
                       }
                       onClick={(event) => navigate("/Activities/Experiments")}
+                      style={{ marginLeft: "19px" }}
                     >
                       <div>
                         <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
-                        <br />
-                        <span className="YellowLabel">New</span>{" "}
-                        {notTakenSessionsNum}
                       </div>
                     </Button>
                   </Tooltip>
