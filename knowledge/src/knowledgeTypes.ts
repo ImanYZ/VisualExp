@@ -1,7 +1,13 @@
 export enum NodeTypes {
-  "Relation",
-  "Concept",
-  "Code",
+  "Relation" = "Relation",
+  "Concept" = "Concept",
+  "Code" = "Code",
+  "Reference" = "Reference",
+  "Idea" = "Idea",
+  "Question" = "Question",
+  "Profile" = "Profile",
+  "Sequel" = "Sequel",
+  "Advertisement" = "Advertisement",
 }
 
 export type KnowledgeNode = {
