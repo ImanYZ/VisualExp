@@ -19,12 +19,13 @@ export default class MyDocument extends Document {
             content={getMetaThemeColor("dark")}
             media="(prefers-color-scheme: dark)"
           />
-          <meta httpEquiv="Pragma" content="no-cache" />
-          <meta httpEquiv="Expires" content="-1" />
-          <meta httpEquiv="CACHE-CONTROL" content="NO-CACHE" />
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="true"
+          />
           <meta
             name="google-site-verification"
             content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y"
@@ -46,8 +47,6 @@ export default class MyDocument extends Document {
           <meta httpEquiv="Cache-Control" content="no-cache" />
           <meta httpEquiv="x-dns-prefetch-control" content="off" />
           {/* PWA primary color */}
-          <meta name="theme-color" content={theme.palette.primary.main} />
-          <link rel="shortcut icon" href="/public/favicon.ico" />
           <link
             href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
             rel="stylesheet"

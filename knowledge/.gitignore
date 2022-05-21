@@ -70,7 +70,6 @@ build/Release
 **/.next/**
 knowledge/.next/**
 /out/
-
 next.config.js
 
 # Cloud Run and Firebase stuff
