@@ -70,10 +70,6 @@ button.NavLink:hover {
   color: white;
 }
 
-#ExpPointsLabel {
-  margin-left: 19px;
-}
-
 #DataVisualization {
   height: 340px;
   width: 100%;
