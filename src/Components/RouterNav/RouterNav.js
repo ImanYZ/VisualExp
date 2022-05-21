@@ -32,8 +32,6 @@ import {
   projectsState,
   activePageState,
   notAResearcherState,
-  notTakenSessionsState,
-  notTakenSessionsLoadedState,
   upVotedTodayState,
   instructorsTodayState,
   upvotedInstructorsTodayState,
@@ -68,12 +66,6 @@ const RouterNav = (props) => {
   const activePage = useRecoilValue(activePageState);
   const [notAResearcher, setNotAResearcher] =
     useRecoilState(notAResearcherState);
-  const [notTakenSessions, setNotTakenSessions] = useRecoilState(
-    notTakenSessionsState
-  );
-  const [notTakenSessionsLoaded, setNotTakenSessionsLoaded] = useRecoilState(
-    notTakenSessionsLoadedState
-  );
   const [upVotedToday, setUpVotedToday] = useRecoilState(upVotedTodayState);
   const [instructorsToday, setInstructorsToday] = useRecoilState(
     instructorsTodayState
@@ -92,8 +84,6 @@ const RouterNav = (props) => {
   const [expPoints, setExpPoints] = useState(0);
   const [instructorPoints, setInstructorPoints] = useState(0);
   const [dayInstructorUpVotes, setDayInstructorUpVotes] = useState(0);
-  const [notTakenSessionsChanges, setNotTakenSessionsChanges] = useState([]);
-  const [notTakenSessionsNum, setNotTakenSessionsNum] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
   const [othersProposals, setOthersProposals] = useState({});
@@ -142,16 +132,6 @@ const RouterNav = (props) => {
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
-      const notTakenSessionsQuery = firebase.db.collection("notTakenSessions");
-      const notTakenSessionsSnapshot = notTakenSessionsQuery.onSnapshot(
-        (snapshot) => {
-          const docChanges = snapshot.docChanges();
-          setNotTakenSessionsChanges((oldNotTakenSessionsChanges) => {
-            return [...oldNotTakenSessionsChanges, ...docChanges];
-          });
-          setNotTakenSessionsLoaded(true);
-        }
-      );
       const researcherQuery = firebase.db
         .collection("researchers")
         .doc(fullname);
@@ -195,10 +175,6 @@ const RouterNav = (props) => {
         }
       });
       return () => {
-        setNotTakenSessionsChanges([]);
-        setNotTakenSessions([]);
-        setNotTakenSessionsNum(0);
-        notTakenSessionsSnapshot();
         setIntellectualPoints(0);
         setUpVotedDays(0);
         setExpPoints(0);
@@ -210,39 +186,6 @@ const RouterNav = (props) => {
       };
     }
   }, [firebase, fullname, notAResearcher, project]);
-
-  useEffect(() => {
-    if (!notAResearcher && notTakenSessionsChanges.length > 0) {
-      const tempNotTakenSessionsChanges = [...notTakenSessionsChanges];
-      setNotTakenSessionsChanges([]);
-      let nTSessions = [...notTakenSessions];
-      let nTSessionsNum = notTakenSessionsNum;
-      for (let change of tempNotTakenSessionsChanges) {
-        if (change.type === "removed") {
-          nTSessions = nTSessions.filter((eSe) => eSe.id !== change.doc.id);
-          nTSessionsNum -= 1;
-        } else {
-          const nTSessionData = change.doc.data();
-          nTSessions.push({
-            start: nTSessionData.start.toDate(),
-            end: nTSessionData.end.toDate(),
-            id: nTSessionData.id,
-            hoursLeft: nTSessionData.hoursLeft,
-            points: nTSessionData.points,
-          });
-          nTSessionsNum += 1;
-        }
-      }
-      setNotTakenSessions(nTSessions);
-      setNotTakenSessionsNum(nTSessionsNum);
-    }
-  }, [
-    firebase,
-    notAResearcher,
-    notTakenSessionsChanges,
-    notTakenSessions,
-    notTakenSessionsNum,
-  ]);
 
   useEffect(() => {
     if (!notAResearcher) {
@@ -643,8 +586,6 @@ const RouterNav = (props) => {
     setProjects([]);
     setProject("");
     setNotAResearcher(true);
-    setNotTakenSessions([]);
-    setNotTakenSessionsLoaded(false);
     setUpVotedToday(0);
     setInstructorsToday(0);
     setUpvotedInstructorsToday(0);
@@ -654,8 +595,6 @@ const RouterNav = (props) => {
     setExpPoints(0);
     setInstructorPoints(0);
     setDayInstructorUpVotes(0);
-    setNotTakenSessionsChanges([]);
-    setNotTakenSessionsNum(0);
     setProposalsChanges([]);
     setProposals({});
     setOthersProposals([]);
@@ -775,10 +714,6 @@ const RouterNav = (props) => {
                           You've earned {expPoints} points from running
                           experiments.
                         </div>
-                        <div>
-                          There are {notTakenSessionsNum} experiment sessions
-                          available to take.
-                        </div>
                       </div>
                     }
                   >
@@ -793,9 +728,6 @@ const RouterNav = (props) => {
                     >
                       <div>
                         <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
-                        <br />
-                        <span className="YellowLabel">New</span>{" "}
-                        {notTakenSessionsNum}
                       </div>
                     </Button>
                   </Tooltip>
