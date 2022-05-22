@@ -53,6 +53,27 @@ const goToGCloud = (event) => {
   window.open("https://cloud.google.com/edu/researchers", "_blank");
 };
 
+const lineDiagramTooltip = (type) => (obj, key, uname) => {
+  if (type === "proposals") {
+    return (
+      (key === uname ? "You've posted" : "Posted") +
+      ` ${obj[key].num} proposals.`
+    );
+  }
+  if (type === "instructors") {
+    return (
+      (key === uname ? "You've added" : "Added") +
+      ` ${obj[key].num} instructors/school administrators.`
+    );
+  }
+  if (type === "grading") {
+    return (
+      (key === uname ? "You've graded" : "Graded") +
+      ` ${obj[key].num} free-recall responses.`
+    );
+  }
+};
+
 const RouterNav = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
@@ -181,16 +202,22 @@ const RouterNav = (props) => {
             graNums[change.doc.id] = theProject.gradingNum;
           }
         }
-        const maxGraNum = Math.max(...Object.values(graNums));
-        for (let researcher in graNums) {
-          graNums[researcher] = {
-            num: graNums[researcher],
-            percent:
-              Math.round(((graNums[researcher] * 100.0) / maxGraNum) * 100) /
-              100,
-          };
-        }
-        setGradingNums(graNums);
+        setGradingNums((oGraNums) => {
+          const oldGraNums = { ...oGraNums };
+          for (let researcher in graNums) {
+            oldGraNums[researcher] = { num: graNums[researcher] };
+          }
+          const maxGraNum = Math.max(
+            ...Object.values(oldGraNums).map(({ num }) => num)
+          );
+          for (let researcher in oldGraNums) {
+            oldGraNums[researcher].percent =
+              Math.round(
+                ((oldGraNums[researcher].num * 100.0) / maxGraNum) * 100
+              ) / 100;
+          }
+          return oldGraNums;
+        });
       });
       return () => {
         setIntellectualPoints(0);
@@ -702,27 +729,6 @@ const RouterNav = (props) => {
       )}
     </Menu>
   );
-
-  const lineDiagramTooltip = (type) => (obj, key, username) => {
-    if (type === "proposals") {
-      return (
-        (key === username ? "You've posted" : "Posted") +
-        ` ${obj[key].num} proposals. THIS DOES NOT INDICATE YOUR SCORE!`
-      );
-    }
-    if (type === "instructors") {
-      return (
-        (key === username ? "You've added" : "Added") +
-        ` ${obj[key].num} instructors/school administrators. THIS DOES NOT INDICATE YOUR SCORE!`
-      );
-    }
-    if (type === "grading") {
-      return (
-        (key === username ? "You've graded" : "Graded") +
-        ` ${obj[key].num} free-recall responses. THIS DOES NOT INDICATE YOUR SCORE!`
-      );
-    }
-  };
 
   const navigate = useNavigate();
 
