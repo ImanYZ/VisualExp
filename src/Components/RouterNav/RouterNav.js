@@ -178,7 +178,7 @@ const RouterNav = (props) => {
             }
           }
           setGradingNums((gNums) => {
-            gNums[change.doc.id] = theProject.gradingNums;
+            gNums[change.doc.id] = theProject.gradingNum;
             return gNums;
           });
         }
