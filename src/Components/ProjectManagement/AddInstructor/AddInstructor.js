@@ -351,46 +351,85 @@ othersInstructorsColumns = [...othersInstructorsColumns, ...extraColumns];
 
 const AddInstructor = (props) => {
   const firebase = useRecoilValue(firebaseState);
+  // The authenticated researcher fullname
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
+  // The instructors/school administrators added by this authenticated
+  // researcher
   const [instructors, setInstructors] = useRecoilState(instructorsState);
+  // The instructors/school administrators added by researchers other than this
+  // authenticated researcher
   const [othersInstructors, setOthersInstructors] = useRecoilState(
     othersInstructorsState
   );
+  // The instructors/school administrators added by this authenticated
+  // researcher today.
   const [instructorsToday, setInstructorsToday] = useRecoilState(
     instructorsTodayState
   );
+  // The instructors/school administrators added by other researchers that this
+  // authenticated researcher upvoted today.
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
     upvotedInstructorsTodayState
   );
 
+  // States for the fileds that the authenticated researcher enters for each
+  // instructor/school administrator.
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [explanation, setExplanation] = useState("");
-  const [alreadyExists, setAlreadyExists] = useState(false);
-  const [CSCObj, setCSCObj] = useState(null);
-  const [allCountries, setAllCountries] = useState([]);
-  const [values, setValues] = useState(initialState);
   const [institution, setInstitution] = useState(
     "University of Michigan - Ann Arbor"
   );
   const [institutionInput, setInstitutionInput] = useState("");
-  const [institutions, setInstitutions] = useState([]);
+  // Every other filed value that the authenticated user can add/modify goes
+  // into this state.
+  const [values, setValues] = useState(initialState);
+
+  // To show the corresponding error
   const [invalidInstructor, setInvalidInstructor] = useState("");
+
+  // Whether the instructor that the authenticated researcher is trying to add
+  // already exists, based on their email address. In this case, we should show
+  // an error message.
+  const [alreadyExists, setAlreadyExists] = useState(false);
+  // These are the arrays of all the countries, states, cities, and institutions
+  // to load in the drop-down menu.
+  const [CSCObj, setCSCObj] = useState(null);
+  const [allCountries, setAllCountries] = useState([]);
+  const [institutions, setInstitutions] = useState([]);
+
+  // Helper states to accumulate changes in all the instructors/votes commming
+  // from the database and indicate that all the instructors are loaded.
   const [instructorsLoaded, setInstructorsLoaded] = useState(false);
   const [instructorsChanges, setInstructorsChanges] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [votesChanges, setVotesChanges] = useState([]);
+
+  // When clicking each row of the datagrid, which consists of the
+  // instructors/school adinistrators added by the authenticated researcher, we
+  // keep those rows in this state to let the authenticated researcher update
+  // the data for this row.
+  const [selectedRows, setSelectedRows] = useState([]);
+
+  // Number of times the authenticated researcher voted others' instructors.
   const [unvotedNum, setUnvotedNum] = useState(0);
+  // A single instructor/school administrator that the authenticated researcher
+  // has not voted on yet.
   const [otherInstructor, setOtherInstructor] = useState({});
+  // The autheniticated researcher has submitted their vote but the response has
+  // not returned from the database yet.
   const [otherVoting, setOtherVoting] = useState(false);
+  // The comment that the authenticated researcher can add to any instructor
+  // entry.
   const [comment, setComment] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
+  // Load the array of all the institutions located in the US or Canada to load
+  // in the drop-down menu.
   useEffect(() => {
     const loadInstitutions = async () => {
       if (institutions.length === 0) {
@@ -407,6 +446,8 @@ const AddInstructor = (props) => {
     loadInstitutions();
   }, []);
 
+  // Listen to all the changes to the instructors' collection and put all of
+  // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
     if (firebase) {
       const instructorsQuery = firebase.db.collection("instructors");
@@ -422,8 +463,11 @@ const AddInstructor = (props) => {
         instructorsSnapshot();
       };
     }
-  }, []);
+  }, [firebase]);
 
+  // After making sure the the instructors are loaded for the first time, define
+  // a new spashot listener to listen to all the instructor votes by the
+  // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
     if (firebase && project && fullname && instructorsLoaded) {
       const instructorVotesQuery = firebase.db
@@ -505,8 +549,14 @@ const AddInstructor = (props) => {
     }
   };
 
+  // Based on the changes to the instructors and votes comming from the database
+  // listeners, make the corresponding changes to differnt states.
   useEffect(() => {
     if (instructorsChanges.length > 0) {
+      // We make a copy of all the instructor changes and delete all the content
+      // of the instructor changes, so that if new changes come from the
+      // database listener while we're working on the previous changes, they do
+      // not mess up.
       const tempInstructorsChanges = [...instructorsChanges];
       setInstructorsChanges([]);
       let insts = [...instructors];
@@ -514,8 +564,11 @@ const AddInstructor = (props) => {
       let instToday = instructorsToday;
       for (let change of tempInstructorsChanges) {
         const instructorData = change.doc.data();
+        // If the change indicates that the instructor doc is removed:
         if (instructorData.deleted || change.type === "removed") {
+          // If the instructor was added by the authenticated researcher:
           if (instructorData.fullname === fullname) {
+            // Then, we need to remove it from instructors.
             const instructorIdx = insts.findIndex(
               (instruct) => instruct.id === change.doc.id
             );
@@ -523,6 +576,8 @@ const AddInstructor = (props) => {
               insts.splice(instructorIdx, 1);
             }
           } else {
+            // If the instructor was added by other researchers:
+            // Then, we need to remove it from othersInstructors.
             const instructorIdx = oInsts.findIndex(
               (instruct) => instruct.id === change.doc.id
             );
@@ -531,7 +586,11 @@ const AddInstructor = (props) => {
             }
           }
         } else {
+          // Otherwise, we know that the entry was added/updated.
+          // If the entry was added by the authenticated researcher:
           if (instructorData.fullname === fullname) {
+            // We combine thedocument data with its id and enty array for
+            // comments to start with.
             const newInstructor = {
               comments: [],
               ...instructorData,
@@ -541,13 +600,19 @@ const AddInstructor = (props) => {
             const instructorIdx = insts.findIndex(
               (instruct) => instruct.id === change.doc.id
             );
+            // If the instructor previously existed in the instructors, we just
+            // need to update it to the new values.
             if (instructorIdx !== -1) {
               insts[instructorIdx] = {
                 ...insts[instructorIdx],
                 ...newInstructor,
               };
             } else {
+              // If the instructor did not previously exist in the instructors,
+              // we add it.
               insts.push(newInstructor);
+              // If this instructor document is created today, we increment the
+              // value of instructorsToday.
               if (isToday(instructorData.createdAt.toDate())) {
                 instToday += 1;
               }
