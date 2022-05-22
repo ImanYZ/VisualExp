@@ -554,9 +554,9 @@ const AddInstructor = (props) => {
   useEffect(() => {
     if (instructorsChanges.length > 0) {
       // We make a copy of all the instructor changes and delete all the content
-      // of the instructor changes, so that if new changes come from the
-      // database listener while we're working on the previous changes, they do
-      // not mess up.
+      // of the instructorChanges, so that if new changes come from the database
+      // listener while we're working on the previous changes, they do not mess
+      // up.
       const tempInstructorsChanges = [...instructorsChanges];
       setInstructorsChanges([]);
       let insts = [...instructors];
@@ -589,7 +589,7 @@ const AddInstructor = (props) => {
           // Otherwise, we know that the entry was added/updated.
           // If the entry was added by the authenticated researcher:
           if (instructorData.fullname === fullname) {
-            // We combine thedocument data with its id and enty array for
+            // We combine the document data with its id and enty array for
             // comments to start with.
             const newInstructor = {
               comments: [],
@@ -618,20 +618,31 @@ const AddInstructor = (props) => {
               }
             }
           } else {
-            const instructorIdx = oInsts.findIndex(
-              (instruct) => instruct.id === change.doc.id
-            );
+            // Otherwise, if the entry was added by researchers other than the
+            // authenticated researcher:
+            // We combine the document data with its id and enty array for
+            // comments to start with.
             const newInstructor = {
               comments: [],
               ...instructorData,
               id: change.doc.id,
             };
+            // We check whether the instructor object already exists in
+            // othersInstructors, and if it exists, what is its index to update
+            // it.
+            const instructorIdx = oInsts.findIndex(
+              (instruct) => instruct.id === change.doc.id
+            );
             if (instructorIdx !== -1) {
               oInsts[instructorIdx] = {
                 ...oInsts[instructorIdx],
                 ...newInstructor,
               };
             } else {
+              // If it does not exist, we just push it together with default
+              // values for upVote, downVote, and currentVote. The value of
+              // currentVote is always upVote - downVote, which can be -1, 0, or
+              // 1.
               oInsts.push({
                 ...newInstructor,
                 upVote: "◻",
@@ -642,22 +653,36 @@ const AddInstructor = (props) => {
           }
         }
       }
+      // When a researcher adds 7 instructors/school administrators in a single
+      // day, they get a point for it. No partial points for less than 7, and no
+      // extra points for more than 7. So, if they've already added 7, they can
+      // keep adding more, but we do not increase the number on the toolbar to
+      // make sure they do not think they can earn more points by adding more.
       setInstructorsToday(instToday <= 7 ? instToday : 7);
       setInstructors(insts);
       setOthersInstructors(oInsts);
     }
     if (votesChanges.length > 0) {
+      // We make a copy of all the vote changes and delete all the content of
+      // the voteChanges, so that if new changes come from the database listener
+      // while we're working on the previous changes, they do not mess up.
       const tempVotesChanges = [...votesChanges];
       setVotesChanges([]);
       let oInsts = [...othersInstructors];
       let nUpVotedToday = upvotedInstructorsToday;
       for (let change of tempVotesChanges) {
         const voteData = change.doc.data();
+        // We need to figure out whether they cast this vote today to determine
+        // whether they should receive the point for the day.
         let didVoteToday = isToday(voteData.createdAt.toDate());
         if ("updatedAt" in voteData) {
           didVoteToday = isToday(voteData.updatedAt.toDate());
         }
+        // They only receive a point for upvotin, not ignoring (noVote).
         const didUpVoteToday = didVoteToday && voteData.upVote;
+        // They only vote on the instructors/school administrators added by
+        // other researchers. So, we should find and update the corresponding
+        // object in othersInstructors.
         const oInstsIdx = oInsts.findIndex(
           (instr) => instr.id === voteData.instructor
         );
