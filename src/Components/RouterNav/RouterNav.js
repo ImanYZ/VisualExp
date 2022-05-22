@@ -135,50 +135,53 @@ const RouterNav = (props) => {
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
       const researcherQuery = firebase.db.collection("researchers");
-      const researcherSnapshot = researcherQuery.onSnapshot((doc) => {
-        const researcherData = doc.data();
-        const theProject = researcherData.projects[project];
-        if (doc.id === fullname) {
-          if (theProject.points) {
-            setIntellectualPoints(theProject.points);
-          } else {
-            setIntellectualPoints(0);
+      const researcherSnapshot = researcherQuery.onSnapshot((snapshot) => {
+        const docChanges = snapshot.docChanges();
+        for (let change of docChanges) {
+          const researcherData = change.doc.data();
+          const theProject = researcherData.projects[project];
+          if (change.doc.id === fullname) {
+            if (theProject.points) {
+              setIntellectualPoints(theProject.points);
+            } else {
+              setIntellectualPoints(0);
+            }
+            if (theProject.dayUpVotePoints) {
+              setUpVotedDays(theProject.dayUpVotePoints);
+            } else {
+              setUpVotedDays(0);
+            }
+            if (theProject.expPoints) {
+              setExpPoints(theProject.expPoints);
+            } else {
+              setExpPoints(0);
+            }
+            if (theProject.instructors) {
+              setInstructorPoints(theProject.instructors);
+            } else {
+              setInstructorPoints(0);
+            }
+            if (theProject.dayInstructorUpVotes) {
+              setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
+            } else {
+              setDayInstructorUpVotes(0);
+            }
+            if (theProject.gradingPoints) {
+              setGradingPoints(theProject.gradingPoints);
+            } else {
+              setGradingPoints(0);
+            }
+            if (theProject.negativeGradingPoints) {
+              setNegativeGradingPoints(theProject.negativeGradingPoints);
+            } else {
+              setNegativeGradingPoints(0);
+            }
           }
-          if (theProject.dayUpVotePoints) {
-            setUpVotedDays(theProject.dayUpVotePoints);
-          } else {
-            setUpVotedDays(0);
-          }
-          if (theProject.expPoints) {
-            setExpPoints(theProject.expPoints);
-          } else {
-            setExpPoints(0);
-          }
-          if (theProject.instructors) {
-            setInstructorPoints(theProject.instructors);
-          } else {
-            setInstructorPoints(0);
-          }
-          if (theProject.dayInstructorUpVotes) {
-            setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
-          } else {
-            setDayInstructorUpVotes(0);
-          }
-          if (theProject.gradingPoints) {
-            setGradingPoints(theProject.gradingPoints);
-          } else {
-            setGradingPoints(0);
-          }
-          if (theProject.negativeGradingPoints) {
-            setNegativeGradingPoints(theProject.negativeGradingPoints);
-          } else {
-            setNegativeGradingPoints(0);
-          }
+          setGradingNums((gNums) => {
+            gNums[change.doc.id] = theProject.gradingNums;
+            return gNums;
+          });
         }
-        setGradingNums((gNums) => {
-          gNums[doc.id] = theProject.gradingNums;
-          return gNums;
-        });
       });
       return () => {
         setIntellectualPoints(0);
@@ -285,9 +288,9 @@ const RouterNav = (props) => {
           }
         } else {
           if (proposalData.proposer in proposNums) {
-            proposNums[proposalData.proposer] += 1;
+            proposNums[proposalData.proposer].num += 1;
           } else {
-            proposNums[proposalData.proposer] = 1;
+            proposNums[proposalData.proposer] = { num: 1 };
           }
           if (proposalData.proposer === username) {
             if (!(change.doc.id in propos)) {
@@ -310,11 +313,14 @@ const RouterNav = (props) => {
           }
         }
       }
-      const maxProposNums = Math.max(...Object.values(proposNums));
+      const maxProposNums = Math.max(
+        ...Object.values(proposNums).map(({ num }) => num)
+      );
       for (let proposer in proposNums) {
-        proposNums[proposer] =
-          Math.round(((proposNums[proposer] * 100.0) / maxProposNums) * 100) /
-          100;
+        proposNums[proposer].percent =
+          Math.round(
+            ((proposNums[proposer].num * 100.0) / maxProposNums) * 100
+          ) / 100;
       }
       setProposals(propos);
       setOthersProposals(oPropos);
@@ -727,97 +733,88 @@ const RouterNav = (props) => {
                   </div>
                 </IconButton>
               </Tooltip>
-              <Box
-                sx={{ mr: "10px", display: "flex", flexDirection: "column" }}
-              >
-                <Tooltip
-                  title={`You've submitted ${proposalsNums[username]} proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
-                >
-                  <Box>
-                    # of{" "}
-                    <img
-                      src={favicon}
-                      width="15.1"
-                      style={{ margin: "0px 4px 0px 4px" }}
-                    />
-                    :
-                  </Box>
-                </Tooltip>
-                <Tooltip
-                  title={`You've collected ${gradingNums[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
-                >
-                  <Box># of 👨‍🏫:</Box>
-                </Tooltip>
-                <Tooltip
-                  title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
-                >
-                  <Box># of 🧠:</Box>
-                </Tooltip>
-              </Box>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  position: "relative",
-                }}
-              >
-                <Box></Box>
-                <Box>
-                  <Box
-                    sx={{
-                      backgroundColor: "yellow",
-                      width: "100%",
-                      height: "1px",
-                      borderRadius: "50%",
-                      mt: "7px",
-                    }}
-                  ></Box>
-                  {Object.keys(proposalsNums).map((proposer) => (
-                    <Box
-                      key={proposer}
-                      sx={{
-                        height: proposer === username ? "19px" : "10px",
-                        width: proposer === username ? "19px" : "10px",
-                        backgroundColor:
-                          proposer === username ? "#f28500" : "yellow",
-                        borderRadius: "50%",
-                        position: "absolute",
-                        left: proposalsNums[proposer] + "%",
-                        top: proposer === username ? "-1px" : "2.5px",
-                      }}
-                    ></Box>
-                  ))}
-                </Box>
-                <Box>
-                  <Box
-                    sx={{
-                      backgroundColor: "yellow",
-                      width: "100%",
-                      height: "1px",
-                      borderRadius: "50%",
-                      mt: "7px",
-                    }}
-                  ></Box>
-                  {Object.keys(proposalsNums).map((proposer) => (
-                    <Box
-                      key={proposer}
-                      sx={{
-                        height: proposer === username ? "19px" : "10px",
-                        width: proposer === username ? "19px" : "10px",
-                        backgroundColor:
-                          proposer === username ? "#f28500" : "yellow",
-                        borderRadius: "50%",
-                        position: "absolute",
-                        left: proposalsNums[proposer] + "%",
-                        top: proposer === username ? "-1px" : "2.5px",
-                      }}
-                    ></Box>
-                  ))}
-                </Box>
-              </Box>
               {projects.length > 0 && (
                 <>
+                  <Box
+                    sx={{
+                      ml: "-25px",
+                      mr: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      rowGap: "4px",
+                    }}
+                  >
+                    <Tooltip
+                      title={`You've submitted ${
+                        proposalsNums[username]
+                          ? proposalsNums[username].num
+                          : ""
+                      } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                    >
+                      <Box>
+                        # of{" "}
+                        <img
+                          src={favicon}
+                          width="15.1"
+                          style={{ margin: "0px 4px 0px 4px" }}
+                        />
+                        :
+                      </Box>
+                    </Tooltip>
+                    <Tooltip
+                      title={`You've collected ${gradingNums[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                    >
+                      <Box># of 👨‍🏫:</Box>
+                    </Tooltip>
+                    <Tooltip
+                      title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                    >
+                      <Box># of 🧠:</Box>
+                    </Tooltip>
+                  </Box>
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      rowGap: "10px",
+                      position: "relative",
+                    }}
+                  >
+                    <Box>
+                      <Box
+                        sx={{
+                          backgroundColor: "yellow",
+                          width: "100%",
+                          height: "1px",
+                        }}
+                      ></Box>
+                      {Object.keys(proposalsNums).map((proposer) => (
+                        <Tooltip
+                          key={proposer}
+                          title={
+                            (proposer === username
+                              ? "You have posted"
+                              : "Posted") +
+                            ` ${proposalsNums[proposer].num} proposals!`
+                          }
+                        >
+                          <Box
+                            sx={{
+                              height: proposer === username ? "19px" : "10px",
+                              width: proposer === username ? "19px" : "10px",
+                              backgroundColor:
+                                proposer === username ? "#f28500" : "yellow",
+                              borderRadius: "50%",
+                              position: "absolute",
+                              left: proposalsNums[proposer].percent + "%",
+                              top: proposer === username ? "-8.5px" : "-4px",
+                            }}
+                          ></Box>
+                        </Tooltip>
+                      ))}
+                    </Box>
+                  </Box>
                   <Tooltip
                     title={
                       <div>
