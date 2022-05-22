@@ -14,7 +14,15 @@ const LineDiagram = ({ obj, username, lineDiagramTooltip }) => {
         }}
       ></Box>
       {Object.keys(obj).map((objKey) => (
-        <Tooltip key={objKey} title={lineDiagramTooltip(obj, objKey, username)}>
+        <Tooltip
+          key={objKey}
+          title={
+            <Box>
+              <p>{lineDiagramTooltip(obj, objKey, username)}</p>
+              <p>THIS DOES NOT INDICATE A SCORE!</p>
+            </Box>
+          }
+        >
           <Box
             sx={{
               height: objKey === username ? "19px" : "10px",
