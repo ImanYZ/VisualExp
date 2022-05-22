@@ -37,14 +37,13 @@ import {
   upvotedInstructorsTodayState,
 } from "../../store/ProjectAtoms";
 
+import LineDiagram from "./LineDiagram";
 import { getTypedCollections } from "./getTypedCollections";
 import { getISODateString } from "../../utils/DateFunctions";
 
 import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
-
-import "./RouterNav.css";
 
 const goToUMSI = (event) => {
   window.open("https://www.si.umich.edu/", "_blank");
@@ -136,6 +135,7 @@ const RouterNav = (props) => {
     if (firebase && fullname && !notAResearcher && project) {
       const researcherQuery = firebase.db.collection("researchers");
       const researcherSnapshot = researcherQuery.onSnapshot((snapshot) => {
+        const graNums = {};
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
@@ -177,11 +177,20 @@ const RouterNav = (props) => {
               setNegativeGradingPoints(0);
             }
           }
-          setGradingNums((gNums) => {
-            gNums[change.doc.id] = theProject.gradingNum;
-            return gNums;
-          });
+          if ("gradingNum" in theProject) {
+            graNums[change.doc.id] = theProject.gradingNum;
+          }
         }
+        const maxGraNum = Math.max(...Object.values(graNums));
+        for (let researcher in graNums) {
+          graNums[researcher] = {
+            num: graNums[researcher],
+            percent:
+              Math.round(((graNums[researcher] * 100.0) / maxGraNum) * 100) /
+              100,
+          };
+        }
+        setGradingNums(graNums);
       });
       return () => {
         setIntellectualPoints(0);
@@ -694,6 +703,27 @@ const RouterNav = (props) => {
     </Menu>
   );
 
+  const lineDiagramTooltip = (type) => (obj, key, username) => {
+    if (type === "proposals") {
+      return (
+        (key === username ? "You've posted" : "Posted") +
+        ` ${obj[key].num} proposals. THIS DOES NOT INDICATE YOUR SCORE!`
+      );
+    }
+    if (type === "instructors") {
+      return (
+        (key === username ? "You've added" : "Added") +
+        ` ${obj[key].num} instructors/school administrators. THIS DOES NOT INDICATE YOUR SCORE!`
+      );
+    }
+    if (type === "grading") {
+      return (
+        (key === username ? "You've graded" : "Graded") +
+        ` ${obj[key].num} free-recall responses. THIS DOES NOT INDICATE YOUR SCORE!`
+      );
+    }
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -777,43 +807,19 @@ const RouterNav = (props) => {
                       flexGrow: 1,
                       display: "flex",
                       flexDirection: "column",
-                      rowGap: "10px",
-                      position: "relative",
+                      rowGap: "25px",
                     }}
                   >
-                    <Box>
-                      <Box
-                        sx={{
-                          backgroundColor: "yellow",
-                          width: "100%",
-                          height: "1px",
-                        }}
-                      ></Box>
-                      {Object.keys(proposalsNums).map((proposer) => (
-                        <Tooltip
-                          key={proposer}
-                          title={
-                            (proposer === username
-                              ? "You have posted"
-                              : "Posted") +
-                            ` ${proposalsNums[proposer].num} proposals!`
-                          }
-                        >
-                          <Box
-                            sx={{
-                              height: proposer === username ? "19px" : "10px",
-                              width: proposer === username ? "19px" : "10px",
-                              backgroundColor:
-                                proposer === username ? "#f28500" : "yellow",
-                              borderRadius: "50%",
-                              position: "absolute",
-                              left: proposalsNums[proposer].percent + "%",
-                              top: proposer === username ? "-8.5px" : "-4px",
-                            }}
-                          ></Box>
-                        </Tooltip>
-                      ))}
-                    </Box>
+                    <LineDiagram
+                      obj={proposalsNums}
+                      username={username}
+                      lineDiagramTooltip={lineDiagramTooltip("proposals")}
+                    ></LineDiagram>
+                    <LineDiagram
+                      obj={gradingNums}
+                      username={fullname}
+                      lineDiagramTooltip={lineDiagramTooltip("grading")}
+                    ></LineDiagram>
                   </Box>
                   <Tooltip
                     title={
