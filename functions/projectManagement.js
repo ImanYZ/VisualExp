@@ -1528,7 +1528,15 @@ exports.remindCalendarInvitations = async (context) => {
     const researcherDocs = await db.collection("researchers").get();
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
-      researchers[researcherData.email] = researcherDoc.id;
+      let isActive = false;
+      for (let proj of researcherData.projects) {
+        if (researcherData.projects[proj].active) {
+          isActive = true;
+        }
+      }
+      if (isActive) {
+        researchers[researcherData.email.toLowerCase()] = researcherDoc.id;
+      }
     }
     // Retrieve all the scheduled sessions.
     // Having an id means the document is not just an availability, but there
@@ -1578,8 +1586,8 @@ exports.remindCalendarInvitations = async (context) => {
               // accept it or ask someone else to take it.
               setTimeout(() => {
                 researcherEventNotificationEmail(
-                  attendee.email,
-                  researchers[attendee.email],
+                  attendee.email.toLowerCase(),
+                  researchers[attendee.email.toLowerCase()],
                   participant.email,
                   hoursLeft,
                   order,
