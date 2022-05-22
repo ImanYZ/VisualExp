@@ -24,6 +24,7 @@ const {
   // updateNotTakenSessions,
   loadfeedbackCodes,
   gradeFreeRecall,
+  addInstructorsNums,
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -82,6 +83,7 @@ app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.post("/gradeFreeRecall", gradeFreeRecall);
 app.get("/loadfeedbackCodes", loadfeedbackCodes);
+app.get("/addInstructorsNums", addInstructorsNums);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
