@@ -1,13 +1,16 @@
 import SearchIcon from "@mui/icons-material/Search";
+import Box from "@mui/material/Box";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
+import { SxProps, Theme } from "@mui/system";
 import { FC, useState } from "react";
 
 type Props = {
   onSearch: (text: string) => void;
+  sx?: SxProps<Theme>;
 };
 
-const SearchInput: FC<Props> = ({ onSearch }) => {
+const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   const [searchText, setSearchText] = useState<string>("");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,7 +23,7 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSearch} style={{ width: "100%" }}>
+    <Box sx={{ width: "100%", ...sx }} component="form" onSubmit={handleSearch}>
       <Search>
         <SearchIconWrapper>
           <SearchIcon />
@@ -34,7 +37,7 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
           onChange={handleChange}
         />
       </Search>
-    </form>
+    </Box>
   );
 };
 
