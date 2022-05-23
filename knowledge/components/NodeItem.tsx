@@ -7,6 +7,7 @@ import { FC } from "react";
 import { KnowledgeNode } from "../src/knowledgeTypes";
 import CardActions from "@mui/material/CardActions";
 import NextLink from "next/link";
+import MarkdownRender from "./Markdown/MarkdownRender";
 
 type Props = {
   node: KnowledgeNode;
@@ -25,10 +26,10 @@ const MasonryNodeItem: FC<Props> = ({ node }) => {
       )}
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {node.title}
+          <MarkdownRender children={node.title} />
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {node.content}
+        <Typography variant="body1" color="text.secondary" component="div">
+          <MarkdownRender children={node.content} />
         </Typography>
       </CardContent>
       <CardActions>
