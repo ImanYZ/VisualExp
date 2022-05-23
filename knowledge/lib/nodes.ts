@@ -1,22 +1,17 @@
-import { remark } from "remark";
-import html from "remark-html";
 import geoip from "geoip-lite";
-
 import {
-  admin,
-  db,
-  MAX_TRANSACTION_WRITES,
-  checkRestartBatchWriteCounts,
-  commitBatch,
-  isFirestoreDeadlineError,
-  batchSet,
-  batchUpdate,
-  batchDelete,
-} from "./admin";
+  KnowledgeNode,
+  KnowledgeNodeContributor,
+  LinkedKnowledgeNode,
+  KnowledgeNodeInstitutions,
+} from "../src/knowledgeTypes";
+
+import { admin, db, commitBatch, batchSet } from "./admin";
 
 export const getSortedPostsData = async () => {
   const nodes = [];
   const nodeDocs = await db.collection("nodes").limit(25).get();
+  console.log("nodeDocs.docs.length", nodeDocs.docs.length);
   for (let nodeDoc of nodeDocs.docs) {
     const nodeData = nodeDoc.data();
     nodes.push({
@@ -32,14 +27,8 @@ export const getSortedPostsData = async () => {
   return nodes;
 };
 
-// Use remark to convert markdown into HTML string
-const getNodeHTMLContent = async (content) => {
-  const processedContent = await remark().use(html).process(content);
-  return processedContent.toString();
-};
-
 // Retrieve all helpful data about the node corresponding to nodeId.
-const retrieveNode = async (nodeId) => {
+const retrieveNode = async (nodeId: string) => {
   const nodeDoc = await db.collection("nodes").doc(nodeId).get();
   if (!nodeDoc.exists) {
     return null;
@@ -99,8 +88,8 @@ const retrieveNode = async (nodeId) => {
       }
     }
   }
-  return {
-    nodeId,
+  const node: KnowledgeNode = {
+    id: nodeId,
     content: nodeData.content,
     nodeType: nodeData.nodeType,
     title: nodeData.title,
@@ -117,22 +106,24 @@ const retrieveNode = async (nodeId) => {
     changedAt: nodeData.changedAt.toDate().toUTCString(),
     createdAt: nodeData.createdAt.toDate().toUTCString(),
   };
+  return node;
 };
 
 // Endpoint retrieving the node data and its direct parents and children
 // data based on the id requested.
-export const getNodeData = async (id) => {
+export const getNodeData = async (id: string) => {
   const nodeData = await retrieveNode(id);
+  // console.log("nodeData", nodeData);
   if (!nodeData) {
     return null;
   }
 
   // Retrieve the content of all the direct children of the node.
-  const children = [];
+  const children: KnowledgeNode[] = [];
   for (let child of nodeData.children) {
     const childData = await retrieveNode(child.node);
     children.push({
-      node: child.node,
+      id: childData.id,
       title: childData.title,
       content: childData.content,
       nodeImage: childData.nodeImage,
@@ -140,7 +131,7 @@ export const getNodeData = async (id) => {
     });
   }
   // Retrieve the content of all the direct parents of the node.
-  const parents = [];
+  const parents: LinkedKnowledgeNode[] = [];
   for (let parent of nodeData.parents) {
     const parentData = await retrieveNode(parent.node);
     parents.push({
@@ -148,12 +139,11 @@ export const getNodeData = async (id) => {
       title: parentData.title,
       content: parentData.content,
       nodeImage: parentData.nodeImage,
-      nodeImage: parentData.nodeImage,
       nodeType: parentData.nodeType,
     });
   }
   // Retrieve the content of all the tags of the node.
-  const tags = [];
+  const tags: LinkedKnowledgeNode[] = [];
   for (let tag of nodeData.tags) {
     const tagData = await retrieveNode(tag.node);
     tags.push({
@@ -161,12 +151,11 @@ export const getNodeData = async (id) => {
       title: tagData.title,
       content: tagData.content,
       nodeImage: tagData.nodeImage,
-      nodeImage: tagData.nodeImage,
       nodeType: tagData.nodeType,
     });
   }
   // Retrieve the content of all the references of the node.
-  const references = [];
+  const references: LinkedKnowledgeNode[] = [];
   for (let reference of nodeData.references) {
     const referenceData = await retrieveNode(reference.node);
     references.push({
@@ -175,14 +164,14 @@ export const getNodeData = async (id) => {
       title: referenceData.title,
       content: referenceData.content,
       nodeImage: referenceData.nodeImage,
-      nodeImage: referenceData.nodeImage,
       nodeType: referenceData.nodeType,
     });
   }
 
-  console.log({ nodeData });
   // Descendingly sort the contributors array based on the reputation points.
-  const contributors = Object.entries(nodeData.contributors)
+  const contributors: KnowledgeNodeContributor[] = Object.entries(
+    nodeData.contributors
+  )
     .sort(([aId, aObj], [bId, bObj]) => {
       return bObj.reputation - aObj.reputation;
     })
@@ -193,7 +182,7 @@ export const getNodeData = async (id) => {
       return bObj.reputation - aObj.reputation;
     }
   );
-  const institutions = [];
+  const institutions: KnowledgeNodeInstitutions[] = [];
   for (let [name, obj] of institObjs) {
     const institutionDocs = await db
       .collection("institutions")

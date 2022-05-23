@@ -1,6 +1,16 @@
 import { grey } from "@mui/material/colors";
 import { ThemeOptions, Theme } from "@mui/material/styles";
 
+declare module "@mui/material/styles/createPalette" {
+  interface CommonColors {
+    black: string;
+    white: string;
+    orange: string;
+    orangeDark: string;
+    darkGrayBackground: string;
+  }
+}
+
 const common = {
   black: "#1a1a1a",
   white: "#ffffff",

@@ -12,10 +12,10 @@ import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
 import LockIcon from "@mui/icons-material/Lock";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import { NodeTypes } from "../src/knowledgeTypes";
+import { NodeType } from "../src/knowledgeTypes";
 
 type Props = {
-  nodeType: NodeTypes;
+  nodeType: NodeType;
 };
 
 const NodeTypeIcon: FC<Props> = ({ nodeType }) => {
