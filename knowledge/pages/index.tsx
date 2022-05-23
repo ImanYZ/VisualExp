@@ -2,12 +2,12 @@ import { getSortedPostsData } from "../lib/nodes";
 import PagesNavbar from "../components/PagesNavbar";
 import { GetServerSideProps, NextPage } from "next";
 import { KnowledgeNode } from "../src/knowledgeTypes";
-import Masonry from "@mui/lab/Masonry";
-import MasonryNodeItem from "../components/NodeItem";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import SearchInput from "../components/SearchInput";
 import { Button } from "@mui/material";
+import PopularNodes from "../components/PopularNodes";
+import TrendingNodes from "../components/TrendingNodes";
 
 type Props = {
   data: KnowledgeNode[];
@@ -27,10 +27,6 @@ const Home: NextPage<Props> = ({ data }) => {
     console.log("text", text);
   };
 
-  const renderMasonry = () => {
-    return data.map((el) => <MasonryNodeItem key={el.id} node={el} />);
-  };
-
   return (
     <PagesNavbar>
       <Container>
@@ -38,15 +34,8 @@ const Home: NextPage<Props> = ({ data }) => {
           <SearchInput onSearch={handleSearch}></SearchInput>
           <Button>Search</Button>
         </Box>
-        <Masonry
-          columns={4}
-          spacing={2}
-          defaultHeight={450}
-          defaultColumns={4}
-          defaultSpacing={1}
-        >
-          {renderMasonry()}
-        </Masonry>
+        <PopularNodes nodes={data} sx={{ mb: 5 }} />
+        <TrendingNodes nodes={data} />
       </Container>
     </PagesNavbar>
   );

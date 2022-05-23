@@ -1,4 +1,4 @@
-export enum NodeTypes {
+export enum NodeType {
   "Relation" = "Relation",
   "Concept" = "Concept",
   "Code" = "Code",
@@ -9,6 +9,28 @@ export enum NodeTypes {
   "Sequel" = "Sequel",
   "Advertisement" = "Advertisement",
 }
+
+export type KnowledgeNodeContributor = {
+  fullname?: string;
+  reputation?: number;
+  chooseUname?: boolean;
+  imageUrl?: string;
+};
+
+export type KnowledgeNodeInstitutions = {
+  reputation?: number;
+  logoURL?: string;
+  name?: string;
+};
+
+export type LinkedKnowledgeNode = {
+  label?: string;
+  node?: string;
+  title?: string;
+  content?: string;
+  nodeImage?: string;
+  nodeType?: NodeType;
+};
 
 export type KnowledgeNode = {
   id: string;
@@ -24,7 +46,7 @@ export type KnowledgeNode = {
   updatedAt?: string;
   nodeImage?: string;
   changedAt?: string;
-  tags?: string[];
+  tags?: LinkedKnowledgeNode[];
   createdAt?: string;
   referenceIds?: string[];
   referenceLabels?: string[];
@@ -33,11 +55,15 @@ export type KnowledgeNode = {
   institNames?: string[];
   deleted?: boolean;
   aChooseUname?: boolean;
-  nodeType?: string;
-  references?: string[];
+  nodeType?: NodeType;
+  references?: LinkedKnowledgeNode[];
   wrongs?: number;
   viewers?: number;
   closedHeight?: number;
   title?: string;
   height?: number;
+  contributors?: KnowledgeNodeContributor[];
+  institutions?: KnowledgeNodeInstitutions[];
+  children?: LinkedKnowledgeNode[];
+  parents?: LinkedKnowledgeNode[];
 };
