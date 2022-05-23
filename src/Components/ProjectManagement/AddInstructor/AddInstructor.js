@@ -687,6 +687,9 @@ const AddInstructor = (props) => {
           (instr) => instr.id === voteData.instructor
         );
         if (change.type === "removed") {
+          // If the vote is removed and othersInstructor exists, we should reset
+          // its votes and comment and decrement nUpVotedToday only if
+          // didUpVoteToday.
           if (oInstsIdx !== -1) {
             oInsts[oInstsIdx].upVote = false;
             oInsts[oInstsIdx].downVote = false;
@@ -695,18 +698,25 @@ const AddInstructor = (props) => {
             nUpVotedToday += didUpVoteToday ? -1 : 0;
           }
         } else {
+          // Otherwise, if the vote is added/modified:
+          // If othersInstructor exists:
           if (oInstsIdx !== -1) {
+            // If the vote today:
             if (didVoteToday) {
+              // If they previously downvoted:
               if (oInsts[oInstsIdx].currentVote < 1) {
+                // If they're upvoting now:
                 if (voteData.upVote) {
                   nUpVotedToday += 1;
                 }
               } else {
+                // If they previously upvoted and now they are downvoting:
                 if (!voteData.upVote) {
                   nUpVotedToday -= 1;
                 }
               }
             }
+            // Update the othersInstructor object accordingly.
             oInsts[oInstsIdx] = {
               ...oInsts[oInstsIdx],
               comment: voteData.comment ? voteData.comment : "",
@@ -715,6 +725,10 @@ const AddInstructor = (props) => {
               currentVote: voteData.upVote - voteData.downVote,
             };
           } else {
+            // If the othersInstructor object does not exist, create it with
+            // default values for other fields until we load those values. This
+            // will probably never happen becuase an othersInstructor should be
+            // loaded for the researcher to be able to vote on it.
             oInsts.push({
               comment: voteData.comment ? voteData.comment : "",
               upVote: voteData.upVote ? "👍" : "◻",
@@ -732,6 +746,12 @@ const AddInstructor = (props) => {
         }
       }
       assignDayUpVotesPoint(nUpVotedToday);
+      // When a researcher upvotes 16 instructors/school administrators that are
+      // added by other researchers, today, they get a point for it. No partial
+      // points for less than 16, and no extra points for more than 16. So, if
+      // they've already upvote 16, they can keep adding more, but we do not
+      // increase the number on the toolbar to make sure they do not think they
+      // can earn more points by upvoting more.
       setUpvotedInstructorsToday(nUpVotedToday <= 16 ? nUpVotedToday : 16);
       setOthersInstructors(oInsts);
     }
@@ -746,6 +766,13 @@ const AddInstructor = (props) => {
     project,
   ]);
 
+  // Every time a chnage happens to othersInstructors, we should look for the
+  // othersInstructor that the authenticated researcher has not voted yet, and
+  // it has received fewer than 3 total votes by researchers, to show it in the
+  // upper box to facilitate evaluating (voting) it by the authenticated
+  // researcher. If a othersInstructor has already received greater than or
+  // equal to 3 votes from researchers, we should remove it from
+  // othersInstructors.
   useEffect(() => {
     let theInstructor;
     let uInstructorsNum = 0;
@@ -773,6 +800,10 @@ const AddInstructor = (props) => {
     }
   }, [othersInstructors]);
 
+  // If the authenticated research clicks one of the rows in the other
+  // instructors' data grid, we should load that as the other instructor to show
+  // it in the upper box to facilitate evaluating (voting) it by the
+  // authenticated researcher.
   const othersInstructorsRowClick = (clickedRow) => {
     const theRow = clickedRow.row;
     if (theRow) {
@@ -786,6 +817,8 @@ const AddInstructor = (props) => {
     }
   };
 
+  // Validator useEffect: Based on the changes in the input field, we validate
+  // them and generate corresponding error messages.
   useEffect(() => {
     const validwebURL = isValidHttpUrl(values.webURL);
     const validGoogleScholar = isValidHttpUrl(values.GoogleScholar);
@@ -846,6 +879,7 @@ const AddInstructor = (props) => {
     values.position,
   ]);
 
+  // This is for the vote buttons in the data grid that displays other instructors.
   const voteOthersInstructors = async (clickedCell) => {
     if (clickedCell.field === "upVote" || clickedCell.field === "downVote") {
       try {
@@ -862,6 +896,9 @@ const AddInstructor = (props) => {
             [clickedCell.field]: "O",
           };
           setOthersInstructors(oInstructors);
+          // We need to refresh the Firebase Auth idToken because in the
+          // backend, we'll retrive the authenticated researcher. This way, we
+          // do not let anyone hack the system to vote on their own entries.
           await firebase.idToken();
           await axios.post("/voteInstructor", {
             instructor: clickedCell.id,
@@ -878,10 +915,14 @@ const AddInstructor = (props) => {
     }
   };
 
+  // This is for the vote buttons in the box above the page that displays the single other instructor.
   const voteOtherInstructor = (instructorId, voteType) => async (event) => {
     try {
       if (!otherVoting) {
         setOtherVoting(true);
+        // We need to refresh the Firebase Auth idToken because in the
+        // backend, we'll retrive the authenticated researcher. This way, we
+        // do not let anyone hack the system to vote on their own entries.
         await firebase.idToken();
         await axios.post("/voteInstructor", {
           instructor: instructorId,
@@ -926,6 +967,8 @@ const AddInstructor = (props) => {
     setExplanation(event.target.value);
   };
 
+  // One handleChnage for all the text fields depending on the
+  // event.target.name.
   const handleChange = (event) => {
     if ("persist" in event) {
       event.persist();
@@ -939,6 +982,9 @@ const AddInstructor = (props) => {
     });
   };
 
+  // When emailBlur happens, we should check whether this instructor/school
+  // administrator was enterred before. In that case, we should return an error
+  // message to prevent entering duplicate records.
   const emailBlur = async (event) => {
     const instructorDocs = await firebase.db
       .collection("instructors")
@@ -974,6 +1020,10 @@ const AddInstructor = (props) => {
     });
   };
 
+  // If the authenticated researcher clicks any of the rows in the datagrid that
+  // contains the instructors/school administrators that they enterred before,
+  // we should populate its data in the above fields so that they can update
+  // their previously enterred information.
   const myInstructorsRowClick = (clickedRow) => {
     const theRow = clickedRow.row;
     if (theRow) {
@@ -1004,6 +1054,7 @@ const AddInstructor = (props) => {
 
   const submitInstructor = async (event) => {
     if (!invalidInstructor) {
+      // If a row is selected, it means they're trying to update the record.
       const updating = selectedRows.length > 0;
       try {
         let gotUpdated = false;
