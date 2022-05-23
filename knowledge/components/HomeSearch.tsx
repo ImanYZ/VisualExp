@@ -1,19 +1,17 @@
-import { Typography } from "@mui/material";
+import { IconButton, Popover, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import SearchInput from "./SearchInput";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+import { FC, useState } from "react";
+import FilterListIcon from "@mui/icons-material/FilterList";
 
 type Props = {
   sx?: SxProps<Theme>;
+  onSearch: (text: string) => void;
 };
 
-const HomeSearch: FC<Props> = ({ sx }) => {
-  const handleSearch = (text: string) => {
-    console.log("text", text);
-  };
-
+const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
   return (
     <Box
       sx={{
@@ -38,7 +36,7 @@ const HomeSearch: FC<Props> = ({ sx }) => {
           flexDirection: "row",
         }}
       >
-        <SearchInput onSearch={handleSearch}></SearchInput>
+        <SearchInput onSearch={onSearch}></SearchInput>
         <Button variant="contained" sx={{ ml: 2 }}>
           Search
         </Button>

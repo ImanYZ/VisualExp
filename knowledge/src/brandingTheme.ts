@@ -91,7 +91,9 @@ export const getDesignTokens = (mode: "light" | "dark") =>
     },
   } as ThemeOptions);
 
-export function getThemedComponents(theme: Theme) {
+export function getThemedComponents(theme: Theme): {
+  components: Theme["components"];
+} {
   return {
     components: {
       MuiButtonBase: {
@@ -103,6 +105,11 @@ export function getThemedComponents(theme: Theme) {
         defaultProps: {
           disableElevation: true,
           // variant: "contained",
+        },
+        styleOverrides: {
+          containedPrimary: {
+            color: common.white,
+          },
         },
       },
       MuiAppBar: {
