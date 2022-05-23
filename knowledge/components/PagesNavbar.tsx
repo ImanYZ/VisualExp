@@ -22,6 +22,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description }) => {
           minHeight:
             "calc(100vh - var(--navbar-height) - var(--footer-height) )",
           py: 4,
+          px: { xs: 1, md: 2 },
         }}
       >
         {children}
