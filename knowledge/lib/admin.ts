@@ -1,4 +1,5 @@
-import { initializeApp, cert } from "firebase-admin/app";
+import admin from "firebase-admin";
+import { initializeApp, cert, App } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 // For production:
@@ -6,12 +7,9 @@ import { getFirestore } from "firebase-admin/firestore";
 
 require("dotenv").config();
 
-// console.log("***************************************");
-// console.log({ ENV: process.env });
-// console.log("***************************************");
-const admin = global.firebaseApp
+const firebaseApp: App = global.firebaseApp
   ? global.firebaseApp
-  : initializeApp(
+  : (initializeApp(
       {
         credential: cert({
           type: "service_account",
@@ -30,14 +28,14 @@ const admin = global.firebaseApp
           client_x509_cert_url: process.env.ONECADEMYCRED_CLIENT_X509_CERT_URL,
           storageBucket: "onecademy-dev.appspot.com",
           databaseURL: "https://onecademy-dev-default-rtdb.firebaseio.com/",
-        }),
+        } as any),
       },
       "onecademy"
-    );
+    ) as App);
 
 // store on global object so we can reuse it if we attempt
 // to initialize the app again
-global.firebaseApp = admin;
+global.firebaseApp = firebaseApp;
 
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
@@ -51,7 +49,7 @@ const isFirestoreDeadlineError = (err) => {
   );
 };
 
-const db = getFirestore(admin);
+const db = getFirestore(firebaseApp);
 
 // How many transactions/batchWrites out of 500 so far.
 // I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
@@ -158,8 +156,9 @@ const batchDelete = async (docRef) => {
   }
 };
 
-module.exports = {
+export {
   admin,
+  firebaseApp,
   db,
   MAX_TRANSACTION_WRITES,
   checkRestartBatchWriteCounts,
