@@ -585,6 +585,45 @@ exports.voteInstructorReset = async (req, res) => {
   }
 };
 
+exports.addInstructorsNums = async (req, res) => {
+  try {
+    const instructorsNums = {};
+    const instructorDocs = await db.collection("instructors").get();
+    for (let instructorDoc of instructorDocs.docs) {
+      const instructorData = instructorDoc.data();
+      if (instructorData.fullname in instructorsNums) {
+        instructorsNums[instructorData.fullname].num += 1;
+      } else {
+        instructorsNums[instructorData.fullname] = {
+          project: instructorData.project,
+          num: 1,
+        };
+      }
+    }
+    for (let fullname in instructorsNums) {
+      const researcherRef = db.collection("researchers").doc(fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      const projectData =
+        researcherData.projects[[instructorsNums[fullname].project]];
+      await batchUpdate(researcherRef, {
+        projects: {
+          ...researcherData.projects,
+          [instructorsNums[fullname].project]: {
+            ...projectData,
+            instructorsNum: instructorsNums[fullname],
+          },
+        },
+      });
+    }
+    await commitBatch();
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};
+
 // const codeFeedback = async (
 //   coder,
 //   code,
@@ -1489,7 +1528,15 @@ exports.remindCalendarInvitations = async (context) => {
     const researcherDocs = await db.collection("researchers").get();
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
-      researchers[researcherData.email] = researcherDoc.id;
+      let isActive = false;
+      for (let proj of researcherData.projects) {
+        if (researcherData.projects[proj].active) {
+          isActive = true;
+        }
+      }
+      if (isActive) {
+        researchers[researcherData.email.toLowerCase()] = researcherDoc.id;
+      }
     }
     // Retrieve all the scheduled sessions.
     // Having an id means the document is not just an availability, but there
@@ -1539,8 +1586,8 @@ exports.remindCalendarInvitations = async (context) => {
               // accept it or ask someone else to take it.
               setTimeout(() => {
                 researcherEventNotificationEmail(
-                  attendee.email,
-                  researchers[attendee.email],
+                  attendee.email.toLowerCase(),
+                  researchers[attendee.email.toLowerCase()],
                   participant.email,
                   hoursLeft,
                   order,
