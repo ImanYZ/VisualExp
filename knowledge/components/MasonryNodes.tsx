@@ -18,15 +18,7 @@ const TrendingNodes: FC<Props> = ({ nodes, sx }) => {
 
   return (
     <Box sx={{ ...sx }}>
-      <Typography variant="h3">Trending</Typography>
-      <Masonry
-        sx={{ mt: 2 }}
-        columns={4}
-        spacing={2}
-        defaultHeight={450}
-        defaultColumns={4}
-        defaultSpacing={1}
-      >
+      <Masonry sx={{ m: 0 }} columns={3} spacing={2} defaultHeight={450}>
         {renderMasonry()}
       </Masonry>
     </Box>
