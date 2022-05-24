@@ -1,6 +1,16 @@
 import { grey } from "@mui/material/colors";
 import { ThemeOptions, Theme } from "@mui/material/styles";
 
+declare module "@mui/material/styles/createPalette" {
+  interface CommonColors {
+    black: string;
+    white: string;
+    orange: string;
+    orangeDark: string;
+    darkGrayBackground: string;
+  }
+}
+
 const common = {
   black: "#1a1a1a",
   white: "#ffffff",
@@ -81,7 +91,9 @@ export const getDesignTokens = (mode: "light" | "dark") =>
     },
   } as ThemeOptions);
 
-export function getThemedComponents(theme: Theme) {
+export function getThemedComponents(theme: Theme): {
+  components: Theme["components"];
+} {
   return {
     components: {
       MuiButtonBase: {
@@ -94,12 +106,22 @@ export function getThemedComponents(theme: Theme) {
           disableElevation: true,
           // variant: "contained",
         },
+        styleOverrides: {
+          containedPrimary: {
+            color: common.white,
+          },
+        },
       },
       MuiAppBar: {
         styleOverrides: {
           root: {
             backgroundColor: common.darkGrayBackground,
           },
+        },
+      },
+      MuiTooltip: {
+        defaultProps: {
+          arrow: true,
         },
       },
     },
