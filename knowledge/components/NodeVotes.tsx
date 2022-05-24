@@ -19,12 +19,12 @@ const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            mr: 1,
+            mr: 2,
           }}
         >
-          <ThumbUpIcon color="disabled" />
+          <ThumbUpIcon fontSize="small" color="disabled" />
           <Typography
-            sx={{ color: (theme) => theme.palette.text.disabled }}
+            sx={{ ml: 1, color: (theme) => theme.palette.text.disabled }}
             color="disabled"
           >
             {corrects}
@@ -39,9 +39,9 @@ const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
             alignItems: "center",
           }}
         >
-          <ThumbDownIcon color="disabled" />
+          <ThumbDownIcon fontSize="small" color="disabled" />
           <Typography
-            sx={{ color: (theme) => theme.palette.text.disabled }}
+            sx={{ ml: 1, color: (theme) => theme.palette.text.disabled }}
             color="disabled"
           >
             {wrongs}
