@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import CardMedia from "@mui/material/CardMedia";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -49,7 +50,9 @@ const MasonryNodeItem: FC<Props> = ({ node }) => {
       </CardContent>
       <Divider />
       <CardActions>
-        <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
+        <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+          <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
+        </Box>
       </CardActions>
     </Card>
   );
