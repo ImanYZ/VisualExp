@@ -258,13 +258,18 @@ const Communities = (props) => {
                   >
                     Community Description
                   </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ textAlign: "left" }}
-                  >
-                    {communi.description}
-                  </Typography>
+                  {typeof communi.description === "object" &&
+                  communi.description !== null ? (
+                    communi.description
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ textAlign: "left" }}
+                    >
+                      {communi.description}
+                    </Typography>
+                  )}
                 </Paper>
                 {typeof communi.accomplishments === "object" &&
                   !Array.isArray(communi.accomplishments) &&
