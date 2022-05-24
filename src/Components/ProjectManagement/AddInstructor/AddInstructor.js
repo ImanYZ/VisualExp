@@ -1342,7 +1342,7 @@ const AddInstructor = (props) => {
               <i>Extra Info:</i> {otherInstructor.explanation}
             </p>
             <TextareaAutosize
-              aria-label="Comment Text box"
+              ariaLabel="Comment Text box"
               minRows={4}
               style={{ width: "94%" }}
               placeholder="Comment"
@@ -1699,7 +1699,7 @@ const AddInstructor = (props) => {
               />
             )}
             <TextareaAutosize
-              aria-label="Extra Information Text box"
+              ariaLabel="Extra Information Text box"
               minRows={4}
               style={{ width: "100%", marginTop: "10px" }}
               placeholder="You can enter extra information here."
