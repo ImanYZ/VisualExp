@@ -879,7 +879,8 @@ const AddInstructor = (props) => {
     values.position,
   ]);
 
-  // This is for the vote buttons in the data grid that displays other instructors.
+  // This is for the vote buttons in the data grid that displays other
+  // instructors.
   const voteOthersInstructors = async (clickedCell) => {
     if (clickedCell.field === "upVote" || clickedCell.field === "downVote") {
       try {
@@ -1057,8 +1058,12 @@ const AddInstructor = (props) => {
       // If a row is selected, it means they're trying to update the record.
       const updating = selectedRows.length > 0;
       try {
+        // We use this flag to check if they updated their existing record to
+        // reset its votes in the database.
         let gotUpdated = false;
         await firebase.db.runTransaction(async (t) => {
+          // First check whether the instructor already exists to make sure they
+          // don't add duplicate entries.
           const instructorDocs = await firebase.db
             .collection("instructors")
             .where("email", "==", email)
@@ -1069,6 +1074,9 @@ const AddInstructor = (props) => {
             if (
               !instructorData.deleted &&
               (!updating ||
+                // Even if they are updating an existing record, we should make
+                // sure it is not different from the row that they have selected
+                // to update.
                 (updating && instructorDocs.docs[0].id !== selectedRows[0]))
             ) {
               instructorExists = true;
@@ -1126,42 +1134,76 @@ const AddInstructor = (props) => {
               ...instructorData,
               id: instructorRef.id,
             });
-
-            if (
-              !updating &&
-              instructorsToday === 6 &&
-              dayInstructorsDocs.docs.length === 0
-            ) {
-              const dayInstructorRef = firebase.db
-                .collection("dayInstructors")
-                .doc();
-              await dayInstructorRef.set({
-                project,
-                fullname,
-                date: today,
-              });
-              const researcherInstructors = {
-                projects: {
-                  ...researcherData.projects,
-                  [project]: {
-                    ...researcherData.projects[project],
-                    instructors: 1,
+            if (!updating) {
+              // If they collect 7 instructors/school administrators' information
+              // in a single day, we should giv them a point.
+              if (
+                instructorsToday === 6 &&
+                dayInstructorsDocs.docs.length === 0
+              ) {
+                const dayInstructorRef = firebase.db
+                  .collection("dayInstructors")
+                  .doc();
+                await dayInstructorRef.set({
+                  project,
+                  fullname,
+                  date: today,
+                });
+                const researcherInstructors = {
+                  projects: {
+                    ...researcherData.projects,
+                    [project]: {
+                      ...researcherData.projects[project],
+                      instructors: 1,
+                      instructorsNum: 1,
+                    },
                   },
-                },
-              };
-              if ("instructors" in researcherData.projects[project]) {
-                researcherInstructors.projects[project].instructors =
-                  researcherData.projects[project].instructors + 1;
+                };
+                if ("instructors" in researcherData.projects[project]) {
+                  researcherInstructors.projects[project].instructors =
+                    researcherData.projects[project].instructors + 1;
+                }
+                if ("instructorsNum" in researcherData.projects[project]) {
+                  researcherInstructors.projects[project].instructorsNum =
+                    researcherData.projects[project].instructorsNum + 1;
+                }
+                t.update(researcherRef, researcherInstructors);
+                const researcherLogRef = firebase.db
+                  .collection("researcherLogs")
+                  .doc();
+                t.set(researcherLogRef, {
+                  ...researcherInstructors,
+                  id: researcherRef.id,
+                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                });
+              } else {
+                // Even if we don't give the authenticated researher a point for
+                // adding 7 instructors in a day, we still need to increase the
+                // total number of instructors/school administrators they have
+                // collected.
+                const researcherInstructors = {
+                  projects: {
+                    ...researcherData.projects,
+                    [project]: {
+                      ...researcherData.projects[project],
+                      instructorsNum: 1,
+                    },
+                  },
+                };
+                if ("instructorsNum" in researcherData.projects[project]) {
+                  researcherInstructors.projects[project].instructorsNum =
+                    researcherData.projects[project].instructorsNum + 1;
+                }
+                t.update(researcherRef, researcherInstructors);
+                const researcherLogRef = firebase.db
+                  .collection("researcherLogs")
+                  .doc();
+                t.set(researcherLogRef, {
+                  ...researcherInstructors,
+                  id: researcherRef.id,
+                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                });
               }
-              t.update(researcherRef, researcherInstructors);
-              const researcherLogRef = firebase.db
-                .collection("researcherLogs")
-                .doc();
-              t.set(researcherLogRef, {
-                ...researcherInstructors,
-                id: researcherRef.id,
-                updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
-              });
             }
             setSnackbarMessage(
               "You successfully submitted your instructor/administrator!"
