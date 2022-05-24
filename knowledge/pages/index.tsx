@@ -2,12 +2,9 @@ import { getSortedPostsData } from "../lib/nodes";
 import PagesNavbar from "../components/PagesNavbar";
 import { GetServerSideProps, NextPage } from "next";
 import { KnowledgeNode } from "../src/knowledgeTypes";
-import Masonry from "@mui/lab/Masonry";
-import MasonryNodeItem from "../components/NodeItem";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import SearchInput from "../components/SearchInput";
-import { Button } from "@mui/material";
+import MasonryNodes from "../components/MasonryNodes";
+import HomeSearch from "../components/HomeSearch";
+import { useRouter } from "next/router";
 
 type Props = {
   data: KnowledgeNode[];
@@ -22,34 +19,19 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
   };
 };
 
-const Home: NextPage<Props> = ({ data }) => {
-  const handleSearch = (text: string) => {
-    console.log("text", text);
-  };
+const HomePage: NextPage<Props> = ({ data }) => {
+  const router = useRouter();
 
-  const renderMasonry = () => {
-    return data.map((el) => <MasonryNodeItem key={el.id} node={el} />);
+  const handleSearch = (text: string) => {
+    router.push({ query: { q: text } });
   };
 
   return (
     <PagesNavbar>
-      <Container>
-        <Box sx={{ mb: 2, display: "flex", flexDirection: "row" }}>
-          <SearchInput onSearch={handleSearch}></SearchInput>
-          <Button>Search</Button>
-        </Box>
-        <Masonry
-          columns={4}
-          spacing={2}
-          defaultHeight={450}
-          defaultColumns={4}
-          defaultSpacing={1}
-        >
-          {renderMasonry()}
-        </Masonry>
-      </Container>
+      <HomeSearch sx={{ mb: 5 }} onSearch={handleSearch}></HomeSearch>
+      <MasonryNodes nodes={data} />
     </PagesNavbar>
   );
 };
 
-export default Home;
+export default HomePage;
