@@ -313,11 +313,15 @@ export default [
         title: "Mindfulness",
         node: "L6N5EOy8Ij73XoJgy09e",
       },
+      {
+        title: "Positive Psychology",
+        node: "v9d4f86mmgaWV7tMLZQM",
+      },
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Mindfulness.jpg",
-    title: "Mindfulness",
+    title: "Positive Psychology",
     width: "34%",
     leaders: [
       // {
@@ -343,39 +347,84 @@ export default [
         ],
       },
     ],
-    YouTube: "Xaa1JnTHtSY",
-    description: `Join an interdisciplinary, transnational group of researchers who have been iteratively
-    developing and executing empirical research on the large-scale, online collaborative
-    platform 1Cademy. The goal of the Mindfulness Research Community on 1Cademy is to
-    investigate the psychological effects of mindfulness in everyday life and as treatment for
-    mental and physical illnesses.`,
+    YouTube: "2tH94sJ18BI",
+    description: (
+      <div>
+        <p>
+          We are an interdisciplinary group of learners and researchers who have
+          been iteratively contributing to and improving a large-scale, online
+          collaborative research platform called 1Cademy. Our platform
+          facilitates knowledge sharing and remote, collaborative research by
+          enabling users to organize research in a hierarchical format through
+          content generation, mapping, and evaluation.
+        </p>
+        <p>
+          The main objective of the Positive Psychology community is to explore
+          three fundamental lines of inquiry of the discipline which includes
+          positive subjective experiences, individual traits, and social
+          institutions. A focus will be on the efficacy of mindfulness practices
+          within the clinical context. Interns will have the freedom to research
+          a topic of interest within positive psychology and share their
+          findings on the collaborative research platform 1Cademy.
+        </p>
+        <p>Some of the topics such as the following will be discussed:</p>
+        <ul>
+          <li>
+            Impact of positive experiences such as love, good mood, and
+            happiness on the wellbeing of individuals and its buffering effect
+            on psychopathology.
+          </li>
+          <li>
+            The power of social support on individuals and its relation to
+            psychological nurturement.
+          </li>
+          <li>
+            The 3rd wave of cognitive behavioral therapy (CBT) and its impact in
+            popularizing mindfulness in western practices.
+          </li>
+          <li>
+            The multitude of ways in which mindfulness can be applied in
+            clinical practices with individuals that suffer from severe
+            psychopathology.
+          </li>
+          <li>
+            The functions of mindfulness that leads to mental flexibility,
+            greater impulse resistance, and decrease in judgmentalness among
+            individuals.
+          </li>
+          <li>
+            Many other topics of your choosing within positive psychology.
+          </li>
+        </ul>
+      </div>
+    ),
     accomplishments: `We have examined and updated the mindfulness community tag on 1Cademy with cross-disciplinary applications of mindfulness in thorough detail.
     We have compiled an inclusive list of mental disorders from the DSM-5 that can benefit from clinical mindfulness as well as documented case studies of certain populations that were able to benefit from mindfulness when it applied to psychopathological symptoms.
     We have outlined multiple mindfulness interventions that have been backed by empirical research and heavily tested across the world in multiple research institutions.
     Also, we have connected the origins of mindfulness that stemmed from eastern traditions to the current applications of mindfulness in the clinical western setting as well as provided a cohesive snapshot of the roots of mindfulness in ancient eastern religions.`,
     gains: [
-      `Gain experience by developing important skills in research, including paper analysis, summary, and presentation.`,
-      `Work towards proposing and executing research on mindfulness, mindfulness meditation, positive psychology, clinical psychology, and neuroscience.`,
-      `Collaborate with other interns to summarize existing research and brainstorm new research ideas.`,
-      `Collect and organize research in an effective and meaningful manner that will have cohesive interactions`,
+      `Gain experience by developing critical skills in research, including reviewing past literature, analyzing, and synthesizing information in a concise cohesive manner.`,
+      `Work towards executing and publishing research on a public research platform on positive psychology and mindfulness.`,
+      `Collaborate with other interns in gaining a deeper understanding of psychology as a science.`,
       `Work remotely with all interactions, task fulfillment, and communications.`,
-      `Completing responsibilities will require a minimum of 6 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
+      `Completing responsibilities will require a minimum of 5 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
       `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
     hasTest: true,
     qualifications: [
-      `Interest and enthusiasm for topics related to mindfulness, mindfulness meditation, positive psychology, clinical psychology, and neuroscience.`,
-      `Fluency in writing and reading in English, as well as experience with academic literature review.`,
-      `Must be able to attend weekly meetings on Thursdays @ 7pm EST.`,
+      `Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0`,
+      `A clear understanding of fundamentals of psychology`,
+      `Interest and enthusiasm for positive psychology and scientific research`,
+      `Strong desire and willingness to collaborate with others and engage in group discussions`,
+      `Willingness to attend weekly meetings and present findings`,
+      `Able to commit to approximately 5-10 hours of work each week`,
     ],
     responsibilities: [
-      `Read through textbooks and research papers, summarize content on our
-      knowledge visualization platform, 1Cademy, and publicly share summaries with
-      the research team.`,
-      `Improve the Mindfulness 1Cademy Map through minor and major updates to previous nodes.`,
+      `Read through textbooks and research papers to develop a synthesized cohesive summary on our knowledge visualization platform 1Cademy.`,
       `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work and engage in discussion with other interns' presentations.`,
+      `Contribute in meetings by presenting work and accepting constructive feedback.`,
+      `Contribute in meetings by engaging in discussion with other interns about research topics.`,
     ],
   },
   {
