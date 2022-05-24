@@ -9,9 +9,8 @@ import {
 import { admin, db, commitBatch, batchSet } from "./admin";
 
 export const getSortedPostsData = async () => {
-  const nodes = [];
+  const nodes: KnowledgeNode[] = [];
   const nodeDocs = await db.collection("nodes").limit(25).get();
-  console.log("nodeDocs.docs.length", nodeDocs.docs.length);
   for (let nodeDoc of nodeDocs.docs) {
     const nodeData = nodeDoc.data();
     nodes.push({
@@ -22,6 +21,8 @@ export const getSortedPostsData = async () => {
       nodeImage: nodeData.nodeImage,
       content: nodeData.content,
       viewers: nodeData.viewers,
+      corrects: nodeData.corrects,
+      wrongs: nodeData.wrongs,
     });
   }
   return nodes;
