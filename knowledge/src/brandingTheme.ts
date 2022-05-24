@@ -119,6 +119,11 @@ export function getThemedComponents(theme: Theme): {
           },
         },
       },
+      MuiTooltip: {
+        defaultProps: {
+          arrow: true,
+        },
+      },
     },
   };
 }

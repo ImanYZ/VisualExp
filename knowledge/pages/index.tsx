@@ -2,7 +2,7 @@ import { getSortedPostsData } from "../lib/nodes";
 import PagesNavbar from "../components/PagesNavbar";
 import { GetServerSideProps, NextPage } from "next";
 import { KnowledgeNode } from "../src/knowledgeTypes";
-import TrendingNodes from "../components/TrendingNodes";
+import MasonryNodes from "../components/MasonryNodes";
 import HomeSearch from "../components/HomeSearch";
 import { useRouter } from "next/router";
 
@@ -29,7 +29,7 @@ const HomePage: NextPage<Props> = ({ data }) => {
   return (
     <PagesNavbar>
       <HomeSearch sx={{ mb: 5 }} onSearch={handleSearch}></HomeSearch>
-      <TrendingNodes nodes={data} />
+      <MasonryNodes nodes={data} />
     </PagesNavbar>
   );
 };
