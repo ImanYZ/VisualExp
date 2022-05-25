@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase-admin/firestore";
+
 export enum NodeType {
   "Relation" = "Relation",
   "Concept" = "Concept",
@@ -18,9 +20,10 @@ export type KnowledgeNodeContributor = {
   reputation?: number;
   chooseUname?: boolean;
   imageUrl?: string;
+  username?: string;
 };
 
-export type KnowledgeNodeInstitutions = {
+export type KnowledgeNodeInstitution = {
   reputation?: number;
   logoURL?: string;
   name?: string;
@@ -28,45 +31,79 @@ export type KnowledgeNodeInstitutions = {
 
 export type LinkedKnowledgeNode = {
   label?: string;
-  node?: string;
+  node: string;
   title?: string;
   content?: string;
   nodeImage?: string;
-  nodeType?: NodeType;
+  nodeType: NodeType;
 };
 
-export type KnowledgeNode = {
-  id: string;
-  studied?: number;
-  versions?: number;
-  maxVersionRating?: number;
-  content?: string;
-  admin?: string;
-  corrects?: number;
-  comments?: number;
+export type NodeFireStore = {
+  aChooseUname?: boolean;
   aFullname?: string;
+  aImgUrl?: string;
+  admin?: string;
+  bookmarks?: number;
+  changedAt?: Timestamp;
+  children?: { node?: string; label?: string; title?: string }[];
+  closedHeight?: number;
+  comments?: number;
+  content?: string;
+  contribNames?: string[];
+  contributors?: {
+    [key: string]: {
+      chooseUname?: boolean;
+      fullname?: string;
+      imageUrl?: string;
+      reputation?: number;
+    };
+  };
+  corrects?: number;
+  createdAt?: Timestamp;
+  deleted?: boolean;
+  height?: number;
+  institNames?: string[];
+  institutions?: {
+    [key: string]: { reputation?: number };
+  };
+  isTag?: boolean;
+  maxVersionRating?: number;
+  nodeImage?: string;
+  nodeType: NodeType;
+  parents?: { node?: string; label?: string; title?: string }[];
+  referenceIds?: string[];
+  referenceLabels?: string[];
+  references?: string[] | { node: string; title?: string; label?: string }[];
+  studied?: number;
   tagIds?: string[];
+  tags?: string[] | { node: string; title?: string; label?: string }[];
+  title?: string;
+  updatedAt?: Timestamp;
+  versions?: number;
+  viewers?: number;
+  wrongs?: number;
+};
+
+export type KnowledgeNode = Omit<
+  NodeFireStore,
+  | "updatedAt"
+  | "changedAt"
+  | "createdAt"
+  | "contributors"
+  | "institutions"
+  | "tags"
+  | "parents"
+> & {
+  // export type KnowledgeNode = NodeFireStore & {
+  id: string;
   updatedAt?: string;
   nodeImage?: string;
   changedAt?: string;
   tags?: LinkedKnowledgeNode[];
   createdAt?: string;
-  referenceIds?: string[];
-  referenceLabels?: string[];
-  contribNames?: string[];
-  aImgUrl?: string;
-  institNames?: string[];
-  deleted?: boolean;
-  aChooseUname?: boolean;
-  nodeType?: NodeType;
   references?: LinkedKnowledgeNode[];
-  wrongs?: number;
-  viewers?: number;
-  closedHeight?: number;
-  title?: string;
-  height?: number;
   contributors?: KnowledgeNodeContributor[];
-  institutions?: KnowledgeNodeInstitutions[];
+  institutions?: KnowledgeNodeInstitution[];
   children?: LinkedKnowledgeNode[];
   parents?: LinkedKnowledgeNode[];
 };

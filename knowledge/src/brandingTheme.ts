@@ -108,9 +108,20 @@ export function getThemedComponents(theme: Theme): {
         },
         styleOverrides: {
           containedPrimary: {
+            backgroundColor: common.orange,
             color: common.white,
           },
         },
+        variants: [
+          {
+            props: { variant: "contained" },
+            style: {
+              "&:hover, &.Mui-focusVisible": {
+                backgroundColor: common.orangeDark,
+              },
+            },
+          },
+        ],
       },
       MuiAppBar: {
         styleOverrides: {
