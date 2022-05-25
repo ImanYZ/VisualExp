@@ -103,6 +103,7 @@ const RouterNav = (props) => {
   const [upVotedDays, setUpVotedDays] = useState(0);
   const [expPoints, setExpPoints] = useState(0);
   const [instructorPoints, setInstructorPoints] = useState(0);
+  const [instructorsNum, setInstructorsNum] = useState({});
   const [dayInstructorUpVotes, setDayInstructorUpVotes] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
@@ -157,6 +158,7 @@ const RouterNav = (props) => {
       const researcherQuery = firebase.db.collection("researchers");
       const researcherSnapshot = researcherQuery.onSnapshot((snapshot) => {
         const graNums = {};
+        const instraNums = {};
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
@@ -201,6 +203,9 @@ const RouterNav = (props) => {
           if ("gradingNum" in theProject) {
             graNums[change.doc.id] = theProject.gradingNum;
           }
+          if ("instructorsNum" in theProject) {
+            instraNums[change.doc.id] = theProject.instructorsNum;
+          }
         }
         setGradingNums((oGraNums) => {
           const oldGraNums = { ...oGraNums };
@@ -218,12 +223,29 @@ const RouterNav = (props) => {
           }
           return oldGraNums;
         });
+        setInstructorsNum((oInstraNums) => {
+          const oldInstraNums = { ...oInstraNums };
+          for (let researcher in instraNums) {
+            oldInstraNums[researcher] = { num: instraNums[researcher] };
+          }
+          const maxInstraNum = Math.max(
+            ...Object.values(oldInstraNums).map(({ num }) => num)
+          );
+          for (let researcher in oldInstraNums) {
+            oldInstraNums[researcher].percent =
+              Math.round(
+                ((oldInstraNums[researcher].num * 100.0) / maxInstraNum) * 100
+              ) / 100;
+          }
+          return oldInstraNums;
+        });
       });
       return () => {
         setIntellectualPoints(0);
         setUpVotedDays(0);
         setExpPoints(0);
         setInstructorPoints(0);
+        setInstructorsNum({});
         setDayInstructorUpVotes(0);
         setGradingPoints(0);
         setGradingNums({});
@@ -798,7 +820,7 @@ const RouterNav = (props) => {
                       </Box>
                     </Tooltip>
                     <Tooltip
-                      title={`You've collected ${gradingNums[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                      title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
                     >
                       <Box># of 👨‍🏫:</Box>
                     </Tooltip>
@@ -820,6 +842,11 @@ const RouterNav = (props) => {
                       obj={proposalsNums}
                       username={username}
                       lineDiagramTooltip={lineDiagramTooltip("proposals")}
+                    ></LineDiagram>
+                    <LineDiagram
+                      obj={instructorsNum}
+                      username={fullname}
+                      lineDiagramTooltip={lineDiagramTooltip("instructors")}
                     ></LineDiagram>
                     <LineDiagram
                       obj={gradingNums}
