@@ -18,7 +18,7 @@ export const getSortedPostsData = async () => {
       id: nodeDoc.id,
       title: nodeData.title,
       nodeType: nodeData.nodeType,
-      createdAt: nodeData.createdAt.toDate().toISOString(),
+      updatedAt: nodeData.updatedAt.toDate().toISOString(),
       nodeImage: nodeData.nodeImage,
       content: nodeData.content,
       viewers: nodeData.viewers,
