@@ -1,0 +1,158 @@
+import Head from "next/head";
+import { FC } from "react";
+import { encodeTitle, escapeBreaksQuotes } from "../lib/utils";
+import { KnowledgeNode } from "../src/knowledgeTypes";
+
+type Props = {
+  node: KnowledgeNode;
+  keywords: string;
+  updatedStr: string;
+  createdStr: string;
+};
+
+export const NodeHead: FC<Props> = ({
+  node,
+  keywords,
+  updatedStr,
+  createdStr,
+}) => {
+  const {
+    id,
+    title,
+    parents = [],
+    references = [],
+    content,
+    nodeImage,
+    nodeType,
+    corrects = 0,
+    wrongs = 0,
+    children = [],
+    tags = [],
+    changedAt,
+  } = node;
+
+  const jsonObj: any = {
+    "@context": "https://schema.org/",
+    "@type": "MediaObject",
+    name: "1Cademy - " + escapeBreaksQuotes(title),
+    description: escapeBreaksQuotes(
+      content +
+        " Keywords: " +
+        title +
+        " " +
+        keywords +
+        (nodeImage ? " \nImage: " + nodeImage : "")
+    ),
+    "@id": id,
+    url: "https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + id,
+    nodeType: nodeType,
+    author: {
+      "@type": "Organization",
+      name: "1Cademy",
+    },
+    datePublished: createdStr,
+    dateModified: updatedStr,
+    publisher: {
+      "@type": "Organization",
+      name: "1Cademy",
+      sameAs: "https://1cademy.us",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://1cademy.us/static/media/Logo_Orange.5a15b5e4.svg",
+      },
+    },
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: "" + (corrects - wrongs),
+      bestRating: "" + (corrects + wrongs),
+      worstRating: "" + -(corrects + wrongs),
+      ratingCount: "" + (corrects + wrongs),
+    },
+  };
+  if (nodeImage) {
+    jsonObj["image"] = nodeImage;
+  }
+  jsonObj["prerequisites"] = [];
+  for (let parent of parents) {
+    jsonObj["prerequisites"].push({
+      "@type": "parent",
+      link:
+        "https://1cademy.us/knowledge/" +
+        encodeTitle(parent.title) +
+        "/" +
+        parent.node,
+      title: "1Cademy - " + escapeBreaksQuotes(parent.title),
+    });
+  }
+  jsonObj["followUps"] = [];
+  for (let child of children) {
+    jsonObj["followUps"].push({
+      "@type": "child",
+      link:
+        "https://1cademy.us/knowledge/" +
+        encodeTitle(child.title) +
+        "/" +
+        child.node,
+      title: "1Cademy - " + escapeBreaksQuotes(child.title),
+    });
+  }
+  jsonObj["tags"] = [];
+  for (let tag of tags) {
+    jsonObj["tags"].push({
+      "@type": "tag",
+      link:
+        "https://1cademy.us/knowledge/" +
+        encodeTitle(tag.title) +
+        "/" +
+        tag.node,
+      title: "1Cademy - " + escapeBreaksQuotes(tag.title),
+    });
+  }
+  jsonObj["references"] = [];
+  for (let reference of references) {
+    jsonObj["references"].push({
+      "@type": "reference",
+      link:
+        "https://1cademy.us/knowledge/" +
+        encodeTitle(reference.title) +
+        "/" +
+        reference.node,
+      title: "1Cademy - " + escapeBreaksQuotes(reference.title),
+      label: reference.label,
+    });
+  }
+
+  const summary = escapeBreaksQuotes(`
+        ${content} Keywords: ${title} ${keywords} ${
+    nodeImage ? "\nImage: " + nodeImage : ""
+  }
+      `);
+
+  return (
+    <Head>
+      <link
+        rel="canonical"
+        href={"https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + id}
+        key="canonical"
+      />
+      <meta name="topic" content={`1Cademy - ${escapeBreaksQuotes(title)}`} />
+      <meta name="subject" content={`1Cademy - ${escapeBreaksQuotes(title)}`} />
+      <meta name="Classification" content={nodeType} />
+      <meta name="keywords" content={keywords} />
+      <meta name="date" content={updatedStr} />
+      <meta name="revised" content={changedAt} />
+      <meta name="summary" content={summary} />
+      <meta name="description" content={summary} />
+      <meta name="abstract" content={content} />
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonObj),
+        }}
+      />
+    </Head>
+  );
+};
+
+export default NodeHead;

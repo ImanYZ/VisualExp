@@ -1,4 +1,5 @@
 module.exports = {
+  reactStrictMode: true,
   basePath: "/knowledge",
   assetPrefix: "/knowledge/", // assetPrefix requires the trailing slash    ];
   async headers() {
