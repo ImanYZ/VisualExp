@@ -20,35 +20,35 @@ type Props = {
   nodeType: NodeType;
 } & SvgIconProps;
 
-const NodeTypeIcon: FC<Props> = ({ nodeType, ...rest }) => {
+const NodeTypeIcon: FC<Props> = ({ nodeType, color = "primary", ...rest }) => {
   const renderIcon = () => {
     switch (nodeType) {
       case "Code":
-        return <CodeIcon {...rest} />;
+        return <CodeIcon color={color} {...rest} />;
       case "Concept":
-        return <LocalLibraryIcon {...rest} />;
+        return <LocalLibraryIcon color={color} {...rest} />;
       case "Relation":
-        return <ShareIcon {...rest} />;
+        return <ShareIcon color={color} {...rest} />;
       case "Question":
-        return <HelpOutlineIcon {...rest} />;
+        return <HelpOutlineIcon color={color} {...rest} />;
       case "Profile":
-        return <PersonIcon {...rest} />;
+        return <PersonIcon color={color} {...rest} />;
       case "Sequel":
-        return <MoreHorizIcon {...rest} />;
+        return <MoreHorizIcon color={color} {...rest} />;
       case "Advertisement":
-        return <EventIcon {...rest} />;
+        return <EventIcon color={color} {...rest} />;
       case "Reference":
-        return <MenuBookIcon {...rest} />;
+        return <MenuBookIcon color={color} {...rest} />;
       case "Idea":
-        return <EmojiObjectsIcon {...rest} />;
+        return <EmojiObjectsIcon color={color} {...rest} />;
       case "News":
-        return <ArticleIcon {...rest} />;
+        return <ArticleIcon color={color} {...rest} />;
       case "Private":
-        return <LockIcon {...rest} />;
+        return <LockIcon color={color} {...rest} />;
       case "Tag":
-        return <LocalOfferIcon {...rest} />;
+        return <LocalOfferIcon color={color} {...rest} />;
       default:
-        return <LockIcon {...rest} />;
+        return <LockIcon color={color} {...rest} />;
     }
   };
   return <Tooltip title={`${nodeType} node`}>{renderIcon()}</Tooltip>;

@@ -2,6 +2,10 @@ import admin from "firebase-admin";
 import { initializeApp, cert, App } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
+declare global {
+  var firebaseApp: App;
+}
+
 // For production:
 // admin.initializeApp();
 
@@ -40,7 +44,7 @@ global.firebaseApp = firebaseApp;
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
-const isFirestoreDeadlineError = (err) => {
+const isFirestoreDeadlineError = (err: any) => {
   console.log({ err });
   const errString = err.toString();
   return (
@@ -111,7 +115,7 @@ const checkRestartBatchWriteCounts = async () => {
   }
 };
 
-const batchSet = async (docRef, docData) => {
+const batchSet = async (docRef: any, docData: any) => {
   if (!isCommitting) {
     batch.set(docRef, docData);
     await checkRestartBatchWriteCounts();
@@ -126,7 +130,7 @@ const batchSet = async (docRef, docData) => {
   }
 };
 
-const batchUpdate = async (docRef, docData) => {
+const batchUpdate = async (docRef: any, docData: any) => {
   if (!isCommitting) {
     batch.update(docRef, docData);
     await checkRestartBatchWriteCounts();
@@ -141,7 +145,7 @@ const batchUpdate = async (docRef, docData) => {
   }
 };
 
-const batchDelete = async (docRef) => {
+const batchDelete = async (docRef: any) => {
   if (!isCommitting) {
     batch.delete(docRef);
     await checkRestartBatchWriteCounts();
