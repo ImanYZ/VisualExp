@@ -585,44 +585,44 @@ exports.voteInstructorReset = async (req, res) => {
   }
 };
 
-exports.addInstructorsNums = async (req, res) => {
-  try {
-    const instructorsNums = {};
-    const instructorDocs = await db.collection("instructors").get();
-    for (let instructorDoc of instructorDocs.docs) {
-      const instructorData = instructorDoc.data();
-      if (instructorData.fullname in instructorsNums) {
-        instructorsNums[instructorData.fullname].num += 1;
-      } else {
-        instructorsNums[instructorData.fullname] = {
-          project: instructorData.project,
-          num: 1,
-        };
-      }
-    }
-    for (let fullname in instructorsNums) {
-      const researcherRef = db.collection("researchers").doc(fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
-      const projectData =
-        researcherData.projects[[instructorsNums[fullname].project]];
-      await batchUpdate(researcherRef, {
-        projects: {
-          ...researcherData.projects,
-          [instructorsNums[fullname].project]: {
-            ...projectData,
-            instructorsNum: instructorsNums[fullname],
-          },
-        },
-      });
-    }
-    await commitBatch();
-    return res.status(200).json({});
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ err });
-  }
-};
+// exports.addInstructorsNums = async (req, res) => {
+//   try {
+//     const instructorsNums = {};
+//     const instructorDocs = await db.collection("instructors").get();
+//     for (let instructorDoc of instructorDocs.docs) {
+//       const instructorData = instructorDoc.data();
+//       if (instructorData.fullname in instructorsNums) {
+//         instructorsNums[instructorData.fullname].num += 1;
+//       } else {
+//         instructorsNums[instructorData.fullname] = {
+//           project: instructorData.project,
+//           num: 1,
+//         };
+//       }
+//     }
+//     for (let fullname in instructorsNums) {
+//       const researcherRef = db.collection("researchers").doc(fullname);
+//       const researcherDoc = await researcherRef.get();
+//       const researcherData = researcherDoc.data();
+//       const projectData =
+//         researcherData.projects[[instructorsNums[fullname].project]];
+//       await batchUpdate(researcherRef, {
+//         projects: {
+//           ...researcherData.projects,
+//           [instructorsNums[fullname].project]: {
+//             ...projectData,
+//             instructorsNum: instructorsNums[fullname].num,
+//           },
+//         },
+//       });
+//     }
+//     await commitBatch();
+//     return res.status(200).json({});
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ err });
+//   }
+// };
 
 // const codeFeedback = async (
 //   coder,
