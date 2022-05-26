@@ -7,25 +7,20 @@ import { darcula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import "katex/dist/katex.min.css";
 
 type Props = {
-  children: string;
+  text: string;
 };
-const MarkdownRender: FC<Props> = ({ children }) => {
+const MarkdownRender: FC<Props> = ({ text }) => {
   return (
     <ReactMarkdown
-      children={children}
       remarkPlugins={[remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
           return !inline && match ? (
-            <SyntaxHighlighter
-              children={String(children).replace(/\n$/, "")}
-              style={darcula as any}
-              language={match[1]}
-              PreTag="div"
-              {...props}
-            />
+            <SyntaxHighlighter style={darcula as any} language={match[1]} PreTag="div" {...props}>
+              {String(text).replace(/\n$/, "")}
+            </SyntaxHighlighter>
           ) : (
             <code className={className} {...props}>
               {children || ""}
@@ -33,7 +28,9 @@ const MarkdownRender: FC<Props> = ({ children }) => {
           );
         },
       }}
-    />
+    >
+      {text}
+    </ReactMarkdown>
   );
 };
 

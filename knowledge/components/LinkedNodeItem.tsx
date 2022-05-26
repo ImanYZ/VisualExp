@@ -34,28 +34,22 @@ const LinkedNodeItem: FC<Props> = ({ node }) => {
       title={
         <Box>
           <Typography variant="body2" sx={{ mb: 3 }} component="div">
-            <MarkdownRender children={node.content || ""} />
+            <MarkdownRender text={node.content || ""}></MarkdownRender>
           </Typography>
           {node.nodeImage && (
             <Box>
-              <img src={node.nodeImage} width="100%" height="100%" />
+              <img src={node.nodeImage} width="100%" height="100%" alt={node.title || ""} />
             </Box>
           )}
         </Box>
       }
       placement="left"
     >
-      <ListItemButton
-        component="a"
-        href={`../${encodeTitle(node.title)}/${node.node}`}
-      >
+      <ListItemButton component="a" href={`../${encodeTitle(node.title)}/${node.node}`}>
         <ListItemIcon>
           <NodeTypeIcon nodeType={node.nodeType} />
         </ListItemIcon>
-        <ListItemText
-          primary={<MarkdownRender children={node.title || ""} />}
-          disableTypography={true}
-        />
+        <ListItemText primary={<MarkdownRender text={node.title || ""} />} disableTypography={true} />
       </ListItemButton>
     </HtmlTooltip>
   );
