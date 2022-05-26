@@ -1,14 +1,16 @@
 import "../styles/global.css";
-import { useMemo } from "react";
-import Head from "next/head";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+
 import { CacheProvider } from "@emotion/react";
-import createEmotionCache from "../src/createEmotionCache";
-import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import { deepmerge } from "@mui/utils";
 import type { AppProps } from "next/app";
+import Head from "next/head";
+import { useMemo } from "react";
+
+import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
+import createEmotionCache from "../src/createEmotionCache";
 
 const emotionCache = createEmotionCache();
 

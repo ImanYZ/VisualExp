@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-import { initializeApp, cert, App } from "firebase-admin/app";
+import { App,cert, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
 declare global {

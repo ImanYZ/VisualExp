@@ -1,6 +1,6 @@
-import { FC, ReactNode } from "react";
 import NextHead from "next/head";
 import { useRouter } from "next/router";
+import { FC, ReactNode } from "react";
 
 const HOST = "https://1cademy.us";
 

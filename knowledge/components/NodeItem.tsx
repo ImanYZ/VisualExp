@@ -1,24 +1,25 @@
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import Box from "@mui/material/Box";
-import CardMedia from "@mui/material/CardMedia";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import { FC, ReactNode, useState } from "react";
-import { KnowledgeChoice, KnowledgeNode } from "../src/knowledgeTypes";
 import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import Divider from "@mui/material/Divider";
+import Link from "@mui/material/Link";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
+import { FC, ReactNode, useState } from "react";
+
+import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
-import Divider from "@mui/material/Divider";
-import Link from "@mui/material/Link";
-import CardHeader from "@mui/material/CardHeader";
-import Tooltip from "@mui/material/Tooltip";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 
 dayjs.extend(relativeTime);
 

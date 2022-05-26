@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { FC } from "react";
+
 import { encodeTitle, escapeBreaksQuotes } from "../lib/utils";
 import { KnowledgeNode } from "../src/knowledgeTypes";
 

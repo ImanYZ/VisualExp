@@ -1,12 +1,12 @@
-import React, { FC } from "react";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
+import AppBar from "@mui/material/AppBar";
+import Dialog from "@mui/material/Dialog";
+import IconButton from "@mui/material/IconButton";
 import Slide from "@mui/material/Slide";
+import Toolbar from "@mui/material/Toolbar";
 import { TransitionProps } from "@mui/material/transitions";
+import Typography from "@mui/material/Typography";
+import React, { FC } from "react";
 
 type Props = {
   onClose: () => void;
