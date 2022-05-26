@@ -13,7 +13,8 @@
     "deploy:database": "firebase deploy --only database",
     "deploy:firestore": "firebase deploy --only firestore",
     "deploy:storage": "firebase deploy --only storage",
-    "deploy:functions": "firebase deploy --only functions"
+    "deploy:functions": "firebase deploy --only functions",
+    "prepare": "cd .. && husky install knowledge/.husky"
   },
   "author": "Iman YeckehZaare",
   "license": "Apache-2.0",
@@ -52,7 +53,13 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "firebase-tools": "^11.0.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.2",
     "prettier": "^2.6.2",
     "typescript": "^4.6.4"
+  },
+  "lint-staged": {
+    "*.+(js|ts|tsx)": "eslint --cache --fix",
+    "*.{ts|tsx|js,css,md}": "prettier --write"
   }
 }
