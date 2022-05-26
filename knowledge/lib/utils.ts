@@ -1,8 +1,8 @@
-export const isValidHttpUrl = string => {
+export const isValidHttpUrl = (possibleUrl: string) => {
   let url;
 
   try {
-    url = new URL(string);
+    url = new URL(possibleUrl);
   } catch (_) {
     return false;
   }
@@ -10,10 +10,10 @@ export const isValidHttpUrl = string => {
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
-export const escapeBreaksQuotes = text => {
+export const escapeBreaksQuotes = (text: string) => {
   return text.replace(/(?:\r\n|\r|\n)/g, "<br>").replace(/['"]/g, "");
 };
 
-export const encodeTitle = title => {
+export const encodeTitle = (title: string) => {
   return encodeURI(escapeBreaksQuotes(title)).replace(/[&\/\?\\]/g, "");
 };
