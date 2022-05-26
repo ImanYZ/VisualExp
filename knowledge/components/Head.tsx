@@ -1,6 +1,6 @@
-import { FC, ReactNode } from "react";
 import NextHead from "next/head";
 import { useRouter } from "next/router";
+import { FC, ReactNode } from "react";
 
 const HOST = "https://1cademy.us";
 
@@ -10,11 +10,11 @@ type Props = {
   children?: ReactNode;
 };
 
-const Head: FC<Props> = (props) => {
+const Head: FC<Props> = props => {
   const {
     description = "1Cademy Knowledge Graph Public Interface!",
     title = "1Cademy Knowledge Graph!",
-    children,
+    children
   } = props;
   const router = useRouter();
   const preview = `${HOST}/knowledge/DarkmodeLogo.png`;

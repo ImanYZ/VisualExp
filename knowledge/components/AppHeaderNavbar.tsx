@@ -1,17 +1,18 @@
-import Image from "next/image";
-import NextLink from "next/link";
-import ROUTES from "../src/routes";
-import React, { FC } from "react";
-import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
-import Tabs from "@mui/material/Tabs";
-import LogoDarkMode from "../public/DarkModeLogo.svg";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import SECTIONS from "../src/navbarSections";
-import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Link from "@mui/material/Link";
 import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
+import Image from "next/image";
+import NextLink from "next/link";
+import React, { FC } from "react";
+
+import LogoDarkMode from "../public/DarkModeLogo.svg";
+import SECTIONS from "../src/navbarSections";
+import ROUTES from "../src/routes";
 
 type Props = {
   showApply?: boolean;
@@ -23,12 +24,7 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
             <Link sx={{ display: "flex" }}>
-              <Image
-                src={LogoDarkMode}
-                alt="logo"
-                width="60px"
-                height="60px"
-              ></Image>
+              <Image src={LogoDarkMode} alt="logo" width="60px" height="60px"></Image>
             </Link>
           </NextLink>
         </Box>
@@ -38,14 +34,14 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
             marginLeft: 2,
             fontWeight: 400,
             "& .MuiTab-root": {
-              color: "#AAAAAA",
+              color: "#AAAAAA"
             },
             "& .MuiTab-root.Mui-selected": {
-              color: "common.white",
+              color: "common.white"
             },
             "& .MuiTabs-indicator": {
-              backgroundColor: "secondary.main",
-            },
+              backgroundColor: "secondary.main"
+            }
           }}
         >
           {SECTIONS.map((page, idx) => {
@@ -63,9 +59,9 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
                 size="large"
                 variant="contained"
                 sx={{
-                  fontSize: (theme) => theme.typography.body1,
+                  fontSize: theme => theme.typography.body1,
                   fontWeight: "bold",
-                  borderRadius: 40,
+                  borderRadius: 40
                 }}
               >
                 APPLY!

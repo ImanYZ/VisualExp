@@ -1,7 +1,8 @@
-import React, { FC, ReactNode } from "react";
 import Box from "@mui/material/Box";
-import AppHeaderNavbar from "./AppHeaderNavbar";
+import React, { FC, ReactNode } from "react";
+
 import AppFooter from "./AppFooter";
+import AppHeaderNavbar from "./AppHeaderNavbar";
 import Head from "./Head";
 
 type Props = {
@@ -19,10 +20,9 @@ const PagesNavbar: FC<Props> = ({ children, title, description }) => {
         component="main"
         sx={{
           mt: "var(--navbar-height)",
-          minHeight:
-            "calc(100vh - var(--navbar-height) - var(--footer-height) )",
+          minHeight: "calc(100vh - var(--navbar-height) - var(--footer-height) )",
           py: 4,
-          px: { xs: 1, md: 2 },
+          px: { xs: 1, md: 2 }
         }}
       >
         {children}
