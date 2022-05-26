@@ -1,20 +1,20 @@
-import React, { FC } from "react";
-
-import CodeIcon from "@mui/icons-material/Code";
-import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
-import ShareIcon from "@mui/icons-material/Share";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import PersonIcon from "@mui/icons-material/Person";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import EventIcon from "@mui/icons-material/Event";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
 import ArticleIcon from "@mui/icons-material/Article";
-import LockIcon from "@mui/icons-material/Lock";
+import CodeIcon from "@mui/icons-material/Code";
+import EmojiObjectsIcon from "@mui/icons-material/EmojiObjects";
+import EventIcon from "@mui/icons-material/Event";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import LocalLibraryIcon from "@mui/icons-material/LocalLibrary";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import { NodeType } from "../src/knowledgeTypes";
+import LockIcon from "@mui/icons-material/Lock";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import PersonIcon from "@mui/icons-material/Person";
+import ShareIcon from "@mui/icons-material/Share";
 import { SvgIconProps } from "@mui/material/SvgIcon";
 import Tooltip from "@mui/material/Tooltip";
+import React, { FC } from "react";
+
+import { NodeType } from "../src/knowledgeTypes";
 
 type Props = {
   nodeType: NodeType;

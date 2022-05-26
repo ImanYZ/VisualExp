@@ -16,7 +16,7 @@ const common = {
   white: "#ffffff",
   orange: "#ff8a33",
   orangeDark: "#ff6d00",
-  darkGrayBackground: "#28282A",
+  darkGrayBackground: "#28282A"
 };
 
 const systemFont = [
@@ -29,13 +29,13 @@ const systemFont = [
   "sans-serif",
   '"Apple Color Emoji"',
   '"Segoe UI Emoji"',
-  '"Segoe UI Symbol"',
+  '"Segoe UI Symbol"'
 ];
 
 export const getMetaThemeColor = (mode: "light" | "dark") => {
   const themeColor = {
     light: common.orange,
-    dark: common.orangeDark,
+    dark: common.orangeDark
   };
   return themeColor[mode];
 };
@@ -46,49 +46,49 @@ export const getDesignTokens = (mode: "light" | "dark") =>
       primary: {
         main: common.orange,
         ...(mode === "dark" && {
-          main: grey[500],
-        }),
+          main: grey[500]
+        })
       },
       warning: {
         main: "#ffc071",
-        dark: "#ffb25e",
+        dark: "#ffb25e"
       },
       divider: mode === "dark" ? grey[400] : grey[400],
       mode,
       background: {
         default: "#f2f2f2",
-        paper: common.white,
+        paper: common.white
       },
       ...(mode === "dark" && {
         background: {
           default: grey[600],
-          paper: grey[700],
-        },
+          paper: grey[700]
+        }
       }),
       common,
       ...(mode === "light" && {
         text: {
           primary: common.black,
-          secondary: grey[700],
-        },
+          secondary: grey[700]
+        }
       }),
       ...(mode === "dark" && {
         text: {
           primary: common.white,
-          secondary: grey[300],
-        },
-      }),
+          secondary: grey[300]
+        }
+      })
     },
     shape: {
-      borderRadius: 10,
+      borderRadius: 10
     },
     typography: {
       fontFamily: [...systemFont].join(","),
       fontFamilySystem: systemFont.join(","),
       button: {
-        textTransform: "initial",
-      },
-    },
+        textTransform: "initial"
+      }
+    }
   } as ThemeOptions);
 
 export function getThemedComponents(theme: Theme): {
@@ -98,43 +98,43 @@ export function getThemedComponents(theme: Theme): {
     components: {
       MuiButtonBase: {
         defaultProps: {
-          disableTouchRipple: true,
-        },
+          disableTouchRipple: true
+        }
       },
       MuiButton: {
         defaultProps: {
-          disableElevation: true,
+          disableElevation: true
           // variant: "contained",
         },
         styleOverrides: {
           containedPrimary: {
             backgroundColor: common.orange,
-            color: common.white,
-          },
+            color: common.white
+          }
         },
         variants: [
           {
             props: { variant: "contained" },
             style: {
               "&:hover, &.Mui-focusVisible": {
-                backgroundColor: common.orangeDark,
-              },
-            },
-          },
-        ],
+                backgroundColor: common.orangeDark
+              }
+            }
+          }
+        ]
       },
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backgroundColor: common.darkGrayBackground,
-          },
-        },
+            backgroundColor: common.darkGrayBackground
+          }
+        }
       },
       MuiTooltip: {
         defaultProps: {
-          arrow: true,
-        },
-      },
-    },
+          arrow: true
+        }
+      }
+    }
   };
 }
