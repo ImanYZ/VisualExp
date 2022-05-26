@@ -3,8 +3,8 @@ import CardMedia from "@mui/material/CardMedia";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
-import { FC, ReactNode } from "react";
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import { FC, ReactNode, useState } from "react";
+import { KnowledgeChoice, KnowledgeNode } from "../src/knowledgeTypes";
 import CardActions from "@mui/material/CardActions";
 import NextLink from "next/link";
 import MarkdownRender from "./Markdown/MarkdownRender";
@@ -16,7 +16,9 @@ import CardHeader from "@mui/material/CardHeader";
 import Tooltip from "@mui/material/Tooltip";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Checkbox, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 
 dayjs.extend(relativeTime);
 
@@ -27,8 +29,16 @@ type Props = {
 
 const NodeItem: FC<Props> = ({ node, contributors }) => {
 
-  const handleToogleQuestion = (value) =>{
-    console.log('toogle q',value)
+  const initialChoicesState = new Array(node.choices?.length || 0).fill(false)
+
+  const [choicesState,setChoicesState] = useState<boolean[]>(initialChoicesState)
+
+  const handleToogleQuestion = (index:number) =>{
+    setChoicesState(previousChoiceState=>{
+      const oldPreviousChoiceState = [...previousChoiceState]
+      oldPreviousChoiceState[index] = !oldPreviousChoiceState[index]
+      return oldPreviousChoiceState
+    })
   }
   return (
     <Card>
@@ -40,40 +50,48 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
             </Link>
           </NextLink>
         }
-        // action={<NodeTypeIcon nodeType={node.nodeType} color="primary" />}
       ></CardHeader>
       {node.nodeImage && <CardMedia component="img" height="140" image={node.nodeImage} alt={node.title} />}
       <Divider />
       <CardContent>
-        {/* <Typography variant="body1" color="text.secondary" component="div">
+        <Typography variant="body1" color="text.secondary" component="div">
           <MarkdownRender children={node.content || ""} />
-        </Typography> */}
+        </Typography>
 
         {node.nodeType==='Question' && node.choices && <>
-        <Typography variant="h6" color="text.secondary" gutterBottom component="div">
-          {node.content}
-        </Typography>
         <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
           {node.choices.map((value,idx) => {
-            const labelId = `checkbox-list-label-${value}`;
 
-            return (
+            return (<>
               <ListItem key={idx} disablePadding>
-                <ListItemButton role={undefined} onClick={()=>handleToogleQuestion(value)} dense>
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      tabIndex={-1}
-                      disableRipple
-                      inputProps={{ 'aria-labelledby': labelId }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText id={labelId} primary={value.choice} />
-                  <Typography variant="h6" color="palette.success.light" gutterBottom component="div">
-                    {value.feedback}
-                  </Typography>
-                </ListItemButton>
+                <ListItemIcon>
+                  <FormControlLabel
+                    label={value.choice}
+                    control={
+                      <>
+                        { !choicesState[idx] && <Checkbox
+                          checked={choicesState[idx]}
+                          onChange={() => handleToogleQuestion(idx)} />
+                        }
+                        { choicesState[idx] && !value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
+                            <CloseIcon color="error"/>
+                          </IconButton>
+                        }
+                        { choicesState[idx] && value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
+                          <CheckIcon color="success"/>
+                        </IconButton>
+                        }
+                      </>
+                    }
+                  />
+                </ListItemIcon>
               </ListItem>
+
+              { choicesState[idx] && <ListItem key={`${idx}-feedback`} disablePadding>
+                  <ListItemText primary={value.feedback} />
+                </ListItem>
+              }
+            </>
             );
           })}
         </List>
