@@ -1,24 +1,25 @@
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import Box from "@mui/material/Box";
-import CardMedia from "@mui/material/CardMedia";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Typography from "@mui/material/Typography";
-import { FC, ReactNode, useState } from "react";
-import { KnowledgeChoice, KnowledgeNode } from "../src/knowledgeTypes";
 import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import Divider from "@mui/material/Divider";
+import Link from "@mui/material/Link";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
+import { FC, ReactNode, useState } from "react";
+
+import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
-import Divider from "@mui/material/Divider";
-import Link from "@mui/material/Link";
-import CardHeader from "@mui/material/CardHeader";
-import Tooltip from "@mui/material/Tooltip";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 
 dayjs.extend(relativeTime);
 
@@ -28,25 +29,24 @@ type Props = {
 };
 
 const NodeItem: FC<Props> = ({ node, contributors }) => {
+  const initialChoicesState = new Array(node.choices?.length || 0).fill(false);
 
-  const initialChoicesState = new Array(node.choices?.length || 0).fill(false)
+  const [choicesState, setChoicesState] = useState<boolean[]>(initialChoicesState);
 
-  const [choicesState,setChoicesState] = useState<boolean[]>(initialChoicesState)
-
-  const handleToogleQuestion = (index:number) =>{
-    setChoicesState(previousChoiceState=>{
-      const oldPreviousChoiceState = [...previousChoiceState]
-      oldPreviousChoiceState[index] = !oldPreviousChoiceState[index]
-      return oldPreviousChoiceState
-    })
-  }
+  const handleToogleQuestion = (index: number) => {
+    setChoicesState(previousChoiceState => {
+      const oldPreviousChoiceState = [...previousChoiceState];
+      oldPreviousChoiceState[index] = !oldPreviousChoiceState[index];
+      return oldPreviousChoiceState;
+    });
+  };
   return (
     <Card>
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
             <Link variant="h5" underline="none" color="inherit">
-              <MarkdownRender children={node.title || ""} />
+              <MarkdownRender text={node.title || ""} />
             </Link>
           </NextLink>
         }
@@ -55,48 +55,51 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
       <Divider />
       <CardContent>
         <Typography variant="body1" color="text.secondary" component="div">
-          <MarkdownRender children={node.content || ""} />
+          <MarkdownRender text={node.content || ""} />
         </Typography>
 
-        {node.nodeType==='Question' && node.choices && <>
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-          {node.choices.map((value,idx) => {
+        {node.nodeType === "Question" && node.choices && (
+          <>
+            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+              {node.choices.map((value, idx) => {
+                return (
+                  <>
+                    <ListItem key={idx} disablePadding>
+                      <ListItemIcon>
+                        <FormControlLabel
+                          label={value.choice}
+                          control={
+                            <>
+                              {!choicesState[idx] && (
+                                <Checkbox checked={choicesState[idx]} onChange={() => handleToogleQuestion(idx)} />
+                              )}
+                              {choicesState[idx] && !value.correct && (
+                                <IconButton onClick={() => handleToogleQuestion(idx)}>
+                                  <CloseIcon color="error" />
+                                </IconButton>
+                              )}
+                              {choicesState[idx] && value.correct && (
+                                <IconButton onClick={() => handleToogleQuestion(idx)}>
+                                  <CheckIcon color="success" />
+                                </IconButton>
+                              )}
+                            </>
+                          }
+                        />
+                      </ListItemIcon>
+                    </ListItem>
 
-            return (<>
-              <ListItem key={idx} disablePadding>
-                <ListItemIcon>
-                  <FormControlLabel
-                    label={value.choice}
-                    control={
-                      <>
-                        { !choicesState[idx] && <Checkbox
-                          checked={choicesState[idx]}
-                          onChange={() => handleToogleQuestion(idx)} />
-                        }
-                        { choicesState[idx] && !value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
-                            <CloseIcon color="error"/>
-                          </IconButton>
-                        }
-                        { choicesState[idx] && value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
-                          <CheckIcon color="success"/>
-                        </IconButton>
-                        }
-                      </>
-                    }
-                  />
-                </ListItemIcon>
-              </ListItem>
-
-              { choicesState[idx] && <ListItem key={`${idx}-feedback`} disablePadding>
-                  <ListItemText primary={value.feedback} />
-                </ListItem>
-              }
-            </>
-            );
-          })}
-        </List>
-      </>}
-
+                    {choicesState[idx] && (
+                      <ListItem key={`${idx}-feedback`} disablePadding>
+                        <ListItemText primary={value.feedback} />
+                      </ListItem>
+                    )}
+                  </>
+                );
+              })}
+            </List>
+          </>
+        )}
       </CardContent>
       <Divider />
       <CardActions>
@@ -104,13 +107,13 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <NodeTypeIcon nodeType={node.nodeType} />

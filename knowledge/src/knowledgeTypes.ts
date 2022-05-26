@@ -12,7 +12,7 @@ export enum NodeType {
   "Advertisement" = "Advertisement",
   "News" = "News",
   "Private" = "Private",
-  "Tag" = "Tag",
+  "Tag" = "Tag"
 }
 
 export type KnowledgeNodeContributor = {
@@ -39,10 +39,10 @@ export type LinkedKnowledgeNode = {
 };
 
 export type KnowledgeChoice = {
-  choice:string,
-  correct:boolean,
-  feedback:string
-}
+  choice: string;
+  correct: boolean;
+  feedback: string;
+};
 
 export type NodeFireStore = {
   aChooseUname?: boolean;
@@ -92,13 +92,7 @@ export type NodeFireStore = {
 
 export type KnowledgeNode = Omit<
   NodeFireStore,
-  | "updatedAt"
-  | "changedAt"
-  | "createdAt"
-  | "contributors"
-  | "institutions"
-  | "tags"
-  | "parents"
+  "updatedAt" | "changedAt" | "createdAt" | "contributors" | "institutions" | "tags" | "parents"
 > & {
   // export type KnowledgeNode = NodeFireStore & {
   id: string;
@@ -107,8 +101,8 @@ export type KnowledgeNode = Omit<
   changedAt?: string;
   tags?: LinkedKnowledgeNode[];
   createdAt?: string;
-  choices?:KnowledgeChoice[];
-  constent?:string;
+  choices?: KnowledgeChoice[];
+  constent?: string;
   references?: LinkedKnowledgeNode[];
   contributors?: KnowledgeNodeContributor[];
   institutions?: KnowledgeNodeInstitution[];
