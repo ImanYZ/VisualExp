@@ -1,7 +1,5 @@
 import { encodeTitle } from "../lib/utils";
 
-const EXTERNAL_DATA_URL = "https://jsonplaceholder.typicode.com/posts";
-
 function SiteMap() {
   // getServerSideProps will do the heavy lifting
 }
@@ -33,9 +31,7 @@ export async function getServerSideProps({ res }) {
         const nodeData = nodeDoc.data();
         xmlContent += `
           <url>
-            <loc>https://1cademy.us/knowledge/${encodeTitle(nodeData.title)}/${
-          nodeDoc.id
-        }</loc>
+            <loc>https://1cademy.us/knowledge/${encodeTitle(nodeData.title)}/${nodeDoc.id}</loc>
             <lastmod>${nodeData.updatedAt.toDate().toISOString()}</lastmod>
             <changefreq>hourly</changefreq>
           </url>`;

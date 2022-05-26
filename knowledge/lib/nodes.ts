@@ -7,7 +7,7 @@ import {
   LinkedKnowledgeNode,
   NodeFireStore,
 } from "../src/knowledgeTypes";
-import { admin, batchSet,commitBatch, db } from "./admin";
+import { admin, batchSet, commitBatch, db } from "./admin";
 
 export const getSortedPostsData = async () => {
   const nodes: KnowledgeNode[] = [];
@@ -128,9 +128,7 @@ const getNodeTags = (nodeData: NodeFireStore) => {
 
 // Endpoint retrieving the node data and its direct parents and children
 // data based on the id requested.
-export const getNodeData = async (
-  id: string
-): Promise<KnowledgeNode | null> => {
+export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => {
   const nodeData = await retrieveNode(id);
 
   if (!nodeData) {
@@ -202,39 +200,27 @@ export const getNodeData = async (
   }
 
   // Descendingly sort the contributors array based on the reputation points.
-  const contributorsNodes: KnowledgeNodeContributor[] = Object.entries(
-    nodeData.contributors || {}
-  )
-    .sort(([aId, aObj], [bId, bObj]) => {
+  const contributorsNodes: KnowledgeNodeContributor[] = Object.entries(nodeData.contributors || {})
+    .sort(([, aObj], [, bObj]) => {
       return (bObj.reputation || 0) - (aObj.reputation || 0);
     })
     .reduce<KnowledgeNodeContributor[]>(
-      (previousValue, currentValue) => [
-        ...previousValue,
-        { ...currentValue[1], username: currentValue[0] },
-      ],
+      (previousValue, currentValue) => [...previousValue, { ...currentValue[1], username: currentValue[0] }],
       []
     );
 
   // Descendingly sort the contributors array based on the reputation points.
-  const institObjs = Object.entries(nodeData.institutions || {}).sort(
-    ([aId, aObj], [bId, bObj]) => {
-      return (bObj.reputation || 0) - (aObj.reputation || 0);
-    }
-  );
+  const institObjs = Object.entries(nodeData.institutions || {}).sort(([, aObj], [, bObj]) => {
+    return (bObj.reputation || 0) - (aObj.reputation || 0);
+  });
   const institutionsNodes: KnowledgeNodeInstitution[] = [];
   for (let [name, obj] of institObjs) {
-    const institutionDocs = await db
-      .collection("institutions")
-      .where("name", "==", name)
-      .get();
-    const logoURL =
-      institutionDocs.docs.length > 0
-        ? institutionDocs.docs[0].data().logoURL
-        : "";
+    const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
+    const logoURL = institutionDocs.docs.length > 0 ? institutionDocs.docs[0].data().logoURL : "";
     institutionsNodes.push({ ...obj, logoURL, name });
   }
   const {
+    /* eslint-disable */
     updatedAt,
     changedAt,
     createdAt,
@@ -244,8 +230,10 @@ export const getNodeData = async (
     institutions,
     children,
     parents,
+    /* eslint-enable */
     ...rest
   } = nodeData;
+  nodeData;
   return {
     id,
     ...rest,
@@ -269,9 +257,7 @@ export const logViews = async (req: any, nodeId: string) => {
     userAgent = navigator.userAgent; // if you are on the client you can access the navigator from the window object
   }
   const forwarded = req.headers["x-forwarded-for"];
-  const ip = forwarded
-    ? (forwarded as string).split(/, /)[0]
-    : req.connection.remoteAddress;
+  const ip = forwarded ? (forwarded as string).split(/, /)[0] : req.connection.remoteAddress;
   const geo = geoip.lookup(ip || "");
   const viewerRef = db.collection("viewers").doc();
   await batchSet(viewerRef, {
