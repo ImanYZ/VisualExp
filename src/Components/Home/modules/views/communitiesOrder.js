@@ -17,7 +17,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Cognitive_Psychology.jpeg",
     title: "UX Research in Cognitive Psychology of Learning",
-    width: "55%",
+    width: "37%",
     leaders: [
       {
         name: "Iman YeckehZaare",
@@ -147,7 +147,7 @@ export default [
       </div>
     ),
     gains: [
-      `Work remotely with an interdisciplinary community of talented students and researchers from different schools in the US.`,
+      `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
       `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
       `Get involved in all aspects of conducting an online controlled experiment under the supervision of Iman YeckehZaare.`,
       `Learn about a mixed-method study including both qualitative and quantitative data, and analysis to prepare for future Ph.D. programs in related disciplines.`,
@@ -163,7 +163,178 @@ export default [
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
-      `Dedicate 25 hours a week over the Summer break to engage in all aspects of the research project.`,
+      `Dedicate 25 hours a week over the Summer to engage in all aspects of the research project.`,
+      `Conduct several experiment sessions and guide participants through the session.`,
+      `Thematically code the qualitative data collected throughout our experiments.`,
+      `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
+      `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
+      `Present the essence of what you learn from the related papers and book chapters in weekly meetings for further discussion.`,
+      `Co-author the final research paper to submit to reputable conferences/journals.`,
+    ],
+  },
+  {
+    id: "Active_Reading_Strategies",
+    tags: [
+      {
+        title: "Cognitive Psychology",
+        node: "jTz0wx46dQsbPURkQ0cl",
+      },
+      {
+        title: "Knowledge Visualization",
+        node: "WgF7yr5q7tJc54apVQSr",
+      },
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Active_Reading_Strategies.png",
+    title: "Active Reading Strategies Research",
+    width: "31%",
+    leaders: [
+      {
+        name: "Iman YeckehZaare",
+        image: "Iman_YeckehZaare.jpg",
+        about: `I am a Ph.D. Candidate at the University of Michigan School of Information.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/oneweb/",
+          },
+        ],
+      },
+    ],
+    YouTube: "B6q-LYXvNCg",
+    description: `We study the Active Reading Strategies literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    accomplishments: (
+      <div>
+        <p>
+          We have recently published the following papers in ACM conferences:
+        </p>
+        <ul>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907"
+              target="_blank"
+            >
+              YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P.
+              (2022). Semester-level Spacing but Not Procrastination Affected
+              Student Exam Performance. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 12th International Conference on Learning
+                Analytics and Knowledge (LAK&#8216;22) online, March 21-25,
+                2022. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408"
+              target="_blank"
+            >
+              YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
+              Retrieval-based Teaching Incentivizes Spacing and Improves Grades
+              in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer
+                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
+                Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313"
+              target="_blank"
+            >
+              YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K., &amp; Fox,
+              E. (2022). Another Victim of COVID-19: Computer Science Education.
+              In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer
+                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
+                Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760"
+              target="_blank"
+            >
+              YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak, C., Kwon,
+              K., ... &amp; Silverstein, N. (2021, August). Incentivized Spacing
+              and Gender in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 17th ACM Conference on International
+                Computing Education Research
+              </span>{" "}
+              (pp. 18-28).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882"
+              target="_blank"
+            >
+              Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020, April).
+              QMaps: Engaging Students in Voluntary Question Generation and
+              Linking. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2020 CHI Conference on Human Factors in
+                Computing Systems
+              </span>{" "}
+              (pp. 1-14).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411"
+              target="_blank"
+            >
+              YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019, July). A
+              spaced, interleaved retrieval practice tool that is motivating and
+              effective. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2019 ACM Conference on International
+                Computing Education Research
+              </span>{" "}
+              (pp. 71-79).
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417"
+              target="_blank"
+            >
+              YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed and
+              Studying: Gendered Pathways to Success. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 50th ACM Technical Symposium on Computer
+                Science Education
+              </span>{" "}
+              (pp. 693-698).
+            </a>
+          </li>
+        </ul>
+      </div>
+    ),
+    gains: [
+      `Work remotely with an interdisciplinary community of talented students and researchers from different schools in the US.`,
+      `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
+      `Get involved in all aspects of conducting an online controlled experiment.`,
+      `Learn about a mixed-method study including both qualitative and quantitative data, and analysis to prepare for future Ph.D. programs in related disciplines.`,
+      `Work towards publishing research on learning science, education, or cognitive psychology of learning and memory in reputable venues.`,
+      `Have opportunities to take on leadership roles within the community.`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+    // coursera: "https://www.coursera.org/learn/academicinfoseek",
+    hasTest: true,
+    qualifications: [
+      `A strong academic background in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
+      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+    ],
+    responsibilities: [
+      `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
+      `Dedicate 25 hours a week over the Summer to engage in all aspects of the research project.`,
       `Conduct several experiment sessions and guide participants through the session.`,
       `Thematically code the qualitative data collected throughout our experiments.`,
       `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
@@ -184,7 +355,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
-    width: "45%",
+    width: "32%",
     leaders: [
       // {
       //   name: "Amelia Henriques",
@@ -633,6 +804,85 @@ export default [
     ],
   },
   {
+    id: "Social_Psychology",
+    tags: [
+      {
+        title: "Social psychology",
+        node: "FyQoGIdVVeDHvn1lHOZL",
+      },
+      {
+        title: "Behavioral Economics",
+        node: "zFZ2Rvnvp4TyJE7g0vUZ",
+      },
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Social_Psychology.jpg",
+    title: "Behavioral Economics & Social Psychology",
+    width: "31%",
+    leaders: [
+      {
+        name: "Noor Jassim",
+        image: "Noor_Jassim.jpeg",
+        about: `Honors student at Eastern Michigan University pursuing a Bachelor of Science in psychology and sociology. A research assistant at the Self-regulation, Early Experience, and Development (SEED) lab in the psychology department. An assistant manager at a real estate company. Active Humane Society volunteer. Adamant enthusiast of quantitative methods in social psychology and medical sociology. Other interests include dialectical behavior therapy (DBT) as well as emotional regulation.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/noor-jassim/",
+          },
+        ],
+      },
+      {
+        name: "Alex Nikolaidis Konstas",
+        image: "Alex_Nikolaidis_Konstas.jpg",
+        about: `I am an undergraduate student from Thessaloniki, Greece, and I am in my senior year at Davidson College, NC. Specifically, I am double majoring in Psychology and Studio Art. I joined 1Cademy as an intern for the Educational Psychology research group in the summer of 2021. For the fall semester of 2021, I began interning for the Social/Political Psychology research team. However, I started co-leading the group in November of 2021, as I was very passionate about the interdisciplinary and collaborative approach of the platform. I have conducted research related to social psychology, and I hope to pursue graduate studies in the field. My research interests include social cognition, bias, and gender.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/alex-nikolaidis-konstas-3894a7207/",
+          },
+        ],
+      },
+      {
+        name: "Iman YeckehZaare",
+        image: "Iman_YeckehZaare.jpg",
+        about: `I am a Ph.D. Candidate at the University of Michigan School of Information.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/oneweb/",
+          },
+        ],
+      },
+    ],
+    YouTube: "B6q-LYXvNCg",
+    description: `We study the UX Research and Cognitive Psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    accomplishments: "",
+    gains: [
+      `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
+      `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
+      `Get involved in all aspects of conducting an online controlled experiment.`,
+      `Learn about conducting a controlled online experiment to prepare for future Ph.D. programs in related disciplines.`,
+      `Work towards publishing research on behavioral economics and social psychology in reputable venues.`,
+      `Have opportunities to take on leadership roles within the community.`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in disciplines related to behavioral economics or social psychology, and answer our quiz questions to evaluate their domain knowledge.`,
+    // coursera: "https://www.coursera.org/learn/academicinfoseek",
+    hasTest: true,
+    qualifications: [
+      `A strong academic background in topics related to behavioral economics or social psychology`,
+      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+    ],
+    responsibilities: [
+      `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
+      `Dedicate 25 hours a week over the Summer to engage in all aspects of the research project.`,
+      `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
+      `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
+      `Present the essence of what you learn from the related papers and book chapters in weekly meetings for further discussion.`,
+      `Co-author the final research paper to submit to reputable conferences/journals.`,
+    ],
+  },
+  {
     id: "Social_Political_Psychology",
     tags: [
       {
@@ -648,7 +898,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Social_Political_Psychology.jpg",
     title: "Social/Political Psychology",
-    width: "50%",
+    width: "37%",
     leaders: [
       {
         name: "Talia Gillespie",
@@ -718,7 +968,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
-    width: "50%",
+    width: "32%",
     leaders: [
       {
         name: "Ge Zhang",
