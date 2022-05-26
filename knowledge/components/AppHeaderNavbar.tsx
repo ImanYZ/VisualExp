@@ -1,17 +1,18 @@
-import Image from "next/image";
-import NextLink from "next/link";
-import ROUTES from "../src/routes";
-import React, { FC } from "react";
-import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
-import Tabs from "@mui/material/Tabs";
-import LogoDarkMode from "../public/DarkModeLogo.svg";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import SECTIONS from "../src/navbarSections";
-import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Link from "@mui/material/Link";
 import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
+import Image from "next/image";
+import NextLink from "next/link";
+import React, { FC } from "react";
+
+import LogoDarkMode from "../public/DarkModeLogo.svg";
+import SECTIONS from "../src/navbarSections";
+import ROUTES from "../src/routes";
 
 type Props = {
   showApply?: boolean;

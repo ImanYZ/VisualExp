@@ -1,13 +1,13 @@
 import geoip from "geoip-lite";
+
 import {
   KnowledgeNode,
   KnowledgeNodeContributor,
-  LinkedKnowledgeNode,
   KnowledgeNodeInstitution,
+  LinkedKnowledgeNode,
   NodeFireStore,
 } from "../src/knowledgeTypes";
-
-import { admin, db, commitBatch, batchSet } from "./admin";
+import { admin, batchSet,commitBatch, db } from "./admin";
 
 export const getSortedPostsData = async () => {
   const nodes: KnowledgeNode[] = [];

@@ -1,9 +1,9 @@
-import Box from "@mui/material/Box";
-import { FC } from "react";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import Typography from "@mui/material/Typography";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { FC } from "react";
 
 type Props = {
   corrects?: number;

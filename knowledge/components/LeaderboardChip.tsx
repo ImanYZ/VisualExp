@@ -1,8 +1,8 @@
-import React, { FC } from "react";
-import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import React, { FC } from "react";
 
 type Props = {
   name?: string;

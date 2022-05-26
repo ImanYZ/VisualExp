@@ -1,7 +1,8 @@
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { FC } from "react";
+
 import { KnowledgeNodeContributor, KnowledgeNodeInstitution } from "../src/knowledgeTypes";
 import LeaderboardChip from "./LeaderboardChip";
 
