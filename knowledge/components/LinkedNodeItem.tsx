@@ -2,14 +2,15 @@ import Box from "@mui/material/Box";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import { styled } from "@mui/material/styles";
+import Tooltip, { tooltipClasses,TooltipProps } from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 import { FC } from "react";
+
 import { encodeTitle } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
-import { styled } from "@mui/material/styles";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 
 type Props = {
   node: LinkedKnowledgeNode;

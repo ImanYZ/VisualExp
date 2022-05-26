@@ -5,6 +5,7 @@ import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import React, { FC } from "react";
+
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import LinkedNodeItem from "./LinkedNodeItem";
 import TypographyUnderlined from "./TypographyUnderlined";

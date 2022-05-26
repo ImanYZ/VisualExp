@@ -1,10 +1,11 @@
-import { getSortedPostsData } from "../lib/nodes";
-import PagesNavbar from "../components/PagesNavbar";
 import { GetServerSideProps, NextPage } from "next";
-import { KnowledgeNode } from "../src/knowledgeTypes";
-import MasonryNodes from "../components/MasonryNodes";
-import HomeSearch from "../components/HomeSearch";
 import { useRouter } from "next/router";
+
+import HomeSearch from "../components/HomeSearch";
+import MasonryNodes from "../components/MasonryNodes";
+import PagesNavbar from "../components/PagesNavbar";
+import { getSortedPostsData } from "../lib/nodes";
+import { KnowledgeNode } from "../src/knowledgeTypes";
 
 type Props = {
   data: KnowledgeNode[];
