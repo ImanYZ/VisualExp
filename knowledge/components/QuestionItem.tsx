@@ -31,8 +31,8 @@ const QuestionItem: FC<Props> = ({ node }) => {
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
         {node.choices.map((value, idx) => {
           return (
-            <>
-              <ListItem key={idx} disablePadding>
+            <div key={idx}>
+              <ListItem disablePadding>
                 <ListItemIcon>
                   <FormControlLabel
                     label={value.choice}
@@ -58,11 +58,11 @@ const QuestionItem: FC<Props> = ({ node }) => {
               </ListItem>
 
               {choicesState[idx] && (
-                <ListItem key={`${idx}-feedback`} disablePadding>
+                <ListItem disablePadding>
                   <ListItemText primary={value.feedback} />
                 </ListItem>
               )}
-            </>
+            </div>
           );
         })}
       </List>
