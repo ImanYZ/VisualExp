@@ -28,25 +28,24 @@ type Props = {
 };
 
 const NodeItem: FC<Props> = ({ node, contributors }) => {
+  const initialChoicesState = new Array(node.choices?.length || 0).fill(false);
 
-  const initialChoicesState = new Array(node.choices?.length || 0).fill(false)
+  const [choicesState, setChoicesState] = useState<boolean[]>(initialChoicesState);
 
-  const [choicesState,setChoicesState] = useState<boolean[]>(initialChoicesState)
-
-  const handleToogleQuestion = (index:number) =>{
-    setChoicesState(previousChoiceState=>{
-      const oldPreviousChoiceState = [...previousChoiceState]
-      oldPreviousChoiceState[index] = !oldPreviousChoiceState[index]
-      return oldPreviousChoiceState
-    })
-  }
+  const handleToogleQuestion = (index: number) => {
+    setChoicesState((previousChoiceState) => {
+      const oldPreviousChoiceState = [...previousChoiceState];
+      oldPreviousChoiceState[index] = !oldPreviousChoiceState[index];
+      return oldPreviousChoiceState;
+    });
+  };
   return (
     <Card>
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
             <Link variant="h5" underline="none" color="inherit">
-              <MarkdownRender children={node.title || ""} />
+              <MarkdownRender text={node.title || ""} />
             </Link>
           </NextLink>
         }
@@ -55,48 +54,51 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
       <Divider />
       <CardContent>
         <Typography variant="body1" color="text.secondary" component="div">
-          <MarkdownRender children={node.content || ""} />
+          <MarkdownRender text={node.content || ""} />
         </Typography>
 
-        {node.nodeType==='Question' && node.choices && <>
-        <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-          {node.choices.map((value,idx) => {
+        {node.nodeType === "Question" && node.choices && (
+          <>
+            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+              {node.choices.map((value, idx) => {
+                return (
+                  <>
+                    <ListItem key={idx} disablePadding>
+                      <ListItemIcon>
+                        <FormControlLabel
+                          label={value.choice}
+                          control={
+                            <>
+                              {!choicesState[idx] && (
+                                <Checkbox checked={choicesState[idx]} onChange={() => handleToogleQuestion(idx)} />
+                              )}
+                              {choicesState[idx] && !value.correct && (
+                                <IconButton onClick={() => handleToogleQuestion(idx)}>
+                                  <CloseIcon color="error" />
+                                </IconButton>
+                              )}
+                              {choicesState[idx] && value.correct && (
+                                <IconButton onClick={() => handleToogleQuestion(idx)}>
+                                  <CheckIcon color="success" />
+                                </IconButton>
+                              )}
+                            </>
+                          }
+                        />
+                      </ListItemIcon>
+                    </ListItem>
 
-            return (<>
-              <ListItem key={idx} disablePadding>
-                <ListItemIcon>
-                  <FormControlLabel
-                    label={value.choice}
-                    control={
-                      <>
-                        { !choicesState[idx] && <Checkbox
-                          checked={choicesState[idx]}
-                          onChange={() => handleToogleQuestion(idx)} />
-                        }
-                        { choicesState[idx] && !value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
-                            <CloseIcon color="error"/>
-                          </IconButton>
-                        }
-                        { choicesState[idx] && value.correct && <IconButton onClick={() => handleToogleQuestion(idx)}>
-                          <CheckIcon color="success"/>
-                        </IconButton>
-                        }
-                      </>
-                    }
-                  />
-                </ListItemIcon>
-              </ListItem>
-
-              { choicesState[idx] && <ListItem key={`${idx}-feedback`} disablePadding>
-                  <ListItemText primary={value.feedback} />
-                </ListItem>
-              }
-            </>
-            );
-          })}
-        </List>
-      </>}
-
+                    {choicesState[idx] && (
+                      <ListItem key={`${idx}-feedback`} disablePadding>
+                        <ListItemText primary={value.feedback} />
+                      </ListItem>
+                    )}
+                  </>
+                );
+              })}
+            </List>
+          </>
+        )}
       </CardContent>
       <Divider />
       <CardActions>
