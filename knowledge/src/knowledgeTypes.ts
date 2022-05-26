@@ -38,6 +38,12 @@ export type LinkedKnowledgeNode = {
   nodeType: NodeType;
 };
 
+export type KnowledgeChoice = {
+  choice:string,
+  correct:boolean,
+  feedback:string
+}
+
 export type NodeFireStore = {
   aChooseUname?: boolean;
   aFullname?: string;
@@ -101,6 +107,8 @@ export type KnowledgeNode = Omit<
   changedAt?: string;
   tags?: LinkedKnowledgeNode[];
   createdAt?: string;
+  choices?:KnowledgeChoice[];
+  constent?:string;
   references?: LinkedKnowledgeNode[];
   contributors?: KnowledgeNodeContributor[];
   institutions?: KnowledgeNodeInstitution[];
