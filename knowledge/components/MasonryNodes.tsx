@@ -13,7 +13,7 @@ type Props = {
 
 const TrendingNodes: FC<Props> = ({ nodes, sx }) => {
   const renderMasonry = () => {
-    return nodes.map((el) => <NodeItem key={el.id} node={el} />);
+    return nodes.map(el => <NodeItem key={el.id} node={el} />);
   };
 
   return (

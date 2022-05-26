@@ -27,7 +27,7 @@ const MarkdownRender: FC<Props> = ({ text }) => {
               {children || ""}
             </code>
           );
-        },
+        }
       }}
     >
       {text}

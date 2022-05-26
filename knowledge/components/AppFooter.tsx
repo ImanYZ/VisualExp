@@ -17,14 +17,14 @@ export default function AppFooter() {
         borderTopStyle: "solid",
         borderTopColor: grey[400],
         borderTopWidth: "1px",
-        height: "var(--footer-height)",
+        height: "var(--footer-height)"
       }}
     >
       <Container
         sx={{
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <Grid container>
@@ -53,13 +53,7 @@ export default function AppFooter() {
               target="_blank"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
             >
-              <Image
-                src={YouTubeLogo}
-                alt="1Cademy YouTube Channel"
-                layout="intrinsic"
-                width="100px"
-                height="40px"
-              />
+              <Image src={YouTubeLogo} alt="1Cademy YouTube Channel" layout="intrinsic" width="100px" height="40px" />
             </Box>
           </Grid>
         </Grid>

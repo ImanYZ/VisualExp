@@ -25,27 +25,13 @@ const Transition = React.forwardRef(function Transition(
 
 const FullScreenImage: FC<Props> = ({ src, open, onClose }) => {
   return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={onClose}
-      TransitionComponent={Transition}
-    >
+    <Dialog fullScreen open={open} onClose={onClose} TransitionComponent={Transition}>
       <AppBar sx={{ position: "relative" }}>
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={onClose}
-            aria-label="close"
-          >
+          <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
             <CloseIcon />
           </IconButton>
-          <Typography
-            sx={{ ml: 2, flex: 1, color: "white" }}
-            variant="h6"
-            component="div"
-          >
+          <Typography sx={{ ml: 2, flex: 1, color: "white" }} variant="h6" component="div">
             Full-screen View
           </Typography>
         </Toolbar>

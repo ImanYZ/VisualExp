@@ -3,7 +3,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { styled } from "@mui/material/styles";
-import Tooltip, { tooltipClasses,TooltipProps } from "@mui/material/Tooltip";
+import Tooltip, { tooltipClasses, TooltipProps } from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import { FC } from "react";
 
@@ -25,8 +25,8 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     fontWeight: theme.typography.fontWeightRegular,
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
-    border: `1px solid ${theme.palette.grey[400]}`,
-  },
+    border: `1px solid ${theme.palette.grey[400]}`
+  }
 }));
 
 const LinkedNodeItem: FC<Props> = ({ node }) => {

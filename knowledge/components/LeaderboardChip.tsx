@@ -21,7 +21,7 @@ const LeaderboardChip: FC<Props> = ({ name = "", imageUrl, reputation, isChamp, 
           alt={name}
           sx={{
             width: 40,
-            height: 40,
+            height: 40
           }}
         />
       );
@@ -32,7 +32,7 @@ const LeaderboardChip: FC<Props> = ({ name = "", imageUrl, reputation, isChamp, 
           alt={name}
           width="40px"
           style={{
-            margin: "4px 4px 4px 10px",
+            margin: "4px 4px 4px 10px"
           }}
         />
       );
@@ -42,7 +42,7 @@ const LeaderboardChip: FC<Props> = ({ name = "", imageUrl, reputation, isChamp, 
     <Chip
       sx={{
         height: 49,
-        borderRadius: 28,
+        borderRadius: 28
       }}
       icon={
         imageUrl ? (
@@ -51,7 +51,7 @@ const LeaderboardChip: FC<Props> = ({ name = "", imageUrl, reputation, isChamp, 
           <Avatar
             sx={{
               width: 40,
-              height: 40,
+              height: 40
             }}
           >
             name.charAt(0)

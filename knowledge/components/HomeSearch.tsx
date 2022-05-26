@@ -19,7 +19,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...sx,
+        ...sx
       }}
     >
       <Typography textAlign="center" variant="h2" component="h1">
@@ -33,7 +33,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
           width: "50%",
           my: 5,
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "row"
         }}
       >
         <SearchInput onSearch={onSearch}></SearchInput>

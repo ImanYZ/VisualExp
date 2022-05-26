@@ -24,12 +24,7 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
             <Link sx={{ display: "flex" }}>
-              <Image
-                src={LogoDarkMode}
-                alt="logo"
-                width="60px"
-                height="60px"
-              ></Image>
+              <Image src={LogoDarkMode} alt="logo" width="60px" height="60px"></Image>
             </Link>
           </NextLink>
         </Box>
@@ -39,14 +34,14 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
             marginLeft: 2,
             fontWeight: 400,
             "& .MuiTab-root": {
-              color: "#AAAAAA",
+              color: "#AAAAAA"
             },
             "& .MuiTab-root.Mui-selected": {
-              color: "common.white",
+              color: "common.white"
             },
             "& .MuiTabs-indicator": {
-              backgroundColor: "secondary.main",
-            },
+              backgroundColor: "secondary.main"
+            }
           }}
         >
           {SECTIONS.map((page, idx) => {
@@ -64,9 +59,9 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
                 size="large"
                 variant="contained"
                 sx={{
-                  fontSize: (theme) => theme.typography.body1,
+                  fontSize: theme => theme.typography.body1,
                   fontWeight: "bold",
-                  borderRadius: 40,
+                  borderRadius: 40
                 }}
               >
                 APPLY!
