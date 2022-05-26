@@ -221,6 +221,7 @@ const IntellectualPoints = (props) => {
         setActivitiesChanges((oldActivitiesChanges) => {
           return [...oldActivitiesChanges, ...docChanges];
         });
+        //we don't want to create multiple sockets 
         setActivitiesLoaded(true);
       });
       return () => {
@@ -310,7 +311,10 @@ const IntellectualPoints = (props) => {
   useEffect(() => {
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];
-      setActivitiesChanges([]);
+      setTimeout(()=>{
+        setActivitiesChanges([]);
+      },0);
+
       let aActivities = [...allActivities];
       let oActivities = [...othersActivities];
       for (let change of tempActivitiesChanges) {
