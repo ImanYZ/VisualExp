@@ -10,27 +10,12 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <meta
-            name="theme-color"
-            content={getMetaThemeColor("light")}
-            media="(prefers-color-scheme: light)"
-          />
-          <meta
-            name="theme-color"
-            content={getMetaThemeColor("dark")}
-            media="(prefers-color-scheme: dark)"
-          />
+          <meta name="theme-color" content={getMetaThemeColor("light")} media="(prefers-color-scheme: light)" />
+          <meta name="theme-color" content={getMetaThemeColor("dark")} media="(prefers-color-scheme: dark)" />
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com"
-            crossOrigin="true"
-          />
-          <meta
-            name="google-site-verification"
-            content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y"
-          />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+          <meta name="google-site-verification" content="XpDB7dCQFlAHNdpUyVmw5Iahh4FzqPzUMUmlOLoNs-Y" />
           <meta charSet="UTF-8" />
           <meta name="robots" content="index, follow" />
           <meta name="googlebot" content="index, follow" />
@@ -66,7 +51,7 @@ export default class MyDocument extends Document {
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async (ctx) => {
+MyDocument.getInitialProps = async ctx => {
   const originalRenderPage = ctx.renderPage;
 
   // You can consider sharing the same emotion cache between
@@ -78,10 +63,10 @@ MyDocument.getInitialProps = async (ctx) => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App) =>
+      enhanceApp: App =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />;
-        },
+        }
     });
 
   const initialProps = await Document.getInitialProps(ctx);
@@ -91,7 +76,7 @@ MyDocument.getInitialProps = async (ctx) => {
   // https://github.com/mui-org/material-ui/issues/26561#issuecomment-855286153
 
   const emotionStyles = extractCriticalToChunks(initialProps.html);
-  const emotionStyleTags = emotionStyles.styles.map((style) => (
+  const emotionStyleTags = emotionStyles.styles.map(style => (
     <style
       data-emotion={`${style.key} ${style.ids.join(" ")}`}
       key={style.key}
@@ -102,6 +87,6 @@ MyDocument.getInitialProps = async (ctx) => {
 
   return {
     ...initialProps,
-    emotionStyleTags,
+    emotionStyleTags
   };
 };

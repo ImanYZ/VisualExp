@@ -15,8 +15,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
   const allPostsData = await getSortedPostsData();
   return {
     props: {
-      data: allPostsData,
-    },
+      data: allPostsData
+    }
   };
 };
 

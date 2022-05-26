@@ -5,7 +5,7 @@ import {
   KnowledgeNodeContributor,
   KnowledgeNodeInstitution,
   LinkedKnowledgeNode,
-  NodeFireStore,
+  NodeFireStore
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
 
@@ -24,7 +24,7 @@ export const getSortedPostsData = async () => {
       viewers: nodeData.viewers,
       corrects: nodeData.corrects,
       wrongs: nodeData.wrongs,
-      contributors: nodeData.contributors,
+      contributors: nodeData.contributors
     });
   }
   return nodes;
@@ -62,7 +62,7 @@ const convertDateFieldsToString = (
   return {
     updatedAt: nodeData.updatedAt?.toDate().toISOString(),
     changedAt: nodeData.changedAt?.toDate().toISOString(),
-    createdAt: nodeData.createdAt?.toDate().toISOString(),
+    createdAt: nodeData.createdAt?.toDate().toISOString()
   };
 };
 
@@ -77,7 +77,7 @@ const getNodeReferences = (nodeData: NodeFireStore) => {
       references.push({
         node: referenceIds[refIdx],
         title: (nodeData.references as string[])[refIdx],
-        label: referenceLabels[refIdx] || "",
+        label: referenceLabels[refIdx] || ""
       });
     }
   } else {
@@ -92,7 +92,7 @@ const getNodeReferences = (nodeData: NodeFireStore) => {
         references.push({
           node: reference.node,
           title: reference.title,
-          label: reference.label,
+          label: reference.label
         });
       }
     }
@@ -106,7 +106,7 @@ const getNodeTags = (nodeData: NodeFireStore) => {
     for (let tagIdx = 0; tagIdx < nodeData.tagIds.length; tagIdx++) {
       tags.push({
         node: nodeData.tagIds[tagIdx],
-        title: (nodeData.tags as string[])[tagIdx],
+        title: (nodeData.tags as string[])[tagIdx]
       });
     }
   } else {
@@ -118,7 +118,7 @@ const getNodeTags = (nodeData: NodeFireStore) => {
       if (tag.node && tag.title) {
         tags.push({
           node: tag.node,
-          title: tag.title,
+          title: tag.title
         });
       }
     }
@@ -147,7 +147,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
       title: childData.title,
       content: childData.content,
       nodeImage: childData.nodeImage,
-      nodeType: childData.nodeType,
+      nodeType: childData.nodeType
     });
   }
   // Retrieve the content of all the direct parents of the node.
@@ -162,7 +162,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
       title: parentData.title,
       content: parentData.content,
       nodeImage: parentData.nodeImage,
-      nodeType: parentData.nodeType,
+      nodeType: parentData.nodeType
     });
   }
   // Retrieve the content of all the tags of the node.
@@ -178,7 +178,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
       title: tagData.title,
       content: tagData.content,
       nodeImage: tagData.nodeImage,
-      nodeType: tagData.nodeType,
+      nodeType: tagData.nodeType
     });
   }
   // Retrieve the content of all the references of the node.
@@ -195,7 +195,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
       title: referenceData.title,
       content: referenceData.content,
       nodeImage: referenceData.nodeImage,
-      nodeType: referenceData.nodeType,
+      nodeType: referenceData.nodeType
     });
   }
 
@@ -243,7 +243,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
     tags: convertedTags,
     references: convertedReferences,
     contributors: contributorsNodes,
-    institutions: institutionsNodes,
+    institutions: institutionsNodes
   };
 };
 
@@ -266,32 +266,32 @@ export const logViews = async (req: any, nodeId: string) => {
     userAgent,
     country: geo?.country,
     state: geo?.region,
-    city: geo?.city,
+    city: geo?.city
   });
   const viewNumRef = db.collection("viewNums").doc();
   await batchSet(viewNumRef, {
     nodeId,
-    num: admin.firestore.FieldValue.increment(1),
+    num: admin.firestore.FieldValue.increment(1)
   });
   const countryViewRef = db.collection("countryViews").doc();
   await batchSet(countryViewRef, {
     country: geo?.country,
-    num: admin.firestore.FieldValue.increment(1),
+    num: admin.firestore.FieldValue.increment(1)
   });
   const stateViewRef = db.collection("stateViews").doc();
   await batchSet(stateViewRef, {
     state: geo?.region,
-    num: admin.firestore.FieldValue.increment(1),
+    num: admin.firestore.FieldValue.increment(1)
   });
   const cityViewRef = db.collection("cityViews").doc();
   await batchSet(cityViewRef, {
     city: geo?.city,
-    num: admin.firestore.FieldValue.increment(1),
+    num: admin.firestore.FieldValue.increment(1)
   });
   const userAgentViewRef = db.collection("userAgentViews").doc();
   await batchSet(userAgentViewRef, {
     userAgent,
-    num: admin.firestore.FieldValue.increment(1),
+    num: admin.firestore.FieldValue.increment(1)
   });
   await commitBatch();
 };

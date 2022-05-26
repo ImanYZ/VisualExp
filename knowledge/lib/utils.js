@@ -1,4 +1,4 @@
-export const isValidHttpUrl = (string) => {
+export const isValidHttpUrl = string => {
   let url;
 
   try {
@@ -10,10 +10,10 @@ export const isValidHttpUrl = (string) => {
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
-export const escapeBreaksQuotes = (text) => {
+export const escapeBreaksQuotes = text => {
   return text.replace(/(?:\r\n|\r|\n)/g, "<br>").replace(/['"]/g, "");
 };
 
-export const encodeTitle = (title) => {
+export const encodeTitle = title => {
   return encodeURI(escapeBreaksQuotes(title)).replace(/[&\/\?\\]/g, "");
 };

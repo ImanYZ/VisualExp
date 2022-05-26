@@ -34,7 +34,7 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
   const [choicesState, setChoicesState] = useState<boolean[]>(initialChoicesState);
 
   const handleToogleQuestion = (index: number) => {
-    setChoicesState((previousChoiceState) => {
+    setChoicesState(previousChoiceState => {
       const oldPreviousChoiceState = [...previousChoiceState];
       oldPreviousChoiceState[index] = !oldPreviousChoiceState[index];
       return oldPreviousChoiceState;
@@ -107,13 +107,13 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Box
               sx={{
                 display: "flex",
-                alignItems: "center",
+                alignItems: "center"
               }}
             >
               <NodeTypeIcon nodeType={node.nodeType} />

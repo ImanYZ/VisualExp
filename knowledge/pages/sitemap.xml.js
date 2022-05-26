@@ -17,7 +17,7 @@ export async function getServerSideProps({ res }) {
       .where("deleted", "==", false)
       .where("tags", "array-contains", {
         node: req.params.nodeId,
-        title: tagData.title,
+        title: tagData.title
       })
       .get();
     if (nodesDocs.docs.length === 0) {
@@ -43,7 +43,7 @@ export async function getServerSideProps({ res }) {
     }
   }
   return {
-    props: {},
+    props: {}
   };
 }
 
