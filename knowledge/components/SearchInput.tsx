@@ -47,10 +47,10 @@ const Search = styled("div")(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   borderColor: theme.palette.grey[500],
   "&:hover": {
-    backgroundColor: alpha(theme.palette.grey[300], 0.06),
+    backgroundColor: alpha(theme.palette.grey[300], 0.06)
   },
   marginLeft: 0,
-  width: "100%",
+  width: "100%"
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
@@ -60,7 +60,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   pointerEvents: "none",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "center"
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -70,8 +70,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create("width"),
-    width: "100%",
-  },
+    width: "100%"
+  }
 }));
 
 export default SearchInput;

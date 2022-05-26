@@ -1,9 +1,9 @@
-import Box from "@mui/material/Box";
-import { FC } from "react";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
-import Typography from "@mui/material/Typography";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import { FC } from "react";
 
 type Props = {
   corrects?: number;
@@ -19,14 +19,11 @@ const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            mr: 2,
+            mr: 2
           }}
         >
           <ThumbUpIcon fontSize="small" color="disabled" />
-          <Typography
-            sx={{ ml: 1, color: (theme) => theme.palette.text.disabled }}
-            color="disabled"
-          >
+          <Typography sx={{ ml: 1, color: theme => theme.palette.text.disabled }} color="disabled">
             {corrects}
           </Typography>
         </Box>
@@ -36,14 +33,11 @@ const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
           sx={{
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
+            alignItems: "center"
           }}
         >
           <ThumbDownIcon fontSize="small" color="disabled" />
-          <Typography
-            sx={{ ml: 1, color: (theme) => theme.palette.text.disabled }}
-            color="disabled"
-          >
+          <Typography sx={{ ml: 1, color: theme => theme.palette.text.disabled }} color="disabled">
             {wrongs}
           </Typography>
         </Box>
