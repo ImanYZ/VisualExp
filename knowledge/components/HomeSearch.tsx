@@ -1,10 +1,10 @@
-import { IconButton, Popover, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import SearchInput from "./SearchInput";
 import { SxProps, Theme } from "@mui/system";
-import { FC, useState } from "react";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { FC } from "react";
+
+import SearchInput from "./SearchInput";
 
 type Props = {
   sx?: SxProps<Theme>;
@@ -19,7 +19,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        ...sx,
+        ...sx
       }}
     >
       <Typography textAlign="center" variant="h2" component="h1">
@@ -33,7 +33,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
           width: "50%",
           my: 5,
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "row"
         }}
       >
         <SearchInput onSearch={onSearch}></SearchInput>

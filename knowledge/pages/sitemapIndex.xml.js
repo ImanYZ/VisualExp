@@ -1,15 +1,9 @@
-const EXTERNAL_DATA_URL = "https://jsonplaceholder.typicode.com/posts";
-
 function sitemapIndex() {
   // getServerSideProps will do the heavy lifting
 }
 
 export async function getServerSideProps({ res }) {
-  const nodesDocs = await db
-    .collection("nodes")
-    .where("deleted", "==", false)
-    .where("isTag", "==", true)
-    .get();
+  const nodesDocs = await db.collection("nodes").where("deleted", "==", false).where("isTag", "==", true).get();
   if (nodesDocs.docs.length === 0) {
     res.writeHeader(404, { "Content-Type": "text/xml" });
     res.write("No Sitemap Index!");
@@ -30,7 +24,7 @@ export async function getServerSideProps({ res }) {
     res.end();
   }
   return {
-    props: {},
+    props: {}
   };
 }
 
