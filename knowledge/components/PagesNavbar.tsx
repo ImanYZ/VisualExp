@@ -20,10 +20,9 @@ const PagesNavbar: FC<Props> = ({ children, title, description }) => {
         component="main"
         sx={{
           mt: "var(--navbar-height)",
-          minHeight:
-            "calc(100vh - var(--navbar-height) - var(--footer-height) )",
+          minHeight: "calc(100vh - var(--navbar-height) - var(--footer-height) )",
           py: 4,
-          px: { xs: 1, md: 2 },
+          px: { xs: 1, md: 2 }
         }}
       >
         {children}

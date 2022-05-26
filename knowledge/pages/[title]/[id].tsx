@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ re
   if (!nodeData) {
     return {
       // returns the default 404 page with a status code of 404
-      notFound: true,
+      notFound: true
     };
   }
   let keywords = "";
@@ -45,8 +45,8 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ re
       node: nodeData,
       keywords,
       updatedStr,
-      createdStr,
-    },
+      createdStr
+    }
   };
 };
 

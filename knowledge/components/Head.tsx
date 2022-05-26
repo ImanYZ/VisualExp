@@ -10,11 +10,11 @@ type Props = {
   children?: ReactNode;
 };
 
-const Head: FC<Props> = (props) => {
+const Head: FC<Props> = props => {
   const {
     description = "1Cademy Knowledge Graph Public Interface!",
     title = "1Cademy Knowledge Graph!",
-    children,
+    children
   } = props;
   const router = useRouter();
   const preview = `${HOST}/knowledge/DarkmodeLogo.png`;

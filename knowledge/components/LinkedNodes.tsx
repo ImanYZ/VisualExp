@@ -28,7 +28,7 @@ const LinkedNodes: FC<Props> = ({ data, header }) => {
   return (
     <Card>
       <CardHeader
-        sx={{ backgroundColor: (theme) => theme.palette.grey[100] }}
+        sx={{ backgroundColor: theme => theme.palette.grey[100] }}
         title={
           <Box sx={{ textAlign: "center" }}>
             <TypographyUnderlined variant="h5" gutterBottom align="center">

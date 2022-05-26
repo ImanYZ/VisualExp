@@ -1,6 +1,6 @@
 const ROUTES = {
   home: "/",
-  knowledge: "/knowledge",
+  knowledge: "/knowledge"
 };
 
 export default ROUTES;

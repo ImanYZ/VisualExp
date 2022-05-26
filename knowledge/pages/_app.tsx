@@ -21,8 +21,8 @@ function MyApp({ Component, pageProps }: AppProps) {
       ...brandingDesignTokens,
       palette: {
         ...brandingDesignTokens.palette,
-        mode: "light",
-      },
+        mode: "light"
+      }
     });
 
     nextTheme = deepmerge(nextTheme, getThemedComponents(nextTheme));
