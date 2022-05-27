@@ -1,5 +1,5 @@
 import createEmotionServer from "@emotion/server/create-instance";
-import Document, { DocumentContext, Head, Html, Main, NextScript } from "next/document";
+import Document, { Head, Html, Main, NextScript } from "next/document";
 import * as React from "react";
 
 import { getMetaThemeColor } from "../src/brandingTheme";
@@ -51,7 +51,7 @@ export default class MyDocument extends Document<{ emotionStyleTags: any }> {
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async (ctx: DocumentContext) => {
+MyDocument.getInitialProps = async ctx => {
   const originalRenderPage = ctx.renderPage;
 
   // You can consider sharing the same emotion cache between
@@ -63,7 +63,7 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: App =>
+      enhanceApp: (App: any) =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />;
         }
