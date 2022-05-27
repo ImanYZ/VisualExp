@@ -2,6 +2,7 @@ import React from "react";
 
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
+import { isEmpty } from "lodash";
 
 const GridCellToolTip = (props) => {
   if (Array.isArray(props.cellValues.value)) {
@@ -70,9 +71,10 @@ const GridCellToolTip = (props) => {
             overflow: "hidden",
           }}
         >
-          {isNaN(props.cellValues.value)
+          {(isNaN(props.cellValues.value) || props.cellValues.value ==="")
             ? props.cellValues.value
-            : Math.round((props.cellValues.value + Number.EPSILON) * 100) / 100}
+            : Math.round((props.cellValues.value + Number.EPSILON) * 100) / 100
+            }
         </div>
       )}
     </Tooltip>
