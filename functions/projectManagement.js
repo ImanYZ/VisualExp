@@ -1529,7 +1529,7 @@ exports.remindCalendarInvitations = async (context) => {
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
       let isActive = false;
-      for (let proj of researcherData.projects) {
+      for (let proj in researcherData.projects) {
         if (researcherData.projects[proj].active) {
           isActive = true;
         }
