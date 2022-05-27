@@ -8,6 +8,8 @@ import NodeHead from "../../components/NodeHead";
 import NodeItem from "../../components/NodeItem";
 import NodeItemContributors from "../../components/NodeItemContributors";
 import PagesNavbar from "../../components/PagesNavbar";
+import ReferencesList from "../../components/ReferencesList";
+import TagsList from "../../components/TagsList";
 import { getNodeData, logViews } from "../../lib/nodes";
 import { escapeBreaksQuotes } from "../../lib/utils";
 import { KnowledgeNode } from "../../src/knowledgeTypes";
@@ -65,6 +67,8 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
               <NodeItemContributors contributors={node.contributors || []} institutions={node.institutions || []} />
             }
           />
+          <ReferencesList references={node.references || []} sx={{ mt: 3 }} />
+          <TagsList tags={node.tags || []} sx={{ mt: 3 }} />
         </Grid>
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNodes data={node.children || []} header="Learn After" />

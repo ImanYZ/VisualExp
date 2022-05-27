@@ -6,6 +6,7 @@ import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import React, { FC } from "react";
 
+import { encodeTitle } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import LinkedNodeItem from "./LinkedNodeItem";
 import TypographyUnderlined from "./TypographyUnderlined";
@@ -19,7 +20,14 @@ const LinkedNodes: FC<Props> = ({ data, header }) => {
   const renderLinkedNodes = () => {
     return data.map((el, idx) => (
       <React.Fragment key={idx}>
-        <LinkedNodeItem node={el} />
+        <LinkedNodeItem
+          key={idx}
+          title={el.title || ""}
+          linkSrc={`../${encodeTitle(el.title)}/${el.node}`}
+          nodeType={el.nodeType}
+          nodeImageUrl={el.nodeImage}
+          nodeContent={el.content}
+        />
         <Divider />
       </React.Fragment>
     ));
