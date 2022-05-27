@@ -149,5 +149,5 @@ exports.assignNodeContributorsAndInstitutions = functions
     memory: "1GB",
     timeoutSeconds: 520,
   })
-  .pubsub.schedule("every 25 minutes")
+  .pubsub.schedule("every 25 hours")
   .onRun(assignNodeContributorsAndInstitutions);
