@@ -1,13 +1,15 @@
 import { grey } from "@mui/material/colors";
-import { ThemeOptions, Theme } from "@mui/material/styles";
+import { Theme, ThemeOptions } from "@mui/material/styles";
 
 declare module "@mui/material/styles/createPalette" {
   interface CommonColors {
     black: string;
     white: string;
     orange: string;
+    orangeLight: string;
     orangeDark: string;
     darkGrayBackground: string;
+    gray: string;
   }
 }
 
@@ -15,8 +17,10 @@ const common = {
   black: "#1a1a1a",
   white: "#ffffff",
   orange: "#ff8a33",
+  orangeLight: "#f9e2d1",
   orangeDark: "#ff6d00",
-  darkGrayBackground: "#28282A"
+  darkGrayBackground: "#28282A",
+  gray: "#D3D3D3"
 };
 
 const systemFont = [
@@ -56,7 +60,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
       divider: mode === "dark" ? grey[400] : grey[400],
       mode,
       background: {
-        default: "#f2f2f2",
+        default: "#F8F8F8",
         paper: common.white
       },
       ...(mode === "dark" && {
@@ -85,12 +89,14 @@ export const getDesignTokens = (mode: "light" | "dark") =>
     typography: {
       fontFamily: [...systemFont].join(","),
       fontFamilySystem: systemFont.join(","),
+      h3: {},
       button: {
         textTransform: "initial"
       }
     }
   } as ThemeOptions);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getThemedComponents(theme: Theme): {
   components: Theme["components"];
 } {
@@ -108,7 +114,7 @@ export function getThemedComponents(theme: Theme): {
         },
         styleOverrides: {
           containedPrimary: {
-            backgroundColor: common.orange,
+            backgroundColor: "common.orange",
             color: common.white
           }
         },
@@ -120,8 +126,44 @@ export function getThemedComponents(theme: Theme): {
                 backgroundColor: common.orangeDark
               }
             }
+          },
+          {
+            props: { variant: "contained" },
+            style: {
+              "&:hover, &.Mui-focusVisible": {
+                backgroundColor: common.orangeDark
+              }
+            }
           }
         ]
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            "&": {
+              color: common.black,
+              borderRadius: "40px",
+              border: "solid 2px",
+              borderColor: common.gray,
+              background: common.white
+            },
+            "&:hover": {
+              color: common.black,
+              background: common.orangeLight,
+              borderColor: common.orangeLight
+            },
+            "&.Mui-selected": {
+              color: common.white,
+              background: common.orange,
+              borderColor: common.orange
+            },
+            "&.Mui-selected:hover": {
+              color: common.black,
+              background: common.orangeLight,
+              borderColor: common.orangeLight
+            }
+          }
+        }
       },
       MuiAppBar: {
         styleOverrides: {
