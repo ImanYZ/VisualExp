@@ -1529,7 +1529,7 @@ exports.remindCalendarInvitations = async (context) => {
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
       let isActive = false;
-      for (let proj of researcherData.projects) {
+      for (let proj in researcherData.projects) {
         if (researcherData.projects[proj].active) {
           isActive = true;
         }
@@ -1741,7 +1741,7 @@ exports.remindCalendarInvitations = async (context) => {
       if (
         endTimeStamp < currentTime &&
         // Find the scheduled session corresponding to this event.
-        ev.id in scheduleIdx &&
+        ev.id in schedule &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
       ) {

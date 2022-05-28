@@ -1,3 +1,5 @@
+import { db } from "../lib/admin";
+
 function sitemapIndex() {
   // getServerSideProps will do the heavy lifting
 }
