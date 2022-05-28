@@ -28,7 +28,7 @@ type Props = {
 
 const NodeItem: FC<Props> = ({ node, contributors }) => {
   return (
-    <Card>
+    <Card sx={{ width: "100%", m: 0 }}>
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
