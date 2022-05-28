@@ -1741,7 +1741,7 @@ exports.remindCalendarInvitations = async (context) => {
       if (
         endTimeStamp < currentTime &&
         // Find the scheduled session corresponding to this event.
-        ev.id in scheduleIdx &&
+        ev.id in schedule &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
       ) {
