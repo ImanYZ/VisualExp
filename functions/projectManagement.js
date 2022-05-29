@@ -818,45 +818,63 @@ exports.voteInstructorReset = async (req, res) => {
 // The pseudocode is illustrated in
 exports.loadfeedbackCodes = async (req, res) => {
   try {
-    // The issue with our CSV files is that we do not have the users' identifiers.
-    // So, we need to retrieve all the users, then for each explanations, we should
-    // check which user it belongs to and get the index of that user to continue with.
+    // The issue with our CSV files is that we do not have the users'
+    // identifiers. So, we need to retrieve all the users, then for each
+    // explanations, we should check which user it belongs to and get the index
+    // of that user to continue with.
     let userDocs = await db.collection("users").get();
-    userDocs = userDocs.docs;
+    const usersData = {};
+    for (let userDoc of userDocs.docs) {
+      usersData[userDoc.id] = userDoc.data();
+    }
 
-    // Because the CSV files are specific to a question from a session, coder, and project,
-    // before opening each, we should specify the following parameter names that the CSV
-    // file is associated with.
+    // Because the CSV files are specific to a question from a session, coder,
+    // and project, before opening each, we should specify the following
+    // parameter names that the CSV file is associated with.
     const project = "H2K2";
-    const coders = ["Zoe Dunnum", "Jasmine Wu"];
-    const session = "1st";
+    const coders = ["Zoe Dunnum", "Jasmine Wu", "Shabana Gupta"];
     const expParameters = [
-      {
-        expIdx: 0,
-        columnName: "explanation1",
-        fieldName: "explanations",
-        filePath: "datasets/Experiment Data - Copy of Coding Q1 Phase 1.csv",
-      },
+      // {
+      //   expIdx: 0,
+      //   columnName: "explanation1",
+      //   session: "1st",
+      //   fieldName: "explanations",
+      //   choiceField: "postQ1Choice",
+      //   filePath: "datasets/Experiment Data - Copy of Coding Q1 Phase 1.csv",
+      // },
       {
         expIdx: 0,
         columnName: "explanation2",
+        session: "2nd",
         fieldName: "explanations3Days",
+        choiceField: "post3DaysQ1Choice",
         filePath: "datasets/Experiment Data - Copy of Coding Q1 Phase 2.csv",
       },
-      {
-        expIdx: 1,
-        columnName: "explanation2",
-        fieldName: "explanations",
-        filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 1.csv",
-      },
-      {
-        expIdx: 1,
-        columnName: "explanation2",
-        fieldName: "explanation2-3Days",
-        filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 2.csv",
-      },
+      // {
+      //   expIdx: 1,
+      //   columnName: "explanation2",
+      //   session: "1st",
+      //   fieldName: "explanations",
+      //   choiceField: "postQ2Choice",
+      //   filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 1.csv",
+      // },
+      // {
+      //   expIdx: 1,
+      //   columnName: "explanation2-3Days",
+      //   session: "2nd",
+      //   fieldName: "explanations3Days",
+      //   choiceField: "post3DaysQ2Choice",
+      //   filePath: "datasets/Experiment Data - Copy of Coding Q2 Phase 2.csv",
+      // },
     ];
-    for (let { expIdx, columnName, fieldName, filePath } of expParameters) {
+    for (let {
+      expIdx,
+      columnName,
+      session,
+      fieldName,
+      choiceField,
+      filePath,
+    } of expParameters) {
       const ws = fs.createReadStream(filePath);
       let rowIdx = 0;
       const parser = csv
@@ -871,35 +889,159 @@ exports.loadfeedbackCodes = async (req, res) => {
           // before continuing with the next row.
           parser.pause();
           if (row[columnName]) {
-            const explanation = row[columnName].replace(
-              /(\r\n|\n|\r|[ ])/gm,
-              ""
-            );
+            let explanation = row[columnName].replace(/(\r\n|\n|\r|[ ])/gm, "");
             // We should iterate through all the users to figure out which user this
-            // explanation belongs to and identify their userIndex.
-            let userIndex = -1;
-            for (let userIdx = 0; userIdx < userDocs.length; userIdx++) {
-              const userDoc = userDocs[userIdx];
-              const userData = userDoc.data();
-              if (userData[fieldName]) {
+            // explanation belongs to and identify their fullname.
+            let fullname = "";
+            for (let userId in usersData) {
+              if (
+                fieldName in usersData[userId] &&
+                usersData[userId][fieldName]
+              ) {
                 if (
-                  userData[fieldName][expIdx].replace(
+                  usersData[userId][fieldName][expIdx].replace(
                     /(\r\n|\n|\r|[ ])/gm,
                     ""
                   ) === explanation
                 ) {
-                  userIndex = userIdx;
+                  fullname = userId;
                   break;
                 }
               }
             }
-            if (userIndex === -1) {
+            if (fullname === "") {
               console.log({ explanation: row[columnName] });
             } else {
-              console.log("Found");
-              // const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-              // for (let coder of coders) {
-              // }
+              explanation = usersData[fullname][fieldName][expIdx];
+              const choice = usersData[fullname][choiceField];
+              await db.runTransaction(async (t) => {
+                // Accumulate all the transaction writes in an array to commit all of them
+                // after all the reads to abide by the Firestore transaction law
+                // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
+                const transactionWrites = [];
+                const currentTime = admin.firestore.Timestamp.fromDate(
+                  new Date()
+                );
+                // We have two coders (researchers) and we need to do the rest for
+                // each of the two coders.
+                for (let coder of coders) {
+                  const researcherRef = db.collection("researchers").doc(coder);
+                  const researcherDoc = await t.get(researcherRef);
+                  const researcherData = researcherDoc.data();
+                  const researcherUpdates = {
+                    projects: {
+                      ...researcherData.projects,
+                      [project]: {
+                        ...researcherData.projects[project],
+                      },
+                    },
+                  };
+                  for (let code in row) {
+                    if (
+                      ![
+                        "UserIndex",
+                        "postQ1Choice",
+                        "explanation1",
+                        "explanation2",
+                        "fullname",
+                        "postQ2Choice",
+                        "postQ2Choice-3Days",
+                        "explanation2-3Days",
+                      ].includes(code) &&
+                      !["", "0", 0].includes(row[code])
+                    ) {
+                      const feedbackCodeBookQuery = db
+                        .collection("feedbackCodeBooks")
+                        .where("code", "==", code);
+                      const feedbackCodeBookDocs = await t.get(
+                        feedbackCodeBookQuery
+                      );
+                      if (feedbackCodeBookDocs.docs.length === 0) {
+                        const feedbackCodeBookRef = db
+                          .collection("feedbackCodeBooks")
+                          .doc();
+                        transactionWrites.push({
+                          type: "set",
+                          objRef: feedbackCodeBookRef,
+                          obj: {
+                            code,
+                            coder,
+                            createdAt: currentTime,
+                          },
+                        });
+                        if (
+                          "codesGenerated" in
+                          researcherUpdates.projects[project]
+                        ) {
+                          researcherUpdates.projects[
+                            project
+                          ].codesGenerated += 1;
+                        } else {
+                          researcherUpdates.projects[
+                            project
+                          ].codesGenerated = 1;
+                        }
+                      }
+                      if ("codesNum" in researcherUpdates.projects[project]) {
+                        researcherUpdates.projects[project].codesNum += 1;
+                      } else {
+                        researcherUpdates.projects[project].codesNum = 1;
+                      }
+                      const feedbackCodeQuery = db
+                        .collection("feedbackCodes")
+                        .where("explanation", "==", explanation)
+                        .where("code", "==", code)
+                        .where("choice", "==", choice)
+                        .where("expIdx", "==", expIdx)
+                        .where("session", "==", session);
+                      const feedbackCodeDocs = await t.get(feedbackCodeQuery);
+                      let approved = false;
+                      if (feedbackCodeDocs.docs.length >= 2) {
+                        approved = true;
+                        if (
+                          "codesPoints" in researcherUpdates.projects[project]
+                        ) {
+                          researcherUpdates.projects[project].codesPoints += 1;
+                        } else {
+                          researcherUpdates.projects[project].codesPoints = 1;
+                        }
+                      }
+                      const feedbackCodeRef = db
+                        .collection("feedbackCodes")
+                        .doc();
+                      transactionWrites.push({
+                        type: "set",
+                        objRef: feedbackCodeRef,
+                        obj: {
+                          coder,
+                          code,
+                          choice,
+                          approved,
+                          project,
+                          fullname,
+                          session,
+                          expIdx,
+                          explanation,
+                          quotes: [],
+                          createdAt: currentTime,
+                        },
+                      });
+                    }
+                  }
+                  transactionWrites.push({
+                    type: "update",
+                    objRef: researcherRef,
+                    obj: researcherUpdates,
+                  });
+                }
+                for (let transWrite of transactionWrites) {
+                  if (transWrite.type === "set") {
+                    t.set(transWrite.objRef, transWrite.obj);
+                  } else if (transWrite.type === "update") {
+                    t.update(transWrite.objRef, transWrite.obj);
+                  }
+                }
+              });
             }
           }
           rowIdx += 1;
@@ -1696,7 +1838,7 @@ exports.remindCalendarInvitations = async (context) => {
                   if (order === "3rd" && !participant.secondDone) {
                     // Delete the 3rd session, because logically they should not go through
                     // the 3rd session without completing the 2nd one.
-                    deleteEvent(ev.id);
+                    await deleteEvent(ev.id);
                     // Also, remove the Calendar event id and order from their schedule doc.
                     const scheduleRef = db
                       .collection("schedule")
@@ -1805,7 +1947,7 @@ exports.remindCalendarInvitations = async (context) => {
                 // If it's their 3rd session, but they did not complete their 2nd session:
                 // Delete the 3rd session, because logically they should not go through
                 // the 3rd session without completing the 2nd one.
-                deleteEvent(ev.id);
+                await deleteEvent(ev.id);
                 // Also, remove the Calendar event id and order from their schedule doc.
                 const scheduleRef = db
                   .collection("schedule")
