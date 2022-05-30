@@ -2,3 +2,7 @@
   --navbar-height: 76px;
   --footer-height: 76px;
 }
+
+.react-markdown p {
+  margin: 0px;
+}
