@@ -72,9 +72,6 @@ export const getDesignTokens = (mode: "light" | "dark") =>
         }
       })
     },
-    shape: {
-      borderRadius: 10
-    },
     typography: {
       fontFamily: [...systemFont].join(","),
       fontFamilySystem: systemFont.join(","),
