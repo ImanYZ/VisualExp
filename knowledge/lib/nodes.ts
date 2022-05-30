@@ -68,7 +68,7 @@ const convertDateFieldsToString = (
 
 const getNodeReferences = (nodeData: NodeFireStore) => {
   const references: { node: string; title?: string; label: string }[] = [];
-  //The "references" field in the DB can be an array of objects or an array of strings
+  //The "references" field in the DB can be an array ofra objects or an array of strings
   if (typeof (nodeData.references || [])[0] !== "object") {
     //In this case the field is an array of strings
     const referenceIds = nodeData.referenceIds || [];
