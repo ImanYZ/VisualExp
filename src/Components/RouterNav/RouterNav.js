@@ -705,7 +705,6 @@ const RouterNav = (props) => {
   };
 
   const handleProfileMenuOpen = (event) => {
-    console.log(event);
     setProfileMenuOpen(event.currentTarget);
   };
 
