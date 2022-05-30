@@ -34,9 +34,10 @@ export default class MyDocument extends Document {
           <meta httpEquiv="x-dns-prefetch-control" content="off" />
           {/* PWA primary color */}
           <link
-            href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
             rel="stylesheet"
           ></link>
+
           {/* Inject MUI styles first to match with the prepend: true configuration. */}
           {this.props.emotionStyleTags}
         </Head>
