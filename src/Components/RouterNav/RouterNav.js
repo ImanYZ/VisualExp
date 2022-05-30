@@ -2,14 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { useNavigate, Outlet } from "react-router-dom";
 
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
+import { AppBar, Toolbar, IconButton, Tooltip, Menu, MenuItem, Box, Grid, Button } from "@mui/material";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -702,6 +695,7 @@ const RouterNav = (props) => {
   };
 
   const handleProfileMenuOpen = (event) => {
+    console.log(event);
     setProfileMenuOpen(event.currentTarget);
   };
 
@@ -741,14 +735,14 @@ const RouterNav = (props) => {
       anchorEl={profileMenuOpen}
       open={isProfileMenuOpen}
       onClose={handleProfileMenuClose}
-      style={{ float: "right" }}
+      onClick={handleProfileMenuClose}
+      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
     >
       {fullname && <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>}
-      {fullname && (
-        <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
-          <LogoutIcon /> <span id="LogoutText">Logout</span>
-        </MenuItem>
-      )}
+      <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
+        <LogoutIcon /> <span id="LogoutText">Logout</span>
+      </MenuItem>
     </Menu>
   );
 
@@ -760,278 +754,280 @@ const RouterNav = (props) => {
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
-              <Tooltip title="University of Michigan - School of Information sponsors this research project.">
-                <IconButton
-                  id="UMICH_Logo"
-                  size="large"
-                  edge="start"
-                  sx={{ mr: 4 }}
-                  onClick={goToUMSI}
-                >
-                  <img
-                    src={UMSI_Logo_Dark}
-                    alt="University of Michigan, School of Information Logo"
-                    width="43px"
-                  />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Google Cloud sponsors this research project.">
-                <IconButton
-                  size="large"
-                  edge="start"
-                  sx={{ mr: 4 }}
-                  onClick={goToGCloud}
-                >
-                  <div id="GCloud_Logo">
-                    <img
-                      src={GCloud_Logo}
-                      alt="Google Cloud Logo"
-                      width="49px"
-                    />
-                  </div>
-                </IconButton>
-              </Tooltip>
-              {projects.length > 0 && (
-                <>
-                  <Box
-                    sx={{
-                      ml: "-25px",
-                      mr: "10px",
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "4px",
-                    }}
-                  >
-                    <Tooltip
-                      title={`You've submitted ${
-                        proposalsNums[username]
+              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Grid>
+                  <Tooltip title="University of Michigan - School of Information sponsors this research project.">
+                    <IconButton
+                      id="UMICH_Logo"
+                      size="large"
+                      edge="start"
+                      sx={{ mr: 4 }}
+                      onClick={goToUMSI}
+                    >
+                      <img
+                        src={UMSI_Logo_Dark}
+                        alt="University of Michigan, School of Information Logo"
+                        width="43px"
+                      />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Google Cloud sponsors this research project.">
+                    <IconButton
+                      size="large"
+                      edge="start"
+                      sx={{ mr: 4 }}
+                      onClick={goToGCloud}
+                    >
+                      <div id="GCloud_Logo">
+                        <img
+                          src={GCloud_Logo}
+                          alt="Google Cloud Logo"
+                          width="49px"
+                        />
+                      </div>
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                {projects.length > 0 && (
+                  <>
+                    <Box
+                      sx={{
+                        ml: "-25px",
+                        mr: "10px",
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "4px",
+                      }}
+                    >
+                      <Tooltip
+                        title={`You've submitted ${proposalsNums[username]
                           ? proposalsNums[username].num
                           : ""
-                      } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                      >
+                        <Box>
+                          # of{" "}
+                          <img
+                            src={favicon}
+                            width="15.1"
+                            style={{ margin: "0px 4px 0px 4px" }}
+                          />
+                          :
+                        </Box>
+                      </Tooltip>
+                      <Tooltip
+                        title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                      >
+                        <Box># of 👨‍🏫:</Box>
+                      </Tooltip>
+                      <Tooltip
+                        title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                      >
+                        <Box># of 🧠:</Box>
+                      </Tooltip>
+                    </Box>
+                    <Box
+                      sx={{
+                        flexGrow: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        rowGap: "25px",
+                      }}
                     >
-                      <Box>
-                        # of{" "}
-                        <img
-                          src={favicon}
-                          width="15.1"
-                          style={{ margin: "0px 4px 0px 4px" }}
-                        />
-                        :
-                      </Box>
+                      <LineDiagram
+                        obj={proposalsNums}
+                        username={username}
+                        lineDiagramTooltip={lineDiagramTooltip("proposals")}
+                      ></LineDiagram>
+                      <LineDiagram
+                        obj={instructorsNum}
+                        username={fullname}
+                        lineDiagramTooltip={lineDiagramTooltip("instructors")}
+                      ></LineDiagram>
+                      <LineDiagram
+                        obj={gradingNums}
+                        username={fullname}
+                        lineDiagramTooltip={lineDiagramTooltip("grading")}
+                      ></LineDiagram>
+                    </Box>
+                    <Tooltip
+                      title={
+                        <div>
+                          <div>
+                            You've earned {expPoints} points from running
+                            experiments.
+                          </div>
+                        </div>
+                      }
+                    >
+                      <Button
+                        id="ExperimentPoints"
+                        className={
+                          activePage === "Experiments"
+                            ? "ActiveNavLink"
+                            : "NavLink"
+                        }
+                        onClick={(event) => navigate("/Activities/Experiments")}
+                        style={{ marginLeft: "19px" }}
+                      >
+                        <div>
+                          <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
+                        </div>
+                      </Button>
                     </Tooltip>
                     <Tooltip
-                      title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                      title={
+                        <div>
+                          <div>
+                            You've earned {oneCademyPoints + dayOneUpVotes} total
+                            1Cademy points, including {oneCademyPoints} from
+                            others' votes and {dayOneUpVotes} points for casting
+                            25 upvotes per day on others' proposals.
+                          </div>
+                          <div>
+                            You cast {proposalUpvotesToday} / 25 up-votes today on
+                            others' 1Cademy proposals.
+                          </div>
+                        </div>
+                      }
                     >
-                      <Box># of 👨‍🏫:</Box>
+                      <Button
+                        id="OneCademyPoints"
+                        className={
+                          activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"
+                        }
+                        onClick={(event) => navigate("/Activities/1Cademy")}
+                      >
+                        {username ? (
+                          <div>
+                            <img src={favicon} width="15.1" />{" "}
+                            {oneCademyPoints + dayOneUpVotes}
+                            <br />✔ {oneCademyPoints}
+                            <br />
+                            <span>🌞 {proposalUpvotesToday} / 25</span>
+                          </div>
+                        ) : (
+                          <div>
+                            Click here to log <br />
+                            in to 1Cademy to <br />
+                            show your points.
+                          </div>
+                        )}
+                      </Button>
                     </Tooltip>
                     <Tooltip
-                      title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
-                    >
-                      <Box># of 🧠:</Box>
-                    </Tooltip>
-                  </Box>
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "25px",
-                    }}
-                  >
-                    <LineDiagram
-                      obj={proposalsNums}
-                      username={username}
-                      lineDiagramTooltip={lineDiagramTooltip("proposals")}
-                    ></LineDiagram>
-                    <LineDiagram
-                      obj={instructorsNum}
-                      username={fullname}
-                      lineDiagramTooltip={lineDiagramTooltip("instructors")}
-                    ></LineDiagram>
-                    <LineDiagram
-                      obj={gradingNums}
-                      username={fullname}
-                      lineDiagramTooltip={lineDiagramTooltip("grading")}
-                    ></LineDiagram>
-                  </Box>
-                  <Tooltip
-                    title={
-                      <div>
+                      title={
                         <div>
-                          You've earned {expPoints} points from running
-                          experiments.
+                          <div>
+                            You've earned {intellectualPoints} intellectual points
+                            from others' votes and {upVotedDays} points for
+                            casting 25 upvotes per day on others' activities.
+                          </div>
+                          <div>
+                            You cast {upVotedToday} / 25 up-votes today on others'
+                            activities.
+                          </div>
                         </div>
-                      </div>
-                    }
-                  >
-                    <Button
-                      id="ExperimentPoints"
-                      className={
-                        activePage === "Experiments"
-                          ? "ActiveNavLink"
-                          : "NavLink"
                       }
-                      onClick={(event) => navigate("/Activities/Experiments")}
-                      style={{ marginLeft: "19px" }}
                     >
-                      <div>
-                        <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
-                      </div>
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      <div>
+                      <Button
+                        id="IntellectualPoints"
+                        className={
+                          activePage === "Intellectual"
+                            ? "ActiveNavLink"
+                            : "NavLink"
+                        }
+                        onClick={(event) => navigate("/Activities/Intellectual")}
+                      >
                         <div>
-                          You've earned {oneCademyPoints + dayOneUpVotes} total
-                          1Cademy points, including {oneCademyPoints} from
-                          others' votes and {dayOneUpVotes} points for casting
-                          25 upvotes per day on others' proposals.
-                        </div>
-                        <div>
-                          You cast {proposalUpvotesToday} / 25 up-votes today on
-                          others' 1Cademy proposals.
-                        </div>
-                      </div>
-                    }
-                  >
-                    <Button
-                      id="OneCademyPoints"
-                      className={
-                        activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"
-                      }
-                      onClick={(event) => navigate("/Activities/1Cademy")}
-                    >
-                      {username ? (
-                        <div>
-                          <img src={favicon} width="15.1" />{" "}
-                          {oneCademyPoints + dayOneUpVotes}
-                          <br />✔ {oneCademyPoints}
+                          <span>
+                            🎓 {intellectualPoints}
+                            <br />✔ {upVotedDays}
+                          </span>
                           <br />
-                          <span>🌞 {proposalUpvotesToday} / 25</span>
+                          <span>🌞 {upVotedToday} / 25</span>
                         </div>
-                      ) : (
+                      </Button>
+                    </Tooltip>
+                    <Tooltip
+                      title={
                         <div>
-                          Click here to log <br />
-                          in to 1Cademy to <br />
-                          show your points.
+                          <div>
+                            You've earned{" "}
+                            {instructorPoints + dayInstructorUpVotes} total
+                            points, including {instructorPoints} points for
+                            collecting instructors/administrators' contact info
+                            and {dayInstructorUpVotes} points for casting 25
+                            up-voting per day on other's collected data.
+                          </div>
+                          <div>
+                            You collected {instructorsToday} / 7
+                            instructors/administrators' info today.
+                          </div>
+                          <div>
+                            You cast {upvotedInstructorsToday} / 16 up-votes today
+                            on others' collected instructors/administrators' data.
+                          </div>
                         </div>
-                      )}
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      <div>
-                        <div>
-                          You've earned {intellectualPoints} intellectual points
-                          from others' votes and {upVotedDays} points for
-                          casting 25 upvotes per day on others' activities.
-                        </div>
-                        <div>
-                          You cast {upVotedToday} / 25 up-votes today on others'
-                          activities.
-                        </div>
-                      </div>
-                    }
-                  >
-                    <Button
-                      id="IntellectualPoints"
-                      className={
-                        activePage === "Intellectual"
-                          ? "ActiveNavLink"
-                          : "NavLink"
-                      }
-                      onClick={(event) => navigate("/Activities/Intellectual")}
-                    >
-                      <div>
-                        <span>
-                          🎓 {intellectualPoints}
-                          <br />✔ {upVotedDays}
-                        </span>
-                        <br />
-                        <span>🌞 {upVotedToday} / 25</span>
-                      </div>
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      <div>
-                        <div>
-                          You've earned{" "}
-                          {instructorPoints + dayInstructorUpVotes} total
-                          points, including {instructorPoints} points for
-                          collecting instructors/administrators' contact info
-                          and {dayInstructorUpVotes} points for casting 25
-                          up-voting per day on other's collected data.
-                        </div>
-                        <div>
-                          You collected {instructorsToday} / 7
-                          instructors/administrators' info today.
-                        </div>
-                        <div>
-                          You cast {upvotedInstructorsToday} / 16 up-votes today
-                          on others' collected instructors/administrators' data.
-                        </div>
-                      </div>
-                    }
-                  >
-                    <Button
-                      id="InstructorPoints"
-                      className={
-                        activePage === "AddInstructor"
-                          ? "ActiveNavLink"
-                          : "NavLink"
-                      }
-                      onClick={(event) => navigate("/Activities/AddInstructor")}
-                    >
-                      👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
-                      {instructorsToday} / 7
-                      <br /> ✅ {upvotedInstructorsToday} / 16
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      <div>
-                        <div>
-                          You've earned {gradingPoints} total 🧠 free-recall
-                          grading points.
-                        </div>
-                        <div>
-                          This means, {gradingPoints} times at least 3 other
-                          researchers have agreed with you on existance or
-                          non-existance of a specific phrase in a free-recall
-                          response.
-                        </div>
-                        <div>
-                          From that total 🧠 points, we've already excluded your
-                          negative {negativeGradingPoints} 🧟 points.
-                        </div>
-                        <div>
-                          This means, 2 x {negativeGradingPoints} times exactly
-                          3 out of 4 researchers agreed on existance
-                          (non-existance) of a specific key phrase in a
-                          free-recall response by a participant, but you opposed
-                          their majority of votes. So, you got a 0.5 🧟 negative
-                          point for each of those cases.
-                        </div>
-                      </div>
-                    }
-                  >
-                    <Button
-                      id="FreeRecallGrading"
-                      className={
-                        activePage === "FreeRecallGrading"
-                          ? "ActiveNavLink"
-                          : "NavLink"
-                      }
-                      onClick={(event) =>
-                        navigate("/Activities/FreeRecallGrading")
                       }
                     >
-                      🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
-                    </Button>
-                  </Tooltip>
-                  {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
+                      <Button
+                        id="InstructorPoints"
+                        className={
+                          activePage === "AddInstructor"
+                            ? "ActiveNavLink"
+                            : "NavLink"
+                        }
+                        onClick={(event) => navigate("/Activities/AddInstructor")}
+                      >
+                        👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
+                        {instructorsToday} / 7
+                        <br /> ✅ {upvotedInstructorsToday} / 16
+                      </Button>
+                    </Tooltip>
+                    <Tooltip
+                      title={
+                        <div>
+                          <div>
+                            You've earned {gradingPoints} total 🧠 free-recall
+                            grading points.
+                          </div>
+                          <div>
+                            This means, {gradingPoints} times at least 3 other
+                            researchers have agreed with you on existance or
+                            non-existance of a specific phrase in a free-recall
+                            response.
+                          </div>
+                          <div>
+                            From that total 🧠 points, we've already excluded your
+                            negative {negativeGradingPoints} 🧟 points.
+                          </div>
+                          <div>
+                            This means, 2 x {negativeGradingPoints} times exactly
+                            3 out of 4 researchers agreed on existance
+                            (non-existance) of a specific key phrase in a
+                            free-recall response by a participant, but you opposed
+                            their majority of votes. So, you got a 0.5 🧟 negative
+                            point for each of those cases.
+                          </div>
+                        </div>
+                      }
+                    >
+                      <Button
+                        id="FreeRecallGrading"
+                        className={
+                          activePage === "FreeRecallGrading"
+                            ? "ActiveNavLink"
+                            : "NavLink"
+                        }
+                        onClick={(event) =>
+                          navigate("/Activities/FreeRecallGrading")
+                        }
+                      >
+                        🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
+                      </Button>
+                    </Tooltip>
+                    {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
                       <Button
@@ -1048,10 +1044,9 @@ const RouterNav = (props) => {
                       </Button>
                     </Tooltip>
                   </Box> */}
-                </>
-              )}
-              {fullname && (
-                <Box>
+                  </>
+                )}
+                {fullname && (
                   <Tooltip title="Account">
                     <IconButton
                       size="large"
@@ -1066,8 +1061,8 @@ const RouterNav = (props) => {
                       <AccountCircle />
                     </IconButton>
                   </Tooltip>
-                </Box>
-              )}
+                )}
+              </Box>
             </Toolbar>
           </AppBar>
           {/* {projects.length > 0 && renderProjectsMenu} */}
