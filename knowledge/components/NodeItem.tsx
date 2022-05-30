@@ -1,4 +1,4 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Avatar, Button, Collapse, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -15,7 +15,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
 import { FC, ReactNode, useState } from "react";
 
-import { KnowledgeNode, KnowledgeNodeContributor } from "../src/knowledgeTypes";
+import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
@@ -23,29 +23,13 @@ import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
-const CONTRIBUTORS: KnowledgeNodeContributor[] = [
-  {
-    username: "Maria",
-    imageUrl: "https://lenstax.com/auth/app-assets/images/profile/user-uploads/user-04.jpg"
-  },
-  {
-    username: "Juan",
-    imageUrl: "https://preview.keenthemes.com/metronic-v4/theme_rtl/assets/pages/media/profile/profile_user.jpg"
-  }
-];
-
-const TAGS: { node: string; title?: string; label?: string }[] = [
-  { node: "", title: "tag 1", label: "tag1" },
-  { node: "", title: "tag 2", label: "tag2" },
-  { node: "", title: "tag 3", label: "tag3" }
-];
-
 type Props = {
   node: KnowledgeNode;
   contributors?: ReactNode;
 };
 
 const NodeItem: FC<Props> = ({ node }) => {
+  // console.log(node)
   const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = () => {
@@ -59,10 +43,11 @@ const NodeItem: FC<Props> = ({ node }) => {
         aria-expanded={expanded}
         aria-label="show more"
         sx={{
-          transform: !expand ? "rotate(0deg)" : "rotate(180deg)"
+          transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
+          color: theme => theme.palette.common.black
         }}
       >
-        <ExpandMoreIcon />
+        <ArrowDropDownIcon />
       </Button>
     );
   };
@@ -116,35 +101,38 @@ const NodeItem: FC<Props> = ({ node }) => {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           <Box py={1}>
-            {TAGS.map((tag, idx) => (
-              <Chip key={idx} label={tag.title} sx={{ marginRight: "10px" }} />
-            ))}
+            {node.tags &&
+              node.tags.map((tag, idx) => (
+                <Chip key={idx} label={tag.title} sx={{ marginRight: "10px", marginBottom: "8px" }} />
+              ))}
           </Box>
           <Grid container spacing={2} py={1}>
             <Grid item xs={6}>
               <Box>
-                {CONTRIBUTORS.map((contributor, idx) => (
-                  <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                    <Avatar
-                      alt="Image contributor"
-                      src={contributor.imageUrl}
-                      sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
-                    />
-                  </Box>
-                ))}
+                {node.contributors &&
+                  node.contributors.map((contributor, idx) => (
+                    <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
+                      <Avatar
+                        alt="Image contributor"
+                        src={contributor.imageUrl}
+                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
+                      />
+                    </Box>
+                  ))}
               </Box>
             </Grid>
             <Grid item xs={6}>
               <Box>
-                {CONTRIBUTORS.map((contributor, idx) => (
-                  <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                    <Avatar
-                      alt="Image contributor"
-                      src={contributor.imageUrl}
-                      sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
-                    />
-                  </Box>
-                ))}
+                {node.institutions &&
+                  node.institutions.map((institution, idx) => (
+                    <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
+                      <Avatar
+                        alt="Image contributor"
+                        src={institution.logoURL}
+                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
+                      />
+                    </Box>
+                  ))}
               </Box>
             </Grid>
           </Grid>
