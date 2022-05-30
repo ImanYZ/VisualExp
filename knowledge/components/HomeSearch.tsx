@@ -17,6 +17,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
       sx={{
         margin: "auto",
         maxWidth: "1087px",
+        padding: "30px",
         flexDirection: "column",
         display: "flex",
         alignItems: "center",
@@ -29,7 +30,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
         variant="h3"
         component="h1"
         fontWeight="500"
-        sx={{ marginBottom: 3, fontSize: { xs: "23px", md: "50px" } }}
+        sx={{ marginBottom: { xs: 1, md: 3 }, fontSize: { xs: "23px", md: "50px" } }}
       >
         What you want to learn today?
       </Typography>
@@ -38,14 +39,14 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
         variant="h5"
         component="h2"
         fontWeight="300"
-        sx={{ marginBottom: 3, fontSize: { xs: "13px", md: "25px" } }}
+        sx={{ marginBottom: { xs: 1, md: 3 }, fontSize: { xs: "13px", md: "25px" } }}
       >
         Explore hundreds of knowledge articles shared by the academic community
       </Typography>
       <Box
         sx={{
           width: "100%",
-          my: { xs: 2, md: 7 },
+          my: { xs: "10px", md: 7 },
           display: "flex",
           flexDirection: "row"
         }}
@@ -64,7 +65,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
     color: theme.palette.common.white,
     borderRadius: 0,
     fontSize: 15,
-    fontWeight: 300
+    fontWeight: 500
   },
   "@media (min-width:600px)": {
     "&": {

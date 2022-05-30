@@ -23,18 +23,7 @@ const common = {
   gray: "#D3D3D3"
 };
 
-const systemFont = [
-  "Work Sans",
-  "-apple-system",
-  "BlinkMacSystemFont",
-  '"Segoe UI"',
-  '"Helvetica Neue"',
-  "Arial",
-  "sans-serif",
-  '"Apple Color Emoji"',
-  '"Segoe UI Emoji"',
-  '"Segoe UI Symbol"'
-];
+const systemFont = ["Roboto", "sans-serif"];
 
 export const getMetaThemeColor = (mode: "light" | "dark") => {
   const themeColor = {
@@ -162,6 +151,11 @@ export function getThemedComponents(theme: Theme): {
               background: common.orangeLight,
               borderColor: common.orangeLight
             }
+          },
+          sizeSmall: {
+            fontSize: "12px",
+            fontWeight: "400",
+            padding: "6px 16px"
           }
         }
       },

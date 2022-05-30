@@ -41,7 +41,7 @@ const HomePage: NextPage<Props> = ({ data }) => {
 
   return (
     <PagesNavbar>
-      <HomeSearch sx={{ mb: 5 }} onSearch={handleSearch}></HomeSearch>
+      <HomeSearch sx={{ mb: 1 }} onSearch={handleSearch}></HomeSearch>
       <HomeFilter></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <Stack
@@ -55,7 +55,13 @@ const HomePage: NextPage<Props> = ({ data }) => {
           <Typography variant="h5" pr="10px" sx={{ fontSize: { xs: "14.5px", md: "20px" } }}>
             Sort by:
           </Typography>
-          <Stack direction="row" alignItems="center" justifyContent="space-between" maxWidth="420px">
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            gap="10px"
+            sx={{ width: { xs: "400px", md: "350px" } }}
+          >
             <ToggleButton
               value="check"
               selected={sortedByUpvotes}
@@ -63,7 +69,7 @@ const HomePage: NextPage<Props> = ({ data }) => {
               onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
               aria-label="list"
             >
-              <Typography>Upvotes</Typography>
+              Upvotes
             </ToggleButton>
             <ToggleButton
               value="check"
@@ -72,16 +78,16 @@ const HomePage: NextPage<Props> = ({ data }) => {
               onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
               aria-label="list"
             >
-              <Typography>Most Recent</Typography>
+              Most Recent
             </ToggleButton>
-            <FormControl sx={{ m: 1, minWidth: 120 }}>
+            <FormControl sx={{ minWidth: 120 }}>
               <Select
                 value={sortedByTime}
                 onChange={handleSortBy}
                 displayEmpty
                 inputProps={{ "aria-label": "Without label" }}
                 size="small"
-                sx={{ borderRadius: "40px", background: theme => theme.palette.common.white }}
+                sx={{ borderRadius: "40px", background: theme => theme.palette.common.white, fontSize: "12px" }}
               >
                 {SortedByTimeOptions.map((SortedByTimeOption, idx) => (
                   <MenuItem value={SortedByTimeOption} key={idx}>
