@@ -159,7 +159,7 @@ export default [
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
-      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+      `Fluency in writing and reading in English`,
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
@@ -330,7 +330,7 @@ export default [
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
-      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+      `Fluency in writing and reading in English`,
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
@@ -856,7 +856,7 @@ export default [
       },
     ],
     YouTube: "B6q-LYXvNCg",
-    description: `We study the UX Research and Cognitive Psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
     accomplishments: "",
     gains: [
       `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
@@ -871,7 +871,7 @@ export default [
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to behavioral economics or social psychology`,
-      `Fluency in writing and reading in English (will have to read and write a lot of research articles)`,
+      `Fluency in writing and reading in English`,
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
