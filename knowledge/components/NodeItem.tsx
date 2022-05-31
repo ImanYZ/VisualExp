@@ -63,16 +63,6 @@ const NodeItem: FC<Props> = ({ node }) => {
           </NextLink>
         }
       ></CardHeader>
-      <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
-        {node.updatedAt && (
-          <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
-            <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-              {dayjs(new Date(node.updatedAt)).fromNow()}
-            </Typography>
-          </Tooltip>
-        )}
-        <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
-      </Box>
 
       <CardContent>
         <Typography variant="body1" color="text.secondary" component="div">
@@ -87,12 +77,17 @@ const NodeItem: FC<Props> = ({ node }) => {
         <Box
           sx={{ display: "flex", flexDirection: "row", flex: 1, justifyContent: "space-between", alignItems: "center" }}
         >
-          <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h6" component="a" sx={{ fontWeight: "400" }}>
-              Learn more
-            </Link>
-          </NextLink>
-          <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+          <Box sx={{ display: "flex", flex: 1, justifyContent: "space-between" }}>
+            <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
+              <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
+              {node.updatedAt && (
+                <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
+                  <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
+                    {dayjs(new Date(node.updatedAt)).fromNow()}
+                  </Typography>
+                </Tooltip>
+              )}
+            </Box>
             <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
           </Box>
           <ExpandMore expand={expanded} />
