@@ -112,3 +112,8 @@ export type ResponseAutocompleteTags = {
   results?: string[];
   errorMessage?: string;
 };
+
+export type ResponseAutocompleteInstitutions = {
+  results?: string[];
+  errorMessage?: string;
+};
