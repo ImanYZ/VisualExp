@@ -3,9 +3,9 @@ import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { getQueryParameter } from "../../lib/utils";
-import { ResponseAutocompleteTags } from "../../src/knowledgeTypes";
+import { ResponseAutocompleteInstitutions } from "../../src/knowledgeTypes";
 
-async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteTags>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteInstitutions>) {
   const q = getQueryParameter(req.query.q) || "";
 
   if (!q) {
@@ -24,12 +24,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocom
 
   try {
     const searchParameters: SearchParams = { q, query_by: "name" };
-    const searchResults = await client.collections<{ name: string }>("tags").documents().search(searchParameters);
-    const tags = searchResults.hits?.map(el => el.document.name);
-    res.status(200).json({ results: tags || [] });
+    const searchResults = await client
+      .collections<{ name: string }>("institutions")
+      .documents()
+      .search(searchParameters);
+    const institutions = searchResults.hits?.map(el => el.document.name);
+    res.status(200).json({ results: institutions || [] });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ errorMessage: "Cannot get tags" });
+    res.status(500).json({ errorMessage: "Cannot get institutions" });
   }
 }
 

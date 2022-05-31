@@ -9,6 +9,7 @@ import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useMemo, useState } from "react";
 import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
 import createEmotionCache from "../src/createEmotionCache";
@@ -54,6 +55,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </ThemeProvider>
         </CacheProvider>
       </Hydrate>
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 }

@@ -124,3 +124,8 @@ export type TypesenseNodesSchema = {
   corrects: number;
   updatedAt: number;
 };
+
+export type ResponseAutocompleteInstitutions = {
+  results?: string[];
+  errorMessage?: string;
+};
