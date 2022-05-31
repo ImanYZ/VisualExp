@@ -8,11 +8,12 @@ import Head from "./Head";
 
 type Props = {
   children: ReactNode;
+  headingComponent: ReactNode | null;
   title?: string;
   description?: string;
 };
 
-const PagesNavbar: FC<Props> = ({ children, title, description }) => {
+const PagesNavbar: FC<Props> = ({ children, title, description, headingComponent = null }) => {
   const [showMenu, setShowMenu] = useState(false);
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
@@ -22,6 +23,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description }) => {
       <Head title={title} description={description} />
       <AppHeaderNavbar showMenu={showMenu} onCloseMenu={onCloseMenu} onShowMenu={onShowMenu} />
       {showMenu && <AppMenuMovil />}
+      {headingComponent}
       <Box
         component="main"
         sx={{
