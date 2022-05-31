@@ -5,8 +5,8 @@ import { ParsedUrlQuery } from "querystring";
 
 import LinkedNodes from "../../components/LinkedNodes";
 import NodeHead from "../../components/NodeHead";
-import NodeItem from "../../components/NodeItem";
 import NodeItemContributors from "../../components/NodeItemContributors";
+import NodeItemFull from "../../components/NodeItemFull";
 import PagesNavbar from "../../components/PagesNavbar";
 import ReferencesList from "../../components/ReferencesList";
 import TagsList from "../../components/TagsList";
@@ -61,7 +61,7 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
           <LinkedNodes data={node.parents || []} header="Learn Before" />
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
-          <NodeItem
+          <NodeItemFull
             node={node}
             contributors={
               <NodeItemContributors contributors={node.contributors || []} institutions={node.institutions || []} />
