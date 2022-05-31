@@ -53,7 +53,7 @@ const NodeItem: FC<Props> = ({ node }) => {
   };
 
   return (
-    <Card sx={{ width: "100%", m: 0, padding: { xs: "4px 9px", md: "14px 36px" } }}>
+    <Card sx={{ width: "100%", my: 1, padding: { xs: "4px 9px", md: "14px 36px" } }}>
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
@@ -136,7 +136,6 @@ const NodeItem: FC<Props> = ({ node }) => {
               </Box>
             </Grid>
           </Grid>
-          {/* </Box> */}
         </CardContent>
       </Collapse>
     </Card>
