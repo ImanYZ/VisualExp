@@ -26,7 +26,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
   const router = useRouter();
 
   return (
-    <AppBar>
+    <AppBar sx={{ boxShadow: "none" }}>
       <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
