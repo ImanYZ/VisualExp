@@ -23,3 +23,11 @@ export const escapeBreaksQuotes = (text?: string) => {
 export const encodeTitle = (title?: string) => {
   return encodeURI(escapeBreaksQuotes(title)).replace(/[&\/\?\\]/g, "");
 };
+
+export const getQueryParameter = (val: string | string[] | undefined) => {
+  if (Array.isArray(val)) {
+    return val[0];
+  } else {
+    return val;
+  }
+};
