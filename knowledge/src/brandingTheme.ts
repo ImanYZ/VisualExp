@@ -1,5 +1,5 @@
 import { grey } from "@mui/material/colors";
-import { ThemeOptions, Theme } from "@mui/material/styles";
+import { Theme, ThemeOptions } from "@mui/material/styles";
 
 declare module "@mui/material/styles/createPalette" {
   interface CommonColors {
@@ -19,18 +19,7 @@ const common = {
   darkGrayBackground: "#28282A"
 };
 
-const systemFont = [
-  "Work Sans",
-  "-apple-system",
-  "BlinkMacSystemFont",
-  '"Segoe UI"',
-  '"Helvetica Neue"',
-  "Arial",
-  "sans-serif",
-  '"Apple Color Emoji"',
-  '"Segoe UI Emoji"',
-  '"Segoe UI Symbol"'
-];
+const systemFont = ["Roboto", "sans-serif"];
 
 export const getMetaThemeColor = (mode: "light" | "dark") => {
   const themeColor = {
@@ -91,6 +80,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
     }
   } as ThemeOptions);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getThemedComponents(theme: Theme): {
   components: Theme["components"];
 } {
