@@ -40,8 +40,7 @@ const HomePage: NextPage<Props> = ({ data }) => {
   };
 
   return (
-    <PagesNavbar>
-      <HomeSearch sx={{ mb: 1 }} onSearch={handleSearch}></HomeSearch>
+    <PagesNavbar headingComponent={<HomeSearch sx={{ mb: 1, mt: "72px" }} onSearch={handleSearch}></HomeSearch>}>
       <HomeFilter></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <Stack
