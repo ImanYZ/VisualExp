@@ -115,7 +115,6 @@ export const NodeHead: FC<Props> = ({ node, keywords, updatedStr, createdStr }) 
       <meta name="abstract" content={content} />
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonObj)
         }}

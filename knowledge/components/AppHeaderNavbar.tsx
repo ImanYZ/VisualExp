@@ -138,8 +138,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(() => ({
   "& .MuiInputBase-input": {
     padding: 0,
     width: "100%",

@@ -82,8 +82,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
     }
   } as ThemeOptions);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function getThemedComponents(theme: Theme): {
+export function getThemedComponents(): {
   components: Theme["components"];
 } {
   return {
