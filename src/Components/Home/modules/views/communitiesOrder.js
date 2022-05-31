@@ -982,19 +982,30 @@ export default [
         ],
       },
       {
-        name: "Vatsal Chaudhari",
-        image: "Vatsal_Chaudhari.jpeg",
-        about: `I am a hardworking computer science student studying at The Ohio State University. As a student, I have learned to solve problems in creative ways. I am also an active member of Humanitarian Engineering Scholars, Competitive Programing Club, and Underwater Robotics Club.
-        In my spare time, I like to work on mobile app development. I am currently working on AcneTracker, which is an android app intended to help those with mild to severe acne. I am creating this app using Java and Android Studio.        
-        I am eager to hear about potential career opportunities, so I would be pleased to chat about job openings in the computer science/engineering and software development area.        
-        Areas of expertise: Java, Python, C++, Flutter, HTML5/CSS3, Mobile App Development, Web App Development, Git, Problem Solving, Mathematics.`,
+        name: "Xinrong Yao",
+        image: "Xinrong_Yao.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/vatsalchaudhari/",
+            url: "https://www.linkedin.com/in/xinrong-yao-07aa071b1/",
           },
         ],
       },
+      // {
+      //   name: "Vatsal Chaudhari",
+      //   image: "Vatsal_Chaudhari.jpeg",
+      //   about: `I am a hardworking computer science student studying at The Ohio State University. As a student, I have learned to solve problems in creative ways. I am also an active member of Humanitarian Engineering Scholars, Competitive Programing Club, and Underwater Robotics Club.
+      //   In my spare time, I like to work on mobile app development. I am currently working on AcneTracker, which is an android app intended to help those with mild to severe acne. I am creating this app using Java and Android Studio.
+      //   I am eager to hear about potential career opportunities, so I would be pleased to chat about job openings in the computer science/engineering and software development area.
+      //   Areas of expertise: Java, Python, C++, Flutter, HTML5/CSS3, Mobile App Development, Web App Development, Git, Problem Solving, Mathematics.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/vatsalchaudhari/",
+      //     },
+      //   ],
+      // },
     ],
     YouTube: "J0y0tZzzuQ0",
     description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the deep learning area on 1Cademy, our collaborative research platform. This semester, we will explore natural language processing, which is a branch of artificial intelligence concerned with giving computers the ability to understand text and spoken words in much the same way human beings can. Our team members will dive into the Speech and Language Processing textbook and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
