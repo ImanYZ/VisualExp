@@ -5,7 +5,7 @@ import * as React from "react";
 import { getMetaThemeColor } from "../src/brandingTheme";
 import createEmotionCache from "../src/createEmotionCache";
 
-export default class MyDocument extends Document {
+export default class MyDocument extends Document<{ emotionStyleTags: any }> {
   render() {
     return (
       <Html lang="en">
@@ -64,7 +64,7 @@ MyDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: App =>
+      enhanceApp: (App: any) =>
         function EnhanceApp(props) {
           return <App emotionCache={cache} {...props} />;
         }

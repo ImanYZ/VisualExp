@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="vwbJsP5kCBEH-EEFsKNK" name="Page-1">
-        <mxGraphModel dx="1162" dy="425" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="966" dy="301" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -97,13 +97,13 @@
                 <mxCell id="22" value="&amp;gt;= 2" style="rhombus;whiteSpace=wrap;html=1;rounded=0;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
                     <mxGeometry x="693" y="686" width="100" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="23" value="Set approved = true" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
+                <mxCell id="23" value="Set approved = true&amp;nbsp;and the rest of the fields as a new document" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
                     <mxGeometry x="483" y="764" width="120" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.995;entryY=0.872;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="25" target="5" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="25" value="Set approved = false" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
+                <mxCell id="25" value="Set approved = false and the rest of the fields" style="rounded=1;whiteSpace=wrap;html=1;shadow=1;labelBackgroundColor=none;strokeWidth=1;fontFamily=Verdana;fontSize=8;align=center;" parent="1" vertex="1">
                     <mxGeometry x="493" y="701" width="120" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="26" value="&lt;b&gt;researchers&lt;/b&gt;&lt;br&gt;id&lt;br&gt;projects:&lt;br&gt;&amp;nbsp; &amp;nbsp;H2K2:&lt;br&gt;&amp;nbsp; &amp;nbsp;{&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; expPoints 112&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; // Intellectual Points&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; points 1&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; upVotes 0&amp;nbsp;&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; noVotes 0&lt;br&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; dayUpVotePoints 70&amp;nbsp;&lt;/div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; // Instructors&amp;nbsp;Points&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; instructors 1&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; instructorDownVotes 3&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; instructorUpVotes 0&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp;&amp;nbsp;&lt;span style=&quot;color: rgb(0 , 0 , 0)&quot;&gt;dayInstructorUpVotes 0&lt;/span&gt;&lt;br&gt;&lt;div&gt;&lt;/div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; // 1Cademy&amp;nbsp;Points&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; onePoints 4&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; dayOneUpVotePoints 0&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; // Coding Points&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; codesNum&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; codesGenerated&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; codePoints&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; // # of consecutive same codes assigned&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; sameCode&lt;br&gt;&amp;nbsp; &amp;nbsp; }" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;align=left;" parent="1" vertex="1">
@@ -127,7 +127,7 @@
                 <mxCell id="32" value="codesPoints++&lt;br&gt;for researcher id == coder" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
                     <mxGeometry x="833" y="686" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="33" value="&lt;h1&gt;loadfeedbackCodes&lt;/h1&gt;" style="text;html=1;resizable=0;autosize=1;align=center;verticalAlign=middle;points=[];fillColor=none;strokeColor=none;rounded=0;" vertex="1" parent="1">
+                <mxCell id="33" value="&lt;h1&gt;loadfeedbackCodes&lt;/h1&gt;" style="text;html=1;resizable=0;autosize=1;align=center;verticalAlign=middle;points=[];fillColor=none;strokeColor=none;rounded=0;" parent="1" vertex="1">
                     <mxGeometry x="377.5" y="80" width="240" height="50" as="geometry"/>
                 </mxCell>
             </root>
