@@ -112,3 +112,15 @@ export type ResponseAutocompleteTags = {
   results?: string[];
   errorMessage?: string;
 };
+
+export type TypesenseNodesSchema = {
+  id: string;
+  content: string;
+  title: string;
+  tags: string[];
+  institutions: string[];
+  contributors: string[];
+  nodeType: string;
+  corrects: number;
+  updatedAt: number;
+};
