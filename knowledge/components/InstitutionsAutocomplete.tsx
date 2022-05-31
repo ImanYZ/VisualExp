@@ -15,9 +15,7 @@ type Props = {
 const InstitutionsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText), {
-    enabled: searchText.length > 2
-  });
+  const { data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText));
 
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
     if (event && query.trim().length > 0) {
