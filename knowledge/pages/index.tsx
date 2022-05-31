@@ -26,7 +26,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
 };
 
 const HomePage: NextPage<Props> = ({ data }) => {
-  console.log("data", data);
   const router = useRouter();
 
   const [sortedByUpvotes, setSortedByUpvotes] = useState(false);
