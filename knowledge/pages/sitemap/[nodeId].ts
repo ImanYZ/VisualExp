@@ -1,14 +1,23 @@
-import { encodeTitle } from "../lib/utils";
+import { GetServerSideProps } from "next";
+import { ParsedUrlQuery } from "querystring";
 
+import { db } from "../../lib/admin";
+import { encodeTitle } from "../../lib/utils";
 function SiteMap() {
   // getServerSideProps will do the heavy lifting
 }
-
-export async function getServerSideProps({ res }) {
-  const tagDoc = await db.collection("nodes").doc(req.params.nodeId).get();
+interface Params extends ParsedUrlQuery {
+  nodeId: string;
+}
+export const getServerSideProps: GetServerSideProps<any, Params> = async ({ res, params }) => {
+  if (!params)
+    return {
+      props: {}
+    };
+  const tagDoc = await db.collection("nodes").doc(params.nodeId).get();
   if (!tagDoc.exists) {
-    res.writeHeader(404, { "Content-Type": "text/xml" });
-    res.write("No Sitemap for Id: " + req.params.nodeId);
+    res.writeHead(404, { "Content-Type": "text/xml" });
+    res.write("No Sitemap for Id: " + params.nodeId);
     res.end();
   } else {
     const tagData = tagDoc.data();
@@ -16,12 +25,12 @@ export async function getServerSideProps({ res }) {
       .collection("nodes")
       .where("deleted", "==", false)
       .where("tags", "array-contains", {
-        node: req.params.nodeId,
-        title: tagData.title
+        node: params.nodeId,
+        title: tagData?.title
       })
       .get();
     if (nodesDocs.docs.length === 0) {
-      res.writeHeader(404, { "Content-Type": "text/xml" });
+      res.writeHead(404, { "Content-Type": "text/xml" });
       res.write("No Sitemap!");
       res.end();
     } else {
@@ -37,7 +46,7 @@ export async function getServerSideProps({ res }) {
           </url>`;
       }
       xmlContent += "</urlset>";
-      res.writeHeader(200, { "Content-Type": "text/xml" });
+      res.writeHead(200, { "Content-Type": "text/xml" });
       res.write(xmlContent);
       res.end();
     }
@@ -45,6 +54,5 @@ export async function getServerSideProps({ res }) {
   return {
     props: {}
   };
-}
-
+};
 export default SiteMap;

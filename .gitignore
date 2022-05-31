@@ -62,6 +62,7 @@ build/Release
 
 # Optional npm cache directory
 .npm
+package-lock.json
 
 # Optional REPL history
 # next.js
