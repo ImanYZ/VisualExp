@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import { SxProps, Theme } from "@mui/system";
 import React, { FC } from "react";
 
-const names = [
+const dataFilter = [
   "Oliver Hansen",
   "Van Henry",
   "April Tucker",
@@ -24,11 +24,11 @@ type Props = {
 };
 
 const HomeFilter: FC<Props> = ({ sx }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [personName, setPersonName] = React.useState<string[]>([]);
+  const [filter, setFilter] = React.useState<string[]>([]);
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    setPersonName(newValue);
+    console.log("filter", filter);
+    setFilter(newValue);
   };
 
   return (
@@ -54,7 +54,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
           <Autocomplete
             multiple
             id="tags-standard"
-            options={names}
+            options={dataFilter}
             getOptionLabel={option => option}
             onChange={handleChange}
             renderInput={params => <TextField {...params} variant="standard" label="Tags" />}
@@ -65,7 +65,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
           <Autocomplete
             multiple
             id="tags-standard"
-            options={names}
+            options={dataFilter}
             getOptionLabel={option => option}
             onChange={handleChange}
             renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
@@ -76,7 +76,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
           <Autocomplete
             multiple
             id="tags-standard"
-            options={names}
+            options={dataFilter}
             getOptionLabel={option => option}
             onChange={handleChange}
             renderInput={params => <TextField {...params} variant="standard" label="Contributors" />}
@@ -87,7 +87,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
           <Autocomplete
             multiple
             id="tags-standard"
-            options={names}
+            options={dataFilter}
             getOptionLabel={option => option}
             onChange={handleChange}
             renderInput={params => <TextField {...params} variant="standard" label="Node Types" />}
