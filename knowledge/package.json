@@ -14,7 +14,9 @@
     "deploy:firestore": "firebase deploy --only firestore",
     "deploy:storage": "firebase deploy --only storage",
     "deploy:functions": "firebase deploy --only functions",
-    "prepare": "cd .. && husky install knowledge/.husky"
+    "prepare": "cd .. && husky install knowledge/.husky",
+    "compileScripts": "cd scripts && tsc",
+    "runScripts": "cd scripts/dist/scripts && node populateTagsCollectionIndex.js"
   },
   "author": "Iman YeckehZaare",
   "license": "Apache-2.0",
