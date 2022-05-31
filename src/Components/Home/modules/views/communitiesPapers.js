@@ -861,6 +861,109 @@ export default {
       },
     },
   },
+  ["Social_Psychology"]: {
+    Effects_of_Ownership_Text_Message_Wording_and_Reminders_on_Receipt_of_an_Influenza_Vaccination:
+      {
+        title:
+          "Effects of Ownership Text Message Wording and Reminders on Receipt of an Influenza Vaccination",
+        url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2Fbuttenheim_2022_oi_211203_1644504654.86367.pdf?alt=media&token=5b13c45b-6552-4766-8c94-fb4cb03d69d1",
+        questions: {
+          One_example_of_the_behavioral_theories_this_study_relies_upon_is: {
+            stem: `1. One example of the behavioral theories this study relies upon is:`,
+            answers: ["a"],
+            choices: {
+              a: "Reciprocity norm",
+              b: "Scarcity",
+              c: "Extinction",
+              d: "Classical conditioning",
+            },
+          },
+          The_experimental_treatment_included: {
+            stem: `2. The experimental treatment included:`,
+            answers: ["b"],
+            choices: {
+              a: "A message that personalizes the flu shot request",
+              b: "An appointment reminder; image of a vaccine vial with “your flu shot” witten on it; A message stating that a shot has “reserved for you” or “available”",
+              c: "An appointment reminder; image of a vaccine vial with “your flu shot” witten on it; A message only stating that a shot has “reserved for you”",
+              d: "An appointment reminder; image of a vaccine vial with “your flu shot” witten on it; A message only stating that a shot is “available”",
+            },
+          },
+          The_main_outcome_measure_of_this_study_is: {
+            stem: `3. The main outcome measure of this study is:`,
+            answers: ["b"],
+            choices: {
+              a: "Number of participants that schedule a flu shot appointment",
+              b: "Number of participants that received the flu shot within the timeframe of  treatment administration",
+              c: "Number of participants that schedule an additional appointment within the timeframe of the treatment",
+              d: "Number of participants that share the availability of flu shot with family",
+            },
+          },
+          Repetition_plays_a_role_in_information_acceptance_by_manipulating_our_perception_of:
+            {
+              stem: `4. Repetition plays a role in information acceptance by manipulating our perception of ________.`,
+              answers: ["c"],
+              choices: {
+                a: "Compatibility",
+                b: "Coherence",
+                c: "Social consensus",
+              },
+            },
+          Warnings_against_misinformation_are_most_effective_when_issued: {
+            stem: `5. Warnings against misinformation are most effective when issued _______.`,
+            answers: ["a"],
+            choices: {
+              a: "Before the claim",
+              b: "After the claim",
+            },
+          },
+          How_do_the_factors_discussed_in_this_article_play_a_role_in_the_spread_of_misinformation_on_social_media:
+            {
+              stem: `6. How do the factors discussed in this article play a role in the spread of misinformation on social media (click all that apply)?`,
+              answers: ["b", "c", "d"],
+              choices: {
+                a: "People see a diversity in opinions.",
+                b: "Short messages are easy to process.",
+                c: "We see posts from friends, establishing credibility.",
+                d: "Users can gain a false sense of expertise.",
+              },
+            },
+          What_does_this_article_recommend_as_a_means_to_correct_and_prevent_misinformation:
+            {
+              stem: `7. What does this article recommend as a means to correct and prevent misinformation?`,
+              answers: ["a"],
+              choices: {
+                a: "Avoid repeating false information",
+                b: "Bust myths",
+                c: "Use jargon in corrections",
+              },
+            },
+          What_is_associated_with_the_intuitive_processing_system: {
+            stem: `8. What is associated with the intuitive processing system?`,
+            answers: ["b"],
+            choices: {
+              a: "Effort, analysis",
+              b: "Speed, heuristics",
+            },
+          },
+          What_is_associated_with_the_analytic_system: {
+            stem: `9. What is associated with the analytic system?`,
+            answers: ["a"],
+            choices: {
+              a: "Effort, slowness, systematic reasoning",
+              b: "Speed, heuristics",
+            },
+          },
+          What_is_naive_realism: {
+            stem: `10. What is naive realism?`,
+            answers: ["a"],
+            choices: {
+              a: "People believe that their view of the world is the true perception and other opposing opinions are either wrong or deliberately causing harm.",
+              b: "People incorrectly believe that people who spread information are doing so unintentionally and with pure intentions.",
+            },
+          },
+        },
+      },
+  },
   ["Social_Political_Psychology"]: {
     When_Fake_News_feels_true: {
       title: "When (Fake) News Feels True",
