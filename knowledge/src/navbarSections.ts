@@ -28,6 +28,12 @@ const SECTIONS = [
     label: "Who",
     title: "Who Is Behind 1Cademy?",
     route: "/changeThis"
+  },
+  {
+    id: "WhoWeAreSection",
+    label: "Node",
+    title: "What do you want to learn today?",
+    route: "/"
   }
 ];
 
