@@ -27,7 +27,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [personName, setPersonName] = React.useState<string[]>([]);
 
-  const handleChange = (_, newValue: string[]) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
     setPersonName(newValue);
   };
 
