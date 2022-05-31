@@ -7,6 +7,7 @@ import { SxProps, Theme } from "@mui/system";
 import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
+import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 
 const dataFilter = [
   "Oliver Hansen",
@@ -27,6 +28,7 @@ type Props = {
 
 const HomeFilter: FC<Props> = ({ sx }) => {
   const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
+  const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
   const [filter, setFilter] = React.useState<string[]>([]);
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
@@ -58,14 +60,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
         </Grid>
 
         <Grid item xs={1}>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={dataFilter}
-            getOptionLabel={option => option}
-            onChange={handleChange}
-            renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
-          />
+          <InstitutionsAutocomplete value={institutionsFilter} setValue={setInstitutionsFilter} />
         </Grid>
 
         <Grid item xs={1}>
