@@ -5,31 +5,27 @@ import { FC, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
-import { getTagsAutocomplete } from "../lib/knowledgeApi";
+import { getInstitutionsAutocomplete } from "../lib/knowledgeApi";
 
 type Props = {
-  value: string;
+  value: string[];
   setValue: (newValues: string[]) => void;
-  hashName: string;
-  queryCallback: <R, P>(params: P) => Promise<R>;
 };
 
-const TagsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
+const InstitutionsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { data } = useQuery(["tags", searchText], () => getTagsAutocomplete(searchText), {
+  const { data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText), {
     enabled: searchText.length > 2
   });
 
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
-    console.log("handleQueryChange -  query", query);
     if (event && query.trim().length > 0) {
       setText(query);
     }
   };
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    console.log("handel change", newValue);
     setValue(newValue);
   };
 
@@ -46,8 +42,8 @@ const TagsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
           <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Tags" />}
+      renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
     />
   );
 };
-export default TagsAutocomplete;
+export default InstitutionsAutocomplete;
