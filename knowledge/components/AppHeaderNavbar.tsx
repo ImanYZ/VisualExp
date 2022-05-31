@@ -1,3 +1,5 @@
+import CloseIcon from "@mui/icons-material/Close";
+import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputBase, Paper, styled, Toolbar } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -16,14 +18,16 @@ import ROUTES from "../src/routes";
 
 type Props = {
   showApply?: boolean;
+  showMenu: boolean;
+  onCloseMenu: () => void;
+  onShowMenu: () => void;
 };
-const AppAppBar: FC<Props> = ({ showApply = true }) => {
+const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
-  console.log("router", router);
 
   return (
-    <AppBar sx={{ maxHeight: "var(--navbar-height)" }}>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
+    <AppBar>
+      <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
             <Link sx={{ display: "flex" }}>
@@ -31,7 +35,7 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
             </Link>
           </NextLink>
         </Box>
-        <Box sx={{ paddingLeft: "30px" }}>
+        <Box sx={{ paddingLeft: "30px" }} display={{ xs: "none", md: "block" }}>
           {SECTIONS.map((page, idx) => {
             return (
               <Tooltip key={idx} title={page.title}>
@@ -55,7 +59,16 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
             );
           })}
         </Box>
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            gap: "20px",
+            marginLeft: "20px"
+          }}
+        >
           <Paper
             component="form"
             sx={{
@@ -84,12 +97,40 @@ const AppAppBar: FC<Props> = ({ showApply = true }) => {
                 sx={{
                   fontWeight: "500",
                   borderRadius: 40,
-                  marginLeft: "50px"
+                  display: { xs: "none", md: "block" }
                 }}
               >
                 APPLY!
               </Button>
             </Tooltip>
+          )}
+          {showMenu && (
+            <IconButton
+              edge="start"
+              onClick={onCloseMenu}
+              aria-label="close"
+              sx={{
+                padding: "0px",
+                alignItems: "center",
+                display: { xs: "flex", md: "none" }
+              }}
+            >
+              <CloseIcon sx={{ color: theme => theme.palette.common.white, m: "auto" }} fontSize="large" />
+            </IconButton>
+          )}
+          {!showMenu && (
+            <IconButton
+              edge="start"
+              onClick={onShowMenu}
+              aria-label="close"
+              sx={{
+                padding: "0px",
+                alignItems: "center",
+                display: { xs: "flex", md: "none" }
+              }}
+            >
+              <MenuIcon sx={{ color: theme => theme.palette.common.white }} fontSize="large" />
+            </IconButton>
           )}
         </Box>
       </Toolbar>
@@ -105,9 +146,5 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: "#fff"
   }
 }));
-
-// placeholder="Search on 1Cademy "
-// inputProps={{ 'aria-label': 'search node' }}
-// sx={{ ml: 1, flex: 1, fontSize: "15px", padding: "0px", color: "white", fontWeight: "700" }}
 
 export default AppAppBar;
