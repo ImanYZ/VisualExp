@@ -1,3 +1,4 @@
+import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
 
 import {
@@ -9,9 +10,9 @@ import {
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
 
-export const getSortedPostsData = async () => {
+export const getSortedPostsData = async (nodeIds: string[]) => {
   const nodes: KnowledgeNode[] = [];
-  const nodeDocs = await db.collection("nodes").limit(5).get();
+  const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
   for (let nodeDoc of nodeDocs.docs) {
     const nodeData = nodeDoc.data() as NodeFireStore;
 

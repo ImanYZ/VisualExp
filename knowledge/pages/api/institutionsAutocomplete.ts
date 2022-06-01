@@ -12,6 +12,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocom
 
   if (!q) {
     res.status(200).json({ results: [] });
+    return;
   }
   const client = new Typesense.Client({
     nodes: [

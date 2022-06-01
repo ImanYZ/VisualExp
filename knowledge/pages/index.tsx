@@ -2,30 +2,65 @@ import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Stack, ToggleBut
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import Typesense from "typesense";
+import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import HomeFilter from "../components/HomeFilter";
 import HomeSearch from "../components/HomeSearch";
 import MasonryNodes from "../components/MasonryNodes";
 import PagesNavbar from "../components/PagesNavbar";
 import { getSortedPostsData } from "../lib/nodes";
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import { getQueryParameter, getQueryParameterAsNumber } from "../lib/utils";
+import { KnowledgeNode, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const SortedByTimeOptions = ["This Week", "This Month", "This Year"];
+const perPage = 10;
 
 type Props = {
   data: KnowledgeNode[];
+  page: number;
+  numResults: number;
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
-  const allPostsData = await getSortedPostsData();
+// const addQueryBy = ({ tags }: { tags?: string }) => {
+//   const searchBy = [];
+//   if (tags && tags.length > 0) {
+//     searchBy.push("tags");
+//   }
+//   return searchBy.join(",");
+// };
+
+export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
+  const q = getQueryParameter(query.q) || "*";
+  // const tags = getQueryParameter(query.tags);
+  const page = getQueryParameterAsNumber(query.page);
+  console.log("page", page);
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
+        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
+        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
+      }
+    ],
+    apiKey: "xyz"
+  });
+  // const query_by = addQueryBy({ tags });
+  const searchParameters: SearchParams = { q, query_by: "title,content", per_page: perPage, page };
+  const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
+  const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
+  console.log("nodeIds", nodeIds);
+  const allPostsData = await getSortedPostsData(nodeIds);
   return {
     props: {
-      data: allPostsData
+      data: allPostsData,
+      page: searchResults.page,
+      numResults: searchResults.found
     }
   };
 };
 
-const HomePage: NextPage<Props> = ({ data }) => {
+const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
   const router = useRouter();
 
   const [sortedByUpvotes, setSortedByUpvotes] = useState(false);
@@ -37,6 +72,10 @@ const HomePage: NextPage<Props> = ({ data }) => {
 
   const handleSortBy = (event: SelectChangeEvent<string>) => {
     setSortedByTime(event.target.value);
+  };
+
+  const handleChangePage = (newPage: number) => {
+    router.replace({ query: { ...router.query, page: newPage } });
   };
 
   return (
@@ -98,7 +137,12 @@ const HomePage: NextPage<Props> = ({ data }) => {
             </FormControl>
           </Stack>
         </Stack>
-        <MasonryNodes nodes={data} />
+        <MasonryNodes
+          nodes={data}
+          page={page}
+          totalPages={Math.floor(numResults / perPage)}
+          onChangePage={handleChangePage}
+        />
       </Box>
     </PagesNavbar>
   );
