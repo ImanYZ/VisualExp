@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -12,19 +13,20 @@ import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getSortedPostsData } from "../lib/nodes";
 import {
+  existValueInEnum,
   getQueryParameter,
   getQueryParameterAsBoolean,
   getQueryParameterAsNumber,
   SortedByTimeOptions
 } from "../lib/utils";
-import { KnowledgeNode, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const perPage = 10;
 
 export const sortByDefaults = {
   upvotes: true,
   mostRecent: true,
-  timeWindow: SortedByTimeOptions[1]
+  timeWindow: SortedByTimeOptions[2]
 };
 
 type Props = {
@@ -33,26 +35,30 @@ type Props = {
   numResults: number;
 };
 
-// const addQueryBy = ({ tags }: { tags?: string }) => {
-//   const searchBy = [];
-//   if (tags && tags.length > 0) {
-//     searchBy.push("tags");
-//   }
-//   return searchBy.join(",");
-// };
-
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   return `corrects:${!upvotes ? "asc" : "desc"}, updatedAt:${!mostRecent ? "asc" : "desc"}`;
+};
+
+const buildFilterBy = (timeWindow: TimeWindowOption) => {
+  let updatedAt: number = dayjs().subtract(1, "year").valueOf();
+  if (timeWindow === TimeWindowOption.ThisWeek) {
+    updatedAt = dayjs().subtract(1, "week").valueOf();
+  } else if (timeWindow === TimeWindowOption.ThisMonth) {
+    updatedAt = dayjs().subtract(1, "month").valueOf();
+  }
+
+  return `updatedAt:>${updatedAt}`;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
   const q = getQueryParameter(query.q) || "*";
   const upvotes = getQueryParameterAsBoolean(query.upvotes) || sortByDefaults.upvotes;
   const mostRecent = getQueryParameterAsBoolean(query.mostRecent) || sortByDefaults.mostRecent;
-  // const timeWindow = getQueryParameter(query.timeWindow) || sortByDefaults.timeWindow;
+  const timeWindow: TimeWindowOption = existValueInEnum(TimeWindowOption, getQueryParameter(query.timeWindow))
+    ? (getQueryParameter(query.timeWindow) as TimeWindowOption)
+    : sortByDefaults.timeWindow;
   // const tags = getQueryParameter(query.tags);
   const page = getQueryParameterAsNumber(query.page);
-  console.log("page", page);
   const client = new Typesense.Client({
     nodes: [
       {
@@ -63,17 +69,16 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     ],
     apiKey: "xyz"
   });
-  // const query_by = addQueryBy({ tags });
   const searchParameters: SearchParams = {
     q,
     query_by: "title,content",
     per_page: perPage,
     page,
-    sort_by: buildSortBy(upvotes, mostRecent)
+    sort_by: buildSortBy(upvotes, mostRecent),
+    filter_by: buildFilterBy(timeWindow)
   };
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
   const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
-  console.log("nodeIds", nodeIds);
   const allPostsData = await getSortedPostsData(nodeIds);
   return {
     props: {
@@ -109,7 +114,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
     setSortedByMostRecent(!sortedByMostRecent);
   };
 
-  const handleChangeTimeWindow = (val: string) => {
+  const handleChangeTimeWindow = (val: TimeWindowOption) => {
     router.replace({ query: { ...router.query, timeWindow: val } });
     setTimeWindow(val);
   };

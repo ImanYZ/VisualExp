@@ -2,6 +2,7 @@ import { FormControl, MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, 
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
+import { TimeWindowOption } from "../src/knowledgeTypes";
 
 type Props = {
   upvotes: boolean;
@@ -9,7 +10,7 @@ type Props = {
   timeWindow: string;
   onUpvotesClicked: () => void;
   onMostRecentClicked: () => void;
-  onTimeWindowChanged: (val: string) => void;
+  onTimeWindowChanged: (val: TimeWindowOption) => void;
 };
 
 const SortByFilters: FC<Props> = ({
@@ -21,7 +22,7 @@ const SortByFilters: FC<Props> = ({
   onTimeWindowChanged
 }) => {
   const handleSortBy = (event: SelectChangeEvent<string>) => {
-    onTimeWindowChanged(event.target.value);
+    onTimeWindowChanged(event.target.value as TimeWindowOption);
   };
 
   return (

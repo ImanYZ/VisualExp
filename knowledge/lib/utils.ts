@@ -1,3 +1,5 @@
+import { TimeWindowOption } from "../src/knowledgeTypes";
+
 export const isValidHttpUrl = (possibleUrl?: string) => {
   let url;
   if (!possibleUrl) {
@@ -50,4 +52,16 @@ export const getQueryParameterAsBoolean = (val: string | string[] | undefined): 
   return true;
 };
 
-export const SortedByTimeOptions = ["This Week", "This Month", "This Year"];
+export const SortedByTimeOptions: TimeWindowOption[] = [
+  TimeWindowOption.ThisWeek,
+  TimeWindowOption.ThisMonth,
+  TimeWindowOption.ThisYear
+];
+
+export const existValueInEnum = (type: any, value: any): boolean => {
+  return (
+    Object.keys(type)
+      .filter(k => isNaN(Number(k)))
+      .filter(k => type[k] === value).length > 0
+  );
+};
