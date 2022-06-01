@@ -17,7 +17,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
     <Box
       sx={{
         width: "100%",
-        height: "479px",
+        height: { xs: "236px", md: "479px" },
         margin: "auto",
         padding: "30px",
         flexDirection: "column",

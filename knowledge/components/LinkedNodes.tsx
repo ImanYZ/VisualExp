@@ -21,12 +21,13 @@ const LinkedNodes: FC<Props> = ({ data, header }) => {
     return data.map((el, idx, src) => (
       <React.Fragment key={idx}>
         <LinkedNodeItem
-          key={idx}
           title={el.title || ""}
           linkSrc={`../${encodeTitle(el.title)}/${el.node}`}
           nodeType={el.nodeType}
           nodeImageUrl={el.nodeImage}
           nodeContent={el.content}
+          label={el.label || ""}
+          sx={{ p: "20px" }}
         />
         {idx < src.length - 1 && <Divider />}
       </React.Fragment>
