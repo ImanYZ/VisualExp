@@ -1,6 +1,6 @@
 import "katex/dist/katex.min.css";
 
-import React, { FC, useEffect,useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
 type Props = {

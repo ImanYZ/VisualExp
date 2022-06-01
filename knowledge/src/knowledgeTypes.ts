@@ -84,7 +84,7 @@ export type NodeFireStore = {
   tagIds?: string[];
   tags?: string[] | { node: string; title?: string; label?: string }[];
   title?: string;
-  updatedAt?: Timestamp;
+  updatedAt: Timestamp;
   versions?: number;
   viewers?: number;
   wrongs?: number;

@@ -25,7 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     });
 
-    nextTheme = deepmerge(nextTheme, getThemedComponents(nextTheme));
+    nextTheme = deepmerge(nextTheme, getThemedComponents());
     return nextTheme;
   }, []);
 

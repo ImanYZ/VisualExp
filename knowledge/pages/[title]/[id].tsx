@@ -22,9 +22,12 @@ interface Params extends ParsedUrlQuery {
   id: string;
 }
 
-const NodeItemContainer: ComponentType<any> = dynamic(() => import("../../components/NodeItem").then(m => m.NodeItem), {
-  ssr: false
-});
+const NodeItemFullContainer: ComponentType<any> = dynamic(
+  () => import("../../components/NodeItemFull").then(m => m.NodeItemFull),
+  {
+    ssr: false
+  }
+);
 
 const NodeHeadContainer: ComponentType<any> = dynamic(() => import("../../components/NodeHead").then(m => m.NodeHead), {
   ssr: false
@@ -81,7 +84,7 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
           {parents && parents?.length > 0 && <LinkedNodesContainer data={parents || []} header="Learn Before" />}
         </Grid>
         <Grid item xs={12} sm={12} md={6}>
-          <NodeItemContainer
+          <NodeItemFullContainer
             node={node}
             contributors={<NodeItemContributors contributors={contributors || []} institutions={institutions || []} />}
           />

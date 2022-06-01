@@ -114,7 +114,6 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
       <meta name="abstract" content={content} />
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonObj)
         }}
