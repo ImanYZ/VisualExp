@@ -8,7 +8,7 @@ import Head from "./Head";
 
 type Props = {
   children: ReactNode;
-  headingComponent: ReactNode | null;
+  headingComponent?: ReactNode | null;
   title?: string;
   description?: string;
 };
