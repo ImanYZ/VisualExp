@@ -3,7 +3,12 @@ import { CollectionFieldSchema } from "typesense/lib/Typesense/Collection";
 
 import config from "./typesenseConfig";
 
-const main = async (indexName: string, fields: CollectionFieldSchema[], dataToImport: any[]) => {
+const main = async (
+  indexName: string,
+  fields: CollectionFieldSchema[],
+  dataToImport: any[],
+  forceReIndex?: boolean
+) => {
   const client = new Typesense.Client({
     nodes: [
       {
@@ -25,7 +30,7 @@ const main = async (indexName: string, fields: CollectionFieldSchema[], dataToIm
   try {
     const collection = await client.collections(indexName).retrieve();
     console.log(`Found existing schema: ${indexName}`);
-    if (collection.num_documents !== dataToImport.length) {
+    if (collection.num_documents !== dataToImport.length || forceReIndex) {
       console.log("Deleting existing schema");
       reindexNeeded = true;
       await client.collections(indexName).delete();
