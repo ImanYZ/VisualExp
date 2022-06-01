@@ -13,7 +13,7 @@ type TrendingNodesProps = {
 export const TrendingNodes = ({ sx, nodes }: TrendingNodesProps) => {
   return (
     <Box sx={{ ...sx }}>
-      <Masonry sx={{ m: 0 }} columns={3} spacing={2} defaultHeight={450}>
+      <Masonry sx={{ my: "20px" }} columns={{ xm: 1, md: 2 }} spacing={2} defaultHeight={450}>
         {nodes.map(el => (
           <NodeItem key={el.id} node={el} />
         ))}
