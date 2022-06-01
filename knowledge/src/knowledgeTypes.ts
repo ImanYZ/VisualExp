@@ -126,6 +126,6 @@ export type TypesenseNodesSchema = {
 };
 
 export type ResponseAutocompleteInstitutions = {
-  results?: string[];
+  results?: { name: string; logoUrl?: string }[];
   errorMessage?: string;
 };

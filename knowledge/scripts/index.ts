@@ -20,8 +20,8 @@ const getInstitutionsFirestore = async () => {
   const institutionDocs = await db.collection("institutions").get();
   return institutionDocs.docs.map(institutionDoc => {
     const institutionData = institutionDoc.data();
-    const institutionName = institutionData.name;
-    return { name: institutionName };
+    const institutionName: string = institutionData.name || "";
+    return { id: institutionDoc.id, name: institutionName };
   });
 };
 
@@ -99,18 +99,21 @@ const getNodesFromFirestore = async () => {
   return importData;
 };
 
-const fillInstitutionsIndex = async () => {
+const fillInstitutionsIndex = async (forceReIndex?: boolean) => {
   const data = await getInstitutionsFirestore();
-  const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
+  const fields: CollectionFieldSchema[] = [
+    { name: "id", type: "string" },
+    { name: "name", type: "string" }
+  ];
 
-  await indexCollection("institutions", fields, data);
+  await indexCollection("institutions", fields, data, forceReIndex);
 };
 
-const fillUsersIndex = async () => {
+const fillUsersIndex = async (forceReIndex?: boolean) => {
   const data = await getUsersFromFirestore();
   const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
 
-  await indexCollection("users", fields, data);
+  await indexCollection("users", fields, data, forceReIndex);
 };
 
 const fillTagsIndex = async () => {
