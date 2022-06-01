@@ -166,6 +166,20 @@ export function getThemedComponents(): {
         defaultProps: {
           arrow: true
         }
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            "&": {
+              paddingTop: "0px",
+              paddingBottom: "0px"
+            },
+            "&:last-child": {
+              paddingTop: "0px",
+              paddingBottom: "0px"
+            }
+          }
+        }
       }
     }
   };

@@ -29,7 +29,7 @@ const FullScreenImage: FC<Props> = ({ src, open, onClose }) => {
       <AppBar sx={{ position: "relative" }}>
         <Toolbar>
           <IconButton edge="start" color="inherit" onClick={onClose} aria-label="close">
-            <CloseIcon />
+            <CloseIcon sx={{ color: theme => theme.palette.common.white }} />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1, color: "white" }} variant="h6" component="div">
             Full-screen View
