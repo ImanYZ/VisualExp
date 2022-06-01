@@ -1,17 +1,16 @@
 import Head from "next/head";
-import { FC } from "react";
 
 import { encodeTitle, escapeBreaksQuotes } from "../lib/utils";
 import { KnowledgeNode } from "../src/knowledgeTypes";
 
-type Props = {
+type NodeHeadProps = {
   node: KnowledgeNode;
   keywords: string;
   updatedStr: string;
   createdStr: string;
 };
 
-export const NodeHead: FC<Props> = ({ node, keywords, updatedStr, createdStr }) => {
+export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadProps) => {
   const {
     id,
     title,
@@ -123,5 +122,3 @@ export const NodeHead: FC<Props> = ({ node, keywords, updatedStr, createdStr }) 
     </Head>
   );
 };
-
-export default NodeHead;

@@ -11,7 +11,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
-import { FC, ReactNode } from "react";
+import { ReactNode } from "react";
 
 import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
@@ -21,12 +21,12 @@ import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
-type Props = {
+type NodeItemProps = {
   node: KnowledgeNode;
   contributors?: ReactNode;
 };
 
-const NodeItem: FC<Props> = ({ node, contributors }) => {
+export const NodeItem = ({ node, contributors }: NodeItemProps) => {
   return (
     <Card>
       <CardHeader
@@ -82,5 +82,3 @@ const NodeItem: FC<Props> = ({ node, contributors }) => {
     </Card>
   );
 };
-
-export default NodeItem;
