@@ -19,45 +19,45 @@ export const getSortedPostsData = async (nodeIds: string[]) => {
   for (let nodeDoc of nodeDocs.docs) {
     const nodeData = nodeDoc.data() as NodeFireStore;
 
-    // 1. get tags from every node
-    const nodeTags = getNodeTags(nodeData);
-    const convertedTags: LinkedKnowledgeNode[] = [];
-    for (let tag of nodeTags) {
-      const tagData = await retrieveNode(tag.node || "");
-      if (!tagData) {
-        continue;
-      }
-      convertedTags.push({
-        node: tag.node,
-        title: tagData.title,
-        content: tagData.content,
-        nodeImage: tagData.nodeImage,
-        nodeType: tagData.nodeType
-      });
-    }
+    // // 1. get tags from every node
+    // const nodeTags = getNodeTags(nodeData);
+    // const convertedTags: LinkedKnowledgeNode[] = [];
+    // for (let tag of nodeTags) {
+    //   const tagData = await retrieveNode(tag.node || "");
+    //   if (!tagData) {
+    //     continue;
+    //   }
+    //   convertedTags.push({
+    //     node: tag.node,
+    //     title: tagData.title,
+    //     content: tagData.content,
+    //     nodeImage: tagData.nodeImage,
+    //     nodeType: tagData.nodeType
+    //   });
+    // }
 
-    // 2. get contributors from every node
-    // Descendingly sort the contributors array based on the reputation points.
-    const contributorsNodes: KnowledgeNodeContributor[] = Object.entries(nodeData.contributors || {})
-      .sort(([, aObj], [, bObj]) => {
-        return (bObj.reputation || 0) - (aObj.reputation || 0);
-      })
-      .reduce<KnowledgeNodeContributor[]>(
-        (previousValue, currentValue) => [...previousValue, { ...currentValue[1], username: currentValue[0] }],
-        []
-      );
+    // // 2. get contributors from every node
+    // // Descendingly sort the contributors array based on the reputation points.
+    // const contributorsNodes: KnowledgeNodeContributor[] = Object.entries(nodeData.contributors || {})
+    //   .sort(([, aObj], [, bObj]) => {
+    //     return (bObj.reputation || 0) - (aObj.reputation || 0);
+    //   })
+    //   .reduce<KnowledgeNodeContributor[]>(
+    //     (previousValue, currentValue) => [...previousValue, { ...currentValue[1], username: currentValue[0] }],
+    //     []
+    //   );
 
-    // 3. get institutions from every node
-    // Descendingly sort the contributors array based on the reputation points.
-    const institObjs = Object.entries(nodeData.institutions || {}).sort(([, aObj], [, bObj]) => {
-      return (bObj.reputation || 0) - (aObj.reputation || 0);
-    });
-    const institutionsNodes: KnowledgeNodeInstitution[] = [];
-    for (let [name, obj] of institObjs) {
-      const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
-      const logoURL = institutionDocs.docs.length > 0 ? institutionDocs.docs[0].data().logoURL : "";
-      institutionsNodes.push({ ...obj, logoURL, name });
-    }
+    // // 3. get institutions from every node
+    // // Descendingly sort the contributors array based on the reputation points.
+    // const institObjs = Object.entries(nodeData.institutions || {}).sort(([, aObj], [, bObj]) => {
+    //   return (bObj.reputation || 0) - (aObj.reputation || 0);
+    // });
+    // const institutionsNodes: KnowledgeNodeInstitution[] = [];
+    // for (let [name, obj] of institObjs) {
+    //   const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
+    //   const logoURL = institutionDocs.docs.length > 0 ? institutionDocs.docs[0].data().logoURL : "";
+    //   institutionsNodes.push({ ...obj, logoURL, name });
+    // }
 
     nodes.push({
       id: nodeDoc.id,
@@ -68,10 +68,10 @@ export const getSortedPostsData = async (nodeIds: string[]) => {
       content: nodeData.content,
       viewers: nodeData.viewers,
       corrects: nodeData.corrects,
-      wrongs: nodeData.wrongs,
-      contributors: contributorsNodes,
-      institutions: institutionsNodes,
-      tags: convertedTags
+      wrongs: nodeData.wrongs
+      // contributors: contributorsNodes,
+      // institutions: institutionsNodes,
+      // tags: convertedTags
     });
   }
   return nodes;
