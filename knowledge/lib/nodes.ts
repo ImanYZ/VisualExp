@@ -11,6 +11,9 @@ import {
 import { admin, batchSet, commitBatch, db } from "./admin";
 
 export const getSortedPostsData = async (nodeIds: string[]) => {
+  if (nodeIds.length === 0) {
+    return [];
+  }
   const nodes: KnowledgeNode[] = [];
   const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
   for (let nodeDoc of nodeDocs.docs) {
