@@ -5,18 +5,17 @@ import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
 
 import { encodeTitle, isValidHttpUrl } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import LinkedNodeItem from "./LinkedNodeItem";
 
-type Props = {
+type ReferencesListProps = {
   references: LinkedKnowledgeNode[];
   sx?: SxProps<Theme>;
 };
 
-const ReferencesList: FC<Props> = ({ references, sx }) => {
+export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
   const getReferenceTitle = (el: LinkedKnowledgeNode) => {
     if (isValidHttpUrl(el.label)) {
       return `${el.title}:  ${el.label}`;
@@ -53,5 +52,3 @@ const ReferencesList: FC<Props> = ({ references, sx }) => {
     </Card>
   );
 };
-
-export default ReferencesList;
