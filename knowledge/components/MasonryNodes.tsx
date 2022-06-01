@@ -30,9 +30,11 @@ export const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage }: Pro
           <NodeItem key={el.id} node={el} />
         ))}
       </Masonry>
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <Pagination count={totalPages} page={page} onChange={handleChangePage} />
-      </Box>
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <Pagination count={totalPages} page={page} onChange={handleChangePage} />
+        </Box>
+      )}
     </Box>
   );
 };
