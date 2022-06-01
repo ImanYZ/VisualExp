@@ -34,7 +34,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
   return (
     <Box
       sx={{
-        padding: { xs: "10px 40px", lg: "10px 40px" },
+        padding: { xs: "10px 40px", lg: "10px 10px" },
         ...sx
       }}
     >
