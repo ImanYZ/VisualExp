@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
-import { FC, ReactNode, useState } from "react";
+import { useState } from "react";
 
 import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
@@ -23,13 +23,11 @@ import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
-type Props = {
+type NodeItemProps = {
   node: KnowledgeNode;
-  contributors?: ReactNode;
 };
 
-const NodeItem: FC<Props> = ({ node }) => {
-  // console.log(node)
+export const NodeItem = ({ node }: NodeItemProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = () => {
@@ -115,7 +113,12 @@ const NodeItem: FC<Props> = ({ node }) => {
                       <Avatar
                         alt="Image contributor"
                         src={contributor.imageUrl}
-                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
+                        sx={{
+                          border: "solid",
+                          width: 56,
+                          height: 56,
+                          borderColor: theme => theme.palette.common.darkGrayBackground
+                        }}
                       />
                     </Box>
                   ))}
@@ -129,7 +132,12 @@ const NodeItem: FC<Props> = ({ node }) => {
                       <Avatar
                         alt="Image contributor"
                         src={institution.logoURL}
-                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
+                        sx={{
+                          border: "solid",
+                          width: 56,
+                          height: 56,
+                          borderColor: theme => theme.palette.common.darkGrayBackground
+                        }}
                       />
                     </Box>
                   ))}
@@ -142,5 +150,3 @@ const NodeItem: FC<Props> = ({ node }) => {
     </Card>
   );
 };
-
-export default NodeItem;
