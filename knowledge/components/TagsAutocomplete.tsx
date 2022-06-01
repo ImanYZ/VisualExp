@@ -8,11 +8,11 @@ import { useDebounce } from "use-debounce";
 import { getTagsAutocomplete } from "../lib/knowledgeApi";
 
 type Props = {
-  value: string[];
-  setValue: (newValues: string[]) => void;
+  tags: string[];
+  onTagsChange: (newValues: string[]) => void;
 };
 
-const TagsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
+const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
   const { data } = useQuery(["tags", searchText], () => getTagsAutocomplete(searchText));
@@ -24,7 +24,8 @@ const TagsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
   };
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    setValue(newValue);
+    console.log("handleChange newValue", newValue);
+    onTagsChange(newValue);
   };
 
   return (
@@ -34,7 +35,7 @@ const TagsAutocomplete: FC<Props> = ({ value = [], setValue }) => {
       freeSolo
       onInputChange={handleQueryChange}
       onChange={handleChange}
-      value={value}
+      value={tags}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
           <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
