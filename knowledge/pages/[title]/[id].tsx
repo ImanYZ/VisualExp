@@ -53,11 +53,10 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ re
 };
 
 const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) => {
-  // console.log('node references:', node.references)
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
       <NodeHead node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ mt: "72px" }}>
         <Grid item xs={12} sm={12} md={3}>
           <LinkedNodes data={node.parents || []} header="Learn Before" />
         </Grid>

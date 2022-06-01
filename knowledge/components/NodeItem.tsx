@@ -60,7 +60,7 @@ const NodeItem: FC<Props> = ({ node }) => {
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
             <Tooltip title="Click to learn more...">
-              <Link variant="h5" underline="none" color="inherit">
+              <Link variant="h3" underline="hover" color="inherit" component="h2" sx={{ fontSize: "25px" }}>
                 <MarkdownRender text={node.title || ""} />
               </Link>
             </Tooltip>
