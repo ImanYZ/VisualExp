@@ -11,9 +11,50 @@ import { admin, batchSet, commitBatch, db } from "./admin";
 
 export const getSortedPostsData = async () => {
   const nodes: KnowledgeNode[] = [];
-  const nodeDocs = await db.collection("nodes").limit(25).get();
+  const nodeDocs = await db.collection("nodes").limit(5).get();
   for (let nodeDoc of nodeDocs.docs) {
-    const nodeData = nodeDoc.data();
+    const nodeData = nodeDoc.data() as NodeFireStore;
+
+    // 1. get tags from every node
+    const nodeTags = getNodeTags(nodeData);
+    const convertedTags: LinkedKnowledgeNode[] = [];
+    for (let tag of nodeTags) {
+      const tagData = await retrieveNode(tag.node || "");
+      if (!tagData) {
+        continue;
+      }
+      convertedTags.push({
+        node: tag.node,
+        title: tagData.title,
+        content: tagData.content,
+        nodeImage: tagData.nodeImage,
+        nodeType: tagData.nodeType
+      });
+    }
+
+    // 2. get contributors from every node
+    // Descendingly sort the contributors array based on the reputation points.
+    const contributorsNodes: KnowledgeNodeContributor[] = Object.entries(nodeData.contributors || {})
+      .sort(([, aObj], [, bObj]) => {
+        return (bObj.reputation || 0) - (aObj.reputation || 0);
+      })
+      .reduce<KnowledgeNodeContributor[]>(
+        (previousValue, currentValue) => [...previousValue, { ...currentValue[1], username: currentValue[0] }],
+        []
+      );
+
+    // 3. get institutions from every node
+    // Descendingly sort the contributors array based on the reputation points.
+    const institObjs = Object.entries(nodeData.institutions || {}).sort(([, aObj], [, bObj]) => {
+      return (bObj.reputation || 0) - (aObj.reputation || 0);
+    });
+    const institutionsNodes: KnowledgeNodeInstitution[] = [];
+    for (let [name, obj] of institObjs) {
+      const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
+      const logoURL = institutionDocs.docs.length > 0 ? institutionDocs.docs[0].data().logoURL : "";
+      institutionsNodes.push({ ...obj, logoURL, name });
+    }
+
     nodes.push({
       id: nodeDoc.id,
       title: nodeData.title,
@@ -24,7 +65,9 @@ export const getSortedPostsData = async () => {
       viewers: nodeData.viewers,
       corrects: nodeData.corrects,
       wrongs: nodeData.wrongs,
-      contributors: nodeData.contributors
+      contributors: contributorsNodes,
+      institutions: institutionsNodes,
+      tags: convertedTags
     });
   }
   return nodes;
@@ -68,7 +111,7 @@ const convertDateFieldsToString = (
 
 const getNodeReferences = (nodeData: NodeFireStore) => {
   const references: { node: string; title?: string; label: string }[] = [];
-  //The "references" field in the DB can be an array of objects or an array of strings
+  //The "references" field in the DB can be an array ofra objects or an array of strings
   if (typeof (nodeData.references || [])[0] !== "object") {
     //In this case the field is an array of strings
     const referenceIds = nodeData.referenceIds || [];
