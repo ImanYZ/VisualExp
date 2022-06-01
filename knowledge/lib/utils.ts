@@ -40,3 +40,14 @@ export const getQueryParameterAsNumber = (val: string | string[] | undefined): n
 
   return parseInt(res);
 };
+
+export const getQueryParameterAsBoolean = (val: string | string[] | undefined): boolean => {
+  const res = getQueryParameter(val);
+  if (res === undefined || val === "false") {
+    return false;
+  }
+
+  return true;
+};
+
+export const SortedByTimeOptions = ["This Week", "This Month", "This Year"];
