@@ -24,7 +24,7 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: `url(${backgroundImage.src})`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url(${backgroundImage.src})`,
         backgroundPosition: "center",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",

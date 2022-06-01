@@ -1,13 +1,14 @@
 import {
   Box,
   FormControl,
+  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
   Stack,
   ToggleButton,
-  Tooltip,
-  Typography
+  ToggleButtonGroup,
+  Tooltip
 } from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -38,14 +39,18 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
 const HomePage: NextPage<Props> = ({ data }) => {
   const router = useRouter();
 
-  const [sortedByUpvotes, setSortedByUpvotes] = useState(false);
+  const [filterByType, setFilterByType] = useState(() => ["most-Recent", "italic"]);
   const [sortedByTime, setSortedByTime] = useState(SortedByTimeOptions[1]);
+
+  const handleFormat = (event: React.MouseEvent<HTMLElement>, newFormats: string[]) => {
+    setFilterByType(newFormats);
+  };
 
   const handleSearch = (text: string) => {
     router.push({ query: { q: text } });
   };
 
-  const handleSortBy = (event: SelectChangeEvent<string>) => {
+  const handleSortByTime = (event: SelectChangeEvent<string>) => {
     setSortedByTime(event.target.value);
   };
 
@@ -54,67 +59,42 @@ const HomePage: NextPage<Props> = ({ data }) => {
       <HomeFilter sx={{ maxWidth: "1180px", margin: "auto" }}></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <Stack
-          direction="row"
-          justifyContent="flex-start"
-          flexWrap="wrap"
+          direction={{ xs: "column-reverse", md: "row" }}
           alignItems="center"
-          // spacing={2}
-          sx={{ my: { xs: 1, md: 1 } }}
+          justifyContent={{ xs: "center", sm: "space-between" }}
+          gap="10px"
+          sx={{
+            width: { xs: "100%", md: "750px" },
+            padding: { xs: "0px 40px", md: "0px 0px" },
+            marginBottom: "50px"
+          }}
         >
-          <Typography variant="h5" pr="10px" sx={{ fontSize: { xs: "14.5px", md: "20px" } }}>
-            Sort by:
-          </Typography>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            gap="10px"
-            sx={{ width: { xs: "400px", md: "350px" } }}
+          <ToggleButtonGroup
+            value={filterByType}
+            exclusive
+            onChange={handleFormat}
+            aria-label="text formatting"
+            fullWidth
           >
-            <Tooltip
-              title="Order the nodes descendingly based on their number of upvotes minus downvotes."
-              placement="top"
-            >
-              <ToggleButton
-                value="check"
-                selected={sortedByUpvotes}
-                size="small"
-                onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
-                aria-label="list"
-              >
-                Upvotes
-              </ToggleButton>
-            </Tooltip>
-            <Tooltip title="Order the nodes descendingly based on the last time they got updated." placement="top">
-              <ToggleButton
-                value="check"
-                selected={sortedByUpvotes}
-                size="small"
-                onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
-                aria-label="list"
-              >
-                Most Recent
-              </ToggleButton>
-            </Tooltip>
-            <FormControl sx={{ minWidth: 120 }}>
-              <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-                <Select
-                  value={sortedByTime}
-                  onChange={handleSortBy}
-                  displayEmpty
-                  inputProps={{ "aria-label": "Without label" }}
-                  size="small"
-                  sx={{ borderRadius: "40px", background: theme => theme.palette.common.white, fontSize: "12px" }}
-                >
-                  {SortedByTimeOptions.map((SortedByTimeOption, idx) => (
-                    <MenuItem value={SortedByTimeOption} key={idx}>
-                      {SortedByTimeOption}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Tooltip>
+            <ToggleButton value="most-Recent" aria-label="bold">
+              Most Recent
+            </ToggleButton>
+            <ToggleButton value="upvotes-downvotes" aria-label="italic">
+              Upvotes - Downvotes
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
+            <FormControl variant="filled" sx={{ m: 1, width: "100%" }} size="small">
+              <InputLabel id="any-time-label">Any Time</InputLabel>
+              <Select labelId="any-time-label" id="any-time" value={sortedByTime} onChange={handleSortByTime}>
+                {SortedByTimeOptions.map((SortedByTimeOption, idx) => (
+                  <MenuItem value={SortedByTimeOption} key={idx}>
+                    {SortedByTimeOption}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
-          </Stack>
+          </Tooltip>
         </Stack>
         <MasonryNodes nodes={data} />
       </Box>
