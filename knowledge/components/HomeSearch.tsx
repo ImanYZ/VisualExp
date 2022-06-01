@@ -2,16 +2,15 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
 
 import SearchInput from "./SearchInput";
 
-type Props = {
+type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
 };
 
-const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
+export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
   return (
     <Box
       sx={{
@@ -44,5 +43,3 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
     </Box>
   );
 };
-
-export default HomeSearch;
