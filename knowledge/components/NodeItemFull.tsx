@@ -3,17 +3,15 @@ import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
-import CardMedia from "@mui/material/CardMedia";
 import Divider from "@mui/material/Divider";
-import Link from "@mui/material/Link";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import NextLink from "next/link";
-import { FC, ReactNode } from "react";
+import { FC, ReactNode, useState } from "react";
 
 import { KnowledgeNode } from "../src/knowledgeTypes";
+import FullScreenImage from "./FullScreenImage";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
@@ -27,28 +25,44 @@ type Props = {
 };
 
 const NodeItemFull: FC<Props> = ({ node, contributors }) => {
-  return (
-    <Card sx={{ width: "100%", m: 0 }}>
-      <CardHeader
-        title={
-          <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h5" underline="none" color="inherit">
-              <MarkdownRender text={node.title || ""} />
-            </Link>
-          </NextLink>
-        }
-      ></CardHeader>
-      {node.nodeImage && <CardMedia component="img" height="140" image={node.nodeImage} alt={node.title} />}
-      <Divider />
-      <CardContent>
-        <Typography variant="body1" color="text.secondary" component="div">
-          <MarkdownRender text={node.content || ""} />
-        </Typography>
+  const [imageFullScreen, setImageFullScreen] = useState(false);
+  const handleClickImageFullScreen = () => {
+    setImageFullScreen(true);
+  };
 
-        {node.nodeType === "Question" && <QuestionItem node={node} />}
-      </CardContent>
-      <Divider />
-      <CardActions>
+  return (
+    <Card sx={{ width: "100%", m: 0, padding: { xs: "4px 9px", md: "34px 36px" } }}>
+      <CardHeader title={<MarkdownRender text={node.title || ""} />}></CardHeader>
+
+      {node.content && (
+        <CardContent>
+          <Typography variant="body1" color="text.secondary" component="div">
+            <MarkdownRender text={node.content || ""} />
+          </Typography>
+        </CardContent>
+      )}
+
+      {node.nodeType === "Question" && (
+        <CardContent>{node.nodeType === "Question" && <QuestionItem node={node} />}</CardContent>
+      )}
+
+      {node.nodeImage && (
+        <Tooltip title="Click to view image in full-screen!">
+          <Box
+            onClick={handleClickImageFullScreen}
+            sx={{
+              display: "block",
+              width: "100%",
+              px: "16px",
+              cursor: "pointer"
+            }}
+          >
+            <img src={node.nodeImage} width="100%" height="100%" />
+          </Box>
+        </Tooltip>
+      )}
+
+      <CardActions sx={{ p: "16px" }}>
         <Box sx={{ display: "flex", flexDirection: "column", flex: 1, my: 2 }}>
           <Box
             sx={{
@@ -75,10 +89,13 @@ const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
             </Box>
           </Box>
-          <Divider sx={{ my: 2 }} />
-          {contributors}
         </Box>
       </CardActions>
+      <Divider sx={{ m: "24px 16px" }} />
+      <CardContent>{contributors}</CardContent>
+      {node.nodeImage && (
+        <FullScreenImage src={node.nodeImage} open={imageFullScreen} onClose={() => setImageFullScreen(false)} />
+      )}
     </Card>
   );
 };
