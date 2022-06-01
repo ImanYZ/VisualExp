@@ -47,7 +47,9 @@ const NodeItem: FC<Props> = ({ node }) => {
           color: theme => theme.palette.common.black
         }}
       >
-        <ArrowDropDownIcon />
+        <Tooltip title={expand ? "Hide the tags and contributors." : "Show the tags and contributors."}>
+          <ArrowDropDownIcon />
+        </Tooltip>
       </Button>
     );
   };
@@ -57,9 +59,11 @@ const NodeItem: FC<Props> = ({ node }) => {
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h5" underline="none" color="inherit">
-              <MarkdownRender text={node.title || ""} />
-            </Link>
+            <Tooltip title="Click to learn more...">
+              <Link variant="h5" underline="none" color="inherit">
+                <MarkdownRender text={node.title || ""} />
+              </Link>
+            </Tooltip>
           </NextLink>
         }
       ></CardHeader>
@@ -107,11 +111,18 @@ const NodeItem: FC<Props> = ({ node }) => {
                 {node.contributors &&
                   node.contributors.map((contributor, idx) => (
                     <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                      <Avatar
-                        alt="Image contributor"
-                        src={contributor.imageUrl}
-                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
-                      />
+                      <Tooltip title={`${contributor.fullname} contributed to the evolution of this node.`}>
+                        <Avatar
+                          alt="Image contributor"
+                          src={contributor.imageUrl}
+                          sx={{
+                            border: "solid",
+                            width: 56,
+                            height: 56,
+                            borderColor: theme => theme.palette.common.gray
+                          }}
+                        />
+                      </Tooltip>
                     </Box>
                   ))}
               </Box>
@@ -121,11 +132,20 @@ const NodeItem: FC<Props> = ({ node }) => {
                 {node.institutions &&
                   node.institutions.map((institution, idx) => (
                     <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                      <Avatar
-                        alt="Image contributor"
-                        src={institution.logoURL}
-                        sx={{ border: "solid", width: 56, height: 56, borderColor: theme => theme.palette.common.gray }}
-                      />
+                      <Tooltip
+                        title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
+                      >
+                        <Avatar
+                          alt="Image contributor"
+                          src={institution.logoURL}
+                          sx={{
+                            border: "solid",
+                            width: 56,
+                            height: 56,
+                            borderColor: theme => theme.palette.common.gray
+                          }}
+                        />
+                      </Tooltip>
                     </Box>
                   ))}
               </Box>
