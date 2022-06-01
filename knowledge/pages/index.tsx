@@ -1,4 +1,14 @@
-import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, Typography } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  ToggleButton,
+  Tooltip,
+  Typography
+} from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -61,39 +71,48 @@ const HomePage: NextPage<Props> = ({ data }) => {
             gap="10px"
             sx={{ width: { xs: "400px", md: "350px" } }}
           >
-            <ToggleButton
-              value="check"
-              selected={sortedByUpvotes}
-              size="small"
-              onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
-              aria-label="list"
+            <Tooltip
+              title="Order the nodes descendingly based on their number of upvotes minus downvotes."
+              placement="top"
             >
-              Upvotes
-            </ToggleButton>
-            <ToggleButton
-              value="check"
-              selected={sortedByUpvotes}
-              size="small"
-              onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
-              aria-label="list"
-            >
-              Most Recent
-            </ToggleButton>
-            <FormControl sx={{ minWidth: 120 }}>
-              <Select
-                value={sortedByTime}
-                onChange={handleSortBy}
-                displayEmpty
-                inputProps={{ "aria-label": "Without label" }}
+              <ToggleButton
+                value="check"
+                selected={sortedByUpvotes}
                 size="small"
-                sx={{ borderRadius: "40px", background: theme => theme.palette.common.white, fontSize: "12px" }}
+                onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
+                aria-label="list"
               >
-                {SortedByTimeOptions.map((SortedByTimeOption, idx) => (
-                  <MenuItem value={SortedByTimeOption} key={idx}>
-                    {SortedByTimeOption}
-                  </MenuItem>
-                ))}
-              </Select>
+                Upvotes
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title="Order the nodes descendingly based on the last time they got updated." placement="top">
+              <ToggleButton
+                value="check"
+                selected={sortedByUpvotes}
+                size="small"
+                onClick={() => setSortedByUpvotes(!sortedByUpvotes)}
+                aria-label="list"
+              >
+                Most Recent
+              </ToggleButton>
+            </Tooltip>
+            <FormControl sx={{ minWidth: 120 }}>
+              <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
+                <Select
+                  value={sortedByTime}
+                  onChange={handleSortBy}
+                  displayEmpty
+                  inputProps={{ "aria-label": "Without label" }}
+                  size="small"
+                  sx={{ borderRadius: "40px", background: theme => theme.palette.common.white, fontSize: "12px" }}
+                >
+                  {SortedByTimeOptions.map((SortedByTimeOption, idx) => (
+                    <MenuItem value={SortedByTimeOption} key={idx}>
+                      {SortedByTimeOption}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Tooltip>
             </FormControl>
           </Stack>
         </Stack>

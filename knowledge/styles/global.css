@@ -1,8 +1,14 @@
 :root {
   --navbar-height: 72px;
-  --footer-height: 76px;
+  --footer-height: 222px;
 }
 
 .react-markdown p {
   margin: 0px;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --footer-height: 470px;
+  }
 }

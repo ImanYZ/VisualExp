@@ -1,5 +1,5 @@
 import HelpIcon from "@mui/icons-material/Help";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -94,7 +94,9 @@ const HomeFilter: FC<Props> = ({ sx }) => {
           />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
-          <HelpIcon />
+          <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
+            <HelpIcon />
+          </Tooltip>
         </StyledHelpButton>
       </Grid>
     </Box>
