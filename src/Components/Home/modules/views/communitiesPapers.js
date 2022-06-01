@@ -898,69 +898,178 @@ export default {
               d: "Number of participants that share the availability of flu shot with family",
             },
           },
-          Repetition_plays_a_role_in_information_acceptance_by_manipulating_our_perception_of:
+          The_controlled_treatment_is:
             {
-              stem: `4. Repetition plays a role in information acceptance by manipulating our perception of ________.`,
+              stem: `4. The controlled treatment is:`,
               answers: ["c"],
               choices: {
-                a: "Compatibility",
-                b: "Coherence",
-                c: "Social consensus",
+                a: "An appointment reminder only",
+                b: "An appointment reminder and image of a vaccine vial with “your flu shot” witten on it",
+                c: "No messages/ text",
+                d: "There was no controlled treatment",
               },
             },
-          Warnings_against_misinformation_are_most_effective_when_issued: {
-            stem: `5. Warnings against misinformation are most effective when issued _______.`,
+            How_many_experimental_conditions_were_there: {
+            stem: `5. How many experimental conditions were there?`,
             answers: ["a"],
             choices: {
-              a: "Before the claim",
-              b: "After the claim",
+              a: "2",
+              b: "3",
+              c: "Between 1-14",
+              d: "1"
             },
           },
-          How_do_the_factors_discussed_in_this_article_play_a_role_in_the_spread_of_misinformation_on_social_media:
+          In_the_instance_that_a_participant_reschedules_the_appointment_where_the_flu_shot_could_be_received_the_study_would_not_track_the_receipt_of_the_flu_shot_after_original_appointment:
             {
-              stem: `6. How do the factors discussed in this article play a role in the spread of misinformation on social media (click all that apply)?`,
-              answers: ["b", "c", "d"],
+              stem: `6. In the instance that a participant reschedules the appointment where the flu shot could be received, the study would not track the receipt of the flu shot after original appointment `,
+              answers: ["b"],
               choices: {
-                a: "People see a diversity in opinions.",
-                b: "Short messages are easy to process.",
-                c: "We see posts from friends, establishing credibility.",
-                d: "Users can gain a false sense of expertise.",
+                a: "TRUE",
+                b: "FALSE",
               },
             },
-          What_does_this_article_recommend_as_a_means_to_correct_and_prevent_misinformation:
+            Which_of_the_following_could_be_a_potential_threat_to_external_validity_in_this_study:
             {
-              stem: `7. What does this article recommend as a means to correct and prevent misinformation?`,
-              answers: ["a"],
+              stem: `7. Which of the following could be a potential threat to external validity in this study?`,
+              answers: ["d"],
               choices: {
-                a: "Avoid repeating false information",
+                a: "Small sample size",
                 b: "Bust myths",
                 c: "Use jargon in corrections",
+                d: "The homogeneity of the sample",
               },
             },
-          What_is_associated_with_the_intuitive_processing_system: {
-            stem: `8. What is associated with the intuitive processing system?`,
+            Which_subject_specialty_is_this_study_drawing_foundation_from: {
+            stem: `8. Which subject specialty is this study drawing foundation from?`,
+            answers: ["c"],
+            choices: {
+              a: "Developmental psychology",
+              b: "Clinical psychology",
+              c: "Social psychology",
+              d: "Forensic psychology",
+            },
+          },
+          The_participants_were_rewarded_with_which_of_the_following_for_getting_the_flu_shot: {
+            stem: `9. The participants were rewarded with which of the following for getting the flu shot?`,
+            answers: ["c"],
+            choices: {
+              a: "Ability to get text notification for future appointments",
+              b: "Flu shot was free of cost",
+              c: "No rewards for the participants",
+              d: "Monetary compensation"
+            },
+          },
+          What_can_the_study_do_better_to_minimize_external_validity_threat: {
+            stem: `10. What can the study do better to minimize external validity threat?`,
+            answers: ["d"],
+            choices: {
+              a: "Acquire a larger sample size",
+              b: "Avoid making a casualty assertions.",
+              c: "Avoid making correlational assertions",
+              d: "Acquire a heterogeneous or diverse sample",
+            },
+          },    
+          What_type_of_variable_was_the_outcome_measure: {
+            stem: `11. What type of variable was the outcome measure?`,
+            answers: ["a"],
+            choices: {
+              a: "A binary variable, where 0 suggested that the participant did not get their vaccination and 1 meant that they did receive their vaccination",
+              b: "A binary variable, where 0 suggested that the participant was assigned in the control condition and 1 meant that they received a message.",
+              c: "A continuous variable, where scoring higher meant the participant was more responsive to the text message.",
+              d: "A continuous variable, where scoring higher meant the participant was more likely to get the vaccination.", 
+            },
+          },      
+          Why_were_the_researchers_interested_in_including_demographic_information_into_their_analyses: {
+              stem: `12. Why were the researchers interested in including demographic information into their analyses?`,
+              answers: ["a"],
+              choices: {
+                a: "For equity purposes",
+                b: "To increase statistical significance.",
+                c: "For manipulation check purposes",
+                d: "To avoid texting fake phone numbers",
+              },
+            },      
+          What_can_the_study_do_better_to_minimize_external_validity_threat: {
+              stem: `13. What statistical analysis did the researchers use to explore their primary hypothesis?`,
+              answers: ["c"],
+              choices: {
+                a: "Analysis of Variance",
+                b: "T-tests",
+                c: "Modeling",
+                d: "Descriptive analyses",
+              },
+            },      
+          What_is_one_of_the_findings_of_the_study: {
+            stem: `14. What is one of the findings of the study?`,
+            answers: ["d"],
+            choices: {
+              a: "Participants in both message conditions were more likely to receive their flu shot as compared to the usual care control condition",
+              b: "No differences were found between any of the message conditions and the usual care control condition",
+              c: "Telling participants that there were available flu shots rendered them more likely to actually receive the vaccination than if they had not received a message, but no statistical differences were found between the reserved message condition and the control condition",
+              d: "Reminding participants that they had reserved a shot rendered them more likely to actually receive the vaccination than if they had not received a message, but no statistical differences were found between the available message condition and the control condition",      
+            },
+          },
+          What_relationship_did_the_researchers_find_between_participants_race_and_the_reserved_message_condition: {
+             stem: `15. What relationship did the researchers find between participants’ race and the reserved message condition?`,
+             answers: ["c"],
+             choices: {
+               a: "The reserved message condition significantly increased the likelihood of receiving a message about availability for all races",
+               b: "There was no clear relationship between race and the effectiveness of the reserved message condition",
+               c: "The reserved message condition significantly increased the likelihood of receiving the flu shot for White participants but not for Black participants",
+               d: "The reserved message condition significantly decreased the likelihood of receiving the flu shot for White participants but not for Black participants",
+            },
+          },
+          What_relationship_did_the_researchers_find_between_participants_race_and_the_combined_effect_of_both_message_conditions_on_vaccination_rate: {
+            stem: `16. What relationship did the researchers find between participants’ race and the combined effect of both message conditions on vaccination rate?`,
             answers: ["b"],
             choices: {
-              a: "Effort, analysis",
-              b: "Speed, heuristics",
+              a: "There was no clear relationship",
+              b: "The combined effect was higher for White participants over Black participants",
+              c: "The combined effect was higher for Black participants over White participants",
+              d: "No analysis on the combined effect was conducted",
             },
-          },
-          What_is_associated_with_the_analytic_system: {
-            stem: `9. What is associated with the analytic system?`,
+          }, 
+          What_do_the_results_suggest_about_texting_back: {
+            stem: `17. What do the results suggest about texting back?`,
+            answers: ["c"],
+            choices: {
+              a: "Those who texted back were less likely to receive a flu shot.",
+              b: "The available message condition increased one’s likelihood of messaging back, and texting back was associated with higher likelihood of receiving a flu shot.",
+              c: "The reserved message condition increased one’s likelihood of messaging back, and texting back was associated with higher likelihood of receiving a flu shot.",
+              d: "All message conditions decreased one’s likelihood of messaging back, and texting back was associated with higher likelihood of receiving a flu shot.",
+            },
+          }, 
+          Messaging_back_significantly_mediated_the_relationship_between_message_condition_and_vaccination_rate: {
+            stem: `18. What statistical analysis did the researchers use to explore their primary hypothesis?`,
             answers: ["a"],
             choices: {
-              a: "Effort, slowness, systematic reasoning",
-              b: "Speed, heuristics",
+              a: "True",
+              b: "False",
             },
           },
-          What_is_naive_realism: {
-            stem: `10. What is naive realism?`,
+          What_limitation_is_mentioned_in_the_article: {
+            stem: `19. What limitation is mentioned in the article?`,
+            answers: ["d"],
+            choices: {
+              a: "We cannot know if participants had negative attitudes towards vaccination",
+              b: "There is no way to know if the participants opened the text message",
+              c: "The study was not pre-registered",
+              d: "The study took place during the COVID-19 pandemic",
+            },
+          }, 
+          What_might_a_suggestion_for_future_research_be_based_on_the_article: {
+            stem: `20. What might a suggestion for future research be based on the article?`,
             answers: ["a"],
             choices: {
-              a: "People believe that their view of the world is the true perception and other opposing opinions are either wrong or deliberately causing harm.",
-              b: "People incorrectly believe that people who spread information are doing so unintentionally and with pure intentions.",
+              a: "Taking into account any possible clinical interactions participants may have had about the flu shot",
+              b: "Repeating the study with more participants",
+              c: "Considering the relationship between gender identity and vaccination rate",
+              d: "Adding additional message conditions",
             },
-          },
+          },    
+             
+
+          
         },
       },
   },

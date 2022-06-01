@@ -1,14 +1,13 @@
 import { Box } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import HomeFilter from "../components/HomeFilter";
-import HomeSearch from "../components/HomeSearch";
-import MasonryNodes from "../components/MasonryNodes";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getSortedPostsData } from "../lib/nodes";
@@ -22,6 +21,16 @@ import {
 import { KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const perPage = 10;
+
+const HomeSearchContainer: ComponentType<any> = dynamic(
+  () => import("../components/HomeSearch").then(m => m.HomeSearch),
+  { ssr: false }
+);
+
+const MasonryNodes: ComponentType<any> = dynamic(
+  () => import("../components/MasonryNodes").then(m => m.TrendingNodes),
+  { ssr: false }
+);
 
 export const sortByDefaults = {
   upvotes: true,
@@ -121,7 +130,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
 
   return (
     <PagesNavbar>
-      <HomeSearch sx={{ mb: 1 }} onSearch={handleSearch}></HomeSearch>
+      <HomeSearchContainer sx={{ mb: 1 }} onSearch={handleSearch} />
       <HomeFilter></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters
