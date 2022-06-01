@@ -70,10 +70,6 @@ const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType,
           </Tooltip>
         )}
       </ListItem>
-      {/* <ListItemButton >
-        
-        
-      </ListItemButton> */}
     </HtmlTooltip>
   );
 };

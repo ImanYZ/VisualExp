@@ -34,12 +34,8 @@ const HomeFilter: FC<Props> = ({ sx }) => {
   return (
     <Box
       sx={{
-        margin: "auto",
-        padding: { xs: "10px 50px", lg: "45px 50px" },
-        maxWidth: "1300px",
-        border: "solid 2px",
-        borderColor: theme => theme.palette.grey[200],
-        borderRadius: 2
+        padding: { xs: "10px 40px", lg: "10px 40px" },
+        ...sx
       }}
     >
       <Grid
@@ -48,7 +44,7 @@ const HomeFilter: FC<Props> = ({ sx }) => {
         columns={{ xs: 1, sm: 2, md: 4 }}
         alignItems="flex-end"
         justifyContent="center"
-        sx={{ ...sx, position: "relative" }}
+        sx={{ position: "relative" }}
       >
         <Grid item xs={1}>
           <Autocomplete
@@ -112,9 +108,6 @@ const StyledHelpButton = styled(IconButton)(({ theme }) => ({
     left: "-30px",
     padding: "0px",
     color: theme.palette.common.gray
-  },
-  "&:hover": {
-    color: theme.palette.common.orange
   },
   "@media (min-width:600px)": {
     "&": {

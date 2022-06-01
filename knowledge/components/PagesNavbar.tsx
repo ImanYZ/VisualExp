@@ -27,9 +27,9 @@ const PagesNavbar: FC<Props> = ({ children, title, description, headingComponent
       <Box
         component="main"
         sx={{
-          mt: "var(--navbar-height)",
+          // mt: "var(--navbar-height)",
           minHeight: "calc(100vh - var(--navbar-height) - var(--footer-height) )",
-          py: 4,
+          py: "20px",
           px: { xs: 1, md: 2 }
         }}
       >
