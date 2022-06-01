@@ -1,11 +1,20 @@
-import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  FormControl,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  ToggleButton,
+  Typography
+} from "@mui/material";
 import { GetServerSideProps, NextPage } from "next";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { ComponentType, useState } from "react";
 
 import HomeFilter from "../components/HomeFilter";
-import HomeSearch from "../components/HomeSearch";
-import MasonryNodes from "../components/MasonryNodes";
 import PagesNavbar from "../components/PagesNavbar";
 import { getSortedPostsData } from "../lib/nodes";
 import { KnowledgeNode } from "../src/knowledgeTypes";
@@ -16,11 +25,21 @@ type Props = {
   data: KnowledgeNode[];
 };
 
+const HomeSearchContainer: ComponentType<any> = dynamic(
+  () => import("../components/HomeSearch").then(m => m.HomeSearch),
+  { ssr: false }
+);
+
+const MasonryNodesContainer: ComponentType<any> = dynamic(
+  () => import("../components/MasonryNodes").then(m => m.TrendingNodes),
+  { ssr: false }
+);
+
 export const getServerSideProps: GetServerSideProps<Props> = async ({}) => {
   const allPostsData = await getSortedPostsData();
   return {
     props: {
-      data: allPostsData
+      data: allPostsData || []
     }
   };
 };
@@ -41,7 +60,7 @@ const HomePage: NextPage<Props> = ({ data }) => {
 
   return (
     <PagesNavbar>
-      <HomeSearch sx={{ mb: 1 }} onSearch={handleSearch}></HomeSearch>
+      <HomeSearchContainer sx={{ mb: 1 }} onSearch={handleSearch} />
       <HomeFilter></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <Stack
@@ -98,7 +117,13 @@ const HomePage: NextPage<Props> = ({ data }) => {
             </FormControl>
           </Stack>
         </Stack>
-        <MasonryNodes nodes={data} />
+        {data && data.length > 0 ? (
+          <MasonryNodesContainer nodes={data} />
+        ) : (
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress />
+          </Box>
+        )}
       </Box>
     </PagesNavbar>
   );

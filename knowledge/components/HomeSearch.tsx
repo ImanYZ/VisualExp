@@ -2,16 +2,32 @@ import { styled, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
 
 import SearchInput from "./SearchInput";
 
-type Props = {
+type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
 };
 
-const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
+const StyledButton = styled(Button)(({ theme }) => ({
+  color: "inherit",
+  "&": {
+    width: "64px",
+    color: theme.palette.common.white,
+    borderRadius: 0,
+    fontSize: 15,
+    fontWeight: 500
+  },
+  "@media (min-width:600px)": {
+    "&": {
+      width: "165px",
+      fontSize: 25
+    }
+  }
+}));
+
+export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
   return (
     <Box
       sx={{
@@ -57,22 +73,3 @@ const HomeSearch: FC<Props> = ({ sx, onSearch }) => {
     </Box>
   );
 };
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  color: "inherit",
-  "&": {
-    width: "64px",
-    color: theme.palette.common.white,
-    borderRadius: 0,
-    fontSize: 15,
-    fontWeight: 500
-  },
-  "@media (min-width:600px)": {
-    "&": {
-      width: "165px",
-      fontSize: 25
-    }
-  }
-}));
-
-export default HomeSearch;
