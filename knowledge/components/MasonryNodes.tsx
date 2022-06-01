@@ -1,5 +1,6 @@
 import Masonry from "@mui/lab/Masonry";
 import Box from "@mui/material/Box";
+import Pagination from "@mui/material/Pagination";
 import { SxProps, Theme } from "@mui/system";
 import { FC } from "react";
 
@@ -8,12 +9,19 @@ import NodeItem from "./NodeItem";
 
 type Props = {
   nodes: KnowledgeNode[];
+  page: number;
+  totalPages: number;
   sx?: SxProps<Theme>;
+  onChangePage: (page: number) => void;
 };
 
-const TrendingNodes: FC<Props> = ({ nodes, sx }) => {
+const TrendingNodes: FC<Props> = ({ nodes, sx, page, totalPages, onChangePage }) => {
   const renderMasonry = () => {
     return nodes.map(el => <NodeItem key={el.id} node={el} />);
+  };
+
+  const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
+    onChangePage(value);
   };
 
   return (
@@ -21,6 +29,9 @@ const TrendingNodes: FC<Props> = ({ nodes, sx }) => {
       <Masonry sx={{ my: "20px" }} columns={{ xm: 1, md: 2 }} spacing={2} defaultHeight={450}>
         {renderMasonry()}
       </Masonry>
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Pagination count={totalPages} page={page} onChange={handleChangePage} />
+      </Box>
     </Box>
   );
 };

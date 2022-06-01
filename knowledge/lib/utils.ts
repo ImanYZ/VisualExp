@@ -31,3 +31,12 @@ export const getQueryParameter = (val: string | string[] | undefined) => {
     return val;
   }
 };
+
+export const getQueryParameterAsNumber = (val: string | string[] | undefined): number | undefined => {
+  const res = getQueryParameter(val);
+  if (res === undefined || Number.isNaN(parseInt(res)) || !Number.isFinite(parseInt(res))) {
+    return undefined;
+  }
+
+  return parseInt(res);
+};
