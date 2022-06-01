@@ -129,3 +129,9 @@ export type ResponseAutocompleteInstitutions = {
   results?: { name: string; logoUrl?: string }[];
   errorMessage?: string;
 };
+
+export enum TimeWindowOption {
+  "ThisWeek" = "This Week",
+  "ThisMonth" = "This Month",
+  "ThisYear" = "This Year"
+}

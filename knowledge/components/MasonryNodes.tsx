@@ -24,6 +24,10 @@ const TrendingNodes: FC<Props> = ({ nodes, sx, page, totalPages, onChangePage })
     onChangePage(value);
   };
 
+  if (nodes.length === 0) {
+    return <Box sx={{ textAlign: "center", mt: 3, ...sx }}>No data found</Box>;
+  }
+
   return (
     <Box sx={{ ...sx }}>
       <Masonry sx={{ my: "20px" }} columns={{ xm: 1, md: 2 }} spacing={2} defaultHeight={450}>
