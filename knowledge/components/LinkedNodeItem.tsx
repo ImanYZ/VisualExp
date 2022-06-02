@@ -24,6 +24,7 @@ type Props = {
   sx?: SxProps<Theme>;
 };
 const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType, linkSrc, label, sx }) => {
+  console.log("linkSrc", linkSrc);
   return (
     <HtmlTooltip
       title={
@@ -41,7 +42,7 @@ const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType,
       placement="left"
     >
       <ListItem sx={{ display: "flex", justifyContent: "space-between", ...sx }}>
-        <LinkNext href={linkSrc}>
+        <LinkNext passHref href={linkSrc}>
           <Link
             sx={{ fontSize: "inherit", cursor: "pointer", color: theme => theme.palette.common.black }}
             component="a"
