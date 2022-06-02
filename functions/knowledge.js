@@ -15,10 +15,13 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
     // First get the list of all users and create an Object to map their ids to their
     // institution names.
     const userInstitutions = {};
+    const userFullnames = {};
     const userDocs = await db.collection("users").get();
     for (let userDoc of userDocs.docs) {
       const userData = userDoc.data();
       userInstitutions[userDoc.id] = userData.deInstit;
+      userInstitutions[userDoc.id] =
+        userData.firstname + " " + userData.lastname;
     }
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
@@ -91,7 +94,7 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
                 versionData.proposer in
                 nodesUpdates[versionData.node].contributors
               ) &&
-              "fullname" in versionData &&
+              versionData.proposer in userFullnames &&
               "imageUrl" in versionData
             ) {
               nodesUpdates[versionData.node].contribNames.push(
@@ -100,7 +103,7 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
               nodesUpdates[versionData.node].contributors[
                 versionData.proposer
               ] = {
-                fullname: versionData.fullname,
+                fullname: userFullnames[versionData.proposer],
                 imageUrl: versionData.imageUrl,
                 chooseUname: versionData.chooseUname
                   ? versionData.chooseUname
