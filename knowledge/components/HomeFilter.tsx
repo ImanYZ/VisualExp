@@ -25,21 +25,26 @@ const dataFilter = [
 type Props = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
+  onInstitutionsChange: (newValues: string[]) => void;
 };
 
-const HomeFilter: FC<Props> = ({ sx, onTagsChange }) => {
+const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange }) => {
   const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
   const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
-  const [filter, setFilter] = React.useState<string[]>([]);
+  const [, setFilter] = React.useState<string[]>([]);
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    console.log("filter", filter);
     setFilter(newValue);
   };
 
-  const handleTagsChange = (tags: string[]) => {
-    setTagsFilter(tags);
-    onTagsChange(tags);
+  const handleTagsChange = (values: string[]) => {
+    setTagsFilter(values);
+    onTagsChange(values);
+  };
+
+  const handleInstitutionsChange = (values: string[]) => {
+    setInstitutionsFilter(values);
+    onInstitutionsChange(values);
   };
 
   return (
@@ -62,7 +67,7 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange }) => {
         </Grid>
 
         <Grid item xs={1}>
-          <InstitutionsAutocomplete value={institutionsFilter} setValue={setInstitutionsFilter} />
+          <InstitutionsAutocomplete value={institutionsFilter} onInstitutionsChange={handleInstitutionsChange} />
         </Grid>
 
         <Grid item xs={1}>

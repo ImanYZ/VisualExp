@@ -1,6 +1,5 @@
-import { styled, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import { SxProps, Theme } from "@mui/system";
 
 import backgroundImage from "../public/LibraryBackground.jpg";
@@ -10,23 +9,6 @@ type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
 };
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  color: "inherit",
-  "&": {
-    width: "64px",
-    color: theme.palette.common.white,
-    borderRadius: 0,
-    fontSize: 15,
-    fontWeight: 500
-  },
-  "@media (min-width:600px)": {
-    "&": {
-      width: "165px",
-      fontSize: 25
-    }
-  }
-}));
 
 export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
   return (
@@ -76,7 +58,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
           }}
         >
           <SearchInput onSearch={onSearch}></SearchInput>
-          <StyledButton variant="contained">Search</StyledButton>
+          {/* <StyledButton variant="contained">Search</StyledButton> */}
         </Box>
       </Box>
     </Box>

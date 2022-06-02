@@ -24,7 +24,6 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
   };
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    console.log("handleChange newValue", newValue);
     onTagsChange(newValue);
   };
 
