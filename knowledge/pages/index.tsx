@@ -48,7 +48,13 @@ const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   return `corrects:${!upvotes ? "asc" : "desc"}, updatedAt:${!mostRecent ? "asc" : "desc"}`;
 };
 
-const buildFilterBy = (timeWindow: TimeWindowOption, tags: string, institutions: string, contributors: string) => {
+const buildFilterBy = (
+  timeWindow: TimeWindowOption,
+  tags: string,
+  institutions: string,
+  contributors: string,
+  nodeTypes: string
+) => {
   const filters: string[] = [];
   let updatedAt: number = dayjs().subtract(1, "year").valueOf();
   if (timeWindow === TimeWindowOption.ThisWeek) {
@@ -67,6 +73,9 @@ const buildFilterBy = (timeWindow: TimeWindowOption, tags: string, institutions:
   if (contributors.length > 0) {
     filters.push(`contributors: [${contributors}]`);
   }
+  if (nodeTypes.length > 0) {
+    filters.push(`nodeType: [${nodeTypes}]`);
+  }
 
   return filters.join("&& ");
 };
@@ -81,6 +90,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const tags = getQueryParameter(query.tags) || "";
   const institutions = getQueryParameter(query.institutions) || "";
   const contributors = getQueryParameter(query.contributors) || "";
+  const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
   const client = new Typesense.Client({
     nodes: [
@@ -98,7 +108,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     per_page: perPage,
     page,
     sort_by: buildSortBy(upvotes, mostRecent),
-    filter_by: buildFilterBy(timeWindow, tags, institutions, contributors)
+    filter_by: buildFilterBy(timeWindow, tags, institutions, contributors, nodeTypes)
   };
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
   const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
@@ -157,6 +167,10 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
     router.replace({ query: { ...router.query, contributors: contributors.join(",") } });
   };
 
+  const handleNodeTypesChange = (nodeTypes: string[]) => {
+    router.replace({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
+  };
+
   return (
     <PagesNavbar
       headingComponent={<HomeSearchContainer sx={{ mt: "72px" }} onSearch={handleSearch}></HomeSearchContainer>}
@@ -166,6 +180,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
         onTagsChange={handleTagsChange}
         onInstitutionsChange={handleInstitutionsChange}
         onContributorsChange={handleContributorsChange}
+        onNodeTypesChange={handleNodeTypesChange}
       ></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters
