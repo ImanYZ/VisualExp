@@ -1,38 +1,26 @@
 import HelpIcon from "@mui/icons-material/Help";
 import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
-import TextField from "@mui/material/TextField";
 import { SxProps, Theme } from "@mui/system";
 import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
-
-const dataFilter = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder"
-];
+import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
 
 type Props = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
   onInstitutionsChange: (newValues: string[]) => void;
   onContributorsChange: (newValues: string[]) => void;
+  onNodeTypesChange: (newValues: string[]) => void;
 };
 
-const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContributorsChange }) => {
+const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContributorsChange, onNodeTypesChange }) => {
   const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
   const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
+  const [nodeTypesFilter, setNodeTypesFilter] = React.useState<string[]>([]);
   const [contributorsFilter, setContributorsFilter] = React.useState<string[]>([]);
 
   const handleTagsChange = (values: string[]) => {
@@ -48,6 +36,11 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
   const handleContributorsChange = (values: string[]) => {
     setContributorsFilter(values);
     onContributorsChange(values);
+  };
+
+  const handleNodeTypesChange = (values: string[]) => {
+    setNodeTypesFilter(values);
+    onNodeTypesChange(values);
   };
 
   return (
@@ -78,13 +71,7 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
         </Grid>
 
         <Grid item xs={1}>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={dataFilter}
-            getOptionLabel={option => option}
-            renderInput={params => <TextField {...params} variant="standard" label="Node Types" />}
-          />
+          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} value={nodeTypesFilter} />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
           <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
