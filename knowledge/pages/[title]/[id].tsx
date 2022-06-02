@@ -79,7 +79,7 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
       <NodeHeadContainer node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ mt: "72px" }}>
         <Grid item xs={12} sm={12} md={3}>
           {parents && parents?.length > 0 && <LinkedNodesContainer data={parents || []} header="Learn Before" />}
         </Grid>

@@ -58,7 +58,6 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
           }}
         >
           <SearchInput onSearch={onSearch}></SearchInput>
-          {/* <StyledButton variant="contained">Search</StyledButton> */}
         </Box>
       </Box>
     </Box>
