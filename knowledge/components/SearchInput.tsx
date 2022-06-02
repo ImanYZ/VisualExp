@@ -19,7 +19,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
     fontSize: 15,
     fontWeight: 500
   },
-  "@media (min-width:600px)": {
+  "@media (min-width:900px)": {
     "&": {
       width: "165px",
       fontSize: 25
