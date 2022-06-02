@@ -48,7 +48,7 @@ const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   return `corrects:${!upvotes ? "asc" : "desc"}, updatedAt:${!mostRecent ? "asc" : "desc"}`;
 };
 
-const buildFilterBy = (timeWindow: TimeWindowOption, tags: string, institutions: string) => {
+const buildFilterBy = (timeWindow: TimeWindowOption, tags: string, institutions: string, contributors: string) => {
   const filters: string[] = [];
   let updatedAt: number = dayjs().subtract(1, "year").valueOf();
   if (timeWindow === TimeWindowOption.ThisWeek) {
@@ -64,6 +64,9 @@ const buildFilterBy = (timeWindow: TimeWindowOption, tags: string, institutions:
   if (institutions.length > 0) {
     filters.push(`institutions: [${institutions}]`);
   }
+  if (contributors.length > 0) {
+    filters.push(`contributors: [${contributors}]`);
+  }
 
   return filters.join("&& ");
 };
@@ -77,6 +80,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     : sortByDefaults.timeWindow;
   const tags = getQueryParameter(query.tags) || "";
   const institutions = getQueryParameter(query.institutions) || "";
+  const contributors = getQueryParameter(query.contributors) || "";
   const page = getQueryParameterAsNumber(query.page);
   const client = new Typesense.Client({
     nodes: [
@@ -94,7 +98,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     per_page: perPage,
     page,
     sort_by: buildSortBy(upvotes, mostRecent),
-    filter_by: buildFilterBy(timeWindow, tags, institutions)
+    filter_by: buildFilterBy(timeWindow, tags, institutions, contributors)
   };
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
   const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
@@ -116,7 +120,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
   const router = useRouter();
 
   const handleSearch = (text: string) => {
-    router.push({ query: { q: text } });
+    router.push({ query: { ...router.query, q: text } });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -146,10 +150,18 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
     router.replace({ query: { ...router.query, institutions: institutions.join(",") } });
   };
 
+  const handleContributorsChange = (contributors: string[]) => {
+    router.replace({ query: { ...router.query, contributors: contributors.join(",") } });
+  };
+
   return (
     <PagesNavbar>
       <HomeSearchContainer sx={{ mb: 1 }} onSearch={handleSearch} />
-      <HomeFilter onTagsChange={handleTagsChange} onInstitutionsChange={handleInstitutionsChange}></HomeFilter>
+      <HomeFilter
+        onTagsChange={handleTagsChange}
+        onContributorsChange={handleContributorsChange}
+        onInstitutionsChange={handleInstitutionsChange}
+      ></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters
           upvotes={sortedByUpvotes}
