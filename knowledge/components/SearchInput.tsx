@@ -10,23 +10,6 @@ type Props = {
   sx?: SxProps<Theme>;
 };
 
-const StyledButton = styled(Button)(({ theme }) => ({
-  color: "inherit",
-  "&": {
-    width: "64px",
-    color: theme.palette.common.white,
-    borderRadius: 0,
-    fontSize: 15,
-    fontWeight: 500
-  },
-  "@media (min-width:600px)": {
-    "&": {
-      width: "165px",
-      fontSize: 25
-    }
-  }
-}));
-
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   const [searchText, setSearchText] = useState<string>("");
 
@@ -41,7 +24,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
 
   return (
     <Box sx={{ width: "100%", display: "flex", flexDirection: "row", ...sx }} component="form" onSubmit={handleSearch}>
-      <Search>
+      <SearchStyled>
         <StyledInputBase
           fullWidth
           placeholder="Start learning..."
@@ -49,7 +32,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
           value={searchText}
           onChange={handleChange}
         />
-      </Search>
+      </SearchStyled>
       <StyledButton variant="contained" type="submit">
         Search
       </StyledButton>
@@ -57,7 +40,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   );
 };
 
-const Search = styled("div")(({ theme }) => ({
+const SearchStyled = styled("div")(({ theme }) => ({
   position: "relative",
   border: "2px solid",
   borderColor: theme.palette.grey[200],
@@ -65,6 +48,23 @@ const Search = styled("div")(({ theme }) => ({
     backgroundColor: alpha(theme.palette.grey[300], 0.06)
   },
   width: "100%"
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  color: "inherit",
+  "&": {
+    width: "64px",
+    color: theme.palette.common.white,
+    borderRadius: 0,
+    fontSize: 15,
+    fontWeight: 500
+  },
+  "@media (min-width:900px)": {
+    "&": {
+      width: "165px",
+      fontSize: 25
+    }
+  }
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
