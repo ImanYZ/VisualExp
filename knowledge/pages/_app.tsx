@@ -7,7 +7,9 @@ import { createTheme } from "@mui/material/styles";
 import { deepmerge } from "@mui/utils";
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
 import createEmotionCache from "../src/createEmotionCache";
@@ -15,6 +17,17 @@ import createEmotionCache from "../src/createEmotionCache";
 const emotionCache = createEmotionCache();
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: false
+          }
+        }
+      })
+  );
   const theme = useMemo(() => {
     const brandingDesignTokens = getDesignTokens("light");
     let nextTheme = createTheme({
@@ -30,15 +43,20 @@ function MyApp({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <CacheProvider value={emotionCache}>
-      <Head>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Component {...pageProps} />
-      </ThemeProvider>
-    </CacheProvider>
+    <QueryClientProvider client={queryClient}>
+      <Hydrate state={pageProps.dehydratedState}>
+        <CacheProvider value={emotionCache}>
+          <Head>
+            <meta name="viewport" content="initial-scale=1, width=device-width" />
+          </Head>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </CacheProvider>
+      </Hydrate>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   );
 }
 

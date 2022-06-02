@@ -24,7 +24,7 @@ type Props = {
   contributors?: ReactNode;
 };
 
-const NodeItemFull: FC<Props> = ({ node, contributors }) => {
+export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
   const [imageFullScreen, setImageFullScreen] = useState(false);
   const handleClickImageFullScreen = () => {
     setImageFullScreen(true);
@@ -99,5 +99,3 @@ const NodeItemFull: FC<Props> = ({ node, contributors }) => {
     </Card>
   );
 };
-
-export default NodeItemFull;

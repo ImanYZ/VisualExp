@@ -4,19 +4,19 @@ import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
-import React, { FC } from "react";
+import React from "react";
 
 import { encodeTitle } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import LinkedNodeItem from "./LinkedNodeItem";
 import TypographyUnderlined from "./TypographyUnderlined";
 
-type Props = {
+type LinkedNodesProps = {
   data: LinkedKnowledgeNode[];
   header: string;
 };
 
-const LinkedNodes: FC<Props> = ({ data, header }) => {
+export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
   const renderLinkedNodes = () => {
     return data.map((el, idx, src) => (
       <React.Fragment key={idx}>
@@ -55,5 +55,3 @@ const LinkedNodes: FC<Props> = ({ data, header }) => {
     </Card>
   );
 };
-
-export default LinkedNodes;

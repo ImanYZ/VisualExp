@@ -6,6 +6,9 @@ import TextField from "@mui/material/TextField";
 import { SxProps, Theme } from "@mui/system";
 import React, { FC } from "react";
 
+import TagsAutocomplete from "../components/TagsAutocomplete";
+import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
+
 const dataFilter = [
   "Oliver Hansen",
   "Van Henry",
@@ -21,14 +24,22 @@ const dataFilter = [
 
 type Props = {
   sx?: SxProps<Theme>;
+  onTagsChange: (newValues: string[]) => void;
 };
 
-const HomeFilter: FC<Props> = ({ sx }) => {
+const HomeFilter: FC<Props> = ({ sx, onTagsChange }) => {
+  const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
+  const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
   const [filter, setFilter] = React.useState<string[]>([]);
 
   const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
     console.log("filter", filter);
     setFilter(newValue);
+  };
+
+  const handleTagsChange = (tags: string[]) => {
+    setTagsFilter(tags);
+    onTagsChange(tags);
   };
 
   return (
@@ -47,25 +58,11 @@ const HomeFilter: FC<Props> = ({ sx }) => {
         sx={{ position: "relative" }}
       >
         <Grid item xs={1}>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={dataFilter}
-            getOptionLabel={option => option}
-            onChange={handleChange}
-            renderInput={params => <TextField {...params} variant="standard" label="Tags" />}
-          />
+          <TagsAutocomplete tags={tagsFilter} onTagsChange={handleTagsChange} />
         </Grid>
 
         <Grid item xs={1}>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={dataFilter}
-            getOptionLabel={option => option}
-            onChange={handleChange}
-            renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
-          />
+          <InstitutionsAutocomplete value={institutionsFilter} setValue={setInstitutionsFilter} />
         </Grid>
 
         <Grid item xs={1}>
