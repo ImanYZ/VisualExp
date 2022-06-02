@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
@@ -8,6 +9,23 @@ type Props = {
   onSearch: (text: string) => void;
   sx?: SxProps<Theme>;
 };
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  color: "inherit",
+  "&": {
+    width: "64px",
+    color: theme.palette.common.white,
+    borderRadius: 0,
+    fontSize: 15,
+    fontWeight: 500
+  },
+  "@media (min-width:600px)": {
+    "&": {
+      width: "165px",
+      fontSize: 25
+    }
+  }
+}));
 
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   const [searchText, setSearchText] = useState<string>("");
@@ -22,7 +40,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", ...sx }} component="form" onSubmit={handleSearch}>
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "row", ...sx }} component="form" onSubmit={handleSearch}>
       <Search>
         <StyledInputBase
           fullWidth
@@ -32,6 +50,9 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
           onChange={handleChange}
         />
       </Search>
+      <StyledButton variant="contained" type="submit">
+        Search
+      </StyledButton>
     </Box>
   );
 };
