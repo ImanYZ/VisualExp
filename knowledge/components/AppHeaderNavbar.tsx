@@ -25,6 +25,8 @@ type Props = {
 const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
+  console.log("router.route", router.route);
+
   return (
     <AppBar sx={{ boxShadow: "none" }}>
       <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
@@ -39,7 +41,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
           {SECTIONS.map((page, idx) => {
             return (
               <Tooltip key={idx} title={page.title}>
-                <NextLink color="inherit" href={page.route}>
+                <NextLink passHref color="inherit" href={page.route}>
                   <Link
                     padding="20px 20px"
                     sx={{
@@ -69,37 +71,39 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
             marginLeft: "20px"
           }}
         >
-          <Paper
-            component="form"
-            sx={{
-              p: "0px 4px",
-              display: "flex",
-              alignItems: "center",
-              width: "100%",
-              background: theme => theme.palette.grey[600],
-              borderRadius: "3px",
-              border: "solid 2px",
-              borderColor: theme => theme.palette.grey[600],
-              color: theme => theme.palette.common.white,
-              ":hover": {
-                borderColor: theme => theme.palette.common.white,
-                color: theme => theme.palette.common.white
-              },
-              ":focus-within": {
-                background: theme => theme.palette.common.white,
-                color: theme => theme.palette.common.black
-              }
-            }}
-          >
-            <StyledInputBase
-              placeholder="Search on 1Cademy "
-              inputProps={{ "aria-label": "search node" }}
-              sx={{ ml: 1, flex: 1 }}
-            />
-            <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-          </Paper>
+          {router.route !== "/" && (
+            <Paper
+              component="form"
+              sx={{
+                p: "0px 4px",
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+                background: theme => theme.palette.grey[600],
+                borderRadius: "3px",
+                border: "solid 2px",
+                borderColor: theme => theme.palette.grey[600],
+                color: theme => theme.palette.common.white,
+                ":hover": {
+                  borderColor: theme => theme.palette.common.white,
+                  color: theme => theme.palette.common.white
+                },
+                ":focus-within": {
+                  background: theme => theme.palette.common.white,
+                  color: theme => theme.palette.common.black
+                }
+              }}
+            >
+              <StyledInputBase
+                placeholder="Search on 1Cademy "
+                inputProps={{ "aria-label": "search node" }}
+                sx={{ ml: 1, flex: 1 }}
+              />
+              <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search">
+                <SearchIcon />
+              </IconButton>
+            </Paper>
+          )}
           {showApply && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
