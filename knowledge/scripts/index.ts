@@ -27,11 +27,10 @@ const getInstitutionsFirestore = async () => {
 
 const getTagsFirestore = async () => {
   let tags: string[] = [];
-  const tagDocs = await db.collection("tags").get();
+  const tagDocs = await db.collection("nodes").where("isTag", "==", true).get();
   for (let tagDoc of tagDocs.docs) {
     const tagData = tagDoc.data();
-    const tagsArr = tagData.tags;
-    tags = Array.from(new Set(tags.concat(tagsArr)));
+    tags = Array.from(new Set([...tags, tagData.title]));
   }
   const tagsObjArr = tags.map((el: string) => ({ name: el }));
 
@@ -80,20 +79,22 @@ const getContributors = (nodeData: NodeFireStore): string[] => {
 const getNodesFromFirestore = async () => {
   const importData: TypesenseNodesSchema[] = [];
 
-  const nodeDocs = await db.collection("nodes").where("deleted", "==", false).limit(10000).get();
+  const nodeDocs = await db.collection("nodes").get();
   for (let nodeDoc of nodeDocs.docs) {
     const nodeData = nodeDoc.data() as NodeFireStore;
-    importData.push({
-      id: nodeDoc.id,
-      content: nodeData.content || "",
-      title: nodeData.title || "",
-      tags: getNodeTags(nodeData),
-      institutions: getInstitutions(nodeData),
-      contributors: getContributors(nodeData),
-      corrects: nodeData.corrects || 0,
-      updatedAt: nodeData.updatedAt?.toMillis() || 0,
-      nodeType: nodeData.nodeType
-    });
+    if (!nodeData.deleted) {
+      importData.push({
+        id: nodeDoc.id,
+        content: nodeData.content || "",
+        title: nodeData.title || "",
+        tags: getNodeTags(nodeData),
+        institutions: getInstitutions(nodeData),
+        contributors: getContributors(nodeData),
+        corrects: nodeData.corrects || 0,
+        updatedAt: nodeData.updatedAt?.toMillis() || 0,
+        nodeType: nodeData.nodeType
+      });
+    }
   }
 
   return importData;
@@ -146,7 +147,7 @@ const fillNodesIndex = async (forceReIndex?: boolean) => {
 
 const main = async () => {
   console.log("Filling users index");
-  await fillUsersIndex(true);
+  await fillUsersIndex();
   console.log("End Filling nodes index");
 
   console.log("Filling institutions index");
@@ -154,11 +155,11 @@ const main = async () => {
   console.log("End Filling institutions index");
 
   console.log("Filling tags index");
-  await fillTagsIndex();
+  await fillTagsIndex(true);
   console.log("End Filling tags index");
 
   console.log("Filling nodes index");
-  await fillNodesIndex();
+  await fillNodesIndex(true);
   console.log("End Filling nodes index");
 };
 
