@@ -94,7 +94,6 @@ export type KnowledgeNode = Omit<
   NodeFireStore,
   "updatedAt" | "changedAt" | "createdAt" | "contributors" | "institutions" | "tags" | "parents"
 > & {
-  // export type KnowledgeNode = NodeFireStore & {
   id: string;
   updatedAt?: string;
   nodeImage?: string;
@@ -108,3 +107,31 @@ export type KnowledgeNode = Omit<
   children?: LinkedKnowledgeNode[];
   parents?: LinkedKnowledgeNode[];
 };
+
+export type ResponseAutocompleteTags = {
+  results?: string[];
+  errorMessage?: string;
+};
+
+export type TypesenseNodesSchema = {
+  id: string;
+  content: string;
+  title: string;
+  tags: string[];
+  institutions: string[];
+  contributors: string[];
+  nodeType: string;
+  corrects: number;
+  updatedAt: number;
+};
+
+export type ResponseAutocompleteInstitutions = {
+  results?: { name: string; logoUrl?: string }[];
+  errorMessage?: string;
+};
+
+export enum TimeWindowOption {
+  "ThisWeek" = "This Week",
+  "ThisMonth" = "This Month",
+  "ThisYear" = "This Year"
+}
