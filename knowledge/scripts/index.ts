@@ -5,14 +5,14 @@ import { NodeFireStore, TypesenseNodesSchema } from "../src/knowledgeTypes";
 import indexCollection from "./populateIndex";
 
 const getUsersFromFirestore = async () => {
-  let users: { name: string }[] = [];
-  const usersDocs = await db.collection("users").get();
+  let users: { name: string; username: string; imageUrl: string }[] = [];
+  const usersDocs = await db.collection("users").limit(10).get();
   for (let userDoc of usersDocs.docs) {
     const userData = userDoc.data();
-    const name = `${userData.fname} ${userData.lName}`;
-    users.push({ name });
+    const name = `${userData.fName || ""} ${userData.lName || ""}`;
+    users.push({ name, username: userDoc.id, imageUrl: userData.imageUrl });
   }
-
+  console.log("users", users);
   return users;
 };
 
@@ -111,19 +111,22 @@ const fillInstitutionsIndex = async (forceReIndex?: boolean) => {
 
 const fillUsersIndex = async (forceReIndex?: boolean) => {
   const data = await getUsersFromFirestore();
-  const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
-
+  const fields: CollectionFieldSchema[] = [
+    { name: "username", type: "string" },
+    { name: "name", type: "string" },
+    { name: "imageUrl", type: "string" }
+  ];
   await indexCollection("users", fields, data, forceReIndex);
 };
 
-const fillTagsIndex = async () => {
+const fillTagsIndex = async (forceReIndex?: boolean) => {
   const data = await getTagsFirestore();
   const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
 
-  await indexCollection("tags", fields, data);
+  await indexCollection("tags", fields, data, forceReIndex);
 };
 
-const fillNodesIndex = async () => {
+const fillNodesIndex = async (forceReIndex?: boolean) => {
   const data = await getNodesFromFirestore();
 
   const fields: CollectionFieldSchema[] = [
@@ -138,12 +141,12 @@ const fillNodesIndex = async () => {
     { name: "updatedAt", type: "int64" }
   ];
 
-  await indexCollection("nodes", fields, data);
+  await indexCollection("nodes", fields, data, forceReIndex);
 };
 
 const main = async () => {
   console.log("Filling users index");
-  await fillUsersIndex();
+  await fillUsersIndex(true);
   console.log("End Filling nodes index");
 
   console.log("Filling institutions index");

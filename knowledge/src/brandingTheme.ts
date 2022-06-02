@@ -122,39 +122,6 @@ export function getThemedComponents(): {
           }
         ]
       },
-      MuiToggleButton: {
-        styleOverrides: {
-          root: {
-            "&": {
-              color: common.black,
-              borderRadius: "40px",
-              border: "solid 2px",
-              borderColor: common.gray,
-              background: common.white
-            },
-            "&:hover": {
-              color: common.black,
-              background: common.orangeLight,
-              borderColor: common.orangeLight
-            },
-            "&.Mui-selected": {
-              color: common.white,
-              background: common.orange,
-              borderColor: common.orange
-            },
-            "&.Mui-selected:hover": {
-              color: common.black,
-              background: common.orangeLight,
-              borderColor: common.orangeLight
-            }
-          },
-          sizeSmall: {
-            fontSize: "12px",
-            fontWeight: "400",
-            padding: "6px 16px"
-          }
-        }
-      },
       MuiAppBar: {
         styleOverrides: {
           root: {
@@ -165,6 +132,29 @@ export function getThemedComponents(): {
       MuiTooltip: {
         defaultProps: {
           arrow: true
+        }
+      },
+      MuiCardContent: {
+        styleOverrides: {
+          root: {
+            "&": {
+              paddingTop: "0px",
+              paddingBottom: "0px"
+            },
+            "&:last-child": {
+              paddingTop: "0px",
+              paddingBottom: "0px"
+            }
+          }
+        }
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            "&:hover": {
+              boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)"
+            }
+          }
         }
       }
     }
