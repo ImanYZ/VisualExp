@@ -22,7 +22,7 @@ import { KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/kn
 
 const perPage = 10;
 
-const HomeSearchContainer: ComponentType<any> = dynamic(
+export const HomeSearchContainer: ComponentType<any> = dynamic(
   () => import("../components/HomeSearch").then(m => m.HomeSearch),
   { ssr: false }
 );
@@ -114,9 +114,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 };
 
 const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
-  const [sortedByUpvotes, setSortedByUpvotes] = useState(sortByDefaults.upvotes);
-  const [sortedByMostRecent, setSortedByMostRecent] = useState(sortByDefaults.mostRecent);
+  const [sortedByType, setSortedByType] = useState("");
   const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
+
   const router = useRouter();
 
   const handleSearch = (text: string) => {
@@ -127,14 +127,17 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
     router.replace({ query: { ...router.query, page: newPage } });
   };
 
-  const handleChangeUpvotes = () => {
-    router.replace({ query: { ...router.query, upvotes: !sortedByUpvotes } });
-    setSortedByUpvotes(!sortedByUpvotes);
-  };
-
-  const handleChangeMostRecent = () => {
-    router.replace({ query: { ...router.query, mostRecent: !sortedByMostRecent } });
-    setSortedByMostRecent(!sortedByMostRecent);
+  const handleByType = (val: string) => {
+    if (val === "most-recent") {
+      router.replace({ query: { ...router.query, mostRecent: true, upvotes: false } });
+      return setSortedByType(val);
+    }
+    if (val === "upvotes-downvotes") {
+      router.replace({ query: { ...router.query, mostRecent: false, upvotes: true } });
+      return setSortedByType(val);
+    }
+    router.replace({ query: { ...router.query, mostRecent: false, upvotes: false } });
+    setSortedByType("");
   };
 
   const handleChangeTimeWindow = (val: TimeWindowOption) => {
@@ -155,20 +158,20 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
   };
 
   return (
-    <PagesNavbar>
-      <HomeSearchContainer sx={{ mb: 1 }} onSearch={handleSearch} />
+    <PagesNavbar
+      headingComponent={<HomeSearchContainer sx={{ mt: "72px" }} onSearch={handleSearch}></HomeSearchContainer>}
+    >
       <HomeFilter
+        sx={{ maxWidth: "1180px", margin: "auto" }}
         onTagsChange={handleTagsChange}
-        onContributorsChange={handleContributorsChange}
         onInstitutionsChange={handleInstitutionsChange}
+        onContributorsChange={handleContributorsChange}
       ></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters
-          upvotes={sortedByUpvotes}
-          mostRecent={sortedByMostRecent}
+          sortedByType={sortedByType}
+          handleByType={handleByType}
           timeWindow={timeWindow}
-          onUpvotesClicked={handleChangeUpvotes}
-          onMostRecentClicked={handleChangeMostRecent}
           onTimeWindowChanged={handleChangeTimeWindow}
         />
         <MasonryNodes

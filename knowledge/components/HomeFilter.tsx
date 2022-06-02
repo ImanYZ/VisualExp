@@ -1,5 +1,5 @@
 import HelpIcon from "@mui/icons-material/Help";
-import { Box, Grid, IconButton } from "@mui/material";
+import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
@@ -53,12 +53,8 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
   return (
     <Box
       sx={{
-        margin: "auto",
-        padding: { xs: "10px 50px", lg: "45px 50px" },
-        maxWidth: "1300px",
-        border: "solid 2px",
-        borderColor: theme => theme.palette.grey[200],
-        borderRadius: 2
+        padding: { xs: "10px 40px", lg: "10px 10px" },
+        ...sx
       }}
     >
       <Grid
@@ -67,7 +63,7 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
         columns={{ xs: 1, sm: 2, md: 4 }}
         alignItems="flex-end"
         justifyContent="center"
-        sx={{ ...sx, position: "relative" }}
+        sx={{ position: "relative" }}
       >
         <Grid item xs={1}>
           <TagsAutocomplete tags={tagsFilter} onTagsChange={handleTagsChange} />
@@ -91,7 +87,9 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
           />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
-          <HelpIcon />
+          <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
+            <HelpIcon />
+          </Tooltip>
         </StyledHelpButton>
       </Grid>
     </Box>
@@ -107,9 +105,6 @@ const StyledHelpButton = styled(IconButton)(({ theme }) => ({
     left: "-30px",
     padding: "0px",
     color: theme.palette.common.gray
-  },
-  "&:hover": {
-    color: theme.palette.common.orange
   },
   "@media (min-width:600px)": {
     "&": {
