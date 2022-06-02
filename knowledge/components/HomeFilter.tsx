@@ -7,6 +7,7 @@ import { SxProps, Theme } from "@mui/system";
 import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
+import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 
 const dataFilter = [
@@ -26,16 +27,13 @@ type Props = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
   onInstitutionsChange: (newValues: string[]) => void;
+  onContributorsChange: (newValues: string[]) => void;
 };
 
-const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange }) => {
+const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContributorsChange }) => {
   const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
   const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
-  const [, setFilter] = React.useState<string[]>([]);
-
-  const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
-    setFilter(newValue);
-  };
+  const [contributorsFilter, setContributorsFilter] = React.useState<string[]>([]);
 
   const handleTagsChange = (values: string[]) => {
     setTagsFilter(values);
@@ -45,6 +43,11 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange }) => {
   const handleInstitutionsChange = (values: string[]) => {
     setInstitutionsFilter(values);
     onInstitutionsChange(values);
+  };
+
+  const handleContributorsChange = (values: string[]) => {
+    setContributorsFilter(values);
+    onContributorsChange(values);
   };
 
   return (
@@ -75,14 +78,7 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange }) => {
         </Grid>
 
         <Grid item xs={1}>
-          <Autocomplete
-            multiple
-            id="tags-standard"
-            options={dataFilter}
-            getOptionLabel={option => option}
-            onChange={handleChange}
-            renderInput={params => <TextField {...params} variant="standard" label="Contributors" />}
-          />
+          <ContributorsAutocomplete value={contributorsFilter} onContributorsChange={handleContributorsChange} />
         </Grid>
 
         <Grid item xs={1}>
@@ -91,7 +87,6 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange }) => {
             id="tags-standard"
             options={dataFilter}
             getOptionLabel={option => option}
-            onChange={handleChange}
             renderInput={params => <TextField {...params} variant="standard" label="Node Types" />}
           />
         </Grid>
