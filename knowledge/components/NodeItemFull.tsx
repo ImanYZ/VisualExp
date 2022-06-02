@@ -43,7 +43,9 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
       )}
 
       {node.nodeType === "Question" && (
-        <CardContent>{node.nodeType === "Question" && <QuestionItem node={node} />}</CardContent>
+        <CardContent>
+          <QuestionItem node={node} />
+        </CardContent>
       )}
 
       {node.nodeImage && (
