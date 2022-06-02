@@ -75,9 +75,20 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
               p: "0px 4px",
               display: "flex",
               alignItems: "center",
-              width: "250px",
+              width: "100%",
               background: theme => theme.palette.grey[600],
-              borderRadius: "3px"
+              borderRadius: "3px",
+              border: "solid 2px",
+              borderColor: theme => theme.palette.grey[600],
+              color: theme => theme.palette.common.white,
+              ":hover": {
+                borderColor: theme => theme.palette.common.white,
+                color: theme => theme.palette.common.white
+              },
+              ":focus-within": {
+                background: theme => theme.palette.common.white,
+                color: theme => theme.palette.common.black
+              }
             }}
           >
             <StyledInputBase
@@ -85,7 +96,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
               inputProps={{ "aria-label": "search node" }}
               sx={{ ml: 1, flex: 1 }}
             />
-            <IconButton type="submit" sx={{ p: "5px", color: theme => theme.palette.common.white }} aria-label="search">
+            <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search">
               <SearchIcon />
             </IconButton>
           </Paper>
@@ -138,11 +149,21 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
   );
 };
 
-const StyledInputBase = styled(InputBase)(() => ({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     padding: 0,
     width: "100%",
-    color: "#fff"
+    color: theme.palette.common.white
+  },
+  "& .MuiInputBase-input::placeholder": {
+    opacity: 1,
+    color: theme.palette.common.white,
+    fontWeight: "400"
+  },
+  "& .MuiInputBase-input:focus": {
+    color: theme.palette.common.black,
+    background: theme.palette.common.white,
+    fontWeight: "400"
   }
 }));
 
