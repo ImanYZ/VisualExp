@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, List, Typography } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, Divider, List, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
@@ -22,27 +22,36 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
   return (
     <Card sx={{ ...sx }}>
       <CardHeader
-        sx={{ backgroundColor: theme => theme.palette.grey[300] }}
+        sx={{
+          height: "60px",
+          px: "50px",
+          backgroundColor: theme => theme.palette.grey[100]
+        }}
         title={
           <Box>
-            <Typography variant="h5" fontWeight={100}>
+            <Typography variant="h5" fontWeight={300} fontSize="23px">
               Tags
             </Typography>
           </Box>
         }
       ></CardHeader>
-      <CardContent sx={{ p: 0 }}>
-        <List dense>
-          {tags.map((node, idx) => (
-            <LinkedNodeItem
-              key={idx}
-              title={getReferenceTitle(node)}
-              linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
-              nodeType={node.nodeType}
-              nodeImageUrl={node.nodeImage}
-              nodeContent={node.content}
-              showListItemIcon={false}
-            />
+      <CardContent sx={{ px: "0px" }}>
+        <List sx={{ p: "0px" }} dense>
+          {tags.map((node, idx, src) => (
+            <React.Fragment key={idx}>
+              <LinkedNodeItem
+                // key={idx}
+                title={getReferenceTitle(node)}
+                linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+                nodeType={node.nodeType}
+                nodeImageUrl={node.nodeImage}
+                nodeContent={node.content}
+                showListItemIcon={false}
+                label={node.label || ""}
+                sx={{ p: "40px 50px" }}
+              />
+              {idx < src.length - 1 && <Divider />}
+            </React.Fragment>
           ))}
         </List>
       </CardContent>

@@ -1,63 +1,60 @@
-import { FormControl, MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, Typography } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip
+} from "@mui/material";
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
 import { TimeWindowOption } from "../src/knowledgeTypes";
 
 type Props = {
-  upvotes: boolean;
-  mostRecent: boolean;
+  sortedByType: string;
+  handleByType: (val: string) => void;
   timeWindow: string;
-  onUpvotesClicked: () => void;
-  onMostRecentClicked: () => void;
   onTimeWindowChanged: (val: TimeWindowOption) => void;
 };
 
-const SortByFilters: FC<Props> = ({
-  upvotes,
-  mostRecent,
-  timeWindow,
-  onUpvotesClicked,
-  onMostRecentClicked,
-  onTimeWindowChanged
-}) => {
-  const handleSortBy = (event: SelectChangeEvent<string>) => {
+const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTimeWindowChanged }) => {
+  const handleSortByTime = (event: SelectChangeEvent<string>) => {
     onTimeWindowChanged(event.target.value as TimeWindowOption);
+  };
+
+  const handleSortByType = (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
+    handleByType(newAlignment || "");
   };
 
   return (
     <Stack
-      direction="row"
-      justifyContent="flex-start"
-      flexWrap="wrap"
+      direction={{ xs: "column-reverse", md: "row" }}
       alignItems="center"
-      sx={{ my: { xs: 1, md: 1 } }}
+      justifyContent={{ xs: "center", sm: "space-between" }}
+      gap="10px"
+      sx={{
+        width: { xs: "100%", md: "750px" },
+        padding: { xs: "0px 40px", md: "0px 0px" },
+        marginBottom: "50px"
+      }}
     >
-      <Typography variant="h5" pr="10px" sx={{ fontSize: { xs: "14px", md: "20px" } }}>
-        Sort by:
-      </Typography>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        gap="10px"
-        sx={{ width: { xs: "400px", md: "350px" } }}
-      >
-        <ToggleButton value="check" selected={upvotes} size="small" onClick={onUpvotesClicked} aria-label="list">
-          Upvotes
-        </ToggleButton>
-        <ToggleButton value="check" selected={mostRecent} size="small" onClick={onMostRecentClicked} aria-label="list">
+      <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options" fullWidth>
+        <ToggleButton value="most-recent" aria-label="sort by the most recent">
           Most Recent
         </ToggleButton>
-        <FormControl sx={{ minWidth: 120 }}>
-          <Select
-            value={timeWindow}
-            onChange={handleSortBy}
-            displayEmpty
-            inputProps={{ "aria-label": "Without label" }}
-            size="small"
-            sx={{ borderRadius: "40px", background: theme => theme.palette.common.white, fontSize: "12px" }}
-          >
+        <ToggleButton value="upvotes-downvotes" aria-label="sort by upvotes">
+          Upvotes - Downvotes
+        </ToggleButton>
+      </ToggleButtonGroup>
+
+      <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
+        <FormControl variant="filled" sx={{ m: 1, width: "100%" }} size="small">
+          <InputLabel id="any-time-label">Any Time</InputLabel>
+          <Select labelId="any-time-label" id="any-time" value={timeWindow} onChange={handleSortByTime}>
             {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
               <MenuItem value={sortedByTimeOption} key={idx}>
                 {sortedByTimeOption}
@@ -65,7 +62,7 @@ const SortByFilters: FC<Props> = ({
             ))}
           </Select>
         </FormControl>
-      </Stack>
+      </Tooltip>
     </Stack>
   );
 };
