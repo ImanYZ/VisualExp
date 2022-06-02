@@ -1,3 +1,5 @@
+import { TimeWindowOption } from "../src/knowledgeTypes";
+
 export const isValidHttpUrl = (possibleUrl?: string) => {
   let url;
   if (!possibleUrl) {
@@ -22,4 +24,44 @@ export const escapeBreaksQuotes = (text?: string) => {
 
 export const encodeTitle = (title?: string) => {
   return encodeURI(escapeBreaksQuotes(title)).replace(/[&\/\?\\]/g, "");
+};
+
+export const getQueryParameter = (val: string | string[] | undefined) => {
+  if (Array.isArray(val)) {
+    return val[0];
+  } else {
+    return val;
+  }
+};
+
+export const getQueryParameterAsNumber = (val: string | string[] | undefined): number | undefined => {
+  const res = getQueryParameter(val);
+  if (res === undefined || Number.isNaN(parseInt(res)) || !Number.isFinite(parseInt(res))) {
+    return undefined;
+  }
+
+  return parseInt(res);
+};
+
+export const getQueryParameterAsBoolean = (val: string | string[] | undefined): boolean => {
+  const res = getQueryParameter(val);
+  if (res === undefined || val === "false") {
+    return false;
+  }
+
+  return true;
+};
+
+export const SortedByTimeOptions: TimeWindowOption[] = [
+  TimeWindowOption.ThisWeek,
+  TimeWindowOption.ThisMonth,
+  TimeWindowOption.ThisYear
+];
+
+export const existValueInEnum = (type: any, value: any): boolean => {
+  return (
+    Object.keys(type)
+      .filter(k => isNaN(Number(k)))
+      .filter(k => type[k] === value).length > 0
+  );
 };
