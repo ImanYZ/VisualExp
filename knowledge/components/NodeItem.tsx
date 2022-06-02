@@ -45,32 +45,26 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           color: theme => theme.palette.common.black
         }}
       >
-        <ArrowDropDownIcon />
+        <Tooltip title={expand ? "Hide the tags and contributors." : "Show the tags and contributors."}>
+          <ArrowDropDownIcon />
+        </Tooltip>
       </Button>
     );
   };
 
   return (
-    <Card sx={{ width: "100%", m: 0, padding: { xs: "4px 9px", md: "14px 36px" } }}>
+    <Card sx={{ width: "100%", my: 1, padding: { xs: "4px 9px", md: "14px 36px" } }}>
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h5" underline="none" color="inherit">
-              <MarkdownRender text={node.title || ""} />
-            </Link>
+            <Tooltip title="Click to learn more...">
+              <Link variant="h3" underline="hover" color="inherit" component="h2" sx={{ fontSize: "25px" }}>
+                <MarkdownRender text={node.title || ""} />
+              </Link>
+            </Tooltip>
           </NextLink>
         }
       ></CardHeader>
-      <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
-        {node.updatedAt && (
-          <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
-            <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-              {dayjs(new Date(node.updatedAt)).fromNow()}
-            </Typography>
-          </Tooltip>
-        )}
-        <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
-      </Box>
 
       <CardContent>
         <Typography variant="body1" color="text.secondary" component="div">
@@ -85,12 +79,17 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         <Box
           sx={{ display: "flex", flexDirection: "row", flex: 1, justifyContent: "space-between", alignItems: "center" }}
         >
-          <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h6" component="a" sx={{ fontWeight: "400" }}>
-              Learn more
-            </Link>
-          </NextLink>
-          <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+          <Box sx={{ display: "flex", flex: 1, justifyContent: "space-between" }}>
+            <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
+              <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
+              {node.updatedAt && (
+                <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
+                  <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
+                    {dayjs(new Date(node.updatedAt)).fromNow()}
+                  </Typography>
+                </Tooltip>
+              )}
+            </Box>
             <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
           </Box>
           <ExpandMore expand={expanded} />
@@ -110,16 +109,18 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                 {node.contributors &&
                   node.contributors.map((contributor, idx) => (
                     <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                      <Avatar
-                        alt="Image contributor"
-                        src={contributor.imageUrl}
-                        sx={{
-                          border: "solid",
-                          width: 56,
-                          height: 56,
-                          borderColor: theme => theme.palette.common.darkGrayBackground
-                        }}
-                      />
+                      <Tooltip title={`${contributor.fullname} contributed to the evolution of this node.`}>
+                        <Avatar
+                          alt="Image contributor"
+                          src={contributor.imageUrl}
+                          sx={{
+                            border: "solid",
+                            width: 56,
+                            height: 56,
+                            borderColor: theme => theme.palette.common.gray
+                          }}
+                        />
+                      </Tooltip>
                     </Box>
                   ))}
               </Box>
@@ -129,22 +130,25 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                 {node.institutions &&
                   node.institutions.map((institution, idx) => (
                     <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
-                      <Avatar
-                        alt="Image contributor"
-                        src={institution.logoURL}
-                        sx={{
-                          border: "solid",
-                          width: 56,
-                          height: 56,
-                          borderColor: theme => theme.palette.common.darkGrayBackground
-                        }}
-                      />
+                      <Tooltip
+                        title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
+                      >
+                        <Avatar
+                          alt="Image contributor"
+                          src={institution.logoURL}
+                          sx={{
+                            border: "solid",
+                            width: 56,
+                            height: 56,
+                            borderColor: theme => theme.palette.common.gray
+                          }}
+                        />
+                      </Tooltip>
                     </Box>
                   ))}
               </Box>
             </Grid>
           </Grid>
-          {/* </Box> */}
         </CardContent>
       </Collapse>
     </Card>

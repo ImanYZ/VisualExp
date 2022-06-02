@@ -41,9 +41,9 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
               <Tooltip key={idx} title={page.title}>
                 <NextLink color="inherit" href={page.route}>
                   <Link
-                    padding="13px 20px"
+                    padding="20px 20px"
                     sx={{
-                      fontSize: "20px",
+                      fontSize: "16px",
                       fontWeight: "500",
                       color: theme =>
                         router.route === page.route ? theme.palette.common.white : theme.palette.grey[500],

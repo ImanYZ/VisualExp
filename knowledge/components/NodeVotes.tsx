@@ -13,7 +13,9 @@ type Props = {
 const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
-      <Tooltip title={`${wrongs} downvotes`}>
+      <Tooltip
+        title={`${wrongs}  people found this node unhelpful and voted to delete it. To vote, you should create an account.`}
+      >
         <Box
           sx={{
             display: "flex",
@@ -28,7 +30,9 @@ const NodeVotes: FC<Props> = ({ corrects = 0, wrongs = 0 }) => {
           </Typography>
         </Box>
       </Tooltip>
-      <Tooltip title={`${corrects} upvotes`}>
+      <Tooltip
+        title={`${corrects} people found this node helpful and voted to prevent further changes. To vote, you should create an account.`}
+      >
         <Box
           sx={{
             display: "flex",
