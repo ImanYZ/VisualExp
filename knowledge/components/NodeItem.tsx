@@ -78,7 +78,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         </Typography>
 
         {node.nodeType === "Question" && <QuestionItem node={node} />}
-        {node.nodeImage && <CardMedia component="img" height="140" image={node.nodeImage} alt={node.title} />}
+        {node.nodeImage && <CardMedia component="img" width="100%" image={node.nodeImage} alt={node.title} />}
       </CardContent>
 
       <CardActions>
