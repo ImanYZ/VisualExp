@@ -6,17 +6,17 @@ import { FC, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
-import { getInstitutionsAutocomplete } from "../lib/knowledgeApi";
+import { getContributorsAutocomplete } from "../lib/knowledgeApi";
 
 type Props = {
   value: string[];
-  onInstitutionsChange: (newValues: string[]) => void;
+  onContributorsChange: (newValues: string[]) => void;
 };
 
-const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
+const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange }) => {
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText));
+  const { data } = useQuery(["contributors", searchText], () => getContributorsAutocomplete(searchText));
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
     if (event && query.trim().length > 0) {
       setText(query);
@@ -29,11 +29,11 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
       | string
       | {
           name: string;
-          logoUrl?: string | undefined;
+          imageUrl?: string | undefined;
         }
     )[]
   ) => {
-    onInstitutionsChange(newValue.map(el => (typeof el === "string" ? el : el.name)));
+    onContributorsChange(newValue.map(el => (typeof el === "string" ? el : el.name)));
   };
 
   return (
@@ -44,17 +44,19 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
       onInputChange={handleQueryChange}
       renderOption={(props, option) => (
         <li {...props}>
-          {option.logoUrl ? <Avatar sizes="small" alt={option.name} src={option.logoUrl} sx={{ mr: 1 }} /> : undefined}
+          {option.imageUrl ? (
+            <Avatar sizes="small" alt={option.name} src={option.imageUrl} sx={{ mr: 1 }} />
+          ) : undefined}
           {option.name}
         </li>
       )}
       getOptionLabel={option => (typeof option === "string" ? option : option.name)}
       onChange={handleChange}
       // value={value}
-      renderTags={(value: readonly { name: string; logoUrl?: string }[], getTagProps) =>
+      renderTags={(value: readonly { name: string; imageUrl?: string }[], getTagProps) =>
         value.map((option, index: number) => (
           <Chip
-            avatar={option.logoUrl ? <Avatar alt={option.name} src={option.logoUrl} /> : undefined}
+            avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
             variant="outlined"
             label={typeof option === "string" ? option : option.name}
             {...getTagProps({ index })}
@@ -62,8 +64,8 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
           />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
+      renderInput={params => <TextField {...params} variant="standard" label="Contributors" />}
     />
   );
 };
-export default InstitutionsAutocomplete;
+export default ContributorsAutocomplete;

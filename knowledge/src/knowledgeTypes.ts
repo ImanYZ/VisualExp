@@ -130,6 +130,11 @@ export type ResponseAutocompleteInstitutions = {
   errorMessage?: string;
 };
 
+export type ResponseAutocompleteContributors = {
+  results?: { id: string; name: string; imageUrl?: string }[];
+  errorMessage?: string;
+};
+
 export enum TimeWindowOption {
   "ThisWeek" = "This Week",
   "ThisMonth" = "This Month",
