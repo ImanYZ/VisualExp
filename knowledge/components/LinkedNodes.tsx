@@ -18,17 +18,18 @@ type LinkedNodesProps = {
 
 export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
   const renderLinkedNodes = () => {
-    return data.map((el, idx) => (
+    return data.map((el, idx, src) => (
       <React.Fragment key={idx}>
         <LinkedNodeItem
-          key={idx}
           title={el.title || ""}
           linkSrc={`../${encodeTitle(el.title)}/${el.node}`}
           nodeType={el.nodeType}
           nodeImageUrl={el.nodeImage}
           nodeContent={el.content}
+          label={el.label || ""}
+          sx={{ p: "20px" }}
         />
-        <Divider />
+        {idx < src.length - 1 && <Divider />}
       </React.Fragment>
     ));
   };
@@ -36,18 +37,20 @@ export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
   return (
     <Card>
       <CardHeader
-        sx={{ backgroundColor: theme => theme.palette.grey[100] }}
+        sx={{
+          backgroundColor: theme => theme.palette.common.darkGrayBackground,
+          color: theme => theme.palette.common.white
+        }}
         title={
           <Box sx={{ textAlign: "center" }}>
-            <TypographyUnderlined variant="h5" gutterBottom align="center">
+            <TypographyUnderlined variant="h6" fontWeight="300" gutterBottom align="center">
               {header}
             </TypographyUnderlined>
           </Box>
         }
       ></CardHeader>
-      <Divider />
-      <CardContent sx={{ p: 0 }}>
-        <List>{renderLinkedNodes()}</List>
+      <CardContent sx={{ p: "12px 0px" }}>
+        <List sx={{ p: "0px" }}>{renderLinkedNodes()}</List>
       </CardContent>
     </Card>
   );

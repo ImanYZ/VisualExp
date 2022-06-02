@@ -68,7 +68,7 @@ const Search = styled("div")(({ theme }) => ({
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
+  color: theme.palette.common.black,
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 2, 1, 2),
     transition: theme.transitions.create("width"),
@@ -77,7 +77,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     fontWeight: 300,
     background: theme.palette.common.white
   },
-  "@media (min-width:600px)": {
+  "@media (min-width:900px)": {
     "& .MuiInputBase-input": {
       padding: theme.spacing(1, 5, 1, 5),
       fontSize: 25,
