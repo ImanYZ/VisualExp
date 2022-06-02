@@ -10,6 +10,46 @@ type Props = {
   sx?: SxProps<Theme>;
 };
 
+const SearchInput: FC<Props> = ({ onSearch, sx }) => {
+  const [searchText, setSearchText] = useState<string>("");
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(event.target.value);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSearch(searchText);
+  };
+
+  return (
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "row", ...sx }} component="form" onSubmit={handleSearch}>
+      <SearchStyled>
+        <StyledInputBase
+          fullWidth
+          placeholder="Start learning..."
+          inputProps={{ "aria-label": "search" }}
+          value={searchText}
+          onChange={handleChange}
+        />
+      </SearchStyled>
+      <StyledButton variant="contained" type="submit">
+        Search
+      </StyledButton>
+    </Box>
+  );
+};
+
+const SearchStyled = styled("div")(({ theme }) => ({
+  position: "relative",
+  border: "2px solid",
+  borderColor: theme.palette.grey[200],
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.grey[300], 0.06)
+  },
+  width: "100%"
+}));
+
 const StyledButton = styled(Button)(({ theme }) => ({
   color: "inherit",
   "&": {
@@ -25,46 +65,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
       fontSize: 25
     }
   }
-}));
-
-const SearchInput: FC<Props> = ({ onSearch, sx }) => {
-  const [searchText, setSearchText] = useState<string>("");
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(event.target.value);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch(searchText);
-  };
-
-  return (
-    <Box sx={{ width: "100%", display: "flex", flexDirection: "row", ...sx }} component="form" onSubmit={handleSearch}>
-      <Search>
-        <StyledInputBase
-          fullWidth
-          placeholder="Start learning..."
-          inputProps={{ "aria-label": "search" }}
-          value={searchText}
-          onChange={handleChange}
-        />
-      </Search>
-      <StyledButton variant="contained" type="submit">
-        Search
-      </StyledButton>
-    </Box>
-  );
-};
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  border: "2px solid",
-  borderColor: theme.palette.grey[200],
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.grey[300], 0.06)
-  },
-  width: "100%"
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
