@@ -12,7 +12,7 @@ const getUsersFromFirestore = async () => {
     const name = `${userData.fName || ""} ${userData.lName || ""}`;
     users.push({ name, username: userDoc.id, imageUrl: userData.imageUrl });
   }
-  console.log("users", users);
+  // console.log("users", users);
   return users;
 };
 
