@@ -10,25 +10,25 @@ module.exports = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "*",
+            value: "*"
           },
           {
             key: "Pragma",
-            value: "no-cache",
+            value: "no-cache"
           },
           {
             key: "Expires",
-            value: "-1",
+            value: "-1"
           },
           {
             key: "Cache-Control",
-            value: "no-cache",
-          },
-        ],
-      },
+            value: "no-cache"
+          }
+        ]
+      }
     ];
   },
   images: {
-    domains: ["firebasestorage.googleapis.com"],
-  },
+    domains: ["firebasestorage.googleapis.com", "storage.googleapis.com"]
+  }
 };

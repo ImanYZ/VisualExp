@@ -57,7 +57,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               cursor: "pointer"
             }}
           >
-            <img src={node.nodeImage} width="100%" height="100%" />
+            <img src={node.nodeImage} width="100%" height="100%" loading="lazy" />
           </Box>
         </Tooltip>
       )}
