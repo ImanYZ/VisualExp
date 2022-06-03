@@ -3,9 +3,9 @@ import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { getQueryParameter } from "../../lib/utils";
-import { ResponseAutocompleteInstitutions } from "../../src/knowledgeTypes";
+import { FilterValue, ResponseAutocompleteFilter } from "../../src/knowledgeTypes";
 
-async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteInstitutions>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteFilter>) {
   const q = getQueryParameter(req.query.q) || "";
 
   if (!q) {
@@ -30,13 +30,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocom
       .documents()
       .search(searchParameters);
 
-    const contributors = searchResults.hits?.map(el => ({
+    const contributors: FilterValue[] | undefined = searchResults.hits?.map(el => ({
       id: el.document.username,
       name: el.document.name,
       imageUrl: el.document.imageUrl
     }));
-
-    res.status(200).json({ results: contributors || [] });
+    const response: ResponseAutocompleteFilter = {
+      results: contributors || []
+    };
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: "Cannot get contributors" });
