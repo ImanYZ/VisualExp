@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 
 import LogoDarkMode from "../public/DarkModeLogo.svg";
 import SECTIONS from "../src/navbarSections";
@@ -24,8 +24,15 @@ type Props = {
 };
 const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
+  const [searchText, setSearchText] = useState("");
 
-  console.log("router.route", router.route);
+  const handleSearch = e => {
+    e.preventDefault();
+    router.push({
+      pathname: "/",
+      query: { q: searchText }
+    });
+  };
 
   return (
     <AppBar sx={{ boxShadow: "none" }}>
@@ -93,13 +100,16 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
                   color: theme => theme.palette.common.black
                 }
               }}
+              // onSubmit={handleSearch}
             >
               <StyledInputBase
+                value={searchText}
+                onChange={e => setSearchText(e.target.value)}
                 placeholder="Search on 1Cademy "
                 inputProps={{ "aria-label": "search node" }}
                 sx={{ ml: 1, flex: 1 }}
               />
-              <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search">
+              <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search" onClick={handleSearch}>
                 <SearchIcon />
               </IconButton>
             </Paper>

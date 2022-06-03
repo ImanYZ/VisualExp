@@ -24,7 +24,6 @@ type Props = {
   sx?: SxProps<Theme>;
 };
 const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType, linkSrc, label, sx }) => {
-  console.log("linkSrc", linkSrc);
   return (
     <HtmlTooltip
       title={
