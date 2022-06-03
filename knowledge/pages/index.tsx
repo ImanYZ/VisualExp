@@ -9,6 +9,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
+import { getInstitutionsForAutocomplete } from "../lib/institutions";
 import { getSortedPostsData } from "../lib/nodes";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
@@ -18,7 +19,7 @@ import {
   getQueryParameterAsNumber,
   SortedByTimeOptions
 } from "../lib/utils";
-import { ContributorValue, KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { FilterValue, KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -46,7 +47,8 @@ type Props = {
   data: KnowledgeNode[];
   page: number;
   numResults: number;
-  contributorsFilter?: ContributorValue[];
+  contributorsFilter?: FilterValue[];
+  institutionFilter?: FilterValue[];
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
@@ -96,6 +98,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const institutions = getQueryParameter(query.institutions) || "";
   const contributors = getQueryParameter(query.contributors) || "";
   const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
+  const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
+  const institutionNames = institutionsSelected.map(el => el.name).join(",");
 
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
@@ -115,7 +119,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     per_page: perPage,
     page,
     sort_by: buildSortBy(upvotes, mostRecent),
-    filter_by: buildFilterBy(timeWindow, tags, institutions, contributors, nodeTypes)
+    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
   const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
@@ -126,12 +130,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       data: allPostsData,
       page: searchResults.page,
       numResults: searchResults.found,
-      contributorsFilter: contributorsSelected
+      contributorsFilter: contributorsSelected,
+      institutionFilter: institutionsSelected
     }
   };
 };
 
-const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter }) => {
+const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter, institutionFilter }) => {
   const [sortedByType, setSortedByType] = useState("");
   const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
 
@@ -167,12 +172,13 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter 
     router.replace({ query: { ...router.query, tags: tags.join(",") } });
   };
 
-  const handleInstitutionsChange = (institutions: string[]) => {
-    router.replace({ query: { ...router.query, institutions: institutions.join(",") } });
+  const handleInstitutionsChange = (newValue: FilterValue[]) => {
+    const institutions = newValue.map((el: FilterValue) => el.id);
+    router.push({ query: { ...router.query, institutions: institutions.join(",") } });
   };
 
-  const handleContributorsChange = (newValue: ContributorValue[]) => {
-    const contributors = newValue.map((el: ContributorValue) => el.id);
+  const handleContributorsChange = (newValue: FilterValue[]) => {
+    const contributors = newValue.map((el: FilterValue) => el.id);
     router.push({ query: { ...router.query, contributors: contributors.join(",") } });
   };
 
@@ -191,6 +197,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter 
         onContributorsChange={handleContributorsChange}
         onNodeTypesChange={handleNodeTypesChange}
         contributors={contributorsFilter}
+        institutions={institutionFilter}
       ></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters

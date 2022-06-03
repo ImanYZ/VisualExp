@@ -7,7 +7,7 @@ import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
 import { getQueryParameter } from "../lib/utils";
-import { ContributorValue } from "../src/knowledgeTypes";
+import { FilterValue } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
@@ -15,10 +15,11 @@ import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
 type Props = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
-  onInstitutionsChange: (newValues: string[]) => void;
-  onContributorsChange: (newValues: ContributorValue[]) => void;
+  onInstitutionsChange: (newValues: FilterValue[]) => void;
+  onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
-  contributors: ContributorValue[];
+  contributors: FilterValue[];
+  institutions: FilterValue[];
 };
 
 const HomeFilter: FC<Props> = ({
@@ -27,22 +28,22 @@ const HomeFilter: FC<Props> = ({
   onInstitutionsChange,
   onContributorsChange,
   onNodeTypesChange,
-  contributors
+  contributors,
+  institutions
 }) => {
   const router = useRouter();
   const tags = (getQueryParameter(router.query.tags) || "").split(",");
-  const institutionsFilter = (getQueryParameter(router.query.institutions) || "").split(",");
   const [nodeTypesFilter, setNodeTypesFilter] = React.useState<string[]>([]);
 
   const handleTagsChange = (values: string[]) => {
     onTagsChange(values);
   };
 
-  const handleInstitutionsChange = (values: string[]) => {
+  const handleInstitutionsChange = (values: FilterValue[]) => {
     onInstitutionsChange(values);
   };
 
-  const handleContributorsChange = (values: ContributorValue[]) => {
+  const handleContributorsChange = (values: FilterValue[]) => {
     onContributorsChange(values);
   };
 
@@ -71,7 +72,7 @@ const HomeFilter: FC<Props> = ({
         </Grid>
 
         <Grid item xs={1}>
-          <InstitutionsAutocomplete value={institutionsFilter} onInstitutionsChange={handleInstitutionsChange} />
+          <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
         </Grid>
 
         <Grid item xs={1}>

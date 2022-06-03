@@ -7,27 +7,28 @@ import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
 import { getContributorsAutocomplete } from "../lib/knowledgeApi";
-import { ContributorValue } from "../src/knowledgeTypes";
+import { FilterValue } from "../src/knowledgeTypes";
 
 type Props = {
-  contributors: ContributorValue[];
-  onContributorsChange: (newValues: ContributorValue[]) => void;
+  contributors: FilterValue[];
+  onContributorsChange: (newValues: FilterValue[]) => void;
 };
 
 const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributors = [] }) => {
   const [hasBeenCleared, setHasBeenCleared] = useState(false);
-  const [value, setValue] = useState<ContributorValue[]>([]);
+  const [value, setValue] = useState<FilterValue[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
   const { isLoading, data } = useQuery(["contributors", searchText], () => getContributorsAutocomplete(searchText), {
     enabled: searchText.length > 0
   });
+
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
     if (event && query.trim().length > 0) {
       setText(query);
     }
   };
-  const handleChange = (_: React.SyntheticEvent, newValue: ContributorValue[]) => {
+  const handleChange = (_: React.SyntheticEvent, newValue: FilterValue[]) => {
     if (newValue.length === 0) {
       setHasBeenCleared(true);
     }
@@ -63,14 +64,14 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
           </li>
         );
       }}
-      getOptionLabel={option => (typeof option === "string" ? option : option.name)}
+      getOptionLabel={option => option.name}
       onChange={handleChange}
-      renderTags={(value: readonly { name: string; imageUrl?: string }[], getTagProps) =>
+      renderTags={(value: readonly FilterValue[], getTagProps) =>
         value.map((option, index: number) => (
           <Chip
             avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
             variant="outlined"
-            label={typeof option === "string" ? option : option.name}
+            label={option.name}
             {...getTagProps({ index })}
             key={index}
           />
