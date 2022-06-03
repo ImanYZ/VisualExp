@@ -43,7 +43,9 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
       )}
 
       {node.nodeType === "Question" && (
-        <CardContent>{node.nodeType === "Question" && <QuestionItem node={node} />}</CardContent>
+        <CardContent>
+          <QuestionItem node={node} />
+        </CardContent>
       )}
 
       {node.nodeImage && (
@@ -57,7 +59,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               cursor: "pointer"
             }}
           >
-            <img src={node.nodeImage} width="100%" height="100%" />
+            <img src={node.nodeImage} width="100%" height="100%" loading="lazy" />
           </Box>
         </Tooltip>
       )}
