@@ -56,13 +56,6 @@ const AppRouter = (props) => {
 
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedFirstSession, setStartedFirstSession] = useState(false);
-  const [fromIran, setfromIran] = useState(false);
-
-  useEffect(() => {
-    if (new Date().getTimezoneOffset() == -270) {
-      setfromIran(true);
-    }
-  }, []);
 
   useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {
@@ -75,6 +68,7 @@ const AppRouter = (props) => {
       if (scheduleDocs.docs.length > 0) {
         for (let scheduleDoc of scheduleDocs.docs) {
           const scheduleData = scheduleDoc.data();
+          // Google Calendar ID
           if (scheduleData.id) {
             const session = scheduleData.session.toDate().getTime();
             const minTime = session - 10 * 60 * 1000;
@@ -185,6 +179,8 @@ const AppRouter = (props) => {
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
+          <Route path="/ReminderDate/*" element={<ReminderDate />} />
+          <Route path="/withdraw/*" element={<Withdraw />} />
           {leading.length > 0 && (
             <>
               <Route
@@ -197,8 +193,6 @@ const AppRouter = (props) => {
               />
             </>
           )}
-          <Route path="/ReminderDate/*" element={<ReminderDate />} />
-          <Route path="/withdraw/*" element={<Withdraw />} />
         </>
       )}
       <Route path="/communities/" element={<Communities />} />
@@ -219,6 +213,17 @@ const AppRouter = (props) => {
               />
             }
           />
+          {fullname && emailVerified === "Verified" && (
+            <Route
+              path={"/paperTest/" + communi.id}
+              element={
+                <PaperTest
+                  communiId={communi.id}
+                  communiTitle={communi.title}
+                />
+              }
+            />
+          )}
         </React.Fragment>
       ))}
       <Route
@@ -229,17 +234,6 @@ const AppRouter = (props) => {
         path={"/interestedFacultyLater/:instructorId"}
         element={<InstructorLater />}
       />
-      {fullname &&
-        emailVerified === "Verified" &&
-        communitiesOrder.map((communi, idx) => (
-          <Route
-            key={communi.id + "Test"}
-            path={"/paperTest/" + communi.id}
-            element={
-              <PaperTest communiId={communi.id} communiTitle={communi.title} />
-            }
-          />
-        ))}
       <Route
         path="/*"
         element={<RouterNav duringAnExperiment={duringAnExperiment} />}
