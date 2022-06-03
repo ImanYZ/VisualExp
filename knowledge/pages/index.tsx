@@ -7,10 +7,10 @@ import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-import HomeFilter from "../components/HomeFilter";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getSortedPostsData } from "../lib/nodes";
+import { getContributorsForAutocomplete } from "../lib/users";
 import {
   existValueInEnum,
   getQueryParameter,
@@ -18,7 +18,7 @@ import {
   getQueryParameterAsNumber,
   SortedByTimeOptions
 } from "../lib/utils";
-import { KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { ContributorValue, KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -26,6 +26,10 @@ export const HomeSearchContainer: ComponentType<any> = dynamic(
   () => import("../components/HomeSearch").then(m => m.HomeSearch),
   { ssr: false }
 );
+
+export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
+  ssr: false
+});
 
 const MasonryNodes: ComponentType<any> = dynamic(
   () => import("../components/MasonryNodes").then(m => m.TrendingNodes),
@@ -42,6 +46,7 @@ type Props = {
   data: KnowledgeNode[];
   page: number;
   numResults: number;
+  contributorsFilter?: ContributorValue[];
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
@@ -90,6 +95,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const tags = getQueryParameter(query.tags) || "";
   const institutions = getQueryParameter(query.institutions) || "";
   const contributors = getQueryParameter(query.contributors) || "";
+  const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
+
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
   const client = new Typesense.Client({
@@ -118,12 +125,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     props: {
       data: allPostsData,
       page: searchResults.page,
-      numResults: searchResults.found
+      numResults: searchResults.found,
+      contributorsFilter: contributorsSelected
     }
   };
 };
 
-const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
+const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter }) => {
   const [sortedByType, setSortedByType] = useState("");
   const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
 
@@ -181,6 +189,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults }) => {
         onInstitutionsChange={handleInstitutionsChange}
         onContributorsChange={handleContributorsChange}
         onNodeTypesChange={handleNodeTypesChange}
+        contributors={contributorsFilter}
       ></HomeFilter>
       <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
         <SortByFilters
