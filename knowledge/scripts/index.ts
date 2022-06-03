@@ -6,13 +6,12 @@ import indexCollection from "./populateIndex";
 
 const getUsersFromFirestore = async () => {
   let users: { name: string; username: string; imageUrl: string }[] = [];
-  const usersDocs = await db.collection("users").limit(10).get();
+  const usersDocs = await db.collection("users").get();
   for (let userDoc of usersDocs.docs) {
     const userData = userDoc.data();
     const name = `${userData.fName || ""} ${userData.lName || ""}`;
     users.push({ name, username: userDoc.id, imageUrl: userData.imageUrl });
   }
-  console.log("users", users);
   return users;
 };
 
@@ -71,8 +70,7 @@ const getInstitutions = (nodeData: NodeFireStore) => {
 const getContributors = (nodeData: NodeFireStore): string[] => {
   const contributorsNodes = Object.entries(nodeData.contributors || {});
 
-  const contributors = contributorsNodes.map(el => el[1].fullname || "").filter(el => el.length > 0);
-
+  const contributors = contributorsNodes.map(el => el[0]);
   return contributors;
 };
 
@@ -91,6 +89,7 @@ const getNodesFromFirestore = async () => {
         institutions: getInstitutions(nodeData),
         contributors: getContributors(nodeData),
         corrects: nodeData.corrects || 0,
+        wrongs: nodeData.wrongs || 0,
         updatedAt: nodeData.updatedAt?.toMillis() || 0,
         nodeType: nodeData.nodeType
       });
@@ -139,6 +138,7 @@ const fillNodesIndex = async (forceReIndex?: boolean) => {
     { name: "contributors", type: "string[]" },
     { name: "nodeType", type: "string" },
     { name: "corrects", type: "int32" },
+    { name: "wrongs", type: "int32" },
     { name: "updatedAt", type: "int64" }
   ];
 
@@ -155,7 +155,7 @@ const main = async () => {
   console.log("End Filling institutions index");
 
   console.log("Filling tags index");
-  await fillTagsIndex(true);
+  await fillTagsIndex();
   console.log("End Filling tags index");
 
   console.log("Filling nodes index");

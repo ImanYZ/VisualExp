@@ -122,6 +122,7 @@ export type TypesenseNodesSchema = {
   contributors: string[];
   nodeType: string;
   corrects: number;
+  wrongs: number;
   updatedAt: number;
 };
 
@@ -140,3 +141,9 @@ export enum TimeWindowOption {
   "ThisMonth" = "This Month",
   "ThisYear" = "This Year"
 }
+
+export type ContributorValue = {
+  id: string;
+  name: string;
+  imageUrl?: string | undefined;
+};
