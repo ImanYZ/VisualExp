@@ -31,7 +31,6 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
     <Autocomplete
       multiple
       options={data?.results || []}
-      freeSolo
       onInputChange={handleQueryChange}
       onChange={handleChange}
       value={tags}
