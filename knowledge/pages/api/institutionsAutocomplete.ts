@@ -5,9 +5,9 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { db } from "../../lib/admin";
 import { getQueryParameter } from "../../lib/utils";
-import { ResponseAutocompleteInstitutions } from "../../src/knowledgeTypes";
+import { FilterValue, ResponseAutocompleteFilter } from "../../src/knowledgeTypes";
 
-async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteInstitutions>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteFilter>) {
   const q = getQueryParameter(req.query.q) || "";
 
   if (!q) {
@@ -31,22 +31,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocom
       .collections<{ name: string; id: "string" }>("institutions")
       .documents()
       .search(searchParameters);
-
     const institutionsIds = searchResults.hits?.map(el => el.document.id);
     const institutionDocs = await db
       .collection("institutions")
       .where(firestore.FieldPath.documentId(), "in", institutionsIds)
       .get();
 
-    const institutions = institutionDocs.docs.map(institutionDoc => {
+    const institutions: FilterValue[] | undefined = institutionDocs.docs.map(institutionDoc => {
       const institutionData = institutionDoc.data();
-      return {
-        logoUrl: institutionData.logoURL,
+      const institutionFilter: FilterValue = {
+        id: institutionDoc.id,
+        imageUrl: institutionData.logoURL,
         name: institutionData.name
       };
+      return institutionFilter;
     });
 
-    res.status(200).json({ results: institutions || [] });
+    const response: ResponseAutocompleteFilter = {
+      results: institutions || []
+    };
+    res.status(200).json(response);
   } catch (error) {
     console.error(error);
     res.status(500).json({ errorMessage: "Cannot get institutions" });

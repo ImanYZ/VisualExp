@@ -2,61 +2,77 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
 import { getInstitutionsAutocomplete } from "../lib/knowledgeApi";
+import { FilterValue } from "../src/knowledgeTypes";
 
 type Props = {
-  value: string[];
-  onInstitutionsChange: (newValues: string[]) => void;
+  institutions: FilterValue[];
+  onInstitutionsChange: (newValues: FilterValue[]) => void;
 };
 
-const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
+const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange, institutions }) => {
+  const [hasBeenCleared, setHasBeenCleared] = useState(false);
+  const [value, setValue] = useState<FilterValue[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText));
+  const { isLoading, data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText), {
+    enabled: searchText.length > 0
+  });
+
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
     if (event && query.trim().length > 0) {
       setText(query);
     }
   };
 
-  const handleChange = (
-    _: React.SyntheticEvent,
-    newValue: (
-      | string
-      | {
-          name: string;
-          logoUrl?: string | undefined;
-        }
-    )[]
-  ) => {
-    onInstitutionsChange(newValue.map(el => (typeof el === "string" ? el : el.name)));
+  const handleChange = (_: React.SyntheticEvent, newValue: FilterValue[]) => {
+    if (newValue.length === 0) {
+      setHasBeenCleared(true);
+    }
+    setValue(newValue);
+    onInstitutionsChange(newValue);
   };
+
+  useEffect(() => {
+    if (value.length === 0 && institutions.length > 0 && !hasBeenCleared) {
+      setValue(institutions);
+    }
+  }, [institutions, hasBeenCleared, value.length]);
 
   return (
     <Autocomplete
       multiple
       options={data?.results || []}
-      freeSolo
+      value={value}
+      loading={isLoading}
       onInputChange={handleQueryChange}
-      renderOption={(props, option) => (
-        <li {...props}>
-          {option.logoUrl ? <Avatar sizes="small" alt={option.name} src={option.logoUrl} sx={{ mr: 1 }} /> : undefined}
-          {option.name}
-        </li>
-      )}
-      getOptionLabel={option => (typeof option === "string" ? option : option.name)}
+      noOptionsText={"Search institutions"}
+      isOptionEqualToValue={(option, value) => {
+        return option.id === value.id;
+      }}
+      renderOption={(props, option) => {
+        const newProps = { ...props, key: option.id };
+        return (
+          <li {...newProps}>
+            {option.imageUrl ? (
+              <Avatar sizes="small" alt={option.name} src={option.imageUrl} sx={{ mr: 1 }} />
+            ) : undefined}
+            {option.name}
+          </li>
+        );
+      }}
+      getOptionLabel={option => option.name}
       onChange={handleChange}
-      // value={value}
-      renderTags={(value: readonly { name: string; logoUrl?: string }[], getTagProps) =>
+      renderTags={(value: readonly FilterValue[], getTagProps) =>
         value.map((option, index: number) => (
           <Chip
-            avatar={option.logoUrl ? <Avatar alt={option.name} src={option.logoUrl} /> : undefined}
+            avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
             variant="outlined"
-            label={typeof option === "string" ? option : option.name}
+            label={option.name}
             {...getTagProps({ index })}
             key={index}
           />
