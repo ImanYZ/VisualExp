@@ -32,7 +32,7 @@ const HomeFilter: FC<Props> = ({
   institutions
 }) => {
   const router = useRouter();
-  const tags = (getQueryParameter(router.query.tags) || "").split(",");
+  const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
   const [nodeTypesFilter, setNodeTypesFilter] = React.useState<string[]>([]);
 
   const handleTagsChange = (values: string[]) => {
