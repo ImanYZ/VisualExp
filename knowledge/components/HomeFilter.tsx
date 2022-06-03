@@ -33,7 +33,7 @@ const HomeFilter: FC<Props> = ({
 }) => {
   const router = useRouter();
   const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
-  const [nodeTypesFilter, setNodeTypesFilter] = React.useState<string[]>([]);
+  const nodeTypes = (getQueryParameter(router.query.nodeTypes) || "").split(",").filter(el => el !== "");
 
   const handleTagsChange = (values: string[]) => {
     onTagsChange(values);
@@ -48,7 +48,6 @@ const HomeFilter: FC<Props> = ({
   };
 
   const handleNodeTypesChange = (values: string[]) => {
-    setNodeTypesFilter(values);
     onNodeTypesChange(values);
   };
 
@@ -80,7 +79,7 @@ const HomeFilter: FC<Props> = ({
         </Grid>
 
         <Grid item xs={1}>
-          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} value={nodeTypesFilter} />
+          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
           <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
