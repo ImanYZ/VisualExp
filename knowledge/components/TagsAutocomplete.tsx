@@ -33,6 +33,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
       options={data?.results || []}
       onInputChange={handleQueryChange}
       onChange={handleChange}
+      noOptionsText={"Search tags"}
       value={tags}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
