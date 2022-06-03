@@ -1,8 +1,9 @@
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import React, { FC } from "react";
+
+import OptimizedAvatar from "./OptimizedAvatar";
 
 type Props = {
   name?: string;
@@ -13,51 +14,14 @@ type Props = {
 };
 
 const LeaderboardChip: FC<Props> = ({ name = "", imageUrl, reputation, isChamp, renderAsAvatar = true }) => {
-  const renderIcon = () => {
-    if (renderAsAvatar) {
-      return (
-        <Avatar
-          src={imageUrl}
-          alt={name}
-          sx={{
-            width: 40,
-            height: 40
-          }}
-        />
-      );
-    } else {
-      return (
-        <img
-          src={imageUrl}
-          alt={name}
-          width="40px"
-          style={{
-            margin: "4px 4px 4px 10px"
-          }}
-        />
-      );
-    }
-  };
   return (
     <Chip
       sx={{
-        height: 49,
-        borderRadius: 28
+        height: 60,
+        borderRadius: 28,
+        padding: "6px"
       }}
-      icon={
-        imageUrl ? (
-          renderIcon()
-        ) : (
-          <Avatar
-            sx={{
-              width: 40,
-              height: 40
-            }}
-          >
-            name.charAt(0)
-          </Avatar>
-        )
-      }
+      icon={<OptimizedAvatar name={name} imageUrl={imageUrl} renderAsAvatar={renderAsAvatar} />}
       variant="outlined"
       label={
         <Box sx={{ my: 1 }}>
