@@ -7,7 +7,6 @@ export const getContributorsForAutocomplete = async (users: string[]) => {
     if (user.length === 0) {
       continue;
     }
-    console.log("----user", user);
     const userDoc = await db.collection("users").doc(user).get();
     if (!userDoc.exists || !userDoc.data()) {
       continue;

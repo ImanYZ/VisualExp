@@ -171,8 +171,9 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter 
     router.replace({ query: { ...router.query, institutions: institutions.join(",") } });
   };
 
-  const handleContributorsChange = (contributors: string[]) => {
-    router.replace({ query: { ...router.query, contributors: contributors.join(",") } });
+  const handleContributorsChange = (newValue: ContributorValue[]) => {
+    const contributors = newValue.map((el: ContributorValue) => el.id);
+    router.push({ query: { ...router.query, contributors: contributors.join(",") } });
   };
 
   const handleNodeTypesChange = (nodeTypes: string[]) => {
