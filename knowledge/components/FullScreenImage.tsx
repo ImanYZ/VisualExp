@@ -36,7 +36,7 @@ const FullScreenImage: FC<Props> = ({ src, open, onClose }) => {
           </Typography>
         </Toolbar>
       </AppBar>
-      <img src={src} width="100%" />
+      <img src={src} width="100%" loading="lazy" />
     </Dialog>
   );
 };
