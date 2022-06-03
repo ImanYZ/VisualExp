@@ -1,11 +1,10 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Avatar, Button, Collapse, Grid } from "@mui/material";
+import { Button, Collapse, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
-import CardMedia from "@mui/material/CardMedia";
 import Chip from "@mui/material/Chip";
 import Link from "@mui/material/Link";
 import Tooltip from "@mui/material/Tooltip";
@@ -19,6 +18,7 @@ import { KnowledgeNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
+import OptimizedAvatar from "./OptimizedAvatar";
 import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
@@ -78,7 +78,8 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         </Typography>
 
         {node.nodeType === "Question" && <QuestionItem node={node} />}
-        {node.nodeImage && <CardMedia component="img" width="100%" image={node.nodeImage} alt={node.title} />}
+        {/* {node.nodeImage && <CardMedia component="img" width="100%" image={node.nodeImage} alt={node.title} />} */}
+        {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
       </CardContent>
 
       <CardActions>
@@ -109,46 +110,32 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                 <Chip key={idx} label={tag.title} sx={{ marginRight: "10px", marginBottom: "8px" }} />
               ))}
           </Box>
-          <Grid container spacing={2} py={1}>
-            <Grid item xs={6}>
-              <Box>
+          <Grid container spacing={2} columns={2} py={1}>
+            <Grid item xs={1}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
                 {node.contributors &&
                   node.contributors.map((contributor, idx) => (
-                    <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
+                    <Box key={idx} sx={{ display: "inline-block" }}>
                       <Tooltip title={`${contributor.fullname} contributed to the evolution of this node.`}>
-                        <Avatar
-                          alt="Image contributor"
-                          src={contributor.imageUrl}
-                          sx={{
-                            border: "solid",
-                            width: 56,
-                            height: 56,
-                            borderColor: theme => theme.palette.common.gray
-                          }}
-                        />
+                        <Box sx={{ marginLeft: "-10px" }}>
+                          <OptimizedAvatar name={contributor.fullname} imageUrl={contributor.imageUrl} />
+                        </Box>
                       </Tooltip>
                     </Box>
                   ))}
               </Box>
             </Grid>
-            <Grid item xs={6}>
-              <Box>
+            <Grid item xs={1}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
                 {node.institutions &&
                   node.institutions.map((institution, idx) => (
-                    <Box key={idx} sx={{ display: "inline-block", transform: `translateX(${idx * -10}px)` }}>
+                    <Box key={idx} sx={{ display: "inline-block" }}>
                       <Tooltip
                         title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
                       >
-                        <Avatar
-                          alt="Image contributor"
-                          src={institution.logoURL}
-                          sx={{
-                            border: "solid",
-                            width: 56,
-                            height: 56,
-                            borderColor: theme => theme.palette.common.gray
-                          }}
-                        />
+                        <Box sx={{ marginLeft: "-10px" }}>
+                          <OptimizedAvatar name={institution.name} imageUrl={institution.logoURL} contained={true} />
+                        </Box>
                       </Tooltip>
                     </Box>
                   ))}
