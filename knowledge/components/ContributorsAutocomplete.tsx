@@ -10,11 +10,12 @@ import { getContributorsAutocomplete } from "../lib/knowledgeApi";
 import { ContributorValue } from "../src/knowledgeTypes";
 
 type Props = {
-  contributors?: ContributorValue[];
-  onContributorsChange: (newValues: string[]) => void;
+  contributors: ContributorValue[];
+  onContributorsChange: (newValues: ContributorValue[]) => void;
 };
 
 const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributors = [] }) => {
+  const [hasBeenCleared, setHasBeenCleared] = useState(false);
   const [value, setValue] = useState<ContributorValue[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
@@ -27,15 +28,18 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
     }
   };
   const handleChange = (_: React.SyntheticEvent, newValue: ContributorValue[]) => {
+    if (newValue.length === 0) {
+      setHasBeenCleared(true);
+    }
     setValue(newValue);
-    onContributorsChange(newValue.map((el: ContributorValue) => el.id));
+    onContributorsChange(newValue);
   };
 
   useEffect(() => {
-    if (value.length === 0 && contributors.length > 0) {
+    if (value.length === 0 && contributors.length > 0 && !hasBeenCleared) {
       setValue(contributors);
     }
-  }, [contributors, value.length]);
+  }, [contributors, hasBeenCleared, value.length]);
 
   return (
     <Autocomplete
