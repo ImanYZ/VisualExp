@@ -3,11 +3,11 @@ import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import { SxProps, Theme } from "@mui/system";
 
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import { SimpleNode } from "../src/knowledgeTypes";
 import { NodeItem } from "./NodeItem";
 
 type Props = {
-  nodes: KnowledgeNode[];
+  nodes: SimpleNode[];
   page: number;
   totalPages: number;
   sx?: SxProps<Theme>;
