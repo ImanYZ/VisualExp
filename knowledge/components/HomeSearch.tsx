@@ -1,8 +1,8 @@
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
+import Image from "next/image";
 
-import backgroundImage from "../public/LibraryBackground.jpg";
 import SearchInput from "./SearchInput";
 
 type HomeSearchProps = {
@@ -14,6 +14,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
   return (
     <Box
       sx={{
+        position: "relative",
         width: "100%",
         height: { xs: "236px", md: "479px" },
         margin: "auto",
@@ -22,15 +23,21 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url(${backgroundImage.src})`,
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
+        top: 0,
+        left: 0,
         color: theme => theme.palette.common.white,
         ...sx
       }}
     >
-      <Box sx={{ maxWidth: { xs: "340px", md: "1087px" } }}>
+      <Image
+        style={{ filter: "brightness(.4)" }}
+        alt="1cademy library"
+        src="/LibraryBackground.jpg"
+        layout="fill"
+        objectFit="cover"
+        quality={100}
+      />
+      <Box sx={{ position: "absolute", maxWidth: { xs: "340px", md: "1087px" } }}>
         <Typography
           textAlign="center"
           variant="h3"
