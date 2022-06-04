@@ -10,7 +10,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
-import { getSortedPostsData } from "../lib/nodes";
+import { getNodesByIds } from "../lib/nodes";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
   existValueInEnum,
@@ -19,7 +19,7 @@ import {
   getQueryParameterAsNumber,
   SortedByTimeOptions
 } from "../lib/utils";
-import { FilterValue, KnowledgeNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { FilterValue, SimpleNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -44,7 +44,7 @@ export const sortByDefaults = {
 };
 
 type Props = {
-  data: KnowledgeNode[];
+  data: SimpleNode[];
   page: number;
   numResults: number;
   contributorsFilter?: FilterValue[];
@@ -123,7 +123,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   };
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
   const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
-  const allPostsData = await getSortedPostsData(nodeIds);
+  // const allPostsData = await getSortedPostsData(nodeIds);
+  const allPostsData = await getNodesByIds(nodeIds);
 
   return {
     props: {
