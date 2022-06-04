@@ -148,29 +148,29 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter,
   };
 
   const handleChangePage = (newPage: number) => {
-    router.replace({ query: { ...router.query, page: newPage } });
+    router.push({ query: { ...router.query, page: newPage } });
   };
 
   const handleByType = (val: string) => {
     if (val === "most-recent") {
-      router.replace({ query: { ...router.query, mostRecent: true, upvotes: false } });
+      router.push({ query: { ...router.query, mostRecent: true, upvotes: false } });
       return setSortedByType(val);
     }
     if (val === "upvotes-downvotes") {
-      router.replace({ query: { ...router.query, mostRecent: false, upvotes: true } });
+      router.push({ query: { ...router.query, mostRecent: false, upvotes: true } });
       return setSortedByType(val);
     }
-    router.replace({ query: { ...router.query, mostRecent: false, upvotes: false } });
+    router.push({ query: { ...router.query, mostRecent: false, upvotes: false } });
     setSortedByType("");
   };
 
   const handleChangeTimeWindow = (val: TimeWindowOption) => {
-    router.replace({ query: { ...router.query, timeWindow: val } });
+    router.push({ query: { ...router.query, timeWindow: val } });
     setTimeWindow(val);
   };
 
   const handleTagsChange = (tags: string[]) => {
-    router.replace({ query: { ...router.query, tags: tags.join(",") } });
+    router.push({ query: { ...router.query, tags: tags.join(",") } });
   };
 
   const handleInstitutionsChange = (newValue: FilterValue[]) => {
@@ -184,7 +184,7 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter,
   };
 
   const handleNodeTypesChange = (nodeTypes: string[]) => {
-    router.replace({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
+    router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
   };
 
   return (
