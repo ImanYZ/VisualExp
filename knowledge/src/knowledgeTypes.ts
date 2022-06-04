@@ -136,16 +136,12 @@ export type TypesenseNodesSchema = {
   contributors: string[];
   nodeType: string;
   corrects: number;
+  wrongs: number;
   updatedAt: number;
 };
 
-export type ResponseAutocompleteInstitutions = {
-  results?: { name: string; logoUrl?: string }[];
-  errorMessage?: string;
-};
-
-export type ResponseAutocompleteContributors = {
-  results?: { id: string; name: string; imageUrl?: string }[];
+export type ResponseAutocompleteFilter = {
+  results?: FilterValue[];
   errorMessage?: string;
 };
 
@@ -154,3 +150,9 @@ export enum TimeWindowOption {
   "ThisMonth" = "This Month",
   "ThisYear" = "This Year"
 }
+
+export type FilterValue = {
+  id: string;
+  name: string;
+  imageUrl?: string | undefined;
+};
