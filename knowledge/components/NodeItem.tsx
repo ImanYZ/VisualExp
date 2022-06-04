@@ -84,17 +84,9 @@ export const NodeItem = ({ node }: NodeItemProps) => {
       <CardHeader
         title={
           <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Tooltip title="Click to learn more...">
-              <Link
-                variant="h3"
-                underline="hover"
-                color="inherit"
-                component="h2"
-                sx={{ fontSize: "25px", cursor: "pointer" }}
-              >
-                <MarkdownRender text={node.title || ""} />
-              </Link>
-            </Tooltip>
+            <Link variant="h3" underline="hover" color="inherit" sx={{ fontSize: "25px", cursor: "pointer" }}>
+              <MarkdownRender text={node.title || ""} />
+            </Link>
           </NextLink>
         }
       ></CardHeader>
