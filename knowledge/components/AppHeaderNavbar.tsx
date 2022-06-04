@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FC, useState } from "react";
+import React, { FC, MouseEvent, useState } from "react";
 
 import LogoDarkMode from "../public/DarkModeLogo.svg";
 import SECTIONS from "../src/navbarSections";
@@ -26,7 +26,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
 
-  const handleSearch = e => {
+  const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     router.push({
       pathname: "/",
@@ -100,7 +100,6 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
                   color: theme => theme.palette.common.black
                 }
               }}
-              // onSubmit={handleSearch}
             >
               <StyledInputBase
                 value={searchText}

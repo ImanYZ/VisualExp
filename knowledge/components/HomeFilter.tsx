@@ -2,9 +2,12 @@ import HelpIcon from "@mui/icons-material/Help";
 import { Box, Grid, IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
+import { useRouter } from "next/router";
 import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
+import { getQueryParameter } from "../lib/utils";
+import { FilterValue } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
@@ -12,34 +15,39 @@ import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
 type Props = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
-  onInstitutionsChange: (newValues: string[]) => void;
-  onContributorsChange: (newValues: string[]) => void;
+  onInstitutionsChange: (newValues: FilterValue[]) => void;
+  onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
+  contributors: FilterValue[];
+  institutions: FilterValue[];
 };
 
-const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContributorsChange, onNodeTypesChange }) => {
-  const [tagsFilter, setTagsFilter] = React.useState<string[]>([]);
-  const [institutionsFilter, setInstitutionsFilter] = React.useState<string[]>([]);
-  const [nodeTypesFilter, setNodeTypesFilter] = React.useState<string[]>([]);
-  const [contributorsFilter, setContributorsFilter] = React.useState<string[]>([]);
+const HomeFilter: FC<Props> = ({
+  sx,
+  onTagsChange,
+  onInstitutionsChange,
+  onContributorsChange,
+  onNodeTypesChange,
+  contributors,
+  institutions
+}) => {
+  const router = useRouter();
+  const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
+  const nodeTypes = (getQueryParameter(router.query.nodeTypes) || "").split(",").filter(el => el !== "");
 
   const handleTagsChange = (values: string[]) => {
-    setTagsFilter(values);
     onTagsChange(values);
   };
 
-  const handleInstitutionsChange = (values: string[]) => {
-    setInstitutionsFilter(values);
+  const handleInstitutionsChange = (values: FilterValue[]) => {
     onInstitutionsChange(values);
   };
 
-  const handleContributorsChange = (values: string[]) => {
-    setContributorsFilter(values);
+  const handleContributorsChange = (values: FilterValue[]) => {
     onContributorsChange(values);
   };
 
   const handleNodeTypesChange = (values: string[]) => {
-    setNodeTypesFilter(values);
     onNodeTypesChange(values);
   };
 
@@ -59,19 +67,19 @@ const HomeFilter: FC<Props> = ({ sx, onTagsChange, onInstitutionsChange, onContr
         sx={{ position: "relative" }}
       >
         <Grid item xs={1}>
-          <TagsAutocomplete tags={tagsFilter} onTagsChange={handleTagsChange} />
+          <TagsAutocomplete tags={tags} onTagsChange={handleTagsChange} />
         </Grid>
 
         <Grid item xs={1}>
-          <InstitutionsAutocomplete value={institutionsFilter} onInstitutionsChange={handleInstitutionsChange} />
+          <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
         </Grid>
 
         <Grid item xs={1}>
-          <ContributorsAutocomplete value={contributorsFilter} onContributorsChange={handleContributorsChange} />
+          <ContributorsAutocomplete contributors={contributors} onContributorsChange={handleContributorsChange} />
         </Grid>
 
         <Grid item xs={1}>
-          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} value={nodeTypesFilter} />
+          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
           <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
