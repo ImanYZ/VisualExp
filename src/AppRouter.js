@@ -277,6 +277,10 @@ const AppRouter = (props) => {
                   element={<Activities activityName="Intellectual" />}
                 />
                 <Route
+                  path="Activities/CodeFeedback"
+                  element={<Activities activityName="CodeFeedback" />}
+                />
+                <Route
                   path="LifeLog"
                   element={
                     email === "oneweb@umich.edu" ? (

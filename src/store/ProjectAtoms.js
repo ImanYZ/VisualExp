@@ -74,3 +74,21 @@ export const upvotedInstructorsTodayState = atom({
   key: "upvotedInstructorsTodayState",
   default: 0,
 });
+
+export const feedbackcodeState = atom({
+  key: "feedbackcodeState",
+  default: [],
+});
+
+export const codsState = atom({
+  key: "codsState",
+  default: [],
+});
+
+
+export const feedbackCodebookState = atom({
+  key: "feedbackCodebookState",
+  default: [],
+});
+
+

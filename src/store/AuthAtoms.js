@@ -19,7 +19,7 @@ export const emailVerifiedState = atom({
 
 export const fullnameState = atom({
   key: "fullnameState",
-  default: "",
+  default: "sam",
 });
 
 export const resumeUrlState = atom({

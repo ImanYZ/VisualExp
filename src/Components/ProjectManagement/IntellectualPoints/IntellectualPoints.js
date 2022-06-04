@@ -1057,7 +1057,7 @@ const IntellectualPoints = (props) => {
                       : "Button SubmitButton Disabled"
                   }
                   variant="contained"
-                  disabled={!invalidActivity ? null : true}
+                  disabled= {!invalidActivity ? null : true}
                 >
                   {selectedRows.length === 0
                     ? "Add Activity"

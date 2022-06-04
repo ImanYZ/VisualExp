@@ -14,7 +14,7 @@ import Grid from "@mui/material/Grid";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+// import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
 import {
   firebaseState,
@@ -1034,6 +1034,29 @@ const RouterNav = (props) => {
                         🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
                       </Button>
                     </Tooltip>
+                    <Tooltip
+                  title ={
+                    <div>
+                      Code Feed back
+                    </div>
+                  }
+                  >
+                    <Button
+                    id="CodeFeedback"
+                    className={
+                      activePage === "CodeFeedback"
+                        ? "ActiveNavLink"
+                        : "NavLink"
+                    }
+                    onClick={(event)=>
+                      navigate("/Activities/CodeFeedback")
+                    }
+                    >
+                     CodeFeedback
+                    </Button>
+
+                  </Tooltip>  
+                    
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
