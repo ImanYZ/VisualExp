@@ -14,24 +14,51 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
 import { useState } from "react";
 
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import { getInstitutionsByName } from "../lib/firestore/institutions";
+import { SimpleNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
 import OptimizedAvatar from "./OptimizedAvatar";
-import QuestionItem from "./QuestionItem";
+// import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
+type InstitutionData = {
+  name: string;
+  logoURL: string;
+};
+
 type NodeItemProps = {
-  node: KnowledgeNode;
+  node: SimpleNode;
 };
 
 export const NodeItem = ({ node }: NodeItemProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [institutionsData, setInstitutionsData] = useState<InstitutionData[]>([]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleGetInstitutionsData = async () => {
+    const names: string[] = node.institutions.map(cur => cur.name);
+    if (institutionsData.length) {
+      return;
+    }
+
+    const institutions = await getInstitutionsByName(names);
+    setInstitutionsData(institutions);
+  };
+
+  const getInstitutionData = (): InstitutionData[] => {
+    if (institutionsData.length) {
+      return institutionsData;
+    }
+    if (node.institutions) {
+      return node.institutions.map(cur => ({ name: cur.name, logoURL: "" }));
+    }
+    return [];
   };
 
   const ExpandMore = ({ expand }: { expand: boolean }) => {
@@ -77,8 +104,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <MarkdownRender text={node.content || ""} />
         </Typography>
 
-        {node.nodeType === "Question" && <QuestionItem node={node} />}
-        {/* {node.nodeImage && <CardMedia component="img" width="100%" image={node.nodeImage} alt={node.title} />} */}
+        {/* {node.nodeType === "Question" && <QuestionItem node={node} />} */}
         {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
       </CardContent>
 
@@ -102,7 +128,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <ExpandMore expand={expanded} />
         </Box>
       </CardActions>
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={expanded} timeout="auto" onEnter={handleGetInstitutionsData} unmountOnExit>
         <CardContent>
           <Box py={1}>
             {node.tags &&
@@ -116,9 +142,9 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                 {node.contributors &&
                   node.contributors.map((contributor, idx) => (
                     <Box key={idx} sx={{ display: "inline-block" }}>
-                      <Tooltip title={`${contributor.fullname} contributed to the evolution of this node.`}>
+                      <Tooltip title={`${contributor.fullName} contributed to the evolution of this node.`}>
                         <Box sx={{ marginLeft: "-10px" }}>
-                          <OptimizedAvatar name={contributor.fullname} imageUrl={contributor.imageUrl} />
+                          <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
                         </Box>
                       </Tooltip>
                     </Box>
@@ -127,18 +153,17 @@ export const NodeItem = ({ node }: NodeItemProps) => {
             </Grid>
             <Grid item xs={1}>
               <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
-                {node.institutions &&
-                  node.institutions.map((institution, idx) => (
-                    <Box key={idx} sx={{ display: "inline-block" }}>
-                      <Tooltip
-                        title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
-                      >
-                        <Box sx={{ marginLeft: "-10px" }}>
-                          <OptimizedAvatar name={institution.name} imageUrl={institution.logoURL} contained={true} />
-                        </Box>
-                      </Tooltip>
-                    </Box>
-                  ))}
+                {getInstitutionData().map((institution, idx) => (
+                  <Box key={idx} sx={{ display: "inline-block" }}>
+                    <Tooltip
+                      title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
+                    >
+                      <Box sx={{ marginLeft: "-10px" }}>
+                        <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
+                      </Box>
+                    </Tooltip>
+                  </Box>
+                ))}
               </Box>
             </Grid>
           </Grid>

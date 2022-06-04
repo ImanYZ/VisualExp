@@ -16,8 +16,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
     return (
       <Avatar
         sx={{
-          width: 50,
-          height: 50
+          width: "50px",
+          height: "50px"
         }}
       >
         {name.charAt(0)}
@@ -30,8 +30,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
     return (
       <Box
         sx={{
-          width: 50,
-          height: 50,
+          width: "50px",
+          height: "50px",
           border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px",
@@ -51,8 +51,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
     return (
       <Box
         sx={{
-          width: 50,
-          height: 50,
+          width: "50px",
+          height: "50px",
           position: "relative",
           border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
@@ -62,7 +62,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
         <Image
           src={imageUrl}
           alt={name}
-          layout={"fill"}
+          width="50px"
+          height="50px"
           objectFit="cover"
           style={{
             borderRadius: "30px"
