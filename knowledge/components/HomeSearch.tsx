@@ -36,6 +36,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         layout="fill"
         objectFit="cover"
         quality={100}
+        priority
       />
       <Box sx={{ position: "absolute", maxWidth: { xs: "340px", md: "1087px" } }}>
         <Typography
