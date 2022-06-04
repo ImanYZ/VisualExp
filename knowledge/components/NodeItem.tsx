@@ -51,6 +51,16 @@ export const NodeItem = ({ node }: NodeItemProps) => {
     setInstitutionsData(institutions);
   };
 
+  const getInstitutionData = (): InstitutionData[] => {
+    if (institutionsData.length) {
+      return institutionsData;
+    }
+    if (node.institutions) {
+      return node.institutions.map(cur => ({ name: cur.name, logoURL: "" }));
+    }
+    return [];
+  };
+
   const ExpandMore = ({ expand }: { expand: boolean }) => {
     return (
       <Button
@@ -143,7 +153,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
             </Grid>
             <Grid item xs={1}>
               <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
-                {(institutionsData.length ? institutionsData : node.institutions || []).map((institution, idx) => (
+                {getInstitutionData().map((institution, idx) => (
                   <Box key={idx} sx={{ display: "inline-block" }}>
                     <Tooltip
                       title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
