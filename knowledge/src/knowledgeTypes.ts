@@ -108,6 +108,20 @@ export type KnowledgeNode = Omit<
   parents?: LinkedKnowledgeNode[];
 };
 
+export type SimpleNode = {
+  id: string;
+  title?: string;
+  content?: string;
+  nodeType: NodeType;
+  nodeImage?: string;
+  updatedAt?: string;
+  corrects?: number;
+  wrongs?: number;
+  tags: { title: string }[];
+  contributors: { fullName: string; imageUrl: string }[];
+  institutions: { name: string }[];
+};
+
 export type ResponseAutocompleteTags = {
   results?: string[];
   errorMessage?: string;
