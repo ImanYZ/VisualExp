@@ -156,6 +156,13 @@ export function getThemedComponents(): {
             }
           }
         }
+      },
+      MuiChip: {
+        styleOverrides: {
+          icon: {
+            color: common.orange
+          }
+        }
       }
     }
   };

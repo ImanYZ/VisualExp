@@ -1,13 +1,13 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 
 import { NodeType } from "../src/knowledgeTypes";
 import NodeTypeIcon from "./NodeTypeIcon";
 
 type Props = {
-  value: string[];
+  nodeTypes: string[];
   onNodesTypeChange: (newValues: string[]) => void;
 };
 
@@ -26,44 +26,46 @@ const options: NodeType[] = [
   NodeType.Tag
 ];
 
-const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange }) => {
-  //   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
-  //     if (event && query.trim().length > 0) {
-  //       setText(query);
-  //     }
-  //   };
+const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
+  const [value, setValue] = useState<string[]>([]);
+  const [hasBeenCleared, setHasBeenCleared] = useState(false);
 
-  const handleChange = (
-    _: React.SyntheticEvent,
-    newValue: (
-      | string
-      | {
-          name: string;
-          logoUrl?: string | undefined;
-        }
-    )[]
-  ) => {
-    onNodesTypeChange(newValue.map(el => (typeof el === "string" ? el : el.name)));
+  const handleChange = (_: React.SyntheticEvent, newValue: string[]) => {
+    if (newValue.length === 0) {
+      setHasBeenCleared(true);
+    }
+    setValue(newValue);
+    onNodesTypeChange(newValue);
   };
+
+  useEffect(() => {
+    if (value.length === 0 && nodeTypes.length > 0 && !hasBeenCleared) {
+      setValue(nodeTypes);
+    }
+  }, [nodeTypes, hasBeenCleared, value.length]);
 
   return (
     <Autocomplete
       multiple
       options={options}
-      freeSolo
-      //   onInputChange={handleQueryChange}
+      value={value}
       renderOption={(props, option) => (
         <li {...props}>
-          {<NodeTypeIcon sx={{ mr: 1 }} nodeType={option} />}
+          {<NodeTypeIcon sx={{ mr: 1 }} nodeType={option as NodeType} />}
           {option}
         </li>
       )}
       getOptionLabel={option => option}
       onChange={handleChange}
-      // value={value}
-      renderTags={(value: readonly NodeType[], getTagProps) =>
+      renderTags={(value: readonly string[], getTagProps) =>
         value.map((option, index: number) => (
-          <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
+          <Chip
+            icon={<NodeTypeIcon sx={{ color: "red" }} color="primary" nodeType={option as NodeType} />}
+            variant="outlined"
+            label={option}
+            {...getTagProps({ index })}
+            key={index}
+          />
         ))
       }
       renderInput={params => <TextField {...params} variant="standard" label="Node type" />}
