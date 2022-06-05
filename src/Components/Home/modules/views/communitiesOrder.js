@@ -502,17 +502,17 @@ export default [
     title: "Neuroscience",
     width: "61%",
     leaders: [
-      {
-        name: "Victoria Mulligan",
-        image: "Victoria_Mulligan.jpg",
-        about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
-          },
-        ],
-      },
+      // {
+      //   name: "Victoria Mulligan",
+      //   image: "Victoria_Mulligan.jpg",
+      //   about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
+      //     },
+      //   ],
+      // },
       {
         name: "Amrit Das Pradhan",
         image: "Amrit_Das_Pradhan.png",
