@@ -13,11 +13,10 @@ import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
-import Tooltip from '@mui/material/Tooltip';
-import CircularProgress from '@mui/material/CircularProgress';
+
 
 import { firebaseState, fullnameState } from '../../../store/AuthAtoms'
-
+import SnackbarComp from "../../SnackbarComp";
 import { projectState, feedbackcodeState } from '../../../store/ProjectAtoms'
 
 const  CodeFeedback = (props) => {
@@ -32,10 +31,9 @@ const  CodeFeedback = (props) => {
   const [newCode, setNewCode] = useState('')
   const [codes,setCodes] = useState([])
   const [codeUpdate,setCodeUpdate] = useState([])
-  
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const [feed, setFeed] = useState({})
-
 
 
 
@@ -66,6 +64,8 @@ useEffect(() => {
   }, [])
  
 
+  
+
   const nextExplanation=()=>{
 
     const array1 = feedBackCode;
@@ -81,7 +81,6 @@ useEffect(() => {
 
 
 }
-
 
 
 const codeChange =(event) => {
@@ -203,6 +202,7 @@ const vote = async (event) =>{
   })
  
   console.log(codeUpdate[0])
+  console.log( ("codesVotes" in codeUpdate[0]))
   const researcherRef = firebase.db.collection("researchers").doc(coder);
     const researcherDoc = await t.get(researcherRef);
     const researcherData = researcherDoc.data();
@@ -217,11 +217,12 @@ const vote = async (event) =>{
         },
       },
     };
-   if(event.target.checked){
+if(event.target.checked){
   if (
     "codesVotes" in
     codeUpdate[0]
   ) {
+    console.log("i'm here")
     codeUpdate[0].codesVotes += 1;
     if(codeUpdate[0].codesVotes>=2){
       codeUpdate.approved = "true"
@@ -235,9 +236,12 @@ const vote = async (event) =>{
 
 
   } else {
+    console.log("look over here")
     codeUpdate[0].codesVotes = 1;
   }
-
+  setSnackbarMessage(
+    "You successfully voted for someone else's code!"
+  );
    
 }else{
 
@@ -245,11 +249,11 @@ const vote = async (event) =>{
 
 }
 
-    
+    console.log(codeUpdate)
     
    
     t.update(researcherRef,researcherUpdates)
-    t.update(codeRef,codeUpdate)
+    t.set(codeRef,codeUpdate)
 
   }); 
 }
@@ -363,6 +367,10 @@ const vote = async (event) =>{
             height: "200px",
           }}
         ></div>
+        <SnackbarComp
+        newMessage={snackbarMessage}
+        setNewMessage={setSnackbarMessage}
+      />
      
     </>
   );
