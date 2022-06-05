@@ -20,7 +20,7 @@ import { firebaseState, fullnameState } from '../../../store/AuthAtoms'
 
 import { projectState, feedbackcodeState } from '../../../store/ProjectAtoms'
 
-const CodeFeedback = (props) => {
+const  CodeFeedback = (props) => {
   const firebase = useRecoilValue(firebaseState)
   // The authenticated researcher fullname
   const fullname = useRecoilValue(fullnameState)
@@ -31,6 +31,7 @@ const CodeFeedback = (props) => {
   const [sentence,setSentence] = useState([])
   const [newCode, setNewCode] = useState('')
   const [codes,setCodes] = useState([])
+  const [codeUpdate,setCodeUpdate] = useState([])
   
 
   const [feed, setFeed] = useState({})
@@ -181,55 +182,49 @@ const addCode = async () => {
   }
 
 
-const vote = async (event) => { 
-  console.log("hello")
+
+
+const vote = async (event) =>{
   const code = currentExps[event.target.id].code
   console.log(currentExps[event.target.id].code)
   const coder = currentExps[event.target.id].coder
   console.log(currentExps[event.target.id].coder)
   const exp = currentExps[event.target.id].explanation
   console.log(currentExps[event.target.id].explanation)
+  
+
   await firebase.db.runTransaction(async (t) => {
-
-
-    const Ref = firebase.db.collection("feedbackCodes").doc()
-
-    
-
-
-    console.log(Ref)
-    const CodesDoc = await t.get(Ref);
-    const codesData = CodesDoc.data();
-
-    const codesUpdates = { ...codesData}
-    console.log(CodesDoc)
-    console.log(codesData)
-
-    const researcherRef = firebase.db.collection("researchers").doc(coder);
+  const codeRef = firebase.db.collection('feedbackCodes').where("project","==",project).where("code","==",code).where("coder","==",coder).where("explanation","==",exp)
+  codeRef.onSnapshot((snap) => {
+    let fetched = snap.docs.map((doc) => {
+      return {...doc.data() }
+    })
+    setCodeUpdate(fetched) 
+  })
+ 
+  console.log(codeUpdate[0])
+  const researcherRef = firebase.db.collection("researchers").doc(coder);
     const researcherDoc = await t.get(researcherRef);
     const researcherData = researcherDoc.data();
-      
+    console.log(researcherData)
 
     
     const researcherUpdates = {
       projects: {
         ...researcherData.projects,
-        [codesUpdates.project]: {
-          ...researcherData.projects[codesUpdates.project],
+        [codeUpdate.project]: {
+          ...researcherData.projects[codeUpdate.project],
         },
       },
     };
-
-
-   
-if(event.target.checked){
+   if(event.target.checked){
   if (
     "codesVotes" in
-    codesUpdates
+    codeUpdate[0]
   ) {
-    codesUpdates.codesVotes += 1;
-    if(codesUpdates.codesVotes>=2){
-      codesUpdates.approved = "true"
+    codeUpdate[0].codesVotes += 1;
+    if(codeUpdate[0].codesVotes>=2){
+      codeUpdate.approved = "true"
       if("codesPoints" in researcherUpdates){
         researcherUpdates.projects[project].codesPoints +=1;
       }
@@ -240,7 +235,7 @@ if(event.target.checked){
 
 
   } else {
-    codesUpdates.codesVotes = 1;
+    codeUpdate[0].codesVotes = 1;
   }
 
    
@@ -254,17 +249,10 @@ if(event.target.checked){
     
    
     t.update(researcherRef,researcherUpdates)
-    t.update(Ref,codesUpdates)
+    t.update(codeRef,codeUpdate)
 
-    
-    
-  });
- }
-
-const handlechange = (event) =>{
-     console.log(currentExps[event.target.id].coder)
+  }); 
 }
-
   
   return (
     <>
@@ -313,17 +301,21 @@ const handlechange = (event) =>{
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Votes</TableCell>
                     <TableCell>Codes</TableCell>
+                    <TableCell></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {currentExps.map((row) => (
                     <div>
+                      <TableRow>
                       <TableCell align="left">
                       <input onChange={vote}  type="checkbox" id={currentExps.indexOf(row)} value={row} ></input>
+                      </TableCell>
+                      <TableCell>
                       <label for = {row.code} >{row.code}</label>                            
-                        </TableCell>
+                      </TableCell>
+                      </TableRow>  
                     </div>
                   ))}
                 </TableBody>
@@ -334,7 +326,7 @@ const handlechange = (event) =>{
       </div>
 
       <div>
-        <div style ={{position:"relative" ,left:"800px",top:"50px"}}>
+        <div style ={{position:"relative" ,left:"700px",top:"50px"}}>
           <Typography variant="h8" margin-bottom = "20px">
             {" "}
             If the code you're looking for does not exist in the list above, add
@@ -375,5 +367,4 @@ const handlechange = (event) =>{
     </>
   );
 }
-
-export default CodeFeedback
+export default CodeFeedback;
