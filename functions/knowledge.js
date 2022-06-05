@@ -20,8 +20,7 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
     for (let userDoc of userDocs.docs) {
       const userData = userDoc.data();
       userInstitutions[userDoc.id] = userData.deInstit;
-      userInstitutions[userDoc.id] =
-        userData.firstname + " " + userData.lastname;
+      userFullnames[userDoc.id] = userData.firstname + " " + userData.lastname;
     }
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
