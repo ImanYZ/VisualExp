@@ -31,11 +31,12 @@ const CodeFeedback = (props) => {
   const [sentence,setSentence] = useState([])
   const [newCode, setNewCode] = useState('')
   const [codes,setCodes] = useState([])
+  
+
   const [feed, setFeed] = useState({})
 
 
 
-  const[record,setRecord] = useState({})
 
 
  
@@ -74,7 +75,9 @@ useEffect(() => {
     var remainingArr = array1.filter((el) => { return el.explanation !== key0.explanation });
     setFeedBackCode(remainingArr);
     setCurrentExps(newArray)
-    setSentence(str.split("."))
+    
+    setSentence(str.split(".").filter(e => e !== ' '))
+
 
 }
 
@@ -178,19 +181,29 @@ const addCode = async () => {
   }
 
 
-const vote = async (coder, code, exp) => { 
+const vote = async (event) => { 
   console.log("hello")
-
+  const code = currentExps[event.target.id].code
+  console.log(currentExps[event.target.id].code)
+  const coder = currentExps[event.target.id].coder
+  console.log(currentExps[event.target.id].coder)
+  const exp = currentExps[event.target.id].explanation
+  console.log(currentExps[event.target.id].explanation)
   await firebase.db.runTransaction(async (t) => {
 
 
-    const codeRef = firebase.db.collection("feedbackCodes").where("code","==",code).where("coder","==",coder).where("explanation","==",exp).doc();
+    const Ref = firebase.db.collection("feedbackCodes").doc()
+
     
-    const CodesDoc = await t.get(codeRef);
+
+
+    console.log(Ref)
+    const CodesDoc = await t.get(Ref);
     const codesData = CodesDoc.data();
 
     const codesUpdates = { ...codesData}
-
+    console.log(CodesDoc)
+    console.log(codesData)
 
     const researcherRef = firebase.db.collection("researchers").doc(coder);
     const researcherDoc = await t.get(researcherRef);
@@ -208,46 +221,62 @@ const vote = async (coder, code, exp) => {
     };
 
 
-
-
-    
-    
-    if (
-      "codesVotes" in
-      codesUpdates
-    ) {
-      codesUpdates.codesVotes += 1;
-      if(codesUpdates.codesVotes>=2){
-        codesUpdates.approved = "true"
-        if("codesPoints" in researcherUpdates){
-          researcherUpdates.projects[project].codesPoints +=1;
-        }
-        else{
-          researcherUpdates.projects[project].codesPoints = 1;
-        }
+   
+if(event.target.checked){
+  if (
+    "codesVotes" in
+    codesUpdates
+  ) {
+    codesUpdates.codesVotes += 1;
+    if(codesUpdates.codesVotes>=2){
+      codesUpdates.approved = "true"
+      if("codesPoints" in researcherUpdates){
+        researcherUpdates.projects[project].codesPoints +=1;
       }
-
-
-    } else {
-      codesUpdates.codesVotes = 1;
+      else{
+        researcherUpdates.projects[project].codesPoints = 1;
+      }
     }
 
+
+  } else {
+    codesUpdates.codesVotes = 1;
+  }
+
+   
+}else{
+
+  researcherUpdates.projects[project].codesPoints -=1
+
+}
+
+    
+    
+   
     t.update(researcherRef,researcherUpdates)
-    t.update(codeRef,codesUpdates)
+    t.update(Ref,codesUpdates)
 
     
     
   });
  }
 
-const handleChange =(code) =>{
-  console.log(code)
+const handlechange = (event) =>{
+     console.log(currentExps[event.target.id].coder)
 }
 
-
+  
   return (
     <>
       <div>
+
+      <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            height: "50px",
+          }}
+        ></div>
         <Grid
           container
           direction="row"
@@ -289,14 +318,13 @@ const handleChange =(code) =>{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                   {currentExps.map((row) => (
-                    <TableRow>
+                  {currentExps.map((row) => (
+                    <div>
                       <TableCell align="left">
-                        <Checkbox />
-                      </TableCell>
-
-                      <TableCell align="left">{row.code}</TableCell>
-                    </TableRow>
+                      <input onChange={vote}  type="checkbox" id={currentExps.indexOf(row)} value={row} ></input>
+                      <label for = {row.code} >{row.code}</label>                            
+                        </TableCell>
+                    </div>
                   ))}
                 </TableBody>
               </Table>
@@ -306,30 +334,44 @@ const handleChange =(code) =>{
       </div>
 
       <div>
-        <container Width="500">
-          <Typography variant="h8">
+        <div style ={{position:"relative" ,left:"800px",top:"50px"}}>
+          <Typography variant="h8" margin-bottom = "20px">
             {" "}
             If the code you're looking for does not exist in the list above, add
             it below :
+            
           </Typography>
-
-          <form noValidate autoComplete="off">
-            <TextField onChange={codeChange} value={newCode}/>
-            <Button style={{ margin: "5px" }} onClick={addCode}>
-              Create
-            </Button>
-
-            <Button style={{ margin: "5px" }} onClick={nextExplanation}>
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            height: "50px",
+          }}
+        ></div>
+          <div>
+          <TextField  style={{ width: "500px" }} onChange={codeChange} value={newCode} />
+          <Button variant="contained"  style={{ margin: "5px" }} onClick={addCode}>
+            Create
+          </Button>
+          </div>
+        </div>
+       
+      </div>
+        <div  style ={{position:"relative" ,left:"500px",top:"50px"}}>
+         
+            <Button  variant="contained" style={{ margin: "5px" }} onClick={nextExplanation}>
               Submit
             </Button>
-          </form>
-          <form sx={{ height: "50%" }}>
-            
-
-           
-          </form>
-        </container>
-      </div>
+        
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            height: "200px",
+          }}
+        ></div>
+     
     </>
   );
 }
