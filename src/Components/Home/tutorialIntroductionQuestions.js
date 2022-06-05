@@ -612,7 +612,7 @@ export default {
         stem:
           quNum() +
           "When do you see a bookmarked node in your bookmarked updates tab?",
-        answers: ["b", "c"],
+        answers: ["c"],
         choices: {
           a: "When it is marked as studied",
           b: "When it is marked as not studied",
