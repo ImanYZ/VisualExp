@@ -1,20 +1,21 @@
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import { IconButton, InputBase, Paper, styled, Toolbar } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
+import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import React, { FC, MouseEvent, useState } from "react";
+import React, { FC } from "react";
 
 import LogoDarkMode from "../public/DarkModeLogo.svg";
 import SECTIONS from "../src/navbarSections";
 import ROUTES from "../src/routes";
+import AppHeaderSearchBar from "./AppHeaderSearchBar";
 
 type Props = {
   showApply?: boolean;
@@ -24,15 +25,6 @@ type Props = {
 };
 const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
-  const [searchText, setSearchText] = useState("");
-
-  const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    router.push({
-      pathname: "/",
-      query: { q: searchText }
-    });
-  };
 
   return (
     <AppBar sx={{ boxShadow: "none" }}>
@@ -78,41 +70,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
             marginLeft: "20px"
           }}
         >
-          {router.route !== "/" && (
-            <Paper
-              component="form"
-              sx={{
-                p: "0px 4px",
-                display: "flex",
-                alignItems: "center",
-                width: "100%",
-                background: theme => theme.palette.grey[600],
-                borderRadius: "3px",
-                border: "solid 2px",
-                borderColor: theme => theme.palette.grey[600],
-                color: theme => theme.palette.common.white,
-                ":hover": {
-                  borderColor: theme => theme.palette.common.white,
-                  color: theme => theme.palette.common.white
-                },
-                ":focus-within": {
-                  background: theme => theme.palette.common.white,
-                  color: theme => theme.palette.common.black
-                }
-              }}
-            >
-              <StyledInputBase
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                placeholder="Search on 1Cademy "
-                inputProps={{ "aria-label": "search node" }}
-                sx={{ ml: 1, flex: 1 }}
-              />
-              <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search" onClick={handleSearch}>
-                <SearchIcon />
-              </IconButton>
-            </Paper>
-          )}
+          {router.route !== "/" && <AppHeaderSearchBar />}
           {showApply && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
@@ -161,23 +119,5 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
     </AppBar>
   );
 };
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  "& .MuiInputBase-input": {
-    padding: 0,
-    width: "100%",
-    color: theme.palette.common.white
-  },
-  "& .MuiInputBase-input::placeholder": {
-    opacity: 1,
-    color: theme.palette.common.white,
-    fontWeight: "400"
-  },
-  "& .MuiInputBase-input:focus": {
-    color: theme.palette.common.black,
-    background: theme.palette.common.white,
-    fontWeight: "400"
-  }
-}));
 
 export default AppAppBar;
