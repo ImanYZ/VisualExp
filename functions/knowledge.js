@@ -170,7 +170,7 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
 // On 1Cademy.com when users sign up, we do not make the corresponding changes
 // to the institutions collection. We should run this function every 25 hours in
 // a PubSub to assign these arrays.
-exports.updateInstitutions = async (req, res) => {
+exports.updateInstitutions = async (context) => {
   try {
     const userDocs = await db.collection("users").get();
     for (let userDoc of userDocs.docs) {
@@ -186,11 +186,10 @@ exports.updateInstitutions = async (req, res) => {
             .collection("institutions")
             .doc(instDocs.docs[0].id);
           const instData = instDocs.docs[0].data();
-          console.log({ instData });
           if (!instData.users.includes(userDoc.id)) {
             t.update(instRef, {
               users: [...instData.users, userDoc.id],
-              usersNum: admin.firestore.FieldValue.increment(1),
+              usersNum: instData.usersNum + 1,
             });
           }
         } else {
