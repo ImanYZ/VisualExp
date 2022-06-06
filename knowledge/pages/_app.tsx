@@ -1,6 +1,6 @@
 import "../styles/global.css";
 
-import { CacheProvider } from "@emotion/react";
+import { CacheProvider, EmotionCache } from "@emotion/react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
@@ -14,9 +14,15 @@ import { ReactQueryDevtools } from "react-query/devtools";
 import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
 import createEmotionCache from "../src/createEmotionCache";
 
-const emotionCache = createEmotionCache();
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache();
 
-function MyApp({ Component, pageProps }: AppProps) {
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
+
+function MyApp(props: MyAppProps) {
+  const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [queryClient] = useState(
     () =>
       new QueryClient({
