@@ -84,11 +84,14 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
   }
   const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
   const simpleNodes = nodeDocs.docs
-    .map(nodeDoc => ({
-      ...(nodeDoc.data() as NodeFireStore),
-      id: nodeDoc.id,
-      tags: getNodeTags(nodeDoc.data() as NodeFireStore)
-    }))
+    .map(nodeDoc => {
+      const nodeData = nodeDoc.data() as NodeFireStore;
+      return {
+        ...nodeData,
+        id: nodeDoc.id,
+        tags: getNodeTags(nodeData)
+      };
+    })
     .map((nodeData): SimpleNode => {
       const tags = nodeData.tags
         .map(tag => tag.title || "")
@@ -108,6 +111,7 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
         id: nodeData.id,
         title: nodeData.title,
         content: nodeData.content,
+        choices: nodeData.choices || [],
         nodeType: nodeData.nodeType,
         nodeImage: nodeData.nodeImage,
         updatedAt: nodeData.updatedAt.toDate().toISOString(),
