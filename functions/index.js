@@ -43,7 +43,10 @@ const {
   scheduleLifeLog,
   ongoingEvents,
 } = require("./scheduling");
-const { assignNodeContributorsAndInstitutions } = require("./knowledge");
+const {
+  assignNodeContributorsAndInstitutions,
+  updateInstitutions,
+} = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -96,6 +99,7 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 // Misinformation Experiment
 app.get("/card", card);
 app.get("/image*", image);
+app.get("/updateInstitutions", updateInstitutions);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ api: true });

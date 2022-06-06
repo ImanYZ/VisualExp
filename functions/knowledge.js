@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 const {
   admin,
   db,
@@ -8,8 +10,9 @@ const {
 } = require("./admin_Knowledge");
 const { getTypedCollections } = require("./getTypedCollections");
 
-// On 1Cademy.com nodes do not have their list of contributors and institutions assigned to them.
-// We should run this function every 25 hours in a PubSub to assign these arrays.
+// On 1Cademy.com nodes do not have their list of contributors and institutions
+// assigned to them. We should run this function every 25 hours in a PubSub to
+// assign these arrays.
 exports.assignNodeContributorsAndInstitutions = async (context) => {
   try {
     // First get the list of all users and create an Object to map their ids to their
@@ -163,3 +166,104 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
     return null;
   }
 };
+
+// On 1Cademy.com when users sign up, we do not make the corresponding changes
+// to the institutions collection. We should run this function every 25 hours in
+// a PubSub to assign these arrays.
+exports.updateInstitutions = async (req, res) => {
+  try {
+    const userDocs = await db.collection("users").get();
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
+      const institution = userData.deInstit;
+      const instQuery = db
+        .collection("institutions")
+        .where("name", "==", institution);
+      await db.runTransaction(async (t) => {
+        const instDocs = await t.get(instQuery);
+        if (instDocs.docs.length > 0) {
+          const instRef = db
+            .collection("institutions")
+            .doc(instDocs.docs[0].id);
+          const instData = instDocs.docs[0].data;
+          console.log({ instData });
+          if (!instData.users.includes(userDoc.id)) {
+            t.update(instRef, {
+              users: [...instData.users, userDoc.id],
+              usersNum: admin.firestore.FieldValue.increment(1),
+            });
+          }
+        } else {
+          const instRef = db.collection("institutions").doc();
+          try {
+            const response = await axios.get(
+              encodeURI(
+                "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
+                  institution
+              )
+            );
+            const geoLoc = response.data.results[0].geometry.location;
+            t.set(instRef, {
+              country: "USA",
+              lng: geoLoc.lng,
+              lat: geoLoc.lat,
+              logoURL: encodeURI(
+                "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
+                  institution +
+                  ".png"
+              ),
+              name: institution,
+              users: [userDoc.id],
+              usersNum: 1,
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        }
+      });
+    }
+    return null;
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
+
+// const fs = require("fs");
+// const csv = require("csv-parser");
+// exports.createInstitutionsCollection = (req, res) => {
+//   fs.createReadStream(__dirname + "/Interns_Institutions.csv")
+//     .pipe(csv())
+//     .on("data", async (row) => {
+//       let userRef, userDocs, instDocs;
+//       let emailsInsts = [
+//         {
+//           email: Object.keys(row)[2],
+//           institution: Object.keys(row)[3],
+//         },
+//         {
+//           email: Object.values(row)[2],
+//           institution: Object.values(row)[3],
+//         },
+//       ];
+//       for (let { email, institution } of emailsInsts) {
+//         if (institution !== "" && email !== "Email") {
+//           userDocs = await db
+//             .collection("users")
+//             .where("email", "==", email)
+//             .limit(1)
+//             .get();
+//           if (userDocs.docs.length > 0) {
+//             userRef = db.collection("users").doc(userDocs.docs[0].id);
+//             await userRef.update({ deInstit: institution });
+//           }
+//         }
+//       }
+//     })
+//     .on("error", (err) => {
+//       return res.status(200).json(err);
+//     })
+//     .on("end", () => {
+//       return res.status(200).json("Done.");
+//     });
+// };
