@@ -185,7 +185,7 @@ exports.updateInstitutions = async (req, res) => {
           const instRef = db
             .collection("institutions")
             .doc(instDocs.docs[0].id);
-          const instData = instDocs.docs[0].data;
+          const instData = instDocs.docs[0].data();
           console.log({ instData });
           if (!instData.users.includes(userDoc.id)) {
             t.update(instRef, {
