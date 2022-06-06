@@ -4,6 +4,7 @@ import { Box, Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIc
 import React, { FC, useState } from "react";
 
 import { KnowledgeChoice } from "../src/knowledgeTypes";
+import MarkdownRender from "./Markdown/MarkdownRender";
 
 type Props = {
   choices?: KnowledgeChoice[];
@@ -35,7 +36,7 @@ const QuestionItem: FC<Props> = ({ choices }) => {
               <ListItem sx={{ width: "100%", py: "10px" }}>
                 <ListItemIcon sx={{ width: "100%" }}>
                   <FormControlLabel
-                    label={value.choice}
+                    label={<MarkdownRender text={value.choice} />}
                     sx={{ width: "calc(100%) - 46px" }}
                     control={
                       <>
