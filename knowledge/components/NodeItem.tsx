@@ -20,6 +20,7 @@ import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
 import OptimizedAvatar from "./OptimizedAvatar";
+import QuestionItem from "./QuestionItem";
 // import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
@@ -96,7 +97,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <MarkdownRender text={node.content || ""} />
         </Typography>
 
-        {/* {node.nodeType === "Question" && <QuestionItem node={node} />} */}
+        {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
         {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
       </CardContent>
 
