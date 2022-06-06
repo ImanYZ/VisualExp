@@ -1,16 +1,16 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import React, { FC, useState } from "react";
 
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import { KnowledgeChoice } from "../src/knowledgeTypes";
 
 type Props = {
-  node: KnowledgeNode;
+  choices?: KnowledgeChoice[];
 };
 
-const QuestionItem: FC<Props> = ({ node }) => {
-  const initialChoicesState = new Array(node.choices?.length || 0).fill(false);
+const QuestionItem: FC<Props> = ({ choices }) => {
+  const initialChoicesState = new Array(choices?.length || 0).fill(false);
 
   const [choicesState, setChoicesState] = useState<boolean[]>(initialChoicesState);
 
@@ -22,20 +22,21 @@ const QuestionItem: FC<Props> = ({ node }) => {
     });
   };
 
-  if (!node.choices) {
+  if (!choices) {
     return null;
   }
 
   return (
     <>
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-        {node.choices.map((value, idx) => {
+        {choices.map((value, idx) => {
           return (
-            <div key={idx}>
-              <ListItem disablePadding>
-                <ListItemIcon>
+            <Box key={idx} sx={{ width: "100%" }}>
+              <ListItem sx={{ width: "100%", py: "10px" }}>
+                <ListItemIcon sx={{ width: "100%" }}>
                   <FormControlLabel
                     label={value.choice}
+                    sx={{ width: "calc(100%) - 46px" }}
                     control={
                       <>
                         {!choicesState[idx] && (
@@ -62,7 +63,7 @@ const QuestionItem: FC<Props> = ({ node }) => {
                   <ListItemText primary={value.feedback} />
                 </ListItem>
               )}
-            </div>
+            </Box>
           );
         })}
       </List>
