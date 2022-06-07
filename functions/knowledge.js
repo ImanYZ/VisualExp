@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const fs = require("fs");
 
 const {
   admin,
@@ -250,7 +250,7 @@ exports.updateInstitutions = async (req, res) => {
   }
 };
 
-exports.fixInstitutionInUsers =  (req, res) => {
+exports.fixInstitutionInUsers = async (req, res) => {
   try {
     const institutionsObj = await import(
       "./datasets/edited_universities.json"
