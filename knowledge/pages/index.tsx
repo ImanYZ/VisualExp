@@ -46,7 +46,7 @@ const MasonryNodes: ComponentType<any> = dynamic(
 export const sortByDefaults = {
   upvotes: false,
   mostRecent: false,
-  timeWindow: SortedByTimeOptions[2]
+  timeWindow: SortedByTimeOptions[0]
 };
 
 type Props = {
@@ -85,6 +85,8 @@ const buildFilterBy = (
     updatedAt = dayjs().subtract(1, "week").valueOf();
   } else if (timeWindow === TimeWindowOption.ThisMonth) {
     updatedAt = dayjs().subtract(1, "month").valueOf();
+  } else {
+    updatedAt = dayjs().subtract(10, "year").valueOf();
   }
 
   filters.push(`changedAtMillis:>${updatedAt}`);
@@ -182,9 +184,7 @@ const HomePage: NextPage<Props> = ({
   filtersSelected
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
-    if (filtersSelected.mostRecent) {
-      return SortTypeWindowOption.MOST_RECENT;
-    }
+    if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
     if (filtersSelected.upvotes) {
       return SortTypeWindowOption.UPVOTES_DOWNVOTES;
     }
