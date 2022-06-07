@@ -30,7 +30,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
       }}
     >
       <Image
-        style={{ filter: "brightness(.4)" }}
+        style={{ filter: "brightness(.6)" }}
         alt="1cademy library"
         src="/LibraryBackground.jpg"
         layout="fill"
