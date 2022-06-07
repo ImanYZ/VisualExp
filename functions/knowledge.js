@@ -250,7 +250,7 @@ exports.updateInstitutions = async (req, res) => {
   }
 };
 
-exports.fixInstitutionInUsers = aync (req, res) => {
+exports.fixInstitutionInUsers =  (req, res) => {
   try {
     const institutionsObj = await import(
       "./datasets/edited_universities.json"
