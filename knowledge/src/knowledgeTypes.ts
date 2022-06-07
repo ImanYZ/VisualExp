@@ -175,6 +175,12 @@ export enum TimeWindowOption {
   "ThisYear" = "This Year"
 }
 
+export enum SortTypeWindowOption {
+  "MOST_RECENT" = "MOST_RECENT",
+  "UPVOTES_DOWNVOTES" = "UPVOTES_DOWNVOTES",
+  "NONE" = "NONE"
+}
+
 export type FilterValue = {
   id: string;
   name: string;
