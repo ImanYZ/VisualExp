@@ -38,13 +38,13 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         quality={100}
         priority
       />
-      <Box sx={{ position: "absolute", maxWidth: { xs: "340px", md: "1087px" } }}>
+      <Box sx={{ position: "absolute", maxWidth: "100vw", width: "60%" }}>
         <Typography
           textAlign="center"
           variant="h3"
           component="h1"
           fontWeight="500"
-          sx={{ marginBottom: { xs: 1, md: 3 }, marginTop: 8, fontSize: { xs: "23px", md: "50px" } }}
+          sx={{ mt: 0, marginBottom: { xs: 1, md: 2 }, fontSize: { xs: "23px", md: "50px" } }}
         >
           What do you want to learn today?
         </Typography>
@@ -60,7 +60,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         <Box
           sx={{
             width: "100%",
-            my: { xs: "10px", md: 7 },
+            mt: { xs: 1, md: 5 },
             display: "flex",
             flexDirection: "row"
           }}
