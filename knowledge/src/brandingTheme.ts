@@ -161,15 +161,6 @@ export function getThemedComponents(): {
           }
         }
       },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            "&:hover": {
-              boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)"
-            }
-          }
-        }
-      },
       MuiChip: {
         styleOverrides: {
           icon: {

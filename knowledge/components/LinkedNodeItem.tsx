@@ -1,5 +1,5 @@
 import LinkIcon from "@mui/icons-material/Link";
-import { Link, ListItem, Tooltip } from "@mui/material";
+import { IconButton, Link, ListItem, ListItemButton, ListItemText, Tooltip } from "@mui/material";
 import Box from "@mui/material/Box";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Typography from "@mui/material/Typography";
@@ -22,8 +22,18 @@ type Props = {
   showListItemIcon?: boolean;
   label: string;
   sx?: SxProps<Theme>;
+  secondaryActionSx: SxProps<Theme>;
 };
-const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType, linkSrc, label, sx }) => {
+const LinkedNodeItem: FC<Props> = ({
+  nodeImageUrl,
+  nodeContent,
+  title,
+  nodeType,
+  linkSrc,
+  label,
+  sx,
+  secondaryActionSx
+}) => {
   return (
     <HtmlTooltip
       title={
@@ -40,35 +50,40 @@ const LinkedNodeItem: FC<Props> = ({ nodeImageUrl, nodeContent, title, nodeType,
       }
       placement="left"
     >
-      <ListItem sx={{ display: "flex", justifyContent: "space-between", ...sx }}>
+      <ListItem
+        disablePadding
+        sx={{ display: "flex" }}
+        secondaryAction={
+          <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", ...secondaryActionSx }}>
+            <ListItemIcon>
+              <NodeTypeIcon nodeType={nodeType} sx={{ marginLeft: "auto" }} />
+            </ListItemIcon>
+            {isValidHttpUrl(label) && (
+              <Tooltip title="Open the reference specified section in new tab">
+                <IconButton
+                  target="_blank"
+                  LinkComponent={Link}
+                  href={label}
+                  sx={{
+                    ml: 2,
+                    display: "flex",
+                    direction: "row",
+                    justifyContent: "center",
+                    color: theme => theme.palette.common.darkGrayBackground
+                  }}
+                >
+                  <LinkIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Box>
+        }
+      >
         <LinkNext passHref href={linkSrc}>
-          <Link
-            sx={{ fontSize: "inherit", cursor: "pointer", color: theme => theme.palette.common.black }}
-            component="a"
-            underline="none"
-          >
-            <MarkdownRender text={title} />
-          </Link>
+          <ListItemButton component="a" href={linkSrc} sx={{ ...sx }}>
+            <ListItemText primary={<MarkdownRender text={title || ""} />} disableTypography={true} />
+          </ListItemButton>
         </LinkNext>
-        <ListItemIcon>
-          <NodeTypeIcon nodeType={nodeType} sx={{ marginLeft: "auto" }} />
-        </ListItemIcon>
-        {isValidHttpUrl(label) && (
-          <Tooltip title="Open the reference specified section in new tab">
-            <Link
-              target="_blank"
-              href={label}
-              sx={{
-                display: "flex",
-                direction: "row",
-                justifyContent: "center",
-                color: theme => theme.palette.common.darkGrayBackground
-              }}
-            >
-              <LinkIcon />
-            </Link>
-          </Tooltip>
-        )}
       </ListItem>
     </HtmlTooltip>
   );
