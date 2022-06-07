@@ -32,17 +32,23 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
 
   return (
     <Stack
-      direction={{ xs: "column-reverse", md: "row" }}
+      direction={{ xs: "column", md: "row" }}
       alignItems="center"
       justifyContent={{ xs: "center", sm: "space-between" }}
-      gap="10px"
       sx={{
         width: "100%",
         padding: { xs: "0px 40px", md: "0px 0px" },
-        marginBottom: "50px"
+        marginBottom: { xs: "20px", md: "50px" }
       }}
     >
-      <>
+      <Stack
+        direction={{ xs: "column-reverse", md: "row" }}
+        gap="10px"
+        sx={{
+          width: "100%",
+          padding: { xs: "20px 0px", md: "0px 0px" }
+        }}
+      >
         <ToggleButtonGroup
           value={sortedByType}
           exclusive
@@ -70,7 +76,7 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
             </Select>
           </FormControl>
         </Tooltip>
-      </>
+      </Stack>
       <ShareButtons />
     </Stack>
   );
