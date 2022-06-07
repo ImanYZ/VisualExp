@@ -1,5 +1,4 @@
 const axios = require("axios");
-const fs = require('fs');
 
 const {
   admin,
@@ -217,7 +216,7 @@ exports.updateInstitutions = async (req, res) => {
             const response = await axios.get(
               encodeURI(
                 "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
-                instObj.name
+                  institution
               )
             );
             const geoLoc = response.data.results[0].geometry.location;
@@ -227,11 +226,11 @@ exports.updateInstitutions = async (req, res) => {
               lat: geoLoc.lat,
               logoURL: encodeURI(
                 "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
-                instObj.name +
+                  institution +
                   ".png"
               ),
               domains: [domainName],
-              name: instObj.name,
+              name: institution,
               users: [userDoc.id],
               usersNum: 1,
             });
@@ -250,7 +249,7 @@ exports.updateInstitutions = async (req, res) => {
   }
 };
 
-exports.fixInstitutionInUsers = async (req, res) => {
+exports.fixInstitutionInUsers = (req, res) => {
   try {
     const institutionsObj = await import(
       "./datasets/edited_universities.json"
