@@ -117,7 +117,6 @@ export type SimpleNode = {
   choices: KnowledgeChoice[];
   nodeType: NodeType;
   nodeImage?: string;
-  // updatedAt?: string;
   corrects?: number;
   wrongs?: number;
   tags: string[];
@@ -130,27 +129,10 @@ export type ResponseAutocompleteTags = {
   errorMessage?: string;
 };
 
-// export type TypesenseNodesSchema = {
-//   id: string;
-//   title: string;
-//   changedAt: string;
-//   changedAtMillis: number;
-//   updatedAt: number;
-//   corrects: number;
-//   content: string;
-//   // contributors: string[];
-//   // institutions: string[];
-//   contributors: { fullName: string; imageUrl: string }[];
-//   institutions: { name: string }[];
-//   nodeType: NodeType;
-//   nodeImage?: string;
-//   tags: string[];
-//   wrongs: number;
-// };
-
 export type TypesenseNodesSchema = {
   changedAt: string;
   changedAtMillis: number; // typesense
+  choices?: KnowledgeChoice[];
   content: string; // typesense
   contributors: { fullName: string; imageUrl: string }[];
   contributorsNames: string[]; // typesense

@@ -75,8 +75,6 @@ const getContributorsName = (nodeData: NodeFireStore): string[] => {
 };
 
 const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
-  // const importData: TypesenseNodesSchema[] = [];
-
   const getContributorsFromNode = (nodeData: NodeFireStore) => {
     return Object.entries(nodeData.contributors || {})
       .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
@@ -91,10 +89,6 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
       .map(institution => ({ name: institution.name }));
   };
 
-  // const getTagsFromNodes = (nodeData: NodeFireStore) => {
-  //   return getNodeTags(nodeData)
-  // }
-
   const nodeDocs = await db.collection("nodes").get();
 
   return nodeDocs.docs.map((nodeDoc): TypesenseNodesSchema => {
@@ -108,6 +102,7 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
     return {
       changedAt: nodeData.changedAt.toDate().toISOString(),
       changedAtMillis: nodeData.changedAt?.toMillis() || 0,
+      choices: nodeData.choices,
       content: nodeData.content || "",
       contributors,
       contributorsNames,
