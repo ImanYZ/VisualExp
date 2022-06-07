@@ -83,37 +83,21 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
     return [];
   }
 
-  let nodeDocs;
-  // if (sortBy === 'CORRECT') {
-  //   nodeDocs = await db.collection("nodes")
-  //     .where(firestore.FieldPath.documentId(), "in", nodeIds)
-  //     .orderBy('corrects', 'desc').get();
-  //   // .orderBy(firestore.FieldPath.documentId())
-  // } else if (sortBy === 'CHANGED_AT') {
-  //   nodeDocs = await db.collection("nodes")
-  //     // .orderBy(firestore.FieldPath.documentId())
-  //     .where(firestore.FieldPath.documentId(), "in", nodeIds)
-  //     .orderBy('changedAt', 'asc').get();
-  // } else {
-
-  //   }
-
-  nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
+  const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
 
   const simpleNodes = nodeDocs.docs
     .map(nodeDoc => {
-      const dd = nodeDoc.data() as NodeFireStore;
+      const nodeData = nodeDoc.data() as NodeFireStore;
       return {
-        ...dd,
+        ...nodeData,
         id: nodeDoc.id,
-        tags: getNodeTags(nodeDoc.data() as NodeFireStore)
+        tags: getNodeTags(nodeData)
       };
     })
     .map((nodeData): SimpleNode => {
-      const tags = nodeData.tags
-        .map(tag => tag.title || "")
-        .filter(tag => tag)
-        .map(tag => ({ title: tag }));
+      const tags = getNodeTags(nodeData).map(tag => tag.title || "");
+      // .filter(tag => tag)
+      // .map(tag => ({ title: tag }));
       const contributors = Object.entries(nodeData.contributors || {})
         .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
         .sort((a, b) => (b.reputation = a.reputation))
@@ -128,10 +112,10 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
         id: nodeData.id,
         title: nodeData.title,
         content: nodeData.content,
+        choices: nodeData.choices || [],
         nodeType: nodeData.nodeType,
         nodeImage: nodeData.nodeImage,
         changedAt: nodeData.changedAt.toDate().toISOString(),
-        updatedAt: nodeData.updatedAt.toDate().toISOString(),
         corrects: nodeData.corrects,
         wrongs: nodeData.wrongs,
         tags,

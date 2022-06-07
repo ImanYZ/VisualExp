@@ -52,6 +52,7 @@ export type NodeFireStore = {
   bookmarks?: number;
   changedAt: Timestamp;
   children?: { node?: string; label?: string; title?: string }[];
+  choices?: KnowledgeChoice[];
   closedHeight?: number;
   comments?: number;
   content?: string;
@@ -113,6 +114,7 @@ export type SimpleNode = {
   title?: string;
   changedAt?: string;
   content?: string;
+  choices: KnowledgeChoice[];
   nodeType: NodeType;
   nodeImage?: string;
   // updatedAt?: string;
