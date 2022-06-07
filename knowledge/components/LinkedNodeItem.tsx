@@ -22,7 +22,7 @@ type Props = {
   showListItemIcon?: boolean;
   label: string;
   sx?: SxProps<Theme>;
-  secondaryActionSx: SxProps<Theme>;
+  secondaryActionSx?: SxProps<Theme>;
 };
 const LinkedNodeItem: FC<Props> = ({
   nodeImageUrl,
