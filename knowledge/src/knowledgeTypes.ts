@@ -170,6 +170,7 @@ export type ResponseAutocompleteFilter = {
 };
 
 export enum TimeWindowOption {
+  "AnyTime" = "Any Time",
   "ThisWeek" = "This Week",
   "ThisMonth" = "This Month",
   "ThisYear" = "This Year"

@@ -1,6 +1,5 @@
 import {
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -52,8 +51,8 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
       </ToggleButtonGroup>
 
       <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-        <FormControl variant="filled" sx={{ m: 1, width: "100%" }} size="small">
-          <InputLabel id="any-time-label">Any Time</InputLabel>
+        <FormControl variant="standard" sx={{ m: 1, width: "100%" }} size="small">
+          {/* <InputLabel id="any-time-label">Any Time</InputLabel> */}
           <Select labelId="any-time-label" id="any-time" value={timeWindow} onChange={handleSortByTime}>
             {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
               <MenuItem value={sortedByTimeOption} key={idx}>

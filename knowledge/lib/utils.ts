@@ -53,6 +53,7 @@ export const getQueryParameterAsBoolean = (val: string | string[] | undefined): 
 };
 
 export const SortedByTimeOptions: TimeWindowOption[] = [
+  TimeWindowOption.AnyTime,
   TimeWindowOption.ThisWeek,
   TimeWindowOption.ThisMonth,
   TimeWindowOption.ThisYear
