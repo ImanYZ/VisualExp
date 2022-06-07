@@ -178,7 +178,7 @@ exports.updateInstitutions = async (req, res) => {
 
     let userDocs = await db.collection("users").get();
     userDocs = [...userDocs.docs];
-    for (let instObj of institutionsData) {
+      for (let instObj of institutionsData) {
       for (let userDoc of userDocs) {
         const userData = userDoc.data();
         const domainName = userData.email.match("@(.+)$")[0];
