@@ -13,7 +13,6 @@ import { getInstitutionsForAutocomplete } from "../lib/institutions";
 // import { getNodesByIds } from "../lib/nodes";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
-  existValueInEnum,
   getQueryParameter,
   getQueryParameterAsBoolean,
   getQueryParameterAsNumber,
@@ -80,11 +79,13 @@ const buildFilterBy = (
   nodeTypes: string
 ) => {
   const filters: string[] = [];
-  let updatedAt: number = dayjs().subtract(1, "year").valueOf();
+  let updatedAt: number;
   if (timeWindow === TimeWindowOption.ThisWeek) {
     updatedAt = dayjs().subtract(1, "week").valueOf();
   } else if (timeWindow === TimeWindowOption.ThisMonth) {
     updatedAt = dayjs().subtract(1, "month").valueOf();
+  } else if (timeWindow === TimeWindowOption.ThisYear) {
+    updatedAt = dayjs().subtract(1, "year").valueOf();
   } else {
     updatedAt = dayjs().subtract(10, "year").valueOf();
   }
@@ -110,9 +111,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const q = getQueryParameter(query.q) || "*";
   const upvotes = getQueryParameterAsBoolean(query.upvotes) || sortByDefaults.upvotes;
   const mostRecent = getQueryParameterAsBoolean(query.mostRecent) || sortByDefaults.mostRecent;
-  const timeWindow: TimeWindowOption = existValueInEnum(TimeWindowOption, getQueryParameter(query.timeWindow))
-    ? (getQueryParameter(query.timeWindow) as TimeWindowOption)
-    : sortByDefaults.timeWindow;
+  const timeWindow: TimeWindowOption =
+    (getQueryParameter(query.timeWindow) as TimeWindowOption) || sortByDefaults.timeWindow;
   const tags = getQueryParameter(query.tags) || "";
   const institutions = getQueryParameter(query.institutions) || "";
   const contributors = getQueryParameter(query.contributors) || "";
@@ -142,6 +142,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
 
+  // console.log('searchParameters', searchParameters)
+
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
 
   const allPostsData = searchResults.hits?.map(
@@ -156,7 +158,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       wrongs: el.document.wrongs,
       tags: el.document.tags,
       contributors: el.document.contributors,
-      institutions: el.document.institutions
+      institutions: el.document.institutions,
+      choices: []
     })
   );
   return {
