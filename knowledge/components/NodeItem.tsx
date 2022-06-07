@@ -125,7 +125,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <Box py={1}>
             {node.tags &&
               node.tags.map((tag, idx) => (
-                <Chip key={idx} label={tag.title} sx={{ marginRight: "10px", marginBottom: "8px" }} />
+                <Chip key={idx} label={tag} sx={{ marginRight: "10px", marginBottom: "8px" }} />
               ))}
           </Box>
           <Grid container spacing={2} columns={2} py={1}>

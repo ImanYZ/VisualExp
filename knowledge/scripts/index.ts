@@ -1,7 +1,7 @@
 import { CollectionFieldSchema } from "typesense/lib/Typesense/Collection";
 
 import { db } from "../lib/admin";
-import { /*NodeFireStore,*/ TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { NodeFireStore, TypesenseNodesSchema } from "../src/knowledgeTypes";
 import indexCollection from "./populateIndex";
 
 const getUsersFromFirestore = async () => {
@@ -36,89 +36,93 @@ const getTagsFirestore = async () => {
   return tagsObjArr;
 };
 
-// const getNodeTags = (nodeData: NodeFireStore) => {
-//   const tags: string[] = [];
-//   if (nodeData.tagIds) {
-//     for (let tagIdx = 0; tagIdx < nodeData.tagIds.length; tagIdx++) {
-//       tags.push((nodeData.tags as string[])[tagIdx]);
-//     }
-//   } else {
-//     const tagsField = nodeData.tags as {
-//       node: string;
-//       title?: string;
-//     }[];
-//     for (let tag of tagsField) {
-//       if (tag.node && tag.title) {
-//         tags.push(tag.title);
-//       }
-//     }
-//   }
-//   return tags;
-// };
+const getNodeTags = (nodeData: NodeFireStore) => {
+  const tags: string[] = [];
+  if (nodeData.tagIds) {
+    for (let tagIdx = 0; tagIdx < nodeData.tagIds.length; tagIdx++) {
+      tags.push((nodeData.tags as string[])[tagIdx]);
+    }
+  } else {
+    const tagsField = nodeData.tags as {
+      node: string;
+      title?: string;
+    }[];
+    for (let tag of tagsField) {
+      if (tag.node && tag.title) {
+        tags.push(tag.title);
+      }
+    }
+  }
+  return tags;
+};
 
-// const getInstitutions = (nodeData: NodeFireStore) => {
-//   const institutions: string[] = [];
-//   const institObjs = Object.keys(nodeData.institutions || {});
+const getInstitutionsName = (nodeData: NodeFireStore) => {
+  const institutions: string[] = [];
+  const institObjs = Object.keys(nodeData.institutions || {});
 
-//   for (let name of institObjs) {
-//     institutions.push(name);
-//   }
+  for (let name of institObjs) {
+    institutions.push(name);
+  }
 
-//   return institutions;
-// };
+  return institutions;
+};
 
-// const getContributors = (nodeData: NodeFireStore): string[] => {
-//   const contributorsNodes = Object.entries(nodeData.contributors || {});
+const getContributorsName = (nodeData: NodeFireStore): string[] => {
+  const contributorsNodes = Object.entries(nodeData.contributors || {});
 
-//   const contributors = contributorsNodes.map(el => el[0]);
-//   return contributors;
-// };
+  const contributors = contributorsNodes.map(el => el[0]);
+  return contributors;
+};
 
 const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
   const importData: TypesenseNodesSchema[] = [];
 
-  // const getContributorsFromNode = (node)
+  const getContributorsFromNode = (nodeData: NodeFireStore) => {
+    return Object.entries(nodeData.contributors || {})
+      .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
+      .sort((a, b) => (b.reputation = a.reputation))
+      .map(contributor => ({ fullName: contributor.fullname, imageUrl: contributor.imageUrl }));
+  };
 
-  // const nodeDocs = await db.collection("nodes").get();
+  const getInstitutionsFromNode = (nodeData: NodeFireStore) => {
+    return Object.entries(nodeData.institutions || {})
+      .map(cur => ({ name: cur[0], reputation: cur[1].reputation || 0 }))
+      .sort((a, b) => b.reputation - a.reputation)
+      .map(institution => ({ name: institution.name }));
+  };
 
-  // return nodeDocs.docs
-  //   .map(nodeDoc => {
-  //     const dd = nodeDoc.data() as NodeFireStore
-  //     console.log('dd:', { title: dd.title?.substring(0, 20) })
-  //     return ({
-  //       ...(dd),
-  //       id: nodeDoc.id,
-  //       tags: getNodeTags(nodeDoc.data() as NodeFireStore)
-  //     })
-  //   })
-  //   .map((nodeData): TypesenseNodesSchema => {
-  //     const tags = nodeData.tags.filter(tag => tag)
-  //     const contributors = Object.entries(nodeData.contributors || {})
-  //       .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
-  //       .sort((a, b) => (b.reputation = a.reputation))
-  //       .map(contributor => ({ fullName: contributor.fullname, imageUrl: contributor.imageUrl }));
+  // const getTagsFromNodes = (nodeData: NodeFireStore) => {
+  //   return getNodeTags(nodeData)
+  // }
 
-  //     const institutions = Object.entries(nodeData.institutions || {})
-  //       .map(cur => ({ name: cur[0], reputation: cur[1].reputation || 0 }))
-  //       .sort((a, b) => b.reputation - a.reputation)
-  //       .map(institution => ({ name: institution.name }));
+  const nodeDocs = await db.collection("nodes").get();
 
-  //     return {
-  //       id: nodeData.id,
-  //       title: nodeData.title || '',
-  //       content: nodeData.content || '',
-  //       nodeType: nodeData.nodeType,
-  //       nodeImage: nodeData.nodeImage,
-  //       changedAt: nodeData.changedAt.toDate().toISOString(),
-  //       changedAtMillis: nodeData.changedAt?.toMillis() || 0,
-  //       corrects: nodeData.corrects || 0,
-  //       wrongs: nodeData.wrongs || 0,
-  //       tags,
-  //       contributors,
-  //       institutions,
-  //       updatedAt: nodeData.updatedAt?.toMillis() || 0,
-  //     };
-  //   });
+  return nodeDocs.docs.map((nodeDoc): TypesenseNodesSchema => {
+    const nodeData = nodeDoc.data() as NodeFireStore;
+    const contributors = getContributorsFromNode(nodeData);
+    const contributorsNames = getContributorsName(nodeData);
+    const institutions = getInstitutionsFromNode(nodeData);
+    const institutionsNames = getInstitutionsName(nodeData);
+    const tags = getNodeTags(nodeData);
+
+    return {
+      changedAt: nodeData.changedAt.toDate().toISOString(),
+      changedAtMillis: nodeData.changedAt?.toMillis() || 0,
+      content: nodeData.content || "",
+      contributors,
+      contributorsNames,
+      corrects: nodeData.corrects || 0,
+      id: nodeDoc.id,
+      institutions,
+      institutionsNames,
+      nodeImage: nodeData.nodeImage,
+      nodeType: nodeData.nodeType,
+      tags,
+      title: nodeData.title || "",
+      updatedAt: nodeData.updatedAt?.toMillis() || 0,
+      wrongs: nodeData.wrongs || 0
+    };
+  });
 
   // for (let nodeDoc of nodeDocs.docs) {
   //   const nodeData = nodeDoc.data() as NodeFireStore;
@@ -171,7 +175,6 @@ const fillTagsIndex = async (forceReIndex?: boolean) => {
 
 const fillNodesIndex = async (forceReIndex?: boolean) => {
   const data = await getNodesFromFirestore();
-  console.log("-----/nget data from Nodes/n-----");
   const fields: CollectionFieldSchema[] = [
     { name: "changedAtMillis", type: "int64" },
     { name: "content", type: "string" },

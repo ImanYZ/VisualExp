@@ -19,7 +19,13 @@ import {
   getQueryParameterAsNumber,
   SortedByTimeOptions
 } from "../lib/utils";
-import { FilterValue, SimpleNode, TimeWindowOption, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import {
+  FilterValue,
+  SimpleNode,
+  SortTypeWindowOption,
+  TimeWindowOption,
+  TypesenseNodesSchema
+} from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -56,16 +62,10 @@ const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
     return "corrects:desc";
   }
   if (mostRecent) {
-    return "changedAtMillis:asc";
+    return "changedAtMillis:desc";
   }
   return "";
 };
-
-// const buildFirestoreSortBy = (upvotes: boolean, mostRecent: boolean) => {
-//   if (upvotes) { return 'CORRECT' }
-//   if (mostRecent) { return 'CHANGED_AT' }
-//   return undefined
-// };
 
 const buildFilterBy = (
   timeWindow: TimeWindowOption,
@@ -82,15 +82,15 @@ const buildFilterBy = (
     updatedAt = dayjs().subtract(1, "month").valueOf();
   }
 
-  filters.push(`updatedAt:>${updatedAt}`);
+  filters.push(`changedAtMillis:>${updatedAt}`);
   if (tags.length > 0) {
     filters.push(`tags: [${tags}]`);
   }
   if (institutions.length > 0) {
-    filters.push(`institutions: [${institutions}]`);
+    filters.push(`institutionsNames: [${institutions}]`);
   }
   if (contributors.length > 0) {
-    filters.push(`contributors: [${contributors}]`);
+    filters.push(`contributorsNames: [${contributors}]`);
   }
   if (nodeTypes.length > 0) {
     filters.push(`nodeType: [${nodeTypes}]`);
@@ -126,8 +126,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     apiKey: "xyz"
   });
 
-  console.log("SORT:", upvotes, mostRecent, buildSortBy(upvotes, mostRecent));
-
   const searchParameters: SearchParams = {
     q,
     query_by: "title,content",
@@ -136,19 +134,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     page,
     filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
-  console.log("search params", searchParameters);
+
+  console.log("searchParameters", searchParameters);
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
 
-  console.log(
-    "DATA",
-    searchResults.hits
-      ?.map(cur => cur.document)
-      .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }))
-  );
-  // console.log(data))
-  // const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
-  // const allPostsData = await getSortedPostsData(nodeIds);
-  // const allPostsData = await getNodesByIds(nodeIds, buildFirestoreSortBy(upvotes, mostRecent));
   const allPostsData = searchResults.hits?.map(
     (el): SimpleNode => ({
       id: el.document.id,
@@ -179,10 +168,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
 const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter, institutionFilter }) => {
   // console.log('data', data.map(cur => ({ name: cur.title?.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt })))
-  const [sortedByType, setSortedByType] = useState("");
+  const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(SortTypeWindowOption.NONE);
   const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
 
   const router = useRouter();
+  console.log("router.query:", router.query);
 
   const handleSearch = (text: string) => {
     router.push({ query: { ...router.query, q: text } });
@@ -192,17 +182,17 @@ const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter,
     router.push({ query: { ...router.query, page: newPage } });
   };
 
-  const handleByType = (val: string) => {
-    if (val === "most-recent") {
+  const handleByType = (val: SortTypeWindowOption) => {
+    if (val === SortTypeWindowOption.MOST_RECENT) {
       router.push({ query: { ...router.query, mostRecent: true, upvotes: false } });
       return setSortedByType(val);
     }
-    if (val === "upvotes-downvotes") {
+    if (val === SortTypeWindowOption.UPVOTES_DOWNVOTES) {
       router.push({ query: { ...router.query, mostRecent: false, upvotes: true } });
       return setSortedByType(val);
     }
     router.push({ query: { ...router.query, mostRecent: false, upvotes: false } });
-    setSortedByType("");
+    setSortedByType(SortTypeWindowOption.NONE);
   };
 
   const handleChangeTimeWindow = (val: TimeWindowOption) => {
