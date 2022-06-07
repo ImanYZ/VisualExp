@@ -53,15 +53,8 @@ export const getQueryParameterAsBoolean = (val: string | string[] | undefined): 
 };
 
 export const SortedByTimeOptions: TimeWindowOption[] = [
+  TimeWindowOption.AnyTime,
   TimeWindowOption.ThisWeek,
   TimeWindowOption.ThisMonth,
   TimeWindowOption.ThisYear
 ];
-
-export const existValueInEnum = (type: any, value: any): boolean => {
-  return (
-    Object.keys(type)
-      .filter(k => isNaN(Number(k)))
-      .filter(k => type[k] === value).length > 0
-  );
-};
