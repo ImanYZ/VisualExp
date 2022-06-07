@@ -93,7 +93,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
       ></CardHeader>
 
       <CardContent>
-        <Typography variant="body1" color="text.secondary" component="div">
+        <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
           <MarkdownRender text={node.content || ""} />
         </Typography>
 
