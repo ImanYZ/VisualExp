@@ -14,24 +14,42 @@ const { getTypedCollections } = require("./getTypedCollections");
 // On 1Cademy.com nodes do not have their list of contributors and institutions
 // assigned to them. We should run this function every 25 hours in a PubSub to
 // assign these arrays.
-exports.assignNodeContributorsAndInstitutions = async (context) => {
+exports.assignNodeContributorsInstitutionsStats = async (context) => {
   try {
     // First get the list of all users and create an Object to map their ids to their
     // institution names.
     const userInstitutions = {};
     const userFullnames = {};
+    const institutions = new Set();
+    const stats = {
+      users: 0,
+      institutions: 0,
+      nodes: 0,
+      links: 0,
+      proposals: 0,
+      createdAt: admin.firestore.Timestamp.fromDate(new Date()),
+    };
     const userDocs = await db.collection("users").get();
     for (let userDoc of userDocs.docs) {
       const userData = userDoc.data();
       userInstitutions[userDoc.id] = userData.deInstit;
       userFullnames[userDoc.id] = userData.firstname + " " + userData.lastname;
+      stats.users += 1;
+      institutions.add(userData.deInstit);
     }
+    stats.institutions = institutions.size;
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
     const nodesData = {};
     const nodeDocs = await db.collection("nodes").get();
     for (let nodeDoc of nodeDocs.docs) {
-      nodesData[nodeDoc.id] = nodeDoc.data();
+      const nodeData = nodeDoc.data();
+      nodesData[nodeDoc.id] = nodeData;
+      stats.nodes += 1;
+      stats.links +=
+        (nodeData.parents.length + nodeData.children.length) / 2 +
+        nodeData.tags.length +
+        nodeData.references.length;
     }
     // We should retrieve all the accepted versions for all types of nodes.
     const nodeTypes = [
@@ -52,14 +70,13 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
       // updates and finally batch write all of them into nodes collection.
       const nodesUpdates = {};
       const { versionsColl } = getTypedCollections(db, nodeType);
-      const versionDocs = await versionsColl
-        .where("accepted", "==", true)
-        .get();
+      const versionDocs = await versionsColl.get();
       for (let versionDoc of versionDocs.docs) {
         const versionData = versionDoc.data();
-        // Only if the version has never been deleted, i.e., deleted attribute does not
-        // exist or it's false:
-        if (!versionData.deleted) {
+        stats.proposals += 1;
+        // Only if the version is accepted and it has never been deleted, i.e.,
+        // deleted attribute does not exist or it's false:
+        if (!versionData.deleted && versionData.accepted) {
           // We should add the proposer's id and institution
           // to the contributors and institutions arrays in the corresponding node.
           const nodeRef = db.collection("nodes").doc(versionData.node);
@@ -159,6 +176,8 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
         });
       }
     }
+    const statRef = db.collection("stats").doc();
+    await batchSet(statRef, stats);
     await commitBatch();
 
     return null;
@@ -173,76 +192,76 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
 // a PubSub to assign these arrays.
 exports.updateInstitutions = async (req, res) => {
   try {
-    const rawdata = fs.readFileSync(__dirname + "/edited_universities.json");
-    const institutionsData = JSON.parse(rawdata);
-
     let userDocs = await db.collection("users").get();
     userDocs = [...userDocs.docs];
-      for (let instObj of institutionsData) {
-      for (let userDoc of userDocs) {
-        const userData = userDoc.data();
-        const domainName = userData.email.match("@(.+)$")[0];
-        if (
-          (domainName.includes(instObj.domains) &&
-            domainName !== "@bgsu.edu") ||
-          (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu")
-        ) {
-          console.log({ username: userData.uname, instObj });
-          const userRef = db.collection("users").doc(userDoc.id);
-          await userRef.update({ deInstit: instObj.name });
-          const instQuery = db
+    for (let userDoc of userDocs) {
+      const userData = userDoc.data();
+      const domainName = userData.email.match("@(.+)$")[0];
+      const instQuery = db
+        .collection("institutions")
+        .where("name", "==", userData.deInstit)
+        .limit(1);
+      await db.runTransaction(async (t) => {
+        const instDocs = await t.get(instQuery);
+        if (instDocs.docs.length > 0) {
+          const instRef = db
             .collection("institutions")
-            .where("name", "==", instObj.name)
-            .limit(1);
-          await db.runTransaction(async (t) => {
-            const instDocs = await t.get(instQuery);
-            if (instDocs.docs.length > 0) {
-              const instRef = db
-                .collection("institutions")
-                .doc(instDocs.docs[0].id);
-              const institData = instDocs.docs[0].data();
-              if (!institData.users.includes(userDoc.id)) {
-                const instDomains = [...institData.domains];
-                if (!instDomains.includes(domainName)) {
-                  instDomains.push(domainName);
-                }
-                t.update(instRef, {
-                  users: [...institData.users, userDoc.id],
-                  usersNum: institData.usersNum + 1,
-                  domains: instDomains,
-                });
-              }
+            .doc(instDocs.docs[0].id);
+          const institData = instDocs.docs[0].data();
+          if (!institData.users.includes(userDoc.id)) {
+            const instDomains = [...institData.domains];
+            if (!instDomains.includes(domainName)) {
+              instDomains.push(domainName);
+            }
+            t.update(instRef, {
+              users: [...institData.users, userDoc.id],
+              usersNum: institData.usersNum + 1,
+              domains: instDomains,
+            });
+          }
+        } else {
+          const instRef = db.collection("institutions").doc();
+          try {
+            const response = await axios.get(
+              encodeURI(
+                "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
+                  userData.deInstit
+              )
+            );
+            let geoLoc,
+              country = "United States";
+            if (userData.deInstit === "University of Washington") {
+              geoLoc = {
+                lng: -122.3032,
+                lat: 47.655548,
+              };
             } else {
-              const instRef = db.collection("institutions").doc();
-              try {
-                const response = await axios.get(
-                  encodeURI(
-                    "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
-                      instObj.name
-                  )
-                );
-                const geoLoc = response.data.results[0].geometry.location;
-                t.set(instRef, {
-                  country: "USA",
-                  lng: geoLoc.lng,
-                  lat: geoLoc.lat,
-                  logoURL: encodeURI(
-                    "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
-                      instObj.name +
-                      ".png"
-                  ),
-                  domains: [domainName],
-                  name: instObj.name,
-                  users: [userDoc.id],
-                  usersNum: 1,
-                });
-              } catch (err) {
-                console.log(err);
+              geoLoc = response.data.results[0].geometry.location;
+              for (let addressData of response.data.address_components) {
+                if (addressData.type.includes("country")) {
+                  country = addressData.long_name;
+                }
               }
             }
-          });
+            t.set(instRef, {
+              country,
+              lng: geoLoc.lng,
+              lat: geoLoc.lat,
+              logoURL: encodeURI(
+                "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
+                  userData.deInstit +
+                  ".png"
+              ),
+              domains: [domainName],
+              name: userData.deInstit,
+              users: [userDoc.id],
+              usersNum: 1,
+            });
+          } catch (err) {
+            console.log(err);
+          }
         }
-      }
+      });
     }
     return null;
   } catch (err) {
@@ -251,21 +270,40 @@ exports.updateInstitutions = async (req, res) => {
   }
 };
 
-exports.fixInstitutionInUsers = async (req, res) => {
-  try {
-    const institutionsObj = await import("./datasets/edited_universities.json");
-    let institutionsList = institutionsObj.default.map((l) => l.name);
-    institutionsList = [...new Set(institutionsList)];
-    const userDocs = await admin.db.collection("users").get();
-    for (let userDoc of userDocs.docs) {
-      const userData = userDoc.data();
-      const email = userData.email;
-    }
-  } catch (err) {
-    console.log({ err });
-    return null;
-  }
-};
+// Fix the institution for those users who registerred before the institutions
+// drop-down menu.
+// exports.fixInstitutionInUsers = async (req, res) => {
+//   try {
+//     const rawdata = fs.readFileSync(
+//       __dirname + "/datasets/edited_universities.json"
+//     );
+//     const institutionsData = JSON.parse(rawdata);
+
+//     let userDocs = await db.collection("users").get();
+//     userDocs = [...userDocs.docs];
+//     for (let instObj of institutionsData) {
+//       console.log(instObj.name);
+//       for (let userDoc of userDocs) {
+//         const userData = userDoc.data();
+//         const domainName = userData.email.match("@(.+)$")[0];
+//         if (
+//           (domainName.includes(instObj.domains) &&
+//             domainName !== "@bgsu.edu") ||
+//           (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu")
+//         ) {
+//           console.log({ username: userData.uname, instObj });
+//           const userRef = db.collection("users").doc(userDoc.id);
+//           await batchUpdate(userRef, { deInstit: instObj.name });
+//         }
+//       }
+//     }
+//     await commitBatch();
+//     console.log("Done.");
+//   } catch (err) {
+//     console.log({ err });
+//     return null;
+//   }
+// };
 
 // const fs = require("fs");
 // const csv = require("csv-parser");
