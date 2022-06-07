@@ -1,4 +1,5 @@
 const axios = require("axios");
+const fs = require("fs");
 
 const {
   admin,
@@ -170,26 +171,44 @@ exports.assignNodeContributorsAndInstitutions = async (context) => {
 // On 1Cademy.com when users sign up, we do not make the corresponding changes
 // to the institutions collection. We should run this function every 25 hours in
 // a PubSub to assign these arrays.
-exports.updateInstitutions = async (context) => {
+exports.updateInstitutions = async (req, res) => {
   try {
-    const userDocs = await db.collection("users").get();
-    for (let userDoc of userDocs.docs) {
-      const userData = userDoc.data();
-      const institution = userData.deInstit;
+    const rawdata = fs.readFileSync(__dirname + "/edited_universities.json");
+    const institutionsData = JSON.parse(rawdata);
+  
+    let userDocs = await db.collection("users").get();
+    userDocs = [...userDocs.docs];
+      for (let instObj of institutionsData) {
+      for (let userDoc of userDocs) {
+        const userData = userDoc.data();
+        const domainName = userData.email.match("@(.+)$")[0];
+        if (
+          (domainName.includes(instObj.domains) && domainName !== "@bgsu.edu") ||
+          (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu")
+        ) {
+          console.log({ username: userData.uname, instObj });
+          const userRef = db.collection("users").doc(userDoc.id);
+          await userRef.update({ deInstit: instObj.name });
       const instQuery = db
         .collection("institutions")
-        .where("name", "==", institution);
+        .where("name", "==", instObj.name)
+        .limit(1);
       await db.runTransaction(async (t) => {
         const instDocs = await t.get(instQuery);
         if (instDocs.docs.length > 0) {
           const instRef = db
             .collection("institutions")
             .doc(instDocs.docs[0].id);
-          const instData = instDocs.docs[0].data();
-          if (!instData.users.includes(userDoc.id)) {
+          const institData = instDocs.docs[0].data();
+          if (!institData.users.includes(userDoc.id)) {
+            const instDomains = [...institData.domains];
+          if (!instDomains.includes(domainName)) {
+            instDomains.push(domainName);
+          }
             t.update(instRef, {
-              users: [...instData.users, userDoc.id],
-              usersNum: instData.usersNum + 1,
+              users: [...institData.users, userDoc.id],
+              usersNum: institData.usersNum + 1,
+              domains: instDomains,
             });
           }
         } else {
@@ -198,7 +217,7 @@ exports.updateInstitutions = async (context) => {
             const response = await axios.get(
               encodeURI(
                 "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
-                  institution
+                instObj.name
               )
             );
             const geoLoc = response.data.results[0].geometry.location;
@@ -208,10 +227,11 @@ exports.updateInstitutions = async (context) => {
               lat: geoLoc.lat,
               logoURL: encodeURI(
                 "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
-                  institution +
+                instObj.name +
                   ".png"
               ),
-              name: institution,
+              domains: [domainName],
+              name: instObj.name,
               users: [userDoc.id],
               usersNum: 1,
             });
@@ -221,7 +241,29 @@ exports.updateInstitutions = async (context) => {
         }
       });
     }
+  }
+}
     return null;
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
+
+exports.fixInstitutionInUsers = async (req, res) => {
+  try {
+    const institutionsObj = await import(
+      "./datasets/edited_universities.json"
+    );
+    let institutionsList = institutionsObj.default
+      .map((l) => l.name);
+    institutionsList = [...new Set(institutionsList)];
+    const userDocs = await admin.db.collection("users").get();
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
+      const email = userData.email;
+
+    }
   } catch (err) {
     console.log({ err });
     return null;

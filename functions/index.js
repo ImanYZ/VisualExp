@@ -99,6 +99,7 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 // Misinformation Experiment
 app.get("/card", card);
 app.get("/image*", image);
+app.get("/updateInstitutions", updateInstitutions);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ api: true });
@@ -152,11 +153,3 @@ exports.assignNodeContributorsAndInstitutions = functions
   })
   .pubsub.schedule("every 25 hours")
   .onRun(assignNodeContributorsAndInstitutions);
-
-exports.updateInstitutions = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520,
-  })
-  .pubsub.schedule("every 40 minutes")
-  .onRun(updateInstitutions);
