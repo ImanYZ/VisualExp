@@ -79,10 +79,10 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               }}
             >
               <NodeTypeIcon nodeType={node.nodeType} />
-              {node.updatedAt && (
-                <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
+              {node.changedAt && (
+                <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
                   <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-                    {dayjs(new Date(node.updatedAt)).fromNow()}
+                    {dayjs(new Date(node.changedAt)).fromNow()}
                   </Typography>
                 </Tooltip>
               )}
