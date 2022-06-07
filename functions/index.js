@@ -44,7 +44,7 @@ const {
   ongoingEvents,
 } = require("./scheduling");
 const {
-  assignNodeContributorsAndInstitutions,
+  assignNodeContributorsInstitutionsStats,
   updateInstitutions,
 } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
@@ -146,10 +146,10 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-exports.assignNodeContributorsAndInstitutions = functions
+exports.assignNodeContributorsInstitutionsStats = functions
   .runWith({
     memory: "1GB",
     timeoutSeconds: 520,
   })
   .pubsub.schedule("every 25 hours")
-  .onRun(assignNodeContributorsAndInstitutions);
+  .onRun(assignNodeContributorsInstitutionsStats);
