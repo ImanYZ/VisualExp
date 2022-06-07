@@ -1,6 +1,5 @@
 import {
   FormControl,
-  InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -12,11 +11,11 @@ import {
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
-import { TimeWindowOption } from "../src/knowledgeTypes";
+import { SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
 
 type Props = {
-  sortedByType: string;
-  handleByType: (val: string) => void;
+  sortedByType: SortTypeWindowOption;
+  handleByType: (val: SortTypeWindowOption) => void;
   timeWindow: string;
   onTimeWindowChanged: (val: TimeWindowOption) => void;
 };
@@ -26,8 +25,8 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
     onTimeWindowChanged(event.target.value as TimeWindowOption);
   };
 
-  const handleSortByType = (event: React.MouseEvent<HTMLElement>, newAlignment: string | null) => {
-    handleByType(newAlignment || "");
+  const handleSortByType = (event: React.MouseEvent<HTMLElement>, newAlignment: SortTypeWindowOption | null) => {
+    handleByType(newAlignment || SortTypeWindowOption.NONE);
   };
 
   return (
@@ -43,17 +42,17 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
       }}
     >
       <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options" fullWidth>
-        <ToggleButton value="most-recent" aria-label="sort by the most recent">
+        <ToggleButton value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
           Most Recent
         </ToggleButton>
-        <ToggleButton value="upvotes-downvotes" aria-label="sort by upvotes">
+        <ToggleButton value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
           Upvotes - Downvotes
         </ToggleButton>
       </ToggleButtonGroup>
 
       <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-        <FormControl variant="filled" sx={{ m: 1, width: "100%" }} size="small">
-          <InputLabel id="any-time-label">Any Time</InputLabel>
+        <FormControl variant="standard" sx={{ m: 1, width: "100%" }} size="small">
+          {/* <InputLabel id="any-time-label">Any Time</InputLabel> */}
           <Select labelId="any-time-label" id="any-time" value={timeWindow} onChange={handleSortByTime}>
             {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
               <MenuItem value={sortedByTimeOption} key={idx}>

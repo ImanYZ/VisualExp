@@ -82,7 +82,9 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
   if (nodeIds.length === 0) {
     return [];
   }
+
   const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
+
   const simpleNodes = nodeDocs.docs
     .map(nodeDoc => {
       const nodeData = nodeDoc.data() as NodeFireStore;
@@ -93,10 +95,9 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
       };
     })
     .map((nodeData): SimpleNode => {
-      const tags = nodeData.tags
-        .map(tag => tag.title || "")
-        .filter(tag => tag)
-        .map(tag => ({ title: tag }));
+      const tags = getNodeTags(nodeData).map(tag => tag.title || "");
+      // .filter(tag => tag)
+      // .map(tag => ({ title: tag }));
       const contributors = Object.entries(nodeData.contributors || {})
         .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
         .sort((a, b) => (b.reputation = a.reputation))
@@ -114,7 +115,7 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
         choices: nodeData.choices || [],
         nodeType: nodeData.nodeType,
         nodeImage: nodeData.nodeImage,
-        updatedAt: nodeData.updatedAt.toDate().toISOString(),
+        changedAt: nodeData.changedAt.toDate().toISOString(),
         corrects: nodeData.corrects,
         wrongs: nodeData.wrongs,
         tags,
@@ -163,7 +164,6 @@ const convertDateFieldsToString = (
 };
 
 const getNodeReferences = (nodeData: NodeFireStore) => {
-  // console.log('/n nodeData.references:', nodeData.references)
   const references: { node: string; title?: string; label: string }[] = [];
   //The "references" field in the DB can be an array ofra objects or an array of strings
   if (typeof (nodeData.references || [])[0] !== "object") {
