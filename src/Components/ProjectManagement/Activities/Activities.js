@@ -180,7 +180,7 @@ const Activities = (props) => {
               resear.onePoints >= projectSpecs.onePoints ? "GreenText" : ""
             }
           >
-            {resear.onePoints}
+            {formatPoints(resear.onePoints)}
           </span>
         </>
       )
@@ -195,7 +195,7 @@ const Activities = (props) => {
               : ""
           }
         >
-          {"🎓 " + resear.intellectualPoints}
+          {"🎓 " + formatPoints(resear.intellectualPoints)}
         </span>
       )
     }
@@ -209,7 +209,7 @@ const Activities = (props) => {
               : ""
           }
         >
-          {"👨‍🏫 " + resear.instructorsPoints}
+          {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
         </span>
       )
     }
@@ -221,7 +221,7 @@ const Activities = (props) => {
             resear.expPoints >= projectSpecs.expPoints ? "GreenText" : ""
           }
         >
-          {"👨‍🔬 " + resear.expPoints}
+          {"👨‍🔬 " + formatPoints(resear.expPoints)}
         </span>
       )
     }
@@ -235,7 +235,7 @@ const Activities = (props) => {
               : ""
           }
         >
-          {"💬 " + resear.commentsPoints}
+          {"💬 " + formatPoints(resear.commentsPoints)}
         </span>
       )
     }
@@ -249,7 +249,7 @@ const Activities = (props) => {
               : ""
           }
         >
-          {"🧠 " + resear.gradingPoints}
+          {"🧠 " + formatPoints(resear.gradingPoints)}
         </span>
       )
     }
@@ -265,6 +265,10 @@ const Activities = (props) => {
       )
       : item;
     });
+  }
+
+  const formatPoints = (point = 0) => {
+    return point.toFixed(2).replace(/\.0+$/,'')
   }
 
   return (
@@ -359,7 +363,7 @@ const Activities = (props) => {
                         label={
                           <span className="ChipContent">
                             {resear.id === fullname && fullname + " - "}
-                            {expanded ? makeResearcherChipContent(resear) :  resear.totalPoints}
+                            {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
                           </span>
                         }
                       />
