@@ -159,7 +159,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       tags: el.document.tags,
       contributors: el.document.contributors,
       institutions: el.document.institutions,
-      choices: []
+      choices: el.document.choices || []
     })
   );
   return {
