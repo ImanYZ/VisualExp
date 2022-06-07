@@ -103,7 +103,6 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
   const simpleNodes = nodeDocs.docs
     .map(nodeDoc => {
       const dd = nodeDoc.data() as NodeFireStore;
-      console.log("dd:", { title: dd.title?.substring(0, 20) });
       return {
         ...dd,
         id: nodeDoc.id,
