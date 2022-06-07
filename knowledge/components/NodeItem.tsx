@@ -108,10 +108,10 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <Box sx={{ display: "flex", flex: 1, justifyContent: "space-between" }}>
             <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
               <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
-              {node.updatedAt && (
-                <Tooltip title={`Last updated on ${new Date(node.updatedAt).toLocaleString()}`}>
+              {node.changedAt && (
+                <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
                   <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-                    {dayjs(new Date(node.updatedAt)).fromNow()}
+                    {dayjs(new Date(node.changedAt)).fromNow()}
                   </Typography>
                 </Tooltip>
               )}
@@ -126,7 +126,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
           <Box py={1}>
             {node.tags &&
               node.tags.map((tag, idx) => (
-                <Chip key={idx} label={tag.title} sx={{ marginRight: "10px", marginBottom: "8px" }} />
+                <Chip key={idx} label={tag} sx={{ marginRight: "10px", marginBottom: "8px" }} />
               ))}
           </Box>
           <Grid container spacing={2} columns={2} py={1}>
