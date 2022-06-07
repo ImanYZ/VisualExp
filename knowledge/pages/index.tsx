@@ -256,7 +256,7 @@ const HomePage: NextPage<Props> = ({
         contributors={contributorsFilter}
         institutions={institutionFilter}
       ></HomeFilter>
-      <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
+      <Box sx={{ maxWidth: "1180px", margin: "auto", pt: { xs: "20px", md: "50px" } }}>
         <SortByFilters
           sortedByType={sortedByType}
           handleByType={handleByType}
