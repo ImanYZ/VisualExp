@@ -40,8 +40,8 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
           </Box>
         }
       ></CardHeader>
-      <CardContent sx={{ px: "0px" }}>
-        <List sx={{ p: "0px" }}>
+      <CardContent sx={{ px: 0 }}>
+        <List sx={{ p: 0 }}>
           {references.map((node, idx, src) => (
             <React.Fragment key={idx}>
               <LinkedNodeItem
@@ -53,7 +53,8 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
                 nodeContent={node.content}
                 showListItemIcon={false}
                 label={node.label || ""}
-                sx={{ p: "40px 50px" }}
+                sx={{ p: "30px 50px" }}
+                secondaryActionSx={{ mr: "34px" }}
               />
               {idx < src.length - 1 && <Divider />}
             </React.Fragment>
