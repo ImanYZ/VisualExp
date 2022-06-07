@@ -10,7 +10,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
-import { getNodesByIds } from "../lib/nodes";
+// import { getNodesByIds } from "../lib/nodes";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
   existValueInEnum,
@@ -38,8 +38,8 @@ const MasonryNodes: ComponentType<any> = dynamic(
 );
 
 export const sortByDefaults = {
-  upvotes: true,
-  mostRecent: true,
+  upvotes: false,
+  mostRecent: false,
   timeWindow: SortedByTimeOptions[2]
 };
 
@@ -52,8 +52,20 @@ type Props = {
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
-  return `corrects:${!upvotes ? "asc" : "desc"}, updatedAt:${!mostRecent ? "asc" : "desc"}`;
+  if (upvotes) {
+    return "corrects:desc";
+  }
+  if (mostRecent) {
+    return "changedAtMillis:asc";
+  }
+  return "";
 };
+
+// const buildFirestoreSortBy = (upvotes: boolean, mostRecent: boolean) => {
+//   if (upvotes) { return 'CORRECT' }
+//   if (mostRecent) { return 'CHANGED_AT' }
+//   return undefined
+// };
 
 const buildFilterBy = (
   timeWindow: TimeWindowOption,
@@ -113,22 +125,50 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     ],
     apiKey: "xyz"
   });
+
+  console.log("SORT:", upvotes, mostRecent, buildSortBy(upvotes, mostRecent));
+
   const searchParameters: SearchParams = {
     q,
     query_by: "title,content",
+    sort_by: buildSortBy(upvotes, mostRecent),
     per_page: perPage,
     page,
-    sort_by: buildSortBy(upvotes, mostRecent),
     filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
+  console.log("search params", searchParameters);
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
-  const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
-  // const allPostsData = await getSortedPostsData(nodeIds);
-  const allPostsData = await getNodesByIds(nodeIds);
 
+  console.log(
+    "DATA",
+    searchResults.hits
+      ?.map(cur => cur.document)
+      .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }))
+  );
+  // console.log(data))
+  // const nodeIds: string[] = searchResults.hits?.map(el => el.document.id) || [];
+  // const allPostsData = await getSortedPostsData(nodeIds);
+  // const allPostsData = await getNodesByIds(nodeIds, buildFirestoreSortBy(upvotes, mostRecent));
+  const allPostsData = searchResults.hits?.map(
+    (el): SimpleNode => ({
+      id: el.document.id,
+      title: el.document.title,
+      changedAt: el.document.changedAt,
+      content: el.document.content,
+      nodeType: el.document.nodeType,
+      nodeImage: el.document.nodeImage || "",
+      corrects: el.document.corrects,
+      wrongs: el.document.wrongs,
+      tags: el.document.tags,
+      contributors: el.document.contributors,
+      institutions: el.document.institutions
+    })
+  );
+
+  // console.log('data', allPostsData.map(cur => ({ name: cur.title?.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt })))
   return {
     props: {
-      data: allPostsData,
+      data: allPostsData || [],
       page: searchResults.page,
       numResults: searchResults.found,
       contributorsFilter: contributorsSelected,
@@ -138,6 +178,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 };
 
 const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter, institutionFilter }) => {
+  // console.log('data', data.map(cur => ({ name: cur.title?.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt })))
   const [sortedByType, setSortedByType] = useState("");
   const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
 

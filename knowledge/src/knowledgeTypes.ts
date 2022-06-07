@@ -50,7 +50,7 @@ export type NodeFireStore = {
   aImgUrl?: string;
   admin?: string;
   bookmarks?: number;
-  changedAt?: Timestamp;
+  changedAt: Timestamp;
   children?: { node?: string; label?: string; title?: string }[];
   closedHeight?: number;
   comments?: number;
@@ -111,13 +111,14 @@ export type KnowledgeNode = Omit<
 export type SimpleNode = {
   id: string;
   title?: string;
+  changedAt?: string;
   content?: string;
   nodeType: NodeType;
   nodeImage?: string;
-  updatedAt?: string;
+  // updatedAt?: string;
   corrects?: number;
   wrongs?: number;
-  tags: { title: string }[];
+  tags: string[];
   contributors: { fullName: string; imageUrl: string }[];
   institutions: { name: string }[];
 };
@@ -127,17 +128,40 @@ export type ResponseAutocompleteTags = {
   errorMessage?: string;
 };
 
+// export type TypesenseNodesSchema = {
+//   id: string;
+//   title: string;
+//   changedAt: string;
+//   changedAtMillis: number;
+//   updatedAt: number;
+//   corrects: number;
+//   content: string;
+//   // contributors: string[];
+//   // institutions: string[];
+//   contributors: { fullName: string; imageUrl: string }[];
+//   institutions: { name: string }[];
+//   nodeType: NodeType;
+//   nodeImage?: string;
+//   tags: string[];
+//   wrongs: number;
+// };
+
 export type TypesenseNodesSchema = {
+  changedAt: string;
+  changedAtMillis: number; // typesense
+  content: string; // typesense
+  contributors: { fullName: string; imageUrl: string }[];
+  contributorsNames: string[]; // typesense
+  corrects: number; // typesense
   id: string;
-  content: string;
-  title: string;
-  tags: string[];
-  institutions: string[];
-  contributors: string[];
-  nodeType: string;
-  corrects: number;
-  wrongs: number;
+  institutions: { name: string }[];
+  institutionsNames: string[]; // typesense
+  nodeImage?: string;
+  nodeType: NodeType; // typesense
+  tags: string[]; // typesense
+  title: string; // typesense
   updatedAt: number;
+  wrongs: number;
 };
 
 export type ResponseAutocompleteFilter = {
