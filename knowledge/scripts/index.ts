@@ -118,27 +118,6 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
       wrongs: nodeData.wrongs || 0
     };
   });
-
-  // for (let nodeDoc of nodeDocs.docs) {
-  //   const nodeData = nodeDoc.data() as NodeFireStore;
-  //   if (!nodeData.deleted) {
-  //     importData.push({
-  //       id: nodeDoc.id,
-  //       content: nodeData.content || "",
-  //       title: nodeData.title || "",
-  //       tags: getNodeTags(nodeData),
-  //       institutions: getInstitutions(nodeData),
-  //       contributors: getContributors(nodeData),
-  //       corrects: nodeData.corrects || 0,
-  //       wrongs: nodeData.wrongs || 0,
-  //       changedAt: nodeData.changedAt.toDate().toISOString() || '',
-  //       changedAtMillis: nodeData.changedAt?.toMillis() || 0,
-  //       nodeType: nodeData.nodeType
-  //     });
-  //   }
-  // }
-
-  // return importData;
 };
 
 const fillInstitutionsIndex = async (forceReIndex?: boolean) => {
