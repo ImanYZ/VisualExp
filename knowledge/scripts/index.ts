@@ -75,7 +75,7 @@ const getContributorsName = (nodeData: NodeFireStore): string[] => {
 };
 
 const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
-  const importData: TypesenseNodesSchema[] = [];
+  // const importData: TypesenseNodesSchema[] = [];
 
   const getContributorsFromNode = (nodeData: NodeFireStore) => {
     return Object.entries(nodeData.contributors || {})
@@ -143,7 +143,7 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
   //   }
   // }
 
-  return importData;
+  // return importData;
 };
 
 const fillInstitutionsIndex = async (forceReIndex?: boolean) => {

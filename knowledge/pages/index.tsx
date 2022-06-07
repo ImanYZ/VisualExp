@@ -55,6 +55,11 @@ type Props = {
   numResults: number;
   contributorsFilter?: FilterValue[];
   institutionFilter?: FilterValue[];
+  filtersSelected: {
+    mostRecent: boolean;
+    upvotes: boolean;
+    anyType: TimeWindowOption;
+  };
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
@@ -135,7 +140,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
 
-  console.log("searchParameters", searchParameters);
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
 
   const allPostsData = searchResults.hits?.map(
@@ -153,26 +157,44 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       institutions: el.document.institutions
     })
   );
-
-  // console.log('data', allPostsData.map(cur => ({ name: cur.title?.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt })))
   return {
     props: {
       data: allPostsData || [],
       page: searchResults.page,
       numResults: searchResults.found,
       contributorsFilter: contributorsSelected,
-      institutionFilter: institutionsSelected
+      institutionFilter: institutionsSelected,
+      filtersSelected: {
+        mostRecent: mostRecent,
+        upvotes: upvotes,
+        anyType: timeWindow
+      }
     }
   };
 };
 
-const HomePage: NextPage<Props> = ({ data, page, numResults, contributorsFilter, institutionFilter }) => {
-  // console.log('data', data.map(cur => ({ name: cur.title?.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt })))
-  const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(SortTypeWindowOption.NONE);
-  const [timeWindow, setTimeWindow] = useState(sortByDefaults.timeWindow);
+const HomePage: NextPage<Props> = ({
+  data,
+  page,
+  numResults,
+  contributorsFilter,
+  institutionFilter,
+  filtersSelected
+}) => {
+  const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
+    if (filtersSelected.mostRecent) {
+      return SortTypeWindowOption.MOST_RECENT;
+    }
+    if (filtersSelected.upvotes) {
+      return SortTypeWindowOption.UPVOTES_DOWNVOTES;
+    }
+    return SortTypeWindowOption.NONE;
+  };
+
+  const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(getDefaultSortedByType(filtersSelected));
+  const [timeWindow, setTimeWindow] = useState(filtersSelected.anyType || sortByDefaults.timeWindow);
 
   const router = useRouter();
-  console.log("router.query:", router.query);
 
   const handleSearch = (text: string) => {
     router.push({ query: { ...router.query, q: text } });
