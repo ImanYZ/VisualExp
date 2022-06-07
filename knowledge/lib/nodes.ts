@@ -82,13 +82,34 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
   if (nodeIds.length === 0) {
     return [];
   }
-  const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
+
+  let nodeDocs;
+  // if (sortBy === 'CORRECT') {
+  //   nodeDocs = await db.collection("nodes")
+  //     .where(firestore.FieldPath.documentId(), "in", nodeIds)
+  //     .orderBy('corrects', 'desc').get();
+  //   // .orderBy(firestore.FieldPath.documentId())
+  // } else if (sortBy === 'CHANGED_AT') {
+  //   nodeDocs = await db.collection("nodes")
+  //     // .orderBy(firestore.FieldPath.documentId())
+  //     .where(firestore.FieldPath.documentId(), "in", nodeIds)
+  //     .orderBy('changedAt', 'asc').get();
+  // } else {
+
+  //   }
+
+  nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
+
   const simpleNodes = nodeDocs.docs
-    .map(nodeDoc => ({
-      ...(nodeDoc.data() as NodeFireStore),
-      id: nodeDoc.id,
-      tags: getNodeTags(nodeDoc.data() as NodeFireStore)
-    }))
+    .map(nodeDoc => {
+      const dd = nodeDoc.data() as NodeFireStore;
+      console.log("dd:", { title: dd.title?.substring(0, 20) });
+      return {
+        ...dd,
+        id: nodeDoc.id,
+        tags: getNodeTags(nodeDoc.data() as NodeFireStore)
+      };
+    })
     .map((nodeData): SimpleNode => {
       const tags = nodeData.tags
         .map(tag => tag.title || "")
@@ -110,6 +131,7 @@ export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> =>
         content: nodeData.content,
         nodeType: nodeData.nodeType,
         nodeImage: nodeData.nodeImage,
+        changedAt: nodeData.changedAt.toDate().toISOString(),
         updatedAt: nodeData.updatedAt.toDate().toISOString(),
         corrects: nodeData.corrects,
         wrongs: nodeData.wrongs,
