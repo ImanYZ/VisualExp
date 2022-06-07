@@ -1,5 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Button, Collapse, Grid } from "@mui/material";
+import { Button, CardActionArea, Collapse, Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -82,24 +82,22 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
   return (
     <Card sx={{ width: "100%", my: 1, padding: { xs: "4px 9px", md: "14px 34px" } }}>
-      <CardHeader
-        title={
-          <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
-            <Link variant="h3" underline="hover" color="inherit" sx={{ fontSize: "25px", cursor: "pointer" }}>
-              <MarkdownRender text={node.title || ""} />
-            </Link>
-          </NextLink>
-        }
-      ></CardHeader>
+      <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
+        <Link underline="none" color="inherit">
+          <CardActionArea sx={{ pb: 1 }}>
+            <CardHeader title={<MarkdownRender text={node.title || ""} />}></CardHeader>
 
-      <CardContent>
-        <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
-          <MarkdownRender text={node.content || ""} />
-        </Typography>
+            <CardContent>
+              <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
+                <MarkdownRender text={node.content || ""} />
+              </Typography>
 
-        {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
-        {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
-      </CardContent>
+              {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
+              {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
+            </CardContent>
+          </CardActionArea>
+        </Link>
+      </NextLink>
 
       <CardActions>
         <Box
