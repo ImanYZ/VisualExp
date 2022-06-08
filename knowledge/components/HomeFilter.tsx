@@ -1,5 +1,5 @@
 import HelpIcon from "@mui/icons-material/Help";
-import { Box, Grid, IconButton, Tooltip } from "@mui/material";
+import { Container, Grid, IconButton, Tooltip } from "@mui/material";
 import { styled } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { useRouter } from "next/router";
@@ -52,9 +52,10 @@ const HomeFilter: FC<Props> = ({
   };
 
   return (
-    <Box
+    <Container
       sx={{
-        padding: { xs: "10px 40px", lg: "10px 10px" },
+        py: 2,
+        px: { xs: 8, lg: 2 },
         ...sx
       }}
     >
@@ -69,17 +70,14 @@ const HomeFilter: FC<Props> = ({
         <Grid item xs={1}>
           <TagsAutocomplete tags={tags} onTagsChange={handleTagsChange} />
         </Grid>
-
         <Grid item xs={1}>
-          <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
+          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
         </Grid>
-
         <Grid item xs={1}>
           <ContributorsAutocomplete contributors={contributors} onContributorsChange={handleContributorsChange} />
         </Grid>
-
         <Grid item xs={1}>
-          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
+          <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
           <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
@@ -87,7 +85,7 @@ const HomeFilter: FC<Props> = ({
           </Tooltip>
         </StyledHelpButton>
       </Grid>
-    </Box>
+    </Container>
   );
 };
 
