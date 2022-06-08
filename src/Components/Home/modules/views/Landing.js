@@ -39,7 +39,7 @@ export default function Landing() {
       <Box align="center" sx={{ mb: 4, mt: 4 }}>
         <Collapse in={checked} timeout={1000}>
           <Typography color="inherit" variant="h5">
-            We Synthesize Books &amp; Research Papers Together
+            We Visualize Learning Pathways from Books &amp; Research Papers.
           </Typography>
         </Collapse>
       </Box>

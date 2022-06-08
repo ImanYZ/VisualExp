@@ -146,6 +146,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /stats/{statId} {
+      allow read: if true;
+      allow write: if false;
+    }
     match /contacts/{contactId} {
       allow read: if request.auth != null
                     && exists(/databases/$(database)/documents/researchers/$(request.auth.token.name));
