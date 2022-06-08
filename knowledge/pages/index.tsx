@@ -22,6 +22,7 @@ import {
   FilterValue,
   SimpleNode,
   SortTypeWindowOption,
+  StatsSchema,
   TimeWindowOption,
   TypesenseNodesSchema
 } from "../src/knowledgeTypes";
@@ -59,6 +60,7 @@ type Props = {
     upvotes: boolean;
     anyType: TimeWindowOption;
   };
+  stats: StatsSchema;
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
@@ -123,7 +125,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
   const stats = await getStats();
-  console.log({ stats });
   const client = new Typesense.Client({
     nodes: [
       {
