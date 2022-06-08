@@ -52,7 +52,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
           <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Tags" />}
+      renderInput={params => <TextField {...params} variant="outlined" label="Tags" />}
     />
   );
 };
