@@ -1,6 +1,4 @@
-import HelpIcon from "@mui/icons-material/Help";
-import { Container, Grid, IconButton, Tooltip } from "@mui/material";
-import { styled } from "@mui/material";
+import { Grid } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { FC } from "react";
@@ -52,60 +50,28 @@ const HomeFilter: FC<Props> = ({
   };
 
   return (
-    <Container
-      sx={{
-        py: 2,
-        px: { xs: 8, lg: 2 },
-        ...sx
-      }}
+    <Grid
+      container
+      spacing={{ xs: 1, md: 3 }}
+      columns={{ xs: 1, sm: 2, md: 4 }}
+      alignItems="flex-end"
+      justifyContent="center"
+      sx={{ position: "relative", ...sx }}
     >
-      <Grid
-        container
-        spacing={{ xs: 1, md: 3 }}
-        columns={{ xs: 1, sm: 2, md: 4 }}
-        alignItems="flex-end"
-        justifyContent="center"
-        sx={{ position: "relative" }}
-      >
-        <Grid item xs={1}>
-          <TagsAutocomplete tags={tags} onTagsChange={handleTagsChange} />
-        </Grid>
-        <Grid item xs={1}>
-          <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
-        </Grid>
-        <Grid item xs={1}>
-          <ContributorsAutocomplete contributors={contributors} onContributorsChange={handleContributorsChange} />
-        </Grid>
-        <Grid item xs={1}>
-          <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
-        </Grid>
-        <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
-          <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
-            <HelpIcon />
-          </Tooltip>
-        </StyledHelpButton>
+      <Grid item xs={1}>
+        <TagsAutocomplete tags={tags} onTagsChange={handleTagsChange} />
       </Grid>
-    </Container>
+      <Grid item xs={1}>
+        <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
+      </Grid>
+      <Grid item xs={1}>
+        <ContributorsAutocomplete contributors={contributors} onContributorsChange={handleContributorsChange} />
+      </Grid>
+      <Grid item xs={1}>
+        <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
+      </Grid>
+    </Grid>
   );
 };
-
-const StyledHelpButton = styled(IconButton)(({ theme }) => ({
-  color: "inherit",
-  "&": {
-    position: "absolute",
-    background: "none",
-    bottom: "0px",
-    left: "-30px",
-    padding: "0px",
-    color: theme.palette.common.gray
-  },
-  "@media (min-width:600px)": {
-    "&": {
-      left: "auto",
-      right: "-30px",
-      bottom: "0px"
-    }
-  }
-}));
 
 export default HomeFilter;
