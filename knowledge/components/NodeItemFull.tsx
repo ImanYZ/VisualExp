@@ -35,8 +35,15 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
 
   return (
     <Card>
-      <CardHeader title={<MarkdownRender text={node.title || ""} />}></CardHeader>
-      <CardContent>
+      <CardHeader sx={{ px: 10, pt: 10, pb: 8 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
+      <CardContent
+        sx={{
+          p: 10,
+          "&:last-child": {
+            paddingBottom: 10
+          }
+        }}
+      >
         {node.content && (
           <Typography variant="body1" color="text.secondary" component="div">
             <MarkdownRender text={node.content || ""} />
@@ -113,8 +120,8 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
             <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
           </Box>
         </Box>
-        <Divider sx={{ my: 5 }} />
-        <Box sx={{ mb: 6 }}>{contributors}</Box>
+        <Divider sx={{ my: 8 }} />
+        <Box>{contributors}</Box>
       </CardContent>
       {node.nodeImage && (
         <FullScreenImage src={node.nodeImage} open={imageFullScreen} onClose={() => setImageFullScreen(false)} />
