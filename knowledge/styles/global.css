@@ -3,13 +3,6 @@
   --footer-height: 222px;
 }
 
-/* .react-markdown {
-  font-size: 1rem;
-} */
-.react-markdown p {
-  margin: 0px;
-}
-
 @media (max-width: 900px) {
   :root {
     --footer-height: 470px;

@@ -68,7 +68,7 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
           />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Node type" />}
+      renderInput={params => <TextField {...params} variant="outlined" label="Node types" />}
     />
   );
 };
