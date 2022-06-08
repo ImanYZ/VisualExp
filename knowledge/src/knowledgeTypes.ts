@@ -171,3 +171,11 @@ export type FilterValue = {
   name: string;
   imageUrl?: string | undefined;
 };
+
+export type StatsSchema = {
+  institutions: number;
+  users: number;
+  proposals: number;
+  nodes: number;
+  links: number;
+};

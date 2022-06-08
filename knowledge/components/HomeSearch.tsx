@@ -3,14 +3,16 @@ import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
 import Image from "next/image";
 
+import { StatsSchema } from "../src/knowledgeTypes";
 import SearchInput from "./SearchInput";
 
 type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
+  stats: StatsSchema;
 };
 
-export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
+export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
   return (
     <Box
       sx={{
@@ -39,7 +41,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         priority
       />
       <Box sx={{ position: "absolute", maxWidth: "100vw", width: "60%" }}>
-        <Typography
+        {/* <Typography
           textAlign="center"
           variant="h3"
           component="h1"
@@ -47,16 +49,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
           sx={{ mt: 0, marginBottom: { xs: 1, md: 2 }, fontSize: { xs: "23px", md: "50px" } }}
         >
           What do you want to learn today?
-        </Typography>
-        <Typography
-          textAlign="center"
-          variant="h5"
-          component="h2"
-          fontWeight="300"
-          sx={{ marginBottom: { xs: 0, md: 0 }, fontSize: { xs: "13px", md: "25px" } }}
-        >
-          We Synthesize Books & Research Papers Together
-        </Typography>
+        </Typography> */}
         <Box
           sx={{
             width: "100%",
@@ -66,6 +59,38 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
           }}
         >
           <SearchInput onSearch={onSearch}></SearchInput>
+        </Box>
+        <Typography
+          textAlign="center"
+          variant="h5"
+          component="h2"
+          fontWeight="400"
+          sx={{ marginBottom: { xs: 0, md: 0 }, mt: 5.5, fontSize: { xs: "13px", md: "25px" } }}
+        >
+          We Visualize Learning Pathways from Books &amp; Research Papers.
+        </Typography>
+        <Typography
+          textAlign="center"
+          variant="h5"
+          component="h2"
+          fontWeight="400"
+          sx={{ mt: 4, mb: 10, fontSize: { xs: "10px", md: "16px" } }}
+        >
+          We {stats.users}
+        </Typography>
+        <Box sx={{ mt: 0, textAlign: "center" }}>
+          <img src="/DarkModeLogo.svg" alt="1Cademy Logo" width="130px" height="130px" />
+          <Box
+            sx={{
+              borderBottom: "2.5px solid #ff8a33",
+              width: "70px",
+              height: "19px",
+              ml: "auto",
+              mr: "auto",
+              mb: "19px",
+              textAlign: "center"
+            }}
+          ></Box>
         </Box>
       </Box>
     </Box>
