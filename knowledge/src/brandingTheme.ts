@@ -148,6 +148,32 @@ export function getThemedComponents(): {
           arrow: true
         }
       },
+      MuiSelect: {
+        variants: [
+          {
+            props: { variant: "standard" },
+            style: {
+              ".MuiSelect-standard:focus": {
+                backgroundColor: "transparent"
+              },
+              padding: "10px",
+              "&:after": { borderBottom: "none" },
+              "&:before": {
+                borderBottom: "none"
+              },
+              "&:hover": {
+                color: grey[800]
+              },
+              [`&:hover:not(.disabled):before`]: {
+                borderBottom: "none",
+                "@media (hover: none)": {
+                  borderBottom: "none"
+                }
+              }
+            }
+          }
+        ]
+      },
       MuiCardContent: {
         styleOverrides: {
           root: {

@@ -49,25 +49,23 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
           padding: { xs: "20px 0px", md: "0px 0px" }
         }}
       >
-        <ToggleButtonGroup
-          value={sortedByType}
-          exclusive
-          onChange={handleSortByType}
-          aria-label="Sort options"
-          fullWidth
-        >
+        <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options">
           <ToggleButton value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
             Most Recent
           </ToggleButton>
           <ToggleButton value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
-            Upvotes - Downvotes
+            Most Helpful
           </ToggleButton>
         </ToggleButtonGroup>
 
         <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-          <FormControl variant="standard" sx={{ m: 1, width: "100%" }} size="small">
-            {/* <InputLabel id="any-time-label">Any Time</InputLabel> */}
-            <Select labelId="any-time-label" id="any-time" value={timeWindow} onChange={handleSortByTime}>
+          <FormControl>
+            <Select
+              variant="standard"
+              value={timeWindow}
+              onChange={handleSortByTime}
+              inputProps={{ disableUnderline: true, style: { backgroundColor: "red" } }}
+            >
               {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
                 <MenuItem value={sortedByTimeOption} key={idx}>
                   {sortedByTimeOption}
