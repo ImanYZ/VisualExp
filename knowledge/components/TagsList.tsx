@@ -48,7 +48,8 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
                 nodeContent={node.content}
                 showListItemIcon={false}
                 label={node.label || ""}
-                sx={{ p: "40px 50px" }}
+                sx={{ p: "30px 50px" }}
+                secondaryActionSx={{ mr: "34px" }}
               />
               {idx < src.length - 1 && <Divider />}
             </React.Fragment>
