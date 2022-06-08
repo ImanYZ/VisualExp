@@ -25,7 +25,7 @@ export const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage }: Pro
 
   return (
     <Box sx={{ ...sx }}>
-      <Masonry sx={{ my: "20px" }} columns={{ xm: 1, md: 2 }} spacing={2} defaultHeight={450}>
+      <Masonry sx={{ my: 4 }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
         {nodes.map(el => (
           <NodeItem key={el.id} node={el} />
         ))}
