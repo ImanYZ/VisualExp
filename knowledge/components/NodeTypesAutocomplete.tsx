@@ -1,3 +1,4 @@
+import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
@@ -45,31 +46,33 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
   }, [nodeTypes, hasBeenCleared, value.length]);
 
   return (
-    <Autocomplete
-      multiple
-      options={options}
-      value={value}
-      renderOption={(props, option) => (
-        <li {...props}>
-          {<NodeTypeIcon sx={{ mr: 1 }} nodeType={option as NodeType} />}
-          {option}
-        </li>
-      )}
-      getOptionLabel={option => option}
-      onChange={handleChange}
-      renderTags={(value: readonly string[], getTagProps) =>
-        value.map((option, index: number) => (
-          <Chip
-            icon={<NodeTypeIcon sx={{ color: "red" }} color="primary" nodeType={option as NodeType} />}
-            variant="outlined"
-            label={option}
-            {...getTagProps({ index })}
-            key={index}
-          />
-        ))
-      }
-      renderInput={params => <TextField {...params} variant="outlined" label="Node types" />}
-    />
+    <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
+      <Autocomplete
+        multiple
+        options={options}
+        value={value}
+        renderOption={(props, option) => (
+          <li {...props}>
+            {<NodeTypeIcon sx={{ mr: 1 }} nodeType={option as NodeType} />}
+            {option}
+          </li>
+        )}
+        getOptionLabel={option => option}
+        onChange={handleChange}
+        renderTags={(value: readonly string[], getTagProps) =>
+          value.map((option, index: number) => (
+            <Chip
+              icon={<NodeTypeIcon sx={{ color: "red" }} color="primary" nodeType={option as NodeType} />}
+              variant="outlined"
+              label={option}
+              {...getTagProps({ index })}
+              key={index}
+            />
+          ))
+        }
+        renderInput={params => <TextField {...params} variant="outlined" label="Node types" />}
+      />
+    </Tooltip>
   );
 };
 export default NodeTypesAutocomplete;
