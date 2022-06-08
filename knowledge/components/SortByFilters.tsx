@@ -37,7 +37,8 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
       gap="10px"
       sx={{
         width: { xs: "100%", md: "750px" },
-        padding: { xs: "0px 40px", md: "0px 0px" },
+        py: { xs: 0, md: 0 },
+        px: { xs: 8, md: 0 },
         marginBottom: "50px"
       }}
     >
