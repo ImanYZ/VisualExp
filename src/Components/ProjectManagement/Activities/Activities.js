@@ -14,6 +14,7 @@ import {
 import {
   projectState,
   projectsState,
+  projectSpecsState,
   activePageState,
   notAResearcherState,
 } from "../../../store/ProjectAtoms";
@@ -34,6 +35,7 @@ const Activities = (props) => {
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
   const projects = useRecoilValue(projectsState);
+  const projectSpecs = useRecoilValue(projectSpecsState)
   const [activePage, setActivePage] = useRecoilState(activePageState);
   const notAResearcher = useRecoilValue(notAResearcherState);
 
@@ -155,6 +157,120 @@ const Activities = (props) => {
     setExpanded(!expanded);
   };
 
+  const isResearcherCriteriaMet = (resear) => {
+    let met = true;
+    for (let key in projectSpecs) {
+      if((resear[key] || 0) < projectSpecs[key]) {
+        met = false;
+        break;
+      }
+    }
+    return met;
+  }
+
+  const makeResearcherChipContent = (resear) => {
+    const content = []
+
+    if(projectSpecs.onePoints) {
+      content.push(
+        <>
+          <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
+          <span
+            className={
+              resear.onePoints >= projectSpecs.onePoints ? "GreenText" : ""
+            }
+          >
+            {formatPoints(resear.onePoints)}
+          </span>
+        </>
+      )
+    }
+
+    if(projectSpecs.intellectualPoints) {
+       content.push(
+        <span
+          className={
+            resear.intellectualPoints >= projectSpecs.intellectualPoints
+              ? "GreenText"
+              : ""
+          }
+        >
+          {"🎓 " + formatPoints(resear.intellectualPoints)}
+        </span>
+      )
+    }
+
+    if(projectSpecs.instructorsPoints) {
+      content.push(
+        <span
+          className={
+            resear.instructorsPoints >= 100
+              ? "GreenText"
+              : ""
+          }
+        >
+          {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
+        </span>
+      )
+    }
+
+    if(projectSpecs.expPoints) {
+      content.push(
+        <span
+          className={
+            resear.expPoints >= projectSpecs.expPoints ? "GreenText" : ""
+          }
+        >
+          {"👨‍🔬 " + formatPoints(resear.expPoints)}
+        </span>
+      )
+    }
+
+    if(projectSpecs.commentsPoints) {
+      content.push(
+        <span
+          className={
+            resear.commentsPoints >= projectSpecs.commentsPoints
+              ? "GreenText"
+              : ""
+          }
+        >
+          {"💬 " + formatPoints(resear.commentsPoints)}
+        </span>
+      )
+    }
+
+    if(projectSpecs.gradingPoints) {
+      content.push (
+        <span
+          className={
+            resear.gradingPoints >= projectSpecs.gradingPoints
+              ? "GreenText"
+              : ""
+          }
+        >
+          {"🧠 " + formatPoints(resear.gradingPoints)}
+        </span>
+      )
+    }
+
+    return content.map((item, index) => {
+      // if not last one append a " - "
+      return  content.length - 1 !== index 
+      ? (
+        <>
+          {item}
+          {" - "}
+        </>
+      )
+      : item;
+    });
+  }
+
+  const formatPoints = (point = 0) => {
+    return point.toFixed(2).replace(/\.0+$/,'')
+  }
+
   return (
     <div id="ActivitiesContainer">
       {notAResearcher ? (
@@ -172,28 +288,40 @@ const Activities = (props) => {
                 <span className="GreenText">in green</span>, one needs to earn
                 at least:
                 <ul>
-                  <li>
-                    <strong>100</strong> 1Cademy points{" "}
-                    <img src={favicon} width="15.1" /> and{" "}
-                  </li>
-                  <li>
-                    <strong>100</strong> Intellectual points 🎓 and
-                  </li>
-                  <li>
-                    <strong>100</strong> Experiment points 👨‍🔬 and
-                  </li>
-                  <li>
-                    <strong>100</strong> Collecting instructor/administrator
-                    contact points 👨‍🏫 and
-                  </li>
-                  <li>
-                    <strong>100</strong> Coding participants' comments points 💬
-                    and
-                  </li>
-                  <li>
-                    <strong>100</strong> Coding participants' recall responses
-                    points 🧠
-                  </li>
+                  {projectSpecs.onePoints && (
+                    <li>
+                      <strong>{projectSpecs.onePoints}</strong> 1Cademy points{" "}
+                      <img src={favicon} width="15.1" /> and{" "}
+                    </li>
+                  )}
+                  {projectSpecs.intellectualPoints && (
+                    <li>
+                      <strong>{projectSpecs.intellectualPoints}</strong> Intellectual points 🎓 and
+                    </li>
+                  )}
+                  {projectSpecs.expPoints && (
+                    <li>
+                      <strong>{projectSpecs.expPoints}</strong> Experiment points 👨‍🔬 and
+                    </li>
+                  )}
+                  {projectSpecs.instructorsPoints && (
+                    <li>
+                      <strong>{projectSpecs.instructorsPoints}</strong> Collecting instructor/administrator
+                      contact points 👨‍🏫 and
+                    </li>
+                  )}
+                  {projectSpecs.commentsPoints && (
+                    <li>
+                      <strong>{projectSpecs.commentsPoints}</strong> Coding participants' comments points 💬
+                      and
+                    </li>
+                  )}
+                  {projectSpecs.gradingPoints && (
+                    <li>
+                      <strong>{projectSpecs.gradingPoints}</strong> Coding participants' recall responses
+                      points 🧠
+                    </li>
+                  )}
                 </ul>
                 <strong>Order:</strong> The intern with higher total of all the
                 above categories gets a higher position.
@@ -224,93 +352,18 @@ const Activities = (props) => {
                     <li key={resear.id} className="LeaderboardItem">
                       <Chip
                         icon={
-                          resear.expPoints >= 100 &&
-                          resear.onePoints >= 100 &&
-                          resear.intellectualPoints >= 100 &&
-                          resear.instructorsPoints >= 100 &&
-                          resear.commentsPoints >= 100 &&
-                          resear.gradingPoints >= 100 ? (
+                          isResearcherCriteriaMet(resear) ? (
                             <span className="ChipContent">😊</span>
                           ) : (
                             <span className="ChipContent">😔</span>
                           )
                         }
                         variant={resear.id === fullname ? "" : "outlined"}
-                        color={
-                          resear.expPoints >= 100 &&
-                          resear.onePoints >= 100 &&
-                          resear.intellectualPoints >= 100 &&
-                          resear.instructorsPoints >= 100 &&
-                          resear.commentsPoints >= 100 &&
-                          resear.gradingPoints >= 100
-                            ? "success"
-                            : "error"
-                        }
+                        color={ isResearcherCriteriaMet(resear) ? "success" : "error" }
                         label={
                           <span className="ChipContent">
                             {resear.id === fullname && fullname + " - "}
-                            {expanded ? (
-                              <>
-                                <img src={favicon} width="15.1" />{" "}
-                                <span
-                                  className={
-                                    resear.onePoints >= 100 ? "GreenText" : ""
-                                  }
-                                >
-                                  {resear.onePoints}
-                                </span>
-                                {" - "}
-                                <span
-                                  className={
-                                    resear.intellectualPoints >= 100
-                                      ? "GreenText"
-                                      : ""
-                                  }
-                                >
-                                  {"🎓 " + resear.intellectualPoints}
-                                </span>
-                                {" - "}
-                                <span
-                                  className={
-                                    resear.instructorsPoints >= 100
-                                      ? "GreenText"
-                                      : ""
-                                  }
-                                >
-                                  {"👨‍🏫 " + resear.instructorsPoints}
-                                </span>
-                                {" - "}
-                                <span
-                                  className={
-                                    resear.expPoints >= 100 ? "GreenText" : ""
-                                  }
-                                >
-                                  {"👨‍🔬 " + resear.expPoints}
-                                </span>
-                                {" - "}
-                                <span
-                                  className={
-                                    resear.commentsPoints >= 100
-                                      ? "GreenText"
-                                      : ""
-                                  }
-                                >
-                                  {"💬 " + resear.commentsPoints}
-                                </span>
-                                {" - "}
-                                <span
-                                  className={
-                                    resear.gradingPoints >= 100
-                                      ? "GreenText"
-                                      : ""
-                                  }
-                                >
-                                  {"🧠 " + resear.gradingPoints}
-                                </span>
-                              </>
-                            ) : (
-                              resear.totalPoints
-                            )}
+                            {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
                           </span>
                         }
                       />
