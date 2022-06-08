@@ -1,5 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Button, CardActionArea, Collapse, Grid } from "@mui/material";
+import { CardActionArea, Collapse, Grid, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -64,7 +64,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
   const ExpandMore = ({ expand }: { expand: boolean }) => {
     return (
-      <Button
+      <IconButton
         onClick={handleExpandClick}
         aria-expanded={expanded}
         aria-label="show more"
@@ -76,7 +76,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         <Tooltip title={expand ? "Hide the tags and contributors." : "Show the tags and contributors."}>
           <ArrowDropDownIcon />
         </Tooltip>
-      </Button>
+      </IconButton>
     );
   };
 
