@@ -18,7 +18,7 @@ export const HomeSearch = ({ sx, onSearch }: HomeSearchProps) => {
         width: "100%",
         height: { xs: "236px", md: "479px" },
         margin: "auto",
-        padding: "30px",
+        padding: 6,
         flexDirection: "column",
         display: "flex",
         alignItems: "center",
