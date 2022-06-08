@@ -10,6 +10,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
+import { getStats } from "../lib/stats";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
   getQueryParameter,
@@ -121,6 +122,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
 
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
+  const stats = await getStats();
+  console.log({ stats });
   const client = new Typesense.Client({
     nodes: [
       {
@@ -129,7 +132,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
         protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
       }
     ],
-    apiKey: "xyz"
+    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
   });
 
   const searchParameters: SearchParams = {
@@ -170,7 +173,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
         mostRecent: mostRecent,
         upvotes: upvotes,
         anyType: timeWindow
-      }
+      },
+      stats
     }
   };
 };
@@ -181,7 +185,8 @@ const HomePage: NextPage<Props> = ({
   numResults,
   contributorsFilter,
   institutionFilter,
-  filtersSelected
+  filtersSelected,
+  stats
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
     if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
@@ -242,7 +247,11 @@ const HomePage: NextPage<Props> = ({
 
   return (
     <PagesNavbar>
-      <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearchContainer>
+      <HomeSearchContainer
+        sx={{ mt: "var(--navbar-height)" }}
+        onSearch={handleSearch}
+        stats={stats}
+      ></HomeSearchContainer>
       <Container sx={{ my: 10 }}>
         <HomeFilter
           sx={{ mb: 8 }}
