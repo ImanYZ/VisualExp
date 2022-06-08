@@ -241,20 +241,19 @@ const HomePage: NextPage<Props> = ({
   };
 
   return (
-    <PagesNavbar
-      headingComponent={
-        <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearchContainer>
-      }
-    >
-      <HomeFilter
-        onTagsChange={handleTagsChange}
-        onInstitutionsChange={handleInstitutionsChange}
-        onContributorsChange={handleContributorsChange}
-        onNodeTypesChange={handleNodeTypesChange}
-        contributors={contributorsFilter}
-        institutions={institutionFilter}
-      ></HomeFilter>
-      <Container sx={{ pt: 10 }}>
+    <PagesNavbar>
+      <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearchContainer>
+      <Container sx={{ my: 10 }}>
+        <HomeFilter
+          sx={{ mb: 8 }}
+          onTagsChange={handleTagsChange}
+          onInstitutionsChange={handleInstitutionsChange}
+          onContributorsChange={handleContributorsChange}
+          onNodeTypesChange={handleNodeTypesChange}
+          contributors={contributorsFilter}
+          institutions={institutionFilter}
+        ></HomeFilter>
+
         <SortByFilters
           sortedByType={sortedByType}
           handleByType={handleByType}
