@@ -93,7 +93,9 @@ export const NodeItem = ({ node }: NodeItemProps) => {
               </Typography>
 
               {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
-              {node.nodeImage && <img width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />}
+              {node.nodeImage && (
+                <Box component="img" sx={{ mt: 3 }} width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />
+              )}
             </CardContent>
           </CardActionArea>
         </Link>

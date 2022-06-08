@@ -1,23 +1,15 @@
-// import { useRouter } from "next/router";
 import CloseIcon from "@mui/icons-material/Close";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { Box, IconButton, Snackbar, Tooltip } from "@mui/material";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 export const ShareButtons = () => {
-  const router = useRouter();
-  const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const URL = window.location.href;
-    setUrl(URL);
-  }, [router]);
-
+  const url = typeof window !== "undefined" ? window.location.href : "";
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpen(false);
@@ -30,7 +22,6 @@ export const ShareButtons = () => {
 
   const onShareByLink = () => {
     navigator.clipboard.writeText(url);
-    console.log(URL);
     setOpen(true);
   };
 

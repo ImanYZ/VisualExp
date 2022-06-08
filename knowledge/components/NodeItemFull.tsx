@@ -1,8 +1,8 @@
 import ShareIcon from "@mui/icons-material/Share";
-import { Button, CardActions } from "@mui/material";
+import { Button } from "@mui/material";
+import { CardContent } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
@@ -34,7 +34,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
   };
 
   return (
-    <Card sx={{ width: "100%", m: 0, padding: { xs: "4px 9px", md: "34px 36px" } }}>
+    <Card>
       <CardHeader title={<MarkdownRender text={node.title || ""} />}></CardHeader>
       <CardContent>
         {node.content && (
@@ -43,11 +43,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
           </Typography>
         )}
 
-        {node.nodeType === "Question" && (
-          <CardContent>
-            <QuestionItem choices={node.choices} />
-          </CardContent>
-        )}
+        {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
 
         {node.nodeImage && (
           <Tooltip title="Click to view image in full-screen!">
@@ -56,24 +52,22 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               sx={{
                 display: "block",
                 width: "100%",
-                px: "16px",
-                cursor: "pointer"
+                cursor: "pointer",
+                mt: 3
               }}
             >
               <img src={node.nodeImage} width="100%" height="100%" loading="lazy" />
             </Box>
           </Tooltip>
         )}
-      </CardContent>
 
-      <CardActions sx={{ p: "16px" }}>
         <Box
           sx={{
-            width: "100%",
             display: "flex",
+            alignItems: "center",
             flexDirection: { xs: "column", sm: "row" },
-            alignItems: { xs: "center", sm: "center" },
-            justifyContent: "space-between"
+            justifyContent: "space-between",
+            mt: 5
           }}
         >
           <Box
@@ -119,9 +113,9 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
             <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
           </Box>
         </Box>
-      </CardActions>
-      <Divider sx={{ m: "24px 16px" }} />
-      <CardContent>{contributors}</CardContent>
+        <Divider sx={{ my: 5 }} />
+        <Box sx={{ mb: 6 }}>{contributors}</Box>
+      </CardContent>
       {node.nodeImage && (
         <FullScreenImage src={node.nodeImage} open={imageFullScreen} onClose={() => setImageFullScreen(false)} />
       )}
