@@ -76,7 +76,8 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
           fontWeight="400"
           sx={{ mt: 4, mb: 10, fontSize: { xs: "10px", md: "16px" } }}
         >
-          We {stats.users}
+          {stats.users} students and researchers from {stats.institutions} have contributed {stats.nodes} nodes and{" "}
+          {stats.links} links through {stats.proposals} proposals.
         </Typography>
         <Box sx={{ mt: 0, textAlign: "center" }}>
           <img src="/DarkModeLogo.svg" alt="1Cademy Logo" width="130px" height="130px" />
