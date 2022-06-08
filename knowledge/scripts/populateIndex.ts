@@ -17,7 +17,8 @@ const main = async (
         protocol: config.protocol
       }
     ],
-    apiKey: "xyz"
+    connectionTimeoutSeconds: 1000,
+    apiKey: config.apiKey
   });
 
   const schema = {
