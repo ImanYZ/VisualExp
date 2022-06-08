@@ -78,7 +78,7 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange, institution
           />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Institutions" />}
+      renderInput={params => <TextField {...params} variant="outlined" label="Institutions" />}
     />
   );
 };
