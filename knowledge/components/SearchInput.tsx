@@ -23,7 +23,11 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", display: "flex", flexDirection: "row", ...sx }} component="form" onSubmit={handleSearch}>
+    <Box
+      sx={{ width: "100%", display: "flex", height: "50px", flexDirection: "row", ...sx }}
+      component="form"
+      onSubmit={handleSearch}
+    >
       <SearchStyled>
         <StyledInputBase
           fullWidth
@@ -74,6 +78,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     transition: theme.transitions.create("width"),
     width: "100%",
     fontSize: 15,
+    height: "36px",
     fontWeight: 300,
     background: theme.palette.common.white
   },

@@ -1,4 +1,3 @@
-import { grey } from "@mui/material/colors";
 import { Theme, ThemeOptions } from "@mui/material/styles";
 
 declare module "@mui/material/styles/createPalette" {
@@ -21,6 +20,19 @@ const common = {
   orangeDark: "#ff6d00",
   darkGrayBackground: "#28282A",
   gray: "#D3D3D3"
+};
+
+const grey = {
+  50: "#fafafa",
+  100: "#f8f8f8",
+  200: "#eeeeee",
+  300: "#e0e0e0",
+  400: "#bdbdbd",
+  500: "#9e9e9e",
+  600: "#757575",
+  700: "#616161",
+  800: "#424242",
+  900: "#212121"
 };
 
 const systemFont = ["Roboto", "sans-serif"];
@@ -70,8 +82,10 @@ export const getDesignTokens = (mode: "light" | "dark") =>
           primary: common.white,
           secondary: grey[300]
         }
-      })
+      }),
+      grey
     },
+    spacing: 5,
     typography: {
       fontFamily: [...systemFont].join(","),
       fontFamilySystem: systemFont.join(","),
@@ -144,15 +158,6 @@ export function getThemedComponents(): {
             "&:last-child": {
               paddingTop: "0px",
               paddingBottom: "0px"
-            }
-          }
-        }
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            "&:hover": {
-              boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)"
             }
           }
         }

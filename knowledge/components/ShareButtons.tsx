@@ -15,7 +15,6 @@ export const ShareButtons = () => {
 
   useEffect(() => {
     const URL = window.location.href;
-    console.log("URL", URL);
     setUrl(URL);
   }, [router]);
 
