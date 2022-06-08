@@ -1,3 +1,5 @@
+import ShareIcon from "@mui/icons-material/Share";
+import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -16,6 +18,7 @@ import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
 import QuestionItem from "./QuestionItem";
+import { ShareButtons } from "./ShareButtons";
 
 dayjs.extend(relativeTime);
 
@@ -26,6 +29,7 @@ type Props = {
 
 export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
   const [imageFullScreen, setImageFullScreen] = useState(false);
+  const [showShareButtons, setShowShareButtons] = useState(false);
   const handleClickImageFullScreen = () => {
     setImageFullScreen(true);
   };
@@ -65,33 +69,46 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
       )}
 
       <CardActions sx={{ p: "16px" }}>
-        <Box sx={{ display: "flex", flexDirection: "column", flex: 1, my: 2 }}>
+        {/* <Box sx={{ display: "flex", flexDirection: "column", flex: 1, my: 2 }}> */}
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
+        >
           <Box
             sx={{
               display: "flex",
               alignItems: "center"
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center"
-              }}
-            >
-              <NodeTypeIcon nodeType={node.nodeType} />
-              {node.changedAt && (
-                <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
-                  <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-                    {dayjs(new Date(node.changedAt)).fromNow()}
-                  </Typography>
-                </Tooltip>
-              )}
-            </Box>
-            <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
-              <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
+            <NodeTypeIcon nodeType={node.nodeType} />
+            {node.changedAt && (
+              <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
+                <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
+                  {dayjs(new Date(node.changedAt)).fromNow()}
+                </Typography>
+              </Tooltip>
+            )}
+
+            <Box sx={{ display: "flex" }}>
+              <Button
+                sx={{ color: theme => (showShareButtons ? theme.palette.common.orange : theme.palette.grey[600]) }}
+                onClick={() => setShowShareButtons(!showShareButtons)}
+              >
+                <ShareIcon sx={{ mx: "12px" }} />
+                {!showShareButtons && <Typography py="2px">Share</Typography>}
+              </Button>
+              {showShareButtons && <ShareButtons />}
             </Box>
           </Box>
+          <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+            <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
+          </Box>
         </Box>
+        {/* </Box> */}
       </CardActions>
       <Divider sx={{ m: "24px 16px" }} />
       <CardContent>{contributors}</CardContent>

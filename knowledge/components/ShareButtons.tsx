@@ -4,7 +4,7 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import LinkIcon from "@mui/icons-material/Link";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
-import { Box, IconButton, Snackbar } from "@mui/material";
+import { Box, IconButton, Snackbar, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -37,20 +37,40 @@ export const ShareButtons = () => {
 
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>
-      <IconButton href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`} target="_blank" rel="noopener">
+      <IconButton
+        href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`}
+        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
+        target="_blank"
+        rel="noopener"
+      >
         <TwitterIcon />
       </IconButton>
       {/* this works with different urls from localhost */}
-      <IconButton href={`https://www.facebook.com/sharer/sharer.php?u=${url}`} target="_blank" rel="noopener">
+      <IconButton
+        href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
+        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
+        target="_blank"
+        rel="noopener"
+      >
         <FacebookRoundedIcon />
       </IconButton>
       {/* this works with different urls from localhost */}
-      <IconButton href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`} target="_blank" rel="noopener">
+      <IconButton
+        href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
+        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
+        target="_blank"
+        rel="noopener"
+      >
         <LinkedInIcon />
       </IconButton>
-      <IconButton onClick={onShareByLink}>
-        <LinkIcon />
-      </IconButton>
+      <Tooltip title="Copy link" placement="top" arrow>
+        <IconButton
+          sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
+          onClick={onShareByLink}
+        >
+          <LinkIcon />
+        </IconButton>
+      </Tooltip>
       <Snackbar
         open={open}
         autoHideDuration={3000}
