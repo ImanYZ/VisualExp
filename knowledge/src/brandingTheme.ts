@@ -85,6 +85,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
       }),
       grey
     },
+    spacing: 5,
     typography: {
       fontFamily: [...systemFont].join(","),
       fontFamilySystem: systemFont.join(","),

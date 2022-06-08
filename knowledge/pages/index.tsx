@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Container } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -10,7 +10,6 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
-// import { getNodesByIds } from "../lib/nodes";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
   getQueryParameter,
@@ -142,8 +141,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
   };
 
-  // console.log('searchParameters', searchParameters)
-
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
 
   const allPostsData = searchResults.hits?.map(
@@ -245,10 +242,11 @@ const HomePage: NextPage<Props> = ({
 
   return (
     <PagesNavbar
-      headingComponent={<HomeSearchContainer sx={{ mt: "72px" }} onSearch={handleSearch}></HomeSearchContainer>}
+      headingComponent={
+        <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearchContainer>
+      }
     >
       <HomeFilter
-        sx={{ maxWidth: "1180px", margin: "auto" }}
         onTagsChange={handleTagsChange}
         onInstitutionsChange={handleInstitutionsChange}
         onContributorsChange={handleContributorsChange}
@@ -256,7 +254,7 @@ const HomePage: NextPage<Props> = ({
         contributors={contributorsFilter}
         institutions={institutionFilter}
       ></HomeFilter>
-      <Box sx={{ maxWidth: "1180px", margin: "auto", pt: "50px" }}>
+      <Container sx={{ pt: 10 }}>
         <SortByFilters
           sortedByType={sortedByType}
           handleByType={handleByType}
@@ -269,7 +267,7 @@ const HomePage: NextPage<Props> = ({
           totalPages={Math.floor(numResults / perPage)}
           onChangePage={handleChangePage}
         />
-      </Box>
+      </Container>
     </PagesNavbar>
   );
 };
