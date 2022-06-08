@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardHeader, Divider, List, Typography } from "@mui/material";
+import { Box, Card, CardHeader, Divider, List, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
@@ -35,27 +35,24 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
           </Box>
         }
       ></CardHeader>
-      <CardContent sx={{ px: "0px" }}>
-        <List sx={{ p: "0px" }} dense>
-          {tags.map((node, idx, src) => (
-            <React.Fragment key={idx}>
-              <LinkedNodeItem
-                // key={idx}
-                title={getReferenceTitle(node)}
-                linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
-                nodeType={node.nodeType}
-                nodeImageUrl={node.nodeImage}
-                nodeContent={node.content}
-                showListItemIcon={false}
-                label={node.label || ""}
-                sx={{ p: "30px 50px" }}
-                secondaryActionSx={{ mr: "34px" }}
-              />
-              {idx < src.length - 1 && <Divider />}
-            </React.Fragment>
-          ))}
-        </List>
-      </CardContent>
+      <List sx={{ p: "0px" }} dense>
+        {tags.map((node, idx, src) => (
+          <React.Fragment key={idx}>
+            <LinkedNodeItem
+              title={getReferenceTitle(node)}
+              linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+              nodeType={node.nodeType}
+              nodeImageUrl={node.nodeImage}
+              nodeContent={node.content}
+              showListItemIcon={false}
+              label={node.label || ""}
+              sx={{ p: "30px 50px" }}
+              secondaryActionSx={{ mr: "34px" }}
+            />
+            {idx < src.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
+      </List>
     </Card>
   );
 };
