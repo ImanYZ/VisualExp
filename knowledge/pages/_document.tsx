@@ -1,11 +1,12 @@
-import createEmotionServer from "@emotion/server/create-instance";
+import { Children } from 'react';
 import Document, { Head, Html, Main, NextScript } from "next/document";
-import * as React from "react";
-
 import { getMetaThemeColor } from "../src/brandingTheme";
-import createEmotionCache from "../src/createEmotionCache";
 
-export default class MyDocument extends Document<{ emotionStyleTags: any }> {
+// ** Emotion Imports
+import createEmotionServer from '@emotion/server/create-instance'
+import { createEmotionCache } from "../src/createEmotionCache";
+
+class CustomDocument extends Document {
   render() {
     return (
       <Html lang="en">
@@ -37,9 +38,6 @@ export default class MyDocument extends Document<{ emotionStyleTags: any }> {
             href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
             rel="stylesheet"
           ></link>
-
-          {/* Inject MUI styles first to match with the prepend: true configuration. */}
-          {this.props.emotionStyleTags}
         </Head>
         <body>
           <Main />
@@ -48,11 +46,11 @@ export default class MyDocument extends Document<{ emotionStyleTags: any }> {
       </Html>
     );
   }
-}
+};
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async ctx => {
+CustomDocument.getInitialProps = async ctx => {
   const originalRenderPage = ctx.renderPage;
 
   // You can consider sharing the same emotion cache between
@@ -64,10 +62,13 @@ MyDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
-        function EnhanceApp(props) {
-          return <App emotionCache={cache} {...props} />;
-        }
+      enhanceApp: App => props =>
+      (
+        <App
+          {...props} // @ts-ignore
+          emotionCache={cache}
+        />
+      )
     });
 
   const initialProps = await Document.getInitialProps(ctx);
@@ -79,14 +80,16 @@ MyDocument.getInitialProps = async ctx => {
   const emotionStyles = extractCriticalToChunks(initialProps.html);
   const emotionStyleTags = emotionStyles.styles.map(style => (
     <style
-      data-emotion={`${style.key} ${style.ids.join(" ")}`}
       key={style.key}
       dangerouslySetInnerHTML={{ __html: style.css }}
+      data-emotion={`${style.key} ${style.ids.join(' ')}`}
     />
   ));
 
   return {
     ...initialProps,
-    emotionStyleTags
+    styles: [...Children.toArray(initialProps.styles), ...emotionStyleTags]
   };
 };
+
+export default CustomDocument;

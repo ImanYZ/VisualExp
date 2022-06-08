@@ -1,10 +1,10 @@
 import "../styles/global.css";
 
-import { CacheProvider, EmotionCache } from "@emotion/react";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { createTheme } from "@mui/material/styles";
 import { deepmerge } from "@mui/utils";
+import type { NextPage } from 'next'
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useMemo, useState } from "react";
@@ -12,16 +12,23 @@ import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 
 import { getDesignTokens, getThemedComponents } from "../src/brandingTheme";
-import createEmotionCache from "../src/createEmotionCache";
+
+// ** Emotion Imports
+import { CacheProvider } from '@emotion/react';
+import type { EmotionCache } from '@emotion/cache';
+import { createEmotionCache } from "../src/createEmotionCache";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
-interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache;
-}
+// ** Extend App Props with Emotion
+type ExtendedAppProps = AppProps & {
+  Component: NextPage;
+  emotionCache: EmotionCache;
+};
 
-function MyApp(props: MyAppProps) {
+// ** Configure JSS & ClassName
+const App = (props: ExtendedAppProps) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const [queryClient] = useState(
     () =>
@@ -66,4 +73,4 @@ function MyApp(props: MyAppProps) {
   );
 }
 
-export default MyApp;
+export default App;
