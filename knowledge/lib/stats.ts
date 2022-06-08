@@ -5,7 +5,13 @@ export const getStats = async () => {
   if (statDocs.docs.length > 0) {
     const statsData = statDocs.docs[0].data();
     delete statsData.createdAt;
-    return statsData;
+    return {
+      institutions: statsData.institutions.toLocaleString("en-US"),
+      users: statsData.users.toLocaleString("en-US"),
+      proposals: statsData.proposals.toLocaleString("en-US"),
+      nodes: statsData.nodes.toLocaleString("en-US"),
+      links: statsData.links.toLocaleString("en-US")
+    };
   }
 
   return {
