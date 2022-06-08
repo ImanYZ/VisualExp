@@ -77,7 +77,7 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
           />
         ))
       }
-      renderInput={params => <TextField {...params} variant="standard" label="Contributors" />}
+      renderInput={params => <TextField {...params} variant="outlined" label="Contributors" />}
     />
   );
 };
