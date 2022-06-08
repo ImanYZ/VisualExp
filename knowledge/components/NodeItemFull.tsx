@@ -74,24 +74,29 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
           sx={{
             width: "100%",
             display: "flex",
-            alignItems: "center",
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "center", sm: "center" },
             justifyContent: "space-between"
           }}
         >
           <Box
             sx={{
+              width: { xs: "100%", sm: "auto" },
               display: "flex",
-              alignItems: "center"
+              alignItems: "center",
+              justifyContent: "space-between"
             }}
           >
-            <NodeTypeIcon nodeType={node.nodeType} />
-            {node.changedAt && (
-              <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
-                <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-                  {dayjs(new Date(node.changedAt)).fromNow()}
-                </Typography>
-              </Tooltip>
-            )}
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <NodeTypeIcon nodeType={node.nodeType} />
+              {node.changedAt && (
+                <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
+                  <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
+                    {dayjs(new Date(node.changedAt)).fromNow()}
+                  </Typography>
+                </Tooltip>
+              )}
+            </Box>
 
             <Box sx={{ display: "flex" }}>
               <Button
@@ -104,7 +109,16 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
               {showShareButtons && <ShareButtons />}
             </Box>
           </Box>
-          <Box sx={{ display: "flex", flex: 1, justifyContent: "flex-end" }}>
+          <Box
+            sx={{
+              width: "100%",
+              pt: { xs: "20px", sm: "0px" },
+              display: "flex",
+              flex: 1,
+              justifyContent: "flex-end",
+              alignItems: { xs: "end", sm: "center" }
+            }}
+          >
             <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
           </Box>
         </Box>
