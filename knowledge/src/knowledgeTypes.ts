@@ -148,8 +148,20 @@ export type TypesenseNodesSchema = {
   wrongs: number;
 };
 
+export type TypesenseReferencesSchema = {
+  id: string;
+  node: string;
+  title: string;
+  label: string;
+};
+
 export type ResponseAutocompleteFilter = {
   results?: FilterValue[];
+  errorMessage?: string;
+};
+
+export type ResponseAutocompleteReferencesFilter = {
+  results?: TypesenseReferencesSchema[];
   errorMessage?: string;
 };
 
@@ -171,3 +183,13 @@ export type FilterValue = {
   name: string;
   imageUrl?: string | undefined;
 };
+
+export type TypesenseProcessedReferences = {
+  title: string;
+  data: { label: string; node: string }[];
+};
+
+// export type ReferencesFilterValue = {
+//   titleText: string,
+//   labelText: string,
+// };

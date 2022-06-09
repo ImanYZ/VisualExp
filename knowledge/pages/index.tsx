@@ -22,7 +22,8 @@ import {
   SimpleNode,
   SortTypeWindowOption,
   TimeWindowOption,
-  TypesenseNodesSchema
+  TypesenseNodesSchema,
+  TypesenseReferencesSchema
 } from "../src/knowledgeTypes";
 
 const perPage = 10;
@@ -185,9 +186,7 @@ const HomePage: NextPage<Props> = ({
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
     if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
-    if (filtersSelected.upvotes) {
-      return SortTypeWindowOption.UPVOTES_DOWNVOTES;
-    }
+    if (filtersSelected.upvotes) return SortTypeWindowOption.UPVOTES_DOWNVOTES;
     return SortTypeWindowOption.NONE;
   };
 
@@ -240,6 +239,13 @@ const HomePage: NextPage<Props> = ({
     router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
   };
 
+  const handleReferencesChange = (newValue: TypesenseReferencesSchema) => {
+    console.log("make the filter with references", newValue);
+    router.push({ query: { ...router.query, reference: newValue.title, label: newValue.label } });
+  };
+
+  const reference: TypesenseReferencesSchema | null = null;
+
   return (
     <PagesNavbar
       headingComponent={
@@ -251,8 +257,10 @@ const HomePage: NextPage<Props> = ({
         onInstitutionsChange={handleInstitutionsChange}
         onContributorsChange={handleContributorsChange}
         onNodeTypesChange={handleNodeTypesChange}
+        onReferencesChange={handleReferencesChange}
         contributors={contributorsFilter}
         institutions={institutionFilter}
+        reference={reference}
       ></HomeFilter>
       <Container sx={{ pt: 10 }}>
         <SortByFilters
