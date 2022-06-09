@@ -3,7 +3,10 @@ import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
+import { useRouter } from "next/router";
 import { FC, useState } from "react";
+
+import { getQueryParameter } from "../lib/utils";
 
 type Props = {
   onSearch: (text: string) => void;
@@ -11,7 +14,11 @@ type Props = {
 };
 
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
-  const [searchText, setSearchText] = useState<string>("");
+  const router = useRouter();
+  const [searchText, setSearchText] = useState<string>(() => {
+    const q = getQueryParameter(router.query.q) || "";
+    return q;
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
