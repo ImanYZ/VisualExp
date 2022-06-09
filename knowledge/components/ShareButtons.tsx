@@ -4,12 +4,19 @@ import LinkIcon from "@mui/icons-material/Link";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { Box, IconButton, Snackbar, Tooltip } from "@mui/material";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 export const ShareButtons = () => {
+  const router = useRouter();
+  const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
 
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  useEffect(() => {
+    const URL = window.location.href;
+    setUrl(URL);
+  }, [router]);
+
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpen(false);
@@ -29,7 +36,7 @@ export const ShareButtons = () => {
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <IconButton
         href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
         target="_blank"
         rel="noopener"
       >
@@ -38,7 +45,7 @@ export const ShareButtons = () => {
       {/* this works with different urls from localhost */}
       <IconButton
         href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
         target="_blank"
         rel="noopener"
       >
@@ -47,7 +54,7 @@ export const ShareButtons = () => {
       {/* this works with different urls from localhost */}
       <IconButton
         href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
         target="_blank"
         rel="noopener"
       >
@@ -55,7 +62,7 @@ export const ShareButtons = () => {
       </IconButton>
       <Tooltip title="Copy link" placement="top" arrow>
         <IconButton
-          sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
+          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
           onClick={onShareByLink}
         >
           <LinkIcon />
