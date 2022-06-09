@@ -194,13 +194,6 @@ export function getThemedComponents(): {
             color: common.orange
           }
         }
-      },
-      MuiIconButton: {
-        styleOverrides: {
-          root: {
-            color: "#BDBDBD"
-          }
-        }
       }
     }
   };

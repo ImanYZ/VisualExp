@@ -69,8 +69,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         aria-expanded={expanded}
         aria-label="show more"
         sx={{
-          transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-          color: theme => theme.palette.common.black
+          transform: !expand ? "rotate(0deg)" : "rotate(180deg)"
         }}
       >
         <Tooltip title={expand ? "Hide the tags and contributors." : "Show the tags and contributors."}>
