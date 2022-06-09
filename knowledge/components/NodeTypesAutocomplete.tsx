@@ -62,7 +62,7 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
         renderTags={(value: readonly string[], getTagProps) =>
           value.map((option, index: number) => (
             <Chip
-              icon={<NodeTypeIcon sx={{ color: "red" }} color="primary" nodeType={option as NodeType} />}
+              icon={<NodeTypeIcon color="primary" nodeType={option as NodeType} />}
               variant="outlined"
               label={option}
               {...getTagProps({ index })}
