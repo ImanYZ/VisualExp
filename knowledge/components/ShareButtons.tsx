@@ -4,12 +4,19 @@ import LinkIcon from "@mui/icons-material/Link";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { Box, IconButton, Snackbar, Tooltip } from "@mui/material";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
 
 export const ShareButtons = () => {
+  const router = useRouter();
+  const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
 
-  const url = typeof window !== "undefined" ? window.location.href : "";
+  useEffect(() => {
+    const URL = window.location.href;
+    setUrl(URL);
+  }, [router]);
+
   const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === "clickaway") return;
     setOpen(false);
