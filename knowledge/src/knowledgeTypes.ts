@@ -140,10 +140,12 @@ export type TypesenseNodesSchema = {
   id: string;
   institutions: { name: string }[];
   institutionsNames: string[]; // typesense
+  labelsReferences: string[]; // typesense
   nodeImage?: string;
   nodeType: NodeType; // typesense
   tags: string[]; // typesense
   title: string; // typesense
+  titlesReferences: string[]; // typesense
   updatedAt: number;
   wrongs: number;
 };
@@ -165,6 +167,10 @@ export type ResponseAutocompleteReferencesFilter = {
   errorMessage?: string;
 };
 
+export type ResponseAutocompleteProcessedReferencesFilter = {
+  results?: FilterProcessedReferences[];
+  errorMessage?: string;
+};
 export enum TimeWindowOption {
   "AnyTime" = "Any Time",
   "ThisWeek" = "This Week",
@@ -182,6 +188,12 @@ export type FilterValue = {
   id: string;
   name: string;
   imageUrl?: string | undefined;
+};
+
+export type FilterProcessedReferences = {
+  id: string;
+  title: string;
+  data: { label: string; node: string }[];
 };
 
 export type TypesenseProcessedReferences = {

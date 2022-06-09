@@ -7,7 +7,7 @@ import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
 import { getQueryParameter } from "../lib/utils";
-import { FilterValue, ReferencesFilterValue, TypesenseReferencesSchema } from "../src/knowledgeTypes";
+import { FilterValue } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
@@ -19,10 +19,10 @@ type Props = {
   onInstitutionsChange: (newValues: FilterValue[]) => void;
   onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
-  onReferencesChange: (newValues: ReferencesFilterValue) => void;
+  onReferencesChange: (title: string, label: string) => void;
   contributors: FilterValue[];
   institutions: FilterValue[];
-  reference: TypesenseReferencesSchema | null;
+  reference: { title: string; label: string } | null;
 };
 
 const HomeFilter: FC<Props> = ({
@@ -56,8 +56,8 @@ const HomeFilter: FC<Props> = ({
     onNodeTypesChange(values);
   };
 
-  const handleReferencesChange = (values: ReferencesFilterValue) => {
-    onReferencesChange(values);
+  const handleReferencesChange = (title: string, label: string) => {
+    onReferencesChange(title, label);
   };
 
   return (

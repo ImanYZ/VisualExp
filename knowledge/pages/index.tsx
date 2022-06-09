@@ -22,8 +22,7 @@ import {
   SimpleNode,
   SortTypeWindowOption,
   TimeWindowOption,
-  TypesenseNodesSchema,
-  TypesenseReferencesSchema
+  TypesenseNodesSchema
 } from "../src/knowledgeTypes";
 
 const perPage = 10;
@@ -58,16 +57,14 @@ type Props = {
     mostRecent: boolean;
     upvotes: boolean;
     anyType: TimeWindowOption;
+    reference: string;
+    label: string;
   };
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
-  if (upvotes) {
-    return "corrects:desc";
-  }
-  if (mostRecent) {
-    return "changedAtMillis:desc";
-  }
+  if (upvotes) return "corrects:desc";
+  if (mostRecent) return "changedAtMillis:desc";
   return "";
 };
 
@@ -76,7 +73,9 @@ const buildFilterBy = (
   tags: string,
   institutions: string,
   contributors: string,
-  nodeTypes: string
+  nodeTypes: string,
+  reference: string,
+  label: string
 ) => {
   const filters: string[] = [];
   let updatedAt: number;
@@ -91,20 +90,30 @@ const buildFilterBy = (
   }
 
   filters.push(`changedAtMillis:>${updatedAt}`);
-  if (tags.length > 0) {
-    filters.push(`tags: [${tags}]`);
-  }
-  if (institutions.length > 0) {
-    filters.push(`institutionsNames: [${institutions}]`);
-  }
-  if (contributors.length > 0) {
-    filters.push(`contributorsNames: [${contributors}]`);
-  }
-  if (nodeTypes.length > 0) {
-    filters.push(`nodeType: [${nodeTypes}]`);
-  }
+  console.log("label", label);
+  if (tags.length > 0) filters.push(`tags: [${tags}]`);
+  if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
+  if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
+  if (nodeTypes.length > 0) filters.push(`nodeType: [${nodeTypes}]`);
+  if (reference) filters.push(`titlesReferences: ${reference}`);
+  if (label && label !== "All Sections" && label !== "All Pages") filters.push(`labelsReferences: ${label}`);
 
   return filters.join("&& ");
+};
+
+const getTypesenseClient = () => {
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
+        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
+        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
+      }
+    ],
+    apiKey: "xyz"
+  });
+
+  return client;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
@@ -119,19 +128,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
   const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
   const institutionNames = institutionsSelected.map(el => el.name).join(",");
-
+  const reference = getQueryParameter(query.reference) || "";
+  const label = getQueryParameter(query.label) || "";
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
-  const client = new Typesense.Client({
-    nodes: [
-      {
-        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
-        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
-        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
-      }
-    ],
-    apiKey: "xyz"
-  });
+
+  const client = getTypesenseClient();
+
+  console.log("REFERENCE", reference, "LABEL", label);
 
   const searchParameters: SearchParams = {
     q,
@@ -139,7 +143,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     sort_by: buildSortBy(upvotes, mostRecent),
     per_page: perPage,
     page,
-    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
+    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes, reference, label)
   };
 
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
@@ -170,7 +174,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       filtersSelected: {
         mostRecent: mostRecent,
         upvotes: upvotes,
-        anyType: timeWindow
+        anyType: timeWindow,
+        reference,
+        label
       }
     }
   };
@@ -239,12 +245,15 @@ const HomePage: NextPage<Props> = ({
     router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
   };
 
-  const handleReferencesChange = (newValue: TypesenseReferencesSchema) => {
-    console.log("make the filter with references", newValue);
-    router.push({ query: { ...router.query, reference: newValue.title, label: newValue.label } });
+  const handleReferencesChange = (title: string, label: string) => {
+    console.log("make the filter with references", title, label);
+    router.push({ query: { ...router.query, reference: title, label } });
   };
 
-  const reference: TypesenseReferencesSchema | null = null;
+  const reference = (): { title: string; label: string } | null => {
+    if (!filtersSelected.reference) return null;
+    return { title: filtersSelected.reference, label: filtersSelected.label };
+  };
 
   return (
     <PagesNavbar
@@ -260,7 +269,7 @@ const HomePage: NextPage<Props> = ({
         onReferencesChange={handleReferencesChange}
         contributors={contributorsFilter}
         institutions={institutionFilter}
-        reference={reference}
+        reference={reference()}
       ></HomeFilter>
       <Container sx={{ pt: 10 }}>
         <SortByFilters

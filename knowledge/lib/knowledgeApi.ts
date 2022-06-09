@@ -2,7 +2,7 @@ import axios from "axios";
 
 import {
   ResponseAutocompleteFilter,
-  ResponseAutocompleteReferencesFilter,
+  ResponseAutocompleteProcessedReferencesFilter,
   ResponseAutocompleteTags
 } from "../src/knowledgeTypes";
 
@@ -23,7 +23,7 @@ export const getContributorsAutocomplete = async (contributorName: string): Prom
 
 export const getReferencesAutocomplete = async (
   referenceSearch: string
-): Promise<ResponseAutocompleteReferencesFilter> => {
+): Promise<ResponseAutocompleteProcessedReferencesFilter> => {
   const response = await axios.get("/api/referencesAutocomplete", { params: { q: referenceSearch } });
   return response.data;
 };

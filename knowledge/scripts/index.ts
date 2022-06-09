@@ -101,6 +101,10 @@ const getNodesData = (
     const institutions = getInstitutionsFromNode(nodeData);
     const institutionsNames = getInstitutionsName(nodeData);
     const tags = getNodeTags(nodeData);
+    const references = getNodeReferences(nodeData);
+
+    const titlesReferences = references.map(cur => cur.title || "").filter(cur => cur);
+    const labelsReferences = references.map(cur => cur.label).filter(cur => cur);
 
     return {
       changedAt: nodeData.changedAt.toDate().toISOString(),
@@ -113,10 +117,12 @@ const getNodesData = (
       id: nodeDoc.id,
       institutions,
       institutionsNames,
+      labelsReferences,
       nodeImage: nodeData.nodeImage,
       nodeType: nodeData.nodeType,
       tags,
       title: nodeData.title || "",
+      titlesReferences,
       updatedAt: nodeData.updatedAt?.toMillis() || 0,
       wrongs: nodeData.wrongs || 0
     };
@@ -147,9 +153,6 @@ const getReferencesData = (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFir
     },
     []
   );
-
-  console.log(" --- --- --- ");
-  processedReferences.map(cur => console.log("[L]:", cur.data.length));
 
   return { references, processedReferences };
 };
@@ -191,10 +194,12 @@ const fillNodesIndex = async (
     { name: "content", type: "string" },
     { name: "contributorsNames", type: "string[]" },
     { name: "corrects", type: "int32" },
+    { name: "labelsReferences", type: "string[]" },
     { name: "institutionsNames", type: "string[]" },
     { name: "nodeType", type: "string" },
     { name: "tags", type: "string[]" },
-    { name: "title", type: "string" }
+    { name: "title", type: "string" },
+    { name: "titlesReferences", type: "string[]" }
   ];
 
   await indexCollection("nodes", fields, data, forceReIndex);
@@ -236,7 +241,7 @@ const main = async () => {
 
   console.log(`[4/${steps}]: Filling nodes index`);
   // await fillNodesIndex(true);
-  await fillNodesIndex(nodeDocs);
+  await fillNodesIndex(nodeDocs, true);
   console.log("End Filling nodes index");
 
   console.log(`[5/${steps}]: Filling references index`);
