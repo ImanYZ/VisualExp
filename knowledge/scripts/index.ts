@@ -210,7 +210,6 @@ const fillReferencesIndex = async (
   forceReIndex?: boolean
 ) => {
   const { references, processedReferences } = getReferencesData(nodeDocs);
-  console.log("LENGTH", references.length, "LENGTH_P", processedReferences.length);
   const fields: CollectionFieldSchema[] = [
     { name: "title", type: "string" },
     { name: "label", type: "string" }
