@@ -195,10 +195,17 @@ export function getThemedComponents(): {
           }
         }
       },
-      MuiIconButton: {
+      MuiToggleButtonGroup: {
         styleOverrides: {
           root: {
-            color: "#BDBDBD"
+            backgroundColor: "#fff"
+          }
+        }
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none"
           }
         }
       }

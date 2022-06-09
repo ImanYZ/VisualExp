@@ -1,13 +1,4 @@
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip
-} from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
@@ -50,24 +41,22 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
         }}
       >
         <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options">
-          <ToggleButton value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
+          <ToggleButton size="large" value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
             Most Recent
           </ToggleButton>
-          <ToggleButton value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
+          <ToggleButton size="large" value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
             Most Helpful
           </ToggleButton>
         </ToggleButtonGroup>
 
         <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-          <FormControl>
-            <Select variant="standard" value={timeWindow} onChange={handleSortByTime}>
-              {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
-                <MenuItem value={sortedByTimeOption} key={idx}>
-                  {sortedByTimeOption}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Select variant="standard" value={timeWindow} onChange={handleSortByTime}>
+            {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
+              <MenuItem value={sortedByTimeOption} key={idx}>
+                {sortedByTimeOption}
+              </MenuItem>
+            ))}
+          </Select>
         </Tooltip>
       </Stack>
       <ShareButtons />
