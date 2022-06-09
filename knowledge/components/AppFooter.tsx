@@ -31,17 +31,32 @@ export default function AppFooter() {
         >
           <Box p={2}>{`©  1Cademy ${new Date().getFullYear()}`}</Box>
           <Box p={2}>
-            <Link target="_blank" href="/terms" underline="none" sx={{ color: theme => theme.palette.common.black }}>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/terms"
+              underline="none"
+              sx={{ color: theme => theme.palette.common.black }}
+            >
               Terms
             </Link>
           </Box>
           <Box p={2}>
-            <Link target="_blank" href="/privacy" underline="none" sx={{ color: theme => theme.palette.common.black }}>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/privacy"
+              underline="none"
+              sx={{ color: theme => theme.palette.common.black }}
+            >
               Privacy
             </Link>
           </Box>
           <Box p={2}>
-            <Link target="_blank" href="/cookie" underline="none" sx={{ color: theme => theme.palette.common.black }}>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/cookie"
+              underline="none"
+              sx={{ color: theme => theme.palette.common.black }}
+            >
               Cookie
             </Link>
           </Box>
