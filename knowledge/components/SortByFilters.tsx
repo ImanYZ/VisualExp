@@ -1,17 +1,9 @@
-import {
-  FormControl,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Tooltip
-} from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
 import { SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
+import { ShareButtons } from "./ShareButtons";
 
 type Props = {
   sortedByType: SortTypeWindowOption;
@@ -31,37 +23,43 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
 
   return (
     <Stack
-      direction={{ xs: "column-reverse", md: "row" }}
+      direction={{ xs: "column", md: "row" }}
       alignItems="center"
       justifyContent={{ xs: "center", sm: "space-between" }}
-      gap="10px"
       sx={{
-        width: { xs: "100%", md: "750px" },
-        py: { xs: 0, md: 0 },
-        px: { xs: 8, md: 0 },
-        marginBottom: "50px"
+        width: "100%",
+        padding: { xs: "0px 40px", md: "0px 0px" },
+        marginBottom: { xs: "20px", md: "50px" }
       }}
     >
-      <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options" fullWidth>
-        <ToggleButton value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
-          Most Recent
-        </ToggleButton>
-        <ToggleButton value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
-          Upvotes - Downvotes
-        </ToggleButton>
-      </ToggleButtonGroup>
+      <Stack
+        direction={{ xs: "column-reverse", md: "row" }}
+        gap="10px"
+        sx={{
+          width: "100%",
+          padding: { xs: "20px 0px", md: "0px 0px" }
+        }}
+      >
+        <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options">
+          <ToggleButton size="large" value={SortTypeWindowOption.MOST_RECENT} aria-label="sort by the most recent">
+            Most Recent
+          </ToggleButton>
+          <ToggleButton size="large" value={SortTypeWindowOption.UPVOTES_DOWNVOTES} aria-label="sort by upvotes">
+            Most Helpful
+          </ToggleButton>
+        </ToggleButtonGroup>
 
-      <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-        <FormControl variant="standard" sx={{ m: 1, width: "100%" }} size="small">
-          <Select labelId="any-time-label" id="any-time" value={timeWindow} onChange={handleSortByTime}>
+        <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
+          <Select variant="standard" value={timeWindow} onChange={handleSortByTime}>
             {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
               <MenuItem value={sortedByTimeOption} key={idx}>
                 {sortedByTimeOption}
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
-      </Tooltip>
+        </Tooltip>
+      </Stack>
+      <ShareButtons />
     </Stack>
   );
 };

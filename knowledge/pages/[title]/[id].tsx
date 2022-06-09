@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
 import dynamic from "next/dynamic";
@@ -78,25 +79,29 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
   const { parents, contributors, references, institutions, tags, children } = node;
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
-      <NodeHeadContainer node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
-      <Grid container spacing={3} sx={{ mt: "72px" }}>
-        <Grid item xs={12} sm={12} md={3}>
-          {parents && parents?.length > 0 && <LinkedNodesContainer data={parents || []} header="Learn Before" />}
+      <Box sx={{ p: { xs: 3, md: 10 } }}>
+        <NodeHeadContainer node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={12} md={3}>
+            {parents && parents?.length > 0 && <LinkedNodesContainer data={parents || []} header="Learn Before" />}
+          </Grid>
+          <Grid item xs={12} sm={12} md={6}>
+            <NodeItemFullContainer
+              node={node}
+              contributors={
+                <NodeItemContributors contributors={contributors || []} institutions={institutions || []} />
+              }
+            />
+            {references && references?.length > 0 && (
+              <ReferencesListContainer references={references || []} sx={{ mt: 3 }} />
+            )}
+            {tags && tags?.length > 0 && <TagsListContainer tags={tags || []} sx={{ mt: 3 }} />}
+          </Grid>
+          <Grid item xs={12} sm={12} md={3}>
+            {children && children?.length > 0 && <LinkedNodesContainer data={children || []} header="Learn After" />}
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={12} md={6}>
-          <NodeItemFullContainer
-            node={node}
-            contributors={<NodeItemContributors contributors={contributors || []} institutions={institutions || []} />}
-          />
-          {references && references?.length > 0 && (
-            <ReferencesListContainer references={references || []} sx={{ mt: 3 }} />
-          )}
-          {tags && tags?.length > 0 && <TagsListContainer tags={tags || []} sx={{ mt: 3 }} />}
-        </Grid>
-        <Grid item xs={12} sm={12} md={3}>
-          {children && children?.length > 0 && <LinkedNodesContainer data={children || []} header="Learn After" />}
-        </Grid>
-      </Grid>
+      </Box>
     </PagesNavbar>
   );
 };

@@ -205,3 +205,10 @@ export type TypesenseProcessedReferences = {
 //   titleText: string,
 //   labelText: string,
 // };
+export type StatsSchema = {
+  institutions: number;
+  users: number;
+  proposals: number;
+  nodes: number;
+  links: number;
+};
