@@ -194,6 +194,20 @@ export function getThemedComponents(): {
             color: common.orange
           }
         }
+      },
+      MuiToggleButtonGroup: {
+        styleOverrides: {
+          root: {
+            backgroundColor: "#fff"
+          }
+        }
+      },
+      MuiToggleButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none"
+          }
+        }
       }
     }
   };
