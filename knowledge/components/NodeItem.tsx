@@ -1,5 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Button, CardActionArea, Collapse, Grid } from "@mui/material";
+import { CardActionArea, Collapse, Grid, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -64,30 +64,29 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
   const ExpandMore = ({ expand }: { expand: boolean }) => {
     return (
-      <Button
+      <IconButton
         onClick={handleExpandClick}
         aria-expanded={expanded}
         aria-label="show more"
         sx={{
-          transform: !expand ? "rotate(0deg)" : "rotate(180deg)",
-          color: theme => theme.palette.common.black
+          transform: !expand ? "rotate(0deg)" : "rotate(180deg)"
         }}
       >
         <Tooltip title={expand ? "Hide the tags and contributors." : "Show the tags and contributors."}>
           <ArrowDropDownIcon />
         </Tooltip>
-      </Button>
+      </IconButton>
     );
   };
 
   return (
-    <Card sx={{ width: "100%", my: 1, padding: { xs: "4px 9px", md: "14px 34px" } }}>
+    <Card sx={{ width: "100%", ":hover": { boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)" } }}>
       <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
         <Link underline="none" color="inherit">
-          <CardActionArea sx={{ pb: 1 }}>
-            <CardHeader title={<MarkdownRender text={node.title || ""} />}></CardHeader>
+          <CardActionArea sx={{ pt: { xs: 4, lg: 6 }, px: { xs: 5, lg: 10 }, pb: 2 }}>
+            <CardHeader sx={{ p: 0, pb: 5 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
 
-            <CardContent>
+            <CardContent sx={{ p: 0 }}>
               <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
                 <MarkdownRender text={node.content || ""} />
               </Typography>
@@ -101,67 +100,73 @@ export const NodeItem = ({ node }: NodeItemProps) => {
         </Link>
       </NextLink>
 
-      <CardActions>
-        <Box
-          sx={{ display: "flex", flexDirection: "row", flex: 1, justifyContent: "space-between", alignItems: "center" }}
-        >
-          <Box sx={{ display: "flex", flex: 1, justifyContent: "space-between" }}>
-            <Box sx={{ padding: "0px 8px", display: "flex", alignItems: "center" }}>
-              <NodeTypeIcon nodeType={node.nodeType} sx={{ marginLeft: "10px" }} />
-              {node.changedAt && (
-                <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
-                  <Typography sx={{ ml: 1 }} component="span" color="text.secondary" variant="caption">
-                    {dayjs(new Date(node.changedAt)).fromNow()}
-                  </Typography>
-                </Tooltip>
-              )}
+      <CardActions sx={{ px: 10, pb: 5, pt: 4 }}>
+        <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              flex: 1,
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
+            <Box sx={{ display: "flex", flex: 1, justifyContent: "space-between" }}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <NodeTypeIcon nodeType={node.nodeType} />
+                {node.changedAt && (
+                  <Tooltip title={`Last updated on ${new Date(node.changedAt).toLocaleString()}`}>
+                    <Typography sx={{ ml: 3 }} component="span" color="text.secondary" variant="caption">
+                      {dayjs(new Date(node.changedAt)).fromNow()}
+                    </Typography>
+                  </Tooltip>
+                )}
+              </Box>
+              <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
             </Box>
-            <NodeVotes corrects={node.corrects} wrongs={node.wrongs} />
+            <ExpandMore expand={expanded} />
           </Box>
-          <ExpandMore expand={expanded} />
-        </Box>
-      </CardActions>
-      <Collapse in={expanded} timeout="auto" onEnter={handleGetInstitutionsData} unmountOnExit>
-        <CardContent>
-          <Box py={1}>
-            {node.tags &&
-              node.tags.map((tag, idx) => (
-                <Chip key={idx} label={tag} sx={{ marginRight: "10px", marginBottom: "8px" }} />
-              ))}
-          </Box>
-          <Grid container spacing={2} columns={2} py={1}>
-            <Grid item xs={1}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
-                {node.contributors &&
-                  node.contributors.map((contributor, idx) => (
+          <Collapse sx={{ mt: 5 }} in={expanded} timeout="auto" onEnter={handleGetInstitutionsData} unmountOnExit>
+            <Box pb={1}>
+              {node.tags &&
+                node.tags.map((tag, idx) => (
+                  <Chip key={idx} label={tag} sx={{ marginRight: "10px", marginBottom: "8px" }} />
+                ))}
+            </Box>
+            <Grid container spacing={2} columns={2} py={1}>
+              <Grid item xs={1}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
+                  {node.contributors &&
+                    node.contributors.map((contributor, idx) => (
+                      <Box key={idx} sx={{ display: "inline-block" }}>
+                        <Tooltip title={`${contributor.fullName} contributed to the evolution of this node.`}>
+                          <Box sx={{ marginLeft: "-10px" }}>
+                            <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
+                          </Box>
+                        </Tooltip>
+                      </Box>
+                    ))}
+                </Box>
+              </Grid>
+              <Grid item xs={1}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
+                  {getInstitutionData().map((institution, idx) => (
                     <Box key={idx} sx={{ display: "inline-block" }}>
-                      <Tooltip title={`${contributor.fullName} contributed to the evolution of this node.`}>
+                      <Tooltip
+                        title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
+                      >
                         <Box sx={{ marginLeft: "-10px" }}>
-                          <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
+                          <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
                         </Box>
                       </Tooltip>
                     </Box>
                   ))}
-              </Box>
+                </Box>
+              </Grid>
             </Grid>
-            <Grid item xs={1}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
-                {getInstitutionData().map((institution, idx) => (
-                  <Box key={idx} sx={{ display: "inline-block" }}>
-                    <Tooltip
-                      title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
-                    >
-                      <Box sx={{ marginLeft: "-10px" }}>
-                        <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
-                      </Box>
-                    </Tooltip>
-                  </Box>
-                ))}
-              </Box>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Collapse>
+          </Collapse>
+        </Box>
+      </CardActions>
     </Card>
   );
 };

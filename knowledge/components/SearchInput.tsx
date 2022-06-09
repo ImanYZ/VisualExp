@@ -1,9 +1,13 @@
+import SearchIcon from "@mui/icons-material/Search";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
+import { useRouter } from "next/router";
 import { FC, useState } from "react";
+
+import { getQueryParameter } from "../lib/utils";
 
 type Props = {
   onSearch: (text: string) => void;
@@ -11,7 +15,11 @@ type Props = {
 };
 
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
-  const [searchText, setSearchText] = useState<string>("");
+  const router = useRouter();
+  const [searchText, setSearchText] = useState<string>(() => {
+    const q = getQueryParameter(router.query.q) || "";
+    return q;
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -31,14 +39,14 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
       <SearchStyled>
         <StyledInputBase
           fullWidth
-          placeholder="Start learning..."
+          placeholder="What do you want to learn today?"
           inputProps={{ "aria-label": "search" }}
           value={searchText}
           onChange={handleChange}
         />
       </SearchStyled>
       <StyledButton variant="contained" type="submit">
-        Search
+        <SearchIcon fontSize="large" />
       </StyledButton>
     </Box>
   );
@@ -47,7 +55,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
 const SearchStyled = styled("div")(({ theme }) => ({
   position: "relative",
   border: "2px solid",
-  borderColor: theme.palette.grey[200],
+  borderColor: theme.palette.common.white,
   "&:hover": {
     backgroundColor: alpha(theme.palette.grey[300], 0.06)
   },
@@ -55,19 +63,14 @@ const SearchStyled = styled("div")(({ theme }) => ({
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  color: "inherit",
-  "&": {
-    width: "64px",
-    color: theme.palette.common.white,
-    borderRadius: 0,
-    fontSize: 15,
-    fontWeight: 500
-  },
-  "@media (min-width:900px)": {
-    "&": {
-      width: "165px",
-      fontSize: 25
-    }
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.grey[600],
+  borderRadius: 0,
+  fontSize: 15,
+  fontWeight: 500,
+  border: "none",
+  "&:hover": {
+    backgroundColor: theme.palette.grey[200]
   }
 }));
 
@@ -80,7 +83,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     fontSize: 15,
     height: "36px",
     fontWeight: 300,
-    background: theme.palette.common.white
+    background: theme.palette.common.white,
+    border: "none"
   },
   "@media (min-width:900px)": {
     "& .MuiInputBase-input": {

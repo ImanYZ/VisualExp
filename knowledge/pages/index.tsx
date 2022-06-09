@@ -10,6 +10,7 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
+import { getStats } from "../lib/stats";
 import { getContributorsForAutocomplete } from "../lib/users";
 import {
   getQueryParameter,
@@ -21,6 +22,7 @@ import {
   FilterValue,
   SimpleNode,
   SortTypeWindowOption,
+  StatsSchema,
   TimeWindowOption,
   TypesenseNodesSchema
 } from "../src/knowledgeTypes";
@@ -42,7 +44,7 @@ const MasonryNodes: ComponentType<any> = dynamic(
 );
 
 export const sortByDefaults = {
-  upvotes: false,
+  upvotes: true,
   mostRecent: false,
   timeWindow: SortedByTimeOptions[0]
 };
@@ -60,6 +62,7 @@ type Props = {
     reference: string;
     label: string;
   };
+  stats: StatsSchema;
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
@@ -110,9 +113,8 @@ const getTypesenseClient = () => {
         protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
       }
     ],
-    apiKey: "xyz"
+    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
   });
-
   return client;
 };
 
@@ -132,6 +134,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const label = getQueryParameter(query.label) || "";
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
+  const stats = await getStats();
 
   const client = getTypesenseClient();
 
@@ -175,7 +178,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
         anyType: timeWindow,
         reference,
         label
-      }
+      },
+      stats
     }
   };
 };
@@ -186,7 +190,8 @@ const HomePage: NextPage<Props> = ({
   numResults,
   contributorsFilter,
   institutionFilter,
-  filtersSelected
+  filtersSelected,
+  stats
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
     if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
@@ -253,22 +258,25 @@ const HomePage: NextPage<Props> = ({
   };
 
   return (
-    <PagesNavbar
-      headingComponent={
-        <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearchContainer>
-      }
-    >
-      <HomeFilter
-        onTagsChange={handleTagsChange}
-        onInstitutionsChange={handleInstitutionsChange}
-        onContributorsChange={handleContributorsChange}
-        onNodeTypesChange={handleNodeTypesChange}
-        onReferencesChange={handleReferencesChange}
-        contributors={contributorsFilter}
-        institutions={institutionFilter}
-        reference={reference()}
-      ></HomeFilter>
-      <Container sx={{ pt: 10 }}>
+    <PagesNavbar>
+      <HomeSearchContainer
+        sx={{ mt: "var(--navbar-height)" }}
+        onSearch={handleSearch}
+        stats={stats}
+      ></HomeSearchContainer>
+      <Container sx={{ my: 10 }}>
+        <HomeFilter
+          sx={{ mb: 8 }}
+          onTagsChange={handleTagsChange}
+          onInstitutionsChange={handleInstitutionsChange}
+          onContributorsChange={handleContributorsChange}
+          onNodeTypesChange={handleNodeTypesChange}
+          onReferencesChange={handleReferencesChange}
+          contributors={contributorsFilter}
+          institutions={institutionFilter}
+          reference={reference()}
+        ></HomeFilter>
+
         <SortByFilters
           sortedByType={sortedByType}
           handleByType={handleByType}
