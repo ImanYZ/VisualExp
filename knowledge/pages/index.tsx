@@ -45,7 +45,7 @@ const MasonryNodes: ComponentType<any> = dynamic(
 
 export const sortByDefaults = {
   upvotes: false,
-  mostRecent: false,
+  mostRecent: true,
   timeWindow: SortedByTimeOptions[0]
 };
 
