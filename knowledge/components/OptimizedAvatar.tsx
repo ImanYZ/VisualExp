@@ -31,7 +31,7 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
         sx={{
           width: "50px",
           height: "50px",
-          // border: "solid 2px",
+          border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px",
           display: "flex",
@@ -40,15 +40,7 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           background: theme => theme.palette.common.white
         }}
       >
-        <Avatar
-          sx={{
-            width: "33px",
-            height: "24px",
-            borderRadius: "30px"
-          }}
-          src={imageUrl}
-          alt={name}
-        />
+        <img src={imageUrl} alt={name} width="33px" height="24px" />
       </Box>
     );
   }
@@ -61,19 +53,21 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           width: "50px",
           height: "50px",
           position: "relative",
-          // border: "solid 2px",
+          border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px"
         }}
       >
-        <Avatar
-          sx={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "30px"
-          }}
+        <img
           src={imageUrl}
           alt={name}
+          width="48px"
+          height="48px"
+          style={{
+            objectFit: "cover",
+            borderRadius: "30px",
+            padding: "0px 2px 2px 0px"
+          }}
         />
       </Box>
     );
@@ -82,14 +76,7 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
   // render an image without border
   return (
     <Box sx={{ width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Avatar
-        sx={{
-          width: "33px",
-          height: "24px"
-        }}
-        src={imageUrl}
-        alt={name}
-      />
+      <img src={imageUrl} alt={name} width="33px" height="24px" />
     </Box>
   );
 };
