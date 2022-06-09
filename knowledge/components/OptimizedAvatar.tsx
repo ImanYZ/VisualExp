@@ -42,8 +42,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
       >
         <Avatar
           sx={{
-            width: "33px",
-            height: "24px",
+            width: "34px",
+            height: "34px",
             borderRadius: "30px"
           }}
           src={imageUrl}
@@ -84,8 +84,8 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
     <Box sx={{ width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <Avatar
         sx={{
-          width: "33px",
-          height: "24px"
+          width: "34px",
+          height: "34px"
         }}
         src={imageUrl}
         alt={name}
