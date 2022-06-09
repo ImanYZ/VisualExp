@@ -61,7 +61,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
       divider: mode === "dark" ? grey[400] : grey[400],
       mode,
       background: {
-        default: "#F8F8F8",
+        default: "#FAFAFA",
         paper: common.white
       },
       ...(mode === "dark" && {
