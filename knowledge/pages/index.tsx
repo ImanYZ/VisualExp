@@ -90,7 +90,7 @@ const buildFilterBy = (
   }
 
   filters.push(`changedAtMillis:>${updatedAt}`);
-  console.log("label", label);
+
   if (tags.length > 0) filters.push(`tags: [${tags}]`);
   if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
   if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
@@ -134,8 +134,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const page = getQueryParameterAsNumber(query.page);
 
   const client = getTypesenseClient();
-
-  console.log("REFERENCE", reference, "LABEL", label);
 
   const searchParameters: SearchParams = {
     q,
@@ -246,7 +244,6 @@ const HomePage: NextPage<Props> = ({
   };
 
   const handleReferencesChange = (title: string, label: string) => {
-    console.log("make the filter with references", title, label);
     router.push({ query: { ...router.query, reference: title, label } });
   };
 
