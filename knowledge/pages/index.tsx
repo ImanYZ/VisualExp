@@ -65,7 +65,7 @@ type Props = {
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   if (upvotes) {
-    return "corrects:desc";
+    return "mostHelpful:desc";
   }
   if (mostRecent) {
     return "changedAtMillis:desc";
@@ -111,8 +111,8 @@ const buildFilterBy = (
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
   const q = getQueryParameter(query.q) || "*";
-  const upvotes = getQueryParameterAsBoolean(query.upvotes) || sortByDefaults.upvotes;
-  const mostRecent = getQueryParameterAsBoolean(query.mostRecent) || sortByDefaults.mostRecent;
+  const upvotes = getQueryParameterAsBoolean(query.upvotes || String(sortByDefaults.upvotes));
+  const mostRecent = getQueryParameterAsBoolean(query.mostRecent || String(sortByDefaults.mostRecent));
   const timeWindow: TimeWindowOption =
     (getQueryParameter(query.timeWindow) as TimeWindowOption) || sortByDefaults.timeWindow;
   const tags = getQueryParameter(query.tags) || "";

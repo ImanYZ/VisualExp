@@ -146,6 +146,7 @@ export type TypesenseNodesSchema = {
   title: string; // typesense
   updatedAt: number;
   wrongs: number;
+  mostHelpful: number; // typesense
 };
 
 export type ResponseAutocompleteFilter = {
