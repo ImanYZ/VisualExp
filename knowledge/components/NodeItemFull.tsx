@@ -35,12 +35,15 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
 
   return (
     <Card>
-      <CardHeader sx={{ px: 10, pt: 10, pb: 8 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
+      <CardHeader
+        sx={{ px: { xs: 5, md: 10 }, pt: { xs: 4, md: 10 }, pb: 8 }}
+        title={<MarkdownRender text={node.title || ""} />}
+      ></CardHeader>
       <CardContent
         sx={{
-          p: 10,
+          p: { xs: 5, md: 10 },
           "&:last-child": {
-            paddingBottom: 10
+            paddingBottom: { xs: 4, md: 10 }
           }
         }}
       >
