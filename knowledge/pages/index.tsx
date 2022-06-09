@@ -22,9 +22,9 @@ import {
   FilterValue,
   SimpleNode,
   SortTypeWindowOption,
+  StatsSchema,
   TimeWindowOption,
-  TypesenseNodesSchema
-} from "../src/knowledgeTypes";
+  TypesenseNodesSchema} from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -59,6 +59,7 @@ type Props = {
     upvotes: boolean;
     anyType: TimeWindowOption;
   };
+  stats: StatsSchema;
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
