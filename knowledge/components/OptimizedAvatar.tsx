@@ -1,6 +1,5 @@
 import { Avatar } from "@mui/material";
 import { Box } from "@mui/system";
-import Image from "next/image";
 import React, { FC } from "react";
 
 type Props = {
@@ -32,7 +31,7 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
         sx={{
           width: "50px",
           height: "50px",
-          border: "solid 2px",
+          // border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px",
           display: "flex",
@@ -41,7 +40,15 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           background: theme => theme.palette.common.white
         }}
       >
-        <Image src={imageUrl} alt={name} width="33px" height="24px" />
+        <Avatar
+          sx={{
+            width: "33px",
+            height: "24px",
+            borderRadius: "30px"
+          }}
+          src={imageUrl}
+          alt={name}
+        />
       </Box>
     );
   }
@@ -54,20 +61,19 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           width: "50px",
           height: "50px",
           position: "relative",
-          border: "solid 2px",
+          // border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px"
         }}
       >
-        <Image
-          src={imageUrl}
-          alt={name}
-          width="50px"
-          height="50px"
-          objectFit="cover"
-          style={{
+        <Avatar
+          sx={{
+            width: "50px",
+            height: "50px",
             borderRadius: "30px"
           }}
+          src={imageUrl}
+          alt={name}
         />
       </Box>
     );
@@ -76,7 +82,14 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
   // render an image without border
   return (
     <Box sx={{ width: "50px", height: "50px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Image src={imageUrl} alt={name} width="33px" height="24px" />
+      <Avatar
+        sx={{
+          width: "33px",
+          height: "24px"
+        }}
+        src={imageUrl}
+        alt={name}
+      />
     </Box>
   );
 };
