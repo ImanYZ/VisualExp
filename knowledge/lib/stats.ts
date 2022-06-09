@@ -1,6 +1,7 @@
+import { StatsSchema } from "../src/knowledgeTypes";
 import { db } from "./admin";
 
-export const getStats = async () => {
+export const getStats = async (): Promise<StatsSchema> => {
   const statDocs = await db.collection("stats").orderBy("createdAt", "desc").limit(1).get();
   if (statDocs.docs.length > 0) {
     const statsData = statDocs.docs[0].data();

@@ -1,9 +1,9 @@
-import { Children } from 'react';
-import Document, { Head, Html, Main, NextScript } from "next/document";
-import { getMetaThemeColor } from "../src/brandingTheme";
-
 // ** Emotion Imports
-import createEmotionServer from '@emotion/server/create-instance'
+import createEmotionServer from "@emotion/server/create-instance";
+import Document, { Head, Html, Main, NextScript } from "next/document";
+import { Children } from "react";
+
+import { getMetaThemeColor } from "../src/brandingTheme";
 import { createEmotionCache } from "../src/createEmotionCache";
 
 class CustomDocument extends Document {
@@ -46,7 +46,7 @@ class CustomDocument extends Document {
       </Html>
     );
   }
-};
+}
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
@@ -62,13 +62,14 @@ CustomDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
+      // eslint-disable-next-line react/display-name
       enhanceApp: App => props =>
-      (
-        <App
-          {...props} // @ts-ignore
-          emotionCache={cache}
-        />
-      )
+        (
+          <App
+            {...props} // @ts-ignore
+            emotionCache={cache}
+          />
+        )
     });
 
   const initialProps = await Document.getInitialProps(ctx);
@@ -82,7 +83,7 @@ CustomDocument.getInitialProps = async ctx => {
     <style
       key={style.key}
       dangerouslySetInnerHTML={{ __html: style.css }}
-      data-emotion={`${style.key} ${style.ids.join(' ')}`}
+      data-emotion={`${style.key} ${style.ids.join(" ")}`}
     />
   ));
 
