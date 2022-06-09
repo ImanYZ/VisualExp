@@ -1,6 +1,5 @@
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
@@ -49,9 +48,7 @@ export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
           </Box>
         }
       ></CardHeader>
-      <CardContent sx={{ p: "12px 0px" }}>
-        <List sx={{ p: "0px" }}>{renderLinkedNodes()}</List>
-      </CardContent>
+      <List sx={{ p: "0px" }}>{renderLinkedNodes()}</List>
     </Card>
   );
 };
