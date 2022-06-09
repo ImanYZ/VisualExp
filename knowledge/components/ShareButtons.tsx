@@ -29,7 +29,7 @@ export const ShareButtons = () => {
     <Box sx={{ display: "flex", alignItems: "center" }}>
       <IconButton
         href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
         target="_blank"
         rel="noopener"
       >
@@ -38,7 +38,7 @@ export const ShareButtons = () => {
       {/* this works with different urls from localhost */}
       <IconButton
         href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
         target="_blank"
         rel="noopener"
       >
@@ -47,7 +47,7 @@ export const ShareButtons = () => {
       {/* this works with different urls from localhost */}
       <IconButton
         href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
-        sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
+        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
         target="_blank"
         rel="noopener"
       >
@@ -55,7 +55,7 @@ export const ShareButtons = () => {
       </IconButton>
       <Tooltip title="Copy link" placement="top" arrow>
         <IconButton
-          sx={{ transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
+          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
           onClick={onShareByLink}
         >
           <LinkIcon />
