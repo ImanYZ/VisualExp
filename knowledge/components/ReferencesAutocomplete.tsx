@@ -1,49 +1,72 @@
 import { Autocomplete, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
 import { getReferencesAutocomplete } from "../lib/knowledgeApi";
 import { isValidHttpUrl } from "../lib/utils";
-import { TypesenseReferencesSchema } from "../src/knowledgeTypes";
+import { FilterProcessedReferences } from "../src/knowledgeTypes";
 
 type Props = {
-  reference: TypesenseReferencesSchema | null;
-  onReferencesChange: (newValues: TypesenseReferencesSchema | null) => void;
+  reference: { title: string; label: string } | null;
+  onReferencesChange: (title: string, label: string) => void;
 };
 
-export const ReferencesAutocomplete = ({}: Props) => {
-  const [text, setText] = useState("");
-  const [referenceSelected, setReferenceSelected] = useState<TypesenseReferencesSchema | null>(null);
+export const ReferencesAutocomplete = ({ onReferencesChange, reference = null }: Props) => {
+  const [text, setText] = useState(reference?.title || "");
   const [searchText] = useDebounce(text, 250);
   const { isLoading, data } = useQuery(["references", searchText], () => getReferencesAutocomplete(searchText));
 
+  // const [referenceSelected] = useState()
+
+  const [referenceSelected, setReferenceSelected] = useState<FilterProcessedReferences | null>(null);
+
   const [labelSelected, setLabelSelected] = useState("");
 
-  const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
-    console.log("handleQueryChange", query);
-    const queryProcesed = query.trim();
-    setText(queryProcesed);
+  useEffect(() => {
+    if (!data || !reference) {
+      return;
+    }
+
+    const getReferenceValue = () => data.results?.find(cur => cur.title === reference.title) || null;
+    const referenceValue = getReferenceValue();
+    const getLabelValue = () => getLabels(referenceValue).find(cur => cur.label === reference.label);
+    const labelValue = getLabelValue()?.label || "";
+
+    setReferenceSelected(referenceValue);
+    setLabelSelected(labelValue);
+  }, [reference, data]);
+
+  const handleInputChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
+    const queryProcessed = query.trim();
+    setText(queryProcessed);
   };
 
-  const handleChange = (event: SyntheticEvent<Element, Event>, newValue: TypesenseReferencesSchema | null) => {
-    console.log("handleChange", newValue);
-    // onReferencesChange(newValue)
+  const handleChange = (event: SyntheticEvent<Element, Event>, newValue: FilterProcessedReferences | null) => {
+    onReferencesChange(newValue?.title || "", "");
+
     setReferenceSelected(newValue);
+    setLabelSelected("");
   };
 
-  const onChangeLabel = (event: SelectChangeEvent) => {
+  const handleChangeLabel = (event: SelectChangeEvent) => {
     setLabelSelected(event.target.value);
+
+    onReferencesChange(referenceSelected?.title || "", event.target.value);
   };
 
-  const isWeb = (currentReference: TypesenseReferencesSchema) => {
-    return isValidHttpUrl(currentReference.label);
+  const isWeb = (currentReference: FilterProcessedReferences) => {
+    return isValidHttpUrl(currentReference.data[0]?.label);
   };
 
-  // const getLabelOptions = () => {
+  const getLabels = (currentReferenceSelected: FilterProcessedReferences | null): { label: string; node: string }[] => {
+    if (!currentReferenceSelected) return [];
+    const labels = currentReferenceSelected.data.filter(cur => cur.label);
 
-  // }
+    const emptyLabel = isWeb(currentReferenceSelected) ? "All Sections" : "All Pages";
+    return [{ label: emptyLabel, node: "" }, ...labels];
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -52,8 +75,8 @@ export const ReferencesAutocomplete = ({}: Props) => {
         value={referenceSelected}
         loading={isLoading}
         noOptionsText={"Search references"}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        onInputChange={handleQueryChange}
+        isOptionEqualToValue={(option, value) => option.title === value.title}
+        onInputChange={handleInputChange}
         getOptionLabel={option => option.title} // << ----- ---- ---- --- HERE we are defining to suggest by only title
         renderOption={(props, option) => {
           const newProps = { ...props, key: option.id };
@@ -71,9 +94,13 @@ export const ReferencesAutocomplete = ({}: Props) => {
             id="demo-simple-select"
             value={labelSelected}
             label={isWeb(referenceSelected) ? "Sections" : "Pages"}
-            onChange={onChangeLabel}
+            onChange={handleChangeLabel}
           >
-            <MenuItem value={""}>{isWeb(referenceSelected) ? "All Sections" : "All Pages"}</MenuItem>
+            {getLabels(referenceSelected).map((data, idx) => (
+              <MenuItem key={idx} value={data.label}>
+                {data.label}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
       )}
