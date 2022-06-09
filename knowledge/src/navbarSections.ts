@@ -3,31 +3,31 @@ const SECTIONS = [
     id: "HowItWorksSection",
     label: "How",
     title: "How We Work",
-    route: "/changeThis"
+    route: "https://1cademy.us/home#HowItWorksSection"
   },
   {
     id: "CommunitiesSection",
     label: "What",
     title: "Our Communities",
-    route: "/changeThis"
+    route: "https://1cademy.us/home#CommunitiesSection"
   },
   {
     id: "ValuesSection",
     label: "Why",
     title: "Why 1Cademy Helps",
-    route: "/changeThis"
+    route: "https://1cademy.us/home#ValuesSection"
   },
   {
     id: "SchoolsSection",
     label: "Where",
     title: "Where Are We From?",
-    route: "/changeThis"
+    route: "https://1cademy.us/home#SchoolsSection"
   },
   {
     id: "WhoWeAreSection",
     label: "Who",
     title: "Who Is Behind 1Cademy?",
-    route: "/changeThis"
+    route: "https://1cademy.us/home#WhoWeAreSection"
   },
   {
     id: "WhoWeAreSection",
