@@ -40,7 +40,7 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         quality={100}
         priority
       />
-      <Box sx={{ position: "absolute", maxWidth: "100vw", width: "60%" }}>
+      <Box sx={{ position: "absolute", maxWidth: "100vw", width: { md: "60%", xs: "85%" } }}>
         {/* <Typography
           textAlign="center"
           variant="h3"
@@ -52,47 +52,30 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         </Typography> */}
         <Box
           sx={{
+            textAlign: "center",
+            display: {
+              md: "block",
+              xs: "none"
+            }
+          }}
+        >
+          <img src="/LogoExtended.svg" alt="1Cademy Logo" width="421px" height="130px" />
+        </Box>
+        <Box
+          sx={{
             width: "100%",
-            mt: { xs: 1, md: 5 },
+            mt: { xs: 15, md: 5 },
             display: "flex",
             flexDirection: "row"
           }}
         >
           <SearchInput onSearch={onSearch}></SearchInput>
         </Box>
-        <Typography
-          textAlign="center"
-          variant="h5"
-          component="h2"
-          fontWeight="400"
-          sx={{ marginBottom: { xs: 0, md: 0 }, mt: 5.5, fontSize: { xs: "13px", md: "25px" } }}
-        >
-          We Visualize Learning Pathways from Books &amp; Research Papers.
+        <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
+          Search {stats.nodes} nodes and {stats.links} links through {stats.proposals} proposals
+          <br />
+          from {stats.users} users in {stats.institutions} institutions
         </Typography>
-        <Typography
-          textAlign="center"
-          variant="h5"
-          component="h2"
-          fontWeight="400"
-          sx={{ mt: 4, mb: 10, fontSize: { xs: "10px", md: "16px" } }}
-        >
-          {stats.users} students and researchers from {stats.institutions} have contributed {stats.nodes} nodes and{" "}
-          {stats.links} links through {stats.proposals} proposals.
-        </Typography>
-        <Box sx={{ mt: 0, textAlign: "center" }}>
-          <img src="/DarkModeLogo.svg" alt="1Cademy Logo" width="130px" height="130px" />
-          <Box
-            sx={{
-              borderBottom: "2.5px solid #ff8a33",
-              width: "70px",
-              height: "19px",
-              ml: "auto",
-              mr: "auto",
-              mb: "19px",
-              textAlign: "center"
-            }}
-          ></Box>
-        </Box>
       </Box>
     </Box>
   );
