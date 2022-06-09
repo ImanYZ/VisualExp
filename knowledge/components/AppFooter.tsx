@@ -1,4 +1,4 @@
-import { Divider, Stack } from "@mui/material";
+import { Container, Divider, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Image from "next/image";
@@ -15,19 +15,22 @@ export default function AppFooter() {
       }}
     >
       <Divider />
-      <Box
+      <Container
         sx={{
-          display: "flex",
+          position: "relative",
           justifyContent: "center",
-          flexDirection: "column",
           alignItems: "center",
-          height: "100%"
+          height: "100%",
+          flex: 1,
+          mt: { xs: 5, sm: 0 }
         }}
       >
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={{ xs: 1, sm: 2, md: 4 }}
-          sx={{ justifyContent: "center", alignItems: "center" }}
+          justifyContent="space-between"
+          sx={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}
+          alignItems="center"
         >
           <Box p={2}>{`©  1Cademy ${new Date().getFullYear()}`}</Box>
           <Box p={2}>
@@ -70,7 +73,7 @@ export default function AppFooter() {
             <Image src={YouTubeLogo} alt="1Cademy YouTube Channel" layout="intrinsic" width="100px" height="40px" />
           </Box>
         </Stack>
-      </Box>
+      </Container>
     </Box>
   );
 }
