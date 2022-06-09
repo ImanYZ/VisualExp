@@ -24,7 +24,8 @@ import {
   SortTypeWindowOption,
   StatsSchema,
   TimeWindowOption,
-  TypesenseNodesSchema} from "../src/knowledgeTypes";
+  TypesenseNodesSchema
+} from "../src/knowledgeTypes";
 
 const perPage = 10;
 
@@ -124,7 +125,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
   const stats = await getStats();
-  console.log({ stats });
   const client = new Typesense.Client({
     nodes: [
       {
@@ -247,24 +247,23 @@ const HomePage: NextPage<Props> = ({
   };
 
   return (
-    <PagesNavbar
-      headingComponent={
-        <HomeSearchContainer
-          sx={{ mt: "var(--navbar-height)" }}
-          onSearch={handleSearch}
-          stats={stats}
-        ></HomeSearchContainer>
-      }
-    >
-      <HomeFilter
-        onTagsChange={handleTagsChange}
-        onInstitutionsChange={handleInstitutionsChange}
-        onContributorsChange={handleContributorsChange}
-        onNodeTypesChange={handleNodeTypesChange}
-        contributors={contributorsFilter}
-        institutions={institutionFilter}
-      ></HomeFilter>
-      <Container sx={{ pt: 10 }}>
+    <PagesNavbar>
+      <HomeSearchContainer
+        sx={{ mt: "var(--navbar-height)" }}
+        onSearch={handleSearch}
+        stats={stats}
+      ></HomeSearchContainer>
+      <Container sx={{ my: 10 }}>
+        <HomeFilter
+          sx={{ mb: 8 }}
+          onTagsChange={handleTagsChange}
+          onInstitutionsChange={handleInstitutionsChange}
+          onContributorsChange={handleContributorsChange}
+          onNodeTypesChange={handleNodeTypesChange}
+          contributors={contributorsFilter}
+          institutions={institutionFilter}
+        ></HomeFilter>
+
         <SortByFilters
           sortedByType={sortedByType}
           handleByType={handleByType}
