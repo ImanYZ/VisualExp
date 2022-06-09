@@ -45,10 +45,18 @@ const client = new Typesense.Client({
 //   });
 // };
 
-const getProcessedReferences = async () => {
-  return await client.collections("processedReferences").documents().search({
+// const getProcessedReferences = async () => {
+//   return await client.collections("processedReferences").documents().search({
+//     query_by: "title",
+//     q: "wiki"
+//   });
+// };
+
+const getNodes = async () => {
+  return await client.collections("nodes").documents().search({
     query_by: "title",
-    q: "wikiped"
+    q: "sig",
+    filter_by: "titlesReferences:WikipediA && labelsReferences:Sigmoid function"
   });
 };
 
@@ -70,13 +78,19 @@ const run = async () => {
 
   //----------------------------------
   // get processedReferences
-  const res = await getProcessedReferences();
-  const data = res.hits.map(cur => cur.document);
-  data.map(cur => {
-    console.log("TITLE:", cur.title.substring(0, 10));
-    cur.data.map(c => console.log("   DD__II", c));
-  });
-  // console.log(data);
+  // const res = await getProcessedReferences();
+  // const data = res.hits.map(cur => cur.document);
+  // data.map(cur => {
+  //   console.log("TITLE:", cur.title.substring(0, 10));
+  //   cur.data.map(c => console.log("   DD__II", c));
+  // });
+
+  //----------------------------------
+  // get filtered nodes by references
+  const res = await getNodes();
+  const data = res.hits.map(cur => cur.document).map(cur => ({ t: cur.title }));
+
+  console.log("DATA:", data);
 };
 
 run();

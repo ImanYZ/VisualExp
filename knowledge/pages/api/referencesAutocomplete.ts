@@ -3,22 +3,22 @@ import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { clientTypesense } from "../../lib/typesense/typesense.config";
 import { getQueryParameter } from "../../lib/utils";
-import { ResponseAutocompleteReferencesFilter, TypesenseReferencesSchema } from "../../src/knowledgeTypes";
+import { FilterProcessedReferences, ResponseAutocompleteProcessedReferencesFilter } from "../../src/knowledgeTypes";
 
-async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteReferencesFilter>) {
+async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteProcessedReferencesFilter>) {
   const q = getQueryParameter(req.query.q) || "";
 
   if (!q) return res.status(200).json({ results: [] });
 
   try {
-    const searchParameters: SearchParams = { q, query_by: "title,label" };
+    const searchParameters: SearchParams = { q, query_by: "title" };
     const searchResults = await clientTypesense
-      .collections<TypesenseReferencesSchema>("references")
+      .collections<FilterProcessedReferences>("processedReferences")
       .documents()
       .search(searchParameters);
 
-    const references: TypesenseReferencesSchema[] = searchResults.hits?.map(el => el.document) || [];
-    const response: ResponseAutocompleteReferencesFilter = {
+    const references: FilterProcessedReferences[] = searchResults.hits?.map(el => el.document) || [];
+    const response: ResponseAutocompleteProcessedReferencesFilter = {
       results: references
     };
     res.status(200).json(response);
