@@ -60,12 +60,7 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
 
         <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
           <FormControl>
-            <Select
-              variant="standard"
-              value={timeWindow}
-              onChange={handleSortByTime}
-              inputProps={{ disableUnderline: true, style: { backgroundColor: "red" } }}
-            >
+            <Select variant="standard" value={timeWindow} onChange={handleSortByTime}>
               {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
                 <MenuItem value={sortedByTimeOption} key={idx}>
                   {sortedByTimeOption}
