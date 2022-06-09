@@ -26,8 +26,8 @@ const firebaseApp: App = global.firebaseApp
           token_uri: "https://oauth2.googleapis.com/token",
           auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
           client_x509_cert_url: process.env.ONECADEMYCRED_CLIENT_X509_CERT_URL,
-          storageBucket: "onecademy-dev.appspot.com",
-          databaseURL: "https://onecademy-dev-default-rtdb.firebaseio.com/"
+          storageBucket: "onecademy-1.appspot.com",
+          databaseURL: "https://onecademy-1-default-rtdb.firebaseio.com/"
         } as any)
       },
       "onecademy"
