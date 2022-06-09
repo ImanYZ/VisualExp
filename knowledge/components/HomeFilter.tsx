@@ -7,10 +7,11 @@ import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
 import { getQueryParameter } from "../lib/utils";
-import { FilterValue } from "../src/knowledgeTypes";
+import { FilterValue, ReferencesFilterValue, TypesenseReferencesSchema } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
+import { ReferencesAutocomplete } from "./ReferencesAutocomplete";
 
 type Props = {
   sx?: SxProps<Theme>;
@@ -18,8 +19,10 @@ type Props = {
   onInstitutionsChange: (newValues: FilterValue[]) => void;
   onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
+  onReferencesChange: (newValues: ReferencesFilterValue) => void;
   contributors: FilterValue[];
   institutions: FilterValue[];
+  reference: TypesenseReferencesSchema | null;
 };
 
 const HomeFilter: FC<Props> = ({
@@ -28,8 +31,10 @@ const HomeFilter: FC<Props> = ({
   onInstitutionsChange,
   onContributorsChange,
   onNodeTypesChange,
+  onReferencesChange,
   contributors,
-  institutions
+  institutions,
+  reference
 }) => {
   const router = useRouter();
   const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
@@ -49,6 +54,10 @@ const HomeFilter: FC<Props> = ({
 
   const handleNodeTypesChange = (values: string[]) => {
     onNodeTypesChange(values);
+  };
+
+  const handleReferencesChange = (values: ReferencesFilterValue) => {
+    onReferencesChange(values);
   };
 
   return (
@@ -78,6 +87,9 @@ const HomeFilter: FC<Props> = ({
         </Grid>
         <Grid item xs={1}>
           <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
+        </Grid>
+        <Grid item xs={1} sm={2} md={4}>
+          <ReferencesAutocomplete reference={reference} onReferencesChange={handleReferencesChange} />
         </Grid>
         <StyledHelpButton color="primary" aria-label="help" size="small" title="Help">
           <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
