@@ -211,5 +211,5 @@ export type StatsSchema = {
   users: number;
   proposals: number;
   nodes: number;
-  links: number;
+  links: string | number;
 };
