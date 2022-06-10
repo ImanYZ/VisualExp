@@ -32,7 +32,7 @@ const SECTIONS = [
   {
     id: "WhoWeAreSection",
     label: "Node",
-    title: "What do you want to learn today?",
+    title: "What do you want to learn now?",
     route: "/"
   }
 ];
