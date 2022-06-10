@@ -8,8 +8,6 @@ import { FilterProcessedReferences, ResponseAutocompleteProcessedReferencesFilte
 async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteProcessedReferencesFilter>) {
   const q = getQueryParameter(req.query.q) || "";
 
-  if (!q) return res.status(200).json({ results: [] });
-
   try {
     const searchParameters: SearchParams = { q, query_by: "title" };
     const searchResults = await clientTypesense
