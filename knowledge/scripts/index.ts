@@ -1,7 +1,8 @@
 import { CollectionFieldSchema } from "typesense/lib/Typesense/Collection";
 
 import { db } from "../lib/admin";
-import { NodeFireStore, TypesenseNodesSchema } from "../src/knowledgeTypes";
+import { NodeFireStore, TypesenseNodesSchema, TypesenseProcessedReferences } from "../src/knowledgeTypes";
+import { getNodeReferences } from "./helper";
 import indexCollection from "./populateIndex";
 
 const getUsersFromFirestore = async () => {
@@ -74,7 +75,9 @@ const getContributorsName = (nodeData: NodeFireStore): string[] => {
   return contributors;
 };
 
-const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
+const getNodesData = (
+  nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>
+): TypesenseNodesSchema[] => {
   const getContributorsFromNode = (nodeData: NodeFireStore) => {
     return Object.entries(nodeData.contributors || {})
       .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
@@ -89,7 +92,7 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
       .map(institution => ({ name: institution.name }));
   };
 
-  const nodeDocs = await db.collection("nodes").get();
+  // const nodeDocs = await db.collection("nodes").get();
 
   return nodeDocs.docs.map((nodeDoc): TypesenseNodesSchema => {
     const nodeData = nodeDoc.data() as NodeFireStore;
@@ -98,6 +101,10 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
     const institutions = getInstitutionsFromNode(nodeData);
     const institutionsNames = getInstitutionsName(nodeData);
     const tags = getNodeTags(nodeData);
+    const references = getNodeReferences(nodeData);
+
+    const titlesReferences = references.map(cur => cur.title || "").filter(cur => cur);
+    const labelsReferences = references.map(cur => cur.label).filter(cur => cur);
 
     return {
       changedAt: nodeData.changedAt.toDate().toISOString(),
@@ -111,14 +118,44 @@ const getNodesFromFirestore = async (): Promise<TypesenseNodesSchema[]> => {
       id: nodeDoc.id,
       institutions,
       institutionsNames,
+      labelsReferences,
       nodeImage: nodeData.nodeImage,
       nodeType: nodeData.nodeType,
       tags,
       title: nodeData.title || "",
+      titlesReferences,
       updatedAt: nodeData.updatedAt?.toMillis() || 0,
       wrongs: nodeData.wrongs || 0
     };
   });
+};
+
+const getReferencesData = (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>) => {
+  // const nodeDocs = await db.collection("nodes").get();
+
+  const references = nodeDocs.docs
+    .map(nodeDoc => {
+      const nodeData = nodeDoc.data() as NodeFireStore;
+      const data = getNodeReferences(nodeData);
+      return data;
+    })
+    .flat();
+
+  const processedReferences: TypesenseProcessedReferences[] = references.reduce(
+    (referencesSet: TypesenseProcessedReferences[], currentReference): TypesenseProcessedReferences[] => {
+      const indexReference = referencesSet.findIndex(cur => cur.title === currentReference.title);
+      const processedReference: TypesenseProcessedReferences = {
+        title: currentReference.title || "",
+        data: [{ label: currentReference.label, node: currentReference.node }]
+      };
+      if (indexReference < 0) return [...referencesSet, processedReference];
+      referencesSet[indexReference].data = [...referencesSet[indexReference].data, ...processedReference.data];
+      return referencesSet;
+    },
+    []
+  );
+
+  return { references, processedReferences };
 };
 
 const fillInstitutionsIndex = async (forceReIndex?: boolean) => {
@@ -148,38 +185,69 @@ const fillTagsIndex = async (forceReIndex?: boolean) => {
   await indexCollection("tags", fields, data, forceReIndex);
 };
 
-const fillNodesIndex = async (forceReIndex?: boolean) => {
-  const data = await getNodesFromFirestore();
+const fillNodesIndex = async (
+  nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
+  forceReIndex?: boolean
+) => {
+  const data = getNodesData(nodeDocs);
   const fields: CollectionFieldSchema[] = [
     { name: "changedAtMillis", type: "int64" },
     { name: "content", type: "string" },
     { name: "contributorsNames", type: "string[]" },
     { name: "mostHelpful", type: "int32" },
+    { name: "corrects", type: "int32" },
+    { name: "labelsReferences", type: "string[]" },
     { name: "institutionsNames", type: "string[]" },
     { name: "nodeType", type: "string" },
     { name: "tags", type: "string[]" },
-    { name: "title", type: "string" }
+    { name: "title", type: "string" },
+    { name: "titlesReferences", type: "string[]" }
   ];
 
   await indexCollection("nodes", fields, data, forceReIndex);
 };
 
+const fillReferencesIndex = async (
+  nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
+  forceReIndex?: boolean
+) => {
+  const { references, processedReferences } = getReferencesData(nodeDocs);
+  const fields: CollectionFieldSchema[] = [
+    { name: "title", type: "string" },
+    { name: "label", type: "string" }
+  ];
+
+  const fieldsProcessedReferences: CollectionFieldSchema[] = [{ name: "title", type: "string" }];
+
+  await indexCollection("references", fields, references, forceReIndex);
+  await indexCollection("processedReferences", fieldsProcessedReferences, processedReferences, forceReIndex);
+};
+
 const main = async () => {
-  console.log("Filling users index");
+  const steps = 5;
+
+  const nodeDocs = await db.collection("nodes").get();
+
+  console.log(`[1/${steps}]: Filling users index`);
   await fillUsersIndex();
   console.log("End Filling nodes index");
 
-  console.log("Filling institutions index");
+  console.log(`[2/${steps}]: Filling institutions index`);
   await fillInstitutionsIndex();
   console.log("End Filling institutions index");
 
-  console.log("Filling tags index");
+  console.log(`[3/${steps}]: Filling tags index`);
   await fillTagsIndex();
   console.log("End Filling tags index");
 
-  console.log("Filling nodes index");
-  await fillNodesIndex(true);
+  console.log(`[4/${steps}]: Filling nodes index`);
+  // await fillNodesIndex(true);
+  await fillNodesIndex(nodeDocs, true);
   console.log("End Filling nodes index");
+
+  console.log(`[5/${steps}]: Filling references index`);
+  await fillReferencesIndex(nodeDocs, true);
+  console.log("End Filling references index");
 };
 
 main();
