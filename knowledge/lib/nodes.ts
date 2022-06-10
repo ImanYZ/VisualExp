@@ -223,7 +223,7 @@ const getNodeTags = (nodeData: NodeFireStore) => {
   return tags;
 };
 
-// Endpoint retrieving the node data and its direct parents and children
+// Endpoint retrieving the node data and its direct parents,children and siblings
 // data based on the id requested.
 export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => {
   const nodeData = await retrieveNode(id);
@@ -249,6 +249,7 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
   }
   // Retrieve the content of all the direct parents of the node.
   const parentsConverted: LinkedKnowledgeNode[] = [];
+  const siblingsConverted: LinkedKnowledgeNode[] = [];
   for (let parent of nodeData.parents || []) {
     const parentData = await retrieveNode(parent.node || "");
     if (!parentData) {
@@ -261,6 +262,21 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
       nodeImage: parentData.nodeImage,
       nodeType: parentData.nodeType
     });
+
+    //Retrieve sibling nodes
+    for (let children of parentData.children || []) {
+      const childrenData = await retrieveNode(children.node || "");
+      if (!childrenData) {
+        continue;
+      }
+      siblingsConverted.push({
+        node: children.node as string,
+        title: childrenData.title,
+        content: childrenData.content,
+        nodeImage: childrenData.nodeImage,
+        nodeType: childrenData.nodeType
+      });
+    }
   }
   // Retrieve the content of all the tags of the node.
   const nodeTags = getNodeTags(nodeData);
@@ -340,7 +356,8 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
     tags: convertedTags,
     references: convertedReferences,
     contributors: contributorsNodes,
-    institutions: institutionsNodes
+    institutions: institutionsNodes,
+    siblings: siblingsConverted
   };
 };
 

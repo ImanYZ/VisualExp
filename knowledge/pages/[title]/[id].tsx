@@ -8,7 +8,7 @@ import React, { ComponentType } from "react";
 
 import NodeItemContributors from "../../components/NodeItemContributors";
 import PagesNavbar from "../../components/PagesNavbar";
-import { getNodeData, logViews } from "../../lib/nodes";
+import { getNodeData } from "../../lib/nodes";
 import { escapeBreaksQuotes } from "../../lib/utils";
 import { KnowledgeNode } from "../../src/knowledgeTypes";
 
@@ -34,10 +34,7 @@ const NodeHeadContainer: ComponentType<any> = dynamic(() => import("../../compon
   ssr: false
 });
 
-const LinkedNodesContainer: ComponentType<any> = dynamic(
-  () => import("../../components/LinkedNodes").then(m => m.LinkedNodes),
-  { ssr: false }
-);
+const LinkedNodesContainer = dynamic(() => import("../../components/LinkedNodes"), { ssr: false });
 
 const ReferencesListContainer: ComponentType<any> = dynamic(
   () => import("../../components/ReferencesList").then(m => m.ReferencesList),
@@ -48,8 +45,7 @@ const TagsListContainer: ComponentType<any> = dynamic(() => import("../../compon
   ssr: false
 });
 
-export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ req, params }) => {
-  logViews(req, params?.id || "");
+export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ params }) => {
   const nodeData = await getNodeData(params?.id || "");
   if (!nodeData) {
     return {
@@ -76,7 +72,7 @@ export const getServerSideProps: GetServerSideProps<Props, Params> = async ({ re
 };
 
 const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) => {
-  const { parents, contributors, references, institutions, tags, children } = node;
+  const { parents, contributors, references, institutions, tags, children, siblings } = node;
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
       <Box sx={{ p: { xs: 3, md: 10 } }}>
@@ -96,6 +92,9 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
               <ReferencesListContainer references={references || []} sx={{ mt: 3 }} />
             )}
             {tags && tags?.length > 0 && <TagsListContainer tags={tags || []} sx={{ mt: 3 }} />}
+            {siblings && siblings.length > 0 && (
+              <LinkedNodesContainer sx={{ mt: 3 }} data={siblings} header="Related"></LinkedNodesContainer>
+            )}
           </Grid>
           <Grid item xs={12} sm={12} md={3}>
             {children && children?.length > 0 && <LinkedNodesContainer data={children || []} header="Learn After" />}
