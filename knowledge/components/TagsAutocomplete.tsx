@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
@@ -50,7 +51,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
       loading={isLoading}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
-          <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
+          <Chip variant="outlined" label={option} deleteIcon={<CloseIcon />} {...getTagProps({ index })} key={index} />
         ))
       }
       renderInput={params => <TextField {...params} variant="outlined" label="Tags" />}
