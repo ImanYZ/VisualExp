@@ -5,16 +5,16 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next/types";
 import { ParsedUrlQuery } from "querystring";
 import React from "react";
 
-import LinkedNodes from "../components/LinkedNodes";
-import { NodeHead } from "../components/NodeHead";
-import NodeItemContributors from "../components/NodeItemContributors";
-import { NodeItemFull } from "../components/NodeItemFull";
-import PagesNavbar from "../components/PagesNavbar";
-import { ReferencesList } from "../components/ReferencesList";
-import { TagsList } from "../components/TagsList";
-import { getNodeData } from "../lib/nodes";
-import { escapeBreaksQuotes } from "../lib/utils";
-import { KnowledgeNode } from "../src/knowledgeTypes";
+import LinkedNodes from "../../components/LinkedNodes";
+import { NodeHead } from "../../components/NodeHead";
+import NodeItemContributors from "../../components/NodeItemContributors";
+import { NodeItemFull } from "../../components/NodeItemFull";
+import PagesNavbar from "../../components/PagesNavbar";
+import { ReferencesList } from "../../components/ReferencesList";
+import { TagsList } from "../../components/TagsList";
+import { getNodeData } from "../../lib/nodes";
+import { escapeBreaksQuotes } from "../../lib/utils";
+import { KnowledgeNode } from "../../src/knowledgeTypes";
 
 type Props = {
   node: KnowledgeNode;
@@ -28,24 +28,24 @@ interface Params extends ParsedUrlQuery {
 }
 
 // const NodeItemFull: ComponentType<any> = dynamic(
-//   () => import("../components/NodeItemFull").then(m => m.NodeItemFull),
+//   () => import("../../components/NodeItemFull").then(m => m.NodeItemFull),
 //   {
 //     ssr: false
 //   }
 // );
 
-// const NodeHead: ComponentType<any> = dynamic(() => import("../components/NodeHead").then(m => m.NodeHead), {
+// const NodeHead: ComponentType<any> = dynamic(() => import("../../components/NodeHead").then(m => m.NodeHead), {
 //   ssr: false
 // });
 
-// const LinkedNodes = dynamic(() => import("../components/LinkedNodes"), { ssr: false });
+// const LinkedNodes = dynamic(() => import("../../components/LinkedNodes"), { ssr: false });
 
 // const ReferencesList: ComponentType<any> = dynamic(
-//   () => import("../components/ReferencesList").then(m => m.ReferencesList),
+//   () => import("../../components/ReferencesList").then(m => m.ReferencesList),
 //   { ssr: false }
 // );
 
-// const TagsList: ComponentType<any> = dynamic(() => import("../components/TagsList").then(m => m.TagsList), {
+// const TagsList: ComponentType<any> = dynamic(() => import("../../components/TagsList").then(m => m.TagsList), {
 //   ssr: false
 // });
 
