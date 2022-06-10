@@ -3,6 +3,7 @@ import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
+import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
 import { encodeTitle } from "../lib/utils";
@@ -13,9 +14,10 @@ import TypographyUnderlined from "./TypographyUnderlined";
 type LinkedNodesProps = {
   data: LinkedKnowledgeNode[];
   header: string;
+  sx?: SxProps<Theme>;
 };
 
-export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
+const LinkedNodes = ({ data, header, sx }: LinkedNodesProps) => {
   const renderLinkedNodes = () => {
     return data.map((el, idx, src) => (
       <React.Fragment key={idx}>
@@ -34,7 +36,7 @@ export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
   };
 
   return (
-    <Card>
+    <Card sx={{ ...sx }}>
       <CardHeader
         sx={{
           backgroundColor: theme => theme.palette.common.darkGrayBackground,
@@ -52,3 +54,5 @@ export const LinkedNodes = ({ data, header }: LinkedNodesProps) => {
     </Card>
   );
 };
+
+export default LinkedNodes;
