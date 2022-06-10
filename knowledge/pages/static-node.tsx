@@ -98,9 +98,9 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
               contributors={
                 <NodeItemContributors contributors={contributors || []} institutions={institutions || []} />
               }
+              references={<ReferencesList references={references || []} sx={{ mt: 3 }} />}
+              tags={<TagsList tags={tags || []} sx={{ mt: 3 }} />}
             />
-            {references && references?.length > 0 && <ReferencesList references={references || []} sx={{ mt: 3 }} />}
-            {tags && tags?.length > 0 && <TagsList tags={tags || []} sx={{ mt: 3 }} />}
             {siblings && siblings.length > 0 && (
               <LinkedNodes sx={{ mt: 3 }} data={siblings} header="Related"></LinkedNodes>
             )}
