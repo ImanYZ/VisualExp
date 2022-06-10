@@ -11,7 +11,7 @@ export const getStats = async (): Promise<StatsSchema> => {
       users: statsData.users.toLocaleString("en-US"),
       proposals: statsData.proposals.toLocaleString("en-US"),
       nodes: statsData.nodes.toLocaleString("en-US"),
-      links: statsData.links.toLocaleString("en-US")
+      links: Math.round(statsData.links).toLocaleString("en-US")
     };
   }
 
