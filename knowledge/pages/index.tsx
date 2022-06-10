@@ -209,7 +209,7 @@ const HomePage: NextPage<Props> = ({
   const router = useRouter();
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text } });
+    router.push({ query: { ...router.query, q: text, page: 1 } });
   };
 
   const handleChangePage = (newPage: number) => {
