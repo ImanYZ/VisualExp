@@ -16,7 +16,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
   const [value, setValue] = useState<string[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { data } = useQuery(["tags", searchText], () => getTagsAutocomplete(searchText));
+  const { data, isLoading } = useQuery(["tags", searchText], () => getTagsAutocomplete(searchText));
   const [hasBeenCleared, setHasBeenCleared] = useState(false);
 
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
@@ -47,6 +47,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
       onInputChange={handleQueryChange}
       onChange={handleChange}
       noOptionsText={"Search tags"}
+      loading={isLoading}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
           <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
