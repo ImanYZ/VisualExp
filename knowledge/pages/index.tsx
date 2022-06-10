@@ -67,7 +67,7 @@ type Props = {
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   if (upvotes) {
-    return "mostHelpful:desc";
+    return "";
   }
   if (mostRecent) {
     return "changedAtMillis:desc";
