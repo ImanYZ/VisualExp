@@ -39,7 +39,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
       <SearchStyled>
         <StyledInputBase
           fullWidth
-          placeholder="What do you want to learn today?"
+          placeholder="What do you want to learn now?"
           inputProps={{ "aria-label": "search" }}
           value={searchText}
           onChange={handleChange}

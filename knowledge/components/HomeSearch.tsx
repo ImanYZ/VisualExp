@@ -48,7 +48,7 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
           fontWeight="500"
           sx={{ mt: 0, marginBottom: { xs: 1, md: 2 }, fontSize: { xs: "23px", md: "50px" } }}
         >
-          What do you want to learn today?
+          What do you want to learn now?
         </Typography> */}
         <Box
           sx={{
