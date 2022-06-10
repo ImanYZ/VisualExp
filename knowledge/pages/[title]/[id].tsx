@@ -91,11 +91,9 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
               contributors={
                 <NodeItemContributors contributors={contributors || []} institutions={institutions || []} />
               }
+              references={<ReferencesListContainer references={references || []} sx={{ mt: 3 }} />}
+              tags={<TagsListContainer tags={tags || []} sx={{ mt: 3 }} />}
             />
-            {references && references?.length > 0 && (
-              <ReferencesListContainer references={references || []} sx={{ mt: 3 }} />
-            )}
-            {tags && tags?.length > 0 && <TagsListContainer tags={tags || []} sx={{ mt: 3 }} />}
           </Grid>
           <Grid item xs={12} sm={12} md={3}>
             {children && children?.length > 0 && <LinkedNodesContainer data={children || []} header="Learn After" />}
