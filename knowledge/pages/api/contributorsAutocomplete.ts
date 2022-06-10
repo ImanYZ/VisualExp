@@ -8,10 +8,6 @@ import { FilterValue, ResponseAutocompleteFilter } from "../../src/knowledgeType
 async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteFilter>) {
   const q = getQueryParameter(req.query.q) || "";
 
-  if (!q) {
-    res.status(200).json({ results: [] });
-    return;
-  }
   const client = new Typesense.Client({
     nodes: [
       {

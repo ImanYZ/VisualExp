@@ -19,9 +19,7 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange, institution
   const [value, setValue] = useState<FilterValue[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { isLoading, data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText), {
-    enabled: searchText.length > 0
-  });
+  const { isLoading, data } = useQuery(["institutions", searchText], () => getInstitutionsAutocomplete(searchText));
 
   const handleQueryChange = (event: React.SyntheticEvent<Element, Event>, query: string) => {
     if (event && query.trim().length > 0) {
