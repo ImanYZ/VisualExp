@@ -73,7 +73,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) 
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  const paths = [{ params: { id: "some" } }];
+  const paths = [{ params: { id: "zzyy7iThmjX3M9OzngE8" } }];
   //   const paths = [{ params: { id: "uYgvhNdciHcuK7ioGZEv" } }];
   console.log("------ incremental-static-mode - getStaticPaths - paths ", paths);
   return { paths, fallback: true };
@@ -87,7 +87,7 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
     return <div>Loading...</div>;
   }
 
-  const { parents, contributors, references, institutions, tags, children, siblings } = node;
+  const { parents, contributors, references, institutions, tags, children, siblings } = node || {};
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
       <Box sx={{ p: { xs: 3, md: 10 } }}>

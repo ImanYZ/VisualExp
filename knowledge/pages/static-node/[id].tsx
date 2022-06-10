@@ -84,14 +84,14 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
   //   { params: { id: "zzBGPoYppADsx5p3tYPs" } },
   //   { params: { id: "zzFjyn44HwTexs4pHOE0" } }
   // ];
-  const paths = [{ params: { id: "" } }];
+  const paths = [{ params: { id: "zzyy7iThmjX3M9OzngE8" } }];
   console.log("------ static-node - getStaticPaths - paths ", paths);
   return { paths, fallback: false };
 };
 
 const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) => {
-  console.log("NodePage- static-node - node", node);
-  const { parents, contributors, references, institutions, tags, children, siblings } = node;
+  // console.log("Nod ePage- static-node - node", node);
+  const { parents, contributors, references, institutions, tags, children, siblings } = node || {};
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>
       <Box sx={{ p: { xs: 3, md: 10 } }}>

@@ -92,9 +92,9 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) => {
   //   console.log("NodePage- update-incremental-static-node- node", node);
 
-  const { parents, contributors, references, institutions, tags, children, siblings } = node;
+  const { parents, contributors, references, institutions, tags, children, siblings } = node || {};
   return (
-    <PagesNavbar title={`1Cademy - ${node.title}`}>
+    <PagesNavbar title={`1Cademy - ${node?.title}`}>
       <Box sx={{ p: { xs: 3, md: 10 } }}>
         <NodeHeadContainer node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
         <Grid container spacing={3}>
