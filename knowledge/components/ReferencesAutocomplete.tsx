@@ -82,7 +82,7 @@ export const ReferencesAutocomplete = ({ onReferencesChange, reference = null }:
         sx={{ flexGrow: 1 }}
       />
       {referenceSelected.title && (
-        <FormControl sx={{ width: { xs: "10%", md: "30%" } }}>
+        <FormControl sx={{ width: { xs: "40%", md: "30%" } }}>
           <InputLabel id="demo-simple-select-label">
             {referenceIsWeb(referenceSelected.title) ? "Sections" : "Pages"}
           </InputLabel>
