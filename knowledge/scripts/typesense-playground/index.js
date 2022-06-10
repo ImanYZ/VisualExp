@@ -29,25 +29,68 @@ const client = new Typesense.Client({
 //   });
 // };
 
-const getIntitutions = async () => {
-  return await client.collections("tags").documents().search({
-    query_by: "name",
-    q: "dat"
-    // 'sort_by': sortBy
+// const getIntitutions = async () => {
+//   return await client.collections("tags").documents().search({
+//     query_by: "name",
+//     q: "dat"
+//     // 'sort_by': sortBy
+//   });
+// };
+
+// const getReferences = async () => {
+//   return await client.collections("references").documents().search({
+//     query_by: "title,label",
+//     q: "a"
+//     // 'sort_by': sortBy
+//   });
+// };
+
+// const getProcessedReferences = async () => {
+//   return await client.collections("processedReferences").documents().search({
+//     query_by: "title",
+//     q: "wiki"
+//   });
+// };
+
+const getNodes = async () => {
+  return await client.collections("nodes").documents().search({
+    query_by: "title",
+    q: "sig",
+    filter_by: "titlesReferences:WikipediA && labelsReferences:Sigmoid function"
   });
 };
 
 // Dont delete this function
 const run = async () => {
-  const res = await getIntitutions();
-  // const data = res.hits
-  //   .map(cur => cur.document)
-  //   .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }));
+  // const res = await getIntitutions();
+  // // const data = res.hits
+  // //   .map(cur => cur.document)
+  // //   .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }));
 
-  const data = res.hits.map(cur => cur.document);
-  // .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }));
+  // const data = res.hits.map(cur => cur.document);
+  // // .map(cur => ({ title: cur.title.substring(0, 20), corrects: cur.corrects, changedAt: cur.changedAt }));
 
-  console.log(data);
+  //----------------------------------
+  // get references
+  // const res = await getReferences()
+  // const data = res.hits.map(cur => cur.document)
+  // console.log(data.map(cur => ({ label: cur.label, node: cur.node, title: cur.title.substring(0, 10) })));
+
+  //----------------------------------
+  // get processedReferences
+  // const res = await getProcessedReferences();
+  // const data = res.hits.map(cur => cur.document);
+  // data.map(cur => {
+  //   console.log("TITLE:", cur.title.substring(0, 10));
+  //   cur.data.map(c => console.log("   DD__II", c));
+  // });
+
+  //----------------------------------
+  // get filtered nodes by references
+  const res = await getNodes();
+  const data = res.hits.map(cur => cur.document).map(cur => ({ t: cur.title }));
+
+  console.log("DATA:", data);
 };
 
 run();
