@@ -45,7 +45,7 @@ const TagsListContainer: ComponentType<any> = dynamic(() => import("../../compon
   ssr: false
 });
 export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) => {
-  console.log("********** getStaticProps - params", params);
+  console.log("********** update-incremental-static-node - getStaticProps - params", params);
   const nodeData = await getNodeData(params?.id || "");
   if (!nodeData) {
     return {
@@ -73,12 +73,25 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) 
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  const paths = [{ params: { id: "uYgvhNdciHcuK7ioGZEv" } }];
-  console.log("------ getStaticPaths - paths ", paths);
-  return { paths, fallback: false };
+  const paths = [
+    { params: { id: "zzyy7iThmjX3M9OzngE8" } },
+    { params: { id: "zzkoyR3Ke1kRaH5Pf9ZH" } },
+    { params: { id: "zzWNrYf8GjnXBqkf9mJQ" } },
+    { params: { id: "zzeuylk97oZMOZ4p6tzQ" } },
+    { params: { id: "zzS0u9ZJD1hbIG3b7TiH" } },
+    { params: { id: "zzQ5WUf0S9dfizdpD7Jl" } },
+    { params: { id: "zz8ni7EhCnklLOYGUZ0n" } },
+    { params: { id: "zzFaAfrBpm4n3xqlFYqZ" } },
+    { params: { id: "zzBGPoYppADsx5p3tYPs" } },
+    { params: { id: "zzFjyn44HwTexs4pHOE0" } }
+  ];
+  console.log("------ update-incremental-static-node - getStaticPaths - paths ", paths);
+  return { paths, fallback: true };
 };
 
 const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) => {
+  //   console.log("NodePage- update-incremental-static-node- node", node);
+
   const { parents, contributors, references, institutions, tags, children, siblings } = node;
   return (
     <PagesNavbar title={`1Cademy - ${node.title}`}>

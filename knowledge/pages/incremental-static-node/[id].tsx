@@ -46,7 +46,7 @@ const TagsListContainer: ComponentType<any> = dynamic(() => import("../../compon
   ssr: false
 });
 export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) => {
-  console.log("********** getStaticProps - params", params);
+  console.log("********** incremental-static-mode -  getStaticProps - params", params);
   const nodeData = await getNodeData(params?.id || "");
   if (!nodeData) {
     return {
@@ -75,7 +75,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({ params }) 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   const paths = [{ params: { id: "some" } }];
   //   const paths = [{ params: { id: "uYgvhNdciHcuK7ioGZEv" } }];
-  console.log("------ getStaticPaths - paths ", paths);
+  console.log("------ incremental-static-mode - getStaticPaths - paths ", paths);
   return { paths, fallback: true };
 };
 

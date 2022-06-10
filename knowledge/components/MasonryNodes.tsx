@@ -12,9 +12,10 @@ type Props = {
   totalPages: number;
   sx?: SxProps<Theme>;
   onChangePage: (page: number) => void;
+  type: "ssr" | "static" | "incremental";
 };
 
-export const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage }: Props) => {
+const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage, type }: Props) => {
   const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
     onChangePage(value);
   };
@@ -27,7 +28,7 @@ export const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage }: Pro
     <Box sx={{ ...sx }}>
       <Masonry sx={{ my: 4 }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
         {nodes.map(el => (
-          <NodeItem key={el.id} node={el} />
+          <NodeItem type={type} key={el.id} node={el} />
         ))}
       </Masonry>
       {totalPages > 1 && (
@@ -38,3 +39,5 @@ export const TrendingNodes = ({ nodes, sx, page, totalPages, onChangePage }: Pro
     </Box>
   );
 };
+
+export default TrendingNodes;

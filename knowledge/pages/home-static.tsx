@@ -286,7 +286,7 @@ const HomePage: NextPage<Props> = ({
         />
         <MasonryNodes
           nodes={data}
-          type="ssr"
+          type="incremental"
           page={page}
           totalPages={Math.floor(numResults / perPage)}
           onChangePage={handleChangePage}
