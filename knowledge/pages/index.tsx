@@ -59,17 +59,15 @@ type Props = {
     mostRecent: boolean;
     upvotes: boolean;
     anyType: TimeWindowOption;
+    reference: string;
+    label: string;
   };
   stats: StatsSchema;
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
-  if (upvotes) {
-    return "corrects:desc";
-  }
-  if (mostRecent) {
-    return "changedAtMillis:desc";
-  }
+  if (upvotes) return "corrects:desc";
+  if (mostRecent) return "changedAtMillis:desc";
   return "";
 };
 
@@ -78,7 +76,9 @@ const buildFilterBy = (
   tags: string,
   institutions: string,
   contributors: string,
-  nodeTypes: string
+  nodeTypes: string,
+  reference: string,
+  label: string
 ) => {
   const filters: string[] = [];
   let updatedAt: number;
@@ -93,20 +93,29 @@ const buildFilterBy = (
   }
 
   filters.push(`changedAtMillis:>${updatedAt}`);
-  if (tags.length > 0) {
-    filters.push(`tags: [${tags}]`);
-  }
-  if (institutions.length > 0) {
-    filters.push(`institutionsNames: [${institutions}]`);
-  }
-  if (contributors.length > 0) {
-    filters.push(`contributorsNames: [${contributors}]`);
-  }
-  if (nodeTypes.length > 0) {
-    filters.push(`nodeType: [${nodeTypes}]`);
-  }
+
+  if (tags.length > 0) filters.push(`tags: [${tags}]`);
+  if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
+  if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
+  if (nodeTypes.length > 0) filters.push(`nodeType: [${nodeTypes}]`);
+  if (reference) filters.push(`titlesReferences: ${reference}`);
+  if (label && label !== "All Sections" && label !== "All Pages") filters.push(`labelsReferences: ${label}`);
 
   return filters.join("&& ");
+};
+
+const getTypesenseClient = () => {
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
+        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
+        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
+      }
+    ],
+    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
+  });
+  return client;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
@@ -121,20 +130,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
   const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
   const institutionNames = institutionsSelected.map(el => el.name).join(",");
-
+  const reference = getQueryParameter(query.reference) || "";
+  const label = getQueryParameter(query.label) || "";
   const nodeTypes = getQueryParameter(query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(query.page);
   const stats = await getStats();
-  const client = new Typesense.Client({
-    nodes: [
-      {
-        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
-        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
-        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
-      }
-    ],
-    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
-  });
+
+  const client = getTypesenseClient();
 
   const searchParameters: SearchParams = {
     q,
@@ -142,7 +144,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     sort_by: buildSortBy(upvotes, mostRecent),
     per_page: perPage,
     page,
-    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
+    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes, reference, label)
   };
 
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
@@ -173,7 +175,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
       filtersSelected: {
         mostRecent: mostRecent,
         upvotes: upvotes,
-        anyType: timeWindow
+        anyType: timeWindow,
+        reference,
+        label
       },
       stats
     }
@@ -191,9 +195,7 @@ const HomePage: NextPage<Props> = ({
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
     if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
-    if (filtersSelected.upvotes) {
-      return SortTypeWindowOption.UPVOTES_DOWNVOTES;
-    }
+    if (filtersSelected.upvotes) return SortTypeWindowOption.UPVOTES_DOWNVOTES;
     return SortTypeWindowOption.NONE;
   };
 
@@ -246,6 +248,15 @@ const HomePage: NextPage<Props> = ({
     router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
   };
 
+  const handleReferencesChange = (title: string, label: string) => {
+    router.push({ query: { ...router.query, reference: title, label } });
+  };
+
+  const reference = (): { title: string; label: string } | null => {
+    if (!filtersSelected.reference) return null;
+    return { title: filtersSelected.reference, label: filtersSelected.label };
+  };
+
   return (
     <PagesNavbar>
       <HomeSearchContainer
@@ -260,8 +271,10 @@ const HomePage: NextPage<Props> = ({
           onInstitutionsChange={handleInstitutionsChange}
           onContributorsChange={handleContributorsChange}
           onNodeTypesChange={handleNodeTypesChange}
+          onReferencesChange={handleReferencesChange}
           contributors={contributorsFilter}
           institutions={institutionFilter}
+          reference={reference()}
         ></HomeFilter>
 
         <SortByFilters
