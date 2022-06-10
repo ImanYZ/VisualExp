@@ -107,6 +107,7 @@ export type KnowledgeNode = Omit<
   institutions?: KnowledgeNodeInstitution[];
   children?: LinkedKnowledgeNode[];
   parents?: LinkedKnowledgeNode[];
+  siblings?: LinkedKnowledgeNode[];
 };
 
 export type SimpleNode = {
