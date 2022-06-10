@@ -24,9 +24,11 @@ dayjs.extend(relativeTime);
 type Props = {
   node: KnowledgeNode;
   contributors?: ReactNode;
+  references?: ReactNode;
+  tags?: ReactNode;
 };
 
-export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
+export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }) => {
   const [imageFullScreen, setImageFullScreen] = useState(false);
   const [showShareButtons, setShowShareButtons] = useState(false);
   const handleClickImageFullScreen = () => {
@@ -125,6 +127,8 @@ export const NodeItemFull: FC<Props> = ({ node, contributors }) => {
         </Box>
         <Divider sx={{ my: 8 }} />
         <Box>{contributors}</Box>
+        <Box>{references}</Box>
+        <Box>{tags}</Box>
       </CardContent>
       {node.nodeImage && (
         <FullScreenImage src={node.nodeImage} open={imageFullScreen} onClose={() => setImageFullScreen(false)} />
