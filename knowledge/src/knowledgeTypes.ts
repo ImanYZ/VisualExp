@@ -148,6 +148,7 @@ export type TypesenseNodesSchema = {
   titlesReferences: string[]; // typesense
   updatedAt: number;
   wrongs: number;
+  mostHelpful: number; // typesense
 };
 
 export type TypesenseReferencesSchema = {
