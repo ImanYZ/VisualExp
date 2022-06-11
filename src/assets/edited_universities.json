@@ -1285,6 +1285,11 @@
     "country": "United States"
   },
   {
+    "domains": "carleton.ca",
+    "name": "Careleton",
+    "country": "Canada"
+  },
+  {
     "domains": "carlow.edu",
     "name": "Carlow College",
     "country": "United States"
@@ -3695,6 +3700,11 @@
     "country": "United States"
   },
   {
+    "domains": "pointloma.edu",
+    "name": "Point loma nazarene university",
+    "country": "United States"
+  },
+  {
     "domains": "poly.edu",
     "name": "Polytechnic University of New York",
     "country": "United States"
@@ -4080,6 +4090,11 @@
     "country": "United States"
   },
   {
+    "domains": "sva.edu",
+    "name": "School of Visual Arts",
+    "country": "United States"
+  },
+  {
     "domains": "seattlecentral.edu",
     "name": "Seattle Central College",
     "country": "United States"
@@ -4447,6 +4462,11 @@
   {
     "domains": "sjc.edu",
     "name": "St. Joseph College (CT)",
+    "country": "United States"
+  },
+  {
+    "domains": "sjcny.edu",
+    "name": "St. Joseph’s College",
     "country": "United States"
   },
   {
@@ -5027,6 +5047,11 @@
   {
     "domains": "uidaho.edu",
     "name": "University of Idaho",
+    "country": "United States"
+  },
+  {
+    "domains": "illinois.edu",
+    "name": "University of Illinois",
     "country": "United States"
   },
   {
