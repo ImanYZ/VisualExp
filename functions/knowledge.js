@@ -176,6 +176,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
         });
       }
     }
+    stats.links = Math.round(stats.links);
     const statRef = db.collection("stats").doc();
     await batchSet(statRef, stats);
     await commitBatch();
