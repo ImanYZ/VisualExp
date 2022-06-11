@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
@@ -65,6 +66,7 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
               icon={<NodeTypeIcon color="primary" nodeType={option as NodeType} />}
               variant="outlined"
               label={option}
+              deleteIcon={<CloseIcon />}
               {...getTagProps({ index })}
               key={index}
             />
