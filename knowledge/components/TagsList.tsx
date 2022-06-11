@@ -1,17 +1,17 @@
-import { Box, Card, CardContent, CardHeader, List, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
-import React, { FC } from "react";
+import React from "react";
 
 import { encodeTitle, isValidHttpUrl } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
-import LinkedNodeItem from "./LinkedNodeItem";
+import { LinkedTag } from "./LinkedTag";
 
-type Props = {
+type TagsListProps = {
   tags: LinkedKnowledgeNode[];
   sx?: SxProps<Theme>;
 };
 
-const TagsList: FC<Props> = ({ tags, sx }) => {
+export const TagsList = ({ tags, sx }: TagsListProps) => {
   const getReferenceTitle = (el: LinkedKnowledgeNode) => {
     if (isValidHttpUrl(el.label)) {
       return `${el.title}:  ${el.label}`;
@@ -19,35 +19,26 @@ const TagsList: FC<Props> = ({ tags, sx }) => {
     return el.title || "";
   };
 
+  if (!tags.length) {
+    return null;
+  }
+
   return (
-    <Card sx={{ ...sx }}>
-      <CardHeader
-        sx={{ backgroundColor: theme => theme.palette.grey[300] }}
-        title={
-          <Box>
-            <Typography variant="h5" fontWeight={100}>
-              Tags
-            </Typography>
-          </Box>
-        }
-      ></CardHeader>
-      <CardContent sx={{ p: 0 }}>
-        <List dense>
-          {tags.map((node, idx) => (
-            <LinkedNodeItem
-              key={idx}
-              title={getReferenceTitle(node)}
-              linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
-              nodeType={node.nodeType}
-              nodeImageUrl={node.nodeImage}
-              nodeContent={node.content}
-              showListItemIcon={false}
-            />
-          ))}
-        </List>
-      </CardContent>
-    </Card>
+    <Box sx={{ ...sx }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: "5px" }}>
+        Tags:
+      </Typography>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        {tags.map((node, idx) => (
+          <LinkedTag
+            key={idx}
+            title={getReferenceTitle(node)}
+            linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+            nodeImageUrl={node.nodeImage}
+            nodeContent={node.content}
+          />
+        ))}
+      </Box>
+    </Box>
   );
 };
-
-export default TagsList;

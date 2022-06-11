@@ -1,4 +1,12 @@
 :root {
-  --navbar-height: 76px;
-  --footer-height: 76px;
+  --navbar-height: 72px;
+  --footer-height: 309px;
+  /* --footer-height: 632px; */
+}
+
+@media (max-width: 900px) {
+  :root {
+    --footer-height: 632px;
+    /* --footer-height: 309px; */
+  }
 }

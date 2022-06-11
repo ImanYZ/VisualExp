@@ -43,7 +43,10 @@ const {
   scheduleLifeLog,
   ongoingEvents,
 } = require("./scheduling");
-const { assignNodeContributorsAndInstitutions } = require("./knowledge");
+const {
+  assignNodeContributorsInstitutionsStats,
+  updateInstitutions,
+} = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -145,10 +148,18 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-exports.assignNodeContributorsAndInstitutions = functions
+exports.assignNodeContributorsInstitutionsStats = functions
   .runWith({
     memory: "1GB",
     timeoutSeconds: 520,
   })
   .pubsub.schedule("every 25 hours")
-  .onRun(assignNodeContributorsAndInstitutions);
+  .onRun(assignNodeContributorsInstitutionsStats);
+
+exports.updateInstitutions = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520,
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(updateInstitutions);

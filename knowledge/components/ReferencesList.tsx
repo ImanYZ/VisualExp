@@ -1,57 +1,62 @@
+import { Divider } from "@mui/material";
 import Box from "@mui/material/Box";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardHeader from "@mui/material/CardHeader";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import { SxProps, Theme } from "@mui/system";
-import { FC } from "react";
+import React from "react";
 
 import { encodeTitle, isValidHttpUrl } from "../lib/utils";
-import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
-import LinkedNodeItem from "./LinkedNodeItem";
+import { LinkedKnowledgeNode, NodeType } from "../src/knowledgeTypes";
+import { LinkedReference } from "./LinkedReference";
+import NodeTypeIcon from "./NodeTypeIcon";
 
-type Props = {
+type ReferencesListProps = {
   references: LinkedKnowledgeNode[];
   sx?: SxProps<Theme>;
 };
 
-const ReferencesList: FC<Props> = ({ references, sx }) => {
+export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
   const getReferenceTitle = (el: LinkedKnowledgeNode) => {
     if (isValidHttpUrl(el.label)) {
       return `${el.title}:  ${el.label}`;
     }
     return el.title || "";
   };
+
+  if (!references.length) {
+    return null;
+  }
+
   return (
-    <Card sx={{ ...sx }}>
-      <CardHeader
-        sx={{ backgroundColor: theme => theme.palette.grey[300] }}
-        title={
-          <Box>
-            <Typography variant="h5" fontWeight={100}>
-              References
-            </Typography>
-          </Box>
-        }
-      ></CardHeader>
-      <CardContent sx={{ p: 0 }}>
-        <List dense>
+    <Box sx={{ ...sx }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: "5px" }}>
+        <Typography variant="body2" color="text.secondary">
+          References:
+        </Typography>
+        <NodeTypeIcon nodeType={NodeType.Reference} sx={{ ml: "10px" }} />
+      </Box>
+      <Divider />
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        <List sx={{ width: "100%", p: 0 }}>
           {references.map((node, idx) => (
-            <LinkedNodeItem
-              key={idx}
-              title={getReferenceTitle(node)}
-              linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
-              nodeType={node.nodeType}
-              nodeImageUrl={node.nodeImage}
-              nodeContent={node.content}
-              showListItemIcon={false}
-            />
+            <React.Fragment key={idx}>
+              <LinkedReference
+                // key={idx}
+                title={getReferenceTitle(node)}
+                linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+                nodeType={node.nodeType}
+                nodeImageUrl={node.nodeImage}
+                nodeContent={node.content}
+                showListItemIcon={false}
+                label={node.label || ""}
+                sx={{ p: "20px 0px" }}
+                secondaryActionSx={{ mr: "34px" }}
+              />
+              <Divider />
+            </React.Fragment>
           ))}
         </List>
-      </CardContent>
-    </Card>
+      </Box>
+    </Box>
   );
 };
-
-export default ReferencesList;

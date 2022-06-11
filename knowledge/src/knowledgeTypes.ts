@@ -50,8 +50,9 @@ export type NodeFireStore = {
   aImgUrl?: string;
   admin?: string;
   bookmarks?: number;
-  changedAt?: Timestamp;
+  changedAt: Timestamp;
   children?: { node?: string; label?: string; title?: string }[];
+  choices?: KnowledgeChoice[];
   closedHeight?: number;
   comments?: number;
   content?: string;
@@ -84,7 +85,7 @@ export type NodeFireStore = {
   tagIds?: string[];
   tags?: string[] | { node: string; title?: string; label?: string }[];
   title?: string;
-  updatedAt?: Timestamp;
+  updatedAt: Timestamp;
   versions?: number;
   viewers?: number;
   wrongs?: number;
@@ -94,7 +95,6 @@ export type KnowledgeNode = Omit<
   NodeFireStore,
   "updatedAt" | "changedAt" | "createdAt" | "contributors" | "institutions" | "tags" | "parents"
 > & {
-  // export type KnowledgeNode = NodeFireStore & {
   id: string;
   updatedAt?: string;
   nodeImage?: string;
@@ -107,4 +107,109 @@ export type KnowledgeNode = Omit<
   institutions?: KnowledgeNodeInstitution[];
   children?: LinkedKnowledgeNode[];
   parents?: LinkedKnowledgeNode[];
+};
+
+export type SimpleNode = {
+  id: string;
+  title?: string;
+  changedAt?: string;
+  content?: string;
+  choices: KnowledgeChoice[];
+  nodeType: NodeType;
+  nodeImage?: string;
+  corrects?: number;
+  wrongs?: number;
+  tags: string[];
+  contributors: { fullName: string; imageUrl: string }[];
+  institutions: { name: string }[];
+};
+
+export type ResponseAutocompleteTags = {
+  results?: string[];
+  errorMessage?: string;
+};
+
+export type TypesenseNodesSchema = {
+  changedAt: string;
+  changedAtMillis: number; // typesense
+  choices?: KnowledgeChoice[];
+  content: string; // typesense
+  contributors: { fullName: string; imageUrl: string }[];
+  contributorsNames: string[]; // typesense
+  corrects: number; // typesense
+  id: string;
+  institutions: { name: string }[];
+  institutionsNames: string[]; // typesense
+  labelsReferences: string[]; // typesense
+  nodeImage?: string;
+  nodeType: NodeType; // typesense
+  tags: string[]; // typesense
+  title: string; // typesense
+  titlesReferences: string[]; // typesense
+  updatedAt: number;
+  wrongs: number;
+  mostHelpful: number; // typesense
+};
+
+export type TypesenseReferencesSchema = {
+  id: string;
+  node: string;
+  title: string;
+  label: string;
+};
+
+export type ResponseAutocompleteFilter = {
+  results?: FilterValue[];
+  errorMessage?: string;
+};
+
+export type ResponseAutocompleteReferencesFilter = {
+  results?: TypesenseReferencesSchema[];
+  errorMessage?: string;
+};
+
+export type ResponseAutocompleteProcessedReferencesFilter = {
+  results?: FilterProcessedReferences[];
+  errorMessage?: string;
+};
+export enum TimeWindowOption {
+  "AnyTime" = "Any Time",
+  "ThisWeek" = "This Week",
+  "ThisMonth" = "This Month",
+  "ThisYear" = "This Year"
+}
+
+export enum SortTypeWindowOption {
+  "MOST_RECENT" = "MOST_RECENT",
+  "UPVOTES_DOWNVOTES" = "UPVOTES_DOWNVOTES",
+  "NONE" = "NONE"
+}
+
+export type FilterValue = {
+  id: string;
+  name: string;
+  imageUrl?: string | undefined;
+};
+
+export type FilterProcessedReferences = {
+  id: string;
+  title: string;
+  data: { label: string; node: string }[];
+};
+
+export type TypesenseProcessedReferences = {
+  title: string;
+  data: { label: string; node: string }[];
+};
+
+// export type ReferencesFilterValue = {
+//   titleText: string,
+//   labelText: string,
+// };
+export type StatsSchema = {
+  institutions: number;
+  users: number;
+  proposals: number;
+  nodes: number;
+  links: string | number;
 };

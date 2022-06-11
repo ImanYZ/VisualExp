@@ -1,5 +1,6 @@
 import "katex/dist/katex.min.css";
 
+import { Typography } from "@mui/material";
 import React, { FC } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -16,6 +17,7 @@ const MarkdownRender: FC<Props> = ({ text }) => {
       remarkPlugins={[remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
+        p: ({ ...props }) => <Typography fontSize={"inherit"} {...props} />,
         code({ inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
           return !inline && match ? (

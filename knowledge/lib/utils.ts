@@ -1,3 +1,5 @@
+import { TimeWindowOption } from "../src/knowledgeTypes";
+
 export const isValidHttpUrl = (possibleUrl?: string) => {
   let url;
   if (!possibleUrl) {
@@ -23,3 +25,36 @@ export const escapeBreaksQuotes = (text?: string) => {
 export const encodeTitle = (title?: string) => {
   return encodeURI(escapeBreaksQuotes(title)).replace(/[&\/\?\\]/g, "");
 };
+
+export const getQueryParameter = (val: string | string[] | undefined) => {
+  if (Array.isArray(val)) {
+    return val[0];
+  } else {
+    return val;
+  }
+};
+
+export const getQueryParameterAsNumber = (val: string | string[] | undefined): number | undefined => {
+  const res = getQueryParameter(val);
+  if (res === undefined || Number.isNaN(parseInt(res)) || !Number.isFinite(parseInt(res))) {
+    return undefined;
+  }
+
+  return parseInt(res);
+};
+
+export const getQueryParameterAsBoolean = (val: string | string[] | undefined): boolean => {
+  const res = getQueryParameter(val);
+  if (res === undefined || val === "false") {
+    return false;
+  }
+
+  return true;
+};
+
+export const SortedByTimeOptions: TimeWindowOption[] = [
+  TimeWindowOption.AnyTime,
+  TimeWindowOption.ThisWeek,
+  TimeWindowOption.ThisMonth,
+  TimeWindowOption.ThisYear
+];

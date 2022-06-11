@@ -1,9 +1,13 @@
 import SearchIcon from "@mui/icons-material/Search";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
+import { useRouter } from "next/router";
 import { FC, useState } from "react";
+
+import { getQueryParameter } from "../lib/utils";
 
 type Props = {
   onSearch: (text: string) => void;
@@ -11,7 +15,11 @@ type Props = {
 };
 
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
-  const [searchText, setSearchText] = useState<string>("");
+  const router = useRouter();
+  const [searchText, setSearchText] = useState<string>(() => {
+    const q = getQueryParameter(router.query.q) || "";
+    return q;
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
@@ -23,54 +31,67 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   };
 
   return (
-    <Box sx={{ width: "100%", ...sx }} component="form" onSubmit={handleSearch}>
-      <Search>
-        <SearchIconWrapper>
-          <SearchIcon />
-        </SearchIconWrapper>
-
+    <Box
+      sx={{ width: "100%", display: "flex", height: "50px", flexDirection: "row", ...sx }}
+      component="form"
+      onSubmit={handleSearch}
+    >
+      <SearchStyled>
         <StyledInputBase
           fullWidth
-          placeholder="Search..."
+          placeholder="What do you want to learn now?"
           inputProps={{ "aria-label": "search" }}
           value={searchText}
           onChange={handleChange}
         />
-      </Search>
+      </SearchStyled>
+      <StyledButton variant="contained" type="submit">
+        <SearchIcon fontSize="large" />
+      </StyledButton>
     </Box>
   );
 };
 
-const Search = styled("div")(({ theme }) => ({
+const SearchStyled = styled("div")(({ theme }) => ({
   position: "relative",
-  border: "1px solid",
-  borderRadius: theme.shape.borderRadius,
-  borderColor: theme.palette.grey[500],
+  border: "2px solid",
+  borderColor: theme.palette.common.white,
   "&:hover": {
     backgroundColor: alpha(theme.palette.grey[300], 0.06)
   },
-  marginLeft: 0,
   width: "100%"
 }));
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center"
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: theme.palette.common.white,
+  color: theme.palette.grey[600],
+  borderRadius: 0,
+  fontSize: 15,
+  fontWeight: 500,
+  border: "none",
+  "&:hover": {
+    backgroundColor: theme.palette.grey[200]
+  }
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
+  color: theme.palette.common.black,
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    padding: theme.spacing(1, 2, 1, 2),
     transition: theme.transitions.create("width"),
-    width: "100%"
+    width: "100%",
+    fontSize: 15,
+    height: "36px",
+    fontWeight: 300,
+    background: theme.palette.common.white,
+    border: "none"
+  },
+  "@media (min-width:900px)": {
+    "& .MuiInputBase-input": {
+      padding: theme.spacing(1, 5, 1, 5),
+      fontSize: 25,
+      fontWeight: 300
+    }
   }
 }));
 

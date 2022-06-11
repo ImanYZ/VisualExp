@@ -1,11 +1,12 @@
+// ** Emotion Imports
 import createEmotionServer from "@emotion/server/create-instance";
 import Document, { Head, Html, Main, NextScript } from "next/document";
-import * as React from "react";
+import { Children } from "react";
 
 import { getMetaThemeColor } from "../src/brandingTheme";
-import createEmotionCache from "../src/createEmotionCache";
+import { createEmotionCache } from "../src/createEmotionCache";
 
-export default class MyDocument extends Document<{ emotionStyleTags: any }> {
+class CustomDocument extends Document {
   render() {
     return (
       <Html lang="en">
@@ -34,11 +35,9 @@ export default class MyDocument extends Document<{ emotionStyleTags: any }> {
           <meta httpEquiv="x-dns-prefetch-control" content="off" />
           {/* PWA primary color */}
           <link
-            href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;700&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
             rel="stylesheet"
           ></link>
-          {/* Inject MUI styles first to match with the prepend: true configuration. */}
-          {this.props.emotionStyleTags}
         </Head>
         <body>
           <Main />
@@ -51,7 +50,7 @@ export default class MyDocument extends Document<{ emotionStyleTags: any }> {
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).
-MyDocument.getInitialProps = async ctx => {
+CustomDocument.getInitialProps = async ctx => {
   const originalRenderPage = ctx.renderPage;
 
   // You can consider sharing the same emotion cache between
@@ -63,10 +62,14 @@ MyDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: (App: any) =>
-        function EnhanceApp(props) {
-          return <App emotionCache={cache} {...props} />;
-        }
+      // eslint-disable-next-line react/display-name
+      enhanceApp: App => props =>
+        (
+          <App
+            {...props} // @ts-ignore
+            emotionCache={cache}
+          />
+        )
     });
 
   const initialProps = await Document.getInitialProps(ctx);
@@ -78,15 +81,16 @@ MyDocument.getInitialProps = async ctx => {
   const emotionStyles = extractCriticalToChunks(initialProps.html);
   const emotionStyleTags = emotionStyles.styles.map(style => (
     <style
-      data-emotion={`${style.key} ${style.ids.join(" ")}`}
       key={style.key}
-      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: style.css }}
+      data-emotion={`${style.key} ${style.ids.join(" ")}`}
     />
   ));
 
   return {
     ...initialProps,
-    emotionStyleTags
+    styles: [...Children.toArray(initialProps.styles), ...emotionStyleTags]
   };
 };
+
+export default CustomDocument;

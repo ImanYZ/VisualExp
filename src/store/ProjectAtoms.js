@@ -10,6 +10,11 @@ export const projectState = atom({
   default: "",
 });
 
+export const projectSpecsState = atom({
+  key: "projectSpecs",
+  default: {},
+});
+
 export const activePageState = atom({
   key: "activePageState",
   default: "Intellectual",
