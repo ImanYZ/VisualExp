@@ -124,6 +124,7 @@ const RouterNav = (props) => {
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
+  const [codesPoints, setCodesPoints] =useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -225,6 +226,12 @@ const RouterNav = (props) => {
             } else {
               setNegativeGradingPoints(0);
             }
+            if (theProject.codesPoints) {
+              setCodesPoints(theProject.codesPoints);
+            } else {
+              setCodesPoints(0);
+            }
+
           }
           if ("gradingNum" in theProject) {
             graNums[change.doc.id] = theProject.gradingNum;
@@ -1109,11 +1116,11 @@ const RouterNav = (props) => {
                      <Tooltip
                   title ={
                     <div>
-                      Code Feed back
+                       You've earned {codesPoints} total 💬 points for Coding participants' comments .
                     </div>
                   }
                   >
-                    <Button
+                  <Button
                     id="CodeFeedback"
                     className={
                       activePage === "CodeFeedback"
@@ -1124,8 +1131,8 @@ const RouterNav = (props) => {
                       navigate("/Activities/CodeFeedback")
                     }
                     >
-                     Code Feed back
-                    </Button>
+                     {codesPoints} 💬
+                  </Button>
 
                   </Tooltip>  
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>

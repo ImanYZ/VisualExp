@@ -35,7 +35,7 @@ const  CodeFeedback = (props) => {
   const [creating, setCreating] = useState(false)
   const [codeSelect, setCodeSelect] = useState([]);
   const [quotesSelect, setQuotesSelect]=useState([]);
-  const [count,setCount]=useState([]);
+
 
  
 
@@ -57,8 +57,8 @@ useEffect(() => {
      }
     
     }
-  setCount(exp)
-  console.log(count)  
+
+ 
   for (let feedDoc of feedbackCodesDocs.docs) {
     const feedData = feedDoc.data();
     setFeed(feedData)
@@ -101,8 +101,6 @@ retrieveFeedbackcodes();
   }, [firebase,retrieveNext])
  
 const submit =() =>{
-  console.log(codeSelect);
-  console.log(quotesSelect);
   setSubmitting(true);
   voteCode();
   setRetrieveNext((oldValue) => oldValue + 1);
@@ -174,8 +172,24 @@ const addCode = async () =>{
               project
             ].codesGenerated = 1;
           }
-    
+          setSnackbarMessage("You successfully submitted your code!");
+          setCodes([...codes,{
+            coder : fullname ,
+            code : newCode,
+            choice : feed.choice? feed.choice:"",
+            approved: feed.approved,
+            project :project,
+            fullname: feed.fullname,
+            session: feed.session,
+            expIdx: feed.expIdx,
+            explanation:feed.explanation,
+            quotes:feed.quotes,
+            createdAt:firebase.firestore.Timestamp.fromDate(new Date()),
+            }]);
+        }else{
+          setSnackbarMessage("this code alearedy exist ");
         }
+
         if ("codesNum" in researcherUpdates.projects[project]) {
             researcherUpdates.projects[project].codesNum += 1;
           } else {
@@ -185,23 +199,11 @@ const addCode = async () =>{
     
          
           t.update(researcherRef,researcherUpdates)
-          setSnackbarMessage("You successfully submitted your code!");
+          
     
         }); 
         
-       setCodes([...codes,{
-        coder : fullname ,
-        code : newCode,
-        choice : feed.choice? feed.choice:"",
-        approved: feed.approved,
-        project :project,
-        fullname: feed.fullname,
-        session: feed.session,
-        expIdx: feed.expIdx,
-        explanation:feed.explanation,
-        quotes:feed.quotes,
-        createdAt:firebase.firestore.Timestamp.fromDate(new Date()),
-        }]);
+       
        setNewCode("");
        setTimeout(() => {
         setCreating(false);
@@ -215,8 +217,8 @@ const voteCode = async (event) =>{
   let approved =false;
   let codesVote = codes.filter((ele)=>{ return ele.code === code;});
 
-  if(codesVote.length<3){
-    console.log("we are here")
+  if(codesVote.length>=2){
+    
     if(codesVote.length===2){
       approved=true;
       const researcherRef = firebase.db.collection("researchers").doc(codesVote[0].coder);
@@ -239,7 +241,10 @@ const voteCode = async (event) =>{
       researcherRef.update(researcherUpdates);
 
     }
-   
+    if(codesVote.length>=2){
+      approved=true;
+    }
+    
     const codeRef = firebase.db.collection('feedbackCodes');
     let codeUpdate={
       coder:codesVote[0].coder,
@@ -261,13 +266,16 @@ const voteCode = async (event) =>{
  }  
 }
 
-
+const uncheckBoxes = async(event) => { 
+   if(event.target.checked){
+    event.target.checked = false
+  }
+ }
 
 
 const codeSelected = async(event) =>{
   if(event.target.checked){
     setCodeSelect([...codeSelect,event.target.value])
-
   }else{
     let array = codeSelect.filter((ele)=>{ 
       return ele !== event.target.value; 
@@ -284,7 +292,7 @@ const quotesSelected = async(event) =>{
 
   }else{
     let array = quotesSelect.filter((ele)=>{return ele !== event.target.value;});
-    setCodeSelect(array);
+    setQuotesSelect(array);
   }
     
 }
