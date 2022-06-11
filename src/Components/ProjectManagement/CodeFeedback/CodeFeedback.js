@@ -66,7 +66,7 @@ useEffect(() => {
      
     }else{
     
-    //  console.log(feedData);
+   
    
         const CodesDocs =  await firebase.db.collection('feedbackCodes')
         .where("explanation","==",feedData.explanation)
@@ -103,6 +103,7 @@ retrieveFeedbackcodes();
 const submit =() =>{
   setSubmitting(true);
   voteCode();
+  uncheckBoxes();
   setRetrieveNext((oldValue) => oldValue + 1);
 }
 
@@ -267,8 +268,9 @@ const voteCode = async (event) =>{
 }
 
 const uncheckBoxes = async(event) => { 
-   if(event.target.checked){
-    event.target.checked = false
+  var inputs = document.querySelectorAll('.check');
+  for (var i = 0; i < inputs.length; i++) {
+      inputs[i].checked = false;
   }
  }
 
@@ -328,6 +330,7 @@ const quotesSelected = async(event) =>{
                               onChange={quotesSelected}
                               type="checkbox"
                               value={row}
+                              class ="check"
                             ></input>
                           </TableCell>
                           <TableCell>
@@ -359,6 +362,7 @@ const quotesSelected = async(event) =>{
                                 onChange={codeSelected}
                                 type="checkbox"
                                 value={row.code}
+                                class ="check"
                               ></input>
                             </TableCell>
                             <TableCell>
