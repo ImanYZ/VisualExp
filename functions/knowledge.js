@@ -20,7 +20,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
     // institution names.
     const userInstitutions = {};
     const userFullnames = {};
-    const institutions = new Set();
+    let institutions = new Set();
     const stats = {
       users: 0,
       institutions: 0,
@@ -38,6 +38,11 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       institutions.add(userData.deInstit);
     }
     stats.institutions = institutions.size;
+
+    const contributors = {};
+    institutions = {};
+    const tags = {};
+    const references = {};
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
     const nodesData = {};
@@ -50,6 +55,20 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
         (nodeData.parents.length + nodeData.children.length) / 2 +
         nodeData.tags.length +
         nodeData.references.length;
+      for (let tag of nodeData.tags) {
+        if (tag.node in tags) {
+          tags[tag.node].push(nodeDoc.id);
+        } else {
+          tags[tag.node] = [];
+        }
+      }
+      for (let reference of nodeData.references) {
+        if (reference.node in references) {
+          references[reference.node].push(nodeDoc.id);
+        } else {
+          references[reference.node] = [];
+        }
+      }
     }
     // We should retrieve all the accepted versions for all types of nodes.
     const nodeTypes = [
@@ -164,15 +183,55 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 userInstitutions[versionData.proposer]
               ].reputation += versionData.corrects - versionData.wrongs;
             }
+            if (versionData.proposer in contributors) {
+              contributors[versionData.proposer].reputation +=
+                versionData.corrects - versionData.wrongs;
+            } else {
+              contributors[versionData.proposer] = {
+                docRef: db.collection("users").doc(versionData.proposer),
+                reputation: versionData.corrects - versionData.wrongs,
+              };
+            }
+            if (userInstitutions[versionData.proposer] in institutions) {
+              institutions[userInstitutions[versionData.proposer]] +=
+                versionData.corrects - versionData.wrongs;
+            } else {
+              const institutionDocs = await db
+                .collection("institutions")
+                .where(
+                  "name",
+                  "==",
+                  institutions[userInstitutions[versionData.proposer]]
+                )
+                .get();
+              if (institutionDocs.docs.length > 0) {
+                institutions[userInstitutions[versionData.proposer]] = {
+                  docRef: db
+                    .collection("institutions")
+                    .doc(institutionDocs.docs[0].id),
+                  reputation: versionData.corrects - versionData.wrongs,
+                };
+              }
+            }
           }
         }
       }
-      for (nodeId in nodesUpdates) {
+      for (let nodeId in nodesUpdates) {
         await batchUpdate(nodesUpdates[nodeId].nodeRef, {
           contributors: nodesUpdates[nodeId].contributors,
           institutions: nodesUpdates[nodeId].institutions,
           contribNames: nodesUpdates[nodeId].contribNames,
           institNames: nodesUpdates[nodeId].institNames,
+        });
+      }
+      for (let contributorId in contributors) {
+        await batchUpdate(contributors[contributorId].docRef, {
+          totalPoints: contributors[contributorId].reputation,
+        });
+      }
+      for (let institutionName in institutions) {
+        await batchUpdate(institutions[institutionName].docRef, {
+          totalPoints: institutions[institutionName].reputation,
         });
       }
     }
