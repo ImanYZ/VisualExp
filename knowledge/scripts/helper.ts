@@ -2,6 +2,9 @@ import { NodeFireStore } from "../src/knowledgeTypes";
 
 export const getNodeReferences = (nodeData: NodeFireStore) => {
   const references: { node: string; title?: string; label: string }[] = [];
+  if (!nodeData.references || nodeData.references.length === 0) {
+    return [];
+  }
   //The "references" field in the DB can be an array ofra objects or an array of strings
   if (typeof (nodeData.references || [])[0] !== "object") {
     //In this case the field is an array of strings

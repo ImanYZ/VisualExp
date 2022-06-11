@@ -185,10 +185,9 @@ const fillTagsIndex = async (forceReIndex?: boolean) => {
   await indexCollection("tags", fields, data, forceReIndex);
 };
 
-const fillNodesIndex = async (
-  nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
-  forceReIndex?: boolean
-) => {
+const fillNodesIndex = async (forceReIndex?: boolean) => {
+  const nodeDocs = await db.collection("nodes").get();
+
   const data = getNodesData(nodeDocs);
   const fields: CollectionFieldSchema[] = [
     { name: "changedAtMillis", type: "int64" },
@@ -207,10 +206,8 @@ const fillNodesIndex = async (
   await indexCollection("nodes", fields, data, forceReIndex);
 };
 
-const fillReferencesIndex = async (
-  nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
-  forceReIndex?: boolean
-) => {
+const fillReferencesIndex = async (forceReIndex?: boolean) => {
+  const nodeDocs = await db.collection("nodes").where("nodeType", "==", "Reference").get();
   const { references, processedReferences } = getReferencesData(nodeDocs);
   const fields: CollectionFieldSchema[] = [
     { name: "title", type: "string" },
@@ -218,15 +215,14 @@ const fillReferencesIndex = async (
   ];
 
   const fieldsProcessedReferences: CollectionFieldSchema[] = [{ name: "title", type: "string" }];
-
-  await indexCollection("references", fields, references, forceReIndex);
-  await indexCollection("processedReferences", fieldsProcessedReferences, processedReferences, forceReIndex);
+  if (references.length > 0 && processedReferences.length > 0) {
+    await indexCollection("references", fields, references, forceReIndex);
+    await indexCollection("processedReferences", fieldsProcessedReferences, processedReferences, forceReIndex);
+  }
 };
 
 const main = async () => {
   const steps = 5;
-
-  const nodeDocs = await db.collection("nodes").get();
 
   console.log(`[1/${steps}]: Filling users index`);
   await fillUsersIndex();
@@ -241,12 +237,10 @@ const main = async () => {
   console.log("End Filling tags index");
 
   console.log(`[4/${steps}]: Filling nodes index`);
-  // await fillNodesIndex(true);
-  await fillNodesIndex(nodeDocs, true);
+  await fillNodesIndex(true);
   console.log("End Filling nodes index");
-
   console.log(`[5/${steps}]: Filling references index`);
-  await fillReferencesIndex(nodeDocs, true);
+  await fillReferencesIndex(true);
   console.log("End Filling references index");
 };
 
