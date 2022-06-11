@@ -11,6 +11,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
+import Switch from '@mui/material/Switch';
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -31,6 +32,7 @@ import {
 import {
   projectState,
   projectsState,
+  projectSpecsState,
   activePageState,
   notAResearcherState,
   upVotedTodayState,
@@ -46,6 +48,7 @@ import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
 
+const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY"
 const goToUMSI = (event) => {
   window.open("https://www.si.umich.edu/", "_blank");
 };
@@ -84,6 +87,7 @@ const RouterNav = (props) => {
   const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
   const [projects, setProjects] = useRecoilState(projectsState);
   const [project, setProject] = useRecoilState(projectState);
+  const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState)
   const activePage = useRecoilValue(activePageState);
   const [notAResearcher, setNotAResearcher] =
     useRecoilState(notAResearcherState);
@@ -140,7 +144,12 @@ const RouterNav = (props) => {
           myProjects.push(pr);
         }
         setProjects(myProjects);
-        setProject(myProjects[0]);
+        const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
+        if(myProjects.includes(prevProj)) {
+          setProject(prevProj);
+        } else {
+          setProject(myProjects[0]);
+        }
         if (researcherData.isAdmin) {
           setIsAdmin(true);
         }
@@ -153,6 +162,22 @@ const RouterNav = (props) => {
       checkResearcher();
     }
   }, [firebase, fullname]);
+
+  useEffect(() => {
+    const getProjectSpecs = async () => {
+      const pSpec = await firebase.db
+        .collection("projectSpecs")
+        .doc(project)
+        .get();
+      
+      setProjectSpecs({...pSpec.data()})
+    }
+
+    if(firebase && fullname && project) {
+      getProjectSpecs()
+    }
+    // update project settings 
+  }, [firebase, fullname, project])
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
@@ -697,9 +722,10 @@ const RouterNav = (props) => {
   };
 
   const changeProject = (event, index) => {
-    setProject(projects[index]);
+    const proj = projects[index];
+    localStorage.setItem(CURRENT_PROJ_LOCAL_S_KEY, proj)
+    setProject(proj);
     setProjectIndex(index);
-    setProjectMenuOpen(null);
   };
 
   const handleProfileMenuOpen = (event) => {
@@ -747,6 +773,27 @@ const RouterNav = (props) => {
       anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
     >
       {fullname && <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>}
+      
+      {
+        projects.map((proj, index) => (
+          <MenuItem
+            key={`${proj}MenuItem`}
+            selected={index === projectIndex}
+            // onClick={(event) => changeProject(event, index)}
+          >
+            {proj}
+            <Switch 
+              checked={proj === project}
+              onClick={event => event.stopPropagation()}
+              onChange={event => {
+                if(event.target.checked) {
+                  changeProject(event, index)
+                }
+              }}
+            />
+          </MenuItem>
+        ))
+      }
       <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
         <LogoutIcon /> <span id="LogoutText">Logout</span>
       </MenuItem>
@@ -806,32 +853,40 @@ const RouterNav = (props) => {
                         rowGap: "4px",
                       }}
                     >
-                      <Tooltip
-                        title={`You've submitted ${proposalsNums[username]
-                          ? proposalsNums[username].num
-                          : ""
-                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
-                      >
-                        <Box>
-                          # of{" "}
-                          <img
-                            src={favicon}
-                            width="15.1"
-                            style={{ margin: "0px 4px 0px 4px" }}
-                          />
-                          :
-                        </Box>
-                      </Tooltip>
-                      <Tooltip
-                        title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
-                      >
-                        <Box># of 👨‍🏫:</Box>
-                      </Tooltip>
-                      <Tooltip
-                        title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
-                      >
-                        <Box># of 🧠:</Box>
-                      </Tooltip>
+                     {projectSpecs.onePoints ? (
+                        <Tooltip
+                          title={`You've submitted ${proposalsNums[username]
+                            ? proposalsNums[username].num
+                            : ""
+                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                        >
+                          <Box>
+                            # of{" "}
+                            <img
+                              src={favicon}
+                              width="15.1"
+                              style={{ margin: "0px 4px 0px 4px" }}
+                            />
+                            :
+                          </Box>
+                        </Tooltip>
+                      ) : null}
+
+                      {projectSpecs.instructorsPoints  ? (
+                        <Tooltip
+                          title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                        >
+                          <Box># of 👨‍🏫:</Box>
+                        </Tooltip>
+                      ) : null}
+
+                      {projectSpecs.gradingPoints ? (
+                        <Tooltip
+                          title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                        >
+                          <Box># of 🧠:</Box>
+                        </Tooltip>
+                      ) : null}
                     </Box>
                     <Box
                       sx={{
@@ -841,47 +896,57 @@ const RouterNav = (props) => {
                         rowGap: "25px",
                       }}
                     >
-                      <LineDiagram
-                        obj={proposalsNums}
-                        username={username}
-                        lineDiagramTooltip={lineDiagramTooltip("proposals")}
-                      ></LineDiagram>
-                      <LineDiagram
-                        obj={instructorsNum}
-                        username={fullname}
-                        lineDiagramTooltip={lineDiagramTooltip("instructors")}
-                      ></LineDiagram>
-                      <LineDiagram
-                        obj={gradingNums}
-                        username={fullname}
-                        lineDiagramTooltip={lineDiagramTooltip("grading")}
-                      ></LineDiagram>
+                      {projectSpecs.onePoints ? (
+                        <LineDiagram
+                          obj={proposalsNums}
+                          username={username}
+                          lineDiagramTooltip={lineDiagramTooltip("proposals")}
+                        ></LineDiagram>
+                      ) : null}
+
+                      {projectSpecs.instructorsPoints ? (
+                        <LineDiagram
+                          obj={instructorsNum}
+                          username={fullname}
+                          lineDiagramTooltip={lineDiagramTooltip("instructors")}
+                        ></LineDiagram>
+                      ) : null}
+                      
+                      {projectSpecs.gradingPoints ? (
+                        <LineDiagram
+                          obj={gradingNums}
+                          username={fullname}
+                          lineDiagramTooltip={lineDiagramTooltip("grading")}
+                        ></LineDiagram>
+                      ) : null}
                     </Box>
-                    <Tooltip
-                      title={
-                        <div>
+                    {projectSpecs.onePoints ? (
+                      <Tooltip
+                        title={
                           <div>
-                            You've earned {expPoints} points from running
-                            experiments.
+                            <div>
+                              You've earned {expPoints} points from running
+                              experiments.
+                            </div>
                           </div>
-                        </div>
-                      }
-                    >
-                      <Button
-                        id="ExperimentPoints"
-                        className={
-                          activePage === "Experiments"
-                            ? "ActiveNavLink"
-                            : "NavLink"
                         }
-                        onClick={(event) => navigate("/Activities/Experiments")}
-                        style={{ marginLeft: "19px" }}
                       >
-                        <div>
-                          <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
-                        </div>
-                      </Button>
-                    </Tooltip>
+                        <Button
+                          id="ExperimentPoints"
+                          className={
+                            activePage === "Experiments"
+                              ? "ActiveNavLink"
+                              : "NavLink"
+                          }
+                          onClick={(event) => navigate("/Activities/Experiments")}
+                          style={{ marginLeft: "19px" }}
+                        >
+                          <div>
+                            <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
+                          </div>
+                        </Button>
+                      </Tooltip>
+                    ) : null}
                     <Tooltip
                       title={
                         <div>
@@ -922,118 +987,125 @@ const RouterNav = (props) => {
                         )}
                       </Button>
                     </Tooltip>
-                    <Tooltip
-                      title={
-                        <div>
+                    {projectSpecs.intellectualPoints ? (
+                      <Tooltip
+                        title={
                           <div>
-                            You've earned {intellectualPoints} intellectual points
-                            from others' votes and {upVotedDays} points for
-                            casting 25 upvotes per day on others' activities.
+                            <div>
+                              You've earned {intellectualPoints} intellectual points
+                              from others' votes and {upVotedDays} points for
+                              casting 25 upvotes per day on others' activities.
+                            </div>
+                            <div>
+                              You cast {upVotedToday} / 25 up-votes today on others'
+                              activities.
+                            </div>
                           </div>
-                          <div>
-                            You cast {upVotedToday} / 25 up-votes today on others'
-                            activities.
-                          </div>
-                        </div>
-                      }
-                    >
-                      <Button
-                        id="IntellectualPoints"
-                        className={
-                          activePage === "Intellectual"
-                            ? "ActiveNavLink"
-                            : "NavLink"
-                        }
-                        onClick={(event) => navigate("/Activities/Intellectual")}
-                      >
-                        <div>
-                          <span>
-                            🎓 {intellectualPoints}
-                            <br />✔ {upVotedDays}
-                          </span>
-                          <br />
-                          <span>🌞 {upVotedToday} / 25</span>
-                        </div>
-                      </Button>
-                    </Tooltip>
-                    <Tooltip
-                      title={
-                        <div>
-                          <div>
-                            You've earned{" "}
-                            {instructorPoints + dayInstructorUpVotes} total
-                            points, including {instructorPoints} points for
-                            collecting instructors/administrators' contact info
-                            and {dayInstructorUpVotes} points for casting 25
-                            up-voting per day on other's collected data.
-                          </div>
-                          <div>
-                            You collected {instructorsToday} / 7
-                            instructors/administrators' info today.
-                          </div>
-                          <div>
-                            You cast {upvotedInstructorsToday} / 16 up-votes today
-                            on others' collected instructors/administrators' data.
-                          </div>
-                        </div>
-                      }
-                    >
-                      <Button
-                        id="InstructorPoints"
-                        className={
-                          activePage === "AddInstructor"
-                            ? "ActiveNavLink"
-                            : "NavLink"
-                        }
-                        onClick={(event) => navigate("/Activities/AddInstructor")}
-                      >
-                        👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
-                        {instructorsToday} / 7
-                        <br /> ✅ {upvotedInstructorsToday} / 16
-                      </Button>
-                    </Tooltip>
-                    <Tooltip
-                      title={
-                        <div>
-                          <div>
-                            You've earned {gradingPoints} total 🧠 free-recall
-                            grading points.
-                          </div>
-                          <div>
-                            This means, {gradingPoints} times at least 3 other
-                            researchers have agreed with you on existance or
-                            non-existance of a specific phrase in a free-recall
-                            response.
-                          </div>
-                          <div>
-                            From that total 🧠 points, we've already excluded your
-                            negative {negativeGradingPoints} 🧟 points.
-                          </div>
-                          <div>
-                            This means, 2 x {negativeGradingPoints} times exactly
-                            3 out of 4 researchers agreed on existance
-                            (non-existance) of a specific key phrase in a
-                            free-recall response by a participant, but you opposed
-                            their majority of votes. So, you got a 0.5 🧟 negative
-                            point for each of those cases.
-                          </div>
-                        </div>
-                      }
-                    >
-                      <Button
-                        id="FreeRecallGrading"
-                        className={
-                          activePage === "FreeRecallGrading"
-                            ? "ActiveNavLink"
-                            : "NavLink"
-                        }
-                        onClick={(event) =>
-                          navigate("/Activities/FreeRecallGrading")
                         }
                       >
-                        🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
-                      </Button>
-                    </Tooltip>
+                        <Button
+                          id="IntellectualPoints"
+                          className={
+                            activePage === "Intellectual"
+                              ? "ActiveNavLink"
+                              : "NavLink"
+                          }
+                          onClick={(event) => navigate("/Activities/Intellectual")}
+                        >
+                          <div>
+                            <span>
+                              🎓 {intellectualPoints}
+                              <br />✔ {upVotedDays}
+                            </span>
+                            <br />
+                            <span>🌞 {upVotedToday} / 25</span>
+                          </div>
+                        </Button>
+                      </Tooltip>
+                    ) : null}
+                    
+                    {projectSpecs.instructorsPoints ? (
+                      <Tooltip
+                        title={
+                          <div>
+                            <div>
+                              You've earned{" "}
+                              {instructorPoints + dayInstructorUpVotes} total
+                              points, including {instructorPoints} points for
+                              collecting instructors/administrators' contact info
+                              and {dayInstructorUpVotes} points for casting 25
+                              up-voting per day on other's collected data.
+                            </div>
+                            <div>
+                              You collected {instructorsToday} / 7
+                              instructors/administrators' info today.
+                            </div>
+                            <div>
+                              You cast {upvotedInstructorsToday} / 16 up-votes today
+                              on others' collected instructors/administrators' data.
+                            </div>
+                          </div>
+                        }
+                      >
+                        <Button
+                          id="InstructorPoints"
+                          className={
+                            activePage === "AddInstructor"
+                              ? "ActiveNavLink"
+                              : "NavLink"
+                          }
+                          onClick={(event) => navigate("/Activities/AddInstructor")}
+                        >
+                          👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
+                          {instructorsToday} / 7
+                          <br /> ✅ {upvotedInstructorsToday} / 16
+                        </Button>
+                      </Tooltip>
+                    ) : null}
+                    {projectSpecs.gradingPoints ? (
+                      <Tooltip
+                        title={
+                          <div>
+                            <div>
+                              You've earned {gradingPoints} total 🧠 free-recall
+                              grading points.
+                            </div>
+                            <div>
+                              This means, {gradingPoints} times at least 3 other
+                              researchers have agreed with you on existance or
+                              non-existance of a specific phrase in a free-recall
+                              response.
+                            </div>
+                            <div>
+                              From that total 🧠 points, we've already excluded your
+                              negative {negativeGradingPoints} 🧟 points.
+                            </div>
+                            <div>
+                              This means, 2 x {negativeGradingPoints} times exactly
+                              3 out of 4 researchers agreed on existance
+                              (non-existance) of a specific key phrase in a
+                              free-recall response by a participant, but you opposed
+                              their majority of votes. So, you got a 0.5 🧟 negative
+                              point for each of those cases.
+                            </div>
+                          </div>
+                        }
+                      >
+                        <Button
+                          id="FreeRecallGrading"
+                          className={
+                            activePage === "FreeRecallGrading"
+                              ? "ActiveNavLink"
+                              : "NavLink"
+                          }
+                          onClick={(event) =>
+                            navigate("/Activities/FreeRecallGrading")
+                          }
+                        >
+                          🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
+                        </Button>
+                      </Tooltip>
+                    ) : null}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
