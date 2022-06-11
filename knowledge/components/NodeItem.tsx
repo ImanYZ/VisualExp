@@ -82,7 +82,7 @@ export const NodeItem = ({ node, type }: NodeItemProps) => {
   const getLink = () => {
     console.log("type", type);
     if (type === "incremental") {
-      return `/update-incremental-static-node/${node.id}`;
+      return `/update-incremental-static-node2/${node.id}`;
     }
     return `/${encodeURIComponent(node.title || "")}/${node.id}`;
   };
