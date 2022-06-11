@@ -8,5 +8,5 @@ export const clientTypesense = new Typesense.Client({
       protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
     }
   ],
-  apiKey: "xyz"
+  apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
 });

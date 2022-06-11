@@ -1,3 +1,4 @@
+import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
@@ -70,6 +71,7 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
             avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
             variant="outlined"
             label={option.name}
+            deleteIcon={<CloseIcon />}
             {...getTagProps({ index })}
             key={index}
           />
