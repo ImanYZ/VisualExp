@@ -9,6 +9,7 @@ import { FilterValue } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
+import { ReferencesAutocomplete } from "./ReferencesAutocomplete";
 
 type Props = {
   sx?: SxProps<Theme>;
@@ -16,8 +17,10 @@ type Props = {
   onInstitutionsChange: (newValues: FilterValue[]) => void;
   onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
+  onReferencesChange: (title: string, label: string) => void;
   contributors: FilterValue[];
   institutions: FilterValue[];
+  reference: { title: string; label: string } | null;
 };
 
 const HomeFilter: FC<Props> = ({
@@ -26,8 +29,10 @@ const HomeFilter: FC<Props> = ({
   onInstitutionsChange,
   onContributorsChange,
   onNodeTypesChange,
+  onReferencesChange,
   contributors,
-  institutions
+  institutions,
+  reference
 }) => {
   const router = useRouter();
   const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
@@ -47,6 +52,10 @@ const HomeFilter: FC<Props> = ({
 
   const handleNodeTypesChange = (values: string[]) => {
     onNodeTypesChange(values);
+  };
+
+  const handleReferencesChange = (title: string, label: string) => {
+    onReferencesChange(title, label);
   };
 
   return (
@@ -69,6 +78,9 @@ const HomeFilter: FC<Props> = ({
       </Grid>
       <Grid item xs={1}>
         <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
+      </Grid>
+      <Grid item xs={1} sm={2} md={4}>
+        <ReferencesAutocomplete reference={reference} onReferencesChange={handleReferencesChange} />
       </Grid>
     </Grid>
   );
