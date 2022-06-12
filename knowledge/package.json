@@ -41,7 +41,7 @@
     "firebase": "^9.8.2",
     "firebase-admin": "^10.2.0",
     "geoip-lite": "^1.4.5",
-    "next": "^12.1.6",
+    "next": "12.1.7-canary.35",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-markdown": "^8.0.3",
