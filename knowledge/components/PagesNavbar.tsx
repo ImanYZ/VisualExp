@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
-import React, { FC, ReactNode, useState } from "react";
+import dynamic from "next/dynamic";
+import React, { ComponentType,FC, ReactNode, useState } from "react";
 
-import AppFooter from "./AppFooter";
 import AppHeaderNavbar from "./AppHeaderNavbar";
 import AppMenuMovil from "./AppMenuMovil";
 import Head from "./Head";
@@ -11,6 +11,10 @@ type Props = {
   title?: string;
   description?: string;
 };
+
+export const AppFooter: ComponentType<any> = dynamic(() => import("./AppFooter").then(m => m.default), {
+  ssr: false
+});
 
 const PagesNavbar: FC<Props> = ({ children, title, description }) => {
   const [showMenu, setShowMenu] = useState(false);

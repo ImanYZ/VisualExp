@@ -7,8 +7,6 @@ import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
-import PagesNavbar from "../components/PagesNavbar";
-import SortByFilters from "../components/SortByFilters";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
 import { getStats } from "../lib/stats";
 import { getContributorsForAutocomplete } from "../lib/users";
@@ -38,6 +36,17 @@ export const HomeFilter: ComponentType<any> = dynamic(() => import("../component
   ssr: false
 });
 
+export const PagesNavbar: ComponentType<any> = dynamic(() => import("../components/PagesNavbar").then(m => m.default), {
+  ssr: false
+});
+
+export const SortByFilters: ComponentType<any> = dynamic(
+  () => import("../components/SortByFilters").then(m => m.default),
+  {
+    ssr: false
+  }
+);
+
 const MasonryNodes: ComponentType<any> = dynamic(
   () => import("../components/MasonryNodes").then(m => m.TrendingNodes),
   { ssr: false }
@@ -49,7 +58,7 @@ export const sortByDefaults = {
   timeWindow: SortedByTimeOptions[0]
 };
 
-type Props = {
+type HomePageProps = {
   data: SimpleNode[];
   page: number;
   numResults: number;
@@ -122,7 +131,7 @@ const getTypesenseClient = () => {
   return client;
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ query }) => {
   const q = getQueryParameter(query.q) || "*";
   const upvotes = getQueryParameterAsBoolean(query.upvotes || String(sortByDefaults.upvotes));
   const mostRecent = getQueryParameterAsBoolean(query.mostRecent || String(sortByDefaults.mostRecent));
@@ -188,7 +197,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
   };
 };
 
-const HomePage: NextPage<Props> = ({
+const HomePage: NextPage<HomePageProps> = ({
   data,
   page,
   numResults,
