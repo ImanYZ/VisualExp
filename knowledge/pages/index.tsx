@@ -68,13 +68,15 @@ type HomePageProps = {
     mostRecent: boolean;
     upvotes: boolean;
     anyType: TimeWindowOption;
+    reference: string;
+    label: string;
   };
   stats: StatsSchema;
 };
 
 const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
   if (upvotes) {
-    return "corrects:desc";
+    return "mostHelpful:desc";
   }
   if (mostRecent) {
     return "changedAtMillis:desc";
@@ -87,7 +89,9 @@ const buildFilterBy = (
   tags: string,
   institutions: string,
   contributors: string,
-  nodeTypes: string
+  nodeTypes: string,
+  reference: string,
+  label: string
 ) => {
   const filters: string[] = [];
   let updatedAt: number;
@@ -102,38 +106,18 @@ const buildFilterBy = (
   }
 
   filters.push(`changedAtMillis:>${updatedAt}`);
-  if (tags.length > 0) {
-    filters.push(`tags: [${tags}]`);
-  }
-  if (institutions.length > 0) {
-    filters.push(`institutionsNames: [${institutions}]`);
-  }
-  if (contributors.length > 0) {
-    filters.push(`contributorsNames: [${contributors}]`);
-  }
-  if (nodeTypes.length > 0) {
-    filters.push(`nodeType: [${nodeTypes}]`);
-  }
+
+  if (tags.length > 0) filters.push(`tags: [${tags}]`);
+  if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
+  if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
+  if (nodeTypes.length > 0) filters.push(`nodeType: [${nodeTypes}]`);
+  if (reference) filters.push(`titlesReferences: ${reference}`);
+  if (label && label !== "All Sections" && label !== "All Pages") filters.push(`labelsReferences: ${label}`);
 
   return filters.join("&& ");
 };
 
-export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ query }) => {
-  const q = getQueryParameter(query.q) || "*";
-  const upvotes = getQueryParameterAsBoolean(query.upvotes) || sortByDefaults.upvotes;
-  const mostRecent = getQueryParameterAsBoolean(query.mostRecent) || sortByDefaults.mostRecent;
-  const timeWindow: TimeWindowOption =
-    (getQueryParameter(query.timeWindow) as TimeWindowOption) || sortByDefaults.timeWindow;
-  const tags = getQueryParameter(query.tags) || "";
-  const institutions = getQueryParameter(query.institutions) || "";
-  const contributors = getQueryParameter(query.contributors) || "";
-  const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
-  const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
-  const institutionNames = institutionsSelected.map(el => el.name).join(",");
-
-  const nodeTypes = getQueryParameter(query.nodeTypes) || "";
-  const page = getQueryParameterAsNumber(query.page);
-  const stats = await getStats();
+const getTypesenseClient = () => {
   const client = new Typesense.Client({
     nodes: [
       {
@@ -144,6 +128,28 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ qu
     ],
     apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
   });
+  return client;
+};
+
+export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ query }) => {
+  const q = getQueryParameter(query.q) || "*";
+  const upvotes = getQueryParameterAsBoolean(query.upvotes || String(sortByDefaults.upvotes));
+  const mostRecent = getQueryParameterAsBoolean(query.mostRecent || String(sortByDefaults.mostRecent));
+  const timeWindow: TimeWindowOption =
+    (getQueryParameter(query.timeWindow) as TimeWindowOption) || sortByDefaults.timeWindow;
+  const tags = getQueryParameter(query.tags) || "";
+  const institutions = getQueryParameter(query.institutions) || "";
+  const contributors = getQueryParameter(query.contributors) || "";
+  const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
+  const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
+  const institutionNames = institutionsSelected.map(el => el.name).join(",");
+  const reference = getQueryParameter(query.reference) || "";
+  const label = getQueryParameter(query.label) || "";
+  const nodeTypes = getQueryParameter(query.nodeTypes) || "";
+  const page = getQueryParameterAsNumber(query.page);
+  const stats = await getStats();
+
+  const client = getTypesenseClient();
 
   const searchParameters: SearchParams = {
     q,
@@ -151,7 +157,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ qu
     sort_by: buildSortBy(upvotes, mostRecent),
     per_page: perPage,
     page,
-    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes)
+    filter_by: buildFilterBy(timeWindow, tags, institutionNames, contributors, nodeTypes, reference, label)
   };
 
   const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
@@ -182,7 +188,9 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async ({ qu
       filtersSelected: {
         mostRecent: mostRecent,
         upvotes: upvotes,
-        anyType: timeWindow
+        anyType: timeWindow,
+        reference,
+        label
       },
       stats
     }
@@ -200,9 +208,7 @@ const HomePage: NextPage<HomePageProps> = ({
 }) => {
   const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
     if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
-    if (filtersSelected.upvotes) {
-      return SortTypeWindowOption.UPVOTES_DOWNVOTES;
-    }
+    if (filtersSelected.upvotes) return SortTypeWindowOption.UPVOTES_DOWNVOTES;
     return SortTypeWindowOption.NONE;
   };
 
@@ -255,6 +261,15 @@ const HomePage: NextPage<HomePageProps> = ({
     router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
   };
 
+  const handleReferencesChange = (title: string, label: string) => {
+    router.push({ query: { ...router.query, reference: title, label } });
+  };
+
+  const reference = (): { title: string; label: string } | null => {
+    if (!filtersSelected.reference) return null;
+    return { title: filtersSelected.reference, label: filtersSelected.label };
+  };
+
   return (
     <PagesNavbar>
       <HomeSearchContainer
@@ -269,8 +284,10 @@ const HomePage: NextPage<HomePageProps> = ({
           onInstitutionsChange={handleInstitutionsChange}
           onContributorsChange={handleContributorsChange}
           onNodeTypesChange={handleNodeTypesChange}
+          onReferencesChange={handleReferencesChange}
           contributors={contributorsFilter}
           institutions={institutionFilter}
+          reference={reference()}
         ></HomeFilter>
 
         <SortByFilters
