@@ -8,10 +8,6 @@ import { ResponseAutocompleteTags } from "../../src/knowledgeTypes";
 async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteTags>) {
   const q = getQueryParameter(req.query.q) || "";
 
-  if (!q) {
-    res.status(200).json({ results: [] });
-    return;
-  }
   const client = new Typesense.Client({
     nodes: [
       {

@@ -1,10 +1,10 @@
-import { Box, Card, CardHeader, Divider, List, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
 import { encodeTitle, isValidHttpUrl } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
-import LinkedNodeItem from "./LinkedNodeItem";
+import { LinkedTag } from "./LinkedTag";
 
 type TagsListProps = {
   tags: LinkedKnowledgeNode[];
@@ -19,40 +19,26 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
     return el.title || "";
   };
 
+  if (!tags.length) {
+    return null;
+  }
+
   return (
-    <Card sx={{ ...sx }}>
-      <CardHeader
-        sx={{
-          height: "60px",
-          px: "50px",
-          backgroundColor: theme => theme.palette.grey[100]
-        }}
-        title={
-          <Box>
-            <Typography variant="h5" fontWeight={300} fontSize="23px">
-              Tags
-            </Typography>
-          </Box>
-        }
-      ></CardHeader>
-      <List sx={{ p: "0px" }} dense>
-        {tags.map((node, idx, src) => (
-          <React.Fragment key={idx}>
-            <LinkedNodeItem
-              title={getReferenceTitle(node)}
-              linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
-              nodeType={node.nodeType}
-              nodeImageUrl={node.nodeImage}
-              nodeContent={node.content}
-              showListItemIcon={false}
-              label={node.label || ""}
-              sx={{ p: "30px 50px" }}
-              secondaryActionSx={{ mr: "34px" }}
-            />
-            {idx < src.length - 1 && <Divider />}
-          </React.Fragment>
+    <Box sx={{ ...sx }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: "5px" }}>
+        Tags:
+      </Typography>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+        {tags.map((node, idx) => (
+          <LinkedTag
+            key={idx}
+            title={getReferenceTitle(node)}
+            linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+            nodeImageUrl={node.nodeImage}
+            nodeContent={node.content}
+          />
         ))}
-      </List>
-    </Card>
+      </Box>
+    </Box>
   );
 };

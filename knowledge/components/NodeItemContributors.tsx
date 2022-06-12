@@ -41,6 +41,10 @@ const NodeItemContributors: FC<Props> = ({ contributors, institutions }) => {
     ));
   };
 
+  if (!contributors.length && !institutions.length) {
+    return null;
+  }
+
   return (
     <Box>
       <Typography variant="body2" color="text.secondary">
