@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import { ParsedUrlQuery } from "querystring";
 
 import { db } from "../../lib/admin";
-import { encodeTitle } from "../../lib/utils";
+import { getNodePageUrl } from "../../lib/utils";
 function SiteMap() {
   // getServerSideProps will do the heavy lifting
 }
@@ -40,7 +40,7 @@ export const getServerSideProps: GetServerSideProps<any, Params> = async ({ res,
         const nodeData = nodeDoc.data();
         xmlContent += `
           <url>
-            <loc>https://1cademy.us/knowledge/${encodeTitle(nodeData.title)}/${nodeDoc.id}</loc>
+            <loc>https://1cademy.us/knowledge/${getNodePageUrl(nodeData.title, nodeDoc.id)}</loc>
             <lastmod>${nodeData.updatedAt.toDate().toISOString()}</lastmod>
             <changefreq>hourly</changefreq>
           </url>`;
