@@ -43,6 +43,8 @@ export default function AppFooter() {
           </Typography>
           <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" } }}>
             <IconButton
+              rel="noreferrer"
+              target="_blank"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
               sx={{ color: theme => theme.palette.common.white }}
             >
