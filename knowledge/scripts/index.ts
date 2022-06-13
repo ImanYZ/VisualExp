@@ -223,28 +223,13 @@ const fillReferencesIndex = async (
 };
 
 const main = async () => {
-  const steps = 5;
   const nodeDocs = await db.collection("nodes").get();
 
-  console.log(`[1/${steps}]: Filling users index`);
   await fillUsersIndex();
-  console.log("End Filling nodes index");
-
-  console.log(`[2/${steps}]: Filling institutions index`);
   await fillInstitutionsIndex();
-  console.log("End Filling institutions index");
-
-  console.log(`[3/${steps}]: Filling tags index`);
   await fillTagsIndex();
-  console.log("End Filling tags index");
-
-  console.log(`[4/${steps}]: Filling nodes index`);
   await fillNodesIndex(nodeDocs, true);
-  console.log("End Filling nodes index");
-
-  console.log(`[5/${steps}]: Filling references index`);
   await fillReferencesIndex(nodeDocs, true);
-  console.log("End Filling references index");
 };
 
 main();
