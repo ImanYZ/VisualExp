@@ -684,7 +684,7 @@ export default [
         ],
       },
     ],
-    YouTube: "B6q-LYXvNCg",
+    YouTube: "7L1MfVRySFI",
     description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
     accomplishments: "",
     gains: [
