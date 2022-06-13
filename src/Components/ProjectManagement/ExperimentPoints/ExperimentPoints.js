@@ -15,8 +15,8 @@ import {
 } from "../../../store/AuthAtoms";
 import {
   projectState,
-  notTakenSessionsState,
-  notTakenSessionsLoadedState,
+  // notTakenSessionsState,
+  // notTakenSessionsLoadedState,
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
@@ -41,12 +41,12 @@ const expSessionsColumns = [
   { field: "points", headerName: "Points", type: "number", width: 130 },
 ];
 
-const notTakenSessionsColumns = [
-  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
-  { field: "end", headerName: "End", type: "dateTime", width: 190 },
-  { field: "hoursLeft", headerName: "Hours Left", type: "number", width: 130 },
-  { field: "points", headerName: "Points", type: "number", width: 130 },
-];
+// const notTakenSessionsColumns = [
+//   { field: "start", headerName: "Start", type: "dateTime", width: 190 },
+//   { field: "end", headerName: "End", type: "dateTime", width: 190 },
+//   { field: "hoursLeft", headerName: "Hours Left", type: "number", width: 130 },
+//   { field: "points", headerName: "Points", type: "number", width: 130 },
+// ];
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -61,8 +61,8 @@ const ExperimentPoints = (props) => {
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
-  const notTakenSessions = useRecoilValue(notTakenSessionsState);
-  const notTakenSessionsLoaded = useRecoilValue(notTakenSessionsLoadedState);
+  // const notTakenSessions = useRecoilValue(notTakenSessionsState);
+  // const notTakenSessionsLoaded = useRecoilValue(notTakenSessionsLoadedState);
 
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
@@ -293,7 +293,7 @@ const ExperimentPoints = (props) => {
           </div>
         </>
       )}
-      <Alert severity="success">
+      {/* <Alert severity="success">
         <h2>Scheduling:</h2>
         <p>
           The experiment sessions in the table below are not taken yet. Note
@@ -391,7 +391,7 @@ const ExperimentPoints = (props) => {
           hideFooterSelectedRowCount
           loading={!notTakenSessionsLoaded}
         />
-      </div>
+      </div> */}
       <h2>Your Experiment Sessions:</h2>
       <Alert severity="warning">
         <h2>Points:</h2>

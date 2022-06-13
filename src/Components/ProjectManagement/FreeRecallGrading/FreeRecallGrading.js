@@ -46,7 +46,7 @@ const FreeRecallGrading = (props) => {
   const [retrieveNext, setRetrieveNext] = useState(0);
   // We need to set these states to identify which phrase is assigned to which
   // participant's free-recall response by which researcher, ... to be able to
-  // assign these values to the corresponding freeRecallGrades document when
+  // assign these values to the corresponding recallGrades document when
   // submitting the researcher's evaluation of this phrase in this free-recall
   // response.
   const [user, setUser] = useState(null);
@@ -65,143 +65,82 @@ const FreeRecallGrading = (props) => {
   // researchers yet.
   useEffect(() => {
     const retrieveFreeRecallResponse = async () => {
-      // ASA we find a free-recall response that is not evaluated by at least
-      // four researchers, we set this flag to true to stop searching.
-      let foundFreeRecallResponse = false;
-      const userDocs = await firebase.db
-        .collection("users")
-        .where("project", "==", project)
+      const recallGradeDocs = await firebase.db
+        .collection("recallGrades")
+        .where("researchersNum", "<", 4)
         .get();
-      for (let userDoc of userDocs.docs) {
-        const userData = userDoc.data();
-        // Because some researchers had previously been participants, we should
-        // not let them grade their own free-recall responses.
-        if (userDoc.id !== fullname) {
-          // Get the free-recall responses of this participant for all passages,
-          // for now they are two because each participant goes through only two
-          // random passages under random conditions.
-          for (
-            let passaIdx = 0;
-            passaIdx < userData.pConditions.length;
-            passaIdx++
-          ) {
-            // There are three types of free-recall responses:
-            for (let recallResponse of [
-              "recallreText",
-              "recall3DaysreText",
-              "recall1WeekreText",
-            ]) {
-              // There are some users who have not attended some sessions or they
-              // did not answer some free-recall questions. We only need to ask
-              // our researchers to grade answered free-recall responses.
-              if (
-                recallResponse in userData.pConditions[passaIdx] &&
-                userData.pConditions[passaIdx][recallResponse]
-              ) {
-                // We need to retrieve the phrases for this passage from the
-                // corresponding passage document.
-                const passageDoc = await firebase.db
-                  .collection("passages")
-                  .doc(userData.pConditions[passaIdx].passage)
-                  .get();
-                if (passageDoc.exists) {
-                  const passageData = passageDoc.data();
-                  // We need to do this for every key phrase in the passage that
-                  // we expect the participants have recalled and mentioned in
-                  // their free-recall response of this passage.
-                  for (let phras of passageData.phrases) {
-                    // freeRecallGrades is the collection that identifies which
-                    // phrase is assigned to which participant's free-recall
-                    // response by which researcher,
-                    // and whether it is approved or not.
-                    const freeRecallGradeDocs = await firebase.db
-                      .collection("freeRecallGrades")
-                      .where("user", "==", userDoc.id)
-                      .where("project", "==", project)
-                      .where(
-                        "passage",
-                        "==",
-                        userData.pConditions[passaIdx].passage
-                      )
-                      .where("phrase", "==", phras)
-                      .get();
-                    // Only if less than four researchers have already graded
-                    // the identification of this phrase in this specific
-                    // free-recall response AND the authenticated researcher has
-                    // never graded this specific phrase in this free-recall
-                    // response before:
-                    if (
-                      freeRecallGradeDocs.docs.length < 4 &&
-                      // If there are no more researchers who graded this, we
-                      // should take it.
-                      (freeRecallGradeDocs.docs.length === 0 ||
-                        // If there is at least one other researcher who graded
-                        // this, the 1st researcher should not be the same as
-                        // the authenticated researcher.
-                        (freeRecallGradeDocs.docs[0].data().researcher !==
-                          fullname &&
-                          // If there are at least two other researchers who graded
-                          // this, the 2nd researcher should not be the same as
-                          // the authenticated researcher.
-                          (freeRecallGradeDocs.docs.length < 2 ||
-                            freeRecallGradeDocs.docs[1].data().researcher !==
-                              fullname) &&
-                          // If there are at least three other researchers who graded
-                          // this, the 3rd researcher should not be the same as
-                          // the authenticated researcher.
-                          (freeRecallGradeDocs.docs.length < 3 ||
-                            freeRecallGradeDocs.docs[2].data().researcher !==
-                              fullname)))
-                    ) {
-                      foundFreeRecallResponse = true;
-                      // We need to set these states to identify which phrase is
-                      // assigned to which participant's free-recall response by
-                      // which researcher, ... to be able to assign these values
-                      // to the corresponding freeRecallGrades document when
-                      // submitting the researcher's evaluation of this phrase
-                      // in this free-recall response.
-                      setUser(userDoc.id);
-                      setCondition(userData.pConditions[passaIdx].condition);
-                      setPassage(passageData.text);
-                      setPassageIdx(passaIdx);
-                      setPassageId(passageDoc.id);
-                      setPhrase(phras);
-                      setPhraseNum(passageData.phrases.length);
-                      setResponse(
-                        userData.pConditions[passaIdx][recallResponse]
-                      );
-                      switch (recallResponse) {
-                        case "recallreText":
-                          setSession("1st");
-                          break;
-                        case "recall3DaysreText":
-                          setSession("2nd");
-                          break;
-                        case "recall1WeekreText":
-                          setSession("3rd");
-                          break;
-                        default:
-                        // code block
-                      }
-                      setTimeout(() => {
-                        setSubmitting(false);
-                      }, 1000);
-                      break;
-                    }
-                  }
-                }
-              }
-              if (foundFreeRecallResponse) {
-                break;
-              }
-            }
-            if (foundFreeRecallResponse) {
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+        const recallGradeData = recallGradeDoc.data();
+        if (
+          recallGradeData.project === project &&
+          recallGradeData.user !== fullname &&
+          (recallGradeData.researchersNum === 0 ||
+            // If there is at least one other researcher who graded
+            // this, the 1st researcher should not be the same as
+            // the authenticated researcher.
+            (recallGradeData.researchers[0] !== fullname &&
+              // If there are at least two other researchers who graded
+              // this, the 2nd researcher should not be the same as
+              // the authenticated researcher.
+              (recallGradeData.researchersNum < 2 ||
+                recallGradeData.researchers[1] !== fullname) &&
+              // If there are at least three other researchers who graded
+              // this, the 3rd researcher should not be the same as
+              // the authenticated researcher.
+              (recallGradeData.researchersNum < 3 ||
+                recallGradeData.researchers[2] !== fullname)))
+        ) {
+          const passageDoc = await firebase.db
+            .collection("passages")
+            .doc(recallGradeData.passage)
+            .get();
+          const passageData = passageDoc.data();
+          const userDoc = await firebase.db
+            .collection("users")
+            .doc(recallGradeData.user)
+            .get();
+          const userData = userDoc.data();
+          let passaIdx = 0;
+          for (; passaIdx < userData.pConditions.length; passaIdx++) {
+            if (
+              userData.pConditions[passaIdx].passage === recallGradeData.passage
+            ) {
               break;
             }
           }
-          if (foundFreeRecallResponse) {
-            break;
+          // We need to set these states to identify which phrase is
+          // assigned to which participant's free-recall response by
+          // which researcher, ... to be able to assign these values
+          // to the corresponding freeRecallGrades document when
+          // submitting the researcher's evaluation of this phrase
+          // in this free-recall response.
+          setUser(recallGradeData.user);
+          setCondition(recallGradeData.condition);
+          setPassage(passageData.text);
+          setPassageIdx(passaIdx);
+          setPassageId(recallGradeData.passage);
+          setPhrase(recallGradeData.phrase);
+          setPhraseNum(passageData.phrases.length);
+          setSession(recallGradeData.session);
+          switch (recallGradeData.session) {
+            case "1st":
+              setResponse(userData.pConditions[passaIdx].recallreText);
+              break;
+            case "2nd":
+              setResponse(userData.pConditions[passaIdx].recall3DaysreText);
+              break;
+            case "3rd":
+              setResponse(userData.pConditions[passaIdx].recall1WeekreText);
+              break;
+            default:
+            // code block
           }
+          setTimeout(() => {
+            setSubmitting(false);
+          }, 4000);
+          // ASA we find a free-recall response that is not evaluated by at least
+          // four researchers, we set this flag to true to stop searching.
+          return null;
         }
       }
     };
