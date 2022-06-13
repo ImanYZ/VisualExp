@@ -6,7 +6,7 @@ import List from "@mui/material/List";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
-import { encodeTitle } from "../lib/utils";
+import { getNodePageUrl } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import LinkedNodeItem from "./LinkedNodeItem";
 import TypographyUnderlined from "./TypographyUnderlined";
@@ -23,7 +23,7 @@ const LinkedNodes = ({ data, header, sx }: LinkedNodesProps) => {
       <React.Fragment key={idx}>
         <LinkedNodeItem
           title={el.title || ""}
-          linkSrc={`../${encodeTitle(el.title)}/${el.node}`}
+          linkSrc={getNodePageUrl(el.title || "", el.node)}
           nodeType={el.nodeType}
           nodeImageUrl={el.nodeImage}
           nodeContent={el.content}
