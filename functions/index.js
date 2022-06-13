@@ -23,6 +23,7 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   gradeFreeRecall,
+  addRecallGradesColl,
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -46,6 +47,7 @@ const {
 const {
   assignNodeContributorsInstitutionsStats,
   updateInstitutions,
+  downloadNodes,
 } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
@@ -74,7 +76,7 @@ app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
-app.get("/reassignAllPConditionNums", reassignAllPConditionNums);
+app.get("/addRecallGradesColl", addRecallGradesColl);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
@@ -95,6 +97,9 @@ app.post("/allEvents", allEvents);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
+
+// Knowledge endpoints
+app.get("/downloadNodes", downloadNodes);
 
 // Misinformation Experiment
 app.get("/card", card);
