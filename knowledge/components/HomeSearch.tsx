@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
 import Image from "next/image";
+import { ForwardedRef, forwardRef } from "react";
 
 import { StatsSchema } from "../src/knowledgeTypes";
 import SearchInput from "./SearchInput";
@@ -12,7 +13,8 @@ type HomeSearchProps = {
   stats: StatsSchema;
 };
 
-export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
+const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps, ref: ForwardedRef<any>) => {
+  console.log(">> ref", ref);
   return (
     <Box
       sx={{
@@ -30,6 +32,7 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         color: theme => theme.palette.common.white,
         ...sx
       }}
+      ref={ref}
     >
       <Image
         style={{ filter: "brightness(.6)" }}
@@ -81,3 +84,5 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
     </Box>
   );
 };
+
+export const HomeSearchForwarded = forwardRef(HomeSearch);

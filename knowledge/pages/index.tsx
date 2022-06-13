@@ -1,4 +1,4 @@
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -8,6 +8,7 @@ import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
+import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
 import { getStats } from "../lib/stats";
 import { getContributorsForAutocomplete } from "../lib/users";
@@ -29,7 +30,7 @@ import {
 const perPage = 10;
 
 export const HomeSearchContainer: ComponentType<any> = dynamic(
-  () => import("../components/HomeSearch").then(m => m.HomeSearch),
+  () => import("../components/HomeSearch").then(m => m.HomeSearchForwarded),
   { ssr: false }
 );
 
@@ -213,22 +214,16 @@ const HomePage: NextPage<HomePageProps> = ({
     return SortTypeWindowOption.NONE;
   };
 
-  // const containerRef = useRef(null)
-  // const [isVisibleMainSearcher, setIsVisibleMainSearcher] = useState(false)
+  const [containerRef, isVisible] = useElementOnScreen({
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0
+  });
 
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(getDefaultSortedByType(filtersSelected));
   const [timeWindow, setTimeWindow] = useState(filtersSelected.anyType || sortByDefaults.timeWindow);
 
   const router = useRouter();
-
-  // const onViewMainSearch = (entries) => {
-  //   const [entry] = entries
-  //   setIsVisibleMainSearcher(entry.isIntersection)
-  // }
-
-  // useEffect(() => {
-
-  // })
 
   const handleSearch = (text: string) => {
     router.push({ query: { ...router.query, q: text }, hash: text ? "#nodes-begin" : "" });
@@ -283,14 +278,18 @@ const HomePage: NextPage<HomePageProps> = ({
     return { title: filtersSelected.reference, label: filtersSelected.label };
   };
 
+  console.log("VISBLE", isVisible, containerRef, containerRef);
+
   return (
     <PagesNavbar showSearch={true}>
       <HomeSearchContainer
         sx={{ mt: "var(--navbar-height)" }}
         onSearch={handleSearch}
         stats={stats}
+        ref={containerRef}
       ></HomeSearchContainer>
       <Container sx={{ my: 10 }}>
+        {isVisible && <Typography>VISIBLE</Typography>}
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
