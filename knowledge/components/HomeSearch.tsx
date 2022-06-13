@@ -77,6 +77,7 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
           from {stats.users} users in {stats.institutions} institutions
         </Typography>
       </Box>
+      <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box>
     </Box>
   );
 };
