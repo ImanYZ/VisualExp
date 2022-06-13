@@ -15,13 +15,13 @@ import NextLink from "next/link";
 import { useState } from "react";
 
 import { getInstitutionsByName } from "../lib/firestore/institutions";
+import { getNodePageUrl } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
 import OptimizedAvatar from "./OptimizedAvatar";
 import QuestionItem from "./QuestionItem";
-// import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
@@ -81,7 +81,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
   return (
     <Card sx={{ width: "100%", ":hover": { boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)" } }}>
-      <NextLink passHref href={`/${encodeURIComponent(node.title || "")}/${node.id}`}>
+      <NextLink passHref href={getNodePageUrl(node.title || "", node.id)}>
         <Link underline="none" color="inherit">
           <CardActionArea sx={{ pt: { xs: 4, lg: 6 }, px: { xs: 5, lg: 10 }, pb: 2 }}>
             <CardHeader sx={{ p: 0, pb: 5 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
