@@ -1403,14 +1403,32 @@ exports.gradeFreeRecall = async (req, res) => {
 
 exports.addRecallGradesColl = async (req, res) => {
   try {
+
+var first = await  db.collection("freeRecallGrades")
+      .orderBy("createdAt")
+      .limit(1000);
+    
+let lastVisible;
+await first.get().then((documentSnapshots) => {
+// Get the last visible document
+ lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+});
+
+var freeRecallGradeDocs =  db.collection("freeRecallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisible)
+        .limit(1000)
+        .get();
+
+  
+  //so here we get the next 1000 users ,and we should run the function multiple times right ??
+
+
     // I don't know how to ask firestore to retrieve documents from 1000 to 2000???
     // Please implement this here.
     // Please implement this here and debug the rest of the code. I may have made some mistakes.
     // You can keep contacting me on Slack. I'll respond ASA I find any chance.
-    const freeRecallGradeDocs = await db
-      .collection("freeRecallGrades")
-      .limit(1000)
-      .get();
+    
     // There is another problem here. We start this from empty {}, which assumes there are no other documents.
     // If we implement this new idea, this will not work. What do you think we should do here???
     const recallGrades = {};
