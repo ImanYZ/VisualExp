@@ -218,7 +218,7 @@ const HomePage: NextPage<HomePageProps> = ({
   const router = useRouter();
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text } });
+    router.push({ query: { ...router.query, q: text, page: 1 } });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -227,42 +227,42 @@ const HomePage: NextPage<HomePageProps> = ({
 
   const handleByType = (val: SortTypeWindowOption) => {
     if (val === SortTypeWindowOption.MOST_RECENT) {
-      router.push({ query: { ...router.query, mostRecent: true, upvotes: false } });
+      router.push({ query: { ...router.query, mostRecent: true, upvotes: false, page: 1 } });
       return setSortedByType(val);
     }
     if (val === SortTypeWindowOption.UPVOTES_DOWNVOTES) {
-      router.push({ query: { ...router.query, mostRecent: false, upvotes: true } });
+      router.push({ query: { ...router.query, mostRecent: false, upvotes: true, page: 1 } });
       return setSortedByType(val);
     }
-    router.push({ query: { ...router.query, mostRecent: false, upvotes: false } });
+    router.push({ query: { ...router.query, mostRecent: false, upvotes: false, page: 1 } });
     setSortedByType(SortTypeWindowOption.NONE);
   };
 
   const handleChangeTimeWindow = (val: TimeWindowOption) => {
-    router.push({ query: { ...router.query, timeWindow: val } });
+    router.push({ query: { ...router.query, timeWindow: val, page: 1 } });
     setTimeWindow(val);
   };
 
   const handleTagsChange = (tags: string[]) => {
-    router.push({ query: { ...router.query, tags: tags.join(",") } });
+    router.push({ query: { ...router.query, tags: tags.join(","), page: 1 } });
   };
 
   const handleInstitutionsChange = (newValue: FilterValue[]) => {
     const institutions = newValue.map((el: FilterValue) => el.id);
-    router.push({ query: { ...router.query, institutions: institutions.join(",") } });
+    router.push({ query: { ...router.query, institutions: institutions.join(","), page: 1 } });
   };
 
   const handleContributorsChange = (newValue: FilterValue[]) => {
     const contributors = newValue.map((el: FilterValue) => el.id);
-    router.push({ query: { ...router.query, contributors: contributors.join(",") } });
+    router.push({ query: { ...router.query, contributors: contributors.join(","), page: 1 } });
   };
 
   const handleNodeTypesChange = (nodeTypes: string[]) => {
-    router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(",") } });
+    router.push({ query: { ...router.query, nodeTypes: nodeTypes.join(","), page: 1 } });
   };
 
   const handleReferencesChange = (title: string, label: string) => {
-    router.push({ query: { ...router.query, reference: title, label } });
+    router.push({ query: { ...router.query, reference: title, label, page: 1 } });
   };
 
   const reference = (): { title: string; label: string } | null => {
