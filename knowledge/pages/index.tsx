@@ -2,6 +2,7 @@ import { Container } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import dynamic from "next/dynamic";
+// import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
@@ -212,13 +213,25 @@ const HomePage: NextPage<HomePageProps> = ({
     return SortTypeWindowOption.NONE;
   };
 
+  // const containerRef = useRef(null)
+  // const [isVisibleMainSearcher, setIsVisibleMainSearcher] = useState(false)
+
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(getDefaultSortedByType(filtersSelected));
   const [timeWindow, setTimeWindow] = useState(filtersSelected.anyType || sortByDefaults.timeWindow);
 
   const router = useRouter();
 
+  // const onViewMainSearch = (entries) => {
+  //   const [entry] = entries
+  //   setIsVisibleMainSearcher(entry.isIntersection)
+  // }
+
+  // useEffect(() => {
+
+  // })
+
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text } });
+    router.push({ query: { ...router.query, q: text }, hash: text ? "#nodes-begin" : "" });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -271,7 +284,7 @@ const HomePage: NextPage<HomePageProps> = ({
   };
 
   return (
-    <PagesNavbar>
+    <PagesNavbar showSearch={true}>
       <HomeSearchContainer
         sx={{ mt: "var(--navbar-height)" }}
         onSearch={handleSearch}
