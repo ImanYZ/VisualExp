@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
-import { encodeTitle, isValidHttpUrl } from "../lib/utils";
+import { getNodePageUrl, isValidHttpUrl } from "../lib/utils";
 import { LinkedKnowledgeNode, NodeType } from "../src/knowledgeTypes";
 import { LinkedReference } from "./LinkedReference";
 import NodeTypeIcon from "./NodeTypeIcon";
@@ -41,9 +41,8 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
           {references.map((node, idx) => (
             <React.Fragment key={idx}>
               <LinkedReference
-                // key={idx}
                 title={getReferenceTitle(node)}
-                linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+                linkSrc={getNodePageUrl(node.title || "", node.node)}
                 nodeType={node.nodeType}
                 nodeImageUrl={node.nodeImage}
                 nodeContent={node.content}

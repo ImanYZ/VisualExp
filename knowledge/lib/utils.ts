@@ -1,3 +1,5 @@
+import slugify from "slugify";
+
 import { TimeWindowOption } from "../src/knowledgeTypes";
 
 export const isValidHttpUrl = (possibleUrl?: string) => {
@@ -58,3 +60,7 @@ export const SortedByTimeOptions: TimeWindowOption[] = [
   TimeWindowOption.ThisMonth,
   TimeWindowOption.ThisYear
 ];
+
+export const getNodePageUrl = (title: string, id: string) => {
+  return `/${slugify(title, { lower: true })}/${id}`;
+};
