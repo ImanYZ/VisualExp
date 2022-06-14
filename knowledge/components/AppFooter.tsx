@@ -26,15 +26,12 @@ export default function AppFooter() {
     >
       <Container
         sx={{
-          // minWidth: '195px',
           maxWidth: { xs: "195px", md: "700px", lg: "1058px" },
           height: { xs: "472px", md: "110px" },
           p: "0px",
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           justifyContent: "space-between"
-          // alignItems: 'center',
-          // border: "solid 1px royalblue"
         }}
       >
         <Box>
@@ -126,66 +123,6 @@ export default function AppFooter() {
           </Box>
         </Box>
       </Container>
-      {/* <Divider /> */}
-      {/* <Container
-        sx={{
-          position: "relative",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: "100%",
-          flex: 1,
-          mt: { xs: 5, sm: 0 }
-        }}
-      > */}
-      {/* <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={{ xs: 1, sm: 2, md: 4 }}
-          justifyContent="space-between"
-          sx={{ position: "absolute", top: "0", bottom: "0", left: "0", right: "0", margin: "auto" }}
-          alignItems="center"
-        >
-          <Box p={2}>{`©  1Cademy ${new Date().getFullYear()}`}</Box>
-          <Box p={2}>
-            <Link
-              target="_blank"
-              href="https://1cademy.us/terms"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.black }}
-            >
-              Terms
-            </Link>
-          </Box>
-          <Box p={2}>
-            <Link
-              target="_blank"
-              href="https://1cademy.us/privacy"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.black }}
-            >
-              Privacy
-            </Link>
-          </Box>
-          <Box p={2}>
-            <Link
-              target="_blank"
-              href="https://1cademy.us/cookie"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.black }}
-            >
-              Cookie
-            </Link>
-          </Box>
-          <Box
-            sx={{ display: "flex" }}
-            p={2}
-            component="a"
-            target="_blank"
-            href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
-          >
-            <Image src={YouTubeLogo} alt="1Cademy YouTube Channel" layout="intrinsic" width="100px" height="40px" />
-          </Box>
-        </Stack> */}
-      {/* </Container> */}
     </Box>
   );
 }
