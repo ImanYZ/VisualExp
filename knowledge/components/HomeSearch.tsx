@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
 import Image from "next/image";
+import { forwardRef } from "react";
 
 import { StatsSchema } from "../src/knowledgeTypes";
 import SearchInput from "./SearchInput";
@@ -12,9 +13,14 @@ type HomeSearchProps = {
   stats: StatsSchema;
 };
 
-export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
+export type Ref = {
+  viewState: HTMLElement;
+};
+
+const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch, stats }, ref) => {
   return (
     <Box
+      ref={ref}
       sx={{
         position: "relative",
         width: "100%",
@@ -31,6 +37,11 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         ...sx
       }}
     >
+      <div>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti aperiam, maiores quaerat eligendi accusamus
+        maxime similique, optio officiis rem nihil temporibus magnam dolorem placeat qui, soluta nobis at blanditiis
+        voluptatum.
+      </div>
       <Image
         style={{ filter: "brightness(.6)" }}
         alt="1cademy library"
@@ -41,15 +52,6 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         priority
       />
       <Box sx={{ position: "absolute", maxWidth: "100vw", width: { md: "60%", xs: "85%" } }}>
-        {/* <Typography
-          textAlign="center"
-          variant="h3"
-          component="h1"
-          fontWeight="500"
-          sx={{ mt: 0, marginBottom: { xs: 1, md: 2 }, fontSize: { xs: "23px", md: "50px" } }}
-        >
-          What do you want to learn now?
-        </Typography> */}
         <Box
           sx={{
             textAlign: "center",
@@ -77,6 +79,10 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
           from {stats.users} users in {stats.institutions} institutions
         </Typography>
       </Box>
+      <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box>
     </Box>
   );
-};
+});
+
+HomeSearch.displayName = "HomeSearch";
+export default HomeSearch;
