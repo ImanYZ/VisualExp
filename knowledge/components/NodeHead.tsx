@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-import { encodeTitle, escapeBreaksQuotes } from "../lib/utils";
+import { escapeBreaksQuotes, getNodePageUrl } from "../lib/utils";
 import { KnowledgeNode } from "../src/knowledgeTypes";
 
 type NodeHeadProps = {
@@ -34,7 +34,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
       content + " Keywords: " + title + " " + keywords + (nodeImage ? " \nImage: " + nodeImage : "")
     ),
     "@id": id,
-    url: "https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + id,
+    url: `https://1cademy.us/${getNodePageUrl(title || "", id)}`,
     nodeType: nodeType,
     author: {
       "@type": "Organization",
@@ -66,7 +66,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
   for (let parent of parents) {
     jsonObj["prerequisites"].push({
       "@type": "parent",
-      link: "https://1cademy.us/knowledge/" + encodeTitle(parent.title) + "/" + parent.node,
+      link: `https://1cademy.us/${getNodePageUrl(parent.title || "", parent.node)}`,
       title: "1Cademy - " + escapeBreaksQuotes(parent.title)
     });
   }
@@ -74,7 +74,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
   for (let child of children) {
     jsonObj["followUps"].push({
       "@type": "child",
-      link: "https://1cademy.us/knowledge/" + encodeTitle(child.title) + "/" + child.node,
+      link: `https://1cademy.us/${getNodePageUrl(child.title || "", child.node)}`,
       title: "1Cademy - " + escapeBreaksQuotes(child.title)
     });
   }
@@ -82,7 +82,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
   for (let tag of tags) {
     jsonObj["tags"].push({
       "@type": "tag",
-      link: "https://1cademy.us/knowledge/" + encodeTitle(tag.title) + "/" + tag.node,
+      link: `https://1cademy.us/${getNodePageUrl(tag.title || "", tag.node)}`,
       title: "1Cademy - " + escapeBreaksQuotes(tag.title)
     });
   }
@@ -90,7 +90,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
   for (let reference of references) {
     jsonObj["references"].push({
       "@type": "reference",
-      link: "https://1cademy.us/knowledge/" + encodeTitle(reference.title) + "/" + reference.node,
+      link: `https://1cademy.us/${getNodePageUrl(reference.title || "", reference.node)}`,
       title: "1Cademy - " + escapeBreaksQuotes(reference.title),
       label: reference.label
     });
@@ -102,7 +102,7 @@ export const NodeHead = ({ node, keywords, updatedStr, createdStr }: NodeHeadPro
 
   return (
     <Head>
-      <link rel="canonical" href={"https://1cademy.us/knowledge/" + encodeTitle(title) + "/" + id} key="canonical" />
+      <link rel="canonical" href={`https://1cademy.us/knowledge/${getNodePageUrl(title || "", id)}`} key="canonical" />
       <meta name="topic" content={`1Cademy - ${escapeBreaksQuotes(title)}`} />
       <meta name="subject" content={`1Cademy - ${escapeBreaksQuotes(title)}`} />
       <meta name="Classification" content={nodeType} />
