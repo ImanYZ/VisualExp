@@ -1,6 +1,5 @@
 import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
-import slugify from "slugify";
 
 import {
   KnowledgeNode,
@@ -11,6 +10,7 @@ import {
   SimpleNode
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
+import { getNodePageURLTitle } from "./utils";
 
 export const getAllNodeParamsForStaticProps = async () => {
   let res = [];
@@ -21,7 +21,7 @@ export const getAllNodeParamsForStaticProps = async () => {
     return {
       params: {
         id: nodeDoc.id,
-        title: slugify(nodeData.title || "", { lower: true })
+        title: getNodePageURLTitle(nodeData.title, nodeDoc.id)
       }
     };
   });
