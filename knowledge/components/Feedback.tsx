@@ -5,9 +5,14 @@ import { alpha, Box, Button, FormControl, InputBase, InputLabel, styled, Typogra
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
-import { addFeedback } from "../lib/firestore/feedback";
+import { sendFeedback } from "../lib/knowledgeApi";
+import { FeedbackInput } from "../src/knowledgeTypes";
 
-export const Feedback = () => {
+interface FeedbackProps {
+  onSuccessFeedback: () => void;
+}
+
+export const Feedback = ({ onSuccessFeedback }: FeedbackProps) => {
   const router = useRouter();
 
   const [url, setUrl] = useState("");
@@ -35,17 +40,14 @@ export const Feedback = () => {
 
   const onSubmitFeedback = async (event: any) => {
     event.preventDefault();
-    const feedbackData = {
+    const feedbackData: FeedbackInput = {
       name,
       email,
       feedback,
-      pageURL: url,
-      createdAt: new Date()
+      pageURL: url
     };
-    console.log("feedbackData:", feedbackData);
 
-    await addFeedback(feedbackData);
-    console.log("feedback was created");
+    await sendFeedback(feedbackData);
     setSuccessFeedback(true);
   };
 
@@ -74,7 +76,7 @@ export const Feedback = () => {
             We have received your feedback. Thank you!
           </Typography>
         </Box>
-        <Button color="success" variant="contained" fullWidth>
+        <Button onClick={onSuccessFeedback} color="success" variant="contained" fullWidth>
           Thank you
           <CheckIcon sx={{ ml: "10px" }} />
         </Button>

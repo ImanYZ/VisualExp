@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import {
+  FeedbackInput,
   ResponseAutocompleteFilter,
   ResponseAutocompleteProcessedReferencesFilter,
   ResponseAutocompleteTags
@@ -25,5 +26,10 @@ export const getReferencesAutocomplete = async (
   referenceSearch: string
 ): Promise<ResponseAutocompleteProcessedReferencesFilter> => {
   const response = await axios.get("/api/referencesAutocomplete", { params: { q: referenceSearch } });
+  return response.data;
+};
+
+export const sendFeedback = async (data: FeedbackInput): Promise<any> => {
+  const response = await axios.post("/api/feedback", { data });
   return response.data;
 };
