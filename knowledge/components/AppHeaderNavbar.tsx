@@ -20,10 +20,11 @@ import AppHeaderSearchBar from "./AppHeaderSearchBar";
 type Props = {
   showApply?: boolean;
   showMenu: boolean;
+  showSearch: boolean;
   onCloseMenu: () => void;
   onShowMenu: () => void;
 };
-const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
+const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
   return (
@@ -70,7 +71,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
             marginLeft: "20px"
           }}
         >
-          {router.route !== "/" && <AppHeaderSearchBar />}
+          {(router.route !== "/" || (router.route === "/" && showSearch)) && <AppHeaderSearchBar />}
           {showApply && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
