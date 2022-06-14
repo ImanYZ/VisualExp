@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import dynamic from "next/dynamic";
-import React, { ComponentType,FC, ReactNode, useState } from "react";
+import React, { ComponentType, FC, ReactNode, useState } from "react";
 
 import AppHeaderNavbar from "./AppHeaderNavbar";
 import AppMenuMovil from "./AppMenuMovil";
@@ -10,13 +10,14 @@ type Props = {
   children: ReactNode;
   title?: string;
   description?: string;
+  showSearch: boolean;
 };
 
 export const AppFooter: ComponentType<any> = dynamic(() => import("./AppFooter").then(m => m.default), {
   ssr: false
 });
 
-const PagesNavbar: FC<Props> = ({ children, title, description }) => {
+const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) => {
   const [showMenu, setShowMenu] = useState(false);
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
@@ -24,7 +25,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description }) => {
   return (
     <>
       <Head title={title} description={description} />
-      <AppHeaderNavbar showMenu={showMenu} onCloseMenu={onCloseMenu} onShowMenu={onShowMenu} />
+      <AppHeaderNavbar showMenu={showMenu} onCloseMenu={onCloseMenu} onShowMenu={onShowMenu} showSearch={showSearch} />
       {showMenu && <AppMenuMovil />}
       <Box
         component="main"

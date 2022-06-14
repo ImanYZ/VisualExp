@@ -9,14 +9,11 @@ import React, { MouseEvent, useState } from "react";
 const AppHeaderSearchBar = () => {
   const router = useRouter();
 
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState<string>((router.query.q as string) || "");
 
   const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    router.push({
-      pathname: "/",
-      query: { q: searchText }
-    });
+    router.push({ pathname: "/", query: { q: searchText }, hash: searchText ? "#nodes-begin" : "" });
   };
 
   return (
