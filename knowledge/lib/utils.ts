@@ -61,6 +61,17 @@ export const SortedByTimeOptions: TimeWindowOption[] = [
   TimeWindowOption.ThisYear
 ];
 
+export const getNodePageURLTitle = (title: string | undefined, id: string) => {
+  const resTitleSlug = slugify(title || "", { lower: true, remove: /[*+~.,$()\\'"!:@\r\n]/g });
+  if (resTitleSlug.length === 0) {
+    return id;
+  }
+  if (resTitleSlug.length > 100) {
+    return resTitleSlug.substring(0, 100);
+  }
+  return resTitleSlug;
+};
+
 export const getNodePageUrl = (title: string, id: string) => {
-  return `/${slugify(title, { lower: true })}/${id}`;
+  return `/${getNodePageURLTitle(title, id)}/${id}`;
 };
