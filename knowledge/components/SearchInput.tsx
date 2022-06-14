@@ -5,9 +5,7 @@ import InputBase from "@mui/material/InputBase";
 import { alpha, styled } from "@mui/material/styles";
 import { SxProps, Theme } from "@mui/system";
 import { useRouter } from "next/router";
-import { FC, useState } from "react";
-
-import { getQueryParameter } from "../lib/utils";
+import { FC, useEffect, useState } from "react";
 
 type Props = {
   onSearch: (text: string) => void;
@@ -16,10 +14,9 @@ type Props = {
 
 const SearchInput: FC<Props> = ({ onSearch, sx }) => {
   const router = useRouter();
-  const [searchText, setSearchText] = useState<string>(() => {
-    const q = getQueryParameter(router.query.q) || "";
-    return q;
-  });
+  const [searchText, setSearchText] = useState<string>((router.query.q as string) || "");
+
+  useEffect(() => setSearchText((router.query.q as string) || ""), [router.query]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
