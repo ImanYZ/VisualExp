@@ -1406,7 +1406,7 @@ exports.addRecallGradesColl = async (req, res) => {
 
 var first = await  db.collection("freeRecallGrades")
       .orderBy("createdAt")
-      .limit(1000);
+      .limit(req.body.number);
     
 let lastVisible;
 await first.get().then((documentSnapshots) => {
@@ -1417,7 +1417,7 @@ await first.get().then((documentSnapshots) => {
 var freeRecallGradeDocs =  db.collection("freeRecallGrades")
         .orderBy("createdAt")
         .startAfter(lastVisible)
-        .limit(1000)
+        .limit(100)
         .get();
 
   
