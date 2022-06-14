@@ -1403,8 +1403,49 @@ exports.gradeFreeRecall = async (req, res) => {
 
 exports.addRecallGradesColl = async (req, res) => {
   try {
-    const freeRecallGradeDocs = await db.collection("freeRecallGrades").get();
+
+var first = await  db.collection("freeRecallGrades")
+      .orderBy("createdAt")
+      .limit(req.body.number);
+    
+let lastVisible;
+await first.get().then((documentSnapshots) => {
+// Get the last visible document
+ lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+});
+
+var freeRecallGradeDocs =  db.collection("freeRecallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisible)
+        .limit(100)
+        .get();
+
+  
+  //so here we get the next 1000 users ,and we should run the function multiple times right ??
+
+
+    // I don't know how to ask firestore to retrieve documents from 1000 to 2000???
+    // Please implement this here.
+    // Please implement this here and debug the rest of the code. I may have made some mistakes.
+    // You can keep contacting me on Slack. I'll respond ASA I find any chance.
+    
+    // There is another problem here. We start this from empty {}, which assumes there are no other documents.
+    // If we implement this new idea, this will not work. What do you think we should do here???
     const recallGrades = {};
+    let recallGradeDocs = await db.collection("recallGrades").get();
+    for (let recallGradeDoc of recallGradeDocs.docs) {
+      const recallGradeData = recallGradeDoc.data();
+      recallGrades[
+        [
+          recallGradeData.user,
+          recallGradeData.session,
+          recallGradeData.project,
+          recallGradeData.condition,
+          recallGradeData.passage,
+          recallGradeData.phrase,
+        ]
+      ] = recallGradeData;
+    }
     for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
       const fRData = freeRecallGradeDoc.data();
       const recallGradeKey = [
@@ -1528,8 +1569,26 @@ exports.addRecallGradesColl = async (req, res) => {
     console.log("Done with users!");
     console.log("*********************");
     for (let rGKey in recallGrades) {
-      const recallGradeRef = db.collection("recallGrades").doc();
-      await batchSet(recallGradeRef, recallGrades[rGKey]);
+      // We have to update this so that it does not always create new documents,
+      // but if the document already exists, it updates it.
+      recallGradeDocs = await db
+        .collection("recallGrades")
+        .where("user", "==", rGKey.user)
+        .where("session", "==", rGKey.session)
+        .where("project", "==", rGKey.project)
+        .where("condition", "==", rGKey.condition)
+        .where("passage", "==", rGKey.passage)
+        .where("phrase", "==", rGKey.phrase)
+        .get();
+      if (recallGradeDocs.docs.length > 0) {
+        const recallGradeRef = db
+          .collection("recallGrades")
+          .doc(recallGradeDocs.docs[0].id);
+        await batchUpdate(recallGradeRef, recallGrades[rGKey]);
+      } else {
+        const recallGradeRef = db.collection("recallGrades").doc();
+        await batchSet(recallGradeRef, recallGrades[rGKey]);
+      }
     }
     console.log("*********************");
     console.log("Started to commit!");

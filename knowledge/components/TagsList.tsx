@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import React from "react";
 
-import { encodeTitle, isValidHttpUrl } from "../lib/utils";
+import { getNodePageUrl, isValidHttpUrl } from "../lib/utils";
 import { LinkedKnowledgeNode } from "../src/knowledgeTypes";
 import { LinkedTag } from "./LinkedTag";
 
@@ -33,7 +33,7 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
           <LinkedTag
             key={idx}
             title={getReferenceTitle(node)}
-            linkSrc={`../${encodeTitle(node.title)}/${node.node}`}
+            linkSrc={getNodePageUrl(node.title || "", node.node)}
             nodeImageUrl={node.nodeImage}
             nodeContent={node.content}
           />
