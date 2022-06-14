@@ -1,4 +1,4 @@
-import ShareIcon from "@mui/icons-material/Share";
+import ReplyIcon from "@mui/icons-material/Reply";
 import { Button } from "@mui/material";
 import { CardContent } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -106,7 +106,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
                 sx={{ color: theme => (showShareButtons ? theme.palette.common.orange : theme.palette.grey[600]) }}
                 onClick={() => setShowShareButtons(!showShareButtons)}
               >
-                <ShareIcon sx={{ mx: "12px" }} />
+                <ReplyIcon sx={{ mx: "12px", transform: "scale(-1,1)" }} />
                 {!showShareButtons && <Typography py="2px">Share</Typography>}
               </Button>
               {showShareButtons && <ShareButtons />}
