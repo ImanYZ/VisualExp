@@ -75,3 +75,10 @@ export const getNodePageURLTitle = (title: string | undefined, id: string) => {
 export const getNodePageUrl = (title: string, id: string) => {
   return `/${getNodePageURLTitle(title, id)}/${id}`;
 };
+
+export const homePageSortByDefaults = {
+  upvotes: true,
+  mostRecent: false,
+  timeWindow: SortedByTimeOptions[0],
+  perPage: 10
+};

@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { getInstitutionsByName } from "../lib/firestore/institutions";
 import { getNodePageUrl } from "../lib/utils";
@@ -35,6 +35,7 @@ type NodeItemProps = {
 };
 
 export const NodeItem = ({ node }: NodeItemProps) => {
+  const ref = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [institutionsData, setInstitutionsData] = useState<InstitutionData[]>([]);
 
@@ -93,7 +94,15 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
               {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
               {node.nodeImage && (
-                <Box component="img" sx={{ mt: 3 }} width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />
+                <Box
+                  ref={ref}
+                  component="img"
+                  sx={{ mt: 3 }}
+                  width="100%"
+                  src={node.nodeImage}
+                  alt={node.title}
+                  loading="lazy"
+                />
               )}
             </CardContent>
           </CardActionArea>
