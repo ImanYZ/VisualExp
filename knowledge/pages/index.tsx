@@ -8,6 +8,7 @@ import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
+import HomeSearch from "../components/HomeSearch";
 import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
 import { getStats } from "../lib/stats";
@@ -28,11 +29,6 @@ import {
 } from "../src/knowledgeTypes";
 
 const perPage = 10;
-
-export const HomeSearchContainer: ComponentType<any> = dynamic(
-  () => import("../components/HomeSearch").then(m => m.HomeSearchForwarded),
-  { ssr: false }
-);
 
 export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
   ssr: false
@@ -214,7 +210,7 @@ const HomePage: NextPage<HomePageProps> = ({
     return SortTypeWindowOption.NONE;
   };
 
-  const [containerRef, isVisible] = useElementOnScreen({
+  const { containerRef, isVisible } = useElementOnScreen({
     root: null,
     rootMargin: "0px",
     threshold: 1.0
@@ -278,18 +274,20 @@ const HomePage: NextPage<HomePageProps> = ({
     return { title: filtersSelected.reference, label: filtersSelected.label };
   };
 
-  console.log("VISBLE", isVisible, containerRef, containerRef);
+  // const tt = useRef(null)
+
+  console.log("VISBLE", isVisible, containerRef.current);
 
   return (
     <PagesNavbar showSearch={true}>
-      <HomeSearchContainer
+      <HomeSearch
         sx={{ mt: "var(--navbar-height)" }}
         onSearch={handleSearch}
         stats={stats}
         ref={containerRef}
-      ></HomeSearchContainer>
+      ></HomeSearch>
       <Container sx={{ my: 10 }}>
-        {isVisible && <Typography>VISIBLE</Typography>}
+        {isVisible ? <Typography>YES</Typography> : <Typography>NO</Typography>}
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
