@@ -94,7 +94,9 @@ export const Feedback = ({ onSuccessFeedback }: FeedbackProps) => {
         Share Your Question/Feedback
       </Typography>
       <Typography component="p" sx={{ color: theme => theme.palette.common.white }}>
-        Hi, thank you for using our website :) We’d love to hear your feedback and comments on anything on this website!
+        Hi, thank you for using our website :)
+        <br />
+        We’d love to hear your feedback and comments on anything on this website!
       </Typography>
       <FormControl variant="standard">
         <InputLabel shrink htmlFor="email-input" sx={{ color: theme => theme.palette.common.white }}>
