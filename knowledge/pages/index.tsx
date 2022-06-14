@@ -1,4 +1,4 @@
-import { Container, Typography } from "@mui/material";
+import { Container } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import dynamic from "next/dynamic";
@@ -210,9 +210,9 @@ const HomePage: NextPage<HomePageProps> = ({
     return SortTypeWindowOption.NONE;
   };
 
-  const { containerRef, isVisible } = useElementOnScreen({
+  const { containerRefCallback, isVisible } = useElementOnScreen({
     root: null,
-    rootMargin: "0px",
+    rootMargin: "100px",
     threshold: 1.0
   });
 
@@ -274,20 +274,15 @@ const HomePage: NextPage<HomePageProps> = ({
     return { title: filtersSelected.reference, label: filtersSelected.label };
   };
 
-  // const tt = useRef(null)
-
-  console.log("VISBLE", isVisible, containerRef.current);
-
   return (
-    <PagesNavbar showSearch={true}>
+    <PagesNavbar showSearch={!isVisible}>
       <HomeSearch
         sx={{ mt: "var(--navbar-height)" }}
         onSearch={handleSearch}
         stats={stats}
-        ref={containerRef}
+        ref={containerRefCallback}
       ></HomeSearch>
       <Container sx={{ my: 10 }}>
-        {isVisible ? <Typography>YES</Typography> : <Typography>NO</Typography>}
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}

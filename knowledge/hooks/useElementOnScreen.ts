@@ -1,40 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 export const useElementOnScreen = (options: IntersectionObserverInit) => {
-  const containerRef = useRef(null);
-  const [isVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // const callbackFunction: IntersectionObserverCallback = (entries) => {
-  //   console.log('entries:', entries)
-  //   const [entry] = entries
-  //   setIsVisible(entry.isIntersecting)
-  // }
+  const containerRefCallback = useCallback(
+    (node: any) => {
+      const observer = new IntersectionObserver(([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      }, options);
 
-  const rr = useCallback(
-    (res: any) => {
-      console.log("res", res);
-      return res;
+      if (node) {
+        observer.unobserve(node);
+        observer.observe(node);
+      }
     },
-    [containerRef]
+    [options]
   );
 
-  const r = rr(containerRef);
-
-  useEffect(() => {
-    console.log("useEffect...", containerRef, r);
-
-    const observer = new IntersectionObserver(([e]) => {
-      console.log("it works", e);
-    }, options);
-    if (r.current) {
-      console.log("exist current");
-      observer.observe(r.current);
-    }
-
-    return () => {
-      if (r.current) observer.unobserve(r.current);
-    };
-  });
-
-  return { containerRef, isVisible };
+  return { containerRefCallback, isVisible };
 };
