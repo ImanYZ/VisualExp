@@ -212,8 +212,8 @@ const HomePage: NextPage<HomePageProps> = ({
 
   const { containerRefCallback, isVisible } = useElementOnScreen({
     root: null,
-    rootMargin: "100px",
-    threshold: 1.0
+    rootMargin: "0px",
+    threshold: 0.2
   });
 
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(getDefaultSortedByType(filtersSelected));
