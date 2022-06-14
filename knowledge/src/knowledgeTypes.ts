@@ -215,10 +215,9 @@ export type StatsSchema = {
   links: string | number;
 };
 
-export type Feedback = {
+export type FeedbackInput = {
   name: string;
   email: string;
   feedback: string;
   pageURL: string;
-  createdAt: Date;
 };

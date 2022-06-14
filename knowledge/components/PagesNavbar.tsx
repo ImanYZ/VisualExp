@@ -26,6 +26,9 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
   const onToggleShowFeedbackForm = () => setShowFeedbackForm(showFeedbackForm => !showFeedbackForm);
+  const onCloseFeedback = () => {
+    setShowFeedbackForm(false);
+  };
 
   return (
     <>
@@ -42,7 +45,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
       >
         {children}
 
-        <FeedbackTooltip open={showFeedbackForm} title={<Feedback />}>
+        <FeedbackTooltip open={showFeedbackForm} title={<Feedback onSuccessFeedback={onCloseFeedback} />}>
           <Fab
             onClick={onToggleShowFeedbackForm}
             color="primary"
