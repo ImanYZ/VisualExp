@@ -219,8 +219,8 @@ export type SearchNodesResponse = {
 };
 export type SearchNodesParams = {
   q?: string | string[];
-  upvotes?: string | string[];
-  mostRecent?: string | string[];
+  upvotes?: boolean;
+  mostRecent?: boolean;
   timeWindow?: string | string[];
   tags?: string | string[];
   institutions?: string | string[];
@@ -228,5 +228,5 @@ export type SearchNodesParams = {
   reference?: string | string[];
   label?: string | string[];
   nodeTypes?: string | string[];
-  page?: string | string[];
+  page?: number;
 };

@@ -1,6 +1,6 @@
 import slugify from "slugify";
 
-import { TimeWindowOption } from "../src/knowledgeTypes";
+import { SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
 
 export const isValidHttpUrl = (possibleUrl?: string) => {
   let url;
@@ -81,4 +81,10 @@ export const homePageSortByDefaults = {
   mostRecent: false,
   timeWindow: SortedByTimeOptions[0],
   perPage: 10
+};
+
+export const getDefaultSortedByType = (filtersSelected: { mostRecent: boolean; upvotes: boolean }) => {
+  if (filtersSelected.mostRecent) return SortTypeWindowOption.MOST_RECENT;
+  if (filtersSelected.upvotes) return SortTypeWindowOption.UPVOTES_DOWNVOTES;
+  return SortTypeWindowOption.NONE;
 };

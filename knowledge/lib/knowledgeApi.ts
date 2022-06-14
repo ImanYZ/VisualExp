@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import {
+  FilterValue,
   ResponseAutocompleteFilter,
   ResponseAutocompleteProcessedReferencesFilter,
   ResponseAutocompleteTags,
@@ -40,6 +41,20 @@ export const getSearchNodes = async (options: SearchNodesParams) => {
   const { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page } = options;
   const response = await axios.get<SearchNodesResponse>("/api/searchNodes", {
     params: { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page }
+  });
+  return response.data;
+};
+
+export const getSelectedContributors = async (users: string) => {
+  const response = await axios.get<FilterValue[]>("/api/getSelectedContributors", {
+    params: { users }
+  });
+  return response.data;
+};
+
+export const getSelectedInstitutions = async (institutions: string) => {
+  const response = await axios.get<FilterValue[]>("/api/getSelectedInstitutions", {
+    params: { institutions }
   });
   return response.data;
 };
