@@ -3,21 +3,23 @@ import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
 import Image from "next/image";
 import { forwardRef } from "react";
+import { useQuery } from "react-query";
 
-import { StatsSchema } from "../src/knowledgeTypes";
+import { getStats } from "../lib/knowledgeApi";
 import SearchInput from "./SearchInput";
 
 type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
-  stats: StatsSchema;
 };
 
 export type Ref = {
   viewState: HTMLElement;
 };
 
-const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch, stats }, ref) => {
+const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch }, ref) => {
+  const { data: stats } = useQuery("stats", getStats);
+
   return (
     <Box
       ref={ref}
@@ -73,11 +75,13 @@ const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch, stats }, re
         >
           <SearchInput onSearch={onSearch}></SearchInput>
         </Box>
-        <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
-          Search {stats.nodes} nodes and {stats.links} links through {stats.proposals} proposals
-          <br />
-          from {stats.users} users in {stats.institutions} institutions
-        </Typography>
+        {stats && (
+          <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
+            Search {stats.nodes} nodes and {stats.links} links through {stats.proposals} proposals
+            <br />
+            from {stats.users} users in {stats.institutions} institutions
+          </Typography>
+        )}
       </Box>
       <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box>
     </Box>
