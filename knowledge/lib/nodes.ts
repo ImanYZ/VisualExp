@@ -1,5 +1,6 @@
 import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
+import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import {
   KnowledgeNode,
@@ -7,26 +8,34 @@ import {
   KnowledgeNodeInstitution,
   LinkedKnowledgeNode,
   NodeFireStore,
-  SimpleNode
+  SimpleNode,
+  TypesenseNodesSchema
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
-import { getNodePageURLTitle } from "./utils";
+import { getTypesenseClient } from "./typesense/typesense.config";
+import { buildFilterBy, buildSortBy, getNodePageURLTitle, homePageSortByDefaults } from "./utils";
 
 export const getAllNodeParamsForStaticProps = async () => {
-  let res = [];
-  const nodeDocs = await db.collection("nodes").select("title").get();
+  const client = getTypesenseClient();
 
-  res = nodeDocs.docs.map(nodeDoc => {
-    const nodeData = nodeDoc.data();
-    return {
-      params: {
-        id: nodeDoc.id,
-        title: getNodePageURLTitle(nodeData.title, nodeDoc.id)
-      }
-    };
-  });
+  const searchParameters: SearchParams = {
+    q: "*",
+    query_by: "title,content",
+    sort_by: buildSortBy(homePageSortByDefaults.upvotes, homePageSortByDefaults.mostRecent),
+    per_page: homePageSortByDefaults.perPage,
+    page: 1,
+    filter_by: buildFilterBy(homePageSortByDefaults.timeWindow, "", "", "", "", "", "")
+  };
+  const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
 
-  return res;
+  const res = searchResults.hits?.map(el => ({
+    params: {
+      id: el.document.id,
+      title: getNodePageURLTitle(el.document.title, el.document.id)
+    }
+  }));
+
+  return res || [];
 };
 
 export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> => {
