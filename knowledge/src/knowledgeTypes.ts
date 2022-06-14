@@ -214,3 +214,11 @@ export type StatsSchema = {
   nodes: number;
   links: string | number;
 };
+
+export type Feedback = {
+  name: string;
+  email: string;
+  feedback: string;
+  pageURL: string;
+  createdAt: Date;
+};
