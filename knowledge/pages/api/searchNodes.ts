@@ -1,59 +1,17 @@
-import dayjs from "dayjs";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { getInstitutionsForAutocomplete } from "../../lib/institutions";
 import { getTypesenseClient } from "../../lib/typesense/typesense.config";
 import {
+  buildFilterBy,
+  buildSortBy,
   getQueryParameter,
   getQueryParameterAsBoolean,
   getQueryParameterAsNumber,
   homePageSortByDefaults
 } from "../../lib/utils";
 import { SearchNodesResponse, SimpleNode, TimeWindowOption, TypesenseNodesSchema } from "../../src/knowledgeTypes";
-
-const buildSortBy = (upvotes: boolean, mostRecent: boolean) => {
-  if (upvotes) {
-    return "mostHelpful:desc";
-  }
-  if (mostRecent) {
-    return "changedAtMillis:desc";
-  }
-  return "";
-};
-
-const buildFilterBy = (
-  timeWindow: TimeWindowOption,
-  tags: string,
-  institutions: string,
-  contributors: string,
-  nodeTypes: string,
-  reference: string,
-  label: string
-) => {
-  const filters: string[] = [];
-  let updatedAt: number;
-  if (timeWindow === TimeWindowOption.ThisWeek) {
-    updatedAt = dayjs().subtract(1, "week").valueOf();
-  } else if (timeWindow === TimeWindowOption.ThisMonth) {
-    updatedAt = dayjs().subtract(1, "month").valueOf();
-  } else if (timeWindow === TimeWindowOption.ThisYear) {
-    updatedAt = dayjs().subtract(1, "year").valueOf();
-  } else {
-    updatedAt = dayjs().subtract(10, "year").valueOf();
-  }
-
-  filters.push(`changedAtMillis:>${updatedAt}`);
-
-  if (tags.length > 0) filters.push(`tags: [${tags}]`);
-  if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
-  if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
-  if (nodeTypes.length > 0) filters.push(`nodeType: [${nodeTypes}]`);
-  if (reference) filters.push(`titlesReferences: ${reference}`);
-  if (label && label !== "All Sections" && label !== "All Pages") filters.push(`labelsReferences: ${label}`);
-
-  return filters.join("&& ");
-};
 
 async function handler(req: NextApiRequest, res: NextApiResponse<SearchNodesResponse>) {
   const q = getQueryParameter(req.query.q) || "*";
