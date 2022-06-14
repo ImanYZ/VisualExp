@@ -2,11 +2,14 @@ import { Container } from "@mui/material";
 import dayjs from "dayjs";
 import { GetServerSideProps, NextPage } from "next";
 import dynamic from "next/dynamic";
+// import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ComponentType, useState } from "react";
 import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
+import HomeSearch from "../components/HomeSearch";
+import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getInstitutionsForAutocomplete } from "../lib/institutions";
 import { getStats } from "../lib/stats";
 import { getContributorsForAutocomplete } from "../lib/users";
@@ -26,11 +29,6 @@ import {
 } from "../src/knowledgeTypes";
 
 const perPage = 10;
-
-export const HomeSearchContainer: ComponentType<any> = dynamic(
-  () => import("../components/HomeSearch").then(m => m.HomeSearch),
-  { ssr: false }
-);
 
 export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
   ssr: false
@@ -212,13 +210,19 @@ const HomePage: NextPage<HomePageProps> = ({
     return SortTypeWindowOption.NONE;
   };
 
+  const { containerRefCallback, isVisible } = useElementOnScreen({
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.2
+  });
+
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(getDefaultSortedByType(filtersSelected));
   const [timeWindow, setTimeWindow] = useState(filtersSelected.anyType || sortByDefaults.timeWindow);
 
   const router = useRouter();
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text, page: 1 } });
+    router.push({ query: { ...router.query, q: text }, hash: text ? "#nodes-begin" : "" });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -271,12 +275,13 @@ const HomePage: NextPage<HomePageProps> = ({
   };
 
   return (
-    <PagesNavbar>
-      <HomeSearchContainer
+    <PagesNavbar showSearch={!isVisible}>
+      <HomeSearch
         sx={{ mt: "var(--navbar-height)" }}
         onSearch={handleSearch}
         stats={stats}
-      ></HomeSearchContainer>
+        ref={containerRefCallback}
+      ></HomeSearch>
       <Container sx={{ my: 10 }}>
         <HomeFilter
           sx={{ mb: 8 }}
