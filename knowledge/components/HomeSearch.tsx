@@ -2,19 +2,27 @@ import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/system";
 import Image from "next/image";
+import { forwardRef } from "react";
+import { useQuery } from "react-query";
 
-import { StatsSchema } from "../src/knowledgeTypes";
+import { getStats } from "../lib/knowledgeApi";
 import SearchInput from "./SearchInput";
 
 type HomeSearchProps = {
   sx?: SxProps<Theme>;
   onSearch: (text: string) => void;
-  stats: StatsSchema;
 };
 
-export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
+type Ref = {
+  viewState: HTMLElement;
+};
+
+const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
+  const { data: stats } = useQuery("stats", getStats);
+
   return (
     <Box
+      ref={ref}
       sx={{
         position: "relative",
         width: "100%",
@@ -41,15 +49,6 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         priority
       />
       <Box sx={{ position: "absolute", maxWidth: "100vw", width: { md: "60%", xs: "85%" } }}>
-        {/* <Typography
-          textAlign="center"
-          variant="h3"
-          component="h1"
-          fontWeight="500"
-          sx={{ mt: 0, marginBottom: { xs: 1, md: 2 }, fontSize: { xs: "23px", md: "50px" } }}
-        >
-          What do you want to learn now?
-        </Typography> */}
         <Box
           sx={{
             textAlign: "center",
@@ -71,12 +70,18 @@ export const HomeSearch = ({ sx, onSearch, stats }: HomeSearchProps) => {
         >
           <SearchInput onSearch={onSearch}></SearchInput>
         </Box>
-        <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
-          Search {stats.nodes} nodes and {stats.links} links through {stats.proposals} proposals
-          <br />
-          from {stats.users} users in {stats.institutions} institutions
-        </Typography>
+        {stats && (
+          <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
+            Search {stats.nodes} nodes and {stats.links} links through {stats.proposals} proposals
+            <br />
+            from {stats.users} users in {stats.institutions} institutions
+          </Typography>
+        )}
       </Box>
+      {/* <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box> */}
     </Box>
   );
-};
+});
+
+HomeSearch.displayName = "HomeSearch";
+export default HomeSearch;
