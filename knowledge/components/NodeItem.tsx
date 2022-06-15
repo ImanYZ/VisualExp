@@ -88,7 +88,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
             <CardHeader sx={{ p: 0, pb: 5 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
 
             <CardContent sx={{ p: 0 }}>
-              <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
+              <Typography variant="body1" fontSize="0.9rem" component="div">
                 <MarkdownRender text={node.content || ""} />
               </Typography>
 
