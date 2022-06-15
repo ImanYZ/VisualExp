@@ -11,6 +11,7 @@ import { useDebounce } from "use-debounce";
 import { getInstitutionsAutocomplete, getSelectedInstitutions } from "../lib/knowledgeApi";
 import { getQueryParameter } from "../lib/utils";
 import { FilterValue } from "../src/knowledgeTypes";
+import OptimizedAvatar from "./OptimizedAvatar";
 
 type Props = {
   onInstitutionsChange: (newValues: FilterValue[]) => void;
@@ -71,7 +72,7 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
         return (
           <li {...newProps}>
             {option.imageUrl ? (
-              <Avatar sizes="small" alt={option.name} src={option.imageUrl} sx={{ mr: 1 }} />
+              <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar />
             ) : undefined}
             {option.name}
           </li>
