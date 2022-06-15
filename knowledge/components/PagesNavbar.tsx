@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { Fab, IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { ClickAwayListener, Fab, IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import Box from "@mui/material/Box";
 import dynamic from "next/dynamic";
 import React, { ComponentType, FC, ReactNode, useState } from "react";
@@ -48,12 +48,20 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         }}
       >
         {children}
+
         <FeedbackTooltip
           open={showFeedbackForm}
           placement="top-start"
-          title={<Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "40px 50px" }} />}
+          title={
+            <Feedback
+              onSuccessFeedback={onCloseFeedback}
+              onClickOutside={onCloseFeedback}
+              sx={{ padding: "40px 50px" }}
+            />
+          }
           sx={{ display: { xs: "none", md: "block" } }}
         >
+          {/* <ClickAwayListener onClickAway={onCloseFeedback}> */}
           <Fab
             onClick={onToggleShowFeedbackForm}
             color="primary"
@@ -71,6 +79,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
               <QuestionMarkIcon />
             </Tooltip>
           </Fab>
+          {/* </ClickAwayListener> */}
         </FeedbackTooltip>
 
         {/* feedback mobil */}
@@ -98,7 +107,13 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
                 position: "relative"
               }}
             >
-              <Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "30px 50px" }} />
+              <ClickAwayListener onClickAway={onCloseFeedback}>
+                <Feedback
+                  onSuccessFeedback={onCloseFeedback}
+                  onClickOutside={() => console.log("click")}
+                  sx={{ padding: "30px 50px" }}
+                />
+              </ClickAwayListener>
               <IconButton
                 onClick={onCloseFeedback}
                 sx={{ position: "absolute", top: "30px", right: "15px", color: "white" }}

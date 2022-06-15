@@ -17,7 +17,7 @@ import {
 import { red } from "@mui/material/colors";
 import { Formik, FormikErrors, FormikHelpers } from "formik";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 
 import { sendFeedback } from "../lib/knowledgeApi";
 
@@ -30,12 +30,16 @@ interface FeedbackFormValues {
   feedback: string;
 }
 
+type Ref = {
+  viewState: HTMLElement;
+};
+
 interface FeedbackProps {
   onSuccessFeedback: () => void;
   sx?: SxProps<Theme>;
 }
 
-export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
+const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref) => {
   const router = useRouter();
 
   const [url, setUrl] = useState("");
@@ -75,7 +79,7 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
     </Typography>
   );
 
-  if (successFeedback) {
+  const SuccessFeedback = () => {
     return (
       <Box
         sx={{
@@ -107,72 +111,92 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
         </Button>
       </Box>
     );
-  }
+  };
+
+  const FormFeedback = () => {
+    return (
+      <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px", ...sx }}>
+        <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
+          Share Your Question/Feedback
+        </Typography>
+        <Typography component="p" sx={{ color: theme => theme.palette.common.white }}>
+          Hi, thank you for using our website :)
+          <br />
+          We’d love to hear your feedback and comments on anything on this website!
+        </Typography>
+        <Formik initialValues={initialValues} validate={validate} onSubmit={onSubmit}>
+          {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+            <form onSubmit={handleSubmit}>
+              <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
+                <InputLabel shrink htmlFor="email-input" sx={{ color: theme => theme.palette.common.white }}>
+                  Email* {getErrorMessage(errors.email, touched.email)}
+                </InputLabel>
+                <CustomInput
+                  id="email-input"
+                  name="email"
+                  type="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              </FormControl>
+
+              <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
+                <InputLabel shrink htmlFor="name-input" sx={{ color: theme => theme.palette.common.white }}>
+                  Name* {getErrorMessage(errors.name, touched.name)}
+                </InputLabel>
+                <CustomInput
+                  id="name-input"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+              </FormControl>
+
+              <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
+                <InputLabel shrink htmlFor="feedback-input" sx={{ color: theme => theme.palette.common.white }}>
+                  Your Feedback* {getErrorMessage(errors.feedback, touched.feedback)}
+                </InputLabel>
+                <CustomInput
+                  id="feedback-input"
+                  name="feedback"
+                  value={values.feedback}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  rows={3}
+                  multiline
+                />
+              </FormControl>
+              <LoadingButton type="submit" color="primary" variant="contained" fullWidth loading={isSubmitting}>
+                Submit
+                <ArrowForwardIcon sx={{ ml: "10px" }} />
+              </LoadingButton>
+            </form>
+          )}
+        </Formik>
+      </Box>
+    );
+  };
 
   return (
-    <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px", ...sx }}>
-      <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
-        Share Your Question/Feedback
-      </Typography>
-      <Typography component="p" sx={{ color: theme => theme.palette.common.white }}>
-        Hi, thank you for using our website :)
-        <br />
-        We’d love to hear your feedback and comments on anything on this website!
-      </Typography>
-      <Formik initialValues={initialValues} validate={validate} onSubmit={onSubmit}>
-        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
-          <form onSubmit={handleSubmit}>
-            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
-              <InputLabel shrink htmlFor="email-input" sx={{ color: theme => theme.palette.common.white }}>
-                Email* {getErrorMessage(errors.email, touched.email)}
-              </InputLabel>
-              <CustomInput
-                id="email-input"
-                name="email"
-                type="email"
-                value={values.email}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-            </FormControl>
-
-            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
-              <InputLabel shrink htmlFor="name-input" sx={{ color: theme => theme.palette.common.white }}>
-                Name* {getErrorMessage(errors.name, touched.name)}
-              </InputLabel>
-              <CustomInput
-                id="name-input"
-                name="name"
-                value={values.name}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-            </FormControl>
-
-            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
-              <InputLabel shrink htmlFor="feedback-input" sx={{ color: theme => theme.palette.common.white }}>
-                Your Feedback* {getErrorMessage(errors.feedback, touched.feedback)}
-              </InputLabel>
-              <CustomInput
-                id="feedback-input"
-                name="feedback"
-                value={values.feedback}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                rows={3}
-                multiline
-              />
-            </FormControl>
-            <LoadingButton type="submit" color="primary" variant="contained" fullWidth loading={isSubmitting}>
-              Submit
-              <ArrowForwardIcon sx={{ ml: "10px" }} />
-            </LoadingButton>
-          </form>
-        )}
-      </Formik>
+    <Box
+      ref={ref}
+      sx={{
+        width: "100%",
+        height: "450px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        ...sx
+      }}
+    >
+      {successFeedback ? <SuccessFeedback /> : <FormFeedback />}
     </Box>
   );
-};
+});
+
+Feedback.displayName = "Feedback";
 
 const CustomInput = styled(InputBase)(({ theme }) => ({
   "label + &": {
