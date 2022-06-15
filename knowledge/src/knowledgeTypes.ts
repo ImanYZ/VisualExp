@@ -230,3 +230,10 @@ export type SearchNodesParams = {
   nodeTypes?: string | string[];
   page?: number;
 };
+
+export type FeedbackInput = {
+  name: string;
+  email: string;
+  feedback: string;
+  pageURL: string;
+};

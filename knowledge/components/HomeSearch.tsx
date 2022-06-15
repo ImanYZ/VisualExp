@@ -13,11 +13,11 @@ type HomeSearchProps = {
   onSearch: (text: string) => void;
 };
 
-export type Ref = {
+type Ref = {
   viewState: HTMLElement;
 };
 
-const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch }, ref) => {
+const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
   const { data: stats } = useQuery("stats", getStats);
 
   return (
@@ -39,11 +39,6 @@ const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch }, ref) => {
         ...sx
       }}
     >
-      <div>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti aperiam, maiores quaerat eligendi accusamus
-        maxime similique, optio officiis rem nihil temporibus magnam dolorem placeat qui, soluta nobis at blanditiis
-        voluptatum.
-      </div>
       <Image
         style={{ filter: "brightness(.6)" }}
         alt="1cademy library"
@@ -83,7 +78,7 @@ const HomeSearch = forwardRef<any, HomeSearchProps>(({ sx, onSearch }, ref) => {
           </Typography>
         )}
       </Box>
-      <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box>
+      {/* <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box> */}
     </Box>
   );
 });
