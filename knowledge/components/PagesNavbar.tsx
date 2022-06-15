@@ -1,5 +1,6 @@
+import CloseIcon from "@mui/icons-material/Close";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { Fab, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { Fab, IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import Box from "@mui/material/Box";
 import dynamic from "next/dynamic";
 import React, { ComponentType, FC, ReactNode, useState } from "react";
@@ -29,8 +30,8 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
   const onCloseFeedback = () => setShowFeedbackForm(false);
 
   const onSendFeedback = () => {
-    // onCloseFeedback()
-    onCloseMenu();
+    setShowMenu(false);
+    setShowFeedbackForm(true);
   };
 
   return (
@@ -50,7 +51,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         <FeedbackTooltip
           open={showFeedbackForm}
           placement="top-start"
-          title={<Feedback onSuccessFeedback={onCloseFeedback} />}
+          title={<Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "40px 50px" }} />}
           sx={{ display: { xs: "none", md: "block" } }}
         >
           <Fab
@@ -73,29 +74,40 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         </FeedbackTooltip>
 
         {/* feedback mobil */}
-        <Box
-          sx={{
-            width: "100vw",
-            height: "calc(100vh - var(--navbar-height) )",
-            position: "fixed",
-            bottom: "0px",
-            zIndex: "10",
-            display: { xs: "flex", md: "none" },
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#6028282A"
-          }}
-        >
+        {showFeedbackForm && (
           <Box
             sx={{
-              maxWidth: "500px",
-              maxHeight: "600px",
-              backgroundColor: theme => theme.palette.common.darkGrayBackground
+              width: "100vw",
+              height: "calc(100vh - var(--navbar-height) )",
+              px: "9px",
+              position: "fixed",
+              bottom: "0px",
+              zIndex: "10",
+              display: { xs: "flex", md: "none" },
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#6028282A"
             }}
           >
-            <Feedback onSuccessFeedback={onCloseFeedback} />
+            <Box
+              sx={{
+                maxWidth: "500px",
+                width: "100%",
+                maxHeight: "600px",
+                backgroundColor: theme => theme.palette.common.darkGrayBackground,
+                position: "relative"
+              }}
+            >
+              <Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "30px 50px" }} />
+              <IconButton
+                onClick={onCloseFeedback}
+                sx={{ position: "absolute", top: "30px", right: "15px", color: "white" }}
+              >
+                <CloseIcon fontSize="large" />
+              </IconButton>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
       <AppFooter />
     </>
