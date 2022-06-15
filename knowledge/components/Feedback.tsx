@@ -1,6 +1,7 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   alpha,
   Box,
@@ -64,7 +65,6 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
     return errors;
   };
   const onSubmit = async (values: FeedbackFormValues, { setSubmitting }: FormikHelpers<FeedbackFormValues>) => {
-    console.log(values);
     await sendFeedback({ ...values, pageURL: url });
     setSuccessFeedback(true);
     setSubmitting(false);
@@ -74,9 +74,8 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
     return (
       <Box
         sx={{
-          width: "500px",
+          width: "100%",
           height: "450px",
-          padding: "40px 50px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
@@ -106,7 +105,7 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
   }
 
   return (
-    <Box sx={{ width: "500px", padding: "40px 50px", display: "flex", flexDirection: "column", gap: "20px", ...sx }}>
+    <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px", ...sx }}>
       <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
         Share Your Question/Feedback
       </Typography>
@@ -164,11 +163,10 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
                 {errors.feedback && touched.feedback && errors.feedback}
               </FormHelperText>
             </FormControl>
-
-            <Button type="submit" color="primary" variant="contained" fullWidth disabled={isSubmitting}>
+            <LoadingButton type="submit" color="primary" variant="contained" fullWidth loading={isSubmitting}>
               Submit
               <ArrowForwardIcon sx={{ ml: "10px" }} />
-            </Button>
+            </LoadingButton>
           </form>
         )}
       </Formik>
