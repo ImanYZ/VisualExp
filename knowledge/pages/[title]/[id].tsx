@@ -75,7 +75,7 @@ const NodePage: NextPage<Props> = ({ node, keywords, createdStr, updatedStr }) =
 
   const { parents, contributors, references, institutions, tags, children, siblings } = node || {};
   return (
-    <PagesNavbar title={`1Cademy - ${node.title}`}>
+    <PagesNavbar title={`1Cademy - ${node.title}`} showSearch={false}>
       <Box sx={{ p: { xs: 3, md: 10 } }}>
         <NodeHead node={node} keywords={keywords} createdStr={createdStr} updatedStr={updatedStr} />
         <Grid container spacing={3}>

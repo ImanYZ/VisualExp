@@ -1,10 +1,14 @@
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import { Box, Button, Link, MenuItem, MenuList } from "@mui/material";
-import NextLink from "next/link";
 import React from "react";
 
 import SECTIONS from "../src/navbarSections";
 
-const AppMenuMovil = () => {
+interface AppMenuMovilProps {
+  onSendFeedback: () => void;
+}
+
+const AppMenuMovil = ({ onSendFeedback }: AppMenuMovilProps) => {
   return (
     <Box
       sx={{
@@ -23,19 +27,23 @@ const AppMenuMovil = () => {
       <MenuList>
         {SECTIONS.map((page, idx) => (
           <MenuItem key={idx} sx={{ justifyContent: "center" }}>
-            <NextLink key={idx} color="inherit" href={page.route}>
-              <Link
-                padding="13px 20px"
-                sx={{
-                  fontSize: "25px",
-                  fontWeight: "400",
-                  color: theme => theme.palette.common.white
-                }}
-                underline="none"
-              >
-                {page.label.toUpperCase()}
-              </Link>
-            </NextLink>
+            <Link
+              key={idx}
+              color="inherit"
+              href={page.route}
+              padding="13px 20px"
+              sx={{
+                fontSize: "18px",
+                fontWeight: "400",
+                color: theme => theme.palette.common.white
+              }}
+              underline="none"
+              target={page.label === "Node" ? "_self" : "_blank"}
+              rel="noreferrer"
+            >
+              {page.label.toUpperCase()}
+            </Link>
+            {/* </NextLink> */}
           </MenuItem>
         ))}
         <MenuItem>
@@ -44,7 +52,7 @@ const AppMenuMovil = () => {
             variant="contained"
             sx={{
               px: "30px",
-              fontSize: "30px",
+              fontSize: "18px",
               fontWeight: "500",
               borderRadius: 40
             }}
@@ -53,6 +61,24 @@ const AppMenuMovil = () => {
           </Button>
         </MenuItem>
       </MenuList>
+      <Button
+        size="large"
+        variant="outlined"
+        sx={{
+          position: "absolute",
+          bottom: "10px",
+          px: "30px",
+          color: theme => theme.palette.common.white,
+          fontSize: "18px",
+          fontWeight: "500",
+          borderColor: theme => theme.palette.common.white,
+          borderRadius: 40
+        }}
+        onClick={onSendFeedback}
+      >
+        <QuestionMarkIcon sx={{ mr: "10px" }} />
+        Question/Feedback
+      </Button>
     </Box>
   );
 };

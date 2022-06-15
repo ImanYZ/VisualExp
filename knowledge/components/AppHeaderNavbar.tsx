@@ -5,8 +5,9 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
+import { styled } from "@mui/material/styles";
 import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
+import Tooltip, { tooltipClasses, TooltipProps } from "@mui/material/Tooltip";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
@@ -20,10 +21,11 @@ import AppHeaderSearchBar from "./AppHeaderSearchBar";
 type Props = {
   showApply?: boolean;
   showMenu: boolean;
+  showSearch: boolean;
   onCloseMenu: () => void;
   onShowMenu: () => void;
 };
-const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu, onShowMenu }) => {
+const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
   return (
@@ -39,24 +41,25 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
         <Box sx={{ paddingLeft: "30px" }} display={{ xs: "none", md: "block" }}>
           {SECTIONS.map((page, idx) => {
             return (
-              <Tooltip key={idx} title={page.title}>
-                <NextLink passHref color="inherit" href={page.route}>
-                  <Link
-                    padding="20px 20px"
-                    sx={{
-                      fontSize: "16px",
-                      fontWeight: "500",
-                      color: theme =>
-                        router.route === page.route ? theme.palette.common.white : theme.palette.grey[500],
-                      borderBottom: theme =>
-                        router.route === page.route ? `solid 2px ${theme.palette.common.orange}` : "none"
-                    }}
-                    underline="none"
-                  >
-                    {page.label.toUpperCase()}
-                  </Link>
-                </NextLink>
-              </Tooltip>
+              <LightTooltip key={idx} title={page.title} arrow={false}>
+                <Link
+                  href={page.route}
+                  padding="20px 20px"
+                  target={page.label === "Node" ? "_self" : "_blank"}
+                  rel="noreferrer"
+                  sx={{
+                    fontSize: "16px",
+                    fontWeight: "500",
+                    color: theme =>
+                      router.route === page.route ? theme.palette.common.white : theme.palette.grey[500],
+                    borderBottom: theme =>
+                      router.route === page.route ? `solid 2px ${theme.palette.common.orange}` : "none"
+                  }}
+                  underline="none"
+                >
+                  {page.label.toUpperCase()}
+                </Link>
+              </LightTooltip>
             );
           })}
         </Box>
@@ -70,7 +73,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
             marginLeft: "20px"
           }}
         >
-          {router.route !== "/" && <AppHeaderSearchBar />}
+          {(router.route !== "/" || (router.route === "/" && showSearch)) && <AppHeaderSearchBar />}
           {showApply && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
@@ -122,5 +125,16 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, onCloseMenu,
     </AppBar>
   );
 };
+
+const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.white,
+    color: "rgba(0, 0, 0, 0.87)",
+    boxShadow: theme.shadows[1],
+    fontSize: 12
+  }
+}));
 
 export default AppAppBar;
