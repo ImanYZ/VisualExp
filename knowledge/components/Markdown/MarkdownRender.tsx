@@ -17,7 +17,7 @@ const MarkdownRender: FC<Props> = ({ text }) => {
       remarkPlugins={[remarkMath]}
       rehypePlugins={[rehypeKatex]}
       components={{
-        p: ({ ...props }) => <Typography fontSize={"inherit"} {...props} />,
+        p: ({ ...props }) => <Typography fontSize={"inherit"} lineHeight={"inherit"} {...props} />,
         code({ inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
           return !inline && match ? (

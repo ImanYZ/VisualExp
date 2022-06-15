@@ -16,10 +16,10 @@ export const getStats = async (): Promise<StatsSchema> => {
   }
 
   return {
-    institutions: 0,
-    users: 0,
-    proposals: 0,
-    nodes: 0,
-    links: 0
+    institutions: "0",
+    users: "0",
+    proposals: "0",
+    nodes: "0",
+    links: "0"
   };
 };
