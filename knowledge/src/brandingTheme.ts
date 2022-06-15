@@ -123,14 +123,10 @@ export function getThemedComponents(): {
             style: {
               "&:hover, &.Mui-focusVisible": {
                 backgroundColor: common.orangeDark
-              }
-            }
-          },
-          {
-            props: { variant: "contained" },
-            style: {
-              "&:hover, &.Mui-focusVisible": {
-                backgroundColor: common.orangeDark
+              },
+              "&.Mui-disabled .MuiLoadingButton-loadingIndicator": {
+                // backgroundColor: common.orangeDark,
+                color: common.orangeLight
               }
             }
           }
