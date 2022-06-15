@@ -1,18 +1,21 @@
+import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
 import { getTagsAutocomplete } from "../lib/knowledgeApi";
+import { getQueryParameter } from "../lib/utils";
 
 type Props = {
-  tags: string[];
   onTagsChange: (newValues: string[]) => void;
 };
 
-const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
+const TagsAutocomplete: FC<Props> = ({ onTagsChange }) => {
+  const router = useRouter();
   const [value, setValue] = useState<string[]>([]);
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
@@ -34,10 +37,11 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
   };
 
   useEffect(() => {
+    const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
     if (value.length === 0 && tags.length > 0 && !hasBeenCleared) {
       setValue(tags);
     }
-  }, [tags, hasBeenCleared, value.length]);
+  }, [hasBeenCleared, router.query.tags, value.length]);
 
   return (
     <Autocomplete
@@ -50,7 +54,7 @@ const TagsAutocomplete: FC<Props> = ({ tags = [], onTagsChange }) => {
       loading={isLoading}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
-          <Chip variant="outlined" label={option} {...getTagProps({ index })} key={index} />
+          <Chip variant="outlined" label={option} deleteIcon={<CloseIcon />} {...getTagProps({ index })} key={index} />
         ))
       }
       renderInput={params => <TextField {...params} variant="outlined" label="Tags" />}

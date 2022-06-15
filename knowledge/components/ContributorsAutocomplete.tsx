@@ -1,20 +1,23 @@
+import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
-import { getContributorsAutocomplete } from "../lib/knowledgeApi";
+import { getContributorsAutocomplete, getSelectedContributors } from "../lib/knowledgeApi";
+import { getQueryParameter } from "../lib/utils";
 import { FilterValue } from "../src/knowledgeTypes";
 
 type Props = {
-  contributors: FilterValue[];
   onContributorsChange: (newValues: FilterValue[]) => void;
 };
 
-const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributors = [] }) => {
+const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange }) => {
+  const router = useRouter();
   const [hasBeenCleared, setHasBeenCleared] = useState(false);
   const [value, setValue] = useState<FilterValue[]>([]);
   const [text, setText] = useState("");
@@ -35,10 +38,21 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
   };
 
   useEffect(() => {
+    const parameterContributors = getQueryParameter(router.query.contributors) || "";
+    const fetchSelectedContributors = async () => {
+      try {
+        const response = await getSelectedContributors(parameterContributors);
+        setValue(response);
+      } catch {
+        setValue([]);
+      }
+    };
+    const contributors = parameterContributors.split(",").filter(el => el !== "");
+
     if (value.length === 0 && contributors.length > 0 && !hasBeenCleared) {
-      setValue(contributors);
+      fetchSelectedContributors();
     }
-  }, [contributors, hasBeenCleared, value.length]);
+  }, [hasBeenCleared, router.query.contributors, value.length]);
 
   return (
     <Autocomplete
@@ -70,6 +84,7 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange, contributor
             avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
             variant="outlined"
             label={option.name}
+            deleteIcon={<CloseIcon />}
             {...getTagProps({ index })}
             key={index}
           />

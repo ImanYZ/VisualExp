@@ -12,16 +12,16 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { getInstitutionsByName } from "../lib/firestore/institutions";
+import { getNodePageUrl } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
 import OptimizedAvatar from "./OptimizedAvatar";
 import QuestionItem from "./QuestionItem";
-// import QuestionItem from "./QuestionItem";
 
 dayjs.extend(relativeTime);
 
@@ -32,10 +32,10 @@ type InstitutionData = {
 
 type NodeItemProps = {
   node: SimpleNode;
-  type: "ssr" | "static" | "incremental";
 };
 
-export const NodeItem = ({ node, type }: NodeItemProps) => {
+export const NodeItem = ({ node }: NodeItemProps) => {
+  const ref = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [institutionsData, setInstitutionsData] = useState<InstitutionData[]>([]);
 
@@ -79,16 +79,10 @@ export const NodeItem = ({ node, type }: NodeItemProps) => {
       </IconButton>
     );
   };
-  const getLink = () => {
-    console.log("type", type);
-    if (type === "incremental") {
-      return `/update-incremental-static-node2/${node.id}`;
-    }
-    return `/${encodeURIComponent(node.title || "")}/${node.id}`;
-  };
+
   return (
     <Card sx={{ width: "100%", ":hover": { boxShadow: "2px 2px 15px rgba(0, 0, 0, 0.2)" } }}>
-      <NextLink passHref href={getLink()}>
+      <NextLink passHref href={getNodePageUrl(node.title || "", node.id)}>
         <Link underline="none" color="inherit">
           <CardActionArea sx={{ pt: { xs: 4, lg: 6 }, px: { xs: 5, lg: 10 }, pb: 2 }}>
             <CardHeader sx={{ p: 0, pb: 5 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
@@ -100,7 +94,15 @@ export const NodeItem = ({ node, type }: NodeItemProps) => {
 
               {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
               {node.nodeImage && (
-                <Box component="img" sx={{ mt: 3 }} width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />
+                <Box
+                  ref={ref}
+                  component="img"
+                  sx={{ mt: 3 }}
+                  width="100%"
+                  src={node.nodeImage}
+                  alt={node.title}
+                  loading="lazy"
+                />
               )}
             </CardContent>
           </CardActionArea>

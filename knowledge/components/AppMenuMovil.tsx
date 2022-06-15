@@ -23,7 +23,7 @@ const AppMenuMovil = () => {
       <MenuList>
         {SECTIONS.map((page, idx) => (
           <MenuItem key={idx} sx={{ justifyContent: "center" }}>
-            <NextLink key={idx} color="inherit" href={page.route}>
+            <NextLink key={idx} href={page.route}>
               <Link
                 padding="13px 20px"
                 sx={{

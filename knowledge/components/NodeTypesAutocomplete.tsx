@@ -1,14 +1,16 @@
+import CloseIcon from "@mui/icons-material/Close";
 import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 
+import { getQueryParameter } from "../lib/utils";
 import { NodeType } from "../src/knowledgeTypes";
 import NodeTypeIcon from "./NodeTypeIcon";
 
 type Props = {
-  nodeTypes: string[];
   onNodesTypeChange: (newValues: string[]) => void;
 };
 
@@ -27,7 +29,8 @@ const options: NodeType[] = [
   NodeType.Tag
 ];
 
-const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
+const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange }) => {
+  const router = useRouter();
   const [value, setValue] = useState<string[]>([]);
   const [hasBeenCleared, setHasBeenCleared] = useState(false);
 
@@ -40,10 +43,12 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
   };
 
   useEffect(() => {
+    const nodeTypes = (getQueryParameter(router.query.nodeTypes) || "").split(",").filter(el => el !== "");
+
     if (value.length === 0 && nodeTypes.length > 0 && !hasBeenCleared) {
       setValue(nodeTypes);
     }
-  }, [nodeTypes, hasBeenCleared, value.length]);
+  }, [hasBeenCleared, router.query.nodeTypes, value.length]);
 
   return (
     <Tooltip title="There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon at the bottom-right corner of each node.">
@@ -65,6 +70,7 @@ const NodeTypesAutocomplete: FC<Props> = ({ onNodesTypeChange, nodeTypes }) => {
               icon={<NodeTypeIcon color="primary" nodeType={option as NodeType} />}
               variant="outlined"
               label={option}
+              deleteIcon={<CloseIcon />}
               {...getTagProps({ index })}
               key={index}
             />
