@@ -3,19 +3,21 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
-import { getInstitutionsAutocomplete } from "../lib/knowledgeApi";
+import { getInstitutionsAutocomplete, getSelectedInstitutions } from "../lib/knowledgeApi";
+import { getQueryParameter } from "../lib/utils";
 import { FilterValue } from "../src/knowledgeTypes";
 
 type Props = {
-  institutions: FilterValue[];
   onInstitutionsChange: (newValues: FilterValue[]) => void;
 };
 
-const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange, institutions }) => {
+const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
+  const router = useRouter();
   const [hasBeenCleared, setHasBeenCleared] = useState(false);
   const [value, setValue] = useState<FilterValue[]>([]);
   const [text, setText] = useState("");
@@ -37,10 +39,21 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange, institution
   };
 
   useEffect(() => {
+    const parameterInstitutions = getQueryParameter(router.query.institutions) || "";
+    const fetchSelectedInstitutions = async () => {
+      try {
+        const response = await getSelectedInstitutions(parameterInstitutions);
+        setValue(response);
+      } catch {
+        setValue([]);
+      }
+    };
+    const institutions = parameterInstitutions.split(",").filter(el => el !== "");
+
     if (value.length === 0 && institutions.length > 0 && !hasBeenCleared) {
-      setValue(institutions);
+      fetchSelectedInstitutions();
     }
-  }, [institutions, hasBeenCleared, value.length]);
+  }, [hasBeenCleared, router.query.institutions, value.length]);
 
   return (
     <Autocomplete
