@@ -17,7 +17,7 @@ type Ref = {
   viewState: HTMLElement;
 };
 
-const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
+export const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
   const { data: stats } = useQuery("stats", getStats);
 
   return (
@@ -84,4 +84,3 @@ const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
 });
 
 HomeSearch.displayName = "HomeSearch";
-export default HomeSearch;

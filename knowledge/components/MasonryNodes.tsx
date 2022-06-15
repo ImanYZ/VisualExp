@@ -7,7 +7,7 @@ import { SxProps, Theme } from "@mui/system";
 import { SimpleNode } from "../src/knowledgeTypes";
 import { NodeItem } from "./NodeItem";
 
-type Props = {
+type MasonryNodesProps = {
   nodes: SimpleNode[];
   page: number;
   totalPages?: number;
@@ -16,7 +16,7 @@ type Props = {
   isLoading?: boolean;
 };
 
-const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoading }: Props) => {
+export const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoading }: MasonryNodesProps) => {
   const handleChangePage = (event: React.ChangeEvent<unknown>, value: number) => {
     onChangePage(value);
   };
@@ -34,7 +34,7 @@ const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoading }: 
             <Skeleton height={250} />
           </>
         )}
-        {!isLoading && nodes.map(el => <NodeItem key={el.id} node={el} />)}
+        {!isLoading && nodes.map((el: any) => <NodeItem key={el.id} node={el} />)}
       </Masonry>
       {totalPages && totalPages > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -44,5 +44,3 @@ const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoading }: 
     </Box>
   );
 };
-
-export default MasonryNodes;
