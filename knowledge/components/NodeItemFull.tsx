@@ -36,7 +36,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
   };
 
   return (
-    <Card>
+    <Card data-testid="node-item-full">
       <CardHeader
         sx={{ px: { xs: 5, md: 10 }, pt: { xs: 4, md: 10 }, pb: 8 }}
         title={<MarkdownRender text={node.title || ""} />}
