@@ -1,14 +1,11 @@
 import Container from "@mui/material/Container";
 import { NextPage } from "next";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { ComponentType, useState } from "react";
 import { useQuery } from "react-query";
 
-import HomeFilter from "../components/HomeFilter";
 import HomeSearch from "../components/HomeSearch";
-import MasonryNodes from "../components/MasonryNodes";
-import PagesNavbar from "../components/PagesNavbar";
-import SortByFilters from "../components/SortByFilters";
 import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
 import {
@@ -19,6 +16,30 @@ import {
   homePageSortByDefaults
 } from "../lib/utils";
 import { FilterValue, SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
+
+// export const HomeSearchContainer: ComponentType<any> = dynamic(
+//   () => import("../components/HomeSearch").then(m => m),
+//   { ssr: false }
+// );
+
+export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
+  ssr: false
+});
+
+export const PagesNavbar: ComponentType<any> = dynamic(() => import("../components/PagesNavbar").then(m => m.default), {
+  ssr: false
+});
+
+export const SortByFilters: ComponentType<any> = dynamic(
+  () => import("../components/SortByFilters").then(m => m.default),
+  {
+    ssr: false
+  }
+);
+
+const MasonryNodes: ComponentType<any> = dynamic(() => import("../components/MasonryNodes").then(m => m.MasonryNodes), {
+  ssr: false
+});
 
 const HomePage: NextPage = () => {
   const router = useRouter();
@@ -117,7 +138,7 @@ const HomePage: NextPage = () => {
 
   return (
     <PagesNavbar showSearch={!isVisible}>
-      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback}></HomeSearch>
+      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback} />
       <Container sx={{ my: 10 }}>
         <HomeFilter
           sx={{ mb: 8 }}

@@ -9,11 +9,11 @@ import { getReferencesAutocomplete } from "../lib/knowledgeApi";
 import { getQueryParameter, isValidHttpUrl } from "../lib/utils";
 import { FilterProcessedReferences } from "../src/knowledgeTypes";
 
-type Props = {
+type ReferencesAutocompleteProps = {
   onReferencesChange: (title: string, label: string) => void;
 };
 
-export const ReferencesAutocomplete = ({ onReferencesChange }: Props) => {
+export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocompleteProps) => {
   const router = useRouter();
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);

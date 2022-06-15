@@ -9,7 +9,7 @@ import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
 import { ReferencesAutocomplete } from "./ReferencesAutocomplete";
 
-type Props = {
+type HomeFilterProps = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
   onInstitutionsChange: (newValues: FilterValue[]) => void;
@@ -18,7 +18,7 @@ type Props = {
   onReferencesChange: (title: string, label: string) => void;
 };
 
-const HomeFilter: FC<Props> = ({
+const HomeFilter: FC<HomeFilterProps> = ({
   sx,
   onTagsChange,
   onInstitutionsChange,
