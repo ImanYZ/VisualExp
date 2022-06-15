@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { ComponentType, useState } from "react";
 import { useQuery } from "react-query";
 
+import HomeSearch from "../components/HomeSearch";
 import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
 import {
@@ -16,10 +17,10 @@ import {
 } from "../lib/utils";
 import { FilterValue, SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
 
-export const HomeSearchContainer: ComponentType<any> = dynamic(
-  () => import("../components/HomeSearch").then(m => m.HomeSearch),
-  { ssr: false }
-);
+// export const HomeSearchContainer: ComponentType<any> = dynamic(
+//   () => import("../components/HomeSearch").then(m => m),
+//   { ssr: false }
+// );
 
 export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
   ssr: false
@@ -137,7 +138,7 @@ const HomePage: NextPage = () => {
 
   return (
     <PagesNavbar showSearch={!isVisible}>
-      <HomeSearchContainer sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback} />
+      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback} />
       <Container sx={{ my: 10 }}>
         <HomeFilter
           sx={{ mb: 8 }}
