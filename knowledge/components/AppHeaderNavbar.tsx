@@ -77,10 +77,13 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, 
           {showApply && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
-                size="small"
+                size="medium"
                 variant="contained"
                 sx={{
-                  fontWeight: "500",
+                  width: "100px",
+                  p: "6px 16px",
+                  fontSize: "16px",
+                  fontWeight: "600",
                   borderRadius: 40,
                   display: { xs: "none", md: "block" }
                 }}
