@@ -15,6 +15,7 @@ export default function AppFooter() {
     <Box
       component="footer"
       sx={{
+        width: "100%",
         height: "var(--footer-height)",
         display: "flex",
         flexDirection: { xs: "column", md: "row" },

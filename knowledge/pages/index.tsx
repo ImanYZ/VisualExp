@@ -9,6 +9,7 @@ import HomeSearch from "../components/HomeSearch";
 import MasonryNodes from "../components/MasonryNodes";
 import PagesNavbar from "../components/PagesNavbar";
 import SortByFilters from "../components/SortByFilters";
+import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
 import {
   getDefaultSortedByType,
@@ -26,6 +27,12 @@ const HomePage: NextPage = () => {
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(
     getDefaultSortedByType({ mostRecent, upvotes })
   );
+
+  const { containerRefCallback, isVisible } = useElementOnScreen({
+    root: null,
+    rootMargin: "0px",
+    threshold: 0.2
+  });
 
   const q = getQueryParameter(router.query.q) || "*";
 
@@ -109,8 +116,8 @@ const HomePage: NextPage = () => {
   };
 
   return (
-    <PagesNavbar showSearch>
-      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch}></HomeSearch>
+    <PagesNavbar showSearch={!isVisible}>
+      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback}></HomeSearch>
       <Container sx={{ my: 10 }}>
         <HomeFilter
           sx={{ mb: 8 }}
