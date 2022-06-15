@@ -51,7 +51,6 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
 
 const SearchStyled = styled("div")(({ theme }) => ({
   position: "relative",
-  border: "2px solid",
   borderColor: theme.palette.common.white,
   "&:hover": {
     backgroundColor: alpha(theme.palette.grey[300], 0.06)
@@ -81,7 +80,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     height: "36px",
     fontWeight: 300,
     background: theme.palette.common.white,
-    border: "none"
+    border: "solid 2px",
+    borderColor: theme.palette.common.white
   },
   "@media (min-width:900px)": {
     "& .MuiInputBase-input": {
