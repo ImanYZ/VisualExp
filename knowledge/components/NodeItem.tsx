@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import NextLink from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { getInstitutionsByName } from "../lib/firestore/institutions";
 import { getNodePageUrl } from "../lib/utils";
@@ -35,6 +35,7 @@ type NodeItemProps = {
 };
 
 export const NodeItem = ({ node }: NodeItemProps) => {
+  const ref = useRef(null);
   const [expanded, setExpanded] = useState(false);
   const [institutionsData, setInstitutionsData] = useState<InstitutionData[]>([]);
 
@@ -87,13 +88,21 @@ export const NodeItem = ({ node }: NodeItemProps) => {
             <CardHeader sx={{ p: 0, pb: 5 }} title={<MarkdownRender text={node.title || ""} />}></CardHeader>
 
             <CardContent sx={{ p: 0 }}>
-              <Typography variant="body1" fontSize="0.9rem" color="text.secondary" component="div">
+              <Typography variant="body1" fontSize="0.9rem" component="div">
                 <MarkdownRender text={node.content || ""} />
               </Typography>
 
               {node.nodeType === "Question" && <QuestionItem choices={node.choices} />}
               {node.nodeImage && (
-                <Box component="img" sx={{ mt: 3 }} width="100%" src={node.nodeImage} alt={node.title} loading="lazy" />
+                <Box
+                  ref={ref}
+                  component="img"
+                  sx={{ mt: 3 }}
+                  width="100%"
+                  src={node.nodeImage}
+                  alt={node.title}
+                  loading="lazy"
+                />
               )}
             </CardContent>
           </CardActionArea>
