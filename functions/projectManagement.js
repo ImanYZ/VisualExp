@@ -1388,8 +1388,9 @@ exports.gradeFreeRecall = async (req, res) => {
         // Finally, we should create the recallGrades doc for this new grade.
         t.update(recallGradeRef, {
           ...recallGradeUpdates,
-          researchera: [...recallGradeData.researchers, fullname],
+          researchers: [...recallGradeData.researchers, fullname],
           grades: [...recallGradeData.grades, grade],
+          researchersNum:recallGradeData.researchersNum +1,
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
       });

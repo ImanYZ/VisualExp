@@ -1,20 +1,21 @@
 import { Autocomplete, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
 import { Box } from "@mui/system";
+import { useRouter } from "next/router";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
 import { getReferencesAutocomplete } from "../lib/knowledgeApi";
-import { isValidHttpUrl } from "../lib/utils";
+import { getQueryParameter, isValidHttpUrl } from "../lib/utils";
 import { FilterProcessedReferences } from "../src/knowledgeTypes";
 
-type Props = {
-  reference: { title: string; label: string } | null;
+type ReferencesAutocompleteProps = {
   onReferencesChange: (title: string, label: string) => void;
 };
 
-export const ReferencesAutocomplete = ({ onReferencesChange, reference = null }: Props) => {
-  const [text, setText] = useState(reference?.title || "");
+export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocompleteProps) => {
+  const router = useRouter();
+  const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
   const { isLoading, data } = useQuery(["references", searchText], () => getReferencesAutocomplete(searchText));
 
@@ -65,9 +66,12 @@ export const ReferencesAutocomplete = ({ onReferencesChange, reference = null }:
   };
 
   useEffect(() => {
-    const newReference = reference || { title: "", label: "" };
+    const reference = getQueryParameter(router.query.reference) || "";
+    const label = getQueryParameter(router.query.label) || "";
+
+    const newReference = { title: reference, label };
     setReferenceSelected(newReference);
-  }, [reference]);
+  }, [router.query.label, router.query.reference]);
 
   return (
     <Box sx={{ display: "flex" }}>
