@@ -5,8 +5,7 @@ describe("This file will go through every node and it will visit it's page", () 
       const res = str.split(",");
       for (let nodepage of res) {
         console.log(`visting page: ${nodepage}`);
-        cy.log(`visting page: ${nodepage}`);
-        cy.visit(`http://localhost:3000${nodepage}`);
+        cy.visit(`http://localhost:8083${nodepage}`);
         // cy.visit(`https://node.1cademy.us${nodepage}`);
         cy.findByTestId("node-item-full").should("exist");
         // cy.wait(2000);
