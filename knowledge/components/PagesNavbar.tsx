@@ -22,13 +22,12 @@ export const AppFooter: ComponentType<any> = dynamic(() => import("./AppFooter")
 
 const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) => {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  // const [showMobileFeedbackForm, setShowMobileFeedbackForm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
   const onToggleShowFeedbackForm = () => setShowFeedbackForm(showFeedbackForm => !showFeedbackForm);
-  const onCloseFeedback = () => {
-    setShowFeedbackForm(false);
-  };
+  const onCloseFeedback = () => setShowFeedbackForm(false);
 
   return (
     <>
@@ -45,7 +44,17 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
       >
         {children}
 
-        <FeedbackTooltip open={showFeedbackForm} title={<Feedback onSuccessFeedback={onCloseFeedback} />}>
+        {/*         
+        <Feedback
+          onSuccessFeedback={onCloseFeedback}
+          sx={{ display: { xs: 'block', md: 'none' }, }}
+        /> */}
+
+        <FeedbackTooltip
+          open={showFeedbackForm}
+          placement="top-start"
+          title={<Feedback onSuccessFeedback={onCloseFeedback} />}
+        >
           <Fab
             onClick={onToggleShowFeedbackForm}
             color="primary"
