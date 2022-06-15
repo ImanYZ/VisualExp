@@ -2,7 +2,7 @@ import Container from "@mui/material/Container";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { ComponentType, useState } from "react";
+import { ComponentType, useRef, useState } from "react";
 import { useQuery } from "react-query";
 
 import HomeSearch from "../components/HomeSearch";
@@ -16,11 +16,6 @@ import {
   homePageSortByDefaults
 } from "../lib/utils";
 import { FilterValue, SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
-
-// export const HomeSearchContainer: ComponentType<any> = dynamic(
-//   () => import("../components/HomeSearch").then(m => m),
-//   { ssr: false }
-// );
 
 export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
   ssr: false
@@ -43,6 +38,7 @@ const MasonryNodes: ComponentType<any> = dynamic(() => import("../components/Mas
 
 const HomePage: NextPage = () => {
   const router = useRouter();
+  const fieldRef = useRef<HTMLInputElement>(null);
   const upvotes = getQueryParameterAsBoolean(router.query.upvotes || String(homePageSortByDefaults.upvotes));
   const mostRecent = getQueryParameterAsBoolean(router.query.mostRecent || String(homePageSortByDefaults.mostRecent));
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(
@@ -67,30 +63,30 @@ const HomePage: NextPage = () => {
   const label = getQueryParameter(router.query.label) || "";
   const nodeTypes = getQueryParameter(router.query.nodeTypes) || "";
   const page = getQueryParameterAsNumber(router.query.page) || 1;
-  const getQueryKey = () => {
-    return [
-      "nodesSearch",
-      { q, upvotes, mostRecent, timeWindow, tags, institutions, contributors, reference, label, page, nodeTypes }
-    ];
+  const nodeSearchKeys = {
+    q,
+    upvotes,
+    mostRecent,
+    timeWindow,
+    tags,
+    institutions,
+    contributors,
+    reference,
+    label,
+    page,
+    nodeTypes
   };
-  const { data, isLoading } = useQuery(getQueryKey(), () =>
-    getSearchNodes({
-      q,
-      upvotes,
-      mostRecent,
-      timeWindow,
-      tags,
-      institutions,
-      contributors,
-      reference,
-      label,
-      page,
-      nodeTypes
-    })
-  );
+
+  const { data, isLoading } = useQuery(["nodesSearch", nodeSearchKeys], () => getSearchNodes(nodeSearchKeys));
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text, page: 1 } });
+    router.push({ query: { ...router.query, q: text, page: 1 } }).then(() => {
+      if (fieldRef.current) {
+        fieldRef.current.scrollIntoView({
+          behavior: "smooth"
+        });
+      }
+    });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -139,7 +135,7 @@ const HomePage: NextPage = () => {
   return (
     <PagesNavbar showSearch={!isVisible}>
       <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback} />
-      <Container sx={{ my: 10 }}>
+      <Container sx={{ my: 10 }} ref={fieldRef} className="field-props">
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
