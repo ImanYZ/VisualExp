@@ -50,7 +50,15 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
         }}
       >
         {node.content && (
-          <Typography variant="body1" color="text.secondary" component="div">
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            component="div"
+            sx={{
+              color: theme => theme.palette.common.black,
+              lineHeight: 2
+            }}
+          >
             <MarkdownRender text={node.content || ""} />
           </Typography>
         )}
