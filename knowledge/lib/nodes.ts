@@ -1,6 +1,5 @@
 import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
-import slugify from "slugify";
 
 import {
   KnowledgeNode,
@@ -13,20 +12,7 @@ import {
 import { admin, batchSet, commitBatch, db } from "./admin";
 
 export const getAllNodeParamsForStaticProps = async () => {
-  let res = [];
-  const nodeDocs = await db.collection("nodes").select("title").get();
-
-  res = nodeDocs.docs.map(nodeDoc => {
-    const nodeData = nodeDoc.data();
-    return {
-      params: {
-        id: nodeDoc.id,
-        title: slugify(nodeData.title || "", { lower: true })
-      }
-    };
-  });
-
-  return res;
+  return [];
 };
 
 export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> => {
