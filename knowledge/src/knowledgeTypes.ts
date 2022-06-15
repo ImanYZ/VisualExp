@@ -203,14 +203,37 @@ export type TypesenseProcessedReferences = {
   data: { label: string; node: string }[];
 };
 
-// export type ReferencesFilterValue = {
-//   titleText: string,
-//   labelText: string,
-// };
 export type StatsSchema = {
-  institutions: number;
-  users: number;
-  proposals: number;
-  nodes: number;
-  links: string | number;
+  institutions: string;
+  users: string;
+  proposals: string;
+  nodes: string;
+  links: string;
+};
+
+export type SearchNodesResponse = {
+  data: SimpleNode[];
+  page: number;
+  numResults: number;
+  perPage: number;
+};
+export type SearchNodesParams = {
+  q?: string | string[];
+  upvotes?: boolean;
+  mostRecent?: boolean;
+  timeWindow?: string | string[];
+  tags?: string | string[];
+  institutions?: string | string[];
+  contributors?: string | string[];
+  reference?: string | string[];
+  label?: string | string[];
+  nodeTypes?: string | string[];
+  page?: number;
+};
+
+export type FeedbackInput = {
+  name: string;
+  email: string;
+  feedback: string;
+  pageURL: string;
 };
