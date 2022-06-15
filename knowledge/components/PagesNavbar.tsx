@@ -28,11 +28,16 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
   const onToggleShowFeedbackForm = () => setShowFeedbackForm(showFeedbackForm => !showFeedbackForm);
   const onCloseFeedback = () => setShowFeedbackForm(false);
 
+  const onSendFeedback = () => {
+    // onCloseFeedback()
+    onCloseMenu();
+  };
+
   return (
     <>
       <Head title={title} description={description} />
       <AppHeaderNavbar showMenu={showMenu} onCloseMenu={onCloseMenu} onShowMenu={onShowMenu} showSearch={showSearch} />
-      {showMenu && <AppMenuMovil />}
+      {showMenu && <AppMenuMovil onSendFeedback={onSendFeedback} />}
       <Box
         component="main"
         sx={{
@@ -46,6 +51,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
           open={showFeedbackForm}
           placement="top-start"
           title={<Feedback onSuccessFeedback={onCloseFeedback} />}
+          sx={{ display: { xs: "none", md: "block" } }}
         >
           <Fab
             onClick={onToggleShowFeedbackForm}
@@ -53,6 +59,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
             sx={{
               color: theme => theme.palette.common.white,
               float: "right",
+              display: { xs: "none", md: "block" },
               position: "sticky",
               margin: "28px 30px",
               bottom: "28px",
@@ -64,6 +71,31 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
             </Tooltip>
           </Fab>
         </FeedbackTooltip>
+
+        {/* feedback mobil */}
+        <Box
+          sx={{
+            width: "100vw",
+            height: "calc(100vh - var(--navbar-height) )",
+            position: "fixed",
+            bottom: "0px",
+            zIndex: "10",
+            display: { xs: "flex", md: "none" },
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#6028282A"
+          }}
+        >
+          <Box
+            sx={{
+              maxWidth: "500px",
+              maxHeight: "600px",
+              backgroundColor: theme => theme.palette.common.darkGrayBackground
+            }}
+          >
+            <Feedback onSuccessFeedback={onCloseFeedback} />
+          </Box>
+        </Box>
       </Box>
       <AppFooter />
     </>
@@ -77,9 +109,9 @@ const FeedbackTooltip = styled(({ className, ...props }: TooltipProps) => (
     backgroundColor: theme.palette.common.darkGrayBackground,
     color: theme.palette.text.primary,
     maxWidth: "500px",
-    maxHeight: "545px",
+    maxHeight: "600px",
     fontWeight: theme.typography.fontWeightRegular,
-    padding: "40px 50px",
+    padding: "0px",
     border: `1px solid ${theme.palette.grey[400]}`,
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
   }
