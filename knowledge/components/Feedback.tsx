@@ -1,7 +1,18 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckIcon from "@mui/icons-material/Check";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { alpha, Box, Button, FormControl, InputBase, InputLabel, styled, Typography } from "@mui/material";
+import {
+  alpha,
+  Box,
+  Button,
+  FormControl,
+  InputBase,
+  InputLabel,
+  styled,
+  SxProps,
+  Theme,
+  Typography
+} from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
@@ -10,9 +21,10 @@ import { FeedbackInput } from "../src/knowledgeTypes";
 
 interface FeedbackProps {
   onSuccessFeedback: () => void;
+  sx?: SxProps<Theme>;
 }
 
-export const Feedback = ({ onSuccessFeedback }: FeedbackProps) => {
+export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
   const router = useRouter();
 
   const [url, setUrl] = useState("");
@@ -55,11 +67,12 @@ export const Feedback = ({ onSuccessFeedback }: FeedbackProps) => {
     return (
       <Box
         sx={{
-          width: "400px",
+          maxWidth: "400px",
           height: "450px",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between"
+          justifyContent: "space-between",
+          ...sx
         }}
       >
         <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
@@ -86,7 +99,7 @@ export const Feedback = ({ onSuccessFeedback }: FeedbackProps) => {
 
   return (
     <Box
-      sx={{ width: "400px", height: "450px", display: "flex", flexDirection: "column", gap: "20px" }}
+      sx={{ maxWidth: "400px", height: "450px", display: "flex", flexDirection: "column", gap: "20px", ...sx }}
       component="form"
       onSubmit={onSubmitFeedback}
     >
