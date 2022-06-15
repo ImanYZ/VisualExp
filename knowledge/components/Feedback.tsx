@@ -7,7 +7,6 @@ import {
   Box,
   Button,
   FormControl,
-  FormHelperText,
   InputBase,
   InputLabel,
   styled,
@@ -51,16 +50,16 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
   const validate = (values: FeedbackFormValues) => {
     let errors: FormikErrors<FeedbackFormValues> = {};
     if (!values.email) {
-      errors.email = "Email Required";
+      errors.email = "Required";
     }
     if (values.email && !RE_EMAIL.test(values.email)) {
       errors.email = "Invalid email address";
     }
     if (!values.name) {
-      errors.name = "Name Required";
+      errors.name = "Required";
     }
     if (!values.feedback) {
-      errors.feedback = "Feedback Required";
+      errors.feedback = "Required";
     }
     return errors;
   };
@@ -69,6 +68,12 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
     setSuccessFeedback(true);
     setSubmitting(false);
   };
+
+  const getErrorMessage = (error?: string, touched?: boolean) => (
+    <Typography component="span" sx={{ color: red[500], pl: "10px" }}>
+      {error && touched && error}
+    </Typography>
+  );
 
   if (successFeedback) {
     return (
@@ -117,9 +122,9 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
       <Formik initialValues={initialValues} validate={validate} onSubmit={onSubmit}>
         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
           <form onSubmit={handleSubmit}>
-            <FormControl variant="standard" fullWidth>
+            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
               <InputLabel shrink htmlFor="email-input" sx={{ color: theme => theme.palette.common.white }}>
-                Email
+                Email* {getErrorMessage(errors.email, touched.email)}
               </InputLabel>
               <CustomInput
                 id="email-input"
@@ -129,12 +134,11 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <FormHelperText sx={{ color: red[500] }}>{errors.email && touched.email && errors.email}</FormHelperText>
             </FormControl>
 
-            <FormControl variant="standard" fullWidth>
+            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
               <InputLabel shrink htmlFor="name-input" sx={{ color: theme => theme.palette.common.white }}>
-                Name
+                Name* {getErrorMessage(errors.name, touched.name)}
               </InputLabel>
               <CustomInput
                 id="name-input"
@@ -143,12 +147,11 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              <FormHelperText sx={{ color: red[500] }}>{errors.name && touched.name && errors.name}</FormHelperText>
             </FormControl>
 
-            <FormControl variant="standard" fullWidth>
+            <FormControl variant="standard" fullWidth sx={{ mb: "20px" }}>
               <InputLabel shrink htmlFor="feedback-input" sx={{ color: theme => theme.palette.common.white }}>
-                Your Feedback
+                Your Feedback* {getErrorMessage(errors.feedback, touched.feedback)}
               </InputLabel>
               <CustomInput
                 id="feedback-input"
@@ -159,9 +162,6 @@ export const Feedback = ({ onSuccessFeedback, sx }: FeedbackProps) => {
                 rows={3}
                 multiline
               />
-              <FormHelperText sx={{ color: red[500] }}>
-                {errors.feedback && touched.feedback && errors.feedback}
-              </FormHelperText>
             </FormControl>
             <LoadingButton type="submit" color="primary" variant="contained" fullWidth loading={isSubmitting}>
               Submit
