@@ -32,6 +32,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 scripts/dist
+cypress/videos
+cypress/screenshots
 
 # Logs
 logs

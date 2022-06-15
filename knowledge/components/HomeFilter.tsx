@@ -1,43 +1,31 @@
 import { Grid } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
-import { useRouter } from "next/router";
 import React, { FC } from "react";
 
 import TagsAutocomplete from "../components/TagsAutocomplete";
-import { getQueryParameter } from "../lib/utils";
 import { FilterValue } from "../src/knowledgeTypes";
 import ContributorsAutocomplete from "./ContributorsAutocomplete";
 import InstitutionsAutocomplete from "./InstitutionsAutocomplete";
 import NodeTypesAutocomplete from "./NodeTypesAutocomplete";
 import { ReferencesAutocomplete } from "./ReferencesAutocomplete";
 
-type Props = {
+type HomeFilterProps = {
   sx?: SxProps<Theme>;
   onTagsChange: (newValues: string[]) => void;
   onInstitutionsChange: (newValues: FilterValue[]) => void;
   onContributorsChange: (newValues: FilterValue[]) => void;
   onNodeTypesChange: (newValues: string[]) => void;
   onReferencesChange: (title: string, label: string) => void;
-  contributors: FilterValue[];
-  institutions: FilterValue[];
-  reference: { title: string; label: string } | null;
 };
 
-const HomeFilter: FC<Props> = ({
+const HomeFilter: FC<HomeFilterProps> = ({
   sx,
   onTagsChange,
   onInstitutionsChange,
   onContributorsChange,
   onNodeTypesChange,
-  onReferencesChange,
-  contributors,
-  institutions,
-  reference
+  onReferencesChange
 }) => {
-  const router = useRouter();
-  const tags = (getQueryParameter(router.query.tags) || "").split(",").filter(el => el !== "");
-  const nodeTypes = (getQueryParameter(router.query.nodeTypes) || "").split(",").filter(el => el !== "");
-
   const handleTagsChange = (values: string[]) => {
     onTagsChange(values);
   };
@@ -68,19 +56,19 @@ const HomeFilter: FC<Props> = ({
       sx={{ position: "relative", ...sx }}
     >
       <Grid item xs={1}>
-        <TagsAutocomplete tags={tags} onTagsChange={handleTagsChange} />
+        <TagsAutocomplete onTagsChange={handleTagsChange} />
       </Grid>
       <Grid item xs={1}>
-        <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} nodeTypes={nodeTypes} />
+        <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} />
       </Grid>
       <Grid item xs={1}>
-        <ContributorsAutocomplete contributors={contributors} onContributorsChange={handleContributorsChange} />
+        <ContributorsAutocomplete onContributorsChange={handleContributorsChange} />
       </Grid>
       <Grid item xs={1}>
-        <InstitutionsAutocomplete institutions={institutions} onInstitutionsChange={handleInstitutionsChange} />
+        <InstitutionsAutocomplete onInstitutionsChange={handleInstitutionsChange} />
       </Grid>
       <Grid item xs={1} sm={2} md={4}>
-        <ReferencesAutocomplete reference={reference} onReferencesChange={handleReferencesChange} />
+        <ReferencesAutocomplete onReferencesChange={handleReferencesChange} />
       </Grid>
     </Grid>
   );
