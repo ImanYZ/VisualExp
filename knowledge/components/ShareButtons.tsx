@@ -7,7 +7,11 @@ import { Box, IconButton, Snackbar, Tooltip } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
-export const ShareButtons = () => {
+interface ShareButtonsProps {
+  showHelp?: boolean;
+}
+
+export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
@@ -33,52 +37,54 @@ export const ShareButtons = () => {
   };
 
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      <IconButton
-        href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`}
-        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
-        target="_blank"
-        rel="noopener"
-      >
-        <TwitterIcon />
-      </IconButton>
-      {/* this works with different urls from localhost */}
-      <IconButton
-        href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
-        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
-        target="_blank"
-        rel="noopener"
-      >
-        <FacebookRoundedIcon />
-      </IconButton>
-      {/* this works with different urls from localhost */}
-      <IconButton
-        href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
-        sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
-        target="_blank"
-        rel="noopener"
-      >
-        <LinkedInIcon />
-      </IconButton>
-      <Tooltip title="Copy link" placement="top" arrow>
+    <Tooltip title={showHelp ? "share the results of your search/filter/sort" : ""} placement="left">
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <IconButton
-          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
-          onClick={onShareByLink}
+          href={`https://twitter.com/intent/tweet?text=${messageTwitter()}`}
+          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
+          target="_blank"
+          rel="noopener"
         >
-          <LinkIcon />
+          <TwitterIcon />
         </IconButton>
-      </Tooltip>
-      <Snackbar
-        open={open}
-        autoHideDuration={3000}
-        onClose={handleClose}
-        message="Link copied to clipboard!"
-        action={
-          <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
-            <CloseIcon fontSize="small" />
+        {/* this works with different urls from localhost */}
+        <IconButton
+          href={`https://www.facebook.com/sharer/sharer.php?u=${url}`}
+          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
+          target="_blank"
+          rel="noopener"
+        >
+          <FacebookRoundedIcon />
+        </IconButton>
+        {/* this works with different urls from localhost */}
+        <IconButton
+          href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}`}
+          sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
+          target="_blank"
+          rel="noopener"
+        >
+          <LinkedInIcon />
+        </IconButton>
+        <Tooltip title="Copy link" placement="top" arrow>
+          <IconButton
+            sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
+            onClick={onShareByLink}
+          >
+            <LinkIcon />
           </IconButton>
-        }
-      />
-    </Box>
+        </Tooltip>
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          message="Link copied to clipboard!"
+          action={
+            <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        />
+      </Box>
+    </Tooltip>
   );
 };
