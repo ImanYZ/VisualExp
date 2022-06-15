@@ -1,5 +1,6 @@
 import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
+import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import {
@@ -12,11 +13,19 @@ import {
   TypesenseNodesSchema
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
-import { getTypesenseClient } from "./typesense/typesense.config";
 import { buildFilterBy, buildSortBy, getNodePageURLTitle, homePageSortByDefaults } from "./utils";
 
 export const getAllNodeParamsForStaticProps = async () => {
-  const client = getTypesenseClient();
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: process.env.ONECADEMYCRED_TYPESENSE_HOST as string,
+        port: parseInt(process.env.ONECADEMYCRED_TYPESENSE_PORT as string),
+        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL as string
+      }
+    ],
+    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY as string
+  });
 
   const searchParameters: SearchParams = {
     q: "*",
