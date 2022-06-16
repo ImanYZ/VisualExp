@@ -208,7 +208,7 @@ const AppAppBar = (props) => {
             </Box>
           </Tooltip>
           <Tabs
-            value={props.section}
+            value={1}
             variant="scrollable"
             scrollButtons="auto"
             allowScrollButtonsMobile
