@@ -69,8 +69,13 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, 
                   if (page.label !== "NODE") open(page.route, "_blank");
                 }}
                 color="inherit"
-                sx={{ fontFamily: "Work Sans,sans-serif" }}
                 label={page.label}
+                aria-label={page.title}
+                sx={{
+                  fontFamily: "Work Sans,sans-serif",
+                  fontSize: "15px",
+                  letterSpacing: "-1px"
+                }}
               />
             </LightTooltip>
           ))}
@@ -94,7 +99,8 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, 
                   display: { xs: "none", md: "block" },
                   fontSize: 16,
                   color: "common.white",
-                  p: "15px 16px",
+                  py: "15px",
+                  px: "16px",
                   borderRadius: 40
                 }}
               >
