@@ -75,14 +75,33 @@ const getContributorsName = (nodeData: NodeFireStore): string[] => {
   return contributors;
 };
 
+// const getInstitutionByName = async (name: string) => {
+//   const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
+//   const institutionDoc = institutionDocs.docs[0];
+//   if (!institutionDoc) { return null }
+//   return institutionDoc.id
+// }
+
 const getNodesData = (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>
 ): TypesenseNodesSchema[] => {
   const getContributorsFromNode = (nodeData: NodeFireStore) => {
     return Object.entries(nodeData.contributors || {})
-      .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
+      .map(
+        cur =>
+          ({ ...cur[1], username: cur[0] } as {
+            fullname: string;
+            imageUrl: string;
+            reputation: number;
+            username: string;
+          })
+      )
       .sort((a, b) => (b.reputation = a.reputation))
-      .map(contributor => ({ fullName: contributor.fullname, imageUrl: contributor.imageUrl }));
+      .map(contributor => ({
+        fullName: contributor.fullname,
+        imageUrl: contributor.imageUrl,
+        username: contributor.username
+      }));
   };
 
   const getInstitutionsFromNode = (nodeData: NodeFireStore) => {
@@ -91,8 +110,6 @@ const getNodesData = (
       .sort((a, b) => b.reputation - a.reputation)
       .map(institution => ({ name: institution.name }));
   };
-
-  // const nodeDocs = await db.collection("nodes").get();
 
   return nodeDocs.docs.map((nodeDoc): TypesenseNodesSchema => {
     const nodeData = nodeDoc.data() as NodeFireStore;
