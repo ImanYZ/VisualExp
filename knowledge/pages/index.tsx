@@ -80,7 +80,7 @@ const HomePage: NextPage = () => {
   const { data, isLoading } = useQuery(["nodesSearch", nodeSearchKeys], () => getSearchNodes(nodeSearchKeys));
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text, page: 1 } }).then(() => {
+    router.push({ query: { ...router.query, q: text, page: 1 }, hash: "nodes-begin" }).then(() => {
       if (fieldRef.current) {
         fieldRef.current.scrollIntoView({
           behavior: "smooth"
