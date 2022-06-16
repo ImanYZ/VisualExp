@@ -1,4 +1,4 @@
-import { firestore } from "firebase-admin";
+// import { firestore } from "firebase-admin";
 import geoip from "geoip-lite";
 
 import {
@@ -6,8 +6,7 @@ import {
   KnowledgeNodeContributor,
   KnowledgeNodeInstitution,
   LinkedKnowledgeNode,
-  NodeFireStore,
-  SimpleNode
+  NodeFireStore
 } from "../src/knowledgeTypes";
 import { admin, batchSet, commitBatch, db } from "./admin";
 
@@ -15,54 +14,54 @@ export const getAllNodeParamsForStaticProps = async () => {
   return [];
 };
 
-export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> => {
-  if (nodeIds.length === 0) {
-    return [];
-  }
+// export const getNodesByIds = async (nodeIds: string[]): Promise<SimpleNode[]> => {
+//   if (nodeIds.length === 0) {
+//     return [];
+//   }
 
-  const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
+//   const nodeDocs = await db.collection("nodes").where(firestore.FieldPath.documentId(), "in", nodeIds).get();
 
-  const simpleNodes = nodeDocs.docs
-    .map(nodeDoc => {
-      const nodeData = nodeDoc.data() as NodeFireStore;
-      return {
-        ...nodeData,
-        id: nodeDoc.id,
-        tags: getNodeTags(nodeData)
-      };
-    })
-    .map((nodeData): SimpleNode => {
-      const tags = getNodeTags(nodeData).map(tag => tag.title || "");
-      // .filter(tag => tag)
-      // .map(tag => ({ title: tag }));
-      const contributors = Object.entries(nodeData.contributors || {})
-        .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
-        .sort((a, b) => (b.reputation = a.reputation))
-        .map(contributor => ({ fullName: contributor.fullname, imageUrl: contributor.imageUrl }));
+//   const simpleNodes = nodeDocs.docs
+//     .map(nodeDoc => {
+//       const nodeData = nodeDoc.data() as NodeFireStore;
+//       return {
+//         ...nodeData,
+//         id: nodeDoc.id,
+//         tags: getNodeTags(nodeData)
+//       };
+//     })
+//     .map((nodeData): SimpleNode => {
+//       const tags = getNodeTags(nodeData).map(tag => tag.title || "");
+//       // .filter(tag => tag)
+//       // .map(tag => ({ title: tag }));
+//       const contributors = Object.entries(nodeData.contributors || {})
+//         .map(cur => cur[1] as { fullname: string; imageUrl: string; reputation: number })
+//         .sort((a, b) => (b.reputation = a.reputation))
+//         .map(contributor => ({ fullName: contributor.fullname, imageUrl: contributor.imageUrl }));
 
-      const institutions = Object.entries(nodeData.institutions || {})
-        .map(cur => ({ name: cur[0], reputation: cur[1].reputation || 0 }))
-        .sort((a, b) => b.reputation - a.reputation)
-        .map(institution => ({ name: institution.name }));
+//       const institutions = Object.entries(nodeData.institutions || {})
+//         .map(cur => ({ name: cur[0], reputation: cur[1].reputation || 0 }))
+//         .sort((a, b) => b.reputation - a.reputation)
+//         .map(institution => ({ name: institution.name }));
 
-      return {
-        id: nodeData.id,
-        title: nodeData.title,
-        content: nodeData.content,
-        choices: nodeData.choices || [],
-        nodeType: nodeData.nodeType,
-        nodeImage: nodeData.nodeImage,
-        changedAt: nodeData.changedAt.toDate().toISOString(),
-        corrects: nodeData.corrects,
-        wrongs: nodeData.wrongs,
-        tags,
-        contributors,
-        institutions
-      };
-    });
+//       return {
+//         id: nodeData.id,
+//         title: nodeData.title,
+//         content: nodeData.content,
+//         choices: nodeData.choices || [],
+//         nodeType: nodeData.nodeType,
+//         nodeImage: nodeData.nodeImage,
+//         changedAt: nodeData.changedAt.toDate().toISOString(),
+//         corrects: nodeData.corrects,
+//         wrongs: nodeData.wrongs,
+//         tags,
+//         contributors,
+//         institutions
+//       };
+//     });
 
-  return simpleNodes;
-};
+//   return simpleNodes;
+// };
 
 // Retrieve all helpful data about the node corresponding to nodeId.
 // const contentHTML = await getNodeHTMLContent(nodeData.content);
