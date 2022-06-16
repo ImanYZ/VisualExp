@@ -8,10 +8,10 @@ export const getInstitutionsByName = async (names: string[]) => {
     names.map(async institutionName => {
       const q = query(institutionsRef, where("name", "==", institutionName));
       const querySnapshot = await getDocs(q);
-      const result: { name: string; logoURL: string }[] = [];
+      const result: { name: string; logoURL: string; id: string }[] = [];
       querySnapshot.forEach(doc => {
         const institutionDoc = doc.data();
-        result.push({ name: institutionDoc.name, logoURL: institutionDoc.logoURL });
+        result.push({ name: institutionDoc.name, logoURL: institutionDoc.logoURL, id: doc.id });
       });
       return result;
     })
