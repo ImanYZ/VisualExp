@@ -169,7 +169,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                         title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
                       >
                         <Box sx={{ marginLeft: "-10px" }}>
-                          <Link href={`${ROUTES.home}?institutions=${institution.name}`}>
+                          <Link href={`${ROUTES.home}?institutions=${institution.id}`}>
                             <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
                           </Link>
                         </Box>
