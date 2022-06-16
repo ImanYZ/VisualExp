@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import { SxProps, Theme } from "@mui/system";
 
+import { randomIntFromInterval } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
 import { NodeItem } from "./NodeItem";
 
@@ -25,15 +26,19 @@ export const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoad
     return <Box sx={{ textAlign: "center", mt: 3, ...sx }}>No data found</Box>;
   }
 
+  const renderLoadingSkeletons = () => {
+    const elements = [];
+    for (let i = 0; i < 10; i++) {
+      const height = randomIntFromInterval(250, 700);
+      elements.push(<Skeleton key={i} height={height} />);
+    }
+    return elements;
+  };
+
   return (
     <Box sx={{ ...sx }}>
       <Masonry sx={{ my: 4 }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
-        {isLoading && (
-          <>
-            <Skeleton height={250} />
-            <Skeleton height={250} />
-          </>
-        )}
+        {isLoading && renderLoadingSkeletons()}
         {!isLoading && nodes.map((el: any) => <NodeItem key={el.id} node={el} />)}
       </Masonry>
       {totalPages && totalPages > 1 && (

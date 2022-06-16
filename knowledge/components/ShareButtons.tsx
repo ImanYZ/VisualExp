@@ -44,6 +44,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#00acee" } }}
           target="_blank"
           rel="noopener"
+          aria-label="Share on Twitter"
         >
           <TwitterIcon />
         </IconButton>
@@ -53,6 +54,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#3b5998" } }}
           target="_blank"
           rel="noopener"
+          aria-label="Share on Facebook"
         >
           <FacebookRoundedIcon />
         </IconButton>
@@ -62,6 +64,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#0e76a8" } }}
           target="_blank"
           rel="noopener"
+          aria-label="Share on Linkedin"
         >
           <LinkedInIcon />
         </IconButton>
@@ -69,6 +72,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           <IconButton
             sx={{ color: "#BDBDBD", transition: "1s", ":hover": { transform: "translate(0px, -5px)", color: "#000" } }}
             onClick={onShareByLink}
+            aria-label="Share on url"
           >
             <LinkIcon />
           </IconButton>
