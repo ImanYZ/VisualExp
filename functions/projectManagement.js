@@ -1390,7 +1390,7 @@ exports.gradeFreeRecall = async (req, res) => {
           ...recallGradeUpdates,
           researchers: [...recallGradeData.researchers, fullname],
           grades: [...recallGradeData.grades, grade],
-          researchersNum:recallGradeData.researchersNum +1,
+          researchersNum: recallGradeData.researchersNum + 1,
           updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
         });
       });
@@ -1404,34 +1404,6 @@ exports.gradeFreeRecall = async (req, res) => {
 
 exports.addRecallGradesColl = async (req, res) => {
   try {
-
-var first = await  db.collection("freeRecallGrades")
-      .orderBy("createdAt")
-      .limit(req.body.number);
-    
-let lastVisible;
-await first.get().then((documentSnapshots) => {
-// Get the last visible document
- lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
-});
-
-var freeRecallGradeDocs =  db.collection("freeRecallGrades")
-        .orderBy("createdAt")
-        .startAfter(lastVisible)
-        .limit(100)
-        .get();
-
-  
-  //so here we get the next 1000 users ,and we should run the function multiple times right ??
-
-
-    // I don't know how to ask firestore to retrieve documents from 1000 to 2000???
-    // Please implement this here.
-    // Please implement this here and debug the rest of the code. I may have made some mistakes.
-    // You can keep contacting me on Slack. I'll respond ASA I find any chance.
-    
-    // There is another problem here. We start this from empty {}, which assumes there are no other documents.
-    // If we implement this new idea, this will not work. What do you think we should do here???
     const recallGrades = {};
     let recallGradeDocs = await db.collection("recallGrades").get();
     for (let recallGradeDoc of recallGradeDocs.docs) {
@@ -1447,116 +1419,151 @@ var freeRecallGradeDocs =  db.collection("freeRecallGrades")
         ]
       ] = recallGradeData;
     }
-    for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
-      const fRData = freeRecallGradeDoc.data();
-      const recallGradeKey = [
-        fRData.user,
-        fRData.session,
-        fRData.project,
-        fRData.condition,
-        fRData.passageId,
-        fRData.phrase,
-      ];
-      if (recallGradeKey in recallGrades) {
-        const recallGradeData = recallGrades[recallGradeKey];
-        recallGrades[recallGradeKey].researchers = [
-          ...recallGradeData.researchers,
-          fRData.researcher,
+    if (
+      "freeRecallNumber" in req.body &&
+      Number.isInteger(req.body.freeRecallNumber)
+    ) {
+      let freeRecallGradeDocs = await db
+        .collection("freeRecallGrades")
+        .orderBy("createdAt")
+        .limit(req.body.freeRecallNumber)
+        .get();
+      const lastVisibleFreeRecallGradeDoc =
+        freeRecallGradeDocs.docs[freeRecallGradeDocs.docs.length - 1];
+      freeRecallGradeDocs = await db
+        .collection("freeRecallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleFreeRecallGradeDoc)
+        .limit(100)
+        .get();
+      for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
+        const fRData = freeRecallGradeDoc.data();
+        const recallGradeKey = [
+          fRData.user,
+          fRData.session,
+          fRData.project,
+          fRData.condition,
+          fRData.passageId,
+          fRData.phrase,
         ];
-        recallGrades[recallGradeKey].researchersNum += 1;
-        recallGrades[recallGradeKey].grades = [
-          ...recallGradeData.grades,
-          fRData.grade,
-        ];
-      } else {
-        recallGrades[recallGradeKey] = {
-          ...fRData,
-          researchers: [fRData.researcher],
-          researchersNum: 1,
-          grades: [fRData.grade],
-        };
-        delete recallGrades[recallGradeKey]["researcher"];
-        delete recallGrades[recallGradeKey]["grade"];
+        if (recallGradeKey in recallGrades) {
+          const recallGradeData = recallGrades[recallGradeKey];
+          recallGrades[recallGradeKey].researchers = [
+            ...recallGradeData.researchers,
+            fRData.researcher,
+          ];
+          recallGrades[recallGradeKey].researchersNum += 1;
+          recallGrades[recallGradeKey].grades = [
+            ...recallGradeData.grades,
+            fRData.grade,
+          ];
+        } else {
+          recallGrades[recallGradeKey] = {
+            ...fRData,
+            researchers: [fRData.researcher],
+            researchersNum: 1,
+            grades: [fRData.grade],
+          };
+          delete recallGrades[recallGradeKey]["researcher"];
+          delete recallGrades[recallGradeKey]["grade"];
+        }
       }
     }
+    // The issue is that every time we call this function, we start from the
+    // first users document and go to the end again and again. To solve this
+    // issue, I believe we should do something similar to what we did for the
+    // freeRecallResponses on the users.
     console.log("*********************");
     console.log("Starting from users!");
     console.log("*********************");
-    const userDocs = await db.collection("users").get();
-    for (let userDoc of userDocs.docs) {
-      const userData = userDoc.data();
-      if ("pConditions" in userData) {
-        // Get the free-recall responses of this participant for all passages,
-        // for now they are two because each participant goes through only two
-        // random passages under random conditions.
-        for (
-          let passaIdx = 0;
-          passaIdx < userData.pConditions.length;
-          passaIdx++
-        ) {
-          // There are three types of free-recall responses:
-          for (let recallResponse of [
-            "recallreText",
-            "recall3DaysreText",
-            "recall1WeekreText",
-          ]) {
-            let session = "1st";
-            switch (recallResponse) {
-              case "recallreText":
-                session = "1st";
-                break;
-              case "recall3DaysreText":
-                session = "2nd";
-                break;
-              case "recall1WeekreText":
-                session = "3rd";
-                break;
-              default:
-              // code block
-            }
-            // There are some users who have not attended some sessions or they
-            // did not answer some free-recall questions. We only need to ask
-            // our researchers to grade answered free-recall responses.
-            if (
-              recallResponse in userData.pConditions[passaIdx] &&
-              userData.pConditions[passaIdx][recallResponse]
-            ) {
-              // We need to retrieve the phrases for this passage from the
-              // corresponding passage document.
-              const passageDoc = await db
-                .collection("passages")
-                .doc(userData.pConditions[passaIdx].passage)
-                .get();
-              if (passageDoc.exists) {
-                const passageData = passageDoc.data();
-                // We need to do this for every key phrase in the passage that
-                // we expect the participants have recalled and mentioned in
-                // their free-recall response of this passage.
-                if ("phrases" in passageData) {
-                  for (let phras of passageData.phrases) {
-                    const recallGradeKey = [
-                      userDoc.id,
-                      session,
-                      userData.project,
-                      userData.pConditions[passaIdx].condition,
-                      userData.pConditions[passaIdx].passage,
-                      phras,
-                    ];
-                    if (!(recallGradeKey in recallGrades)) {
-                      recallGrades[recallGradeKey] = {
-                        user: userDoc.id,
+    if ("userNumber" in req.body && Number.isInteger(req.body.userNumber)) {
+      let userDocs = await db
+        .collection("users")
+        .orderBy("createdAt")
+        .limit(req.body.userNumber)
+        .get();
+      const lastVisibleUserDoc = userDocs.docs[userDocs.docs.length - 1];
+      userDocs = await db
+        .collection("users")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleUserDoc)
+        .limit(100)
+        .get();
+      for (let userDoc of userDocs.docs) {
+        const userData = userDoc.data();
+        if ("pConditions" in userData) {
+          // Get the free-recall responses of this participant for all passages,
+          // for now they are two because each participant goes through only two
+          // random passages under random conditions.
+          for (
+            let passaIdx = 0;
+            passaIdx < userData.pConditions.length;
+            passaIdx++
+          ) {
+            // There are three types of free-recall responses:
+            for (let recallResponse of [
+              "recallreText",
+              "recall3DaysreText",
+              "recall1WeekreText",
+            ]) {
+              let session = "1st";
+              switch (recallResponse) {
+                case "recallreText":
+                  session = "1st";
+                  break;
+                case "recall3DaysreText":
+                  session = "2nd";
+                  break;
+                case "recall1WeekreText":
+                  session = "3rd";
+                  break;
+                default:
+                // code block
+              }
+              // There are some users who have not attended some sessions or they
+              // did not answer some free-recall questions. We only need to ask
+              // our researchers to grade answered free-recall responses.
+              if (
+                recallResponse in userData.pConditions[passaIdx] &&
+                userData.pConditions[passaIdx][recallResponse]
+              ) {
+                // We need to retrieve the phrases for this passage from the
+                // corresponding passage document.
+                const passageDoc = await db
+                  .collection("passages")
+                  .doc(userData.pConditions[passaIdx].passage)
+                  .get();
+                if (passageDoc.exists) {
+                  const passageData = passageDoc.data();
+                  // We need to do this for every key phrase in the passage that
+                  // we expect the participants have recalled and mentioned in
+                  // their free-recall response of this passage.
+                  if ("phrases" in passageData) {
+                    for (let phras of passageData.phrases) {
+                      const recallGradeKey = [
+                        userDoc.id,
                         session,
-                        project: userData.project,
-                        condition: userData.pConditions[passaIdx].condition,
-                        passage: userData.pConditions[passaIdx].passage,
-                        response:
-                          userData.pConditions[passaIdx][recallResponse],
-                        phrase: phras,
-                        researchers: [],
-                        researchersNum: 0,
-                        grades: [],
-                        createdAt: new Date(),
-                      };
+                        userData.project,
+                        userData.pConditions[passaIdx].condition,
+                        userData.pConditions[passaIdx].passage,
+                        phras,
+                      ];
+                      if (!(recallGradeKey in recallGrades)) {
+                        recallGrades[recallGradeKey] = {
+                          user: userDoc.id,
+                          session,
+                          project: userData.project,
+                          condition: userData.pConditions[passaIdx].condition,
+                          passage: userData.pConditions[passaIdx].passage,
+                          response:
+                            userData.pConditions[passaIdx][recallResponse],
+                          phrase: phras,
+                          researchers: [],
+                          researchersNum: 0,
+                          grades: [],
+                          createdAt: new Date(),
+                        };
+                      }
                     }
                   }
                 }
