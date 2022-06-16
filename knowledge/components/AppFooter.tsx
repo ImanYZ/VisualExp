@@ -42,13 +42,18 @@ export default function AppFooter() {
           <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" } }}>
             <IconButton
               rel="noreferrer"
+              aria-label="Open Youtube channel"
               target="_blank"
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
               sx={{ color: theme => theme.palette.common.white }}
             >
               <YouTubeIcon fontSize="large" />
             </IconButton>
-            <IconButton href="mailto:oneweb@umich.edu" sx={{ color: theme => theme.palette.common.white }}>
+            <IconButton
+              href="mailto:oneweb@umich.edu"
+              sx={{ color: theme => theme.palette.common.white }}
+              aria-label="Mail us"
+            >
               <EmailIcon fontSize="large" />
             </IconButton>
           </Box>
@@ -74,14 +79,29 @@ export default function AppFooter() {
                 gap: { md: "50px" }
               }}
             >
-              <Link rel="noreferrer" target="_blank" href="https://www.si.umich.edu/">
-                <NextImage src={logoSchoolOfInformation} />
+              <Link
+                rel="noreferrer"
+                target="_blank"
+                href="https://www.si.umich.edu/"
+                aria-label="Go to School of information"
+              >
+                <NextImage src={logoSchoolOfInformation} alt="School of Information" height={41} width={47} />
               </Link>
-              <Link rel="noreferrer" target="_blank" href="https://www.honor.education/">
-                <NextImage src={logoHonor} />
+              <Link
+                rel="noreferrer"
+                target="_blank"
+                href="https://www.honor.education/"
+                aria-label="Go to Honor Education"
+              >
+                <NextImage src={logoHonor} alt="Honor Education" height={41} width={41} />
               </Link>
-              <Link rel="noreferrer" target="_blank" href="https://cloud.google.com/edu/researchers">
-                <NextImage src={logoGoogleCloud} />
+              <Link
+                rel="noreferrer"
+                target="_blank"
+                href="https://cloud.google.com/edu/researchers"
+                aria-label="Go to Google Cloud"
+              >
+                <NextImage src={logoGoogleCloud} alt="Google Cloud" height={41} width={49} />
               </Link>
             </Box>
           </Box>

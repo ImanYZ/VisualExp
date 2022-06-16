@@ -55,6 +55,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
           sx={{ display: { xs: "none", md: "block" } }}
         >
           <Fab
+            aria-label="Open Feedback"
             onClick={onToggleShowFeedbackForm}
             color="primary"
             sx={{
@@ -100,6 +101,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
             >
               <Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "30px 50px" }} />
               <IconButton
+                aria-label="Close feedback"
                 onClick={onCloseFeedback}
                 sx={{ position: "absolute", top: "30px", right: "15px", color: "white" }}
               >
