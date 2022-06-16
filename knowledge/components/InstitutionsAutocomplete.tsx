@@ -72,7 +72,7 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
         return (
           <li {...newProps}>
             {option.imageUrl ? (
-              <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar />
+              <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar={false} />
             ) : undefined}
             {option.name}
           </li>
