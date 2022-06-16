@@ -19,7 +19,7 @@ type Props = {
   onCloseMenu: () => void;
   onShowMenu: () => void;
 };
-const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, onCloseMenu, onShowMenu }) => {
+const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
   return (
