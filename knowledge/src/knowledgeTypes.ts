@@ -27,6 +27,7 @@ export type KnowledgeNodeInstitution = {
   reputation?: number;
   logoURL?: string;
   name?: string;
+  id: string;
 };
 
 export type LinkedKnowledgeNode = {
