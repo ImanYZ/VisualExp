@@ -59,7 +59,7 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
           </Select>
         </Tooltip>
       </Stack>
-      <ShareButtons />
+      <ShareButtons showHelp />
     </Stack>
   );
 };

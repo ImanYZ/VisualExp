@@ -20,7 +20,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
     // institution names.
     const userInstitutions = {};
     const userFullnames = {};
-    const institutions = new Set();
+    let institutions = new Set();
     const stats = {
       users: 0,
       institutions: 0,
@@ -38,6 +38,11 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       institutions.add(userData.deInstit);
     }
     stats.institutions = institutions.size;
+
+    const contributors = {};
+    institutions = {};
+    const tags = {};
+    const references = {};
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
     const nodesData = {};
@@ -50,6 +55,20 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
         (nodeData.parents.length + nodeData.children.length) / 2 +
         nodeData.tags.length +
         nodeData.references.length;
+      for (let tag of nodeData.tags) {
+        if (tag.node in tags) {
+          tags[tag.node].push(nodeDoc.id);
+        } else {
+          tags[tag.node] = [];
+        }
+      }
+      for (let reference of nodeData.references) {
+        if (reference.node in references) {
+          references[reference.node].push(nodeDoc.id);
+        } else {
+          references[reference.node] = [];
+        }
+      }
     }
     // We should retrieve all the accepted versions for all types of nodes.
     const nodeTypes = [
@@ -164,10 +183,40 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 userInstitutions[versionData.proposer]
               ].reputation += versionData.corrects - versionData.wrongs;
             }
+            if (versionData.proposer in contributors) {
+              contributors[versionData.proposer].reputation +=
+                versionData.corrects - versionData.wrongs;
+            } else {
+              contributors[versionData.proposer] = {
+                docRef: db.collection("users").doc(versionData.proposer),
+                reputation: versionData.corrects - versionData.wrongs,
+              };
+            }
+            if (userInstitutions[versionData.proposer] in institutions) {
+              institutions[userInstitutions[versionData.proposer]] +=
+                versionData.corrects - versionData.wrongs;
+            } else {
+              const institutionDocs = await db
+                .collection("institutions")
+                .where(
+                  "name",
+                  "==",
+                  institutions[userInstitutions[versionData.proposer]]
+                )
+                .get();
+              if (institutionDocs.docs.length > 0) {
+                institutions[userInstitutions[versionData.proposer]] = {
+                  docRef: db
+                    .collection("institutions")
+                    .doc(institutionDocs.docs[0].id),
+                  reputation: versionData.corrects - versionData.wrongs,
+                };
+              }
+            }
           }
         }
       }
-      for (nodeId in nodesUpdates) {
+      for (let nodeId in nodesUpdates) {
         await batchUpdate(nodesUpdates[nodeId].nodeRef, {
           contributors: nodesUpdates[nodeId].contributors,
           institutions: nodesUpdates[nodeId].institutions,
@@ -175,7 +224,18 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
           institNames: nodesUpdates[nodeId].institNames,
         });
       }
+      for (let contributorId in contributors) {
+        await batchUpdate(contributors[contributorId].docRef, {
+          totalPoints: contributors[contributorId].reputation,
+        });
+      }
+      for (let institutionName in institutions) {
+        await batchUpdate(institutions[institutionName].docRef, {
+          totalPoints: institutions[institutionName].reputation,
+        });
+      }
     }
+    stats.links = Math.round(stats.links);
     const statRef = db.collection("stats").doc();
     await batchSet(statRef, stats);
     await commitBatch();
@@ -298,6 +358,104 @@ exports.updateInstitutions = async (context) => {
     console.log({ err });
     return null;
   }
+};
+
+exports.downloadNodes = async (req, res) => {
+  const nodesDocs = await db.collection("nodes").get();
+  if (nodesDocs.docs.length > 0) {
+    const createCsvWriter = require("csv-writer").createObjectCsvWriter;
+    const csvWriter = createCsvWriter({
+      path: "nodes.csv",
+      header: [
+        { id: "id", title: "id" },
+        { id: "admin", title: "admin" },
+        { id: "changedAt", title: "changedAt" },
+        { id: "children", title: "children" },
+        { id: "childrenLength", title: "childrenLength" },
+        { id: "choices", title: "choices" },
+        { id: "choicesLength", title: "choicesLength" },
+        { id: "closedHeight", title: "closedHeight" },
+        { id: "comments", title: "comments" },
+        { id: "content", title: "content" },
+        { id: "corrects", title: "corrects" },
+        { id: "createdAt", title: "createdAt" },
+        { id: "deleted", title: "deleted" },
+        { id: "height", title: "height" },
+        { id: "maxVersionRating", title: "maxVersionRating" },
+        { id: "nodeImage", title: "nodeImage" },
+        { id: "nodeType", title: "nodeType" },
+        { id: "parents", title: "parents" },
+        { id: "parentsLength", title: "parentsLength" },
+        { id: "references", title: "references" },
+        { id: "referencesLength", title: "referencesLength" },
+        { id: "studied", title: "studied" },
+        { id: "tags", title: "tags" },
+        { id: "tagsLength", title: "tagsLength" },
+        { id: "title", title: "title" },
+        { id: "updatedAt", title: "updatedAt" },
+        { id: "versions", title: "versions" },
+        { id: "viewers", title: "viewers" },
+        { id: "wrongs", title: "wrongs" },
+      ],
+    });
+    const data = [];
+    for (let nodeDoc of nodesDocs.docs) {
+      const nodeData = nodeDoc.data();
+      nodeData.id = nodeDoc.id;
+      if ("changedAt" in nodeData && nodeData.changedAt) {
+        nodeData.changedAt = nodeData.changedAt.toDate();
+      }
+      if ("createdAt" in nodeData && nodeData.createdAt) {
+        nodeData.createdAt = nodeData.createdAt.toDate();
+      }
+      if ("updatedAt" in nodeData && nodeData.updatedAt) {
+        nodeData.updatedAt = nodeData.updatedAt.toDate();
+      }
+      if ("children" in nodeData && nodeData.children) {
+        nodeData.childrenLength = nodeData.children.length;
+        nodeData.children = JSON.stringify(nodeData.children);
+      } else {
+        nodeData.children = "";
+        nodeData.childrenLength = 0;
+      }
+      if ("choices" in nodeData && nodeData.choices) {
+        nodeData.choicesLength = nodeData.choices.length;
+        nodeData.choices = JSON.stringify(nodeData.choices);
+      } else {
+        nodeData.choices = "";
+        nodeData.choicesLength = 0;
+      }
+      if ("parents" in nodeData && nodeData.parents) {
+        nodeData.parentsLength = nodeData.parents.length;
+        nodeData.parents = JSON.stringify(nodeData.parents);
+      } else {
+        nodeData.parents = "";
+        nodeData.parentsLength = 0;
+      }
+      if ("references" in nodeData && nodeData.references) {
+        nodeData.referencesLength = nodeData.references.length;
+        nodeData.references = JSON.stringify(nodeData.references);
+      } else {
+        nodeData.references = "";
+        nodeData.referencesLength = 0;
+      }
+      if ("tags" in nodeData && nodeData.tags) {
+        nodeData.tagsLength = nodeData.tags.length;
+        nodeData.tags = JSON.stringify(nodeData.tags);
+      } else {
+        nodeData.tags = "";
+        nodeData.tagsLength = 0;
+      }
+      data.push(nodeData);
+    }
+    csvWriter
+      .writeRecords(data)
+      .then(() => console.log("The CSV file was written successfully."))
+      .catch((err) => console.log("Error:", err));
+  } else {
+    console.log("I found no nodes.");
+  }
+  return res.json("The CSV file was written successfully.");
 };
 
 // Fix the institution for those users who registerred before the institutions
