@@ -29,7 +29,15 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
 
   return (
     <Box
-      sx={{ width: "100%", display: "flex", height: "50px", flexDirection: "row", ...sx }}
+      sx={{
+        width: "100%",
+        display: "flex",
+        height: "50px",
+        flexDirection: "row",
+        alignItems: "center",
+        background: theme => theme.palette.common.white,
+        ...sx
+      }}
       component="form"
       onSubmit={handleSearch}
     >
@@ -79,9 +87,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     fontSize: 15,
     height: "36px",
     fontWeight: 300,
-    background: theme.palette.common.white,
-    border: "solid 2px",
-    borderColor: theme.palette.common.white
+    background: theme.palette.common.white
   },
   "@media (min-width:900px)": {
     "& .MuiInputBase-input": {
