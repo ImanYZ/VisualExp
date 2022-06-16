@@ -82,7 +82,7 @@ const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
           </Typography>
         )}
       </Box>
-      <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box>
+      {/* <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box> */}
     </Box>
   );
 });

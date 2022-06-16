@@ -13,7 +13,7 @@ const AppHeaderSearchBar = () => {
 
   const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    router.push({ pathname: "/", query: { ...router.query, q: searchText, page: 1 }, hash: "nodes-begin" });
+    router.push({ pathname: "/", query: { ...router.query, q: searchText, page: 1 } /*, hash: "nodes-begin" */ });
   };
 
   return (
