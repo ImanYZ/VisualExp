@@ -9,7 +9,6 @@ export const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null> | undef
     const current = ref.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Update our state when observer callback fires
         setIntersecting(entry.isIntersecting);
       },
       {
@@ -20,12 +19,9 @@ export const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null> | undef
       observer.observe(ref.current);
     }
     return () => {
-      if (!current) {
-        return;
-      }
-      console.log("current", current);
+      if (!current) return;
       observer.unobserve(current);
     };
-  }, [ref, rootMargin]); // Empty array ensures that effect is only run on mount and unmount
+  }, [ref, rootMargin]);
   return isIntersecting;
 };
