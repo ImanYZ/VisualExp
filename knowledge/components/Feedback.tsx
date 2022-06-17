@@ -39,19 +39,30 @@ interface FeedbackProps {
   sx?: SxProps<Theme>;
 }
 
-const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref) => {
+export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref) => {
   const router = useRouter();
 
   const [url, setUrl] = useState("");
   const [successFeedback, setSuccessFeedback] = useState(false);
 
   useEffect(() => {
-    const URL = window.location.href;
-    setUrl(URL);
+    setUrl(window.location.href);
   }, [router]);
 
-  const initialValues: FeedbackFormValues = { email: "", name: "", feedback: "" };
+  const saveFeedbackInLocalStorage = (values: FeedbackFormValues) => {
+    localStorage.setItem("feedbackName", values.name);
+    localStorage.setItem("feedbackEmail", values.email);
+    localStorage.setItem("feedbackFeedback", values.feedback);
+  };
+
+  const initialValues: FeedbackFormValues = {
+    name: localStorage.getItem("feedbackName") || "",
+    email: localStorage.getItem("feedbackEmail") || "",
+    feedback: localStorage.getItem("feedbackFeedback") || ""
+  };
+
   const validate = (values: FeedbackFormValues) => {
+    saveFeedbackInLocalStorage(values);
     let errors: FormikErrors<FeedbackFormValues> = {};
     if (!values.email) {
       errors.email = "Required";
@@ -79,18 +90,16 @@ const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref)
     </Typography>
   );
 
+  const onThankYou = () => {
+    onSuccessFeedback();
+    localStorage.setItem("feedbackName", "");
+    localStorage.setItem("feedbackEmail", "");
+    localStorage.setItem("feedbackFeedback", "");
+  };
+
   const SuccessFeedback = () => {
     return (
-      <Box
-        sx={{
-          width: "100%",
-          height: "450px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          ...sx
-        }}
-      >
+      <>
         <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
           Share Your Question/Feedback
         </Typography>
@@ -105,17 +114,17 @@ const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref)
             We have received your feedback. Thank you!
           </Typography>
         </Box>
-        <Button onClick={onSuccessFeedback} color="success" variant="contained" fullWidth>
+        <Button onClick={onThankYou} color="success" variant="contained" fullWidth>
           Thank you
           <CheckIcon sx={{ ml: "10px" }} />
         </Button>
-      </Box>
+      </>
     );
   };
 
   const FormFeedback = () => {
     return (
-      <Box sx={{ width: "100%", display: "flex", flexDirection: "column", gap: "20px", ...sx }}>
+      <>
         <Typography variant="h5" sx={{ color: theme => theme.palette.common.orange }}>
           Share Your Question/Feedback
         </Typography>
@@ -175,7 +184,7 @@ const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref)
             </form>
           )}
         </Formik>
-      </Box>
+      </>
     );
   };
 
@@ -184,7 +193,7 @@ const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx }, ref)
       ref={ref}
       sx={{
         width: "100%",
-        height: "450px",
+        height: "auto",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
