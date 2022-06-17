@@ -1,37 +1,37 @@
 const SECTIONS = [
   {
     id: "HowItWorksSection",
-    label: "How",
+    label: "HOW",
     title: "How We Work",
     route: "https://1cademy.us/home#HowItWorksSection"
   },
   {
     id: "CommunitiesSection",
-    label: "What",
+    label: "WHAT",
     title: "Our Communities",
     route: "https://1cademy.us/home#CommunitiesSection"
   },
   {
     id: "ValuesSection",
-    label: "Why",
+    label: "WHY",
     title: "Why 1Cademy Helps",
     route: "https://1cademy.us/home#ValuesSection"
   },
   {
     id: "SchoolsSection",
-    label: "Where",
+    label: "WHERE",
     title: "Where Are We From?",
     route: "https://1cademy.us/home#SchoolsSection"
   },
   {
     id: "WhoWeAreSection",
-    label: "Who",
+    label: "WHO",
     title: "Who Is Behind 1Cademy?",
     route: "https://1cademy.us/home#WhoWeAreSection"
   },
   {
     id: "WhoWeAreSection",
-    label: "Node",
+    label: "NODE",
     title: "What do you want to learn now?",
     route: "/"
   }

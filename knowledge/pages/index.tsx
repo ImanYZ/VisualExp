@@ -46,9 +46,12 @@ const HomePage: NextPage = () => {
   );
 
   const { containerRefCallback, isVisible } = useElementOnScreen({
-    root: null,
-    rootMargin: "0px",
-    threshold: 0.2
+    options: {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.2
+    },
+    defaultVisible: true
   });
 
   const q = getQueryParameter(router.query.q) || "*";
@@ -80,7 +83,7 @@ const HomePage: NextPage = () => {
   const { data, isLoading } = useQuery(["nodesSearch", nodeSearchKeys], () => getSearchNodes(nodeSearchKeys));
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text, page: 1 } }).then(() => {
+    router.push({ query: { ...router.query, q: text, page: 1 } /*, hash: "nodes-begin" */ }).then(() => {
       if (fieldRef.current) {
         fieldRef.current.scrollIntoView({
           behavior: "smooth"
