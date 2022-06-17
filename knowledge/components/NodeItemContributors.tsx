@@ -4,6 +4,7 @@ import Typography from "@mui/material/Typography";
 import { FC } from "react";
 
 import { KnowledgeNodeContributor, KnowledgeNodeInstitution } from "../src/knowledgeTypes";
+import ROUTES from "../src/routes";
 import LeaderboardChip from "./LeaderboardChip";
 
 type Props = {
@@ -21,6 +22,7 @@ const NodeItemContributors: FC<Props> = ({ contributors, institutions }) => {
           imageUrl={el.imageUrl}
           reputation={el.reputation || 0}
           isChamp={idx === 0}
+          href={`${ROUTES.home}?contributors=${el.username}`}
         />
       </Grid>
     ));
@@ -36,6 +38,7 @@ const NodeItemContributors: FC<Props> = ({ contributors, institutions }) => {
           reputation={el.reputation || 0}
           isChamp={idx === 0}
           renderAsAvatar={false}
+          href={`${ROUTES.home}?institutions=${el.id}`}
         />
       </Grid>
     ));
