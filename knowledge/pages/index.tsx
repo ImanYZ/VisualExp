@@ -2,11 +2,10 @@ import Container from "@mui/material/Container";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { ComponentType, useRef, useState } from "react";
+import { ComponentType, useEffect, useRef, useState } from "react";
 import { useQuery } from "react-query";
 
 import HomeSearch, { HomeSearchRef } from "../components/HomeSearch";
-// import { useElementOnScreen } from "../hooks/useElementOnScreen";
 import { useOnScreen } from "../hooks/useOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
 import {
@@ -50,7 +49,6 @@ const HomePage: NextPage = () => {
   const isIntersecting = useOnScreen(homeSearchRef.current?.containerRef);
 
   const q = getQueryParameter(router.query.q) || "*";
-  console.log("real q:", q);
 
   const timeWindow: TimeWindowOption =
     (getQueryParameter(router.query.timeWindow) as TimeWindowOption) || homePageSortByDefaults.timeWindow;
@@ -78,24 +76,16 @@ const HomePage: NextPage = () => {
 
   const { data, isLoading } = useQuery(["nodesSearch", nodeSearchKeys], () => getSearchNodes(nodeSearchKeys));
 
-  // useEffect(() => {
-  //   console.log('----------->> main useEffect')
-  //   console.log('uE: q', q)
-  //   if (!q || q === '*') { return }
-  //   console.log('go to scroll', homeSearchRef.current)
-  //   if (router.isReady) {
-
-  //     homeSearchRef.current?.scroll()
-  //   }
-  // }, [q])
+  useEffect(() => {
+    const qq = router.query.q || "";
+    const hasQueryValue = qq && qq !== "*";
+    if (router.isReady && data?.data && hasQueryValue) {
+      homeSearchRef.current?.scroll();
+    }
+  }, [router.isReady, data?.data, router.query.q]);
 
   const handleSearch = (text: string) => {
-    router.push({ query: { ...router.query, q: text, page: 1 } }).then(() => {
-      if (!q || q === "*") {
-        return;
-      }
-      homeSearchRef.current?.scroll();
-    });
+    router.push({ query: { ...router.query, q: text, page: 1 } });
   };
 
   const handleChangePage = (newPage: number) => {
@@ -145,7 +135,6 @@ const HomePage: NextPage = () => {
     <PagesNavbar showSearch={!isIntersecting}>
       <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={homeSearchRef} />
       <Container sx={{ my: 10 }}>
-        {/* <Box ref={fieldRef} id='filters-begin' sx={{ border: 'solid 2px royalBlue', position: 'relative', bottom: '120px' }}></Box> */}
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
