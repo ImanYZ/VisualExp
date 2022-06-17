@@ -4,12 +4,13 @@ import InputBase from "@mui/material/InputBase";
 import Paper from "@mui/material/Paper";
 import { alpha, styled } from "@mui/material/styles";
 import { useRouter } from "next/router";
-import React, { MouseEvent, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 
 const AppHeaderSearchBar = () => {
   const router = useRouter();
-
   const [searchText, setSearchText] = useState<string>((router.query.q as string) || "");
+
+  useEffect(() => setSearchText((router.query.q as string) || ""), [router.query]);
 
   const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
