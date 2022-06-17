@@ -27,6 +27,7 @@ export type KnowledgeNodeInstitution = {
   reputation?: number;
   logoURL?: string;
   name?: string;
+  id: string;
 };
 
 export type LinkedKnowledgeNode = {
@@ -121,7 +122,7 @@ export type SimpleNode = {
   corrects?: number;
   wrongs?: number;
   tags: string[];
-  contributors: { fullName: string; imageUrl: string }[];
+  contributors: { fullName: string; imageUrl: string; username: string }[];
   institutions: { name: string }[];
 };
 
@@ -135,7 +136,7 @@ export type TypesenseNodesSchema = {
   changedAtMillis: number; // typesense
   choices?: KnowledgeChoice[];
   content: string; // typesense
-  contributors: { fullName: string; imageUrl: string }[];
+  contributors: { fullName: string; imageUrl: string; username: string }[];
   contributorsNames: string[]; // typesense
   corrects: number; // typesense
   id: string;
