@@ -14,7 +14,7 @@ const AppHeaderSearchBar = () => {
 
   const handleSearch = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    router.push({ pathname: "/", query: { q: searchText } });
+    router.push({ pathname: "/", query: { ...router.query, q: searchText, page: 1 } });
   };
 
   return (

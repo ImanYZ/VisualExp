@@ -30,14 +30,9 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
 
   useImperativeHandle(ref, () => ({
     scroll: () => {
-      console.log("beginFiltersRef.current", beginFiltersRef.current);
       const clientPosition = beginFiltersRef.current?.getBoundingClientRect();
-      console.log("clientPosition", clientPosition);
-      const yPosition = clientPosition ? clientPosition.y + clientPosition.bottom - 120 : 500;
-      console.log(yPosition);
-      return window.scrollBy({ top: yPosition, behavior: "smooth" });
-      // return window.scrollTo(0, yPosition || 0)
-      // return beginFiltersRef.current?.scrollIntoView({ behavior: "smooth" })
+      const yPosition = clientPosition ? clientPosition.y + clientPosition.height - 40 : 500;
+      setTimeout(() => window.scrollBy({ top: yPosition, behavior: "smooth" }), 150);
     },
     containerRef
   }));
