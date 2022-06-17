@@ -1,7 +1,11 @@
 import { MutableRefObject, useEffect, useState } from "react";
 
-export const useOnScreen = (ref: MutableRefObject<HTMLDivElement | null> | undefined, rootMargin = "0px") => {
-  const [isIntersecting, setIntersecting] = useState(false);
+export const useOnScreen = (
+  ref: MutableRefObject<HTMLDivElement | null> | undefined,
+  defaultVisible = false,
+  rootMargin = "0px"
+) => {
+  const [isIntersecting, setIntersecting] = useState(defaultVisible);
   useEffect(() => {
     if (!ref) {
       return;
