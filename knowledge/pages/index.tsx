@@ -5,8 +5,9 @@ import { useRouter } from "next/router";
 import { ComponentType, useRef, useState } from "react";
 import { useQuery } from "react-query";
 
-import HomeSearch from "../components/HomeSearch";
-import { useElementOnScreen } from "../hooks/useElementOnScreen";
+import HomeSearch, { HomeSearchRef } from "../components/HomeSearch";
+// import { useElementOnScreen } from "../hooks/useElementOnScreen";
+import { useOnScreen } from "../hooks/useOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
 import {
   getDefaultSortedByType,
@@ -38,20 +39,18 @@ const MasonryNodes: ComponentType<any> = dynamic(() => import("../components/Mas
 
 const HomePage: NextPage = () => {
   const router = useRouter();
-  const fieldRef = useRef<HTMLInputElement>(null);
   const upvotes = getQueryParameterAsBoolean(router.query.upvotes || String(homePageSortByDefaults.upvotes));
   const mostRecent = getQueryParameterAsBoolean(router.query.mostRecent || String(homePageSortByDefaults.mostRecent));
   const [sortedByType, setSortedByType] = useState<SortTypeWindowOption>(
     getDefaultSortedByType({ mostRecent, upvotes })
   );
 
-  const { containerRefCallback, isVisible } = useElementOnScreen({
-    root: null,
-    rootMargin: "0px",
-    threshold: 0.2
-  });
+  const homeSearchRef = useRef<HomeSearchRef>(null);
+
+  const isIntersecting = useOnScreen(homeSearchRef.current?.containerRef);
 
   const q = getQueryParameter(router.query.q) || "*";
+  console.log("real q:", q);
 
   const timeWindow: TimeWindowOption =
     (getQueryParameter(router.query.timeWindow) as TimeWindowOption) || homePageSortByDefaults.timeWindow;
@@ -79,13 +78,23 @@ const HomePage: NextPage = () => {
 
   const { data, isLoading } = useQuery(["nodesSearch", nodeSearchKeys], () => getSearchNodes(nodeSearchKeys));
 
+  // useEffect(() => {
+  //   console.log('----------->> main useEffect')
+  //   console.log('uE: q', q)
+  //   if (!q || q === '*') { return }
+  //   console.log('go to scroll', homeSearchRef.current)
+  //   if (router.isReady) {
+
+  //     homeSearchRef.current?.scroll()
+  //   }
+  // }, [q])
+
   const handleSearch = (text: string) => {
     router.push({ query: { ...router.query, q: text, page: 1 } }).then(() => {
-      if (fieldRef.current) {
-        fieldRef.current.scrollIntoView({
-          behavior: "smooth"
-        });
+      if (!q || q === "*") {
+        return;
       }
+      homeSearchRef.current?.scroll();
     });
   };
 
@@ -133,9 +142,10 @@ const HomePage: NextPage = () => {
   };
 
   return (
-    <PagesNavbar showSearch={!isVisible}>
-      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={containerRefCallback} />
-      <Container sx={{ my: 10 }} ref={fieldRef} className="field-props">
+    <PagesNavbar showSearch={!isIntersecting}>
+      <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={homeSearchRef} />
+      <Container sx={{ my: 10 }}>
+        {/* <Box ref={fieldRef} id='filters-begin' sx={{ border: 'solid 2px royalBlue', position: 'relative', bottom: '120px' }}></Box> */}
         <HomeFilter
           sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
