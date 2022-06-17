@@ -46,7 +46,7 @@ const HomePage: NextPage = () => {
 
   const homeSearchRef = useRef<HomeSearchRef>(null);
 
-  const isIntersecting = useOnScreen(homeSearchRef.current?.containerRef);
+  const isIntersecting = useOnScreen(homeSearchRef.current?.containerRef, true);
 
   const q = getQueryParameter(router.query.q) || "*";
 
