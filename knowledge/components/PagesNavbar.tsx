@@ -63,6 +63,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         >
           {/* <ClickAwayListener onClickAway={onCloseFeedback}> */}
           <Fab
+            aria-label="Open Feedback"
             onClick={onToggleShowFeedbackForm}
             color="primary"
             sx={{
@@ -115,6 +116,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
                 />
               </ClickAwayListener>
               <IconButton
+                aria-label="Close feedback"
                 onClick={onCloseFeedback}
                 sx={{ position: "absolute", top: "30px", right: "15px", color: "white" }}
               >

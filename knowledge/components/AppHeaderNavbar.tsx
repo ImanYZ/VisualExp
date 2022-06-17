@@ -34,24 +34,27 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, 
         <Box sx={{ my: 1 }}>
           <NextLink href={ROUTES.home} passHref prefetch={false}>
             <Link sx={{ display: "flex" }}>
-              <Image src={LogoDarkMode} alt="logo" width="40px" height="47px"></Image>
+              <Image src={LogoDarkMode} alt="logo" width="46px" height="68px"></Image>
             </Link>
           </NextLink>
         </Box>
-        <Box sx={{ paddingLeft: "30px" }} display={{ xs: "none", md: "block" }}>
+        <Box sx={{ paddingLeft: "25px" }} display={{ xs: "none", md: "block" }}>
           {SECTIONS.map((page, idx) => {
             return (
               <LightTooltip key={idx} title={page.title} arrow={false}>
                 <Link
                   href={page.route}
-                  padding="20px 20px"
+                  padding="12px 16px"
                   target={page.label === "Node" ? "_self" : "_blank"}
                   rel="noreferrer"
                   sx={{
-                    fontSize: "16px",
-                    fontWeight: "500",
-                    color: theme =>
-                      router.route === page.route ? theme.palette.common.white : theme.palette.grey[500],
+                    width: "90px",
+                    display: "inline-block",
+                    fontSize: "15px",
+                    fontWeight: "600",
+                    fontFamily: "Work Sans,sans-serif",
+                    textAlign: "center",
+                    color: theme => (router.route === page.route ? theme.palette.common.white : "#AAAAAA"),
                     borderBottom: theme =>
                       router.route === page.route ? `solid 2px ${theme.palette.common.orange}` : "none"
                   }}
@@ -75,19 +78,25 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch, 
         >
           {(router.route !== "/" || (router.route === "/" && showSearch)) && <AppHeaderSearchBar />}
           {showApply && (
-            <Tooltip title="Apply to join 1Cademy">
+            <LightTooltip title="Apply to join 1Cademy" arrow={false}>
               <Button
-                size="small"
+                size="medium"
                 variant="contained"
+                href="https://1cademy.us/home#JoinUsSection"
+                target="_blank"
+                rel="noreferrer"
                 sx={{
-                  fontWeight: "500",
+                  width: "89px",
+                  p: "6px 16px",
+                  fontSize: "16px",
+                  fontWeight: "600",
                   borderRadius: 40,
                   display: { xs: "none", md: "block" }
                 }}
               >
                 APPLY!
               </Button>
-            </Tooltip>
+            </LightTooltip>
           )}
           {showMenu && (
             <IconButton
@@ -129,7 +138,7 @@ const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: theme.palette.common.white,
     color: "rgba(0, 0, 0, 0.87)",
-    boxShadow: theme.shadows[1],
+    boxShadow: "0px 10px 30px 5px rgba(0,0,0,0.5)",
     fontSize: 12
   }
 }));
