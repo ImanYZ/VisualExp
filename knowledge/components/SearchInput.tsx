@@ -50,7 +50,7 @@ const SearchInput: FC<Props> = ({ onSearch, sx }) => {
           onChange={handleChange}
         />
       </SearchStyled>
-      <StyledButton variant="contained" type="submit">
+      <StyledButton aria-label="Begin Search" variant="contained" type="submit">
         <SearchIcon fontSize="large" />
       </StyledButton>
     </Box>

@@ -1,6 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
 import Autocomplete from "@mui/material/Autocomplete";
-import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
 import { useRouter } from "next/router";
@@ -72,7 +71,7 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
         return (
           <li {...newProps}>
             {option.imageUrl ? (
-              <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar />
+              <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar={false} />
             ) : undefined}
             {option.name}
           </li>
@@ -83,11 +82,16 @@ const InstitutionsAutocomplete: FC<Props> = ({ onInstitutionsChange }) => {
       renderTags={(value: readonly FilterValue[], getTagProps) =>
         value.map((option, index: number) => (
           <Chip
-            avatar={option.imageUrl ? <Avatar alt={option.name} src={option.imageUrl} /> : undefined}
+            avatar={
+              option.imageUrl ? (
+                <OptimizedAvatar name={option.name} imageUrl={option.imageUrl} contained renderAsAvatar={false} />
+              ) : undefined
+            }
             variant="outlined"
             label={option.name}
             deleteIcon={<CloseIcon />}
             {...getTagProps({ index })}
+            sx={{ pl: "5px" }}
             key={index}
           />
         ))
