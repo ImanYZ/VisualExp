@@ -1404,6 +1404,7 @@ exports.gradeFreeRecall = async (req, res) => {
 
 exports.addRecallGradesColl = async (req, res) => {
   try {
+    const batchNum = 50;
     const recallGrades = {};
     let recallGradeDocs = await db.collection("recallGrades").get();
     for (let recallGradeDoc of recallGradeDocs.docs) {
@@ -1419,22 +1420,25 @@ exports.addRecallGradesColl = async (req, res) => {
         ]
       ] = recallGradeData;
     }
-    if (
-      "freeRecallNumber" in req.body &&
-      Number.isInteger(req.body.freeRecallNumber)
-    ) {
+    console.log({
+      params: req.params,
+      freeRecallNum: parseInt(req.params.freeRecallNumber),
+      usersNum: parseInt(req.params.userNumber),
+    });
+    if ("freeRecallNumber" in req.params) {
       let freeRecallGradeDocs = await db
         .collection("freeRecallGrades")
         .orderBy("createdAt")
-        .limit(req.body.freeRecallNumber)
+        .limit(parseInt(req.params.freeRecallNumber))
         .get();
+      console.log({ freeRecallLength: freeRecallGradeDocs.docs.length });
       const lastVisibleFreeRecallGradeDoc =
         freeRecallGradeDocs.docs[freeRecallGradeDocs.docs.length - 1];
       freeRecallGradeDocs = await db
         .collection("freeRecallGrades")
         .orderBy("createdAt")
         .startAfter(lastVisibleFreeRecallGradeDoc)
-        .limit(100)
+        .limit(batchNum)
         .get();
       for (let freeRecallGradeDoc of freeRecallGradeDocs.docs) {
         const fRData = freeRecallGradeDoc.data();
@@ -1447,16 +1451,22 @@ exports.addRecallGradesColl = async (req, res) => {
           fRData.phrase,
         ];
         if (recallGradeKey in recallGrades) {
-          const recallGradeData = recallGrades[recallGradeKey];
-          recallGrades[recallGradeKey].researchers = [
-            ...recallGradeData.researchers,
-            fRData.researcher,
-          ];
-          recallGrades[recallGradeKey].researchersNum += 1;
-          recallGrades[recallGradeKey].grades = [
-            ...recallGradeData.grades,
-            fRData.grade,
-          ];
+          if (
+            !recallGrades[recallGradeKey].researchers.includes(
+              fRData.researcher
+            )
+          ) {
+            const recallGradeData = recallGrades[recallGradeKey];
+            recallGrades[recallGradeKey].researchers = [
+              ...recallGradeData.researchers,
+              fRData.researcher,
+            ];
+            recallGrades[recallGradeKey].researchersNum += 1;
+            recallGrades[recallGradeKey].grades = [
+              ...recallGradeData.grades,
+              fRData.grade,
+            ];
+          }
         } else {
           recallGrades[recallGradeKey] = {
             ...fRData,
@@ -1476,18 +1486,19 @@ exports.addRecallGradesColl = async (req, res) => {
     console.log("*********************");
     console.log("Starting from users!");
     console.log("*********************");
-    if ("userNumber" in req.body && Number.isInteger(req.body.userNumber)) {
+    if ("userNumber" in req.params) {
       let userDocs = await db
         .collection("users")
         .orderBy("createdAt")
-        .limit(req.body.userNumber)
+        .limit(parseInt(req.params.userNumber))
         .get();
+      console.log({ userLength: userDocs.docs.length });
       const lastVisibleUserDoc = userDocs.docs[userDocs.docs.length - 1];
       userDocs = await db
         .collection("users")
         .orderBy("createdAt")
         .startAfter(lastVisibleUserDoc)
-        .limit(100)
+        .limit(batchNum)
         .get();
       for (let userDoc of userDocs.docs) {
         const userData = userDoc.data();
@@ -1577,16 +1588,17 @@ exports.addRecallGradesColl = async (req, res) => {
     console.log("Done with users!");
     console.log("*********************");
     for (let rGKey in recallGrades) {
+      const [user, session, project, condition, passage, phrase] = rGKey;
       // We have to update this so that it does not always create new documents,
       // but if the document already exists, it updates it.
       recallGradeDocs = await db
         .collection("recallGrades")
-        .where("user", "==", rGKey.user)
-        .where("session", "==", rGKey.session)
-        .where("project", "==", rGKey.project)
-        .where("condition", "==", rGKey.condition)
-        .where("passage", "==", rGKey.passage)
-        .where("phrase", "==", rGKey.phrase)
+        .where("user", "==", user)
+        .where("session", "==", session)
+        .where("project", "==", project)
+        .where("condition", "==", condition)
+        .where("passage", "==", passage)
+        .where("phrase", "==", phrase)
         .get();
       if (recallGradeDocs.docs.length > 0) {
         const recallGradeRef = db
