@@ -60,7 +60,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
       return institutionsData;
     }
     if (node.institutions) {
-      return node.institutions.map(cur => ({ name: cur.name, logoURL: "", id: cur.id }));
+      return node.institutions.map(cur => ({ name: cur.name, logoURL: "", id: "" }));
     }
     return [];
   };
@@ -169,9 +169,17 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                         title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
                       >
                         <Box sx={{ marginLeft: "-10px" }}>
-                          <Link href={`${ROUTES.home}?institutions=${institution.id}`}>
+                          {institution.id ? (
+                            <Link href={`${ROUTES.home}?institutions=${institution.id}`}>
+                              <OptimizedAvatar
+                                name={institution.name}
+                                imageUrl={institution?.logoURL}
+                                contained={true}
+                              />
+                            </Link>
+                          ) : (
                             <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
-                          </Link>
+                          )}
                         </Box>
                       </Tooltip>
                     </Box>
