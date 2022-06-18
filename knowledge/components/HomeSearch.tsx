@@ -64,15 +64,8 @@ const HomeSearch = forwardRef<Ref, HomeSearchProps>(({ sx, onSearch }, ref) => {
         >
           <Image src="/LogoExtended.svg" alt="1Cademy Logo" width="421px" height="130px" />
         </Box>
-        <Box
-          sx={{
-            width: "100%",
-            mt: { xs: 15, md: 5 },
-            display: "flex",
-            flexDirection: "row"
-          }}
-        >
-          <SearchInput onSearch={onSearch}></SearchInput>
+        <Box sx={{ width: "100%", mt: { xs: 15, md: 5 } }}>
+          <SearchInput onSearch={onSearch} sx={{ height: "62px" }}></SearchInput>
         </Box>
         {stats && (
           <Typography textAlign="center" sx={{ mt: 4, mb: 10, fontSize: 16 }}>
