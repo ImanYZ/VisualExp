@@ -188,10 +188,7 @@ const App = () => {
 
   const resetChoices = () => {
     setCurrentQIdx(0);
-    const initChoices = [];
-    for (let qIdx = 0; qIdx < 10; qIdx++) {
-      initChoices.push("");
-    }
+    const initChoices = new Array(10).fill("");
     setChoices(initChoices);
     return initChoices;
   };
@@ -203,6 +200,7 @@ const App = () => {
     });
     const userLogRef = firebase.db.collection("userLogs").doc();
     await userLogRef.set({
+      ...userUpdates,
       step: newStep,
       id: userRef.id,
       updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
