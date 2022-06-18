@@ -1,7 +1,12 @@
 import { useCallback, useState } from "react";
 
-export const useElementOnScreen = (options: IntersectionObserverInit) => {
-  const [isVisible, setIsVisible] = useState(false);
+interface UseElementOnScreenProps {
+  options: IntersectionObserverInit;
+  defaultVisible: boolean;
+}
+
+export const useElementOnScreen = ({ options, defaultVisible = false }: UseElementOnScreenProps) => {
+  const [isVisible, setIsVisible] = useState(defaultVisible);
 
   const containerRefCallback = useCallback(
     (node: any) => {
