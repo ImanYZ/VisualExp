@@ -460,38 +460,64 @@ exports.downloadNodes = async (req, res) => {
 
 // Fix the institution for those users who registerred before the institutions
 // drop-down menu.
-// exports.fixInstitutionInUsers = async (req, res) => {
-//   try {
-//     const rawdata = fs.readFileSync(
-//       __dirname + "/datasets/edited_universities.json"
-//     );
-//     const institutionsData = JSON.parse(rawdata);
+exports.fixInstitutionInUsers = async (req, res) => {
+  try {
+    const rawdata = fs.readFileSync(
+      __dirname + "/datasets/edited_universities.json"
+    );
+    const institutionsData = JSON.parse(rawdata);
 
-//     let userDocs = await db.collection("users").get();
-//     userDocs = [...userDocs.docs];
-//     for (let instObj of institutionsData) {
-//       console.log(instObj.name);
-//       for (let userDoc of userDocs) {
-//         const userData = userDoc.data();
-//         const domainName = userData.email.match("@(.+)$")[0];
-//         if (
-//           (domainName.includes(instObj.domains) &&
-//             domainName !== "@bgsu.edu") ||
-//           (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu")
-//         ) {
-//           console.log({ username: userData.uname, instObj });
-//           const userRef = db.collection("users").doc(userDoc.id);
-//           await batchUpdate(userRef, { deInstit: instObj.name });
-//         }
-//       }
-//     }
-//     await commitBatch();
-//     console.log("Done.");
-//   } catch (err) {
-//     console.log({ err });
-//     return null;
-//   }
-// };
+    let userDocs = await db.collection("users").get();
+    userDocs = [...userDocs.docs];
+    for (let instObj of institutionsData) {
+      console.log(instObj.name);
+      for (let userDoc of userDocs) {
+        const userData = userDoc.data();
+        const domainName = userData.email.match("@(.+)$")[0];
+        if (
+          (domainName.includes(instObj.domains) &&
+            domainName !== "@bgsu.edu" &&
+            domainName !== "@yu.edu") ||
+          (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu") ||
+          (instObj.domains === "yu.edu" && domainName === "@yu.edu")
+        ) {
+          console.log({ username: userData.uname, instObj });
+          const userRef = db.collection("users").doc(userDoc.id);
+          await batchUpdate(userRef, { deInstit: instObj.name });
+        }
+      }
+    }
+    await commitBatch();
+    console.log("Done.");
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
+
+exports.identifyDuplicateInstitutionDomains = async (req, res) => {
+  try {
+    const rawdata = fs.readFileSync(
+      __dirname + "/datasets/edited_universities.json"
+    );
+    const institutionsData = JSON.parse(rawdata);
+
+    for (let instObj1 of institutionsData) {
+      for (let instObj2 of institutionsData) {
+        if (
+          instObj1.domains.includes(instObj2.domains) &&
+          instObj1.name !== instObj2.name
+        ) {
+          console.log(instObj1.domains + ", " + instObj2.domains);
+        }
+      }
+    }
+    console.log("Done.");
+  } catch (err) {
+    console.log({ err });
+    return null;
+  }
+};
 
 // const fs = require("fs");
 // const csv = require("csv-parser");
