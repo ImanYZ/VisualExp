@@ -17,6 +17,7 @@ import { useRef, useState } from "react";
 import { getInstitutionsByName } from "../lib/firestore/institutions";
 import { getNodePageUrl } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
+import ROUTES from "../src/routes";
 import MarkdownRender from "./Markdown/MarkdownRender";
 import NodeTypeIcon from "./NodeTypeIcon";
 import NodeVotes from "./NodeVotes";
@@ -26,6 +27,7 @@ import QuestionItem from "./QuestionItem";
 dayjs.extend(relativeTime);
 
 type InstitutionData = {
+  id: string;
   name: string;
   logoURL: string;
 };
@@ -58,7 +60,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
       return institutionsData;
     }
     if (node.institutions) {
-      return node.institutions.map(cur => ({ name: cur.name, logoURL: "" }));
+      return node.institutions.map(cur => ({ name: cur.name, logoURL: "", id: "" }));
     }
     return [];
   };
@@ -150,7 +152,9 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                       <Box key={idx} sx={{ display: "inline-block" }}>
                         <Tooltip title={`${contributor.fullName} contributed to the evolution of this node.`}>
                           <Box sx={{ marginLeft: "-10px" }}>
-                            <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
+                            <Link href={`${ROUTES.home}?contributors=${contributor.username}`}>
+                              <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
+                            </Link>
                           </Box>
                         </Tooltip>
                       </Box>
@@ -165,7 +169,17 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                         title={`Students/researchers at ${institution.name} contributed to the evolution of this node.`}
                       >
                         <Box sx={{ marginLeft: "-10px" }}>
-                          <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
+                          {institution.id ? (
+                            <Link href={`${ROUTES.home}?institutions=${institution.id}`}>
+                              <OptimizedAvatar
+                                name={institution.name}
+                                imageUrl={institution?.logoURL}
+                                contained={true}
+                              />
+                            </Link>
+                          ) : (
+                            <OptimizedAvatar name={institution.name} imageUrl={institution?.logoURL} contained={true} />
+                          )}
                         </Box>
                       </Tooltip>
                     </Box>
