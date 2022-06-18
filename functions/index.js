@@ -48,6 +48,8 @@ const {
   assignNodeContributorsInstitutionsStats,
   updateInstitutions,
   downloadNodes,
+  fixInstitutionInUsers,
+  identifyDuplicateInstitutionDomains,
 } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
@@ -76,7 +78,10 @@ app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
-app.get("/addRecallGradesColl", addRecallGradesColl);
+app.get(
+  "/addRecallGradesColl/:freeRecallNumber/:userNumber",
+  addRecallGradesColl
+);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
@@ -104,6 +109,11 @@ app.get("/downloadNodes", downloadNodes);
 // Misinformation Experiment
 app.get("/card", card);
 app.get("/image*", image);
+app.get("/fixInstitutionInUsers", fixInstitutionInUsers);
+app.get(
+  "/identifyDuplicateInstitutionDomains",
+  identifyDuplicateInstitutionDomains
+);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ api: true });
