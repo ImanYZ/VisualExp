@@ -1195,17 +1195,28 @@ exports.gradeFreeRecall = async (req, res) => {
         thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum
           ? thisResearcherUpdates.gradingNum + 1
           : 1;
+        // recallGrades collection is huge and it's extremely inefficient to
+        // search through it if all the docs for all projects are in the same
+        // collection. Also, when querying them to find the appropriate doc to
+        // show the authenticated researcher to grade, we cannot combine the
+        // where clause on the project and the researchersNum < 4. As a
+        // solution, we separated the collections per project, other than the
+        // H2K2 project that we have already populated the data in and it's very
+        // costly to rename.
+        let collName = "recallGrades";
+        if (project !== "H2K2") {
+          collName += project;
+        }
         // We need to check whether each of the other researchers have identified
         // the phrase in this free-recall response.
         const recallGradeQuery = db
-          .collection("recallGrades")
+          .collection(collName)
           .where("user", "==", user)
-          .where("project", "==", project)
           .where("passage", "==", passageId)
           .where("phrase", "==", phrase);
         const recallGradeDocs = await t.get(recallGradeQuery);
         const recallGradeRef = db
-          .collection("recallGrades")
+          .collection(collName)
           .doc(recallGradeDocs.docs[0].id);
         const recallGradeData = recallGradeDocs.docs[0].data();
         const recallGradeUpdates = {};
