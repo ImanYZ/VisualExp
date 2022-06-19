@@ -113,23 +113,34 @@ exports.downloadNodes = async (req, res) => {
 exports.fixInstitutionInUsers = async (req, res) => {
   try {
     const rawdata = fs.readFileSync(
-      __dirname + "/datasets/edited_universities.json"
+      __dirname + "/functions/datasets/edited_universities.json"
     );
     const institutionsData = JSON.parse(rawdata);
 
     let userDocs = await db.collection("users").get();
     userDocs = [...userDocs.docs];
+    let domainsNW = [];
+    for (let instObj1 of institutionsData) {
+      for (let instObj2 of institutionsData) {
+        if (
+          instObj1.domains.includes(instObj2.domains) &&
+          instObj1.name !== instObj2.name
+        ) {
+          domainsNW.push(instObj2.domains)
+        }
+      }
+    }
+
     for (let instObj of institutionsData) {
       console.log(instObj.name);
       for (let userDoc of userDocs) {
         const userData = userDoc.data();
         const domainName = userData.email.match("@(.+)$")[0];
+
         if (
           (domainName.includes(instObj.domains) &&
-            domainName !== "@bgsu.edu" &&
-            domainName !== "@yu.edu") ||
-          (instObj.domains === "bgsu.edu" && domainName === "@bgsu.edu") ||
-          (instObj.domains === "yu.edu" && domainName === "@yu.edu")
+          !domainsNW.includes(domainName)) ||
+          (instObj.domains === domainName )
         ) {
           console.log({ username: userData.uname, instObj });
           const userRef = db.collection("users").doc(userDoc.id);
