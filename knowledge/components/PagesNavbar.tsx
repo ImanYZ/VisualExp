@@ -27,8 +27,6 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
   const [showMenu, setShowMenu] = useState(false);
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
-  // const onToggleShowFeedbackForm = () => setShowFeedbackForm(showFeedbackForm => !showFeedbackForm);
-  // const onCloseFeedback = () => setShowFeedbackForm(false);
 
   const onSendFeedback = () => {
     setShowMenu(false);
@@ -48,7 +46,6 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
           minHeight: "calc(100vh - var(--navbar-height) - var(--footer-height) )"
         }}
       >
-        {showFeedbackForm ? "SHOW" : "HIDE"}
         {children}
 
         <FeedbackTooltip
@@ -56,16 +53,11 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
           placement="top-start"
           title={
             <ClickAwayListener onClickAway={() => setShowFeedbackForm(false)}>
-              <Feedback
-                onSuccessFeedback={() => setShowFeedbackForm(false)}
-                // onClickOutside={onCloseFeedback}
-                sx={{ padding: "40px 50px" }}
-              />
+              <Feedback onSuccessFeedback={() => setShowFeedbackForm(false)} sx={{ padding: "40px 50px" }} />
             </ClickAwayListener>
           }
           sx={{ display: { xs: "none", md: "block" } }}
         >
-          {/* <ClickAwayListener onClickAway={onCloseFeedback}> */}
           <Fab
             aria-label="Open Feedback"
             onClick={() => setShowFeedbackForm(true)}
@@ -112,11 +104,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
               }}
             >
               <ClickAwayListener onClickAway={() => setShowMobileFeedbackForm(false)}>
-                <Feedback
-                  onSuccessFeedback={() => setShowMobileFeedbackForm(false)}
-                  // onClickOutside={() => console.log("click")}
-                  sx={{ padding: "30px 50px" }}
-                />
+                <Feedback onSuccessFeedback={() => setShowMobileFeedbackForm(false)} sx={{ padding: "30px 50px" }} />
               </ClickAwayListener>
               <IconButton
                 aria-label="Close feedback"
