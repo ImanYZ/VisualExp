@@ -315,8 +315,8 @@ const IntellectualPoints = (props) => {
   };
 
   useEffect(() => {
+    console.log('activitiesChanges');
     if (activitiesChanges.length > 0) {
-      console.log('activitiesChanges');
       const tempActivitiesChanges = [...activitiesChanges];
       setTimeout(()=>{
         setActivitiesChanges([]);
