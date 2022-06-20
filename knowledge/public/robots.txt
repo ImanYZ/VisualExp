@@ -1,6 +1,6 @@
 # https://www.robotstxt.org/robotstxt.html
 
-sitemap: https://1cademy.us/knowledge/sitemapIndex
+sitemap: https://node.1cademy.us/sitemapIndex
 
 # Block all crawlers for /accounts
 # User-agent: *
