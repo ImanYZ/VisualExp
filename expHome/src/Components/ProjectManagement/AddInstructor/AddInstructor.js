@@ -431,6 +431,7 @@ const AddInstructor = (props) => {
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
+    console.log('loadInstitutions();');
     const loadInstitutions = async () => {
       if (institutions.length === 0) {
         const institutionsObj = await import(
@@ -450,6 +451,7 @@ const AddInstructor = (props) => {
   // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
     if (firebase) {
+      console.log('instructorsinstructors');
       const instructorsQuery = firebase.db.collection("instructors");
       const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
@@ -469,6 +471,7 @@ const AddInstructor = (props) => {
   // a new spashot listener to listen to all the instructor votes by the
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
+    console.log('firebase && project && fullname && instructorsLoaded');
     if (firebase && project && fullname && instructorsLoaded) {
       const instructorVotesQuery = firebase.db
         .collection("instructorVotes")
@@ -552,6 +555,7 @@ const AddInstructor = (props) => {
   // Based on the changes to the instructors and votes comming from the database
   // listeners, make the corresponding changes to differnt states.
   useEffect(() => {
+    console.log('instructorsChanges');
     if (instructorsChanges.length > 0) {
       // We make a copy of all the instructor changes and delete all the content
       // of the instructorChanges, so that if new changes come from the database
@@ -774,6 +778,7 @@ const AddInstructor = (props) => {
   // equal to 3 votes from researchers, we should remove it from
   // othersInstructors.
   useEffect(() => {
+    console.log('othersInstructors');
     let theInstructor;
     let uInstructorsNum = 0;
     let oInsts = [...othersInstructors];
@@ -820,6 +825,7 @@ const AddInstructor = (props) => {
   // Validator useEffect: Based on the changes in the input field, we validate
   // them and generate corresponding error messages.
   useEffect(() => {
+    console.log('validwebURL');
     const validwebURL = isValidHttpUrl(values.webURL);
     const validGoogleScholar = isValidHttpUrl(values.GoogleScholar);
     const validEmail = isEmail(email);
