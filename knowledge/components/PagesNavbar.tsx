@@ -1,6 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { Fab, IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
+import { ClickAwayListener, Fab, IconButton, styled, Tooltip, tooltipClasses, TooltipProps } from "@mui/material";
 import Box from "@mui/material/Box";
 import dynamic from "next/dynamic";
 import React, { ComponentType, FC, ReactNode, useState } from "react";
@@ -22,16 +22,15 @@ export const AppFooter: ComponentType<any> = dynamic(() => import("./AppFooter")
 });
 
 const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) => {
+  const [showMobileFeedbackForm, setShowMobileFeedbackForm] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const onCloseMenu = () => setShowMenu(false);
   const onShowMenu = () => setShowMenu(true);
-  const onToggleShowFeedbackForm = () => setShowFeedbackForm(showFeedbackForm => !showFeedbackForm);
-  const onCloseFeedback = () => setShowFeedbackForm(false);
 
   const onSendFeedback = () => {
     setShowMenu(false);
-    setShowFeedbackForm(true);
+    setShowMobileFeedbackForm(true);
   };
 
   return (
@@ -48,15 +47,20 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         }}
       >
         {children}
+
         <FeedbackTooltip
           open={showFeedbackForm}
           placement="top-start"
-          title={<Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "40px 50px" }} />}
+          title={
+            <ClickAwayListener onClickAway={() => setShowFeedbackForm(false)}>
+              <Feedback onSuccessFeedback={() => setShowFeedbackForm(false)} sx={{ padding: "40px 50px" }} />
+            </ClickAwayListener>
+          }
           sx={{ display: { xs: "none", md: "block" } }}
         >
           <Fab
             aria-label="Open Feedback"
-            onClick={onToggleShowFeedbackForm}
+            onClick={() => setShowFeedbackForm(true)}
             color="primary"
             sx={{
               color: theme => theme.palette.common.white,
@@ -75,7 +79,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
         </FeedbackTooltip>
 
         {/* feedback mobil */}
-        {showFeedbackForm && (
+        {showMobileFeedbackForm && (
           <Box
             sx={{
               width: "100vw",
@@ -99,10 +103,12 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
                 position: "relative"
               }}
             >
-              <Feedback onSuccessFeedback={onCloseFeedback} sx={{ padding: "30px 50px" }} />
+              <ClickAwayListener onClickAway={() => setShowMobileFeedbackForm(false)}>
+                <Feedback onSuccessFeedback={() => setShowMobileFeedbackForm(false)} sx={{ padding: "30px 50px" }} />
+              </ClickAwayListener>
               <IconButton
                 aria-label="Close feedback"
-                onClick={onCloseFeedback}
+                onClick={() => setShowMobileFeedbackForm(false)}
                 sx={{ position: "absolute", top: "30px", right: "15px", color: "white" }}
               >
                 <CloseIcon fontSize="large" />
