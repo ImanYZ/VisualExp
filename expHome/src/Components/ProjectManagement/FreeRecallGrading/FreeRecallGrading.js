@@ -65,14 +65,26 @@ const FreeRecallGrading = (props) => {
   // researchers yet.
   useEffect(() => {
     const retrieveFreeRecallResponse = async () => {
+      // recallGrades collection is huge and it's extremely inefficient to
+      // search through it if all the docs for all projects are in the same
+      // collection. Also, when querying them to find the appropriate doc to
+      // show the authenticated researcher to grade, we cannot combine the
+      // where clause on the project and the researchersNum < 4. As a
+      // solution, we separated the collections per project, other than the
+      // H2K2 project that we have already populated the data in and it's very
+      // costly to rename.
+      let collName = "recallGrades";
+      if (project !== "H2K2") {
+        collName += project;
+      }
       const recallGradeDocs = await firebase.db
-        .collection("recallGrades")
+        .collection(collName)
         .where("researchersNum", "<", 4)
+        .limit(1000)
         .get();
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
         if (
-          recallGradeData.project === project &&
           recallGradeData.user !== fullname &&
           (recallGradeData.researchersNum === 0 ||
             // If there is at least one other researcher who graded
