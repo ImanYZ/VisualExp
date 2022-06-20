@@ -61,6 +61,7 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
         objectFit="cover"
         placeholder="blur"
         blurDataURL={blurImage()}
+        priority
       />
       <Box sx={{ position: "absolute", maxWidth: "100vw", width: { md: "60%", xs: "85%" } }}>
         <Box
