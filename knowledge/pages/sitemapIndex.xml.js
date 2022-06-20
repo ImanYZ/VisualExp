@@ -16,7 +16,7 @@ export async function getServerSideProps({ res }) {
     for (let nodeDoc of nodesDocs.docs) {
       xmlContent += `
         <sitemap>
-          <loc>https://1cademy.us/knowledge/sitemap/${nodeDoc.id}</loc>
+          <loc>https://node.1cademy.us/sitemap/${nodeDoc.id}</loc>
           <lastmod>${new Date().toISOString()}</lastmod>
         </sitemap>`;
     }
