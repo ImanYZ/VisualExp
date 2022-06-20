@@ -48,7 +48,7 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
                 nodeContent={node.content}
                 showListItemIcon={false}
                 label={node.label || ""}
-                sx={{ p: "20px 0px" }}
+                sx={{ p: "30px 0px", mx: "5px" }}
                 secondaryActionSx={{ mr: "34px" }}
               />
               <Divider />
