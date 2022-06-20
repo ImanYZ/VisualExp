@@ -9,11 +9,11 @@ const Stats = () => {
   const { data: stats } = useQuery("stats", getStats);
 
   if (!stats) {
-    return <Box sx={{ mt: 4, mb: 10, height: "48px" }}></Box>;
+    return <Box data-testid="empty-stats" sx={{ mt: 4, mb: 10, height: "48px" }}></Box>;
   }
 
   return (
-    <Stack sx={{ mt: 4, mb: 10 }} spacing={2}>
+    <Stack sx={{ mt: 4, mb: 10 }} spacing={1}>
       <Typography textAlign="center">
         {`Search ${stats.nodes} nodes and ${stats.links} links through ${stats.proposals} proposals`}
       </Typography>
