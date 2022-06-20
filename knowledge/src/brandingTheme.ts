@@ -186,6 +186,11 @@ export function getThemedComponents(): {
       },
       MuiChip: {
         styleOverrides: {
+          root: {
+            "&": {
+              border: `solid 1px ${grey[300]}`
+            }
+          },
           icon: {
             color: common.orange
           }
