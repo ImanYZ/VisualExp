@@ -199,7 +199,9 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     const loadTags = async () => {
+      console.log('fetch tags Data');
       const tagDocs = await firebase.db.collection("tags").get();
+      console.log('fetched tags Data');
       const aTags = [];
       for (let tagDoc of tagDocs.docs) {
         aTags.push(tagDoc.id);
@@ -213,6 +215,7 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     if (firebase && project && fullname) {
+      console.log('fetched activities Data');
       const activitiesQuery = firebase.db
         .collection("activities")
         .where("project", "==", project);
@@ -223,6 +226,7 @@ const IntellectualPoints = (props) => {
         });
         //we don't want to create multiple sockets 
         setActivitiesLoaded(true);
+        console.log('fetched activities Data onSnapshot');
       });
       return () => {
         setActivitiesLoaded(false);
@@ -233,6 +237,7 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     if (firebase && project && fullname && activitiesLoaded) {
+      console.log('fetch votes');
       const votesQuery = firebase.db
         .collection("votes")
         .where("voter", "==", fullname)
@@ -242,6 +247,7 @@ const IntellectualPoints = (props) => {
         setVotesChanges((oldVotesChanges) => {
           return [...oldVotesChanges, ...docChanges];
         });
+        console.log('fetch votes snapshot');
       });
       return () => {
         setVotesChanges([]);
@@ -310,6 +316,7 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     if (activitiesChanges.length > 0) {
+      console.log('activitiesChanges');
       const tempActivitiesChanges = [...activitiesChanges];
       setTimeout(()=>{
         setActivitiesChanges([]);
@@ -472,6 +479,7 @@ const IntellectualPoints = (props) => {
   ]);
 
   useEffect(() => {
+    console.log('othersActivities');
     let theActivity;
     let uActivitiesNum = 0;
     for (let oActivity of othersActivities) {
@@ -490,6 +498,7 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     // if (activityDate && startTime && endTime && activityDescription) {
+      console.log('activityDate && startTime && activityDescription');
     if (activityDate && startTime && activityDescription) {
       setInvalidActivity(false);
     } else {
@@ -715,6 +724,8 @@ const IntellectualPoints = (props) => {
       console.error(err);
     }
   };
+
+  // console.log({ isAdmin, otherActivity, });
 
   return (
     <>
