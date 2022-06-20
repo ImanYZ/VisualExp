@@ -9,5 +9,5 @@
     "allowJs": true,
     "noEmit": true
   },
-  "files": ["../cypress.config.ts"]
+  "files": ["../cypress.config.js"]
 }
