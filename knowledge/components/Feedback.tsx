@@ -147,6 +147,7 @@ export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx 
                   value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  isError={Boolean(errors.email) && Boolean(touched.email)}
                 />
               </FormControl>
 
@@ -160,6 +161,7 @@ export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx 
                   value={values.name}
                   onChange={handleChange}
                   onBlur={handleBlur}
+                  isError={Boolean(errors.name) && Boolean(touched.name)}
                 />
               </FormControl>
 
@@ -175,6 +177,7 @@ export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx 
                   onBlur={handleBlur}
                   rows={3}
                   multiline
+                  isError={Boolean(errors.feedback) && Boolean(touched.feedback)}
                 />
               </FormControl>
               <LoadingButton type="submit" color="primary" variant="contained" fullWidth loading={isSubmitting}>
@@ -193,7 +196,7 @@ export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx 
       ref={ref}
       sx={{
         width: "100%",
-        height: "auto",
+        height: "545px",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -207,7 +210,7 @@ export const Feedback = forwardRef<Ref, FeedbackProps>(({ onSuccessFeedback, sx 
 
 Feedback.displayName = "Feedback";
 
-const CustomInput = styled(InputBase)(({ theme }) => ({
+const CustomInput = styled(InputBase)<{ isError: boolean }>(({ theme, isError }) => ({
   "label + &": {
     marginTop: theme.spacing(3),
     color: theme.palette.common.white
@@ -215,7 +218,9 @@ const CustomInput = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     borderRadius: 4,
     position: "relative",
-    backgroundColor: "#515153",
+    backgroundColor: isError ? "#FF000080" : "#515153",
+    border: "solid 1px",
+    borderColor: isError ? "#FF0000" : "#515153",
     fontSize: 16,
     width: "100%",
     padding: "10px 12px",
