@@ -23,6 +23,7 @@ const blurImage = () => {
 };
 
 const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch }, ref) => {
+
   const { data: stats } = useQuery("stats", getStats);
 
   const beginFiltersRef = useRef<HTMLDivElement | null>(null);
@@ -65,6 +66,8 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
         objectFit="cover"
         placeholder="blur"
         blurDataURL={blurImage()}
+        quality={80}
+
       />
       <Box sx={{ position: "absolute", maxWidth: "100vw", width: { md: "60%", xs: "85%" } }}>
         <Box
@@ -97,7 +100,6 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
           </Typography>
         )}
       </Box>
-      {/* <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box> */}
     </Box>
   );
 });
