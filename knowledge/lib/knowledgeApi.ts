@@ -5,6 +5,7 @@ import {
   FilterValue,
   ResponseAutocompleteFilter,
   ResponseAutocompleteProcessedReferencesFilter,
+  ResponseAutocompleteSearch,
   ResponseAutocompleteTags,
   SearchNodesParams,
   SearchNodesResponse,
@@ -60,5 +61,10 @@ export const getSelectedInstitutions = async (institutions: string) => {
   const response = await axios.get<FilterValue[]>("/api/getSelectedInstitutions", {
     params: { institutions }
   });
+  return response.data;
+};
+
+export const getSearchAutocomplete = async (searchText: string): Promise<ResponseAutocompleteSearch> => {
+  const response = await axios.get("/api/searchAutocomplete", { params: { q: searchText } });
   return response.data;
 };
