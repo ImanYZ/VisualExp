@@ -19,7 +19,6 @@ export default defineConfig({
     requestTimeout: 20000,
     video: false,
     setupNodeEvents(on, config) {
-      // eslint-disable-next-line
       require("@cypress/code-coverage/task")(on, config);
       // include any other plugin code...
 
