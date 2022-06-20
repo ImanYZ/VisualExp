@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
+import axios from "axios";
+
 import { ResponsiveCalendar } from "@nivo/calendar";
 
 import Button from "@mui/material/Button";
@@ -26,6 +28,51 @@ import ResearcherAvailabilities from "./ResearcherAvailabilities";
 import { getISODateString } from "../../../utils/DateFunctions";
 
 import "./ExperimentPoints.css";
+
+// Call this for sessions that the participant has not accepted the Google
+// Calendar invite yet, or should have been in the session but they have not
+// shown up yet.
+const sendEventNotificationEmail = (params) => async (event) => {
+  await axios.post("/sendEventNotificationEmail", params);
+};
+
+// Characteristics of the columns of the experiment sessions table.
+const participantsColumns = [
+  { field: "start", headerName: "Start", type: "dateTime", width: 190 },
+  {
+    field: "participant", // email address
+    headerName: "Participant",
+    width: 190,
+  },
+  {
+    field: "acceptedNum",
+    headerName: "Acc Num",
+    type: "number",
+    width: 70,
+    renderCell: (cellValues) => {
+      // If we're waiting for this participant, clicking this button
+      // would email them a notification.
+      return cellValues.row.weAreWaiting ? (
+        <Button
+          onClick={sendEventNotificationEmail({
+            email: cellValues.row.participant,
+            order: cellValues.row.order,
+            firstname: cellValues.row.firstname,
+            weAreWaiting: cellValues.row.weAreWaiting,
+            hangoutLink: cellValues.row.hangoutLink,
+            courseName: cellValues.row.courseName,
+          })}
+          className="Button Red NotificationBtn"
+          variant="contained"
+        >
+          {cellValues.value + " A"}
+        </Button>
+      ) : (
+        cellValues.value + " A"
+      );
+    },
+  },
+];
 
 const expSessionsColumns = [
   { field: "start", headerName: "Start", type: "dateTime", width: 190 },
@@ -75,6 +122,7 @@ const ExperimentPoints = (props) => {
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
 
   useEffect(() => {
+    console.log('expSessionsChanges');
     if (expSessionsChanges.length > 0) {
       const tempExpSessionsChanges = [...expSessionsChanges];
       setExpSessionsChanges([]);
@@ -121,6 +169,7 @@ const ExperimentPoints = (props) => {
   }, [email, expSessions, dailyPoints, expSessionsChanges]);
 
   useEffect(() => {
+    console.log('expSessions');
     if (project && fullname) {
       const expSessionsQuery = firebase.db
         .collection("expSessions")
@@ -139,6 +188,7 @@ const ExperimentPoints = (props) => {
   }, [project, fullname]);
 
   useEffect(() => {
+    console.log('resScheduleresSchedule');
     const loadSchedule = async () => {
       setScheduleLoaded(false);
       const scheduleDocs = await firebase.db
