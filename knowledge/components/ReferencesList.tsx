@@ -29,7 +29,7 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
 
   return (
     <Box sx={{ ...sx }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: "5px" }}>
+      <Box sx={{ display: "flex", alignItems: "center", mb: "15px", mt: "20px" }}>
         <Typography variant="body2" color="text.secondary">
           References:
         </Typography>
