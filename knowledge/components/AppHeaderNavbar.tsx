@@ -23,7 +23,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
   const router = useRouter();
 
   return (
-    <AppBar>
+    <AppBar data-testid="app-nav-bar">
       <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
         <LightTooltip title="1Cademy's Landing Page">
           <Box
