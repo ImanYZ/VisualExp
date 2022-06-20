@@ -152,7 +152,7 @@ const HomePage: NextPage = () => {
         <MasonryNodes
           nodes={data?.data || []}
           page={page}
-          totalPages={Math.floor(data?.numResults || 0 / (data?.perPage || homePageSortByDefaults.perPage))}
+          totalPages={Math.ceil((data?.numResults || 0) / (data?.perPage || homePageSortByDefaults.perPage))}
           onChangePage={handleChangePage}
           isLoading={isLoading}
         />
