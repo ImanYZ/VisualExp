@@ -5,7 +5,7 @@ import React, { SyntheticEvent, useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useDebounce } from "use-debounce";
 
-import { getSearchAutocomplete } from "../lib/knowledgeApi";
+import { getReferencesAutocomplete } from "../lib/knowledgeApi";
 import { getQueryParameter, isValidHttpUrl } from "../lib/utils";
 import { FilterProcessedReferences } from "../src/knowledgeTypes";
 
@@ -17,7 +17,7 @@ export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocom
   const router = useRouter();
   const [text, setText] = useState("");
   const [searchText] = useDebounce(text, 250);
-  const { isLoading, data } = useQuery(["references", searchText], () => getSearchAutocomplete(searchText));
+  const { isLoading, data } = useQuery(["references", searchText], () => getReferencesAutocomplete(searchText));
 
   const [referenceSelected, setReferenceSelected] = useState<{ title: string; label: string }>({
     title: "",
