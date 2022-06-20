@@ -40,7 +40,7 @@ export const getServerSideProps: GetServerSideProps<any, Params> = async ({ res,
         const nodeData = nodeDoc.data();
         xmlContent += `
           <url>
-            <loc>https://1cademy.us/knowledge/${getNodePageUrl(nodeData.title, nodeDoc.id)}</loc>
+            <loc>https://node.1cademy.us/${getNodePageUrl(nodeData.title, nodeDoc.id)}</loc>
             <lastmod>${nodeData.updatedAt.toDate().toISOString()}</lastmod>
             <changefreq>hourly</changefreq>
           </url>`;
