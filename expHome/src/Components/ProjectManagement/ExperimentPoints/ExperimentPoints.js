@@ -122,6 +122,7 @@ const ExperimentPoints = (props) => {
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
 
   useEffect(() => {
+    console.log('expSessionsChanges');
     if (expSessionsChanges.length > 0) {
       const tempExpSessionsChanges = [...expSessionsChanges];
       setExpSessionsChanges([]);
@@ -168,6 +169,7 @@ const ExperimentPoints = (props) => {
   }, [email, expSessions, dailyPoints, expSessionsChanges]);
 
   useEffect(() => {
+    console.log('expSessions');
     if (project && fullname) {
       const expSessionsQuery = firebase.db
         .collection("expSessions")
@@ -186,6 +188,7 @@ const ExperimentPoints = (props) => {
   }, [project, fullname]);
 
   useEffect(() => {
+    console.log('resScheduleresSchedule');
     const loadSchedule = async () => {
       setScheduleLoaded(false);
       const scheduleDocs = await firebase.db
