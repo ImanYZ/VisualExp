@@ -57,7 +57,9 @@ const Activities = (props) => {
         setResearchersChanges((oldResearchersChanges) => {
           return [...oldResearchersChanges, ...docChanges];
         });
+        console.log('researchersSnapshot');
       });
+      console.log('researchersSnapshot useEffect');
       return () => {
         setResearchers([]);
         researchersSnapshot();
@@ -150,6 +152,7 @@ const Activities = (props) => {
       }
       resears.sort((a, b) => b.totalPoints - a.totalPoints);
       setResearchers(resears);
+      console.log('researchersChanges useEffect');
     }
   }, [project, researchers, researchersChanges]);
 
@@ -172,6 +175,7 @@ const Activities = (props) => {
     const content = []
 
     if(projectSpecs.onePoints) {
+      console.log('projectSpecs.onePoints');
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
@@ -187,6 +191,7 @@ const Activities = (props) => {
     }
 
     if(projectSpecs.intellectualPoints) {
+      console.log('projectSpecs.intellectualPoints');
        content.push(
         <span
           className={
@@ -201,6 +206,7 @@ const Activities = (props) => {
     }
 
     if(projectSpecs.instructorsPoints) {
+      console.log('projectSpecs.instructorsPoints');
       content.push(
         <span
           className={
@@ -254,6 +260,7 @@ const Activities = (props) => {
       )
     }
 
+    console.log('makeResearcherChipContent', makeResearcherChipContent);
     return content.map((item, index) => {
       // if not last one append a " - "
       return  content.length - 1 !== index 
@@ -271,6 +278,7 @@ const Activities = (props) => {
     return point.toFixed(2).replace(/\.0+$/,'')
   }
 
+  // console.log('researchers', { researchers });
   return (
     <div id="ActivitiesContainer">
       {notAResearcher ? (
