@@ -130,6 +130,10 @@ export type ResponseAutocompleteTags = {
   results?: string[];
   errorMessage?: string;
 };
+export type ResponseAutocompleteNodes = {
+  results?: string[];
+  errorMessage?: string;
+};
 
 export type TypesenseNodesSchema = {
   changedAt: string;
@@ -174,6 +178,12 @@ export type ResponseAutocompleteProcessedReferencesFilter = {
   results?: FilterProcessedReferences[];
   errorMessage?: string;
 };
+
+export type ResponseAutocompleteSearch = {
+  results?: string[];
+  errorMessage?: string;
+};
+
 export enum TimeWindowOption {
   "AnyTime" = "Any Time",
   "ThisWeek" = "This Week",
