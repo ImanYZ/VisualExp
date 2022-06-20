@@ -78,15 +78,7 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
         >
           <Image src="/LogoExtended.svg" alt="1Cademy Logo" width="421px" height="130px" />
         </Box>
-        <Box
-          ref={containerRef}
-          sx={{
-            width: "100%",
-            mt: { xs: 15, md: 5 },
-            display: "flex",
-            flexDirection: "row"
-          }}
-        >
+        <Box ref={containerRef} sx={{ width: "100%", mt: { xs: 15, md: 5 } }}>
           <SearchInput onSearch={onSearch}></SearchInput>
         </Box>
         {stats && (
@@ -97,7 +89,6 @@ const HomeSearch = forwardRef<HomeSearchRef, HomeSearchProps>(({ sx, onSearch },
           </Typography>
         )}
       </Box>
-      {/* <Box id="nodes-begin" sx={{ position: "absolute", bottom: "70px" }}></Box> */}
     </Box>
   );
 });
