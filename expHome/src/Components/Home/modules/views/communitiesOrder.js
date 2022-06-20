@@ -263,7 +263,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
-    width: "28%",
+    width: "50%",
     leaders: [
       {
         name: "Victoria Mulligan",
@@ -307,127 +307,6 @@ export default [
     ],
   },
   {
-    id: "Mindfulness",
-    tags: [
-      {
-        title: "Mindfulness",
-        node: "L6N5EOy8Ij73XoJgy09e",
-      },
-      {
-        title: "Positive Psychology",
-        node: "v9d4f86mmgaWV7tMLZQM",
-      },
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Mindfulness.jpg",
-    title: "Positive Psychology",
-    width: "34%",
-    leaders: [
-      // {
-      //   name: "Dallas Wilburn",
-      //   image: "Dallas_Wilburn.jpg",
-      //   about: `I am a student at the University of Texas at Austin pursuing a Bachelor's of Art in Psychology. I am passionate about increasing mental health awareness and learning the best techniques for treatment of mental illness. I have experience mentoring my peers and have held several leadership positions within and outside of my university. I am dedicated to helping those in my community, whether that be social or academic, and love learning more about psychology in any context.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/dallas-wilburn-795145228/",
-      //     },
-      //   ],
-      // },
-      {
-        name: "Noor Jassim",
-        image: "Noor_Jassim.jpeg",
-        about: `Honors student at Eastern Michigan University pursuing a Bachelor of Science in psychology and sociology. A research assistant at the Self-regulation, Early Experience, and Development (SEED) lab in the psychology department. An assistant manager at a real estate company. Active Humane Society volunteer. Adamant enthusiast of quantitative methods in social psychology and medical sociology. Other interests include dialectical behavior therapy (DBT) as well as emotional regulation.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/noor-jassim/",
-          },
-        ],
-      },
-    ],
-    YouTube: "2tH94sJ18BI",
-    description: (
-      <div>
-        <p>
-          We are an interdisciplinary group of learners and researchers who have
-          been iteratively contributing to and improving a large-scale, online
-          collaborative research platform called 1Cademy. Our platform
-          facilitates knowledge sharing and remote, collaborative research by
-          enabling users to organize research in a hierarchical format through
-          content generation, mapping, and evaluation.
-        </p>
-        <p>
-          The main objective of the Positive Psychology community is to explore
-          three fundamental lines of inquiry of the discipline which includes
-          positive subjective experiences, individual traits, and social
-          institutions. A focus will be on the efficacy of mindfulness practices
-          within the clinical context. Interns will have the freedom to research
-          a topic of interest within positive psychology and share their
-          findings on the collaborative research platform 1Cademy.
-        </p>
-        <p>Some of the topics such as the following will be discussed:</p>
-        <ul>
-          <li>
-            Impact of positive experiences such as love, good mood, and
-            happiness on the wellbeing of individuals and its buffering effect
-            on psychopathology.
-          </li>
-          <li>
-            The power of social support on individuals and its relation to
-            psychological nurturement.
-          </li>
-          <li>
-            The 3rd wave of cognitive behavioral therapy (CBT) and its impact in
-            popularizing mindfulness in western practices.
-          </li>
-          <li>
-            The multitude of ways in which mindfulness can be applied in
-            clinical practices with individuals that suffer from severe
-            psychopathology.
-          </li>
-          <li>
-            The functions of mindfulness that leads to mental flexibility,
-            greater impulse resistance, and decrease in judgmentalness among
-            individuals.
-          </li>
-          <li>
-            Many other topics of your choosing within positive psychology.
-          </li>
-        </ul>
-      </div>
-    ),
-    accomplishments: `We have examined and updated the mindfulness community tag on 1Cademy with cross-disciplinary applications of mindfulness in thorough detail.
-    We have compiled an inclusive list of mental disorders from the DSM-5 that can benefit from clinical mindfulness as well as documented case studies of certain populations that were able to benefit from mindfulness when it applied to psychopathological symptoms.
-    We have outlined multiple mindfulness interventions that have been backed by empirical research and heavily tested across the world in multiple research institutions.
-    Also, we have connected the origins of mindfulness that stemmed from eastern traditions to the current applications of mindfulness in the clinical western setting as well as provided a cohesive snapshot of the roots of mindfulness in ancient eastern religions.`,
-    gains: [
-      `Gain experience by developing critical skills in research, including reviewing past literature, analyzing, and synthesizing information in a concise cohesive manner.`,
-      `Work towards executing and publishing research on a public research platform on positive psychology and mindfulness.`,
-      `Collaborate with other interns in gaining a deeper understanding of psychology as a science.`,
-      `Work remotely with all interactions, task fulfillment, and communications.`,
-      `Completing responsibilities will require a minimum of 5 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
-      `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
-    hasTest: true,
-    qualifications: [
-      `Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0`,
-      `A clear understanding of fundamentals of psychology`,
-      `Interest and enthusiasm for positive psychology and scientific research`,
-      `Strong desire and willingness to collaborate with others and engage in group discussions`,
-      `Willingness to attend weekly meetings and present findings`,
-      `Able to commit to approximately 5-10 hours of work each week`,
-    ],
-    responsibilities: [
-      `Read through textbooks and research papers to develop a synthesized cohesive summary on our knowledge visualization platform 1Cademy.`,
-      `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work and accepting constructive feedback.`,
-      `Contribute in meetings by engaging in discussion with other interns about research topics.`,
-    ],
-  },
-  {
     id: "Health_Psychology",
     tags: [
       {
@@ -439,7 +318,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
-    width: "38%",
+    width: "50%",
     leaders: [
       {
         name: "Madeline Paige Jacoby",
@@ -651,17 +530,6 @@ export default [
     width: "50%",
     leaders: [
       {
-        name: "Noor Jassim",
-        image: "Noor_Jassim.jpeg",
-        about: `Honors student at Eastern Michigan University pursuing a Bachelor of Science in psychology and sociology. A research assistant at the Self-regulation, Early Experience, and Development (SEED) lab in the psychology department. An assistant manager at a real estate company. Active Humane Society volunteer. Adamant enthusiast of quantitative methods in social psychology and medical sociology. Other interests include dialectical behavior therapy (DBT) as well as emotional regulation.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/noor-jassim/",
-          },
-        ],
-      },
-      {
         name: "Alex Nikolaidis Konstas",
         image: "Alex_Nikolaidis_Konstas.jpg",
         about: `I am an undergraduate student from Thessaloniki, Greece, and I am in my senior year at Davidson College, NC. Specifically, I am double majoring in Psychology and Studio Art. I joined 1Cademy as an intern for the Educational Psychology research group in the summer of 2021. For the fall semester of 2021, I began interning for the Social/Political Psychology research team. However, I started co-leading the group in November of 2021, as I was very passionate about the interdisciplinary and collaborative approach of the platform. I have conducted research related to social psychology, and I hope to pursue graduate studies in the field. My research interests include social cognition, bias, and gender.`,
@@ -684,7 +552,7 @@ export default [
         ],
       },
     ],
-    YouTube: "7L1MfVRySFI",
+    YouTube: "73Uk2Nsgbgg",
     description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
     accomplishments: "",
     gains: [
@@ -920,6 +788,127 @@ export default [
       `All interactions, task fulfillment, and communications will be remote.`,
     ],
   },
+  // {
+  //   id: "Mindfulness",
+  //   tags: [
+  //     {
+  //       title: "Mindfulness",
+  //       node: "L6N5EOy8Ij73XoJgy09e",
+  //     },
+  //     {
+  //       title: "Positive Psychology",
+  //       node: "v9d4f86mmgaWV7tMLZQM",
+  //     },
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Mindfulness.jpg",
+  //   title: "Positive Psychology",
+  //   width: "34%",
+  //   leaders: [
+  //     // {
+  //     //   name: "Dallas Wilburn",
+  //     //   image: "Dallas_Wilburn.jpg",
+  //     //   about: `I am a student at the University of Texas at Austin pursuing a Bachelor's of Art in Psychology. I am passionate about increasing mental health awareness and learning the best techniques for treatment of mental illness. I have experience mentoring my peers and have held several leadership positions within and outside of my university. I am dedicated to helping those in my community, whether that be social or academic, and love learning more about psychology in any context.`,
+  //     //   websites: [
+  //     //     {
+  //     //       name: "LinkedIn",
+  //     //       url: "https://www.linkedin.com/in/dallas-wilburn-795145228/",
+  //     //     },
+  //     //   ],
+  //     // },
+  //     {
+  //       name: "Noor Jassim",
+  //       image: "Noor_Jassim.jpeg",
+  //       about: `Honors student at Eastern Michigan University pursuing a Bachelor of Science in psychology and sociology. A research assistant at the Self-regulation, Early Experience, and Development (SEED) lab in the psychology department. An assistant manager at a real estate company. Active Humane Society volunteer. Adamant enthusiast of quantitative methods in social psychology and medical sociology. Other interests include dialectical behavior therapy (DBT) as well as emotional regulation.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/noor-jassim/",
+  //         },
+  //       ],
+  //     },
+  //   ],
+  //   YouTube: "2tH94sJ18BI",
+  //   description: (
+  //     <div>
+  //       <p>
+  //         We are an interdisciplinary group of learners and researchers who have
+  //         been iteratively contributing to and improving a large-scale, online
+  //         collaborative research platform called 1Cademy. Our platform
+  //         facilitates knowledge sharing and remote, collaborative research by
+  //         enabling users to organize research in a hierarchical format through
+  //         content generation, mapping, and evaluation.
+  //       </p>
+  //       <p>
+  //         The main objective of the Positive Psychology community is to explore
+  //         three fundamental lines of inquiry of the discipline which includes
+  //         positive subjective experiences, individual traits, and social
+  //         institutions. A focus will be on the efficacy of mindfulness practices
+  //         within the clinical context. Interns will have the freedom to research
+  //         a topic of interest within positive psychology and share their
+  //         findings on the collaborative research platform 1Cademy.
+  //       </p>
+  //       <p>Some of the topics such as the following will be discussed:</p>
+  //       <ul>
+  //         <li>
+  //           Impact of positive experiences such as love, good mood, and
+  //           happiness on the wellbeing of individuals and its buffering effect
+  //           on psychopathology.
+  //         </li>
+  //         <li>
+  //           The power of social support on individuals and its relation to
+  //           psychological nurturement.
+  //         </li>
+  //         <li>
+  //           The 3rd wave of cognitive behavioral therapy (CBT) and its impact in
+  //           popularizing mindfulness in western practices.
+  //         </li>
+  //         <li>
+  //           The multitude of ways in which mindfulness can be applied in
+  //           clinical practices with individuals that suffer from severe
+  //           psychopathology.
+  //         </li>
+  //         <li>
+  //           The functions of mindfulness that leads to mental flexibility,
+  //           greater impulse resistance, and decrease in judgmentalness among
+  //           individuals.
+  //         </li>
+  //         <li>
+  //           Many other topics of your choosing within positive psychology.
+  //         </li>
+  //       </ul>
+  //     </div>
+  //   ),
+  //   accomplishments: `We have examined and updated the mindfulness community tag on 1Cademy with cross-disciplinary applications of mindfulness in thorough detail.
+  //   We have compiled an inclusive list of mental disorders from the DSM-5 that can benefit from clinical mindfulness as well as documented case studies of certain populations that were able to benefit from mindfulness when it applied to psychopathological symptoms.
+  //   We have outlined multiple mindfulness interventions that have been backed by empirical research and heavily tested across the world in multiple research institutions.
+  //   Also, we have connected the origins of mindfulness that stemmed from eastern traditions to the current applications of mindfulness in the clinical western setting as well as provided a cohesive snapshot of the roots of mindfulness in ancient eastern religions.`,
+  //   gains: [
+  //     `Gain experience by developing critical skills in research, including reviewing past literature, analyzing, and synthesizing information in a concise cohesive manner.`,
+  //     `Work towards executing and publishing research on a public research platform on positive psychology and mindfulness.`,
+  //     `Collaborate with other interns in gaining a deeper understanding of psychology as a science.`,
+  //     `Work remotely with all interactions, task fulfillment, and communications.`,
+  //     `Completing responsibilities will require a minimum of 5 hours per week. Further research and leadership opportunities become available to those who contribute to the community beyond minimum responsibilities.`,
+  //     `Participants may have the opportunity to continue their engagement in this research community after the end of this internship.`,
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current cover letter and the most current version of their university transcript, with GPA included on it. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are also required to have elevant experience with research and literature review, Psychology preferred.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0`,
+  //     `A clear understanding of fundamentals of psychology`,
+  //     `Interest and enthusiasm for positive psychology and scientific research`,
+  //     `Strong desire and willingness to collaborate with others and engage in group discussions`,
+  //     `Willingness to attend weekly meetings and present findings`,
+  //     `Able to commit to approximately 5-10 hours of work each week`,
+  //   ],
+  //   responsibilities: [
+  //     `Read through textbooks and research papers to develop a synthesized cohesive summary on our knowledge visualization platform 1Cademy.`,
+  //     `Attend weekly online meetings.`,
+  //     `Contribute in meetings by presenting work and accepting constructive feedback.`,
+  //     `Contribute in meetings by engaging in discussion with other interns about research topics.`,
+  //   ],
+  // },
   // {
   //   id: "Active_Reading_Strategies",
   //   tags: [
