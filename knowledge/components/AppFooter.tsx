@@ -1,11 +1,13 @@
-import EmailIcon from "@mui/icons-material/Email";
-import YouTubeIcon from "@mui/icons-material/YouTube";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import { Container, Divider, IconButton, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import NextImage from "next/image";
 import React from "react";
 
+import logo1cademy from "../public/1cademy.svg";
+import iconEmail from "../public/icon-email.svg";
+import iconYoutube from "../public/icon-youtube.svg";
 import logoGoogleCloud from "../public/logo-google-cloud.svg";
 import logoHonor from "../public/logo-honor.svg";
 import logoSchoolOfInformation from "../public/logo-school-of-information.svg";
@@ -27,19 +29,20 @@ export default function AppFooter() {
     >
       <Container
         sx={{
-          maxWidth: { xs: "195px", md: "700px", lg: "1058px" },
-          height: { xs: "472px", md: "110px" },
+          maxWidth: { xs: "207px", md: "700px", lg: "1058px" },
+          height: { xs: "391px", md: "110px" },
           p: "0px",
           display: "flex",
+          alignItems: "center",
           flexDirection: { xs: "column", md: "row" },
           justifyContent: "space-between"
         }}
       >
-        <Box>
-          <Typography fontSize={"40px"} fontFamily={"EB Garamond"} textAlign={{ xs: "center", md: "left" }}>
-            1Cademy
-          </Typography>
-          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" } }}>
+        <Box sx={{ width: "177px" }}>
+          <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
+            <NextImage src={logo1cademy} width="147px"></NextImage>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, my: "30px" }}>
             <IconButton
               rel="noreferrer"
               aria-label="Open Youtube channel"
@@ -47,28 +50,53 @@ export default function AppFooter() {
               href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/"
               sx={{ color: theme => theme.palette.common.white }}
             >
-              <YouTubeIcon fontSize="large" />
+              <NextImage src={iconYoutube} height="20px" />
             </IconButton>
             <IconButton
               href="mailto:oneweb@umich.edu"
               sx={{ color: theme => theme.palette.common.white }}
               aria-label="Mail us"
             >
-              <EmailIcon fontSize="large" />
+              <NextImage src={iconEmail} height="20px" />
             </IconButton>
           </Box>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/terms"
+              underline="none"
+              sx={{ color: theme => theme.palette.grey[500] }}
+            >
+              Terms
+            </Link>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/privacy"
+              underline="none"
+              sx={{ color: theme => theme.palette.grey[500] }}
+            >
+              Privacy
+            </Link>
+            <Link
+              target="_blank"
+              href="https://1cademy.us/cookie"
+              underline="none"
+              sx={{ color: theme => theme.palette.grey[500] }}
+            >
+              Cookie
+            </Link>
+          </Box>
         </Box>
-        <Box>
+        <Box sx={{ width: { md: "400px", lg: "493px" } }}>
           <Box
             sx={{
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
-              alignItems: "center",
-              gap: { xs: "10px", md: "50px" }
+              gap: { xs: "20px", md: "50px" }
             }}
           >
             <Typography fontSize={"16px"} component="h6" sx={{ whiteSpace: "nowrap" }}>
-              Supported by{" "}
+              Supported by
             </Typography>
             <Box
               sx={{
@@ -105,41 +133,46 @@ export default function AppFooter() {
               </Link>
             </Box>
           </Box>
-          <Divider sx={{ my: "20px" }} />
+          <Divider
+            sx={{ my: "30px", color: theme => theme.palette.grey[500], borderColor: theme => theme.palette.grey[500] }}
+          />
           <Box
             sx={{
-              width: { md: "300px", lg: "511px" },
+              width: { lg: "511px" },
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
+              flexDirection: { xs: "row", md: "row" },
               alignItems: "center",
               justifyContent: "space-between",
-              gap: { xs: "30px", md: "10px" }
+              gap: { xs: "10px", md: "10px" }
             }}
           >
             <Link
+              href="https://github.com/ImanYZ/VisualExp"
               target="_blank"
-              href="https://1cademy.us/terms"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.white }}
+              rel="noreferrer"
+              sx={{
+                display: { xs: "flex", md: "none" },
+                color: theme => theme.palette.common.white,
+                textDecorationColor: theme => theme.palette.common.white
+              }}
             >
-              Terms
+              <GitHubIcon />
             </Link>
-            <Link
-              target="_blank"
-              href="https://1cademy.us/privacy"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.white }}
-            >
-              Privacy
-            </Link>
-            <Link
-              target="_blank"
-              href="https://1cademy.us/cookie"
-              underline="none"
-              sx={{ color: theme => theme.palette.common.white }}
-            >
-              Cookie
-            </Link>
+            <Typography color={theme => theme.palette.common.white} sx={{ display: { xs: "none", md: "block" } }}>
+              We're committed to OpenSource on{" "}
+              <Link
+                href="https://github.com/ImanYZ/VisualExp"
+                target="_blank"
+                rel="noreferrer"
+                sx={{
+                  color: theme => theme.palette.common.white,
+                  textDecorationColor: theme => theme.palette.common.white
+                }}
+              >
+                Github
+              </Link>{" "}
+              <GitHubIcon />
+            </Typography>
             <Typography color={theme => theme.palette.grey[500]}>{`©  1Cademy ${new Date().getFullYear()}`}</Typography>
           </Box>
         </Box>
