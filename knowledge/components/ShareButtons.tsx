@@ -9,9 +9,10 @@ import React, { useEffect, useState } from "react";
 
 interface ShareButtonsProps {
   showHelp?: boolean;
+  responsive?: boolean;
 }
 
-export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
+export const ShareButtons = ({ showHelp = false, responsive = false }: ShareButtonsProps) => {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
@@ -46,7 +47,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           rel="noopener"
           aria-label="Share on Twitter"
         >
-          <TwitterIcon />
+          <TwitterIcon sx={{ fontSize: { xs: responsive ? "1.3rem" : "1.5rem", md: "1.5rem" } }} />
         </IconButton>
         {/* this works with different urls from localhost */}
         <IconButton
@@ -56,7 +57,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           rel="noopener"
           aria-label="Share on Facebook"
         >
-          <FacebookRoundedIcon />
+          <FacebookRoundedIcon sx={{ fontSize: { xs: responsive ? "1.3rem" : "1.5rem", md: "1.5rem" } }} />
         </IconButton>
         {/* this works with different urls from localhost */}
         <IconButton
@@ -66,7 +67,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           rel="noopener"
           aria-label="Share on Linkedin"
         >
-          <LinkedInIcon />
+          <LinkedInIcon sx={{ fontSize: { xs: responsive ? "1.3rem" : "1.5rem", md: "1.5rem" } }} />
         </IconButton>
         <Tooltip title="Copy link" placement="top" arrow>
           <IconButton
@@ -74,7 +75,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
             onClick={onShareByLink}
             aria-label="Share on url"
           >
-            <LinkIcon />
+            <LinkIcon sx={{ fontSize: { xs: responsive ? "1.3rem" : "1.5rem", md: "1.5rem" } }} />
           </IconButton>
         </Tooltip>
         <Snackbar
@@ -84,7 +85,7 @@ export const ShareButtons = ({ showHelp = false }: ShareButtonsProps) => {
           message="Link copied to clipboard!"
           action={
             <IconButton size="small" aria-label="close" color="inherit" onClick={handleClose}>
-              <CloseIcon fontSize="small" />
+              <CloseIcon sx={{ fontSize: { xs: responsive ? "1.3rem" : "1.5rem", md: "1.5rem" } }} />
             </IconButton>
           }
         />
