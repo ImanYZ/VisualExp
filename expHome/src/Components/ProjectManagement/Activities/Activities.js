@@ -176,7 +176,6 @@ const Activities = (props) => {
     const content = []
 
     if (projectSpecs.onePoints) {
-      console.log('projectSpecs.onePoints');
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
@@ -192,7 +191,6 @@ const Activities = (props) => {
     }
 
     if (projectSpecs.intellectualPoints) {
-      console.log('projectSpecs.intellectualPoints');
       content.push(
         <span
           className={
@@ -207,7 +205,6 @@ const Activities = (props) => {
     }
 
     if (projectSpecs.instructorsPoints) {
-      console.log('projectSpecs.instructorsPoints');
       content.push(
         <span
           className={
@@ -267,8 +264,7 @@ const Activities = (props) => {
       return content.length - 1 !== index
         ? (
           <>
-            {item}
-            {" - "}
+            {`${item} - `}
           </>
         )
         : item;
@@ -276,11 +272,12 @@ const Activities = (props) => {
   }
 
   const currentPage = (() => {
+    if (activePage === "Intellectual") return <IntellectualPoints />;
     if (activePage === "Experiments") return <ExperimentPoints />;
     if (activePage === "AddInstructor") return <AddInstructor />;
     if (activePage === "1Cademy") return <OneCademy />;
     if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
-    return <IntellectualPoints />
+    return null;
   })();
 
 
