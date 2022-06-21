@@ -6,6 +6,7 @@ export const getInstitutionsByName = async (names: string[]) => {
   const institutionsRef = collection(db, "institutions");
   const res = await Promise.all(
     names.map(async institutionName => {
+      console.log("name FRONT", institutionName);
       const q = query(institutionsRef, where("name", "==", institutionName));
       const querySnapshot = await getDocs(q);
       const result: { name: string; logoURL: string; id: string }[] = [];
