@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Alert from "@mui/material/Alert";
-import Chip from "@mui/material/Chip";
-import Paper from "@mui/material/Paper";
+
 import Button from "@mui/material/Button";
 
 import {
@@ -24,6 +23,8 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import { LeaderBoard, ProjectSpecs } from './components';
+import { formatPoints } from "../../../utils/utils";
 
 import favicon from "../../../assets/favicon.png";
 
@@ -163,7 +164,7 @@ const Activities = (props) => {
   const isResearcherCriteriaMet = (resear) => {
     let met = true;
     for (let key in projectSpecs) {
-      if((resear[key] || 0) < projectSpecs[key]) {
+      if ((resear[key] || 0) < projectSpecs[key]) {
         met = false;
         break;
       }
@@ -174,8 +175,7 @@ const Activities = (props) => {
   const makeResearcherChipContent = (resear) => {
     const content = []
 
-    if(projectSpecs.onePoints) {
-      console.log('projectSpecs.onePoints');
+    if (projectSpecs.onePoints) {
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
@@ -190,9 +190,8 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.intellectualPoints) {
-      console.log('projectSpecs.intellectualPoints');
-       content.push(
+    if (projectSpecs.intellectualPoints) {
+      content.push(
         <span
           className={
             resear.intellectualPoints >= projectSpecs.intellectualPoints
@@ -205,8 +204,7 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.instructorsPoints) {
-      console.log('projectSpecs.instructorsPoints');
+    if (projectSpecs.instructorsPoints) {
       content.push(
         <span
           className={
@@ -220,7 +218,7 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.expPoints) {
+    if (projectSpecs.expPoints) {
       content.push(
         <span
           className={
@@ -232,7 +230,7 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.commentsPoints) {
+    if (projectSpecs.commentsPoints) {
       content.push(
         <span
           className={
@@ -246,8 +244,8 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.gradingPoints) {
-      content.push (
+    if (projectSpecs.gradingPoints) {
+      content.push(
         <span
           className={
             resear.gradingPoints >= projectSpecs.gradingPoints
@@ -263,167 +261,57 @@ const Activities = (props) => {
     console.log('makeResearcherChipContent', makeResearcherChipContent);
     return content.map((item, index) => {
       // if not last one append a " - "
-      return  content.length - 1 !== index 
-      ? (
-        <>
-          {item}
-          {" - "}
-        </>
-      )
-      : item;
+      return content.length - 1 !== index
+        ? (
+          <>
+            {`${item} - `}
+          </>
+        )
+        : item;
     });
   }
 
-  const formatPoints = (point = 0) => {
-    return point.toFixed(2).replace(/\.0+$/,'')
-  }
+  const currentPage = (() => {
+    if (activePage === "Intellectual") return <IntellectualPoints />;
+    if (activePage === "Experiments") return <ExperimentPoints />;
+    if (activePage === "AddInstructor") return <AddInstructor />;
+    if (activePage === "1Cademy") return <OneCademy />;
+    if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
+    return null;
+  })();
 
-  // console.log('researchers', { researchers });
+
+  if (notAResearcher) {
+    return (
+      <h1>
+        You're not a researcher on{" "}
+        {projects.length > 0 ? `the project ${project}!` : "any project!"}
+      </h1>
+    );
+  };
+
   return (
     <div id="ActivitiesContainer">
-      {notAResearcher ? (
-        <h1>
-          You're not a researcher on{" "}
-          {projects.length > 0 ? `the project ${project}!` : "any project!"}
-        </h1>
-      ) : (
-        <>
-          <div className="Columns40_60">
-            <Alert severity="warning">
-              <h2>Inclusion and Order of Authors Criteria:</h2>
-              <div>
-                <strong>Inclusion:</strong> To be an author,{" "}
-                <span className="GreenText">in green</span>, one needs to earn
-                at least:
-                <ul>
-                  {projectSpecs.onePoints && (
-                    <li>
-                      <strong>{projectSpecs.onePoints}</strong> 1Cademy points{" "}
-                      <img src={favicon} width="15.1" /> and{" "}
-                    </li>
-                  )}
-                  {projectSpecs.intellectualPoints && (
-                    <li>
-                      <strong>{projectSpecs.intellectualPoints}</strong> Intellectual points 🎓 and
-                    </li>
-                  )}
-                  {projectSpecs.expPoints && (
-                    <li>
-                      <strong>{projectSpecs.expPoints}</strong> Experiment points 👨‍🔬 and
-                    </li>
-                  )}
-                  {projectSpecs.instructorsPoints && (
-                    <li>
-                      <strong>{projectSpecs.instructorsPoints}</strong> Collecting instructor/administrator
-                      contact points 👨‍🏫 and
-                    </li>
-                  )}
-                  {projectSpecs.commentsPoints && (
-                    <li>
-                      <strong>{projectSpecs.commentsPoints}</strong> Coding participants' comments points 💬
-                      and
-                    </li>
-                  )}
-                  {projectSpecs.gradingPoints && (
-                    <li>
-                      <strong>{projectSpecs.gradingPoints}</strong> Coding participants' recall responses
-                      points 🧠
-                    </li>
-                  )}
-                </ul>
-                <strong>Order:</strong> The intern with higher total of all the
-                above categories gets a higher position.
-              </div>
-              <Button
-                onClick={expandLeaderboard}
-                className={expanded ? "Button Red" : "Button Green"}
-                variant="contained"
-              >
-                {expanded ? "Collapse" : "Expand"} leaderboard details
-              </Button>
-            </Alert>
-            <div id="Leaderboard">
-              <h2 id="InternsLeaderboardHeader">Interns Leaderboard:</h2>
-              <Paper
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  flexWrap: "wrap",
-                  listStyle: "none",
-                  p: 0.5,
-                  m: 0,
-                }}
-                component="ul"
-              >
-                {researchers.map((resear) => {
-                  return (
-                    <li key={resear.id} className="LeaderboardItem">
-                      <Chip
-                        icon={
-                          isResearcherCriteriaMet(resear) ? (
-                            <span className="ChipContent">😊</span>
-                          ) : (
-                            <span className="ChipContent">😔</span>
-                          )
-                        }
-                        variant={resear.id === fullname ? "" : "outlined"}
-                        color={ isResearcherCriteriaMet(resear) ? "success" : "error" }
-                        label={
-                          <span className="ChipContent">
-                            {resear.id === fullname && fullname + " - "}
-                            {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
-                          </span>
-                        }
-                      />
-                    </li>
-                  );
-                })}
-              </Paper>
-            </div>
-          </div>
-          {/* <div id="InternsNumFormControl">
-        <span id="InternsNumQuestion">
-          How many interns should be in the authors list?
-        </span>
-        <InputLabel id="InternsNumLabel">
-          How many interns would you like to include the authors list?
-        </InputLabel>
-        <Select
-          // labelId="InternsNumLabel"
-          id="InternsNumSelect"
-          value={internsNum}
-          label="Number of Interns"
-          onChange={internsNumChange}
-        >
-          {Object.keys(researchers).map((resea, idx) => (
-            <MenuItem
-              key={resea + "Key"}
-              className="SelectItem"
-              value={idx + 1}
-            >
-              {idx + 1}
-            </MenuItem>
-          ))}
-        </Select>
-        <span id="InternsNumAvgLabel">
-          The average vote is: {internsNumsAvg}
-        </span>
-      </div> */}
-          {activePage === "Intellectual" ? (
-            <IntellectualPoints />
-          ) : activePage === "Experiments" ? (
-            <ExperimentPoints />
-          ) : activePage === "AddInstructor" ? (
-            <AddInstructor />
-          ) : activePage === "1Cademy" ? (
-            <OneCademy />
-          ) : activePage === "FreeRecallGrading" ? (
-            <FreeRecallGrading />
-          ) : (
-            <IntellectualPoints />
-          )}
-        </>
-      )}
+      <div className="Columns40_60">
+        <Alert severity="warning">
+          <ProjectSpecs projectSpecs={projectSpecs} />
+          <Button
+            onClick={expandLeaderboard}
+            className={expanded ? "Button Red" : "Button Green"}
+            variant="contained"
+          >
+            {expanded ? "Collapse" : "Expand"} leaderboard details
+          </Button>
+        </Alert >
+        <LeaderBoard
+          fullname={fullname}
+          expanded={expanded}
+          researchers={researchers}
+          isResearcherCriteriaMet={isResearcherCriteriaMet}
+          makeResearcherChipContent={makeResearcherChipContent}
+        />
+      </div>
+      {currentPage}
     </div>
   );
 };
