@@ -50,13 +50,13 @@ const NodeItemContributors: FC<Props> = ({ contributors, institutions }) => {
 
   return (
     <Box>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" color="text.secondary" sx={{ mb: "15px" }}>
         Contributors are:
       </Typography>
       <Grid container spacing={1} sx={{ mt: 0 }}>
         {renderContributors()}
       </Grid>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: "20px", mb: "15px" }}>
         Who are from:
       </Typography>
       <Grid container spacing={1} sx={{ mt: 0 }}>
