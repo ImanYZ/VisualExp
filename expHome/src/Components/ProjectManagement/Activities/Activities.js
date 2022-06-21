@@ -43,6 +43,8 @@ const Activities = (props) => {
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
 
+  const projectPoints = projectSpecs?.points || {}
+
   useEffect(() => {
     if (props.activityName && activePage !== props.activityName) {
       setActivePage(props.activityName);
@@ -162,8 +164,8 @@ const Activities = (props) => {
 
   const isResearcherCriteriaMet = (resear) => {
     let met = true;
-    for (let key in projectSpecs) {
-      if((resear[key] || 0) < projectSpecs[key]) {
+    for (let key in projectPoints) {
+      if((resear[key] || 0) < projectPoints[key]) {
         met = false;
         break;
       }
@@ -174,14 +176,14 @@ const Activities = (props) => {
   const makeResearcherChipContent = (resear) => {
     const content = []
 
-    if(projectSpecs.onePoints) {
-      console.log('projectSpecs.onePoints');
+    if(projectPoints.onePoints) {
+      console.log('projectPoints.onePoints');
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
           <span
             className={
-              resear.onePoints >= projectSpecs.onePoints ? "GreenText" : ""
+              resear.onePoints >= projectPoints.onePoints ? "GreenText" : ""
             }
           >
             {formatPoints(resear.onePoints)}
@@ -190,12 +192,12 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.intellectualPoints) {
-      console.log('projectSpecs.intellectualPoints');
+    if(projectPoints.intellectualPoints) {
+      console.log('projectPoints.intellectualPoints');
        content.push(
         <span
           className={
-            resear.intellectualPoints >= projectSpecs.intellectualPoints
+            resear.intellectualPoints >= projectPoints.intellectualPoints
               ? "GreenText"
               : ""
           }
@@ -205,8 +207,8 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.instructorsPoints) {
-      console.log('projectSpecs.instructorsPoints');
+    if(projectPoints.instructorsPoints) {
+      console.log('projectPoints.instructorsPoints');
       content.push(
         <span
           className={
@@ -220,11 +222,11 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.expPoints) {
+    if(projectPoints.expPoints) {
       content.push(
         <span
           className={
-            resear.expPoints >= projectSpecs.expPoints ? "GreenText" : ""
+            resear.expPoints >= projectPoints.expPoints ? "GreenText" : ""
           }
         >
           {"👨‍🔬 " + formatPoints(resear.expPoints)}
@@ -232,11 +234,11 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.commentsPoints) {
+    if(projectPoints.commentsPoints) {
       content.push(
         <span
           className={
-            resear.commentsPoints >= projectSpecs.commentsPoints
+            resear.commentsPoints >= projectPoints.commentsPoints
               ? "GreenText"
               : ""
           }
@@ -246,11 +248,11 @@ const Activities = (props) => {
       )
     }
 
-    if(projectSpecs.gradingPoints) {
+    if(projectPoints.gradingPoints) {
       content.push (
         <span
           className={
-            resear.gradingPoints >= projectSpecs.gradingPoints
+            resear.gradingPoints >= projectPoints.gradingPoints
               ? "GreenText"
               : ""
           }
@@ -296,37 +298,37 @@ const Activities = (props) => {
                 <span className="GreenText">in green</span>, one needs to earn
                 at least:
                 <ul>
-                  {projectSpecs.onePoints && (
+                  {projectPoints.onePoints && (
                     <li>
-                      <strong>{projectSpecs.onePoints}</strong> 1Cademy points{" "}
+                      <strong>{projectPoints.onePoints}</strong> 1Cademy points{" "}
                       <img src={favicon} width="15.1" /> and{" "}
                     </li>
                   )}
-                  {projectSpecs.intellectualPoints && (
+                  {projectPoints.intellectualPoints && (
                     <li>
-                      <strong>{projectSpecs.intellectualPoints}</strong> Intellectual points 🎓 and
+                      <strong>{projectPoints.intellectualPoints}</strong> Intellectual points 🎓 and
                     </li>
                   )}
-                  {projectSpecs.expPoints && (
+                  {projectPoints.expPoints && (
                     <li>
-                      <strong>{projectSpecs.expPoints}</strong> Experiment points 👨‍🔬 and
+                      <strong>{projectPoints.expPoints}</strong> Experiment points 👨‍🔬 and
                     </li>
                   )}
-                  {projectSpecs.instructorsPoints && (
+                  {projectPoints.instructorsPoints && (
                     <li>
-                      <strong>{projectSpecs.instructorsPoints}</strong> Collecting instructor/administrator
+                      <strong>{projectPoints.instructorsPoints}</strong> Collecting instructor/administrator
                       contact points 👨‍🏫 and
                     </li>
                   )}
-                  {projectSpecs.commentsPoints && (
+                  {projectPoints.commentsPoints && (
                     <li>
-                      <strong>{projectSpecs.commentsPoints}</strong> Coding participants' comments points 💬
+                      <strong>{projectPoints.commentsPoints}</strong> Coding participants' comments points 💬
                       and
                     </li>
                   )}
-                  {projectSpecs.gradingPoints && (
+                  {projectPoints.gradingPoints && (
                     <li>
-                      <strong>{projectSpecs.gradingPoints}</strong> Coding participants' recall responses
+                      <strong>{projectPoints.gradingPoints}</strong> Coding participants' recall responses
                       points 🧠
                     </li>
                   )}
