@@ -5,7 +5,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import Link from "@mui/material/Link";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
@@ -36,7 +35,7 @@ import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
 import sectionsOrder from "./sectionsOrder";
-import { getFullname } from "../../../../utils/general";
+import { getFullname } from "../../../../utils/utils";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
