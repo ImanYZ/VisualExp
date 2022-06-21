@@ -25,7 +25,7 @@ export const TagsList = ({ tags, sx }: TagsListProps) => {
 
   return (
     <Box sx={{ ...sx }}>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: "5px" }}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: "15px", mt: "20px" }}>
         Tags:
       </Typography>
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>

@@ -63,7 +63,7 @@ export const SortedByTimeOptions: TimeWindowOption[] = [
 ];
 
 export const getNodePageURLTitle = (title: string | undefined, id: string) => {
-  const resTitleSlug = slugify(title || "", { lower: true, remove: /[‐*+~.,?/$()\\'"!:@\r\n]/g });
+  const resTitleSlug = slugify(title || "", { lower: true, remove: /[#‐*+~.,?/$()\\'"!:@\r\n]/g });
   if (resTitleSlug.length === 0) {
     return id;
   }
@@ -136,3 +136,12 @@ export const buildFilterBy = (
 export function randomIntFromInterval(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
+export const loadHomeSearchBackground = () => `
+<svg width="1200" height="479" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <rect width="1200" height="479" fill="#28282A" />
+  <rect id="r" width="1200" height="479" fill="url(#g)" />
+</svg>`;
+
+export const toBase64 = (str: string) =>
+  typeof window === "undefined" ? Buffer.from(str).toString("base64") : window.btoa(str);

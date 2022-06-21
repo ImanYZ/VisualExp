@@ -53,16 +53,14 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           width: "50px",
           height: "50px",
           position: "relative",
-          border: "solid 2px",
-          borderColor: theme => theme.palette.common.gray,
           borderRadius: "30px"
         }}
       >
         <img
           src={imageUrl}
           alt={name}
-          width="48px"
-          height="48px"
+          width="50px"
+          height="50px"
           style={{
             objectFit: "cover",
             borderRadius: "30px",
