@@ -21,9 +21,7 @@ import {
 
 import SelectSessions from "./SelectSessions";
 
-import { isEmail } from "../../utils/general";
-
-import UMSI_Logo_Light from "../../assets/UMSI_Logo_Light.jpeg";
+import { isEmail } from "../../utils/utils";
 
 import "./SchedulePage.css";
 
