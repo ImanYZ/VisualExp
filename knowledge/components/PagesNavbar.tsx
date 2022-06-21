@@ -65,7 +65,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
             sx={{
               color: theme => theme.palette.common.white,
               float: "right",
-              display: { xs: "none", md: "block" },
+              display: { xs: "none", md: "flex" },
               position: "sticky",
               margin: "28px 30px",
               bottom: "28px",
