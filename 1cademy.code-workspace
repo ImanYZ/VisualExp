@@ -9,7 +9,7 @@
             "path": "./expHome"
         },
 	{
-            "name": "Local-functions",
+            "name": "localFunctions",
             "path": "./localFunctions"
         },
 	{
