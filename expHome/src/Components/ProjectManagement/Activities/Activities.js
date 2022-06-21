@@ -24,6 +24,7 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import CodeFeedback from "../CodeFeedback/CodeFeedback"
 
 import favicon from "../../../assets/favicon.png";
 
@@ -419,7 +420,10 @@ const Activities = (props) => {
             <OneCademy />
           ) : activePage === "FreeRecallGrading" ? (
             <FreeRecallGrading />
-          ) : (
+          ) :activePage === "CodeFeedback" ? (
+            <CodeFeedback />
+          ) :
+          (
             <IntellectualPoints />
           )}
         </>

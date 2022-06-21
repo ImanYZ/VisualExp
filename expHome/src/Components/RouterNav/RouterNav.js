@@ -122,6 +122,7 @@ const RouterNav = (props) => {
   const [proposalUpvotesToday, setProposalUpvotesToday] = useState(0);
   const [dayOneUpVotes, setDayOneUpVotes] = useState(0);
   const [gradingPoints, setGradingPoints] = useState(0);
+  const [commentsPoints, setCommentsPoints]=useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
@@ -223,6 +224,11 @@ const RouterNav = (props) => {
               }
               if (theProject.gradingPoints) {
                 setGradingPoints(theProject.gradingPoints);
+              } else {
+                setGradingPoints(0);
+              }
+              if (theProject.codesPoints) {
+                setCommentsPoints(theProject.codesPoints);
               } else {
                 setGradingPoints(0);
               }
@@ -1127,6 +1133,30 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
+
+                    {projectSpecs.commentsPoints ?(
+                      <Tooltip
+                      title ={
+                        <div>
+                             You've earned {commentsPoints} total 💬 free-recall
+                            grading points.
+                        </div>}
+                   
+                      >
+                      <Button
+                        id="FreeRecallGrading"
+                        className={
+                          activePage === "CodeFeedback"
+                            ? "ActiveNavLink"
+                            : "NavLink"
+                        }
+                        onClick={(event) =>
+                          navigate("/Activities/CodeFeedback")
+                        }>
+                          💬 {commentsPoints} </Button>  
+                      </Tooltip>
+                        
+                    ):null}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
