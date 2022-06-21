@@ -310,6 +310,10 @@ export default [
     id: "Health_Psychology",
     tags: [
       {
+        title: "Psychology",
+        node: "owiurXq2sPdbHTC3zWHq",
+      },
+      {
         title: "Health Psychology",
         node: "7kScwzjwIaxgBv1RyjVM",
       },
