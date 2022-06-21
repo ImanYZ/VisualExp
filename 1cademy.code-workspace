@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "name": "knowledge",
+            "path": "./knowledge"
+        },
+        {
+            "name": "PMS",
+            "path": "./expHome"
+        },
+	{
+            "name": "Local-functions",
+            "path": "./localFunctions"
+        },
+	{
+            "name": "1cademy",
+            "path": "."
+        },
+    ]
+}
