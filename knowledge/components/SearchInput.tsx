@@ -79,7 +79,7 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
               onChange={e => {
                 setText(e.target.value);
               }}
-              placeholder="Search on 1Cademy "
+              placeholder="Search on 1Cademy"
             />
             <IconButton
               type="submit"
