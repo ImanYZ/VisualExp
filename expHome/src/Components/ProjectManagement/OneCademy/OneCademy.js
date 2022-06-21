@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import { red, green } from "@mui/material/colors";
 
-import { isEmail } from "../../../utils/general";
+import { isEmail } from "../../../utils/utils";
 import withRoot from "../../Home/modules/withRoot";
 
 import {
