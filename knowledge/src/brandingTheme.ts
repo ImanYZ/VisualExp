@@ -58,7 +58,7 @@ export const getDesignTokens = (mode: "light" | "dark") =>
         main: "#ffc071",
         dark: "#ffb25e"
       },
-      divider: mode === "dark" ? grey[400] : grey[400],
+      divider: mode === "dark" ? grey[200] : grey[200],
       mode,
       background: {
         default: "#FAFAFA",
@@ -186,6 +186,11 @@ export function getThemedComponents(): {
       },
       MuiChip: {
         styleOverrides: {
+          root: {
+            "&": {
+              border: `solid 1px ${grey[300]}`
+            }
+          },
           icon: {
             color: common.orange
           }
