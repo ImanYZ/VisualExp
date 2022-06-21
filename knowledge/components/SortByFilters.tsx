@@ -1,4 +1,5 @@
 import { MenuItem, Select, SelectChangeEvent, Stack, ToggleButton, ToggleButtonGroup, Tooltip } from "@mui/material";
+import { Box } from "@mui/system";
 import { FC } from "react";
 
 import { SortedByTimeOptions } from "../lib/utils";
@@ -49,15 +50,28 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
           </ToggleButton>
         </ToggleButtonGroup>
 
-        <Tooltip title="Only show the nodes that were updated in this last period." placement="top">
-          <Select variant="standard" value={timeWindow} onChange={handleSortByTime}>
-            {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
-              <MenuItem value={sortedByTimeOption} key={idx}>
-                {sortedByTimeOption}
-              </MenuItem>
-            ))}
-          </Select>
-        </Tooltip>
+        <Select
+          variant="standard"
+          value={timeWindow}
+          onChange={handleSortByTime}
+          renderValue={value => (
+            <Tooltip
+              title="Only show the nodes that were updated in this last period."
+              placement="top"
+              leaveDelay={0}
+              disableFocusListener={false}
+              disableTouchListener={true}
+            >
+              <Box>{value}</Box>
+            </Tooltip>
+          )}
+        >
+          {SortedByTimeOptions.map((sortedByTimeOption, idx) => (
+            <MenuItem value={sortedByTimeOption} key={idx}>
+              {sortedByTimeOption}
+            </MenuItem>
+          ))}
+        </Select>
       </Stack>
       <ShareButtons showHelp />
     </Stack>
