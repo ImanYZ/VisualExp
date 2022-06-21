@@ -63,7 +63,7 @@ export const SortedByTimeOptions: TimeWindowOption[] = [
 ];
 
 export const getNodePageURLTitle = (title: string | undefined, id: string) => {
-  const resTitleSlug = slugify(title || "", { lower: true, remove: /[‐*+~.,?/$()\\'"!:@\r\n]/g });
+  const resTitleSlug = slugify(title || "", { lower: true, remove: /[#‐*+~.,?/$()\\'"!:@\r\n]/g });
   if (resTitleSlug.length === 0) {
     return id;
   }
