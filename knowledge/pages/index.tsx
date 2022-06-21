@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { ComponentType, useEffect, useRef, useState } from "react";
 import { useQuery } from "react-query";
 
+import HomeFilter, { HomeFilterRef } from "../components/HomeFilter";
 import HomeSearch, { HomeSearchRef } from "../components/HomeSearch";
 import { useOnScreen } from "../hooks/useOnScreen";
 import { getSearchNodes } from "../lib/knowledgeApi";
@@ -16,10 +17,6 @@ import {
   homePageSortByDefaults
 } from "../lib/utils";
 import { FilterValue, SortTypeWindowOption, TimeWindowOption } from "../src/knowledgeTypes";
-
-export const HomeFilter: ComponentType<any> = dynamic(() => import("../components/HomeFilter").then(m => m.default), {
-  ssr: false
-});
 
 export const PagesNavbar: ComponentType<any> = dynamic(() => import("../components/PagesNavbar").then(m => m.default), {
   ssr: false
@@ -45,6 +42,7 @@ const HomePage: NextPage = () => {
   );
 
   const homeSearchRef = useRef<HomeSearchRef>(null);
+  const homeFilterRef = useRef<HomeFilterRef>(null);
 
   const isIntersecting = useOnScreen(homeSearchRef.current?.containerRef, true);
 
@@ -80,7 +78,7 @@ const HomePage: NextPage = () => {
     const qq = router.query.q || "";
     const hasQueryValue = qq && qq !== "*";
     if (router.isReady && data?.data && hasQueryValue) {
-      homeSearchRef.current?.scroll();
+      document.body.clientWidth >= 900 ? homeSearchRef.current?.scroll() : homeFilterRef.current?.scroll();
     }
   }, [router.isReady, data?.data, router.query.q]);
 
@@ -142,6 +140,7 @@ const HomePage: NextPage = () => {
           onContributorsChange={handleContributorsChange}
           onNodeTypesChange={handleNodeTypesChange}
           onReferencesChange={handleReferencesChange}
+          ref={homeFilterRef}
         ></HomeFilter>
         <SortByFilters
           sortedByType={sortedByType}
@@ -152,7 +151,7 @@ const HomePage: NextPage = () => {
         <MasonryNodes
           nodes={data?.data || []}
           page={page}
-          totalPages={Math.floor(data?.numResults || 0 / (data?.perPage || homePageSortByDefaults.perPage))}
+          totalPages={Math.ceil((data?.numResults || 0) / (data?.perPage || homePageSortByDefaults.perPage))}
           onChangePage={handleChangePage}
           isLoading={isLoading}
         />

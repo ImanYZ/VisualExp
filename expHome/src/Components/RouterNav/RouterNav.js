@@ -11,7 +11,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Switch from '@mui/material/Switch';
+import Switch from "@mui/material/Switch";
 
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -48,7 +48,7 @@ import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
 
-const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY"
+const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY";
 const goToUMSI = (event) => {
   window.open("https://www.si.umich.edu/", "_blank");
 };
@@ -87,7 +87,7 @@ const RouterNav = (props) => {
   const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
   const [projects, setProjects] = useRecoilState(projectsState);
   const [project, setProject] = useRecoilState(projectState);
-  const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState)
+  const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState);
   const activePage = useRecoilValue(activePageState);
   const [notAResearcher, setNotAResearcher] =
     useRecoilState(notAResearcherState);
@@ -145,7 +145,7 @@ const RouterNav = (props) => {
         }
         setProjects(myProjects);
         const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
-        if(myProjects.includes(prevProj)) {
+        if (myProjects.includes(prevProj)) {
           setProject(prevProj);
         } else {
           setProject(myProjects[0]);
@@ -169,15 +169,15 @@ const RouterNav = (props) => {
         .collection("projectSpecs")
         .doc(project)
         .get();
-      
-      setProjectSpecs({...pSpec.data()})
-    }
 
-    if(firebase && fullname && project) {
-      getProjectSpecs()
+      setProjectSpecs({ ...pSpec.data() });
+    };
+
+    if (firebase && fullname && project) {
+      getProjectSpecs();
     }
-    // update project settings 
-  }, [firebase, fullname, project])
+    // update project settings
+  }, [firebase, fullname, project]);
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
@@ -188,49 +188,56 @@ const RouterNav = (props) => {
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
-          const theProject = researcherData.projects[project];
-          if (change.doc.id === fullname) {
-            if (theProject.points) {
-              setIntellectualPoints(theProject.points);
-            } else {
-              setIntellectualPoints(0);
+          // Because researchers have different active projects, we should make
+          // sure that the project exists.
+          if (
+            "projects" in researcherData &&
+            project in researcherData.projects
+          ) {
+            const theProject = researcherData.projects[project];
+            if (change.doc.id === fullname) {
+              if (theProject.points) {
+                setIntellectualPoints(theProject.points);
+              } else {
+                setIntellectualPoints(0);
+              }
+              if (theProject.dayUpVotePoints) {
+                setUpVotedDays(theProject.dayUpVotePoints);
+              } else {
+                setUpVotedDays(0);
+              }
+              if (theProject.expPoints) {
+                setExpPoints(theProject.expPoints);
+              } else {
+                setExpPoints(0);
+              }
+              if (theProject.instructors) {
+                setInstructorPoints(theProject.instructors);
+              } else {
+                setInstructorPoints(0);
+              }
+              if (theProject.dayInstructorUpVotes) {
+                setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
+              } else {
+                setDayInstructorUpVotes(0);
+              }
+              if (theProject.gradingPoints) {
+                setGradingPoints(theProject.gradingPoints);
+              } else {
+                setGradingPoints(0);
+              }
+              if (theProject.negativeGradingPoints) {
+                setNegativeGradingPoints(theProject.negativeGradingPoints);
+              } else {
+                setNegativeGradingPoints(0);
+              }
             }
-            if (theProject.dayUpVotePoints) {
-              setUpVotedDays(theProject.dayUpVotePoints);
-            } else {
-              setUpVotedDays(0);
+            if ("gradingNum" in theProject) {
+              graNums[change.doc.id] = theProject.gradingNum;
             }
-            if (theProject.expPoints) {
-              setExpPoints(theProject.expPoints);
-            } else {
-              setExpPoints(0);
+            if ("instructorsNum" in theProject) {
+              instraNums[change.doc.id] = theProject.instructorsNum;
             }
-            if (theProject.instructors) {
-              setInstructorPoints(theProject.instructors);
-            } else {
-              setInstructorPoints(0);
-            }
-            if (theProject.dayInstructorUpVotes) {
-              setDayInstructorUpVotes(theProject.dayInstructorUpVotes);
-            } else {
-              setDayInstructorUpVotes(0);
-            }
-            if (theProject.gradingPoints) {
-              setGradingPoints(theProject.gradingPoints);
-            } else {
-              setGradingPoints(0);
-            }
-            if (theProject.negativeGradingPoints) {
-              setNegativeGradingPoints(theProject.negativeGradingPoints);
-            } else {
-              setNegativeGradingPoints(0);
-            }
-          }
-          if ("gradingNum" in theProject) {
-            graNums[change.doc.id] = theProject.gradingNum;
-          }
-          if ("instructorsNum" in theProject) {
-            instraNums[change.doc.id] = theProject.instructorsNum;
           }
         }
         setGradingNums((oGraNums) => {
@@ -723,7 +730,7 @@ const RouterNav = (props) => {
 
   const changeProject = (event, index) => {
     const proj = projects[index];
-    localStorage.setItem(CURRENT_PROJ_LOCAL_S_KEY, proj)
+    localStorage.setItem(CURRENT_PROJ_LOCAL_S_KEY, proj);
     setProject(proj);
     setProjectIndex(index);
   };
@@ -769,31 +776,29 @@ const RouterNav = (props) => {
       open={isProfileMenuOpen}
       onClose={handleProfileMenuClose}
       onClick={handleProfileMenuClose}
-      transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-      anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
       {fullname && <MenuItem sx={{ flexGrow: 3 }}>{fullname}</MenuItem>}
-      
-      {
-        projects.map((proj, index) => (
-          <MenuItem
-            key={`${proj}MenuItem`}
-            selected={index === projectIndex}
-            // onClick={(event) => changeProject(event, index)}
-          >
-            {proj}
-            <Switch 
-              checked={proj === project}
-              onClick={event => event.stopPropagation()}
-              onChange={event => {
-                if(event.target.checked) {
-                  changeProject(event, index)
-                }
-              }}
-            />
-          </MenuItem>
-        ))
-      }
+
+      {projects.map((proj, index) => (
+        <MenuItem
+          key={`${proj}MenuItem`}
+          selected={index === projectIndex}
+          // onClick={(event) => changeProject(event, index)}
+        >
+          {proj}
+          <Switch
+            checked={proj === project}
+            onClick={(event) => event.stopPropagation()}
+            onChange={(event) => {
+              if (event.target.checked) {
+                changeProject(event, index);
+              }
+            }}
+          />
+        </MenuItem>
+      ))}
       <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
         <LogoutIcon /> <span id="LogoutText">Logout</span>
       </MenuItem>
@@ -808,7 +813,14 @@ const RouterNav = (props) => {
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
-              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <Grid>
                   <Tooltip title="University of Michigan - School of Information sponsors this research project.">
                     <IconButton
@@ -853,12 +865,13 @@ const RouterNav = (props) => {
                         rowGap: "4px",
                       }}
                     >
-                     {projectSpecs.onePoints ? (
+                      {projectSpecs.onePoints ? (
                         <Tooltip
-                          title={`You've submitted ${proposalsNums[username]
-                            ? proposalsNums[username].num
-                            : ""
-                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          title={`You've submitted ${
+                            proposalsNums[username]
+                              ? proposalsNums[username].num
+                              : ""
+                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
                             # of{" "}
@@ -872,7 +885,7 @@ const RouterNav = (props) => {
                         </Tooltip>
                       ) : null}
 
-                      {projectSpecs.instructorsPoints  ? (
+                      {projectSpecs.instructorsPoints ? (
                         <Tooltip
                           title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
                         >
@@ -911,7 +924,7 @@ const RouterNav = (props) => {
                           lineDiagramTooltip={lineDiagramTooltip("instructors")}
                         ></LineDiagram>
                       ) : null}
-                      
+
                       {projectSpecs.gradingPoints ? (
                         <LineDiagram
                           obj={gradingNums}
@@ -938,7 +951,9 @@ const RouterNav = (props) => {
                               ? "ActiveNavLink"
                               : "NavLink"
                           }
-                          onClick={(event) => navigate("/Activities/Experiments")}
+                          onClick={(event) =>
+                            navigate("/Activities/Experiments")
+                          }
                           style={{ marginLeft: "19px" }}
                         >
                           <div>
@@ -951,14 +966,14 @@ const RouterNav = (props) => {
                       title={
                         <div>
                           <div>
-                            You've earned {oneCademyPoints + dayOneUpVotes} total
-                            1Cademy points, including {oneCademyPoints} from
-                            others' votes and {dayOneUpVotes} points for casting
-                            25 upvotes per day on others' proposals.
+                            You've earned {oneCademyPoints + dayOneUpVotes}{" "}
+                            total 1Cademy points, including {oneCademyPoints}{" "}
+                            from others' votes and {dayOneUpVotes} points for
+                            casting 25 upvotes per day on others' proposals.
                           </div>
                           <div>
-                            You cast {proposalUpvotesToday} / 25 up-votes today on
-                            others' 1Cademy proposals.
+                            You cast {proposalUpvotesToday} / 25 up-votes today
+                            on others' 1Cademy proposals.
                           </div>
                         </div>
                       }
@@ -992,13 +1007,14 @@ const RouterNav = (props) => {
                         title={
                           <div>
                             <div>
-                              You've earned {intellectualPoints} intellectual points
-                              from others' votes and {upVotedDays} points for
-                              casting 25 upvotes per day on others' activities.
+                              You've earned {intellectualPoints} intellectual
+                              points from others' votes and {upVotedDays} points
+                              for casting 25 upvotes per day on others'
+                              activities.
                             </div>
                             <div>
-                              You cast {upVotedToday} / 25 up-votes today on others'
-                              activities.
+                              You cast {upVotedToday} / 25 up-votes today on
+                              others' activities.
                             </div>
                           </div>
                         }
@@ -1010,7 +1026,9 @@ const RouterNav = (props) => {
                               ? "ActiveNavLink"
                               : "NavLink"
                           }
-                          onClick={(event) => navigate("/Activities/Intellectual")}
+                          onClick={(event) =>
+                            navigate("/Activities/Intellectual")
+                          }
                         >
                           <div>
                             <span>
@@ -1023,7 +1041,7 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    
+
                     {projectSpecs.instructorsPoints ? (
                       <Tooltip
                         title={
@@ -1032,17 +1050,18 @@ const RouterNav = (props) => {
                               You've earned{" "}
                               {instructorPoints + dayInstructorUpVotes} total
                               points, including {instructorPoints} points for
-                              collecting instructors/administrators' contact info
-                              and {dayInstructorUpVotes} points for casting 25
-                              up-voting per day on other's collected data.
+                              collecting instructors/administrators' contact
+                              info and {dayInstructorUpVotes} points for casting
+                              25 up-voting per day on other's collected data.
                             </div>
                             <div>
                               You collected {instructorsToday} / 7
                               instructors/administrators' info today.
                             </div>
                             <div>
-                              You cast {upvotedInstructorsToday} / 16 up-votes today
-                              on others' collected instructors/administrators' data.
+                              You cast {upvotedInstructorsToday} / 16 up-votes
+                              today on others' collected
+                              instructors/administrators' data.
                             </div>
                           </div>
                         }
@@ -1054,7 +1073,9 @@ const RouterNav = (props) => {
                               ? "ActiveNavLink"
                               : "NavLink"
                           }
-                          onClick={(event) => navigate("/Activities/AddInstructor")}
+                          onClick={(event) =>
+                            navigate("/Activities/AddInstructor")
+                          }
                         >
                           👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞{" "}
                           {instructorsToday} / 7
@@ -1073,20 +1094,20 @@ const RouterNav = (props) => {
                             <div>
                               This means, {gradingPoints} times at least 3 other
                               researchers have agreed with you on existance or
-                              non-existance of a specific phrase in a free-recall
-                              response.
+                              non-existance of a specific phrase in a
+                              free-recall response.
                             </div>
                             <div>
-                              From that total 🧠 points, we've already excluded your
-                              negative {negativeGradingPoints} 🧟 points.
+                              From that total 🧠 points, we've already excluded
+                              your negative {negativeGradingPoints} 🧟 points.
                             </div>
                             <div>
-                              This means, 2 x {negativeGradingPoints} times exactly
-                              3 out of 4 researchers agreed on existance
+                              This means, 2 x {negativeGradingPoints} times
+                              exactly 3 out of 4 researchers agreed on existance
                               (non-existance) of a specific key phrase in a
-                              free-recall response by a participant, but you opposed
-                              their majority of votes. So, you got a 0.5 🧟 negative
-                              point for each of those cases.
+                              free-recall response by a participant, but you
+                              opposed their majority of votes. So, you got a 0.5
+                              🧟 negative point for each of those cases.
                             </div>
                           </div>
                         }

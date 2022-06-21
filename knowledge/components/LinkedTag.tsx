@@ -29,7 +29,13 @@ export const LinkedTag: FC<Props> = ({ nodeImageUrl, nodeContent, title, linkSrc
       }
       placement="left"
     >
-      <Chip label={<MarkdownRender text={title || ""} />} component="a" href={linkSrc} clickable />
+      <Chip
+        label={<MarkdownRender text={title || ""} />}
+        component="a"
+        href={linkSrc}
+        clickable
+        sx={{ p: "20px", color: "black", fontSize: "14px", borderRadius: "20px" }}
+      />
     </HtmlTooltip>
   );
 };
