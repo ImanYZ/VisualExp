@@ -27,8 +27,8 @@ const AppHeaderSearchBar = () => {
         width: "100%",
         background: theme => alpha(theme.palette.grey[100], 0.1),
         borderRadius: "3px",
-        border: "solid 2px",
-        borderColor: theme => theme.palette.grey[600],
+        border: "solid 1px",
+        borderColor: theme => alpha(theme.palette.grey[100], 0.1),
         color: theme => theme.palette.common.white,
         ":hover": {
           borderColor: theme => theme.palette.common.white,
@@ -45,7 +45,7 @@ const AppHeaderSearchBar = () => {
         onChange={e => setSearchText(e.target.value)}
         placeholder="Search on 1Cademy "
         inputProps={{ "aria-label": "search node" }}
-        sx={{ ml: 1, flex: 1 }}
+        sx={{ ml: 1, flex: 1, color: "inherit" }}
       />
       <IconButton type="submit" sx={{ p: "5px", color: "inherit" }} aria-label="search" onClick={handleSearch}>
         <SearchIcon />
@@ -57,8 +57,7 @@ const AppHeaderSearchBar = () => {
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   "& .MuiInputBase-input": {
     padding: 0,
-    width: "100%",
-    color: theme.palette.common.white
+    width: "100%"
   },
   "& .MuiInputBase-input::placeholder": {
     opacity: 1,

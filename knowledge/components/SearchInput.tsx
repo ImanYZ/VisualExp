@@ -1,101 +1,99 @@
 import SearchIcon from "@mui/icons-material/Search";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import InputBase from "@mui/material/InputBase";
-import { alpha, styled } from "@mui/material/styles";
-import { SxProps, Theme } from "@mui/system";
+import { Autocomplete, IconButton } from "@mui/material";
+import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import { FC, useEffect, useState } from "react";
+import { useQuery } from "react-query";
+import { useDebounce } from "use-debounce";
+
+import { getSearchAutocomplete } from "../lib/knowledgeApi";
 
 type Props = {
   onSearch: (text: string) => void;
-  sx?: SxProps<Theme>;
+  // sx?: SxProps<Theme>;
 };
 
-const SearchInput: FC<Props> = ({ onSearch, sx }) => {
+const SearchInput: FC<Props> = ({ onSearch }) => {
   const router = useRouter();
-  const [searchText, setSearchText] = useState<string>((router.query.q as string) || "");
+  const [text, setText] = useState<string>((router.query.q as string) || "");
+  const [searchText] = useDebounce(text, 250);
 
-  useEffect(() => setSearchText((router.query.q as string) || ""), [router.query]);
+  const { data, isLoading } = useQuery(["searchAutocomplete", searchText], () => getSearchAutocomplete(searchText));
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(event.target.value);
-  };
+  useEffect(() => {
+    setText((router.query.q as string) || "");
+  }, [router.query]);
 
   const handleSearch = (e: React.FormEvent) => {
+    (document.activeElement as HTMLElement).blur();
     e.preventDefault();
-    onSearch(searchText);
+    onSearch(text);
+  };
+
+  const handleChangeOption = (value: string) => {
+    (document.activeElement as HTMLElement).blur();
+    setText(value);
+    onSearch(value);
   };
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        display: "flex",
-        height: "50px",
-        flexDirection: "row",
-        alignItems: "center",
-        background: theme => theme.palette.common.white,
-        ...sx
-      }}
-      component="form"
-      onSubmit={handleSearch}
-    >
-      <SearchStyled>
-        <StyledInputBase
-          fullWidth
-          placeholder="What do you want to learn now?"
-          inputProps={{ "aria-label": "search" }}
-          value={searchText}
-          onChange={handleChange}
-        />
-      </SearchStyled>
-      <StyledButton aria-label="Begin Search" variant="contained" type="submit">
-        <SearchIcon fontSize="large" />
-      </StyledButton>
+    <Box component="form" onSubmit={handleSearch}>
+      <Autocomplete
+        id="custom-input-demo"
+        fullWidth
+        options={data?.results || []}
+        freeSolo={true}
+        loading={isLoading}
+        onChange={(e, value) => handleChangeOption(value || "")}
+        openOnFocus={true}
+        sx={{
+          display: "inline-block",
+          fontSize: "inherit",
+          "& input": {
+            width: "100%",
+            p: "0",
+            fontSize: { xs: "16px", md: "25px" },
+            fontWeight: 300,
+            border: "none",
+            color: theme => theme.palette.common.black,
+            background: theme => theme.palette.common.white
+          },
+          "& input:focus": {
+            outline: "none"
+          }
+        }}
+        renderInput={params => (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              height: { xs: "40px", md: "62px" },
+              px: { xs: "12px", md: "25px" },
+              background: theme => theme.palette.common.white
+            }}
+            ref={params.InputProps.ref}
+          >
+            <input
+              {...params.inputProps}
+              value={text}
+              onChange={e => {
+                setText(e.target.value);
+              }}
+              placeholder="Search on 1Cademy "
+            />
+            <IconButton
+              type="submit"
+              sx={{ p: "5px", color: "#757575", fontSize: "inherit" }}
+              aria-label="search"
+              onClick={handleSearch}
+            >
+              <SearchIcon sx={{ color: "inherit", fontSize: { xs: "25px", md: "35px" } }} />
+            </IconButton>
+          </Box>
+        )}
+      />
     </Box>
   );
 };
-
-const SearchStyled = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderColor: theme.palette.common.white,
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.grey[300], 0.06)
-  },
-  width: "100%"
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.common.white,
-  color: theme.palette.grey[600],
-  borderRadius: 0,
-  fontSize: 15,
-  fontWeight: 500,
-  border: "none",
-  "&:hover": {
-    backgroundColor: theme.palette.grey[200]
-  }
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: theme.palette.common.black,
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 2, 1, 2),
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    fontSize: 15,
-    height: "36px",
-    fontWeight: 300,
-    background: theme.palette.common.white
-  },
-  "@media (min-width:900px)": {
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 5, 1, 5),
-      fontSize: 25,
-      fontWeight: 300
-    }
-  }
-}));
 
 export default SearchInput;
