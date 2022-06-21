@@ -39,6 +39,7 @@
     "@types/react-syntax-highlighter": "^15.5.1",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "axios": "^0.27.2",
+    "csv-writer": "^1.6.0",
     "cypress": "^10.1.0",
     "dayjs": "^1.11.2",
     "dotenv": "^16.0.1",

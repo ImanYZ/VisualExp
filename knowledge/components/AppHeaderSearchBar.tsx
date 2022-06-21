@@ -43,7 +43,7 @@ const AppHeaderSearchBar = () => {
       <StyledInputBase
         value={searchText}
         onChange={e => setSearchText(e.target.value)}
-        placeholder="Search on 1Cademy "
+        placeholder="Search on 1Cademy"
         inputProps={{ "aria-label": "search node" }}
         sx={{ ml: 1, flex: 1, color: "inherit" }}
       />
