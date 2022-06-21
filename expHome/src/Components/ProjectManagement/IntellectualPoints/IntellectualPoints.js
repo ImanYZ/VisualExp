@@ -8,7 +8,6 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
-import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Tooltip from "@mui/material/Tooltip";
@@ -39,7 +38,12 @@ import SnackbarComp from "../../SnackbarComp";
 // import AdminIntellectualPoints from "./AdminIntellectualPoints";
 import GridCellToolTip from "../../GridCellToolTip";
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
-
+import {
+  ActivityInfoAlert,
+  ActivityInstructionsAlert,
+  CalendarVisualizationAlert,
+  IntellectualActivitiesAlert
+} from './Alerts';
 import "./IntellectualPoints.css";
 
 const othersActivitiesColumns = [
@@ -307,7 +311,7 @@ const IntellectualPoints = (props) => {
           console.log("Transaction failure:", err);
           window.alert(
             "You did not get today's point for 25 upvotes on others' activities. Copy the text of this complete message to Iman on Microsoft Teams. Do not take a screenshot. The error message is: " +
-              err
+            err
           );
         }
       }
@@ -727,22 +731,7 @@ const IntellectualPoints = (props) => {
     <>
       {/* {isAdmin && <AdminIntellectualPoints />} */}
       <h2>Others' Intellectual Activities:</h2>
-      <Alert className="VoteActivityAlert" severity="success">
-        <h2>Calendar visualization:</h2>
-        <ul>
-          <li>
-            <strong>Each small square</strong> indicates a day. The shades of
-            the color indicate the number of points you earned on that day. You
-            can hover your mouse over each of the green squares to see the exact
-            date and the number of points you earned on that day.
-          </li>
-          <li>
-            <strong>A point per day</strong>: you've earned one point for every
-            25 upvotes you cast on your colleagues' activities in every single
-            day. So, on each single day, you've earned one or zero points.
-          </li>
-        </ul>
-      </Alert>
+      <CalendarVisualizationAlert />
       <div id="DataVisualization">
         <ResponsiveCalendar
           data={dailyPoints}
@@ -770,50 +759,7 @@ const IntellectualPoints = (props) => {
         />
       </div>
       <div className="ColumnsAuto_Auto">
-        <Alert className="VoteActivityAlert" severity="success">
-          <ul>
-            <li>
-              <strong>30-minute slots:</strong> every reported activity has
-              taken 30 minutes. Please evaluate them accordingly.
-            </li>
-            <li>
-              <strong>
-                You earn points for evaluating others' activities:
-              </strong>{" "}
-              you receive one point for every 25 upvotes you cast on your
-              colleagues' activities in every single day.
-            </li>
-            <li>
-              <strong>No partial or extra points:</strong> if on a single day
-              you cast more than 25 upvotes, you'll not receive any extra
-              points. If you cast fewer than 25 upvotes, you'll not receive any
-              partial points, either.
-            </li>
-            <li>
-              <strong>Activity description:</strong> to read the long
-              descriptions, you can hover or tap on the description.
-            </li>
-            <li>
-              <strong>Total upvotes:</strong> the total number of upvotes for
-              each activity, including your upvote if any, is shown in the third
-              column. You can sort and filter every column by clicking the
-              column titles.
-            </li>
-            <li>
-              <strong>Upvote ( 👍 ):</strong> you can upvote each activity by
-              clicking the fourth column in the corresponding row. You can also
-              sort activities by clicking the title of this column to see which
-              activities you have or have not upvoted so far.
-            </li>
-            <li>
-              <strong>Skip vote ( ✘ ):</strong> if you prefer not to vote on any
-              reported activity, please skip it by clicking the fifth column of
-              the corresponding row. This will help you not to waste any time on
-              activities that you've already evaluated and decided not to vote
-              for.
-            </li>
-          </ul>
-        </Alert>
+        <ActivityInfoAlert />
         {Object.keys(otherActivity).length > 0 ? (
           <Paper className="VoteActivityPaper">
             <h3>
@@ -865,7 +811,7 @@ const IntellectualPoints = (props) => {
             </div>
           </Paper>
         ) : (
-          <div></div>
+          null
         )}
       </div>
       <div className="DataGridBox">
@@ -885,82 +831,13 @@ const IntellectualPoints = (props) => {
       {/* {!isAdmin && ( */}
       <>
         <h2>Your Intellectual Activities:</h2>
-        <Alert severity="error">
-          <strong>
-            Please DO NOT report the following activities; you'll automatically
-            receive points for them:
-          </strong>
-          <ul>
-            <li>
-              <strong>Running experiment sessions:</strong> you receive 16
-              points for every first session and 7 points for every second or
-              third session you run.
-            </li>
-            <li>
-              <strong>Evaluating others' activities:</strong> you receive one
-              point for every 25 upvotes you cast on your colleagues activities
-              in every single day.
-            </li>
-            <li>
-              <strong>Adding instructors/administrators' contact info:</strong>{" "}
-              you receive one point for every 25 instructors/administrators'
-              contact information that you add in every single day.
-            </li>
-            <li>
-              <strong>
-                Verifying instructors/administrators' contact info:
-              </strong>{" "}
-              you receive one point for every 25 upvotes you cast in every
-              single day, verifying the contact information of the
-              instructors/administrators added by other researchers.
-            </li>
-            <li>
-              <strong>Coding participants' feedback:</strong> you receive one
-              point for every code you assign to any participant feedback, only
-              if the same code is assigned to the feedback by 2 other
-              researchers.
-            </li>
-            <li>
-              <strong>Coding participants' free recall responses:</strong> you
-              receive one point for every code you assign to any participant
-              free recall response, only if the same code is assigned to the
-              response by 2 other researchers.
-            </li>
-          </ul>
-        </Alert>
+        <IntellectualActivitiesAlert />
         <h3>
           You're reporting your activities for project{" "}
           <strong>{project}</strong>.
         </h3>
         <div className="Columns40_60">
-          <Alert className="VoteActivityAlert" severity="success">
-            <ul>
-              <li>
-                <strong>30-minute slots:</strong> report your activities in only
-                30-minute time slots.
-              </li>
-              <li>
-                <strong>To enter an activity:</strong> input the activity info
-                in the corresponding boxes below and click the "ADD ACTIVITY"
-                button.
-              </li>
-              <li>
-                <strong>To update an activity:</strong> click the corresponding
-                row. All the activity info shows up in the boxes below. Modify
-                them and then click the "UPDATE ACTIVITY" button. To switch to
-                another activity to update, you can click the other row.
-              </li>
-              <li>
-                <strong>To delete an activity:</strong> click the ❌ button in
-                the corresponding row.
-              </li>
-              <li>
-                <strong>To clear the input boxes:</strong> click the "CLEAR
-                SELECTION" button to unselect the activity and clear the input
-                boxes.
-              </li>
-            </ul>
-          </Alert>
+          <ActivityInstructionsAlert />
           <Paper className="VoteActivityPaper">
             <div id="ActivityDateTimeContainer">
               <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -1041,7 +918,7 @@ const IntellectualPoints = (props) => {
                     {...params}
                     variant="standard"
                     label="Tags (without dots or slashes!)"
-                    // placeholder="Tags"
+                  // placeholder="Tags"
                   />
                 )}
               />
