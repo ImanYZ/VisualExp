@@ -265,6 +265,8 @@ export const getNodeData = async (id: string): Promise<KnowledgeNode | null> => 
   const institutionsNodes: KnowledgeNodeInstitution[] = [];
   for (let [name, obj] of institObjs) {
     const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
+    if (!institutionDocs.docs.length) continue;
+
     const institutionDoc = institutionDocs.docs[0];
     const logoURL = institutionDocs.docs.length > 0 ? institutionDoc.data().logoURL : "";
     institutionsNodes.push({ ...obj, logoURL, name, id: institutionDoc.id });
