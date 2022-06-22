@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Alert from "@mui/material/Alert";
-import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Chip from '@mui/material/Chip'
 
 import {
   firebaseState,
@@ -24,6 +24,8 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import { LeaderBoard, ProjectSpecs } from './components';
+import { formatPoints } from "../../../utils/utils";
 
 import favicon from "../../../assets/favicon.png";
 
@@ -265,22 +267,35 @@ const Activities = (props) => {
     console.log('makeResearcherChipContent', makeResearcherChipContent);
     return content.map((item, index) => {
       // if not last one append a " - "
-      return  content.length - 1 !== index 
-      ? (
-        <>
-          {item}
-          {" - "}
-        </>
-      )
-      : item;
+      return content.length - 1 !== index
+        ? (
+          <>
+            {`${item} - `}
+          </>
+        )
+        : item;
     });
   }
 
-  const formatPoints = (point = 0) => {
-    return point.toFixed(2).replace(/\.0+$/,'')
-  }
+  const currentPage = (() => {
+    if (activePage === "Intellectual") return <IntellectualPoints />;
+    if (activePage === "Experiments") return <ExperimentPoints />;
+    if (activePage === "AddInstructor") return <AddInstructor />;
+    if (activePage === "1Cademy") return <OneCademy />;
+    if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
+    return null;
+  })();
 
-  // console.log('researchers', { researchers });
+
+  if (notAResearcher) {
+    return (
+      <h1>
+        You're not a researcher on{" "}
+        {projects.length > 0 ? `the project ${project}!` : "any project!"}
+      </h1>
+    );
+  };
+
   return (
     <div id="ActivitiesContainer">
       {notAResearcher ? (
@@ -426,6 +441,26 @@ const Activities = (props) => {
           )}
         </>
       )}
+      <div className="Columns40_60">
+        <Alert severity="warning">
+          <ProjectSpecs projectSpecs={projectSpecs} />
+          <Button
+            onClick={expandLeaderboard}
+            className={expanded ? "Button Red" : "Button Green"}
+            variant="contained"
+          >
+            {expanded ? "Collapse" : "Expand"} leaderboard details
+          </Button>
+        </Alert >
+        <LeaderBoard
+          fullname={fullname}
+          expanded={expanded}
+          researchers={researchers}
+          isResearcherCriteriaMet={isResearcherCriteriaMet}
+          makeResearcherChipContent={makeResearcherChipContent}
+        />
+      </div>
+      {currentPage}
     </div>
   );
 };

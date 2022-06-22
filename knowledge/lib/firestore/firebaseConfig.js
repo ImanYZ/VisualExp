@@ -1,10 +1,10 @@
 export const config = {
-  apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",
-  authDomain: "onecademy-1.firebaseapp.com",
-  databaseURL: "https://onecademy-1.firebaseio.com",
-  projectId: "onecademy-1",
-  storageBucket: "onecademy-1.appspot.com",
-  messagingSenderId: "731671946677",
-  appId: "1:731671946677:web:a897c328436f21ba",
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_DATA_BASE_URL,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
