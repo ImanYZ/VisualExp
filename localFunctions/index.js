@@ -6,7 +6,7 @@ const {
   identifyDuplicateInstitutionDomains,
 } = require("./knowledge");
 
-const { addRecallGradesColl } = require("./visualExp");
+const { addRecallGradesColl, restructureProjectSpecs } = require("./visualExp");
 
 const app = express();
 
@@ -21,6 +21,7 @@ app.get(
   "/identifyDuplicateInstitutionDomains",
   identifyDuplicateInstitutionDomains
 );
+app.get("/restructureProjectSpecs", restructureProjectSpecs)
 
 const port = 8080;
 app.listen(port, () => {

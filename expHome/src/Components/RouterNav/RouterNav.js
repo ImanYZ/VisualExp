@@ -131,6 +131,9 @@ const RouterNav = (props) => {
   const [userNodesChanges, setUserNodesChanges] = useState([]);
   const [userNodes, setUserNodes] = useState([]);
 
+
+  const projectPoints = projectSpecs?.points || {}
+
   useEffect(() => {
     const checkResearcher = async () => {
       const researcherDoc = await firebase.db
@@ -865,7 +868,7 @@ const RouterNav = (props) => {
                         rowGap: "4px",
                       }}
                     >
-                      {projectSpecs.onePoints ? (
+                     {projectPoints.onePoints ? (
                         <Tooltip
                           title={`You've submitted ${
                             proposalsNums[username]
@@ -885,7 +888,7 @@ const RouterNav = (props) => {
                         </Tooltip>
                       ) : null}
 
-                      {projectSpecs.instructorsPoints ? (
+                      {projectPoints.instructorsPoints  ? (
                         <Tooltip
                           title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
                         >
@@ -893,7 +896,7 @@ const RouterNav = (props) => {
                         </Tooltip>
                       ) : null}
 
-                      {projectSpecs.gradingPoints ? (
+                      {projectPoints.gradingPoints ? (
                         <Tooltip
                           title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
                         >
@@ -909,7 +912,7 @@ const RouterNav = (props) => {
                         rowGap: "25px",
                       }}
                     >
-                      {projectSpecs.onePoints ? (
+                      {projectPoints.onePoints ? (
                         <LineDiagram
                           obj={proposalsNums}
                           username={username}
@@ -917,15 +920,15 @@ const RouterNav = (props) => {
                         ></LineDiagram>
                       ) : null}
 
-                      {projectSpecs.instructorsPoints ? (
+                      {projectPoints.instructorsPoints ? (
                         <LineDiagram
                           obj={instructorsNum}
                           username={fullname}
                           lineDiagramTooltip={lineDiagramTooltip("instructors")}
                         ></LineDiagram>
                       ) : null}
-
-                      {projectSpecs.gradingPoints ? (
+                      
+                      {projectPoints.gradingPoints ? (
                         <LineDiagram
                           obj={gradingNums}
                           username={fullname}
@@ -933,7 +936,7 @@ const RouterNav = (props) => {
                         ></LineDiagram>
                       ) : null}
                     </Box>
-                    {projectSpecs.onePoints ? (
+                    {projectPoints.onePoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1002,7 +1005,7 @@ const RouterNav = (props) => {
                         )}
                       </Button>
                     </Tooltip>
-                    {projectSpecs.intellectualPoints ? (
+                    {projectPoints.intellectualPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1041,8 +1044,8 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
-
-                    {projectSpecs.instructorsPoints ? (
+                    
+                    {projectPoints.instructorsPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1083,7 +1086,7 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectSpecs.gradingPoints ? (
+                    {projectPoints.gradingPoints ? (
                       <Tooltip
                         title={
                           <div>
