@@ -47,9 +47,7 @@ export const NodeItem = ({ node }: NodeItemProps) => {
 
   const handleGetInstitutionsData = async () => {
     const names: string[] = node.institutions.map(cur => cur.name);
-    if (institutionsData.length) {
-      return;
-    }
+    if (institutionsData.length) return;
 
     const institutions = await getInstitutionsByName(names);
     setInstitutionsData(institutions);
