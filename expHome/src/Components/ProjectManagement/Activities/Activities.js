@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Alert from "@mui/material/Alert";
-
+import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Chip from '@mui/material/Chip'
 
 import {
   firebaseState,
@@ -43,6 +44,8 @@ const Activities = (props) => {
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
+
+  const projectPoints = projectSpecs?.points || {}
 
   useEffect(() => {
     if (props.activityName && activePage !== props.activityName) {
@@ -163,8 +166,8 @@ const Activities = (props) => {
 
   const isResearcherCriteriaMet = (resear) => {
     let met = true;
-    for (let key in projectSpecs) {
-      if ((resear[key] || 0) < projectSpecs[key]) {
+    for (let key in projectPoints) {
+      if((resear[key] || 0) < projectPoints[key]) {
         met = false;
         break;
       }
@@ -175,13 +178,14 @@ const Activities = (props) => {
   const makeResearcherChipContent = (resear) => {
     const content = []
 
-    if (projectSpecs.onePoints) {
+    if(projectPoints.onePoints) {
+      console.log('projectPoints.onePoints');
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1CAdemy" />{" "}
           <span
             className={
-              resear.onePoints >= projectSpecs.onePoints ? "GreenText" : ""
+              resear.onePoints >= projectPoints.onePoints ? "GreenText" : ""
             }
           >
             {formatPoints(resear.onePoints)}
@@ -190,11 +194,12 @@ const Activities = (props) => {
       )
     }
 
-    if (projectSpecs.intellectualPoints) {
-      content.push(
+    if(projectPoints.intellectualPoints) {
+      console.log('projectPoints.intellectualPoints');
+       content.push(
         <span
           className={
-            resear.intellectualPoints >= projectSpecs.intellectualPoints
+            resear.intellectualPoints >= projectPoints.intellectualPoints
               ? "GreenText"
               : ""
           }
@@ -204,7 +209,8 @@ const Activities = (props) => {
       )
     }
 
-    if (projectSpecs.instructorsPoints) {
+    if(projectPoints.instructorsPoints) {
+      console.log('projectPoints.instructorsPoints');
       content.push(
         <span
           className={
@@ -218,11 +224,11 @@ const Activities = (props) => {
       )
     }
 
-    if (projectSpecs.expPoints) {
+    if(projectPoints.expPoints) {
       content.push(
         <span
           className={
-            resear.expPoints >= projectSpecs.expPoints ? "GreenText" : ""
+            resear.expPoints >= projectPoints.expPoints ? "GreenText" : ""
           }
         >
           {"👨‍🔬 " + formatPoints(resear.expPoints)}
@@ -230,11 +236,11 @@ const Activities = (props) => {
       )
     }
 
-    if (projectSpecs.commentsPoints) {
+    if(projectPoints.commentsPoints) {
       content.push(
         <span
           className={
-            resear.commentsPoints >= projectSpecs.commentsPoints
+            resear.commentsPoints >= projectPoints.commentsPoints
               ? "GreenText"
               : ""
           }
@@ -244,11 +250,11 @@ const Activities = (props) => {
       )
     }
 
-    if (projectSpecs.gradingPoints) {
-      content.push(
+    if(projectPoints.gradingPoints) {
+      content.push (
         <span
           className={
-            resear.gradingPoints >= projectSpecs.gradingPoints
+            resear.gradingPoints >= projectPoints.gradingPoints
               ? "GreenText"
               : ""
           }
@@ -292,6 +298,149 @@ const Activities = (props) => {
 
   return (
     <div id="ActivitiesContainer">
+      {notAResearcher ? (
+        <h1>
+          You're not a researcher on{" "}
+          {projects.length > 0 ? `the project ${project}!` : "any project!"}
+        </h1>
+      ) : (
+        <>
+          <div className="Columns40_60">
+            <Alert severity="warning">
+              <h2>Inclusion and Order of Authors Criteria:</h2>
+              <div>
+                <strong>Inclusion:</strong> To be an author,{" "}
+                <span className="GreenText">in green</span>, one needs to earn
+                at least:
+                <ul>
+                  {projectPoints.onePoints && (
+                    <li>
+                      <strong>{projectPoints.onePoints}</strong> 1Cademy points{" "}
+                      <img src={favicon} width="15.1" /> and{" "}
+                    </li>
+                  )}
+                  {projectPoints.intellectualPoints && (
+                    <li>
+                      <strong>{projectPoints.intellectualPoints}</strong> Intellectual points 🎓 and
+                    </li>
+                  )}
+                  {projectPoints.expPoints && (
+                    <li>
+                      <strong>{projectPoints.expPoints}</strong> Experiment points 👨‍🔬 and
+                    </li>
+                  )}
+                  {projectPoints.instructorsPoints && (
+                    <li>
+                      <strong>{projectPoints.instructorsPoints}</strong> Collecting instructor/administrator
+                      contact points 👨‍🏫 and
+                    </li>
+                  )}
+                  {projectPoints.commentsPoints && (
+                    <li>
+                      <strong>{projectPoints.commentsPoints}</strong> Coding participants' comments points 💬
+                      and
+                    </li>
+                  )}
+                  {projectPoints.gradingPoints && (
+                    <li>
+                      <strong>{projectPoints.gradingPoints}</strong> Coding participants' recall responses
+                      points 🧠
+                    </li>
+                  )}
+                </ul>
+                <strong>Order:</strong> The intern with higher total of all the
+                above categories gets a higher position.
+              </div>
+              <Button
+                onClick={expandLeaderboard}
+                className={expanded ? "Button Red" : "Button Green"}
+                variant="contained"
+              >
+                {expanded ? "Collapse" : "Expand"} leaderboard details
+              </Button>
+            </Alert>
+            <div id="Leaderboard">
+              <h2 id="InternsLeaderboardHeader">Interns Leaderboard:</h2>
+              <Paper
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  flexWrap: "wrap",
+                  listStyle: "none",
+                  p: 0.5,
+                  m: 0,
+                }}
+                component="ul"
+              >
+                {researchers.map((resear) => {
+                  return (
+                    <li key={resear.id} className="LeaderboardItem">
+                      <Chip
+                        icon={
+                          isResearcherCriteriaMet(resear) ? (
+                            <span className="ChipContent">😊</span>
+                          ) : (
+                            <span className="ChipContent">😔</span>
+                          )
+                        }
+                        variant={resear.id === fullname ? "" : "outlined"}
+                        color={ isResearcherCriteriaMet(resear) ? "success" : "error" }
+                        label={
+                          <span className="ChipContent">
+                            {resear.id === fullname && fullname + " - "}
+                            {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
+                          </span>
+                        }
+                      />
+                    </li>
+                  );
+                })}
+              </Paper>
+            </div>
+          </div>
+          {/* <div id="InternsNumFormControl">
+        <span id="InternsNumQuestion">
+          How many interns should be in the authors list?
+        </span>
+        <InputLabel id="InternsNumLabel">
+          How many interns would you like to include the authors list?
+        </InputLabel>
+        <Select
+          // labelId="InternsNumLabel"
+          id="InternsNumSelect"
+          value={internsNum}
+          label="Number of Interns"
+          onChange={internsNumChange}
+        >
+          {Object.keys(researchers).map((resea, idx) => (
+            <MenuItem
+              key={resea + "Key"}
+              className="SelectItem"
+              value={idx + 1}
+            >
+              {idx + 1}
+            </MenuItem>
+          ))}
+        </Select>
+        <span id="InternsNumAvgLabel">
+          The average vote is: {internsNumsAvg}
+        </span>
+      </div> */}
+          {activePage === "Intellectual" ? (
+            <IntellectualPoints />
+          ) : activePage === "Experiments" ? (
+            <ExperimentPoints />
+          ) : activePage === "AddInstructor" ? (
+            <AddInstructor />
+          ) : activePage === "1Cademy" ? (
+            <OneCademy />
+          ) : activePage === "FreeRecallGrading" ? (
+            <FreeRecallGrading />
+          ) : (
+            <IntellectualPoints />
+          )}
+        </>
+      )}
       <div className="Columns40_60">
         <Alert severity="warning">
           <ProjectSpecs projectSpecs={projectSpecs} />
