@@ -40,7 +40,7 @@ import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
 import { isToday, getISODateString } from "../../../utils/DateFunctions";
-import { isValidHttpUrl, isEmail } from "../../../utils/general";
+import { isValidHttpUrl, isEmail } from "../../../utils/utils";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
