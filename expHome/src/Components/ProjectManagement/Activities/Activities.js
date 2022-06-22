@@ -23,6 +23,7 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import { LeaderBoard, ProjectSpecs } from './components';
 import { formatPoints } from "../../../utils/utils";
 
@@ -277,6 +278,7 @@ const Activities = (props) => {
     if (activePage === "AddInstructor") return <AddInstructor />;
     if (activePage === "1Cademy") return <OneCademy />;
     if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
+    if(activePage === "CodeFeedback") return <CodeFeedback/>;
     return null;
   })();
 
