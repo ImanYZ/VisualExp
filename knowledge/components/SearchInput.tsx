@@ -51,6 +51,10 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
         loading={isLoading}
         onChange={(e, value) => handleChangeOption(value || "")}
         openOnFocus={true}
+        isOptionEqualToValue={(option, value) => {
+          console.log(">>", option.substring(0, 10), "::::", value.substring(0, 10), option === value);
+          return option === value;
+        }}
         sx={{
           display: "inline-block",
           fontSize: "inherit",
