@@ -1,3 +1,5 @@
+import { tagsAutoCompleteCovid, tagsAutoCompletePopular } from "../../testUtils/mockData/tags.data";
+
 describe("Home page", () => {
   it("Should render basic elements the first time the page is open", () => {
     cy.visit("/");
@@ -36,7 +38,38 @@ describe("Home page", () => {
   });
 
   it("Should search by tags", () => {
+    //let's intercept the data to get consistent results for the test
+    cy.intercept("GET", "/api/tagsAutocomplete?q=", { statusCode: 200, body: tagsAutoCompletePopular }).as(
+      "tagsAutocompleteResponseMostPopular"
+    );
+
+    cy.intercept("GET", "/api/tagsAutocomplete?q=covid", { statusCode: 200, body: tagsAutoCompleteCovid }).as(
+      "tagsAutocompleteResponseCovid"
+    );
+
     cy.visit("/");
+    cy.wait("@tagsAutocompleteResponseMostPopular");
+    cy.findByLabelText("Tags").click();
+    //By default there should show 10 items if nothing has been searched
+    cy.findAllByTestId("tag-option").should("have.length", 10);
+    //Asert the most popular tags appear the first time
+    cy.findByText((tagsAutoCompletePopular.results || [])[9]).should("exist");
+    //just to close the autocomplete options
+    cy.clickOutside();
+    //let's search by the tag covid
     cy.findByLabelText("Tags").type("covid");
+    cy.wait("@tagsAutocompleteResponseCovid");
+
+    //Choose the first option
+    cy.findByText((tagsAutoCompleteCovid.results || [])[1]).click();
+    //Assert the selected tag has been passed in the url
+    cy.url().should("include", `tags=${(tagsAutoCompleteCovid.results || [])[1]}`);
+    //let's choose another tag
+    cy.findByLabelText("Tags").click();
+    cy.findByText((tagsAutoCompleteCovid.results || [])[0]).click();
+    const tagsSelected = encodeURIComponent(
+      `${(tagsAutoCompleteCovid.results || [])[1]},${(tagsAutoCompleteCovid.results || [])[0]}`
+    );
+    cy.url().should("include", `tags=${tagsSelected}`);
   });
 });

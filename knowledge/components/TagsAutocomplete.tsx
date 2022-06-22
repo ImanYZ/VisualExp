@@ -51,6 +51,11 @@ const TagsAutocomplete: FC<Props> = ({ onTagsChange }) => {
       onInputChange={handleQueryChange}
       onChange={handleChange}
       noOptionsText={"Search tags"}
+      renderOption={(props, option) => (
+        <li data-testid="tag-option" {...props}>
+          {option}
+        </li>
+      )}
       loading={isLoading}
       renderTags={(value: readonly string[], getTagProps) =>
         value.map((option: string, index: number) => (
