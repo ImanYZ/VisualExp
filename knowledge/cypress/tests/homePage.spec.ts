@@ -27,7 +27,7 @@ describe("Home page", () => {
     //it should be on the first page
     cy.url().should("include", `page=1`);
     //let's change the page
-    cy.findByTestId("pagination").findByLabelText("Go to page 2").click();
+    cy.findByLabelText("Go to page 2").click();
     //assert the page number changed in the url
     cy.url().should("include", `page=2`);
     //assert the second page is selected in the pagination component
