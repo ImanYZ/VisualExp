@@ -197,3 +197,44 @@ exports.addRecallGradesColl = async (req, res) => {
   }
   return res.status(200).json({ done: true });
 };
+
+
+exports.restructureProjectSpecs = async (req, res) => {
+  const documents = {
+    H2K2: {
+      points: {
+        commentsPoints: 100,
+        expPoints: 100,
+        gradingPoints: 100,
+        instructorsPoints: 100,
+        intellectualPoints: 100,
+        onePoints: 100
+      }
+    },
+    Annotating: {
+      points: {
+        commentsPoints: 400,
+        expPoints: 400,
+        gradingPoints: 400,
+        instructorsPoints: 400,
+        intellectualPoints: 400,
+        onePoints: 400
+      }
+    }
+  }
+
+  
+  try {
+    for (proj of Object.keys(documents)) {
+      const projectSpecs = db.collection("projectSpecs").doc();
+      await batchSet(projectSpecs, documents[proj]);
+    }
+  
+    await commitBatch();
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+
+  return res.status(200).json({ done: true });
+}
