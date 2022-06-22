@@ -10,19 +10,24 @@ import { getSearchAutocomplete } from "../lib/knowledgeApi";
 
 type Props = {
   onSearch: (text: string) => void;
-  // sx?: SxProps<Theme>;
 };
 
 const SearchInput: FC<Props> = ({ onSearch }) => {
   const router = useRouter();
   const [text, setText] = useState<string>((router.query.q as string) || "");
   const [searchText] = useDebounce(text, 250);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const { data, isLoading } = useQuery(["searchAutocomplete", searchText], () => getSearchAutocomplete(searchText));
 
   useEffect(() => {
     setText((router.query.q as string) || "");
   }, [router.query]);
+
+  useEffect(() => {
+    if (isLoading) return;
+    setSuggestions(data?.results || []);
+  }, [data, isLoading]);
 
   const handleSearch = (e: React.FormEvent) => {
     (document.activeElement as HTMLElement).blur();
@@ -41,7 +46,7 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
       <Autocomplete
         id="custom-input-demo"
         fullWidth
-        options={data?.results || []}
+        options={suggestions}
         freeSolo={true}
         loading={isLoading}
         onChange={(e, value) => handleChangeOption(value || "")}
