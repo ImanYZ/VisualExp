@@ -1,4 +1,4 @@
-export default (filename, rows) => {
+export const useCSV = (filename, rows) => {
   var processRow = function (row) {
     var finalVal = "";
     for (var j = 0; j < row.length; j++) {
