@@ -54,9 +54,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<SearchNodesResp
         corrects: el.document.corrects,
         wrongs: el.document.wrongs,
         tags: el.document.tags,
-        //TODO: remove the following lines
-        contributors: [],
-        institutions: [],
+        contributors: el.document.contributors,
+        institutions: el.document.institutions,
         choices: el.document.choices || []
       })
     );
