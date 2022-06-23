@@ -98,6 +98,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
                   minWidth: "80px",
                   display: { xs: "none", md: "block" },
                   fontSize: 16,
+                  fontWeight: "700",
                   color: "common.white",
                   py: "15px",
                   px: "16px",
