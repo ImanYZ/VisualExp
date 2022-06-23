@@ -1,2 +1,2 @@
-export { ProjectSpecs } from './ProjectSpecs';
+export { ProjectPoints } from './ProjectPoints';
 export { LeaderBoard } from './LeaderBoard';

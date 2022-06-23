@@ -86,6 +86,7 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
             display: "flex",
             alignItems: "center",
             flexDirection: { xs: "column", sm: "row" },
+            flexWrap: "wrap",
             justifyContent: "space-between",
             mt: 5
           }}
@@ -111,10 +112,14 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
 
             <Box sx={{ display: "flex" }}>
               <Button
-                sx={{ color: theme => (showShareButtons ? theme.palette.common.orange : theme.palette.grey[600]) }}
                 onClick={() => setShowShareButtons(!showShareButtons)}
+                sx={{
+                  minWidth: "20px",
+                  justifyContent: "start",
+                  color: theme => (showShareButtons ? theme.palette.common.orange : theme.palette.grey[600])
+                }}
               >
-                <ReplyIcon sx={{ mx: "12px", transform: "scale(-1,1)" }} />
+                <ReplyIcon sx={{ ml: "10px", transform: "scale(-1,1)" }} />
                 {!showShareButtons && <Typography py="2px">Share</Typography>}
               </Button>
               {showShareButtons && <ShareButtons />}
