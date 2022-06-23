@@ -21,7 +21,7 @@ import {
 
 import SelectSessions from "./SelectSessions";
 
-import { isEmail } from "../../utils/utils";
+import { isEmail } from "../../utils";
 
 import "./SchedulePage.css";
 

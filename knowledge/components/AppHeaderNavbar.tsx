@@ -71,7 +71,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
               <Tab
                 onClick={event => {
                   event.preventDefault();
-                  if (page.label !== "NODE") open(page.route, "_blank");
+                  page.label === "NODE" ? router.push(page.route) : open(page.route, "_blank");
                 }}
                 color="inherit"
                 label={page.label}

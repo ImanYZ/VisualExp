@@ -2,14 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Alert from "@mui/material/Alert";
-import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import Chip from "@mui/material/Chip";
 
 import {
   firebaseState,
   emailState,
   fullnameState,
+  isAdminState,
 } from "../../../store/AuthAtoms";
 import {
   projectState,
@@ -20,12 +19,14 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
+import ExpenseReports from "../IntellectualPoints/ExpenseReports";
+import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
-import { LeaderBoard, ProjectSpecs } from "./components";
-import { formatPoints } from "../../../utils/utils";
+import { LeaderBoard, ProjectPoints } from "./components";
+import { formatPoints } from "../../../utils";
 
 import favicon from "../../../assets/favicon.png";
 
@@ -35,6 +36,7 @@ const Activities = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
+  const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
   const projects = useRecoilValue(projectsState);
   const projectSpecs = useRecoilValue(projectSpecsState);
@@ -273,8 +275,10 @@ const Activities = (props) => {
   };
 
   const currentPage = (() => {
-    if (activePage === "Intellectual") return <IntellectualPoints />;
-    if (activePage === "Experiments") return <ExperimentPoints />;
+    if (activePage === "Intellectual")
+      return isAdmin ? <ExpenseReports /> : <IntellectualPoints />;
+    if (activePage === "Experiments")
+      return isAdmin ? <ManageEvents /> : <ExperimentPoints />;
     if (activePage === "AddInstructor") return <AddInstructor />;
     if (activePage === "1Cademy") return <OneCademy />;
     if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
@@ -300,7 +304,7 @@ const Activities = (props) => {
       ) : (
         <div className="Columns40_60">
           <Alert severity="warning">
-            <ProjectSpecs projectSpecs={projectSpecs} />
+            <ProjectPoints projectPoints={projectPoints} />
             <Button
               onClick={expandLeaderboard}
               className={expanded ? "Button Red" : "Button Green"}
