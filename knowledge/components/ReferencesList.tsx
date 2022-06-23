@@ -16,7 +16,7 @@ type ReferencesListProps = {
 };
 
 export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
-  const getReferenceTitle = (el: LinkedKnowledgeNode) => {
+  const getReferenceContent = (el: LinkedKnowledgeNode) => {
     if (isValidHttpUrl(el.label)) {
       return `${el.title}:  ${el.label}`;
     }
@@ -41,11 +41,11 @@ export const ReferencesList = ({ references, sx }: ReferencesListProps) => {
           {references.map((node, idx) => (
             <React.Fragment key={idx}>
               <LinkedReference
-                title={getReferenceTitle(node)}
+                title={node.title || ""}
                 linkSrc={getNodePageUrl(node.title || "", node.node)}
                 nodeType={node.nodeType}
                 nodeImageUrl={node.nodeImage}
-                nodeContent={node.content}
+                nodeContent={getReferenceContent(node)}
                 showListItemIcon={false}
                 label={node.label || ""}
                 sx={{ p: "30px 0px", mx: "5px" }}
