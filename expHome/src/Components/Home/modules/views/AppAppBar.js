@@ -35,7 +35,7 @@ import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
 import sectionsOrder from "./sectionsOrder";
-import { getFullname } from "../../../../utils/utils";
+import { getFullname } from "../../../../utils";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 

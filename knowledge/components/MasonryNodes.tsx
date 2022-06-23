@@ -1,11 +1,11 @@
 import Masonry from "@mui/lab/Masonry";
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
-import Pagination from "@mui/material/Pagination";
 import { SxProps, Theme } from "@mui/system";
 
 import { randomIntFromInterval } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
+import { CustomPagination } from "./CustomPagination";
 import { NodeItem } from "./NodeItem";
 
 type MasonryNodesProps = {
@@ -43,7 +43,7 @@ export const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoad
       </Masonry>
       {totalPages && totalPages > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Pagination data-testid="pagination" count={totalPages} page={page} onChange={handleChangePage} />
+          <CustomPagination count={totalPages} page={page} onChange={handleChangePage} />
         </Box>
       )}
     </Box>
