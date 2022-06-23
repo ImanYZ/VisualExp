@@ -342,9 +342,6 @@ const ExpenseReports = (props) => {
                 {" "}
                 Show the activities for this period{" "}
               </Button>
-              <Button variant="contained" onClick={filterApproved}>
-                Show Approved Activities Only
-              </Button>
             </Stack>
           </div>
         </div>
