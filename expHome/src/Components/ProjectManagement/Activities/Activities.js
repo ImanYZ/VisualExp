@@ -26,7 +26,7 @@ import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 import { LeaderBoard, ProjectPoints } from "./components";
-import { formatPoints } from "../../../utils/utils";
+import { formatPoints } from "../../../utils";
 
 import favicon from "../../../assets/favicon.png";
 
