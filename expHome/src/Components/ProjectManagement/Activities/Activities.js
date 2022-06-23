@@ -10,6 +10,7 @@ import {
   firebaseState,
   emailState,
   fullnameState,
+  isAdminState,
 } from "../../../store/AuthAtoms";
 import {
   projectState,
@@ -20,6 +21,8 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
+import ExpenseReports from "../IntellectualPoints/ExpenseReports";
+import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
@@ -35,6 +38,7 @@ const Activities = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
+  const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
   const projects = useRecoilValue(projectsState);
   const projectSpecs = useRecoilValue(projectSpecsState);
@@ -273,8 +277,10 @@ const Activities = (props) => {
   };
 
   const currentPage = (() => {
-    if (activePage === "Intellectual") return <IntellectualPoints />;
-    if (activePage === "Experiments") return <ExperimentPoints />;
+    if (activePage === "Intellectual")
+      return isAdmin ? <ExpenseReports /> : <IntellectualPoints />;
+    if (activePage === "Experiments")
+      return isAdmin ? <ManageEvents /> : <ExperimentPoints />;
     if (activePage === "AddInstructor") return <AddInstructor />;
     if (activePage === "1Cademy") return <OneCademy />;
     if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
