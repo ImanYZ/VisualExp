@@ -1,4 +1,13 @@
-import { Autocomplete, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextField
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { SyntheticEvent, useEffect, useState } from "react";
@@ -73,17 +82,49 @@ export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocom
     setReferenceSelected(newReference);
   }, [router.query.label, router.query.reference]);
 
+  const referenceAdornment = () => (
+    <InputAdornment position="start">
+      <Box
+        sx={{
+          p: "7px 10px",
+          fontSize: "14px",
+          lineHeight: "17px",
+          fontWeight: "400",
+          color: "black",
+          background: theme => theme.palette.grey[200],
+          borderRadius: "20px"
+        }}
+      >
+        Book/Paper
+      </Box>
+    </InputAdornment>
+  );
+
   return (
     <Box sx={{ display: "flex" }}>
       <Autocomplete
         options={getReferencesOptions()}
-        value={referenceSelected.title}
+        value={referenceSelected.title || null}
         loading={isLoading}
         noOptionsText={"Search references"}
         onInputChange={handleInputChange}
         onChange={handleChange}
-        renderInput={params => <TextField {...params} variant="outlined" label="References" />}
-        freeSolo
+        renderInput={params => (
+          <TextField
+            {...params}
+            variant="outlined"
+            label="References"
+            InputProps={{
+              ...params.InputProps,
+              startAdornment: referenceSelected.title ? (
+                <>
+                  {referenceAdornment()}
+                  {params.InputProps.startAdornment}
+                </>
+              ) : undefined
+            }}
+          />
+        )}
         sx={{ flexGrow: 1 }}
       />
       {referenceSelected.title && (
@@ -97,6 +138,7 @@ export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocom
             value={referenceSelected.label}
             label={referenceIsWeb(referenceSelected.title) ? "Sections" : "Pages"}
             onChange={handleChangeLabel}
+            sx={{ background: theme => theme.palette.grey[200] }}
           >
             {getLabelsByReference(referenceSelected.title).map((label, idx) => (
               <MenuItem key={idx} value={label}>
