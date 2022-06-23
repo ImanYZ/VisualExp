@@ -22,6 +22,11 @@ type Props = {
 const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
+  const getTabSelected = () => {
+    const tabSelected = SECTIONS.findIndex(cur => cur.route === router.route);
+    return tabSelected >= 0 ? tabSelected : false;
+  };
+
   return (
     <AppBar>
       <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
@@ -40,10 +45,10 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
           </Box>
         </LightTooltip>
         <Tabs
-          value={SECTIONS.findIndex(cur => cur.route === router.route)}
+          value={getTabSelected()}
           variant="scrollable"
           scrollButtons="auto"
-          allowScrollButtonsMobile
+          // allowScrollButtonsMobile
           aria-label="scrollable auto tabs navigation bar"
           sx={{
             px: "25px",
@@ -98,6 +103,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
                   minWidth: "80px",
                   display: { xs: "none", md: "block" },
                   fontSize: 16,
+                  fontWeight: "700",
                   color: "common.white",
                   py: "15px",
                   px: "16px",

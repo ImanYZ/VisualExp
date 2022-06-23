@@ -18,7 +18,6 @@ export const CustomPagination = ({ count, page, onChange }: CustomPaginationProp
     <nav>
       <List>
         {items.map(({ page, type, selected, ...item }, index) => {
-          console.log(page, type, selected, { ...item });
           let children = null;
 
           if (type === "start-ellipsis" || type === "end-ellipsis") {
