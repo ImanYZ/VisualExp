@@ -156,7 +156,7 @@ export default function AppFooter() {
                 textDecorationColor: theme => theme.palette.common.white
               }}
             >
-              <GitHubIcon />
+              <GitHubIcon fontSize="inherit" />
             </Link>
             <Typography color={theme => theme.palette.common.white} sx={{ display: { xs: "none", md: "block" } }}>
               We're committed to OpenSource on{" "}
@@ -171,7 +171,7 @@ export default function AppFooter() {
               >
                 Github
               </Link>{" "}
-              <GitHubIcon />
+              <GitHubIcon fontSize="inherit" />
             </Typography>
             <Typography color={theme => theme.palette.grey[500]}>{`©  1Cademy ${new Date().getFullYear()}`}</Typography>
           </Box>

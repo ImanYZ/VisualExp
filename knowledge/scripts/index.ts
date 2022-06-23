@@ -147,7 +147,17 @@ const getNodesData = (
   });
 };
 
-const getReferencesData = (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>) => {
+const retrieveNode = async (nodeId: string): Promise<NodeFireStore | null> => {
+  const nodeDoc = await db.collection("nodes").doc(nodeId).get();
+  const nodeData = nodeDoc.data();
+
+  if (!nodeDoc.exists || !nodeData) {
+    return null;
+  }
+  return nodeData as NodeFireStore;
+};
+
+const getReferencesData = async (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>) => {
   // const nodeDocs = await db.collection("nodes").get();
 
   const references = nodeDocs.docs
@@ -158,11 +168,22 @@ const getReferencesData = (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFir
     })
     .flat();
 
-  const processedReferences: TypesenseProcessedReferences[] = references.reduce(
+  const fullReferences = await Promise.all(
+    references.map(async reference => {
+      const nodeReference = await retrieveNode(reference.node);
+      return {
+        node: reference.node,
+        title: nodeReference?.title || "",
+        label: reference.label
+      };
+    })
+  );
+
+  const processedReferences: TypesenseProcessedReferences[] = fullReferences.reduce(
     (referencesSet: TypesenseProcessedReferences[], currentReference): TypesenseProcessedReferences[] => {
       const indexReference = referencesSet.findIndex(cur => cur.title === currentReference.title);
       const processedReference: TypesenseProcessedReferences = {
-        title: currentReference.title || "",
+        title: currentReference.title,
         data: [{ label: currentReference.label, node: currentReference.node }]
       };
       if (indexReference < 0) return [...referencesSet, processedReference];
@@ -230,7 +251,7 @@ const fillReferencesIndex = async (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
   forceReIndex?: boolean
 ) => {
-  const { processedReferences } = getReferencesData(nodeDocs);
+  const { processedReferences } = await getReferencesData(nodeDocs);
 
   const fieldsProcessedReferences: CollectionFieldSchema[] = [{ name: "title", type: "string" }];
   if (!processedReferences.length) {
