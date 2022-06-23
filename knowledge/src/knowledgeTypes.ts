@@ -139,13 +139,11 @@ export type TypesenseNodesSchema = {
   changedAt: string;
   changedAtMillis: number; // typesense
   choices?: KnowledgeChoice[];
+  contribNames: string[];
+  institNames: string[];
   content: string; // typesense
-  contributors: { fullName: string; imageUrl: string; username: string }[];
-  contributorsNames: string[]; // typesense
   corrects: number; // typesense
   id: string;
-  institutions: { name: string }[];
-  institutionsNames: string[]; // typesense
   labelsReferences: string[]; // typesense
   nodeImage?: string;
   nodeType: NodeType; // typesense
@@ -155,6 +153,7 @@ export type TypesenseNodesSchema = {
   updatedAt: number;
   wrongs: number;
   mostHelpful: number; // typesense
+  isTag: boolean; // typesense
 };
 
 export type TypesenseReferencesSchema = {
