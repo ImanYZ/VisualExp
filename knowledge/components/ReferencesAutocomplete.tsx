@@ -83,6 +83,7 @@ export const ReferencesAutocomplete = ({ onReferencesChange }: ReferencesAutocom
         onInputChange={handleInputChange}
         onChange={handleChange}
         renderInput={params => <TextField {...params} variant="outlined" label="References" />}
+        freeSolo
         sx={{ flexGrow: 1 }}
       />
       {referenceSelected.title && (
