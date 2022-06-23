@@ -61,9 +61,7 @@ const ContributorsAutocomplete: FC<Props> = ({ onContributorsChange }) => {
       value={value}
       loading={isLoading}
       noOptionsText={"Search contributors"}
-      isOptionEqualToValue={(option, value) => {
-        return option.id === value.id;
-      }}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
       onInputChange={handleQueryChange}
       renderOption={(props, option) => {
         const newProps = { ...props, key: option.id };
