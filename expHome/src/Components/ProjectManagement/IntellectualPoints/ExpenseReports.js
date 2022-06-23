@@ -12,15 +12,19 @@ import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
+import Stack from '@mui/material/Stack';
 
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid ,GridToolbar} from "@mui/x-data-grid";
 
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import DatePicker from "@mui/lab/DatePicker";
+import CalendarPicker from "@mui/x-date-pickers";
 import TimePicker from "@mui/lab/TimePicker";
+import  DateTimePicker  from '@mui/lab/DateTimePicker';
+import DatePicker from "@mui/lab/DatePicker";
 
 import { firebaseState } from "../../../store/AuthAtoms";
+import "./ExpenseReports.css";
 import {
   projectState,
   upVotedTodayState,
@@ -42,13 +46,15 @@ import {
 } from "./Alerts";
 import "./IntellectualPoints.css";
 
+
 const othersActivitiesColumns = [
-  { field: "fullname", headerName: "Fullname", width: 190 },
+  { field: "fullname", headerName: "Fullname", width: 190,filterable: false  },
   { field: "start", headerName: "Start", type: "dateTime", width: 190 },
   {
     field: "description",
     headerName: "Description",
     width: 400,
+    filterable: false ,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     },
@@ -57,8 +63,9 @@ const othersActivitiesColumns = [
     field: "upVotes",
     headerName: "Points",
     type: "number",
+    filterable: false ,
     width: 70,
-    valueFormatter: (params) => {
+        valueFormatter: (params) => {
       return `${params.value} 👍`;
     },
   },
@@ -72,12 +79,22 @@ const ExpenseReports = (props) => {
   const [othersActivities, setOthersActivities] = useRecoilState(
     othersActivitiesState
   );
-
+  const[desplayActivities, setDesplayActivities] = useState([]);
+  
   const [activitiesChanges, setActivitiesChanges] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [votesChanges, setVotesChanges] = useState([]);
   const [activitiesLoaded, setActivitiesLoaded] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [activityDateFrom,setActivityDateFrom]=useState(null);
+  const [activityDateTo,setActivityDateTo]=useState(null);
+  const [clear, setClear] = useState(false);
+  const [showPayButton, setShowPayButton] = useState(false);
+  const [showAllActivitiesButton, setShowAllActivitiesButton] = useState(false);
+  const [pay, setPay] = useState(0);
+
+  const [filterAproved, setFilterAproved] = useState(null);
+
 
   useEffect(() => {
     if (firebase && project) {
@@ -101,7 +118,7 @@ const ExpenseReports = (props) => {
         activitiesSnapshot();
       };
     }
-  }, [firebase, project]);
+  }, [firebase, project,clear]);
 
   useEffect(() => {
     if (firebase && project && activitiesLoaded) {
@@ -118,13 +135,15 @@ const ExpenseReports = (props) => {
       });
       return () => {
         setVotesChanges([]);
+        setOthersActivities([]);
         votesSnapshot();
       };
     }
-  }, [firebase, project, activitiesLoaded]);
+  }, [firebase, project, activitiesLoaded,clear]);
 
   useEffect(() => {
     console.log("activitiesChanges");
+   
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];
       setActivitiesChanges([]);
@@ -171,6 +190,7 @@ const ExpenseReports = (props) => {
         const activityIdx = oActivities.findIndex(
           (acti) => acti.id === voteData.activity
         );
+     
         if (change.type === "removed") {
           oActivities[activityIdx].approved = "◻";
         } else {
@@ -192,26 +212,161 @@ const ExpenseReports = (props) => {
           }
         }
       }
+      
       setOthersActivities(oActivities);
+      setDesplayActivities(oActivities);
     }
   }, [othersActivities, activitiesChanges, votesChanges, project]);
 
+  const filterApproved = () => { 
+      let oActivities =[];
+      for(let act of othersActivities){
+           if(act.approved === "✅"){
+            oActivities.push({...act});
+           }
+      }
+      setDesplayActivities(oActivities);
+      setShowPayButton(true);
+      setShowAllActivitiesButton(true);
+   }
+   
+  const filterDate =()=>{
+    let oActivities =[];
+    for(let act of desplayActivities){
+         if(act.start >= activityDateFrom && act.start <= activityDateTo ){
+          oActivities.push({...act});
+         }
+    }
+    setDesplayActivities(oActivities);
+    setShowPayButton(true);
+    setShowAllActivitiesButton(true);
+ }
+ 
+
+ const markPaid = async()=>{
+      let oActivities =[];
+      for(let act of desplayActivities ){
+        oActivities.push({...act
+          ,paid:"PAID",
+        });
+       const ActivitiesRef = firebase.db
+                  .collection("activities")
+                  .doc(act.id)
+       const actDoc = await firebase.db
+            .collection("activities")
+            .doc(act.id)
+            .get();
+
+       const actData =  actDoc.data();  
+       console.log({...actData,paid:true})
+       ActivitiesRef.set({...actData,paid:true})          
+      console.log(act.id);
+       
+                
+
+      }
+      setPay(pay+oActivities.length*20)
+      console.log(oActivities);
+      setDesplayActivities(oActivities);  
+      setShowPayButton(false);
+     
+ }
+ const showAllActivities = () => {
+    setDesplayActivities(othersActivities);
+    setShowPayButton(false);
+    setShowAllActivitiesButton(false);
+ }
+
+
+
   return (
     <>
-      <h2>Others' Intellectual Activities:</h2>
+      <h2>Activities:</h2>
+    <Paper>
+     <div style ={{align :"center"}}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <div className="ActivityDateTimePicker">
+                  <DateTimePicker
+                    label="from"
+                    value={activityDateFrom}
+                    onChange={(newValue) => {
+                      setActivityDateFrom(newValue);
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </div>
+      </LocalizationProvider> 
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <div className="ActivityDateTimePicker">
+                  <DateTimePicker
+                    label="To"
+                    value={activityDateTo}
+                    onChange={(newValue) => {
+                      setActivityDateTo(newValue);
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </div>
+      </LocalizationProvider> 
+      <div style={{ position: "relative", top: "5px",bottom :"20px" }}>
+      <Stack spacing={2} direction="row">
+      <Button
+         variant="contained"
+         onClick ={filterDate}
+         size="large"
+      > Show the activities for this period </Button>
+       <Button
+      variant="contained"
+         onClick ={filterApproved}
+      >Show Approved Activities Only</Button>
+      </Stack>
+      </div>
+    </div>
+  
+      
+   
+      
+      <div style={{ position: "relative", left: "45%", top: "35px" }}>
+      {showAllActivitiesButton && <Button
+      variant="contained"
+      onClick ={showAllActivities}
+      >Show all The activities</Button>}
+      </div> 
+      
+      {showPayButton && <Button
+      variant="contained"
+      color="success"
+      onClick ={markPaid}>
+        Mark as Paid
+      </Button>}
+     
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          height: "100px",
+        }}
+      ></div>
+
+    </Paper> 
+    
       <div className="DataGridBox">
         <DataGrid
-          rows={othersActivities}
+          rows={desplayActivities}
           columns={othersActivitiesColumns}
           pageSize={10}
           rowsPerPageOptions={[10]}
           autoPageSize
           autoHeight
           // checkboxSelection
-          hideFooterSelectedRowCount
+          components={{ Toolbar: GridToolbar }}
+          FooterSelectedRowCount
           loading={!activitiesLoaded}
         />
       </div>
+  
+      
+      
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}
