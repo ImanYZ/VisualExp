@@ -48,37 +48,7 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
       >
         {children}
 
-        <FeedbackTooltip
-          open={showFeedbackForm}
-          placement="top-start"
-          title={
-            <ClickAwayListener onClickAway={() => setShowFeedbackForm(false)}>
-              <Feedback onSuccessFeedback={() => setShowFeedbackForm(false)} sx={{ padding: "40px 50px" }} />
-            </ClickAwayListener>
-          }
-          sx={{ display: { xs: "none", md: "block" } }}
-        >
-          <Fab
-            aria-label="Open Feedback"
-            onClick={() => setShowFeedbackForm(true)}
-            color="primary"
-            sx={{
-              color: theme => theme.palette.common.white,
-              float: "right",
-              display: { xs: "none", md: "flex" },
-              position: "sticky",
-              margin: "28px 30px",
-              bottom: "28px",
-              right: "0px"
-            }}
-          >
-            <Tooltip title={"Question/Feedback"} placement="top">
-              <QuestionMarkIcon />
-            </Tooltip>
-          </Fab>
-        </FeedbackTooltip>
-
-        {/* feedback mobil */}
+        {/* mobil feedback */}
         {showMobileFeedbackForm && (
           <Box
             sx={{
@@ -117,7 +87,39 @@ const PagesNavbar: FC<Props> = ({ children, title, description, showSearch }) =>
           </Box>
         )}
       </Box>
+
       <AppFooter />
+
+      {/* pc feedback */}
+
+      <FeedbackTooltip
+        open={showFeedbackForm}
+        placement="top-start"
+        title={
+          <ClickAwayListener onClickAway={() => setShowFeedbackForm(false)}>
+            <Feedback onSuccessFeedback={() => setShowFeedbackForm(false)} sx={{ padding: "40px 50px" }} />
+          </ClickAwayListener>
+        }
+        sx={{ display: { xs: "none", md: "block" } }}
+      >
+        <Fab
+          aria-label="Open Feedback"
+          onClick={() => setShowFeedbackForm(true)}
+          color="primary"
+          sx={{
+            color: theme => theme.palette.common.white,
+            float: "right",
+            display: { xs: "none", md: "flex" },
+            position: "fixed",
+            bottom: "28px",
+            right: "30px"
+          }}
+        >
+          <Tooltip title={"Question/Feedback"} placement="top">
+            <QuestionMarkIcon />
+          </Tooltip>
+        </Fab>
+      </FeedbackTooltip>
     </>
   );
 };
