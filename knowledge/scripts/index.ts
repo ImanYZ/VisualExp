@@ -6,12 +6,12 @@ import { getNodeReferences } from "./helper";
 import indexCollection from "./populateIndex";
 
 const getUsersFromFirestore = async () => {
-  let users: { name: string; username: string; imageUrl: string }[] = [];
+  let users: { name: string; username: string; imageUrl: string; id: string }[] = [];
   const usersDocs = await db.collection("users").get();
   for (let userDoc of usersDocs.docs) {
     const userData = userDoc.data();
     const name = `${userData.fName || ""} ${userData.lName || ""}`;
-    users.push({ name, username: userDoc.id, imageUrl: userData.imageUrl });
+    users.push({ name, username: userDoc.id, imageUrl: userData.imageUrl, id: userDoc.id });
   }
   return users;
 };
@@ -20,21 +20,8 @@ const getInstitutionsFirestore = async () => {
   const institutionDocs = await db.collection("institutions").get();
   return institutionDocs.docs.map(institutionDoc => {
     const institutionData = institutionDoc.data();
-    const institutionName: string = institutionData.name || "";
-    return { id: institutionDoc.id, name: institutionName };
+    return { id: institutionDoc.id, name: institutionData.name || "", logoURL: institutionData.logoURL || "" };
   });
-};
-
-const getTagsFirestore = async () => {
-  let tags: string[] = [];
-  const tagDocs = await db.collection("nodes").where("isTag", "==", true).get();
-  for (let tagDoc of tagDocs.docs) {
-    const tagData = tagDoc.data();
-    tags = Array.from(new Set([...tags, tagData.title]));
-  }
-  const tagsObjArr = tags.map((el: string) => ({ name: el }));
-
-  return tagsObjArr;
 };
 
 const getNodeTags = (nodeData: NodeFireStore) => {
@@ -57,69 +44,13 @@ const getNodeTags = (nodeData: NodeFireStore) => {
   return tags;
 };
 
-const getInstitutionsName = (nodeData: NodeFireStore) => {
-  const institutions: string[] = [];
-  const institObjs = Object.keys(nodeData.institutions || {});
-
-  for (let name of institObjs) {
-    institutions.push(name);
-  }
-
-  return institutions;
-};
-
-const getContributorsName = (nodeData: NodeFireStore): string[] => {
-  const contributorsNodes = Object.entries(nodeData.contributors || {});
-
-  const contributors = contributorsNodes.map(el => el[0]);
-  return contributors;
-};
-
-// const getInstitutionByName = async (name: string) => {
-//   const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
-//   const institutionDoc = institutionDocs.docs[0];
-//   if (!institutionDoc) { return null }
-//   return institutionDoc.id
-// }
-
 const getNodesData = (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>
 ): TypesenseNodesSchema[] => {
-  const getContributorsFromNode = (nodeData: NodeFireStore) => {
-    return Object.entries(nodeData.contributors || {})
-      .map(
-        cur =>
-          ({ ...cur[1], username: cur[0] } as {
-            fullname: string;
-            imageUrl: string;
-            reputation: number;
-            username: string;
-          })
-      )
-      .sort((a, b) => (b.reputation = a.reputation))
-      .map(contributor => ({
-        fullName: contributor.fullname,
-        imageUrl: contributor.imageUrl,
-        username: contributor.username
-      }));
-  };
-
-  const getInstitutionsFromNode = (nodeData: NodeFireStore) => {
-    return Object.entries(nodeData.institutions || {})
-      .map(cur => ({ name: cur[0], reputation: cur[1].reputation || 0 }))
-      .sort((a, b) => b.reputation - a.reputation)
-      .map(institution => ({ name: institution.name }));
-  };
-
   return nodeDocs.docs.map((nodeDoc): TypesenseNodesSchema => {
     const nodeData = nodeDoc.data() as NodeFireStore;
-    const contributors = getContributorsFromNode(nodeData);
-    const contributorsNames = getContributorsName(nodeData);
-    const institutions = getInstitutionsFromNode(nodeData);
-    const institutionsNames = getInstitutionsName(nodeData);
     const tags = getNodeTags(nodeData);
     const references = getNodeReferences(nodeData);
-
     const titlesReferences = references.map(cur => cur.title || "").filter(cur => cur);
     const labelsReferences = references.map(cur => cur.label).filter(cur => cur);
 
@@ -128,16 +59,15 @@ const getNodesData = (
       changedAtMillis: nodeData.changedAt?.toMillis() || 0,
       choices: nodeData.choices,
       content: nodeData.content || "",
-      contributors,
-      contributorsNames,
+      contribNames: nodeData.contribNames || [],
+      institNames: nodeData.institNames || [],
       corrects: nodeData.corrects || 0,
       mostHelpful: (nodeData.corrects || 0) - (nodeData.wrongs || 0),
       id: nodeDoc.id,
-      institutions,
-      institutionsNames,
       labelsReferences,
       nodeImage: nodeData.nodeImage,
       nodeType: nodeData.nodeType,
+      isTag: nodeData.isTag || false,
       tags,
       title: nodeData.title || "",
       titlesReferences,
@@ -148,8 +78,6 @@ const getNodesData = (
 };
 
 const getReferencesData = (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>) => {
-  // const nodeDocs = await db.collection("nodes").get();
-
   const references = nodeDocs.docs
     .map(nodeDoc => {
       const nodeData = nodeDoc.data() as NodeFireStore;
@@ -195,34 +123,26 @@ const fillUsersIndex = async (forceReIndex?: boolean) => {
   await indexCollection("users", fields, data, forceReIndex);
 };
 
-const fillTagsIndex = async (forceReIndex?: boolean) => {
-  const data = await getTagsFirestore();
-  const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
-
-  await indexCollection("tags", fields, data, forceReIndex);
-};
-
 const fillNodesIndex = async (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
   forceReIndex?: boolean
 ) => {
-  // const nodeDocs = await db.collection("nodes").get();
-
   const data = getNodesData(nodeDocs);
   const fields: CollectionFieldSchema[] = [
     { name: "changedAtMillis", type: "int64" },
     { name: "content", type: "string" },
-    { name: "contributorsNames", type: "string[]" },
+    { name: "contribNames", type: "string[]" },
     { name: "mostHelpful", type: "int32" },
     { name: "corrects", type: "int32" },
+    { name: "wrongs", type: "int32" },
     { name: "labelsReferences", type: "string[]" },
-    { name: "institutionsNames", type: "string[]" },
+    { name: "institNames", type: "string[]" },
     { name: "nodeType", type: "string" },
     { name: "tags", type: "string[]" },
     { name: "title", type: "string" },
-    { name: "titlesReferences", type: "string[]" }
+    { name: "titlesReferences", type: "string[]" },
+    { name: "isTag", type: "bool" }
   ];
-
   await indexCollection("nodes", fields, data, forceReIndex);
 };
 
@@ -240,11 +160,10 @@ const fillReferencesIndex = async (
 };
 
 const main = async () => {
-  const nodeDocs = await db.collection("nodes").get();
+  const nodeDocs = await db.collection("nodes").limit(500).get();
 
-  await fillUsersIndex();
-  await fillInstitutionsIndex();
-  await fillTagsIndex();
+  await fillUsersIndex(true);
+  await fillInstitutionsIndex(true);
   await fillNodesIndex(nodeDocs, true);
   await fillReferencesIndex(nodeDocs, true);
 };
