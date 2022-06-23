@@ -24,7 +24,7 @@ import { firebaseState } from "../../store/AuthAtoms";
 
 import Timer from "./Timer";
 
-import { uuidv4 } from "../../utils/utils";
+import { uuidv4 } from "../../utils";
 
 import "./LifeLogger.css";
 

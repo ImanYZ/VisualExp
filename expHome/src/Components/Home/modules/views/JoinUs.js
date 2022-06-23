@@ -29,7 +29,7 @@ import Button from "../components/Button";
 import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
 
-import { isValidHttpUrl } from "../../../../utils/utils";
+import { isValidHttpUrl } from "../../../../utils";
 
 import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(
