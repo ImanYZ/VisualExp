@@ -56,7 +56,8 @@ export const NodeItemFull: FC<Props> = ({ node, contributors, references, tags }
             component="div"
             sx={{
               color: theme => theme.palette.common.black,
-              lineHeight: 2
+              lineHeight: 2,
+              fontSize: "1.2rem"
             }}
           >
             <MarkdownRender text={node.content || ""} />
