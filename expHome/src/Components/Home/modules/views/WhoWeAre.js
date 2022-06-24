@@ -327,7 +327,7 @@ const WhoWeAre = (props) => {
                   />
                 </ListItemAvatar>
                 <ListItemText
-                  primary="1Cademy Architect & Developer"
+                  primary="1Cademy Architect"
                   secondary={
                     <React.Fragment>
                       <Typography
