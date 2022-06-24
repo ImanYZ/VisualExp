@@ -21,7 +21,7 @@ const getInstitutionsFirestore = async () => {
   return institutionDocs.docs.map(institutionDoc => {
     const institutionData = institutionDoc.data();
     const institutionName: string = institutionData.name || "";
-    return { id: institutionDoc.id, name: institutionName };
+    return { id: institutionDoc.id, name: institutionName, logoURL: institutionData.logoURL };
   });
 };
 
