@@ -2,27 +2,35 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import axios from "axios";
-import { ResponsiveCalendar } from "@nivo/calendar";
 
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import Chip from "@mui/material/Chip";
 import Autocomplete from "@mui/material/Autocomplete";
 import Tooltip from "@mui/material/Tooltip";
-import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Grid from "@mui/material/Grid";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
 
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import CalendarPicker from "@mui/x-date-pickers";
-import TimePicker from "@mui/lab/TimePicker";
 import DatePicker from "@mui/lab/DatePicker";
+
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 
 import { firebaseState } from "../../../store/AuthAtoms";
 
@@ -45,6 +53,7 @@ import {
   CalendarVisualizationAlert,
   IntellectualActivitiesAlert,
 } from "./Alerts";
+
 import "./IntellectualPoints.css";
 
 const othersActivitiesColumns = [
@@ -69,9 +78,20 @@ const othersActivitiesColumns = [
       return `${params.value} 👍`;
     },
   },
-  { field: "approved", headerName: "approved", width: 190 },
-  { field: "paid", headerName: "Paid", width: 190 },
+  { field: "approved", headerName: "Approved", width: 100 },
+  { field: "paid", headerName: "Paid", width: 70 },
 ];
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const ExpenseReports = (props) => {
   const firebase = useRecoilValue(firebaseState);
@@ -79,7 +99,6 @@ const ExpenseReports = (props) => {
   const [othersActivities, setOthersActivities] = useRecoilState(
     othersActivitiesState
   );
-  const [displayActivities, setDisplayActivities] = useState([]);
 
   const [activitiesChanges, setActivitiesChanges] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -87,15 +106,17 @@ const ExpenseReports = (props) => {
   const [activitiesLoaded, setActivitiesLoaded] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const [clear, setClear] = useState(false);
-  const [showPayButton, setShowPayButton] = useState(false);
-  const [showAllActivitiesButton, setShowAllActivitiesButton] = useState(false);
-  const [pay, setPay] = useState(0);
-
+  const [shownActivities, setShownActivities] = useState([]);
+  const [amount, setAmount] = useState(0);
+  const [researchers, setResearchers] = useState([]);
+  const [onlyResearchers, setOnlyResearchers] = useState([]);
+  const [researcherActivities, setResearcherActivities] = useState([]);
   const [activityDateFrom, setActivityDateFrom] = useState(null);
   const [activityDateTo, setActivityDateTo] = useState(null);
-  const [onlyAproved, setOnlyAproved] = useState(false);
-  const [onlyPaid, setOnlyPaid] = useState(false);
+  const [onlyApproved, setOnlyApproved] = useState(false);
+  const [onlyUnpaid, setOnlyUnpaid] = useState(false);
+  const [showAll, setShowAll] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (firebase && project) {
@@ -119,7 +140,7 @@ const ExpenseReports = (props) => {
         activitiesSnapshot();
       };
     }
-  }, [firebase, project, clear]);
+  }, [firebase, project]);
 
   useEffect(() => {
     if (firebase && project && activitiesLoaded) {
@@ -140,7 +161,7 @@ const ExpenseReports = (props) => {
         votesSnapshot();
       };
     }
-  }, [firebase, project, activitiesLoaded, clear]);
+  }, [firebase, project, activitiesLoaded]);
 
   useEffect(() => {
     console.log("activitiesChanges");
@@ -149,6 +170,7 @@ const ExpenseReports = (props) => {
       setActivitiesChanges([]);
 
       let oActivities = [...othersActivities];
+      const oResearchers = [...researchers];
       for (let change of tempActivitiesChanges) {
         if (change.type === "removed") {
           oActivities = oActivities.filter((acti) => acti.id !== change.doc.id);
@@ -161,10 +183,10 @@ const ExpenseReports = (props) => {
           if (activityDateTo && activityData.start > activityDateTo) {
             isIncluded = false;
           }
-          if (onlyAproved && !activityData.approved) {
+          if (onlyApproved && !activityData.approved) {
             isIncluded = false;
           }
-          if (onlyPaid && !activityData.paid) {
+          if (onlyUnpaid && !activityData.paid) {
             isIncluded = false;
           }
           const newActivity = {
@@ -191,9 +213,14 @@ const ExpenseReports = (props) => {
               approved: "◻",
             });
           }
+          if (!oResearchers.includes(activityData.fullname)) {
+            oResearchers.push(activityData.fullname);
+          }
         }
       }
       setOthersActivities(oActivities);
+      setResearchers(oResearchers);
+      setOnlyResearchers(oResearchers);
     }
     if (votesChanges.length > 0) {
       const tempVotesChanges = [...votesChanges];
@@ -231,159 +258,241 @@ const ExpenseReports = (props) => {
     }
   }, [
     othersActivities,
+    researchers,
     activitiesChanges,
     votesChanges,
     project,
     activityDateFrom,
     activityDateTo,
-    onlyAproved,
-    onlyPaid,
+    onlyApproved,
+    onlyUnpaid,
   ]);
 
   useEffect(() => {
-    const oActivities = othersActivities.map((oActi) => oActi.isIncluded);
-    setDisplayActivities(oActivities);
-  }, [othersActivities]);
-
-  const filterDate = () => {
-    let oActivities = [];
-    for (let act of displayActivities) {
-      if (act.start >= activityDateFrom && act.start <= activityDateTo) {
-        oActivities.push({ ...act });
+    const rActivities = {};
+    const oActivities = [];
+    for (let oActivity of othersActivities) {
+      if (
+        (onlyResearchers.length === researchers.length ||
+          onlyResearchers.includes(oActivity.fullname)) &&
+        (!onlyApproved || oActivity.approved === "✅") &&
+        (!onlyUnpaid || oActivity.paid === "") &&
+        (!activityDateFrom || oActivity.start >= activityDateFrom) &&
+        (!activityDateTo || oActivity.start <= activityDateTo)
+      ) {
+        oActivities.push(oActivity);
+        if (oActivity.fullname in rActivities) {
+          rActivities[oActivity.fullname] += 1;
+        } else {
+          rActivities[oActivity.fullname] = 1;
+        }
       }
     }
-    setDisplayActivities(oActivities);
-    setShowPayButton(true);
-    setShowAllActivitiesButton(true);
-  };
+    setResearcherActivities(
+      Object.keys(rActivities).map((researcher) => ({
+        researcher,
+        num: rActivities[researcher],
+      }))
+    );
+    setShownActivities(oActivities);
+    setAmount(oActivities.length * 10);
+    if (
+      onlyResearchers.length !== researchers.length ||
+      onlyApproved ||
+      onlyUnpaid ||
+      activityDateFrom ||
+      activityDateTo
+    ) {
+      setShowAll(false);
+    }
+  }, [
+    othersActivities,
+    onlyResearchers,
+    researchers,
+    onlyApproved,
+    onlyUnpaid,
+    activityDateFrom,
+    activityDateTo,
+  ]);
 
   const markPaid = async () => {
-    let oActivities = [];
-    for (let act of displayActivities) {
-      oActivities.push({ ...act, paid: "PAID" });
-      const ActivitiesRef = firebase.db.collection("activities").doc(act.id);
-      const actDoc = await firebase.db
-        .collection("activities")
-        .doc(act.id)
-        .get();
-
-      const actData = actDoc.data();
-      console.log({ ...actData, paid: true });
-      ActivitiesRef.set({ ...actData, paid: true });
-      console.log(act.id);
+    if (!isSubmitting) {
+      try {
+        setIsSubmitting(true);
+        await firebase.idToken();
+        await axios.post("/markPaid", { activities: shownActivities });
+        setSnackbarMessage("You successfully marked these activities as paid!");
+        setIsSubmitting(false);
+      } catch (err) {
+        setSnackbarMessage(
+          "Your request was not successfully saved! Please try again!"
+        );
+      }
     }
-    setPay(pay + oActivities.length * 20);
-    console.log(oActivities);
-    setDisplayActivities(oActivities);
-    setShowPayButton(false);
   };
-  const showAllActivities = () => {
-    setDisplayActivities(othersActivities);
-    setShowPayButton(false);
-    setShowAllActivitiesButton(false);
+
+  const handleOnlyResearchers = (event) => {
+    const {
+      target: { value },
+    } = event;
+    // On autofill we get a stringified value.
+    const oResearchers = typeof value === "string" ? value.split(",") : value;
+    setOnlyResearchers(oResearchers);
   };
 
   const handleOnlyApproved = (event) => {
-    setOnlyAproved(event.target.checked);
-    let oActivities = [];
-    for (let act of othersActivities) {
-      if (
-        event.target.checked &&
-        act.approved === "✅" &&
-        !event.target.checked &&
-        act.approved === "◻"
-      ) {
-        oActivities.push({ ...act });
-      }
+    setOnlyApproved(event.target.checked);
+  };
+
+  const handleOnlyUnpaid = (event) => {
+    setOnlyUnpaid(event.target.checked);
+  };
+
+  const handleShowAll = (event) => {
+    if (event.target.checked) {
+      setActivityDateFrom(null);
+      setActivityDateTo(null);
+      setOnlyApproved(false);
+      setOnlyUnpaid(false);
+      setOnlyResearchers(researchers);
+      setShowAll(true);
     }
-    setDisplayActivities(oActivities);
-    setShowPayButton(true);
-    setShowAllActivitiesButton(true);
+  };
+
+  const handleActivityDateFrom = (newValue) => {
+    setActivityDateFrom(newValue);
+    const oActivities = [];
+  };
+
+  const handleActivityDateTo = (newValue) => {
+    setActivityDateTo(newValue);
   };
 
   return (
     <>
-      <h2>Activities:</h2>
-      <Paper>
-        <div style={{ align: "center" }}>
+      <h2 style={{ marginTop: "25px" }}>Researcher Activities & Expenses</h2>
+      <Paper sx={{ m: "13px", p: "19px 19px 0px 19px" }}>
+        <Stack direction="row" spacing={2}>
+          <FormControl sx={{ width: 280 }}>
+            <InputLabel id="multiple-researcher-label">
+              Researcher(s)
+            </InputLabel>
+            <Select
+              labelId="multiple-researcher-label"
+              id="multiple-researcher"
+              multiple
+              value={onlyResearchers}
+              onChange={handleOnlyResearchers}
+              input={<OutlinedInput label="Researcher(s)" />}
+              MenuProps={MenuProps}
+            >
+              {researchers.map((researcher) => (
+                <MenuItem key={researcher} value={researcher}>
+                  {researcher}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="ActivityDateTimePicker">
-              <DatePicker
-                label="from"
-                value={activityDateFrom}
-                onChange={(newValue) => {
-                  setActivityDateFrom(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </div>
+            <DatePicker
+              label="Activities Since"
+              value={activityDateFrom}
+              onChange={handleActivityDateFrom}
+              renderInput={(params) => <TextField {...params} />}
+            />
           </LocalizationProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <div className="ActivityDateTimePicker">
-              <DatePicker
-                label="To"
-                value={activityDateTo}
-                onChange={(newValue) => {
-                  setActivityDateTo(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </div>
+            <DatePicker
+              label="Activities Until"
+              value={activityDateTo}
+              onChange={handleActivityDateTo}
+              renderInput={(params) => <TextField {...params} />}
+            />
           </LocalizationProvider>
-          <Switch
-            checked={onlyAproved}
-            onChange={handleOnlyApproved}
-            inputProps={{ "aria-label": "Change Only Approved Filter" }}
+        </Stack>
+        <FormGroup sx={{ m: "10px 10px 0px 10px" }} row>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={onlyApproved}
+                onChange={handleOnlyApproved}
+                inputProps={{ "aria-label": "Change only approved filter" }}
+              />
+            }
+            label="Only Approved"
           />
-
-          <div style={{ position: "relative", top: "5px", bottom: "20px" }}>
-            <Stack spacing={2} direction="row">
-              <Button variant="contained" onClick={filterDate} size="large">
-                {" "}
-                Show the activities for this period{" "}
-              </Button>
-            </Stack>
-          </div>
-        </div>
-
-        <div style={{ position: "relative", left: "45%", top: "35px" }}>
-          {showAllActivitiesButton && (
-            <Button variant="contained" onClick={showAllActivities}>
-              Show all The activities
-            </Button>
-          )}
-        </div>
-
-        {showPayButton && (
-          <Button variant="contained" color="success" onClick={markPaid}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={onlyUnpaid}
+                onChange={handleOnlyUnpaid}
+                inputProps={{ "aria-label": "Switch only unpaid filter" }}
+              />
+            }
+            label="Only Unpaid"
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={showAll}
+                onChange={handleShowAll}
+                inputProps={{ "aria-label": "Clear all filters" }}
+              />
+            }
+            label="Show All"
+          />
+        </FormGroup>
+        <Table sx={{ m: "25px 0px 0px 0px", width: 550 }} aria-label="Expenses">
+          <TableBody>
+            {researcherActivities.map((rObj) => {
+              return (
+                <TableRow key={rObj.researcher}>
+                  <TableCell>{rObj.researcher}</TableCell>
+                  <TableCell>
+                    {(rObj.num / 2).toLocaleString()} hrs x $20
+                  </TableCell>
+                  <TableCell>= ${(rObj.num * 10).toLocaleString()}</TableCell>
+                </TableRow>
+              );
+            })}
+            <TableRow>
+              <TableCell sx={{ fontSize: "19px" }}>Total</TableCell>
+              <TableCell sx={{ fontSize: "19px" }}>
+                {(shownActivities.length / 2).toLocaleString()} hrs x $20
+              </TableCell>
+              <TableCell sx={{ fontSize: "19px" }}>
+                = ${amount.toLocaleString()}
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        <Box sx={{ position: "relative", left: 610, top: -55 }}>
+          <LoadingButton
+            variant="contained"
+            size="large"
+            onClick={markPaid}
+            loading={isSubmitting}
+            loadingPosition="end"
+            endIcon={<AttachMoneyIcon />}
+          >
             Mark as Paid
-          </Button>
-        )}
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            height: "100px",
-          }}
-        ></div>
+          </LoadingButton>
+        </Box>
       </Paper>
-
-      <Box sx={{ mb: "40px" }}>
+      <Paper sx={{ m: "13px 13px 40px 13px", p: "19px" }}>
         <DataGrid
-          rows={displayActivities}
+          rows={shownActivities}
           columns={othersActivitiesColumns}
           pageSize={10}
           rowsPerPageOptions={[10]}
           autoPageSize
           autoHeight
           // checkboxSelection
-          components={{ Toolbar: GridToolbar }}
+          // components={{ Toolbar: GridToolbar }}
           FooterSelectedRowCount
           loading={!activitiesLoaded}
         />
-      </Box>
-
+      </Paper>
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}
