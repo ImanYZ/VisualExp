@@ -266,18 +266,18 @@ export default [
     width: "50%",
     leaders: [
       {
-        name: "Victoria Mulligan",
-        image: "Victoria_Mulligan.jpg",
-        about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
+        name: "Liza Shokhrin",
+        image: "Liza_Shokhrin.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
+            url: "https://www.linkedin.com/in/elisaveta-liza-shokhrin-0066251bb/",
           },
         ],
       },
     ],
-    YouTube: "K5R17uFWINo",
+    YouTube: "M4Xkm0vD7uk",
     description: `The Clinical Psychology community explores research related to mental illness/disorders, mental health treatment, and psychopathology of individuals across the lifespan. Clinical psychology is interdisciplinary and can intersect with various fields such as neuroscience, cognitive psychology, and social psychology. We encourage interns to dive into research that they have particular interest in (e.g., child psychopathology), share their findings, and collaborate with other interns. This internship is designed to motivate independent research, gain research skills such as analysis and interpretation, and work towards conducting research.
     1Cademy allows interns to present their research findings, gain feedback from other interns, and learn how to communicate their findings in a concise and articulate manner.`,
     accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of clinical psychology and strengthen research skills to prepare for a future in the clinical psychology field.`,
@@ -531,7 +531,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Social_Psychology.jpg",
     title: "Behavioral Economics & Social Psychology",
-    width: "50%",
+    width: "34%",
     leaders: [
       {
         name: "Alex Nikolaidis Konstas",
@@ -584,6 +584,69 @@ export default [
     ],
   },
   {
+    id: "UI_Design",
+    tags: [
+      {
+        title: "Design Science",
+        node: "y1GorOIkFb255Oiqm9k3",
+      },
+      {
+        title: "User Interface Design",
+        node: "1wyXrpreH942fh2MfnEd",
+      },
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/UI_Design.jpg",
+    title: "UI Design",
+    width: "35%",
+    leaders: [
+      {
+        name: "Shannon Kenny",
+        image: "Shannon_Kenny.jpeg",
+        about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/shannon-kenny/",
+          },
+        ],
+      },
+    ],
+    YouTube: "auTcD8jLHwU",
+    description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
+    accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
+    sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
+    We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
+    gains: [
+      `Gain user interface prototyping/design experience.`,
+      `Gain experience collaborating with an interdisciplinary group of people.`,
+      `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
+      `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
+      `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
+      `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
+      `Successful interns would continue with taking leadership roles.`,
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
+    portfolio: true,
+    qualifications: [
+      `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
+      `Instinct and intuition for good UI design.`,
+      `Experience creating and prototyping UI designs (using Figma).`,
+      `Understanding of key graphic design principles.`,
+      `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
+      `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`,
+    ],
+    responsibilities: [
+      `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
+      `Provide input on any/all UI designs/mockups.`,
+      `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
+      `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
+      `Attend weekly meetings.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
+    ],
+  },
+  {
     id: "Deep_Learning",
     tags: [
       {
@@ -599,7 +662,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Deep Learning",
-    width: "50%",
+    width: "31%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -1300,70 +1363,6 @@ export default [
   //     `All interactions, task fulfillment, and communications will be remote.`,
   //   ],
   // },
-  // {
-  //   id: "UI_Design",
-  //   tags: [
-  //     {
-  //       title: "Design Science",
-  //       node: "y1GorOIkFb255Oiqm9k3",
-  //     },
-  //     {
-  //       title: "User Interface Design",
-  //       node: "1wyXrpreH942fh2MfnEd",
-  //     },
-  //   ],
-  //   allTime: [],
-  //   weekly: [],
-  //   url: "/static/Communities/UI_Design.jpg",
-  //   title: "UI Design",
-  //   width: "35%",
-  //   leaders: [
-  //     {
-  //       name: "Shannon Kenny",
-  //       image: "Shannon_Kenny.jpeg",
-  //       about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
-  //       websites: [
-  //         {
-  //           name: "LinkedIn",
-  //           url: "https://www.linkedin.com/in/shannon-kenny/",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  //   YouTube: "3JZnwTXEq0g",
-  //   description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
-  //   accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
-  //   sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
-  //   We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
-  //   gains: [
-  //     `Gain user interface prototyping/design experience.`,
-  //     `Gain experience collaborating with an interdisciplinary group of people.`,
-  //     `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
-  //     `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
-  //     `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
-  //     `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
-  //     `Successful interns would continue with taking leadership roles.`,
-  //   ],
-  //   requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
-  //   portfolio: true,
-  //   qualifications: [
-  //     `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
-  //     `Instinct and intuition for good UI design.`,
-  //     `Experience creating and prototyping UI designs (using Figma).`,
-  //     `Understanding of key graphic design principles.`,
-  //     `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
-  //     `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`,
-  //   ],
-  //   responsibilities: [
-  //     `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
-  //     `Provide input on any/all UI designs/mockups.`,
-  //     `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
-  //     `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
-  //     `Attend weekly meetings.`,
-  //     `All interactions, task fulfillment, and communications will be remote.`,
-  //   ],
-  // },
-  // {
   //   id: "UX_Research",
   //   tags: [
   //     {
