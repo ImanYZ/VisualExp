@@ -37,7 +37,7 @@ export const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoad
 
   return (
     <Box sx={{ ...sx }}>
-      <Masonry sx={{ my: 4 }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
+      <Masonry sx={{ my: 4, mx: { md: "0px" } }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
         {isLoading && renderLoadingSkeletons()}
         {!isLoading && nodes.map((el: any) => <NodeItem key={el.id} node={el} />)}
       </Masonry>
