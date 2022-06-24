@@ -82,9 +82,7 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
             <input
               {...params.inputProps}
               value={text}
-              onChange={e => {
-                setText(e.target.value);
-              }}
+              onChange={e => setText(e.target.value)}
               placeholder="What do you want to learn today?"
               className="home-search-input"
             />

@@ -82,8 +82,22 @@ const FreeRecallGrading = (props) => {
         .where("researchersNum", "<", 4)
         .limit(1000)
         .get();
+
+      if(recallGradeDocs.docs.length === 0) {
+          setUser(null);
+          setCondition(null);
+          setPassage(null);
+          setPassageIdx(null);
+          setPassageId(null);
+          setPhrase(null);
+          setPhraseNum(null);
+          setSession(null);
+          setResponse(null);
+        return;
+      }
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
+
         if (
           recallGradeData.user !== fullname &&
           (recallGradeData.researchersNum === 0 ||
@@ -156,12 +170,12 @@ const FreeRecallGrading = (props) => {
         }
       }
     };
-    if (firebase && !notAResearcher) {
+    if (firebase && !notAResearcher && project) {
       retrieveFreeRecallResponse();
     }
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase, notAResearcher, retrieveNext]);
+  }, [project, firebase, notAResearcher, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they

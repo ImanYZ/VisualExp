@@ -30,7 +30,7 @@ export default function AppFooter() {
       <Container
         sx={{
           maxWidth: { xs: "207px", md: "700px", lg: "1058px" },
-          height: { xs: "391px", md: "110px" },
+          height: { xs: "391px", md: "136px" },
           p: "0px",
           display: "flex",
           alignItems: "center",
@@ -42,7 +42,7 @@ export default function AppFooter() {
           <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
             <NextImage src={logo1cademy} width="147px"></NextImage>
           </Box>
-          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, my: "30px" }}>
+          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, mt: "5px", mb: "30px" }}>
             <IconButton
               rel="noreferrer"
               aria-label="Open Youtube channel"

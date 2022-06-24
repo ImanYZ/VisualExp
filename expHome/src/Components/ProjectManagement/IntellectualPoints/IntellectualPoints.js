@@ -42,8 +42,8 @@ import {
   ActivityInfoAlert,
   ActivityInstructionsAlert,
   CalendarVisualizationAlert,
-  IntellectualActivitiesAlert
-} from './Alerts';
+  IntellectualActivitiesAlert,
+} from "./Alerts";
 import "./IntellectualPoints.css";
 
 const othersActivitiesColumns = [
@@ -311,7 +311,7 @@ const IntellectualPoints = (props) => {
           console.log("Transaction failure:", err);
           window.alert(
             "You did not get today's point for 25 upvotes on others' activities. Copy the text of this complete message to Iman on Microsoft Teams. Do not take a screenshot. The error message is: " +
-            err
+              err
           );
         }
       }
@@ -810,9 +810,7 @@ const IntellectualPoints = (props) => {
               </Tooltip>
             </div>
           </Paper>
-        ) : (
-          null
-        )}
+        ) : null}
       </div>
       <div className="DataGridBox">
         <DataGrid
@@ -918,7 +916,7 @@ const IntellectualPoints = (props) => {
                     {...params}
                     variant="standard"
                     label="Tags (without dots or slashes!)"
-                  // placeholder="Tags"
+                    // placeholder="Tags"
                   />
                 )}
               />
@@ -968,7 +966,6 @@ const IntellectualPoints = (props) => {
           />
         </div>
       </>
-      // )}
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}
