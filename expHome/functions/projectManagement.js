@@ -262,6 +262,42 @@ exports.voteActivityReset = async (req, res) => {
   }
 };
 
+exports.markPaidEndpoint = async (req, res) => {
+  try {
+    const activities = req.body.activities;
+    if (activities) {
+      const authUser = await admin
+        .auth()
+        .verifyIdToken(req.headers.authorization);
+      const userDocs = await db
+        .collection("users")
+        .where("uid", "==", authUser.uid)
+        .limit(1)
+        .get();
+      if (userDocs.docs.length > 0) {
+        const researcherDoc = await db
+          .collection("researchers")
+          .doc(userDocs.docs[0].id)
+          .get();
+        if (researcherDoc.exists) {
+          const researcherData = researcherDoc.data();
+          if (researcherData.isAdmin) {
+            for (let acti of activities) {
+              const activityRef = db.collection("activities").doc(acti.id);
+              await batchUpdate(activityRef, { paid: true });
+            }
+            await commitBatch();
+          }
+        }
+      }
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};
+
 exports.deleteActivity = async (req, res) => {
   try {
     const activity = req.body.activity;
