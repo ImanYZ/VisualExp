@@ -602,13 +602,13 @@ export default [
     width: "35%",
     leaders: [
       {
-        name: "Shannon Kenny",
-        image: "Shannon_Kenny.jpeg",
-        about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
+        name: "Ember Shan",
+        image: "Ember Shan.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/shannon-kenny/",
+            url: "https://www.linkedin.com/in/ember-shan-9b6156194/",
           },
         ],
       },
