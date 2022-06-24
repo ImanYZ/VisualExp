@@ -47,6 +47,7 @@ const {
 const {
   assignNodeContributorsInstitutionsStats,
   updateInstitutions,
+  updateTypesenseIndex,
 } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
@@ -163,3 +164,11 @@ exports.updateInstitutions = functions
   })
   .pubsub.schedule("every 25 hours")
   .onRun(updateInstitutions);
+
+exports.updateTypesenseIndex = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520,
+  })
+  .pubsub.schedule("every 10 minutes")
+  .onRun(updateTypesenseIndex);

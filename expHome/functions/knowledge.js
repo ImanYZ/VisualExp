@@ -364,7 +364,7 @@ exports.updateInstitutions = async (context) => {
 // This function should run periodically to update the typesense index and keep the data updated in Typesense.
 // A better option is to create firebase functions to trigger on write requests on the collections.
 // We cannot do that currently. So this function is our best option for the moment.
-exports.updateTypesenseIndex = async () => {
+exports.updateTypesenseIndex = async (context) => {
   try {
     await typesenseIndex();
     return null;
