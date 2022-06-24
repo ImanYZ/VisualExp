@@ -7,5 +7,12 @@
     "@typescript-eslint/no-unused-vars": ["error"],
     "react/no-unescaped-entities": 0
   },
-  "plugins": ["simple-import-sort", "@typescript-eslint"]
+  "plugins": ["simple-import-sort", "@typescript-eslint", "testing-library"],
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "excludedFiles": ["cypress/**/*.[jt]s?(x)"],
+      "extends": ["plugin:testing-library/react"]
+    }
+  ]
 }

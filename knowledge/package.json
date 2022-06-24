@@ -18,7 +18,9 @@
     "compileScripts": "cd scripts && tsc",
     "runScripts": "cd scripts/dist/scripts && node index.js",
     "cy:run": "cypress run",
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "test": "jest --watch",
+    "test:ci": "jest --ci"
   },
   "author": "Iman YeckehZaare",
   "license": "Apache-2.0",
@@ -64,9 +66,13 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.10.0",
     "@testing-library/cypress": "^8.0.3",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^14.2.1",
     "@types/geoip-lite": "^1.4.1",
-    "@types/node": "17.0.35",
+    "@types/node": "14.18.13",
     "@types/react": "18.0.9",
     "@types/react-dom": "18.0.4",
     "@types/react-syntax-highlighter": "^15.5.1",
@@ -75,8 +81,11 @@
     "eslint-config-next": "12.1.6",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-testing-library": "^5.5.1",
     "firebase-tools": "^11.0.0",
     "husky": "^8.0.1",
+    "jest": "^28.1.1",
+    "jest-environment-jsdom": "^28.1.1",
     "lint-staged": "^12.4.2",
     "prettier": "^2.6.2",
     "typescript": "^4.7.2"
