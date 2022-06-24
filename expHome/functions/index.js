@@ -23,6 +23,7 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   gradeFreeRecall,
+  markPaidEndpoint,
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -77,6 +78,7 @@ app.post("/instructorNo", instructorNo);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
+app.post("/markPaid", markPaidEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);

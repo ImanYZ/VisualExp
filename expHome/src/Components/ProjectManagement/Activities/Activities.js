@@ -302,25 +302,28 @@ const Activities = (props) => {
           {projects.length > 0 ? `the project ${project}!` : "any project!"}
         </h1>
       ) : (
-        <div className="Columns40_60">
-          <Alert severity="warning">
-            <ProjectPoints projectPoints={projectPoints} />
-            <Button
-              onClick={expandLeaderboard}
-              className={expanded ? "Button Red" : "Button Green"}
-              variant="contained"
-            >
-              {expanded ? "Collapse" : "Expand"} leaderboard details
-            </Button>
-          </Alert>
-          <LeaderBoard
-            fullname={fullname}
-            expanded={expanded}
-            researchers={researchers}
-            isResearcherCriteriaMet={isResearcherCriteriaMet}
-            makeResearcherChipContent={makeResearcherChipContent}
-          />
-        </div>
+        activePage !== "Intellectual" ||
+        (!isAdmin && (
+          <div className="Columns40_60">
+            <Alert severity="warning">
+              <ProjectPoints projectPoints={projectPoints} />
+              <Button
+                onClick={expandLeaderboard}
+                className={expanded ? "Button Red" : "Button Green"}
+                variant="contained"
+              >
+                {expanded ? "Collapse" : "Expand"} leaderboard details
+              </Button>
+            </Alert>
+            <LeaderBoard
+              fullname={fullname}
+              expanded={expanded}
+              researchers={researchers}
+              isResearcherCriteriaMet={isResearcherCriteriaMet}
+              makeResearcherChipContent={makeResearcherChipContent}
+            />
+          </div>
+        ))
       )}
       {currentPage}
     </div>
