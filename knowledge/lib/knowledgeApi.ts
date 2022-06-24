@@ -43,9 +43,10 @@ export const getStats = async () => {
 };
 
 export const getSearchNodes = async (options: SearchNodesParams) => {
-  const { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page } = options;
+  const { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page, institutions } =
+    options;
   const response = await axios.get<SearchNodesResponse>("/api/searchNodes", {
-    params: { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page }
+    params: { q, upvotes, mostRecent, timeWindow, tags, contributors, reference, label, nodeTypes, page, institutions }
   });
   return response.data;
 };
