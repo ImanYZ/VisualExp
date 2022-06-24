@@ -108,6 +108,7 @@ const HomePage: NextPage = () => {
   };
 
   const handleTagsChange = (tags: string[]) => {
+    console.log("tags", tags);
     router.push({ query: { ...router.query, tags: tags.join(","), page: 1 } });
   };
 
