@@ -1,4 +1,3 @@
-
 const firebaseDevConfig = {
   apiKey: "AIzaSyCLYan1Q1vda3eed70rRoajMLUSHZfySFc",
   authDomain: "visualexp-5d2c6.firebaseapp.com",
@@ -6,9 +5,8 @@ const firebaseDevConfig = {
   storageBucket: "visualexp-5d2c6.appspot.com",
   messagingSenderId: "1088807277176",
   appId: "1:1088807277176:web:48a3003ddd629bcb07138d",
-  measurementId: "G-075YRXFSRR"
-}
-
+  measurementId: "G-075YRXFSRR",
+};
 
 const firebaseProdConfig = {
   apiKey: "AIzaSyBp9kzfQ-g1qdld9W68Bmrs_aS7rgSWFHs",
@@ -21,7 +19,10 @@ const firebaseProdConfig = {
 };
 
 // Your web app's Firebase configuration
-export const firebaseConfig = process.env.NODE_ENV === 'development' ? firebaseDevConfig : firebaseProdConfig;
+export const firebaseConfig =
+  process.env.NODE_ENV === "development"
+    ? firebaseDevConfig
+    : firebaseProdConfig;
 
 export const firebaseOneConfig = {
   apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",
