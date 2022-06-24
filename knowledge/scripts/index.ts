@@ -25,18 +25,6 @@ const getInstitutionsFirestore = async () => {
   });
 };
 
-const getTagsFirestore = async () => {
-  let tags: string[] = [];
-  const tagDocs = await db.collection("nodes").where("isTag", "==", true).get();
-  for (let tagDoc of tagDocs.docs) {
-    const tagData = tagDoc.data();
-    tags = Array.from(new Set([...tags, tagData.title]));
-  }
-  const tagsObjArr = tags.map((el: string) => ({ name: el }));
-
-  return tagsObjArr;
-};
-
 const getNodeTags = (nodeData: NodeFireStore) => {
   const tags: string[] = [];
   if (nodeData.tagIds) {
@@ -74,13 +62,6 @@ const getContributorsName = (nodeData: NodeFireStore): string[] => {
   const contributors = contributorsNodes.map(el => el[0]);
   return contributors;
 };
-
-// const getInstitutionByName = async (name: string) => {
-//   const institutionDocs = await db.collection("institutions").where("name", "==", name).get();
-//   const institutionDoc = institutionDocs.docs[0];
-//   if (!institutionDoc) { return null }
-//   return institutionDoc.id
-// }
 
 const getNodesData = (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>
@@ -128,6 +109,8 @@ const getNodesData = (
       changedAtMillis: nodeData.changedAt?.toMillis() || 0,
       choices: nodeData.choices,
       content: nodeData.content || "",
+      contribNames: nodeData.contribNames || [],
+      institNames: nodeData.institNames || [],
       contributors,
       contributorsNames,
       corrects: nodeData.corrects || 0,
@@ -138,6 +121,7 @@ const getNodesData = (
       labelsReferences,
       nodeImage: nodeData.nodeImage,
       nodeType: nodeData.nodeType,
+      isTag: nodeData.isTag || false,
       tags,
       title: nodeData.title || "",
       titlesReferences,
@@ -158,8 +142,6 @@ const retrieveNode = async (nodeId: string): Promise<NodeFireStore | null> => {
 };
 
 const getReferencesData = async (nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>) => {
-  // const nodeDocs = await db.collection("nodes").get();
-
   const references = nodeDocs.docs
     .map(nodeDoc => {
       const nodeData = nodeDoc.data() as NodeFireStore;
@@ -216,19 +198,10 @@ const fillUsersIndex = async (forceReIndex?: boolean) => {
   await indexCollection("users", fields, data, forceReIndex);
 };
 
-const fillTagsIndex = async (forceReIndex?: boolean) => {
-  const data = await getTagsFirestore();
-  const fields: CollectionFieldSchema[] = [{ name: "name", type: "string" }];
-
-  await indexCollection("tags", fields, data, forceReIndex);
-};
-
 const fillNodesIndex = async (
   nodeDocs: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>,
   forceReIndex?: boolean
 ) => {
-  // const nodeDocs = await db.collection("nodes").get();
-
   const data = getNodesData(nodeDocs);
   const fields: CollectionFieldSchema[] = [
     { name: "changedAtMillis", type: "int64" },
@@ -241,7 +214,8 @@ const fillNodesIndex = async (
     { name: "nodeType", type: "string" },
     { name: "tags", type: "string[]" },
     { name: "title", type: "string" },
-    { name: "titlesReferences", type: "string[]" }
+    { name: "titlesReferences", type: "string[]" },
+    { name: "isTag", type: "bool" }
   ];
 
   await indexCollection("nodes", fields, data, forceReIndex);
@@ -261,11 +235,9 @@ const fillReferencesIndex = async (
 };
 
 const main = async () => {
+  await fillUsersIndex(true);
+  await fillInstitutionsIndex(true);
   const nodeDocs = await db.collection("nodes").get();
-
-  await fillUsersIndex();
-  await fillInstitutionsIndex();
-  await fillTagsIndex();
   await fillNodesIndex(nodeDocs, true);
   await fillReferencesIndex(nodeDocs, true);
 };

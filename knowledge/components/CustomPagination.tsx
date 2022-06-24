@@ -15,7 +15,7 @@ export const CustomPagination = ({ count, page, onChange }: CustomPaginationProp
   const { items } = usePagination({ count, page, onChange });
 
   return (
-    <nav>
+    <nav data-testid="pagination">
       <List>
         {items.map(({ page, type, selected, ...item }, index) => {
           let children = null;
@@ -25,6 +25,7 @@ export const CustomPagination = ({ count, page, onChange }: CustomPaginationProp
           } else if (type === "page") {
             children = (
               <Button
+                aria-label={`page ${page}`}
                 sx={{
                   minWidth: "40px",
                   height: "40px",

@@ -3,7 +3,7 @@ import Typesense from "typesense";
 import { SearchParams } from "typesense/lib/Typesense/Documents";
 
 import { getQueryParameter } from "../../lib/utils";
-import { ResponseAutocompleteTags } from "../../src/knowledgeTypes";
+import { ResponseAutocompleteTags, TypesenseNodesSchema } from "../../src/knowledgeTypes";
 
 async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocompleteTags>) {
   const q = getQueryParameter(req.query.q) || "";
@@ -20,9 +20,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse<ResponseAutocom
   });
 
   try {
-    const searchParameters: SearchParams = { q, query_by: "name" };
-    const searchResults = await client.collections<{ name: string }>("tags").documents().search(searchParameters);
-    const tags = searchResults.hits?.map(el => el.document.name);
+    const searchParameters: SearchParams = { q, query_by: "title", filter_by: "isTag: true" };
+    const searchResults = await client.collections<TypesenseNodesSchema>("nodes").documents().search(searchParameters);
+    const tags = searchResults.hits?.map(el => el.document.title);
     res.status(200).json({ results: tags || [] });
   } catch (error) {
     console.error(error);
