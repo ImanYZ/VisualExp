@@ -11,15 +11,7 @@ const customJestConfig = {
   testEnvironment: "jest-environment-jsdom",
   testMatch: ["**/__tests__/**/*.[jt]s?(x)"],
   collectCoverage: true,
-  collectCoverageFrom: ["components/**/*.{js,jsx,ts,tsx}", "pages/**/*.{js,jsx,ts,tsx}"],
-  coverageThreshold: {
-    global: {
-      branches: 0.14,
-      functions: 0.3,
-      lines: 0.85,
-      statements: 0.8
-    }
-  }
+  collectCoverageFrom: ["components/**/*.{js,jsx,ts,tsx}", "pages/**/*.{js,jsx,ts,tsx}"]
 };
 
 module.exports = createJestConfig(customJestConfig);
