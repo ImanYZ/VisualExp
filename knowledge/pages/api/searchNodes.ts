@@ -22,7 +22,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<SearchNodesResp
   const tags = getQueryParameter(req.query.tags) || "";
   const institutions = getQueryParameter(req.query.institutions) || "";
   const contributors = getQueryParameter(req.query.contributors) || "";
-  // const contributorsSelected = await getContributorsForAutocomplete(contributors.split(","));
   const institutionsSelected = await getInstitutionsForAutocomplete(institutions.split(","));
   const institutionNames = institutionsSelected.map(el => el.name).join(",");
   const reference = getQueryParameter(req.query.reference) || "";
