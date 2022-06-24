@@ -297,6 +297,7 @@ const fillNodesIndex = async (nodeDocs, forceReIndex) => {
     { name: "tags", type: "string[]" },
     { name: "title", type: "string" },
     { name: "titlesReferences", type: "string[]" },
+    { name: "isTag", type: "bool" },
   ];
 
   await indexCollection("nodes", fields, data, forceReIndex);
