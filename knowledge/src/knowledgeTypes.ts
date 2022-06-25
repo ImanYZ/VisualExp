@@ -251,3 +251,7 @@ export type FeedbackInput = {
   feedback: string;
   pageURL: string;
 };
+
+export type Feedback = FeedbackInput & {
+  createdAt: string;
+};
