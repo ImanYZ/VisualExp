@@ -7,7 +7,6 @@ import {
   emailState,
   emailVerifiedState,
   fullnameState,
-  isAdminState,
   themeState,
   themeOSState,
   leadingState,
@@ -19,7 +18,6 @@ import RouterNav from "./Components/RouterNav/RouterNav";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
-import ManageEvents from "./Components/ProjectManagement/ManageEvents/ManageEvents";
 import Home from "./Components/Home/Home";
 import Privacy from "./Components/Home/Privacy";
 import Terms from "./Components/Home/Terms";
@@ -46,7 +44,6 @@ const AppRouter = (props) => {
   const email = useRecoilValue(emailState);
   const emailVerified = useRecoilValue(emailVerifiedState);
   const fullname = useRecoilValue(fullnameState);
-  const isAdmin = useRecoilValue(isAdminState);
   const leading = useRecoilValue(leadingState);
   const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
   const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
@@ -246,13 +243,7 @@ const AppRouter = (props) => {
               <>
                 <Route
                   path="Activities/Experiments"
-                  element={
-                    isAdmin ? (
-                      <ManageEvents />
-                    ) : (
-                      <Activities activityName="Experiments" />
-                    )
-                  }
+                  element={<Activities activityName="Experiments" />}
                 />
                 <Route
                   path="Activities/AddInstructor"

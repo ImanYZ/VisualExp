@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Box } from "@mui/material";
 import { SxProps, Theme } from "@mui/system";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 
@@ -23,7 +23,7 @@ type HomeFilterProps = {
 };
 
 const HomeFilter = forwardRef<HomeFilterRef, HomeFilterProps>(
-  ({ sx, onTagsChange, onInstitutionsChange, onContributorsChange, onNodeTypesChange, onReferencesChange }, ref) => {
+  ({ onTagsChange, onInstitutionsChange, onContributorsChange, onNodeTypesChange, onReferencesChange }, ref) => {
     const toScrollRef = useRef<HTMLDivElement | null>(null);
 
     useImperativeHandle(ref, () => ({
@@ -55,31 +55,29 @@ const HomeFilter = forwardRef<HomeFilterRef, HomeFilterProps>(
     };
 
     return (
-      <Grid
+      <Box
         ref={toScrollRef}
-        container
-        spacing={{ xs: 1, md: 3 }}
-        columns={{ xs: 1, sm: 2, md: 4 }}
-        alignItems="flex-end"
-        justifyContent="center"
-        sx={{ position: "relative", ...sx }}
+        display="grid"
+        gridTemplateColumns="repeat(12, 1fr)"
+        gap={2}
+        sx={{ mx: { md: "10px" }, mb: 8 }}
       >
-        <Grid item xs={1}>
+        <Box gridColumn={{ xs: "span 12", sm: "span 6", lg: "span 3" }}>
           <TagsAutocomplete onTagsChange={handleTagsChange} />
-        </Grid>
-        <Grid item xs={1}>
+        </Box>
+        <Box gridColumn={{ xs: "span 12", sm: "span 6", lg: "span 3" }}>
           <NodeTypesAutocomplete onNodesTypeChange={handleNodeTypesChange} />
-        </Grid>
-        <Grid item xs={1}>
+        </Box>
+        <Box gridColumn={{ xs: "span 12", sm: "span 6", lg: "span 3" }}>
           <ContributorsAutocomplete onContributorsChange={handleContributorsChange} />
-        </Grid>
-        <Grid item xs={1}>
+        </Box>
+        <Box gridColumn={{ xs: "span 12", sm: "span 6", lg: "span 3" }}>
           <InstitutionsAutocomplete onInstitutionsChange={handleInstitutionsChange} />
-        </Grid>
-        <Grid item xs={1} sm={2} md={4}>
+        </Box>
+        <Box gridColumn={{ xs: "span 12" }}>
           <ReferencesAutocomplete onReferencesChange={handleReferencesChange} />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     );
   }
 );
