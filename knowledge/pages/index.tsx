@@ -108,7 +108,6 @@ const HomePage: NextPage = () => {
   };
 
   const handleTagsChange = (tags: string[]) => {
-    console.log("tags", tags);
     router.push({ query: { ...router.query, tags: tags.join(","), page: 1 } });
   };
 
@@ -135,7 +134,6 @@ const HomePage: NextPage = () => {
       <HomeSearch sx={{ mt: "var(--navbar-height)" }} onSearch={handleSearch} ref={homeSearchRef} />
       <Container sx={{ my: 10 }}>
         <HomeFilter
-          sx={{ mb: 8 }}
           onTagsChange={handleTagsChange}
           onInstitutionsChange={handleInstitutionsChange}
           onContributorsChange={handleContributorsChange}

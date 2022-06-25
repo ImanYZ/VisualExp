@@ -21,7 +21,7 @@ const getInstitutionsFirestore = async () => {
   return institutionDocs.docs.map(institutionDoc => {
     const institutionData = institutionDoc.data();
     const institutionName: string = institutionData.name || "";
-    return { id: institutionDoc.id, name: institutionName };
+    return { id: institutionDoc.id, name: institutionName, logoURL: institutionData.logoURL };
   });
 };
 
@@ -215,7 +215,8 @@ const fillNodesIndex = async (
     { name: "tags", type: "string[]" },
     { name: "title", type: "string" },
     { name: "titlesReferences", type: "string[]" },
-    { name: "isTag", type: "bool" }
+    { name: "isTag", type: "bool" },
+    { name: "institNames", type: "string[]" }
   ];
 
   await indexCollection("nodes", fields, data, forceReIndex);
