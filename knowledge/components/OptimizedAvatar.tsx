@@ -1,5 +1,4 @@
-import { Avatar } from "@mui/material";
-import { Box } from "@mui/system";
+import { Avatar, Box } from "@mui/material";
 import React, { FC } from "react";
 
 type Props = {
@@ -33,6 +32,7 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           height: "50px",
           border: "solid 2px",
           borderColor: theme => theme.palette.common.gray,
+          color: theme => theme.palette.common.gray,
           borderRadius: "30px",
           display: "flex",
           alignItems: "center",
@@ -53,18 +53,20 @@ const OptimizedAvatar: FC<Props> = ({ name = "", imageUrl, renderAsAvatar = true
           width: "50px",
           height: "50px",
           position: "relative",
-          borderRadius: "30px"
+          borderRadius: "30px",
+          border: "solid 2px",
+          borderColor: theme => theme.palette.common.gray,
+          color: theme => theme.palette.common.gray
         }}
       >
         <img
           src={imageUrl}
           alt={name}
-          width="50px"
-          height="50px"
+          width="46px"
+          height="46px"
           style={{
             objectFit: "cover",
-            borderRadius: "30px",
-            padding: "0px 2px 2px 0px"
+            borderRadius: "30px"
           }}
         />
       </Box>
