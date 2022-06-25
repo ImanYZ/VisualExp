@@ -1,5 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Avatar, CardActionArea, Collapse, Grid, IconButton } from "@mui/material";
+import { CardActionArea, Collapse, Grid, IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -11,7 +11,6 @@ import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import Image from "next/image";
 import NextLink from "next/link";
 import { useRef, useState } from "react";
 
@@ -148,28 +147,15 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                 <Box sx={{ display: "flex", flexWrap: "wrap", px: "10px" }}>
                   {node.contributors &&
                     node.contributors.map((contributor, idx) => (
-                      <NextLink key={idx} passHref href={`${ROUTES.home}?contributors=${contributor.username}`}>
+                      <Box key={idx} sx={{ display: "inline-block" }}>
                         <Tooltip title={`${contributor.fullName} contributed to the evolution of this node.`}>
-                          <Avatar
-                            component={Link}
-                            sx={{
-                              marginLeft: "-10px",
-                              color: theme => theme.palette.common.gray,
-                              width: 50,
-                              height: 50,
-                              border: "solid 2px"
-                            }}
-                          >
-                            <Image
-                              alt={contributor.fullName}
-                              src={contributor.imageUrl}
-                              width={50}
-                              height={50}
-                              objectFit="cover"
-                            />
-                          </Avatar>
+                          <Box sx={{ marginLeft: "-10px" }}>
+                            <Link href={`${ROUTES.home}?contributors=${contributor.username}`}>
+                              <OptimizedAvatar name={contributor.fullName} imageUrl={contributor.imageUrl} />
+                            </Link>
+                          </Box>
                         </Tooltip>
-                      </NextLink>
+                      </Box>
                     ))}
                 </Box>
               </Grid>
