@@ -23,7 +23,7 @@ const SortByFilters: FC<Props> = ({ sortedByType, handleByType, timeWindow, onTi
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, mx: { md: "10px" } }}>
       <Grid container spacing={2}>
         <Grid item xs={12} md={4} lg={3}>
           <ToggleButtonGroup value={sortedByType} exclusive onChange={handleSortByType} aria-label="Sort options">
