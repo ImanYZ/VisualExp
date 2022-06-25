@@ -157,7 +157,6 @@ export const NodeItem = ({ node }: NodeItemProps) => {
                               color: theme => theme.palette.common.gray,
                               width: 50,
                               height: 50,
-                              borderColor: "red",
                               border: "solid 2px"
                             }}
                           >
