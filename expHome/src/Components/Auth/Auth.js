@@ -28,7 +28,7 @@ import {
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import { isEmail, getFullname } from "../../utils/utils";
+import { isEmail, getFullname } from "../../utils";
 
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";

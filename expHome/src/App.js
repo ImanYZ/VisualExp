@@ -22,11 +22,11 @@ import FreeRecallPage from "./Components/Passage/FreeRecallPage";
 // import ConceptMappingInput from "./Components/ConceptMapping/ConceptMappingInput";
 import PersonalInfo from "./Components/PersonalInfo/PersonalInfo";
 
-import { tokenize, textCosineSimilarity } from "./utils/CosineSimilarity";
-import Array2CSV from "./utils/Array2CSV";
+import { tokenize, textCosineSimilarity } from "./utils";
 
 import "./App.css";
 
+// eslint-disable-next-line no-lone-blocks
 {
   // const changeQuestions = async () => {
   //   const passagesDocs = await firebase.db.collection("passages").get();
@@ -114,14 +114,18 @@ const postQuestions = [
 
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
+  // eslint-disable-next-line no-unused-vars
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [phase, setPhase] = useRecoilState(phaseState);
   const [step, setStep] = useRecoilState(stepState);
   const [passage, setPassage] = useRecoilState(passageState);
   const [condition, setCondition] = useRecoilState(conditionState);
+  // eslint-disable-next-line no-unused-vars
   const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
+  // eslint-disable-next-line no-unused-vars
   const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
+  // eslint-disable-next-line no-unused-vars
   const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
 
   const [passageTitle, setPassageTitle] = useState("");
@@ -256,6 +260,7 @@ const App = () => {
     );
   };
 
+  // eslint-disable-next-line no-lone-blocks
   {
     // const submitCMap = async (currentTime, timeSpent, userRef, userData) => {
     //   const passageDoc = await firebase.db
@@ -420,6 +425,7 @@ const App = () => {
       userData = userDoc.data();
       pConditions = userData.pConditions;
     }
+    // eslint-disable-next-line default-case
     switch (step) {
       case 0:
         userUpdates = {};
@@ -792,6 +798,7 @@ const App = () => {
     if (fullname) {
       setUserStatus();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullname, secondSession, thirdSession]);
 
   useEffect(() => {
@@ -807,7 +814,8 @@ const App = () => {
         clearTimeout(timerTimeout);
       };
     }
-  }, [phase, step, timer]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, step, timer]); 
 
   useEffect(() => {
     const pConURLSetter = async () => {
@@ -846,6 +854,7 @@ const App = () => {
       }
     };
     pConURLSetter();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullname, passage, nullPassage, condition]);
 
   let minutes = Math.floor(timer / 60);

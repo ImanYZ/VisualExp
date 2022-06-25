@@ -8,5 +8,6 @@
     "isolatedModules": false,
     "allowJs": true,
     "noEmit": true
-  }
+  },
+  "files": ["../cypress.config.js"]
 }
