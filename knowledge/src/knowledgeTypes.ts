@@ -139,9 +139,11 @@ export type TypesenseNodesSchema = {
   changedAt: string;
   changedAtMillis: number; // typesense
   choices?: KnowledgeChoice[];
-  content: string; // typesense
   contributors: { fullName: string; imageUrl: string; username: string }[];
   contributorsNames: string[]; // typesense
+  contribNames: string[];
+  institNames: string[];
+  content: string; // typesense
   corrects: number; // typesense
   id: string;
   institutions: { name: string }[];
@@ -155,6 +157,7 @@ export type TypesenseNodesSchema = {
   updatedAt: number;
   wrongs: number;
   mostHelpful: number; // typesense
+  isTag: boolean; // typesense
 };
 
 export type TypesenseReferencesSchema = {
@@ -247,4 +250,8 @@ export type FeedbackInput = {
   email: string;
   feedback: string;
   pageURL: string;
+};
+
+export type Feedback = FeedbackInput & {
+  createdAt: string;
 };

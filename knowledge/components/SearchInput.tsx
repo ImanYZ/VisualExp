@@ -72,8 +72,9 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
             sx={{
               display: "flex",
               alignItems: "center",
-              height: { xs: "40px", md: "62px" },
-              px: { xs: "12px", md: "25px" },
+              height: { xs: "40px", md: "55px" },
+              // px: { xs: "12px", md: "25px" },
+              p: { xs: "0px 10px 0px 12px", md: "0px 12px 0px 25px" },
               background: theme => theme.palette.common.white
             }}
             ref={params.InputProps.ref}
@@ -81,10 +82,9 @@ const SearchInput: FC<Props> = ({ onSearch }) => {
             <input
               {...params.inputProps}
               value={text}
-              onChange={e => {
-                setText(e.target.value);
-              }}
-              placeholder="Search on 1Cademy "
+              onChange={e => setText(e.target.value)}
+              placeholder="What do you want to learn today?"
+              className="home-search-input"
             />
             <IconButton
               type="submit"

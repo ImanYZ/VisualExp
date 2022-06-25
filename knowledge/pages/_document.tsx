@@ -3,7 +3,7 @@ import createEmotionServer from "@emotion/server/create-instance";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import { Children } from "react";
 
-import { getMetaThemeColor } from "../src/brandingTheme";
+import { getDesignTokens } from "../src/brandingTheme";
 import { createEmotionCache } from "../src/createEmotionCache";
 
 class CustomDocument extends Document {
@@ -11,8 +11,16 @@ class CustomDocument extends Document {
     return (
       <Html lang="en">
         <Head>
-          <meta name="theme-color" content={getMetaThemeColor("light")} media="(prefers-color-scheme: light)" />
-          <meta name="theme-color" content={getMetaThemeColor("dark")} media="(prefers-color-scheme: dark)" />
+          <meta
+            name="theme-color"
+            content={getDesignTokens("light").palette?.common?.darkGrayBackground}
+            media="(prefers-color-scheme: light)"
+          />
+          <meta
+            name="theme-color"
+            content={getDesignTokens("dark").palette?.common?.darkGrayBackground}
+            media="(prefers-color-scheme: dark)"
+          />
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />

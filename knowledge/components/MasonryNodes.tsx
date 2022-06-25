@@ -1,11 +1,11 @@
 import Masonry from "@mui/lab/Masonry";
 import { Skeleton } from "@mui/material";
 import Box from "@mui/material/Box";
-import Pagination from "@mui/material/Pagination";
 import { SxProps, Theme } from "@mui/system";
 
 import { randomIntFromInterval } from "../lib/utils";
 import { SimpleNode } from "../src/knowledgeTypes";
+import { CustomPagination } from "./CustomPagination";
 import { NodeItem } from "./NodeItem";
 
 type MasonryNodesProps = {
@@ -30,20 +30,20 @@ export const MasonryNodes = ({ nodes, sx, page, totalPages, onChangePage, isLoad
     const elements = [];
     for (let i = 0; i < 10; i++) {
       const height = randomIntFromInterval(250, 700);
-      elements.push(<Skeleton key={i} height={height} />);
+      elements.push(<Skeleton data-testid="node-item-skeleton" key={i} height={height} />);
     }
     return elements;
   };
 
   return (
     <Box sx={{ ...sx }}>
-      <Masonry sx={{ my: 4 }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
+      <Masonry sx={{ my: 4, mx: { md: "0px" } }} columns={{ xm: 1, md: 2 }} spacing={4} defaultHeight={450}>
         {isLoading && renderLoadingSkeletons()}
         {!isLoading && nodes.map((el: any) => <NodeItem key={el.id} node={el} />)}
       </Masonry>
       {totalPages && totalPages > 1 && (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Pagination count={totalPages} page={page} onChange={handleChangePage} />
+          <CustomPagination count={totalPages} page={page} onChange={handleChangePage} />
         </Box>
       )}
     </Box>

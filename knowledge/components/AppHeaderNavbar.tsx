@@ -22,8 +22,13 @@ type Props = {
 const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch = false, onCloseMenu, onShowMenu }) => {
   const router = useRouter();
 
+  const getTabSelected = () => {
+    const tabSelected = SECTIONS.findIndex(cur => cur.route === router.route);
+    return tabSelected >= 0 ? tabSelected : false;
+  };
+
   return (
-    <AppBar>
+    <AppBar data-testid="app-nav-bar">
       <Toolbar sx={{ height: "var(--navbar-height)", justifyContent: "space-between" }}>
         <LightTooltip title="1Cademy's Landing Page">
           <Box
@@ -40,10 +45,10 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
           </Box>
         </LightTooltip>
         <Tabs
-          value={SECTIONS.findIndex(cur => cur.route === router.route)}
+          value={getTabSelected()}
           variant="scrollable"
           scrollButtons="auto"
-          allowScrollButtonsMobile
+          // allowScrollButtonsMobile
           aria-label="scrollable auto tabs navigation bar"
           sx={{
             px: "25px",
@@ -66,7 +71,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
               <Tab
                 onClick={event => {
                   event.preventDefault();
-                  if (page.label !== "NODE") open(page.route, "_blank");
+                  page.label === "NODE" ? router.push(page.route) : open(page.route, "_blank");
                 }}
                 color="inherit"
                 label={page.label}
@@ -98,6 +103,7 @@ const AppAppBar: FC<Props> = ({ showApply = true, showMenu = false, showSearch =
                   minWidth: "80px",
                   display: { xs: "none", md: "block" },
                   fontSize: 16,
+                  fontWeight: "700",
                   color: "common.white",
                   py: "15px",
                   px: "16px",

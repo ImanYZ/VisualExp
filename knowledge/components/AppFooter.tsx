@@ -30,7 +30,7 @@ export default function AppFooter() {
       <Container
         sx={{
           maxWidth: { xs: "207px", md: "700px", lg: "1058px" },
-          height: { xs: "391px", md: "110px" },
+          height: { xs: "391px", md: "136px" },
           p: "0px",
           display: "flex",
           alignItems: "center",
@@ -42,7 +42,7 @@ export default function AppFooter() {
           <Box sx={{ textAlign: { xs: "center", md: "left" } }}>
             <NextImage src={logo1cademy} width="147px"></NextImage>
           </Box>
-          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, my: "30px" }}>
+          <Box sx={{ display: "flex", justifyContent: { xs: "center", md: "start" }, mt: "5px", mb: "30px" }}>
             <IconButton
               rel="noreferrer"
               aria-label="Open Youtube channel"
@@ -156,7 +156,7 @@ export default function AppFooter() {
                 textDecorationColor: theme => theme.palette.common.white
               }}
             >
-              <GitHubIcon />
+              <GitHubIcon fontSize="inherit" />
             </Link>
             <Typography color={theme => theme.palette.common.white} sx={{ display: { xs: "none", md: "block" } }}>
               We're committed to OpenSource on{" "}
@@ -171,7 +171,7 @@ export default function AppFooter() {
               >
                 Github
               </Link>{" "}
-              <GitHubIcon />
+              <GitHubIcon fontSize="inherit" />
             </Typography>
             <Typography color={theme => theme.palette.grey[500]}>{`©  1Cademy ${new Date().getFullYear()}`}</Typography>
           </Box>

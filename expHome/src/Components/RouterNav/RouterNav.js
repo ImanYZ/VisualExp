@@ -47,14 +47,12 @@ import { getISODateString } from "../../utils/DateFunctions";
 import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
+import HonorEducation from "../../assets/Honor_Education_Logo.jpeg";
 
 const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY";
-const goToUMSI = (event) => {
-  window.open("https://www.si.umich.edu/", "_blank");
-};
 
-const goToGCloud = (event) => {
-  window.open("https://cloud.google.com/edu/researchers", "_blank");
+const goToLink = (theLink) => (event) => {
+  window.open(theLink, "_blank");
 };
 
 const lineDiagramTooltip = (type) => (obj, key, uname) => {
@@ -131,6 +129,8 @@ const RouterNav = (props) => {
   const [nodesLoaded, setNodesLoaded] = useState(false);
   const [userNodesChanges, setUserNodesChanges] = useState([]);
   const [userNodes, setUserNodes] = useState([]);
+
+  const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
     const checkResearcher = async () => {
@@ -828,13 +828,27 @@ const RouterNav = (props) => {
                 }}
               >
                 <Grid>
+                  <Tooltip title="Honor Education sponsors this research project.">
+                    <IconButton
+                      size="large"
+                      edge="start"
+                      sx={{ mr: 1 }}
+                      onClick={goToLink("https://www.honor.education/")}
+                    >
+                      <img
+                        src={HonorEducation}
+                        alt="Honor Education"
+                        width="43px"
+                      />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="University of Michigan - School of Information sponsors this research project.">
                     <IconButton
                       id="UMICH_Logo"
                       size="large"
                       edge="start"
                       sx={{ mr: 4 }}
-                      onClick={goToUMSI}
+                      onClick={goToLink("https://www.si.umich.edu/")}
                     >
                       <img
                         src={UMSI_Logo_Dark}
@@ -848,7 +862,9 @@ const RouterNav = (props) => {
                       size="large"
                       edge="start"
                       sx={{ mr: 4 }}
-                      onClick={goToGCloud}
+                      onClick={goToLink(
+                        "https://cloud.google.com/edu/researchers"
+                      )}
                     >
                       <div id="GCloud_Logo">
                         <img
@@ -871,7 +887,7 @@ const RouterNav = (props) => {
                         rowGap: "4px",
                       }}
                     >
-                      {projectSpecs.onePoints ? (
+                      {projectPoints.onePoints ? (
                         <Tooltip
                           title={`You've submitted ${
                             proposalsNums[username]
@@ -891,7 +907,7 @@ const RouterNav = (props) => {
                         </Tooltip>
                       ) : null}
 
-                      {projectSpecs.instructorsPoints ? (
+                      {projectPoints.instructorsPoints ? (
                         <Tooltip
                           title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
                         >
@@ -899,7 +915,7 @@ const RouterNav = (props) => {
                         </Tooltip>
                       ) : null}
 
-                      {projectSpecs.gradingPoints ? (
+                      {projectPoints.gradingPoints ? (
                         <Tooltip
                           title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
                         >
@@ -915,7 +931,7 @@ const RouterNav = (props) => {
                         rowGap: "25px",
                       }}
                     >
-                      {projectSpecs.onePoints ? (
+                      {projectPoints.onePoints ? (
                         <LineDiagram
                           obj={proposalsNums}
                           username={username}
@@ -923,7 +939,7 @@ const RouterNav = (props) => {
                         ></LineDiagram>
                       ) : null}
 
-                      {projectSpecs.instructorsPoints ? (
+                      {projectPoints.instructorsPoints ? (
                         <LineDiagram
                           obj={instructorsNum}
                           username={fullname}
@@ -931,7 +947,7 @@ const RouterNav = (props) => {
                         ></LineDiagram>
                       ) : null}
 
-                      {projectSpecs.gradingPoints ? (
+                      {projectPoints.gradingPoints ? (
                         <LineDiagram
                           obj={gradingNums}
                           username={fullname}
@@ -939,7 +955,7 @@ const RouterNav = (props) => {
                         ></LineDiagram>
                       ) : null}
                     </Box>
-                    {projectSpecs.onePoints ? (
+                    {projectPoints.onePoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1008,7 +1024,7 @@ const RouterNav = (props) => {
                         )}
                       </Button>
                     </Tooltip>
-                    {projectSpecs.intellectualPoints ? (
+                    {projectPoints.intellectualPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1048,7 +1064,7 @@ const RouterNav = (props) => {
                       </Tooltip>
                     ) : null}
 
-                    {projectSpecs.instructorsPoints ? (
+                    {projectPoints.instructorsPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1089,7 +1105,7 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectSpecs.gradingPoints ? (
+                    {projectPoints.gradingPoints ? (
                       <Tooltip
                         title={
                           <div>

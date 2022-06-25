@@ -124,7 +124,7 @@ export const buildFilterBy = (
   filters.push(`changedAtMillis:>${updatedAt}`);
 
   if (tags.length > 0) filters.push(`tags: [${tags}]`);
-  if (institutions.length > 0) filters.push(`institutionsNames: [${institutions}]`);
+  if (institutions.length > 0) filters.push(`institNames: [${institutions}]`);
   if (contributors.length > 0) filters.push(`contributorsNames: [${contributors}]`);
   if (nodeTypes.length > 0) filters.push(`nodeType: [${nodeTypes}]`);
   if (reference) filters.push(`titlesReferences: ${reference}`);
