@@ -989,7 +989,7 @@ export default {
                 d: "To avoid texting fake phone numbers",
               },
             },      
-          What_can_the_study_do_better_to_minimize_external_validity_threat: {
+          What_statistical_analysis_did_the_researchers_use_to_explore_their_primary_hypothesis: {
               stem: `13. What statistical analysis did the researchers use to explore their primary hypothesis?`,
               answers: ["c"],
               choices: {
