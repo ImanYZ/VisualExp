@@ -53,19 +53,3 @@ jobs:
           npm run build
       - name: Unit tests
         run: npm run test:ci
-
-  e2e-tests:
-    name: e2e Cypress tests
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Cypress run
-        uses: cypress-io/github-action@v4
-        with:
-          working-directory: ./knowledge
-          build: npm run build
-          start: npm start -p 3000
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
