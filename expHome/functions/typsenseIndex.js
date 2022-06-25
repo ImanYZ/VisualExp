@@ -1,7 +1,7 @@
 const { db } = require("./admin_Knowledge");
 const Typesense = require("typesense");
 
-const config = require("./typesenseConfig.json");
+require("dotenv").config();
 
 const indexCollection = async (
   indexName,
@@ -12,13 +12,13 @@ const indexCollection = async (
   const client = new Typesense.Client({
     nodes: [
       {
-        host: config.host,
-        port: config.port,
-        protocol: config.protocol,
+        host: process.env.ONECADEMYCRED_TYPESENSE_HOST,
+        port: process.env.ONECADEMYCRED_TYPESENSE_PORT,
+        protocol: process.env.ONECADEMYCRED_TYPESENSE_PROTOCOL,
       },
     ],
     connectionTimeoutSeconds: 1000,
-    apiKey: config.apiKey,
+    apiKey: process.env.ONECADEMYCRED_TYPESENSE_APIKEY,
   });
 
   const schema = {
