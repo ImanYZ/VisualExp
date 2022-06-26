@@ -318,6 +318,45 @@ const App = () => {
     const keywordsText = tokenize(keywords.toLowerCase());
     const mainText = tokenize(text.toLowerCase());
     const recalledText = tokenize(reText.toLowerCase());
+
+    // recallGrades collection is huge and it's extremely inefficient to
+    // search through it if all the docs for all projects are in the same
+    // collection. Also, when querying them to find the appropriate doc to
+    // show the authenticated researcher to grade, we cannot combine the
+    // where clause on the project and the researchersNum < 4. As a
+    // solution, we separated the collections per project, other than the
+    // H2K2 project that we have already populated the data in and it's very
+    // costly to rename.
+    let collName = "recallGrades";
+    if (userData.project !== "H2K2") {
+      collName += userData.project;
+    }
+    let session = "1st";
+    if (secondSession) {
+      session = "2nd";
+    } else if (thirdSession) {
+      session = "3rd";
+    }
+    
+const recallGradeData = {
+    condition,
+    createdAt:currentTime,
+    grades:[],
+    passage,
+    project:userData.project,
+    researchers:[],
+    researchersNum:0,
+    response:reText,
+    session,
+    user: fullname,
+  }  
+  for(let phras of passageData.phrases) {
+    recallGradeData.phrase = phras;
+    const recallGradeRef = firebase.db.collection(collName).doc();
+    await firebase.batchSet(recallGradeRef, recallGradeData);
+  }
+  await firebase.commitBatch();
+
     for (let t1 of keywordsText) {
       if (recalledText.includes(t1)) {
         score += 1;
