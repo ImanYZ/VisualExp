@@ -203,7 +203,7 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
     let counter = 0;
     const recallGrades = {};
     console.log("Starting");
-    var first = await  db.collection("recallGrades")
+    let first = await  db.collection("recallGrades")
       .orderBy("createdAt")
       .limit(req.number);
     
