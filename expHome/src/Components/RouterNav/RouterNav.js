@@ -138,6 +138,7 @@ const RouterNav = (props) => {
         .doc(fullname)
         .get();
       if (researcherDoc.exists) {
+        console.log("Im researcher")
         const myProjects = [];
         const researcherData = researcherDoc.data();
         for (let pr in researcherData.projects) {
@@ -173,11 +174,11 @@ const RouterNav = (props) => {
       setProjectSpecs({ ...pSpec.data() });
     };
 
-    if (firebase && fullname && project) {
+    if (firebase && project) {
       getProjectSpecs();
     }
     // update project settings
-  }, [firebase, fullname, project]);
+  }, [firebase, project]);
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {

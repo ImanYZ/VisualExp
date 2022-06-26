@@ -88,6 +88,7 @@ const SchedulePage = (props) => {
       const userDoc = await firebase.db.collection("users").doc(fullname).get();
       const userData = userDoc.data();
       const project = userData.project;
+      console.log("Project => ", project);
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
@@ -102,15 +103,22 @@ const SchedulePage = (props) => {
           researchers[researcherDoc.id] = researcherData.email;
         }
       }
+
+      console.log("Researchers ",researchers)
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
       // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
       // that may include 0 to many researchers who are available at that session.
       const availSessions = {};
+
+
       // Retrieve all the researchers' avaialbilities in this project.
       const resScheduleDocs = await firebase.db
         .collection("resSchedule")
         .where("project", "==", project)
         .get();
+
+        console.log("Res Schedule => ", resScheduleDocs.docs.length)
+
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
         const resSession = resScheduleData.session.toDate();

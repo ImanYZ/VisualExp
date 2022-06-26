@@ -25,10 +25,14 @@ import {
   choicesState,
 } from "../../store/ExperimentAtoms";
 
+import {
+  projectSpecsState
+} from '../../store/ProjectAtoms'
+
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import { isEmail, getFullname } from "../../utils";
+import { isEmail, getFullname, shuffleArray } from "../../utils";
 
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
@@ -73,6 +77,8 @@ const Auth = (props) => {
   const [signUpSubmitable, setSignUpSubmitable] = useState(false);
   const [submitable, setSubmitable] = useState(false);
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
+  const projectSpecs = useRecoilValue(projectSpecsState);
+  const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
   useEffect(() => {
     const getCourses = async () => {
@@ -113,6 +119,7 @@ const Auth = (props) => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
+      console.log("FULL NAME => ", fuName)
       if ("leading" in userData && userData.leading.length > 0) {
         setLeading(userData.leading);
       }
@@ -189,59 +196,36 @@ const Auth = (props) => {
       }
     }
     if (userNotExists) {
-      const conditions = []; // ['H2', 'K2']
-      const minPConditions = [{}, {}]; // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
-      const minPassageNums = [10000, 10000]; // [166, 166]
-      const passagesDocs = await firebase.db.collection("passages").get();
-      for (let passageDoc of passagesDocs.docs) {
-        const passageData = passageDoc.data();
-        if (currentProject in passageData.projects) {
-          let passageNums = 0;
-          for (let cond in passageData.projects[currentProject]) {
-            passageNums += passageData.projects[currentProject][cond];
-            if (!conditions.includes(cond)) {
-              conditions.push(cond);
-            }
-          }
-          if (minPassageNums[0] >= passageNums) {
-            minPassageNums[1] = minPassageNums[0];
-            minPConditions[1] = minPConditions[0];
+      const conditions = shuffleArray([...projectSpecs.conditions]); // ['H2', 'K2']
+       // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
+      // const minPassageNums = [10000, 10000]; // [166, 166]
+      const passagesResult = await firebase.db.collection("passages").get();
 
-            minPassageNums[0] = passageNums;
-            minPConditions[0] = { passage: passageDoc.id };
-          } else if (minPassageNums[1] >= passageNums) {
-            minPassageNums[1] = passageNums;
-            minPConditions[1] = { passage: passageDoc.id };
-          }
-        }
-      }
-      let condIdx = Math.floor(Math.random() * conditions.length);
-      const previousCondIdxes = []; // [1, 0]
-      for (
-        let minPConIdx = 0;
-        minPConIdx < minPConditions.length;
-        minPConIdx++
-      ) {
-        while (previousCondIdxes.includes(condIdx)) {
-          condIdx = Math.floor(Math.random() * conditions.length);
-        }
-        minPConditions[minPConIdx]["condition"] = conditions[condIdx];
-        previousCondIdxes.push(condIdx);
-      }
-
+      // passages that contains the current project
+      let passagesDocs = passagesResult.docs.filter(p => currentProject in p.data()?.projects)
+      // randomize Array order
+      passagesDocs = shuffleArray(passagesDocs);
+      const minPConditions = [];
+      conditions.forEach((con, i) => {
+        minPConditions.push({condition: con, passage: passagesDocs[i].id})
+      });
+      
+      // setting up a null passage that is not in minPConditions.
       let nullPassage = "";
-      let passIdx = Math.floor(Math.random() * passagesDocs.docs.length);
+      let passIdx = Math.floor(Math.random() * passagesDocs.length);
       while (
         minPConditions.some(
-          (pCon) => pCon.passage === passagesDocs.docs[passIdx].id
+          // eslint-disable-next-line no-loop-func
+          (pCon) => pCon.passage === passagesDocs[passIdx].id
         )
       ) {
-        passIdx = Math.floor(Math.random() * passagesDocs.docs.length);
+        passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
-      nullPassage = passagesDocs.docs[passIdx].id;
-
+      nullPassage = passagesDocs[passIdx].id;
+      
       let questions;
       for (let { condition, passage } of minPConditions) {
+        // eslint-disable-next-line no-loop-func
         await firebase.db.runTransaction(async (t) => {
           const conditionRef = firebase.db
             .collection("conditions")
@@ -254,7 +238,7 @@ const Auth = (props) => {
           if (conditionDoc.exists) {
             const conditionData = conditionDoc.data();
             t.update(conditionRef, {
-              [currentProject]: conditionData[currentProject] + 1,
+              [currentProject]: (conditionData[currentProject] || 0) + 1, 
             });
           } else {
             t.set(conditionRef, { [currentProject]: 1 });
@@ -281,10 +265,7 @@ const Auth = (props) => {
           });
         });
       }
-      const initChoices = [];
-      for (let qIdx = 0; qIdx < questions.length; qIdx++) {
-        initChoices.push("");
-      }
+      const initChoices = new Array(10).fill("")
       userData = {
         ...userData,
         phase: 0,
@@ -316,7 +297,7 @@ const Auth = (props) => {
 
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async (user) => {
-      if (user) {
+      if (user && haveProjectSpecs) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         if (!user.emailVerified) {
@@ -348,7 +329,7 @@ const Auth = (props) => {
         setChoices([]);
       }
     });
-  }, [firebase, firstname, lastname, currentProject, isSignUp, course]);
+  }, [firebase, firstname, lastname, currentProject, isSignUp, course, projectSpecs]);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
@@ -390,9 +371,9 @@ const Auth = (props) => {
   useEffect(() => {
     setSubmitable(
       (isSignUp === 0 && signInSubmitable) ||
-        (isSignUp === 1 && signUpSubmitable)
+        (isSignUp === 1 && signUpSubmitable && haveProjectSpecs)
     );
-  }, [isSignUp, signInSubmitable, signUpSubmitable]);
+  }, [isSignUp, signInSubmitable, signUpSubmitable, projectSpecs]);
 
   useEffect(() => {
     setValidPasswordResetEmail(isEmail(resetPasswordEmail));

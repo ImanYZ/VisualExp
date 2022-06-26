@@ -884,7 +884,7 @@ const App = () => {
       }, 400);
     }
   };
-
+  console.log({fullname, passage, condition, pConURL, step, phase})
   return (
     fullname &&
     passage &&
