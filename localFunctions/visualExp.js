@@ -202,9 +202,11 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
   try {
 let counter = 0;
 const recallGrades = {};
+
+for(let numberlimit = 1; i < 1000000; numberlimit+1000){
 let recallDoc = await  db.collection("recallGrades")
       .orderBy("createdAt")
-      .limit(req.params.numberlimit);
+      .limit(numberlimit);
     
 let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
     console.log("Starting");
@@ -259,6 +261,7 @@ let recallGradeDocs = await db.collection("recallGrades")
     return res.status(500).json({ err });
   }
   return res.status(200).json({ done: true });
+}  
 };
 
 exports.restructureProjectSpecs = async (req, res) => {
