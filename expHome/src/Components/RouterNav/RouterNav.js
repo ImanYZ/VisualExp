@@ -86,6 +86,7 @@ const RouterNav = (props) => {
   const [projects, setProjects] = useRecoilState(projectsState);
   const [project, setProject] = useRecoilState(projectState);
   const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState);
+  const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
   const activePage = useRecoilValue(activePageState);
   const [notAResearcher, setNotAResearcher] =
     useRecoilState(notAResearcherState);
@@ -138,6 +139,7 @@ const RouterNav = (props) => {
         .doc(fullname)
         .get();
       if (researcherDoc.exists) {
+        console.log("Im researcher")
         const myProjects = [];
         const researcherData = researcherDoc.data();
         for (let pr in researcherData.projects) {
@@ -173,11 +175,11 @@ const RouterNav = (props) => {
       setProjectSpecs({ ...pSpec.data() });
     };
 
-    if (firebase && fullname && project) {
+    if (firebase && project) {
       getProjectSpecs();
     }
     // update project settings
-  }, [firebase, fullname, project]);
+  }, [firebase, project]);
 
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
@@ -314,7 +316,7 @@ const RouterNav = (props) => {
   }, [firebaseOne, notAResearcher, email]);
 
   useEffect(() => {
-    if (firebaseOne && !notAResearcher && username) {
+    if (firebaseOne && !notAResearcher && username && haveProjectSpecs) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
@@ -322,10 +324,7 @@ const RouterNav = (props) => {
       const nodeTypesInterval = setInterval(() => {
         nodeType = nodeTypes[nodeTypeIdx];
         const { versionsColl } = getTypedCollections(firebaseOne.db, nodeType);
-        const versionsQuery = versionsColl.where("tags", "array-contains", {
-          node: "WgF7yr5q7tJc54apVQSr",
-          title: "Knowledge Visualization",
-        });
+        const versionsQuery = versionsColl.where("tags", "array-contains", projectSpecs.deTag);
         versionsSnapshots.push(
           versionsQuery.onSnapshot((snapshot) => {
             const docChanges = snapshot.docChanges();
@@ -349,7 +348,7 @@ const RouterNav = (props) => {
         }
       };
     }
-  }, [firebaseOne, notAResearcher, username]);
+  }, [firebaseOne, notAResearcher, username, projectSpecs]);
 
   useEffect(() => {
     if (
@@ -526,13 +525,10 @@ const RouterNav = (props) => {
   ]);
 
   useEffect(() => {
-    if (firebaseOne && !notAResearcher && username && userVersionsLoaded) {
+    if (firebaseOne && !notAResearcher && username && userVersionsLoaded && haveProjectSpecs) {
       const nodesQuery = firebaseOne.db
         .collection("nodes")
-        .where("tags", "array-contains", {
-          node: "WgF7yr5q7tJc54apVQSr",
-          title: "Knowledge Visualization",
-        });
+        .where("tags", "array-contains",projectSpecs.deTag);
       const nodesSnapshot = nodesQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
         setNodesChanges((oldNodesChanges) => {
@@ -544,7 +540,7 @@ const RouterNav = (props) => {
         nodesSnapshot();
       };
     }
-  }, [firebaseOne, notAResearcher, username, userVersionsLoaded]);
+  }, [firebaseOne, notAResearcher, username, userVersionsLoaded, projectSpecs]);
 
   useEffect(() => {
     if (!notAResearcher && nodesChanges.length > 0) {
