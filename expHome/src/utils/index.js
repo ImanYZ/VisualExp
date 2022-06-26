@@ -5,7 +5,8 @@ export {
     sortedIndex,
     getFullname,
     formatPoints,
-    isValidHttpUrl
+    isValidHttpUrl,
+    shuffleArray
 } from './helpers';
 export {
     tokenize,

@@ -454,9 +454,14 @@ const AddInstructor = (props) => {
   // Listen to all the changes to the instructors' collection and put all of
   // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
-    if (firebase) {
+    if (firebase && project) {
       console.log('instructorsinstructors');
-      const instructorsQuery = firebase.db.collection("instructors");
+      setInstructors([]);
+      setOthersInstructors([]);
+      setInstructorsToday(0);
+      setUpvotedInstructorsToday(0);
+      setOtherInstructor({});
+      const instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
       const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
         setInstructorsChanges((oldInstructorsChanges) => {
@@ -469,7 +474,7 @@ const AddInstructor = (props) => {
         instructorsSnapshot();
       };
     }
-  }, [firebase]);
+  }, [firebase, project]);
 
   // After making sure the the instructors are loaded for the first time, define
   // a new spashot listener to listen to all the instructor votes by the
