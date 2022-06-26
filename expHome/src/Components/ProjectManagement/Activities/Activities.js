@@ -327,7 +327,7 @@ const Activities = (props) => {
           {
             isAdmin
               ? (
-                  (activePage !== "Intellectual" &&  activePage !== "Experiments") 
+                  (activePage !== "Intellectual") 
                     ?  LBoard : null
                 )
               : LBoard
