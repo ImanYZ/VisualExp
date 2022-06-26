@@ -294,6 +294,27 @@ const Activities = (props) => {
     );
   }
 
+  const LBoard = (
+    <div className="Columns40_60">
+      <Alert severity="warning">
+        <ProjectPoints projectPoints={projectPoints} />
+        <Button
+          onClick={expandLeaderboard}
+          className={expanded ? "Button Red" : "Button Green"}
+          variant="contained"
+        >
+          {expanded ? "Collapse" : "Expand"} leaderboard details
+        </Button>
+      </Alert>
+      <LeaderBoard
+        fullname={fullname}
+        expanded={expanded}
+        researchers={researchers}
+        isResearcherCriteriaMet={isResearcherCriteriaMet}
+        makeResearcherChipContent={makeResearcherChipContent}
+      />
+    </div>
+  );
   return (
     <div id="ActivitiesContainer">
       {notAResearcher ? (
@@ -302,28 +323,16 @@ const Activities = (props) => {
           {projects.length > 0 ? `the project ${project}!` : "any project!"}
         </h1>
       ) : (
-        activePage !== "Intellectual" ||
-        (!isAdmin && (
-          <div className="Columns40_60">
-            <Alert severity="warning">
-              <ProjectPoints projectPoints={projectPoints} />
-              <Button
-                onClick={expandLeaderboard}
-                className={expanded ? "Button Red" : "Button Green"}
-                variant="contained"
-              >
-                {expanded ? "Collapse" : "Expand"} leaderboard details
-              </Button>
-            </Alert>
-            <LeaderBoard
-              fullname={fullname}
-              expanded={expanded}
-              researchers={researchers}
-              isResearcherCriteriaMet={isResearcherCriteriaMet}
-              makeResearcherChipContent={makeResearcherChipContent}
-            />
-          </div>
-        ))
+        <>
+          {
+            isAdmin
+              ? (
+                  (activePage !== "Intellectual" &&  activePage !== "Experiments") 
+                    ?  LBoard : null
+                )
+              : LBoard
+          }
+        </>
       )}
       {currentPage}
     </div>
