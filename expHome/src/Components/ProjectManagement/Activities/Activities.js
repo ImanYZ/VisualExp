@@ -84,8 +84,8 @@ const Activities = (props) => {
         } else {
           const researData = change.doc.data();
           if (
-            project in researData.projects &&
-            researData.projects[project].active
+            project in (researData?.projects || {}) &&
+            researData?.projects?.[project]?.active
           ) {
             const projectData = researData.projects[project];
             let totalPoints = 0;
