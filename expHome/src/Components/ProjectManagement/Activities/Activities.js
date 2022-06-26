@@ -32,6 +32,21 @@ import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
 
+const ShowLeaderBoardForAdmin = ['1Cademy', 'AddInstructor', 'FreeRecallGrading'];
+
+const AdminAccessPages = [
+  { page: 'Intellectual', view: <ExpenseReports /> },
+  { page: 'Experiments', view: <ManageEvents /> }
+];
+
+const CommonPages = [
+  { page: 'Intellectual', view: <IntellectualPoints /> },
+  { page: 'Experiments', view: <ExperimentPoints /> },
+  { page: 'AddInstructor', view: <AddInstructor /> },
+  { page: '1Cademy', view: <OneCademy /> },
+  { page: 'FreeRecallGrading', view: <FreeRecallGrading /> }
+];
+
 const Activities = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -275,14 +290,19 @@ const Activities = (props) => {
   };
 
   const currentPage = (() => {
-    if (activePage === "Intellectual")
-      return isAdmin ? <ExpenseReports /> : <IntellectualPoints />;
-    if (activePage === "Experiments")
-      return isAdmin ? <ManageEvents /> : <ExperimentPoints />;
-    if (activePage === "AddInstructor") return <AddInstructor />;
-    if (activePage === "1Cademy") return <OneCademy />;
-    if (activePage === "FreeRecallGrading") return <FreeRecallGrading />;
+    const adminPageIndex = AdminAccessPages.findIndex(admin => admin.page === activePage);
+    const commonPageIndex = CommonPages.findIndex(admin => admin.page === activePage);
+    if (isAdmin && adminPageIndex >= 0) {
+      return AdminAccessPages[adminPageIndex]?.view;
+    } else if (commonPageIndex >= 0) {
+      return CommonPages[commonPageIndex]?.view;
+    }
     return null;
+  })();
+
+  const showLeaderBoard = (() => {
+    if (isAdmin) return ShowLeaderBoardForAdmin.indexOf(activePage) > -1;
+    return true;
   })();
 
   if (notAResearcher) {
@@ -296,35 +316,27 @@ const Activities = (props) => {
 
   return (
     <div id="ActivitiesContainer">
-      {notAResearcher ? (
-        <h1>
-          You're not a researcher on{" "}
-          {projects.length > 0 ? `the project ${project}!` : "any project!"}
-        </h1>
-      ) : (
-        activePage !== "Intellectual" ||
-        (!isAdmin && (
-          <div className="Columns40_60">
-            <Alert severity="warning">
-              <ProjectPoints projectPoints={projectPoints} />
-              <Button
-                onClick={expandLeaderboard}
-                className={expanded ? "Button Red" : "Button Green"}
-                variant="contained"
-              >
-                {expanded ? "Collapse" : "Expand"} leaderboard details
-              </Button>
-            </Alert>
-            <LeaderBoard
-              fullname={fullname}
-              expanded={expanded}
-              researchers={researchers}
-              isResearcherCriteriaMet={isResearcherCriteriaMet}
-              makeResearcherChipContent={makeResearcherChipContent}
-            />
-          </div>
-        ))
-      )}
+      {showLeaderBoard &&
+        <div className="Columns40_60">
+          <Alert severity="warning">
+            <ProjectPoints projectPoints={projectPoints} />
+            <Button
+              onClick={expandLeaderboard}
+              className={expanded ? "Button Red" : "Button Green"}
+              variant="contained"
+            >
+              {expanded ? "Collapse" : "Expand"} leaderboard details
+            </Button>
+          </Alert>
+          <LeaderBoard
+            fullname={fullname}
+            expanded={expanded}
+            researchers={researchers}
+            isResearcherCriteriaMet={isResearcherCriteriaMet}
+            makeResearcherChipContent={makeResearcherChipContent}
+          />
+        </div>
+      }
       {currentPage}
     </div>
   );
