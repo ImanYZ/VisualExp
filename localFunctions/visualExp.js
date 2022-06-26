@@ -203,7 +203,21 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
     let counter = 0;
     const recallGrades = {};
     console.log("Starting");
-    let recallGradeDocs = await db.collection("recallGrades").get();
+    var first = await  db.collection("recallGrades")
+      .orderBy("createdAt")
+      .limit(req.number);
+    
+    let lastVisible;
+    await first.get().then((documentSnapshots) => {
+     lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+    });
+
+   const recallGradeDocs =  await db.collection("recallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisible)
+        .limit(1000)
+        .get();
+
     for (let recallGradeDoc of recallGradeDocs.docs) {
       if (counter % 1000 === 0) {
         console.log(counter);
