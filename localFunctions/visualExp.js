@@ -200,19 +200,21 @@ exports.addRecallGradesColl = async (req, res) => {
 
 exports.checkRepeatedRecallGrades = async (req, res) => {
   try {
-let counter = 0;
-const recallGrades = {};
-let recallDoc = await  db.collection("recallGrades")
+    let counter = 0;
+    const recallGrades = {};
+    let recallDoc = await db
+      .collection("recallGrades")
       .orderBy("createdAt")
       .limit(req.params.numberlimit);
-    
-let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
+
+    let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
     console.log("Starting");
-let recallGradeDocs = await db.collection("recallGrades")
-    .orderBy("createdAt")
-    .startAfter(lastVisibleRecallGradesDoc)
-    .limit(100)
-    .get();
+    let recallGradeDocs = await db
+      .collection("recallGrades")
+      .orderBy("createdAt")
+      .startAfter(lastVisibleRecallGradesDoc)
+      .limit(100)
+      .get();
 
     for (let recallGradeDoc of recallGradeDocs.docs) {
       if (counter % 1000 === 0) {
