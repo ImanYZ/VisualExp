@@ -19,7 +19,7 @@ const firebaseProdConfig = {
 };
 
 // Your web app's Firebase configuration
-export const firebaseConfig = process.env.REACT_APP_ENV === 'development' ? firebaseDevConfig : firebaseProdConfig;
+export const firebaseConfig = firebaseProdConfig;
 
 export const firebaseOneConfig = {
   apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",
