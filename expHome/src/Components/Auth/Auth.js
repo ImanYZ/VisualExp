@@ -7,13 +7,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
-import {
-  firebaseState,
-  emailState,
-  emailVerifiedState,
-  fullnameState,
-  leadingState,
-} from "../../store/AuthAtoms";
+import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
 
 import {
   currentProjectState,
@@ -22,12 +16,10 @@ import {
   passageState,
   conditionState,
   nullPassageState,
-  choicesState,
+  choicesState
 } from "../../store/ExperimentAtoms";
 
-import {
-  projectSpecsState
-} from '../../store/ProjectAtoms'
+import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
@@ -38,7 +30,7 @@ import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
 
-const Auth = (props) => {
+const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
@@ -61,8 +53,7 @@ const Auth = (props) => {
   const [isSignUp, setIsSignUp] = useState(0);
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [invalidAuth, setInvalidAuth] = useState(false);
-  const [databaseAccountNotCreatedYet, setDatabaseAccountNotCreatedYet] =
-    useState(false);
+  const [databaseAccountNotCreatedYet, setDatabaseAccountNotCreatedYet] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [forgotPassword, setForgotPassword] = useState(false);
   const [resetPasswordEmail, setResetPasswordEmail] = useState("");
@@ -98,17 +89,14 @@ const Auth = (props) => {
     setDatabaseAccountNotCreatedYet(false);
   }, [firstname, lastname, email]);
 
-  const authChangedVerified = async (user) => {
+  const authChangedVerified = async user => {
     setEmailVerified("Verified");
     const uid = user.uid;
     const uEmail = user.email.toLowerCase();
     let userNotExists = false;
     let lName = lastname;
     let userData, userRef, fuName;
-    const userDocs = await firebase.db
-      .collection("users")
-      .where("email", "==", uEmail)
-      .get();
+    const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
     if (userDocs.docs.length > 0) {
       // Sign in and signed up:
       userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
@@ -119,14 +107,11 @@ const Auth = (props) => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
-      console.log("FULL NAME => ", fuName)
+      console.log("FULL NAME => ", fuName);
       if ("leading" in userData && userData.leading.length > 0) {
         setLeading(userData.leading);
       }
-      const researcherDoc = await firebase.db
-        .collection("researchers")
-        .doc(fuName)
-        .get();
+      const researcherDoc = await firebase.db.collection("researchers").doc(fuName).get();
       if (!researcherDoc.exists) {
         if (!("phase" in userData) || !("currentPCon" in userData)) {
           userNotExists = true;
@@ -135,7 +120,7 @@ const Auth = (props) => {
             email: uEmail,
             firstname: fName,
             lastname: lName,
-            project: currentProject,
+            project: currentProject
           };
           if (course) {
             userData.course = course;
@@ -153,7 +138,7 @@ const Auth = (props) => {
         const userDataLog = {
           uid,
           project: currentProject,
-          course,
+          course
         };
         if (userData.firstname && userData.lastname) {
           await userRef.update(userDataLog);
@@ -168,7 +153,7 @@ const Auth = (props) => {
         await userLogRef.set({
           ...userDataLog,
           id: userRef.id,
-          updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+          updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         });
       }
     } else {
@@ -188,7 +173,7 @@ const Auth = (props) => {
           email: uEmail,
           firstname,
           lastname: lName,
-          project: currentProject,
+          project: currentProject
         };
         if (course) {
           userData.course = course;
@@ -197,39 +182,37 @@ const Auth = (props) => {
     }
     if (userNotExists) {
       const conditions = shuffleArray([...projectSpecs.conditions]); // ['H2', 'K2']
-       // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
+      // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
       // const minPassageNums = [10000, 10000]; // [166, 166]
       const passagesResult = await firebase.db.collection("passages").get();
 
       // passages that contains the current project
-      let passagesDocs = passagesResult.docs.filter(p => currentProject in p.data()?.projects)
+      let passagesDocs = passagesResult.docs.filter(p => currentProject in p.data()?.projects);
       // randomize Array order
       passagesDocs = shuffleArray(passagesDocs);
       const minPConditions = [];
       conditions.forEach((con, i) => {
-        minPConditions.push({condition: con, passage: passagesDocs[i].id})
+        minPConditions.push({ condition: con, passage: passagesDocs[i].id });
       });
-      
+
       // setting up a null passage that is not in minPConditions.
       let nullPassage = "";
       let passIdx = Math.floor(Math.random() * passagesDocs.length);
       while (
         minPConditions.some(
           // eslint-disable-next-line no-loop-func
-          (pCon) => pCon.passage === passagesDocs[passIdx].id
+          pCon => pCon.passage === passagesDocs[passIdx].id
         )
       ) {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
       nullPassage = passagesDocs[passIdx].id;
-      
+
       let questions;
       for (let { condition, passage } of minPConditions) {
         // eslint-disable-next-line no-loop-func
-        await firebase.db.runTransaction(async (t) => {
-          const conditionRef = firebase.db
-            .collection("conditions")
-            .doc(condition);
+        await firebase.db.runTransaction(async t => {
+          const conditionRef = firebase.db.collection("conditions").doc(condition);
           const conditionDoc = await t.get(conditionRef);
           const passageRef = firebase.db.collection("passages").doc(passage);
           const passageDoc = await t.get(passageRef);
@@ -238,7 +221,7 @@ const Auth = (props) => {
           if (conditionDoc.exists) {
             const conditionData = conditionDoc.data();
             t.update(conditionRef, {
-              [currentProject]: (conditionData[currentProject] || 0) + 1, 
+              [currentProject]: (conditionData[currentProject] || 0) + 1
             });
           } else {
             t.set(conditionRef, { [currentProject]: 1 });
@@ -248,10 +231,7 @@ const Auth = (props) => {
             questions = passageData.questions;
           }
           let passageCondNum = 0;
-          if (
-            passageData.projects[currentProject] &&
-            passageData.projects[currentProject][condition]
-          ) {
+          if (passageData.projects[currentProject] && passageData.projects[currentProject][condition]) {
             passageCondNum = passageData.projects[currentProject][condition];
           }
           t.update(passageRef, {
@@ -259,13 +239,13 @@ const Auth = (props) => {
               ...passageData.projects,
               [currentProject]: {
                 ...passageData.projects[currentProject],
-                [condition]: passageCondNum + 1,
-              },
-            },
+                [condition]: passageCondNum + 1
+              }
+            }
           });
         });
       }
-      const initChoices = new Array(10).fill("")
+      const initChoices = new Array(10).fill("");
       userData = {
         ...userData,
         phase: 0,
@@ -274,7 +254,7 @@ const Auth = (props) => {
         currentPCon: minPConditions[0],
         nullPassage,
         choices: initChoices,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       };
       setPassage(minPConditions[0].passage);
       setCondition(minPConditions[0].condition);
@@ -285,7 +265,7 @@ const Auth = (props) => {
       const userLogRef = firebase.db.collection("userLogs").doc();
       await firebase.batchSet(userLogRef, {
         ...userData,
-        id: userRef.id,
+        id: userRef.id
       });
       console.log("Committing batch!");
       await firebase.commitBatch();
@@ -296,7 +276,7 @@ const Auth = (props) => {
   };
 
   useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async (user) => {
+    return firebase.auth.onAuthStateChanged(async user => {
       if (user && haveProjectSpecs) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
@@ -305,7 +285,7 @@ const Auth = (props) => {
           await user.sendEmailVerification();
           const emailVerificationInterval = setInterval(() => {
             console.log({
-              emailVerified: firebase.auth.currentUser.emailVerified,
+              emailVerified: firebase.auth.currentUser.emailVerified
             });
             firebase.auth.currentUser.reload();
             if (firebase.auth.currentUser.emailVerified) {
@@ -329,7 +309,7 @@ const Auth = (props) => {
         setChoices([]);
       }
     });
-  }, [firebase, firstname, lastname, currentProject, isSignUp, course, projectSpecs]);
+  }, [firebase, firstname, lastname, currentProject, isSignUp, course, haveProjectSpecs]);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
@@ -360,26 +340,18 @@ const Auth = (props) => {
   }, [validEmail, validPassword]);
 
   useEffect(() => {
-    setSignUpSubmitable(
-      signInSubmitable &&
-        validFirstname &&
-        validlastname &&
-        validConfirmPassword
-    );
+    setSignUpSubmitable(signInSubmitable && validFirstname && validlastname && validConfirmPassword);
   }, [signInSubmitable, validFirstname, validlastname, validConfirmPassword]);
 
   useEffect(() => {
-    setSubmitable(
-      (isSignUp === 0 && signInSubmitable) ||
-        (isSignUp === 1 && signUpSubmitable && haveProjectSpecs)
-    );
+    setSubmitable((isSignUp === 0 && signInSubmitable) || (isSignUp === 1 && signUpSubmitable && haveProjectSpecs));
   }, [isSignUp, signInSubmitable, signUpSubmitable, projectSpecs]);
 
   useEffect(() => {
     setValidPasswordResetEmail(isEmail(resetPasswordEmail));
   }, [resetPasswordEmail]);
 
-  const switchAccount = (event) => {
+  const switchAccount = event => {
     event.preventDefault();
     setIsSubmitting(false);
     if (isSignUp === 1) {
@@ -388,35 +360,35 @@ const Auth = (props) => {
     firebase.logout();
   };
 
-  const resendVerificationEmail = (event) => {
+  const resendVerificationEmail = event => {
     firebase.auth.currentUser.sendEmailVerification();
   };
 
-  const firstnameChange = (event) => {
+  const firstnameChange = event => {
     let fName = event.target.value;
     fName = fName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
     setFirstname(fName);
   };
 
-  const lastnameChange = (event) => {
+  const lastnameChange = event => {
     let lName = event.target.value;
     lName = lName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
     setLastname(lName);
   };
 
-  const emailChange = (event) => {
+  const emailChange = event => {
     setEmail(event.target.value.toLowerCase());
   };
 
-  const passwordChange = (event) => {
+  const passwordChange = event => {
     setPassword(event.target.value);
   };
 
-  const confirmPasswordChange = (event) => {
+  const confirmPasswordChange = event => {
     setConfirmPassword(event.target.value);
   };
 
-  const courseChange = (event) => {
+  const courseChange = event => {
     setCourse(event.target.value);
   };
 
@@ -424,11 +396,11 @@ const Auth = (props) => {
     setIsSignUp(newValue);
   };
 
-  const openForgotPassword = (event) => {
-    setForgotPassword((oldValue) => !oldValue);
+  const openForgotPassword = event => {
+    setForgotPassword(oldValue => !oldValue);
   };
 
-  const signUp = async (event) => {
+  const signUp = async event => {
     setIsSubmitting(true);
     const loweredEmail = email.toLowerCase();
     try {
@@ -468,7 +440,7 @@ const Auth = (props) => {
     }
   };
 
-  const onKeyPress = (event) => {
+  const onKeyPress = event => {
     if (event.key === "Enter" && submitable) {
       signUp(event);
     }
@@ -484,15 +456,10 @@ const Auth = (props) => {
       {emailVerified === "Sent" ? (
         <div>
           <p>
-            We just sent you a verification email. Please click the link in the
-            email to verify and complete your sign-up.
+            We just sent you a verification email. Please click the link in the email to verify and complete your
+            sign-up.
           </p>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={resendVerificationEmail}
-            style={{ marginRight: "19px" }}
-          >
+          <Button variant="contained" color="warning" onClick={resendVerificationEmail} style={{ marginRight: "19px" }}>
             <EmailIcon /> Resend Verification Email
           </Button>
           <Button variant="contained" color="error" onClick={switchAccount}>
@@ -503,23 +470,16 @@ const Auth = (props) => {
         <>
           <h2>Sign the Consent Form to Get Started!</h2>
           <p>
-            Please read the consent form on the left carefully. By creating and
-            account or signing into this website, you sign the consent form and
-            allow us to analyze your data collected throughout this study.
+            Please read the consent form on the left carefully. By creating and account or signing into this website,
+            you sign the consent form and allow us to analyze your data collected throughout this study.
           </p>
           <Alert severity="error">
-            Please only use your Gmail address to create an account. You can
-            also use your school email address, only if your school email is
-            provided by Google.
+            Please only use your Gmail address to create an account. You can also use your school email address, only if
+            your school email is provided by Google.
           </Alert>
           <Box sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-              <Tabs
-                value={isSignUp}
-                onChange={switchSignUp}
-                aria-label="basic tabs"
-                variant="fullWidth"
-              >
+              <Tabs value={isSignUp} onChange={switchSignUp} aria-label="basic tabs" variant="fullWidth">
                 <Tab label="Sign In" {...a11yProps(0)} />
                 <Tab label="Sign Up" {...a11yProps(1)} />
               </Tabs>
@@ -531,9 +491,7 @@ const Auth = (props) => {
                 onChange={emailChange}
                 name="email"
                 value={email}
-                errorMessage={
-                  validEmail ? null : "Please enter your valid email address!"
-                }
+                errorMessage={validEmail ? null : "Please enter your valid email address!"}
                 onKeyPress={onKeyPress}
               />
               <ValidatedInput
@@ -543,11 +501,7 @@ const Auth = (props) => {
                 type="password"
                 placeholder="Password"
                 label="Password"
-                errorMessage={
-                  validPassword
-                    ? null
-                    : "Please enter your desired password with at least 7 characters!"
-                }
+                errorMessage={validPassword ? null : "Please enter your desired password with at least 7 characters!"}
                 onKeyPress={onKeyPress}
               />
             </TabPanel>
@@ -558,9 +512,7 @@ const Auth = (props) => {
                 onChange={firstnameChange}
                 name="firstname"
                 value={firstname}
-                errorMessage={
-                  validFirstname ? null : "Please enter your firstname!"
-                }
+                errorMessage={validFirstname ? null : "Please enter your firstname!"}
                 onKeyPress={onKeyPress}
               />
               <ValidatedInput
@@ -569,9 +521,7 @@ const Auth = (props) => {
                 onChange={lastnameChange}
                 name="lastname"
                 value={lastname}
-                errorMessage={
-                  validlastname ? null : "Please enter your lastname!"
-                }
+                errorMessage={validlastname ? null : "Please enter your lastname!"}
                 onKeyPress={onKeyPress}
               />
               <ValidatedInput
@@ -580,9 +530,7 @@ const Auth = (props) => {
                 onChange={emailChange}
                 name="email"
                 value={email}
-                errorMessage={
-                  validEmail ? null : "Please enter your valid email address!"
-                }
+                errorMessage={validEmail ? null : "Please enter your valid email address!"}
                 onKeyPress={onKeyPress}
               />
               <ValidatedInput
@@ -593,11 +541,7 @@ const Auth = (props) => {
                 placeholder="Password"
                 label="Password"
                 value={password}
-                errorMessage={
-                  validPassword
-                    ? null
-                    : "Please enter your desired password with at least 7 characters!"
-                }
+                errorMessage={validPassword ? null : "Please enter your desired password with at least 7 characters!"}
                 onKeyPress={onKeyPress}
               />
               <ValidatedInput
@@ -608,11 +552,7 @@ const Auth = (props) => {
                 placeholder="Re-enter Password"
                 label="Confirm Password"
                 value={confirmPassword}
-                errorMessage={
-                  validConfirmPassword
-                    ? null
-                    : "Your password and the re-entered password should match!"
-                }
+                errorMessage={validConfirmPassword ? null : "Your password and the re-entered password should match!"}
                 onKeyPress={onKeyPress}
               />
               {/* <p>If participating for course credit, specify the course:</p>
@@ -637,59 +577,40 @@ const Auth = (props) => {
             </TabPanel>
             {databaseAccountNotCreatedYet && (
               <div className="Error">
-                Please sign up using the same email address, firstname, and
-                lastname so that we link your existing account with your
-                authentication.
+                Please sign up using the same email address, firstname, and lastname so that we link your existing
+                account with your authentication.
               </div>
             )}
             {invalidAuth && <div className="Error">{invalidAuth}</div>}
             {participatedBefore && (
-              <div className="Error">
-                You've participated in this study before and cannot participate
-                again!
-              </div>
+              <div className="Error">You've participated in this study before and cannot participate again!</div>
             )}
             <div id="SignButtonContainer">
               <Button
                 id="SignButton"
                 onClick={signUp}
-                className={
-                  submitable && !isSubmitting ? "Button" : "Button Disabled"
-                }
+                className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
                 variant="contained"
                 disabled={submitable && !isSubmitting ? null : true}
               >
-                {isSignUp === 0
-                  ? "Sign In"
-                  : isSubmitting
-                  ? "Creating your account..."
-                  : "Consent and Sign Up"}
+                {isSignUp === 0 ? "Sign In" : isSubmitting ? "Creating your account..." : "Consent and Sign Up"}
               </Button>
             </div>
             <div style={{ textAlign: "center", marginTop: "10px" }}>
-              <Button
-                onClick={openForgotPassword}
-                variant="contained"
-                color="warning"
-              >
+              <Button onClick={openForgotPassword} variant="contained" color="warning">
                 Forgot Password?
               </Button>
             </div>
             {forgotPassword && (
               <>
-                <p>
-                  Enter your account email below to receive a password reset
-                  link.
-                </p>
+                <p>Enter your account email below to receive a password reset link.</p>
                 <ValidatedInput
                   identification="email"
                   name="email"
                   type="email"
                   placeholder="Email"
                   label="Email"
-                  onChange={(event) =>
-                    setResetPasswordEmail(event.target.value)
-                  }
+                  onChange={event => setResetPasswordEmail(event.target.value)}
                   value={resetPasswordEmail}
                   errorMessage={passwordResetError}
                   // autocomplete="off"
@@ -698,19 +619,13 @@ const Auth = (props) => {
                   id="ForgotPasswordEmailButton"
                   variant="contained"
                   onClick={handleResetPassword}
-                  className={
-                    !isSubmitting && validPasswordResetEmail
-                      ? "Button"
-                      : "Button Disabled"
-                  }
+                  className={!isSubmitting && validPasswordResetEmail ? "Button" : "Button Disabled"}
                   disabled={isSubmitting || !validPasswordResetEmail}
                 >
                   Send Email
                 </Button>
 
-                {isPasswordReset && (
-                  <h4>Check your email to reset the password.</h4>
-                )}
+                {isPasswordReset && <h4>Check your email to reset the password.</h4>}
               </>
             )}
           </Box>
