@@ -203,10 +203,11 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
 let counter = 0;
 const recallGrades = {};
 
-for(let numberlimit = 1; i < 1000000; numberlimit+1000){
+for(let numberlimit = 1; numberlimit < 1000000; numberlimit+1000){
 let recallDoc = await  db.collection("recallGrades")
       .orderBy("createdAt")
-      .limit(numberlimit);
+      .limit(numberlimit)
+      .get();
     
 let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
     console.log("Starting");
@@ -232,6 +233,48 @@ let recallGradeDocs = await db.collection("recallGrades")
           recallGradeData.phrase,
         ] in recallGrades
       ) {
+        let id =recallGrades[
+          [
+            recallGradeData.user,
+            recallGradeData.session,
+            recallGradeData.project,
+            recallGradeData.condition,
+            recallGradeData.passage,
+            recallGradeData.phrase,
+          ]
+        ][1];
+        let recallGradeRef = db.collection("recallGrades").doc(id);
+        if(recallGradeData.researchersNum == 0){
+            let recallGradeDeleteRef= db.collection("recallGrades").doc(recallGradeDoc.id);
+            batchDelete(recallGradeDeleteRef);
+            console.log(recallGradeDoc.id);
+        }else{
+          let data = recallGrades[
+            [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ]
+          ][0];
+          if(data.researchersNum<4){
+          for(res of recallGradeData.researchers){
+          if(!(data.researchers).includes(res)){
+            if(data.researchersNum<4){
+            data.researchers.push(res);
+            data.grades.push(recallGradeData.grades[data.researchers.indexOf(res)]);
+            data.researchersNum = data.researchersNum+1;
+            }else{
+               
+            }
+            await batchUpdate(recallGradeRef, data);
+          }
+          }
+        }
+          
+        }
         console.log({
           key: [
             recallGradeData.user,
@@ -253,15 +296,16 @@ let recallGradeDocs = await db.collection("recallGrades")
           recallGradeData.passage,
           recallGradeData.phrase,
         ]
-      ] = recallGradeData;
+      ] = [recallGradeData,recallGradeDoc.id];
     }
-    console.log("Done.");
+   }
+   await commitBatch();  
+   console.log("Done.");
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
   }
   return res.status(200).json({ done: true });
-}  
 };
 
 exports.restructureProjectSpecs = async (req, res) => {
