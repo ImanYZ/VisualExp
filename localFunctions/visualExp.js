@@ -200,69 +200,72 @@ exports.addRecallGradesColl = async (req, res) => {
 
 exports.checkRepeatedRecallGrades = async (req, res) => {
   try {
-let counter = 0;
-const recallGrades = {};
+    let counter = 0;
+    const recallGrades = {};
 
-for(let numberlimit = 1; i < 1000000; numberlimit+1000){
-let recallDoc = await  db.collection("recallGrades")
-      .orderBy("createdAt")
-      .limit(numberlimit);
-    
-let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
-    console.log("Starting");
-    let recallGradeDocs = await db
-      .collection("recallGrades")
-      .orderBy("createdAt")
-      .startAfter(lastVisibleRecallGradesDoc)
-      .limit(100)
-      .get();
+    for (let numberlimit = 1; numberlimit < 1000000; numberlimit + 1000) {
+      let recallDoc = await db
+        .collection("recallGrades")
+        .orderBy("createdAt")
+        .limit(numberlimit)
+        .get();
 
-    for (let recallGradeDoc of recallGradeDocs.docs) {
-      if (counter % 1000 === 0) {
-        console.log(counter);
-      }
-      counter += 1;
-      const recallGradeData = recallGradeDoc.data();
-      if (
-        [
-          recallGradeData.user,
-          recallGradeData.session,
-          recallGradeData.project,
-          recallGradeData.condition,
-          recallGradeData.passage,
-          recallGradeData.phrase,
-        ] in recallGrades
-      ) {
-        console.log({
-          key: [
+      let lastVisibleRecallGradesDoc =
+        recallDoc.docs[recallDoc.docs.length - 1];
+      console.log("Starting");
+      let recallGradeDocs = await db
+        .collection("recallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleRecallGradesDoc)
+        .limit(1000)
+        .get();
+
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+        if (counter % 1000 === 0) {
+          console.log(counter);
+        }
+        counter += 1;
+        const recallGradeData = recallGradeDoc.data();
+        if (
+          [
             recallGradeData.user,
             recallGradeData.session,
             recallGradeData.project,
             recallGradeData.condition,
             recallGradeData.passage,
             recallGradeData.phrase,
-          ],
-          id: recallGradeDoc.id,
-        });
+          ] in recallGrades
+        ) {
+          console.log({
+            key: [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ],
+            id: recallGradeDoc.id,
+          });
+        }
+        recallGrades[
+          [
+            recallGradeData.user,
+            recallGradeData.session,
+            recallGradeData.project,
+            recallGradeData.condition,
+            recallGradeData.passage,
+            recallGradeData.phrase,
+          ]
+        ] = recallGradeData;
       }
-      recallGrades[
-        [
-          recallGradeData.user,
-          recallGradeData.session,
-          recallGradeData.project,
-          recallGradeData.condition,
-          recallGradeData.passage,
-          recallGradeData.phrase,
-        ]
-      ] = recallGradeData;
     }
     console.log("Done.");
+    return res.status(200).json({ done: true });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
   }
-  return res.status(200).json({ done: true });
-}  
 };
 
 exports.restructureProjectSpecs = async (req, res) => {
