@@ -346,3 +346,41 @@ exports.restructureProjectSpecs = async (req, res) => {
 
   return res.status(200).json({ done: true });
 };
+
+
+exports.moveResearchersPoints = async()=>{
+  let researchers = ["Ethan Hiew",
+    "Huijia Zheng",
+ 
+   "Jiayue Mao",
+  
+   "Louwis Truong",
+ 
+   "Shaobo Liang",
+ 
+   "Shivani Lamba",
+   
+   "Sofia Azham" ,
+
+   "Xiaowen Yuan" ,
+
+   "Yizhou Chao"];
+
+   for(let res of researchers){
+      let docResearcherdoc = await db.collection("researchers").doc(res);
+      let data = docResearcherdoc.data();
+      let researcherUpdate ={
+        ...data,
+        projects:{
+          H2L2:{
+            ...data.projects["H2K2"],
+          }
+        }
+      } 
+      let docResearcherRef = db.collection("researchers").doc(res);
+      await batchUpdate(docResearcherRef, researcherUpdate);
+    }
+
+    await commitBatch();
+
+}
