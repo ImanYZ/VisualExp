@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import AppConfig from '../AppConfig';
 
 export const projectsState = atom({
   key: "projectsState",
@@ -7,7 +8,7 @@ export const projectsState = atom({
 
 export const projectState = atom({
   key: "projectState",
-  default: "",
+  default: AppConfig.defaultProject,
 });
 
 export const projectSpecsState = atom({

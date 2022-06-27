@@ -6,7 +6,11 @@ const {
   identifyDuplicateInstitutionDomains,
 } = require("./knowledge");
 
-const { addRecallGradesColl, restructureProjectSpecs } = require("./visualExp");
+const {
+  addRecallGradesColl,
+  restructureProjectSpecs,
+  checkRepeatedRecallGrades,
+} = require("./visualExp");
 
 const app = express();
 
@@ -15,13 +19,14 @@ app.get("/", (req, res) => {
   res.send(`Hello World!\n`);
 });
 app.get("/addRecallGradesColl", addRecallGradesColl);
+app.get("/checkRepeatedRecallGrades", checkRepeatedRecallGrades);
 app.get("/downloadNodes", downloadNodes);
 app.get("/fixInstitutionInUsers", fixInstitutionInUsers);
 app.get(
   "/identifyDuplicateInstitutionDomains",
   identifyDuplicateInstitutionDomains
 );
-app.get("/restructureProjectSpecs", restructureProjectSpecs)
+app.get("/restructureProjectSpecs", restructureProjectSpecs);
 
 const port = 8080;
 app.listen(port, () => {

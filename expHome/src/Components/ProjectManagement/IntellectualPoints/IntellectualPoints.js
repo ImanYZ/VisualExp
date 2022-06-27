@@ -219,7 +219,11 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     if (firebase && project && fullname) {
-      console.log("fetched activities Data");
+      setUpVotedToday(0);
+      setAllActivities([]);
+      setOthersActivities([]);
+      setOtherActivity({});
+      setDailyPoints([]);
       const activitiesQuery = firebase.db
         .collection("activities")
         .where("project", "==", project);
