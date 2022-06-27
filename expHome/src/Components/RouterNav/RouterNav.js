@@ -1149,7 +1149,7 @@ const RouterNav = (props) => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectSpecs.commentsPoints ?(
+                    
                       <Tooltip
                       title ={
                         <div>
@@ -1171,7 +1171,7 @@ const RouterNav = (props) => {
                           💬 {commentsPoints} </Button>  
                       </Tooltip>
 
-                    ):null}
+                 
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
