@@ -384,7 +384,7 @@ exports.moveResearchersPoints = async()=>{
    "Yizhou Chao"];
 
    for(let res of researchers){
-      let docResearcherdoc = await db.collection("researchers").doc(res);
+      let docResearcherdoc = await db.collection("researchers").doc(res).get();
       let data = docResearcherdoc.data();
       let researcherUpdate ={
         ...data,
@@ -401,3 +401,5 @@ exports.moveResearchersPoints = async()=>{
     await commitBatch();
 
 }
+
+
