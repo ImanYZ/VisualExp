@@ -4,23 +4,27 @@ import { useRecoilValue } from "recoil";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
+
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Grid";
+
 import Paper from "@mui/material/Paper";
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 
+import Box from '@mui/material/Box';
+
+
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import { projectState } from "../../../store/ProjectAtoms";
 
+
+
 const CodeFeedback = (props) => {
   const firebase = useRecoilValue(firebaseState);
-  // The authenticated researcher fullname
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
@@ -34,6 +38,7 @@ const CodeFeedback = (props) => {
   const [codeSelect, setCodeSelect] = useState([]);
   const [quotesSelect, setQuotesSelect] = useState([]);
 
+
   useEffect(() => {
     const retrieveFeedbackcodes = async () => {
       let foundResponse = false;
@@ -41,6 +46,7 @@ const CodeFeedback = (props) => {
         .collection("feedbackCodes")
         .where("project", "==", project)
         .get();
+     //we get all the codes where the autenticated resercher have voted on    
       const aleardyVotedDocs = await firebase.db
         .collection("feedbackCodes")
         .where("researcher", "==", fullname)
@@ -64,11 +70,18 @@ const CodeFeedback = (props) => {
             .where("project", "==", project)
             .get();
 
-          var cods = [];
+          let cods = [];
+          let codsShowen = [];
           for (let code of CodesDocs.docs) {
             const codeData = code.data();
-
+           
             cods.push(codeData);
+           
+            codsShowen.push({
+              code:codeData.code,
+              id:code.id,
+            });
+
           }
           foundResponse = true;
           setCodes(cods);
@@ -90,7 +103,7 @@ const CodeFeedback = (props) => {
 
   const submit = () => {
     setSubmitting(true);
-    voteCode();
+    voteCodeAndQuotes();
     uncheckBoxes();
     setRetrieveNext((oldValue) => oldValue + 1);
   };
@@ -121,7 +134,6 @@ const CodeFeedback = (props) => {
       for (let code of codes) {
         codef.push(code.code);
       }
-
       if (!codef.includes(newCode) && newCode !== "") {
         codesRef.set({
           code: newCode,
@@ -176,14 +188,12 @@ const CodeFeedback = (props) => {
 
       t.update(researcherRef, researcherUpdates);
     });
-
     setNewCode("");
     setTimeout(() => {
       setCreating(false);
     }, 1000);
   };
-
-  const voteCode = async (event) => {
+  const voteCodeAndQuotes = async (event) => {
     for (let code of codeSelect) {
       let approved = false;
       let codesVote = codes.filter((ele) => {
@@ -238,13 +248,13 @@ const CodeFeedback = (props) => {
     }
   };
 
+
   const uncheckBoxes = async (event) => {
     var inputs = document.querySelectorAll(".check");
     for (var i = 0; i < inputs.length; i++) {
       inputs[i].checked = false;
     }
   };
-
   const codeSelected = async (event) => {
     if (event.target.checked) {
       setCodeSelect([...codeSelect, event.target.value]);
@@ -267,142 +277,110 @@ const CodeFeedback = (props) => {
     }
   };
 
+
+
+  
+
   return (
     <>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            height: "50px",
-          }}
-        ></div>
-        <container>
-          <Grid container spacing={2}>
-            <Grid item md={6}>
-              <Paper>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Your Votes on Explanation</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {explanation
-                        .split(".")
-                        .filter((e) => e !== " ")
-                        .map((row) => (
-                          <div>
-                            <TableRow>
-                              <TableCell align="left">
-                                <input
-                                  onChange={quotesSelected}
-                                  type="checkbox"
-                                  value={row}
-                                  class="check"
-                                ></input>
-                              </TableCell>
-                              <TableCell>
-                                <label for={row}>{row}</label>
-                              </TableCell>
-                            </TableRow>
-                          </div>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-            <Grid item md={5}>
-              <Paper>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Your Votes on codes</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {codes.map((row) => (
-                        <div>
-                          <TableRow>
-                            <TableCell align="left">
-                              <input
-                                onChange={codeSelected}
-                                type="checkbox"
-                                value={row.code}
-                                class="check"
-                              ></input>
-                            </TableCell>
-                            <TableCell>
-                              <label for={row.code}>{row.code}</label>
-                            </TableCell>
-                          </TableRow>
-                        </div>
-                      ))}
-                    </TableBody>
-                  </Table>
-
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          "& > :not(style)": {
+            m: 3,
+            width: 700,
+            height: "100%",
+          },
+        }}
+      >
+        <Paper>
+          <Table>
+            <TableBody>
+              {explanation
+                .split(".")
+                .filter((e) => e !== "")
+                .map((row) => (
                   <div>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        height: "25px",
-                      }}
-                    ></div>
-                    <div style={{ padding: "10px" }}>
-                      <Typography variant="h8" margin-bottom="20px">
-                        {" "}
-                        If the code you're looking for does not exist in the
-                        list above, add it below :
-                      </Typography>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          height: "30px",
-                        }}
-                      ></div>
-                      <div id="ActivityDescriptionContainer">
-                        <TextareaAutosize
-                          id="ActivityDescriptionTextArea"
-                          minRows={7}
-                          onChange={codeChange}
-                          placeholder={"Add your code here."}
-                          value={newCode}
-                        />
-                      </div>
-                      <div>
-                        <Button
-                          variant="contained"
-                          style={{ margin: "5px" }}
-                          onClick={addCode}
-                          disabled={creating}
-                        >
-                          {creating ? (
-                            <CircularProgress color="warning" size="16px" />
-                          ) : (
-                            "Create"
-                          )}
-                        </Button>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          height: "50px",
-                        }}
-                      ></div>
-                    </div>
+                    <TableRow  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableCell align="left">
+                        <input
+                          onChange={quotesSelected}
+                          type="checkbox"
+                          value={row}
+                          class="check"
+                        ></input>
+                      </TableCell>
+                      <TableCell>
+                        <label for={row}>{row}</label>
+                      </TableCell>
+                    </TableRow>
                   </div>
-                </TableContainer>
-              </Paper>
-            </Grid>
-          </Grid>
-        </container>
-      </div>
+                ))}
+            </TableBody>
+          </Table>
+        </Paper>
+
+        <Paper>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  Choose only one of the following codes and on the left specify
+                  due to which of the sentences from the feedback you chose this
+                  code:
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {codes.map((row) => (
+                <div>
+                  <TableRow
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell align="left">
+                      <input
+                        onChange={codeSelected}
+                        type="checkbox"
+                        value={row.code}
+                        class="check"
+                      ></input>
+                    </TableCell>
+                    <TableCell>
+                      <label for={row.code}>{row.code} </label>
+                    </TableCell>
+                  </TableRow>
+                </div>
+              ))}
+            </TableBody>
+          </Table>
+          <div style={{ padding: "0px 25px 25px 25px" }}>
+            <Typography variant="h7" margin-bottom="20px">
+              If the code you're looking for does not exist in the list above,
+              add it below :
+            </Typography>
+            <TextareaAutosize
+              style={{ width: "80%", alignItems: "center" }}
+              minRows={7}
+              placeholder={"Add your code here."}
+              onChange={codeChange}
+              value={newCode}
+            />
+          </div>
+          <Button
+            variant="contained"
+            style={{ margin: "5px" }}
+            onClick={addCode}
+            disabled={creating}
+          >
+            {creating ? (
+              <CircularProgress color="warning" size="16px" />
+            ) : (
+              "Create"
+            )}
+          </Button>
+        </Paper>
+      </Box>
       <div style={{ position: "relative", left: "45%", top: "50px" }}>
         <Button
           variant="contained"
@@ -419,13 +397,6 @@ const CodeFeedback = (props) => {
           )}
         </Button>
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          height: "200px",
-        }}
-      ></div>
       <SnackbarComp
         newMessage={snackbarMessage}
         setNewMessage={setSnackbarMessage}
@@ -434,3 +405,6 @@ const CodeFeedback = (props) => {
   );
 };
 export default CodeFeedback;
+
+
+
