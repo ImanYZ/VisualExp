@@ -1591,7 +1591,7 @@ export default {
               one
             </>
           ),
-          answers: ["a"],
+          answers: ["c"],
           choices: {
             a: "Delete the component and paste it again on the canvas",
             b: "We cannot break the link between an instance and its main component",
