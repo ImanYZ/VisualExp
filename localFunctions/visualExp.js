@@ -234,7 +234,7 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
             recallGradeData.phrase,
           ] in recallGrades
         ) {
-          let previousrecallGradeId =
+          const previousRecallGrade =
             recallGrades[
               [
                 recallGradeData.user,
@@ -244,80 +244,143 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
                 recallGradeData.passage,
                 recallGradeData.phrase,
               ]
-            ].id;
-          let recallGradeRef = db
+            ];
+          let previousRecallGradeRef = db
             .collection("recallGrades")
-            .doc(previousrecallGradeId);
-          if (recallGradeData.researchersNum == 0) {
-            let recallGradeDeleteRef = db
-              .collection("recallGrades")
-              .doc(recallGradeDoc.id);
-            await batchDelete(recallGradeDeleteRef);
-            console.log(recallGradeDoc.id);
-          } else {
-            let previousrecallGradeData =
-              recallGrades[
-                [
-                  recallGradeData.user,
-                  recallGradeData.session,
-                  recallGradeData.project,
-                  recallGradeData.condition,
-                  recallGradeData.passage,
-                  recallGradeData.phrase,
-                ]
-              ].data;
+            .doc(previousRecallGrade.id);
+          let recallGradeDeleteRef = db
+            .collection("recallGrades")
+            .doc(recallGradeDoc.id);
+          if (!recallGradeData.approved && previousRecallGrade.data.approved) {
             for (
               let resIdx = 0;
               resIdx < recallGradeData.researchers.length;
               resIdx++
             ) {
               if (
-                !previousrecallGradeData.researchers.includes(
+                !previousRecallGrade.data.researchers.includes(
                   recallGradeData.researchers[resIdx]
                 )
               ) {
-                previousrecallGradeData.researchers.push(
+                previousRecallGrade.data.researchers.push(
                   recallGradeData.researchers[resIdx]
                 );
-                previousrecallGradeData.grades.push(
+                previousRecallGrade.data.grades.push(
                   recallGradeData.grades[resIdx]
                 );
-                previousrecallGradeData.researchersNum =
-                  previousrecallGradeData.researchersNum + 1;
-                await batchUpdate(recallGradeRef, {
-                  researchers: previousrecallGradeData.researchers,
-                  researchersNum: previousrecallGradeData.researchersNum,
-                  grades: previousrecallGradeData.grades,
-                });
+                previousRecallGrade.data.researchersNum =
+                  previousRecallGrade.data.researchersNum + 1;
               }
             }
-            let recallGradeCurrentDeleteRef = db
-            .collection("recallGrades")
-            .doc(recallGradeDoc.id);
-          await batchDelete(recallGradeCurrentDeleteRef);
+            await batchUpdate(previousRecallGradeRef, {
+              researchers: previousRecallGrade.data.researchers,
+              researchersNum: previousRecallGrade.data.researchersNum,
+              grades: previousRecallGrade.data.grades,
+            });
+            await batchDelete(recallGradeDeleteRef);
+            recallGrades[
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
+            ].data = previousRecallGrade.data;
+          } else if (
+            recallGradeData.approved &&
+            !previousRecallGrade.data.approved
+          ) {
+            for (
+              let resIdx = 0;
+              resIdx < previousRecallGrade.data.researchers.length;
+              resIdx++
+            ) {
+              if (
+                !recallGradeData.researchers.includes(
+                  previousRecallGrade.data.researchers[resIdx]
+                )
+              ) {
+                recallGradeData.researchers.push(
+                  previousRecallGrade.data.researchers[resIdx]
+                );
+                recallGradeData.grades.push(
+                  previousRecallGrade.data.grades[resIdx]
+                );
+                recallGradeData.researchersNum =
+                  recallGradeData.researchersNum + 1;
+              }
+            }
+            await batchUpdate(recallGradeDeleteRef, {
+              researchers: recallGradeData.researchers,
+              researchersNum: recallGradeData.researchersNum,
+              grades: recallGradeData.grades,
+            });
+            await batchDelete(previousRecallGradeRef);
+            recallGrades[
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
+            ] = { data: recallGradeData, id: recallGradeDoc.id };
+          } else if (
+            recallGradeData.approved &&
+            previousRecallGrade.data.approved
+          ) {
+            for (
+              let resIdx = 0;
+              resIdx < previousRecallGrade.data.researchers.length;
+              resIdx++
+            ) {
+              if (
+                !recallGradeData.researchers.includes(
+                  previousRecallGrade.data.researchers[resIdx]
+                )
+              ) {
+                recallGradeData.researchers.push(
+                  previousRecallGrade.data.researchers[resIdx]
+                );
+                recallGradeData.grades.push(
+                  previousRecallGrade.data.grades[resIdx]
+                );
+                recallGradeData.researchersNum =
+                  recallGradeData.researchersNum + 1;
+              }
+            }
+            await batchUpdate(recallGradeDeleteRef, {
+              researchers: recallGradeData.researchers,
+              researchersNum: recallGradeData.researchersNum,
+              grades: recallGradeData.grades,
+            });
+            await batchDelete(previousRecallGradeRef);
+            recallGrades[
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
+            ] = { data: recallGradeData, id: recallGradeDoc.id };
           }
-          console.log({
-            key: [
+        } else {
+          recallGrades[
+            [
               recallGradeData.user,
               recallGradeData.session,
               recallGradeData.project,
               recallGradeData.condition,
               recallGradeData.passage,
               recallGradeData.phrase,
-            ],
-            id: recallGradeDoc.id,
-          });
+            ]
+          ] = { data: recallGradeData, id: recallGradeDoc.id };
         }
-        recallGrades[
-          [
-            recallGradeData.user,
-            recallGradeData.session,
-            recallGradeData.project,
-            recallGradeData.condition,
-            recallGradeData.passage,
-            recallGradeData.phrase,
-          ]
-        ] = { data: recallGradeData, id: recallGradeDoc.id };
       }
     }
     await commitBatch();
@@ -368,42 +431,40 @@ exports.restructureProjectSpecs = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
-
-exports.moveResearchersPoints = async()=>{
-  let researchers = ["Ethan Hiew",
+exports.moveResearchersPoints = async () => {
+  let researchers = [
+    "Ethan Hiew",
     "Huijia Zheng",
- 
-   "Jiayue Mao",
-  
-   "Louwis Truong",
- 
-   "Shaobo Liang",
- 
-   "Shivani Lamba",
-   
-   "Sofia Azham" ,
 
-   "Xiaowen Yuan" ,
+    "Jiayue Mao",
 
-   "Yizhou Chao"];
+    "Louwis Truong",
 
-   for(let res of researchers){
-      let docResearcherdoc = await db.collection("researchers").doc(res).get();
-      let data = docResearcherdoc.data();
-      let researcherUpdate ={
-        ...data,
-        projects:{
-          H2L2:{
-            ...data.projects["H2K2"],
-          }
-        }
-      } 
-      let docResearcherRef = db.collection("researchers").doc(res);
-      await batchUpdate(docResearcherRef, researcherUpdate);
-    }
+    "Shaobo Liang",
 
-    await commitBatch();
+    "Shivani Lamba",
 
-}
+    "Sofia Azham",
 
+    "Xiaowen Yuan",
 
+    "Yizhou Chao",
+  ];
+
+  for (let res of researchers) {
+    let docResearcherdoc = await db.collection("researchers").doc(res).get();
+    let data = docResearcherdoc.data();
+    let researcherUpdate = {
+      ...data,
+      projects: {
+        H2L2: {
+          ...data.projects["H2K2"],
+        },
+      },
+    };
+    let docResearcherRef = db.collection("researchers").doc(res);
+    await batchUpdate(docResearcherRef, researcherUpdate);
+  }
+
+  await commitBatch();
+};
