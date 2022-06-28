@@ -12,12 +12,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-
-import {
-  firebaseState,
-  emailState,
-  fullnameState,
-} from "../../store/AuthAtoms";
+import {useNavigate} from 'react-router-dom'
+import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
 
 import SelectSessions from "./SelectSessions";
 
@@ -27,13 +23,9 @@ import "./SchedulePage.css";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
-tomorrow = new Date(
-  tomorrow.getFullYear(),
-  tomorrow.getMonth(),
-  tomorrow.getDate()
-);
+tomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
 
-const errorAlert = (data) => {
+const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
     console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
@@ -47,23 +39,24 @@ const sessionFormatter = (start, minutes) => {
       weekday: "long",
       year: "numeric",
       month: "long",
-      day: "numeric",
+      day: "numeric"
     }) +
     ", " +
     start.toLocaleTimeString(navigator.language, {
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      hour12: false
     }) +
     " - " +
-    new Date(start.getTime() + minutes * 60000).toLocaleTimeString(
-      navigator.language,
-      { hour: "2-digit", minute: "2-digit", hour12: false }
-    )
+    new Date(start.getTime() + minutes * 60000).toLocaleTimeString(navigator.language, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    })
   );
 };
 
-const SchedulePage = (props) => {
+const SchedulePage = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
@@ -79,6 +72,7 @@ const SchedulePage = (props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadSchedule = async () => {
@@ -88,11 +82,14 @@ const SchedulePage = (props) => {
       const userDoc = await firebase.db.collection("users").doc(fullname).get();
       const userData = userDoc.data();
       const project = userData.project;
-      console.log("Project => ", project);
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
       for (let researcherDoc of researcherDocs.docs) {
+        if (researcherDoc.id === userDoc.id) {
+          navigate("/Activities/Experiments");
+          return;
+        }
         const researcherData = researcherDoc.data();
         // We only need the researchers who are active in the project that the user belongs to.
         if (
@@ -103,40 +100,25 @@ const SchedulePage = (props) => {
           researchers[researcherDoc.id] = researcherData.email;
         }
       }
-
-      console.log("Researchers ",researchers)
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
       // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
       // that may include 0 to many researchers who are available at that session.
       const availSessions = {};
 
-
       // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db
-        .collection("resSchedule")
-        .where("project", "==", project)
-        .get();
-
-        console.log("Res Schedule => ", resScheduleDocs.docs.length)
+      const resScheduleDocs = await firebase.db.collection("resSchedule").where("project", "==", project).get();
 
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
         const resSession = resScheduleData.session.toDate();
         const resSessionStr = resSession.toLocaleString();
         // Only if the researcher is active in this project AND their availability is in the future:
-        if (
-          resScheduleData.fullname in researchers &&
-          resSession.getTime() > new Date().getTime()
-        ) {
+        if (resScheduleData.fullname in researchers && resSession.getTime() > new Date().getTime()) {
           // Add the available slots for the researcher's email.
           if (resSessionStr in availSessions) {
-            availSessions[resSessionStr].push(
-              researchers[resScheduleData.fullname]
-            );
+            availSessions[resSessionStr].push(researchers[resScheduleData.fullname]);
           } else {
-            availSessions[resSessionStr] = [
-              researchers[resScheduleData.fullname],
-            ];
+            availSessions[resSessionStr] = [researchers[resScheduleData.fullname]];
           }
         }
       }
@@ -153,9 +135,7 @@ const SchedulePage = (props) => {
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            event.attendees.findIndex(
-              (attendee) => attendee.email === email
-            ) !== -1
+            event.attendees.findIndex(attendee => attendee.email === email) !== -1
           ) {
             setParticipatedBefore(true);
             return;
@@ -163,9 +143,7 @@ const SchedulePage = (props) => {
         }
         // Only future events
         const startTime = new Date(event.start.dateTime).toLocaleString();
-        const startMinus30Min = new Date(
-          new Date(event.start.dateTime).getTime() - 30 * 60 * 1000
-        );
+        const startMinus30Min = new Date(new Date(event.start.dateTime).getTime() - 30 * 60 * 1000);
         // If the event has some attendees and the start timestamp is a key in availSessions,
         // we should remove all the attendees who are available researchers at this timestamp,
         // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
@@ -179,31 +157,23 @@ const SchedulePage = (props) => {
           event.attendees &&
           event.attendees.length > 0 &&
           startTime in availSessions &&
-          event.attendees.findIndex((attendee) => attendee.email === email) ===
-            -1 &&
+          event.attendees.findIndex(attendee => attendee.email === email) === -1 &&
           events.findIndex(
-            (eve) =>
-              new Date(eve.start.dateTime).getTime() ===
-                startMinus30Min.getTime() &&
-              new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 ===
-                new Date(eve.end.dateTime).getTime() &&
+            eve =>
+              new Date(eve.start.dateTime).getTime() === startMinus30Min.getTime() &&
+              new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 === new Date(eve.end.dateTime).getTime() &&
               eve.attendees.includes(email)
           ) === -1
         ) {
           for (let attendee of event.attendees) {
-            availSessions[startTime] = availSessions[startTime].filter(
-              (resea) => resea !== attendee.email
-            );
+            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee.email);
           }
         }
       }
       setAvailableSessions(availSessions);
       // Retrieve all the available time slots that the participant previously specified,
       // just to start from. They are supposed to modify these.
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", email.toLowerCase())
-        .get();
+      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
       const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
@@ -232,11 +202,11 @@ const SchedulePage = (props) => {
     }
   }, [fullname, email]);
 
-  const confirmClickOpen = (event) => {
+  const confirmClickOpen = event => {
     setOpenConfirm(true);
   };
 
-  const confirmClose = (value) => (event) => {
+  const confirmClose = value => event => {
     if (value) {
       if (value === "Confirmed") {
         submitData();
@@ -256,21 +226,16 @@ const SchedulePage = (props) => {
         setParticipatedBefore(true);
         return;
       }
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", email.toLowerCase())
-        .get();
+      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         if (scheduleData.id) {
           responseObj = await axios.post("/deleteEvent", {
-            eventId: scheduleData.id,
+            eventId: scheduleData.id
           });
           errorAlert(responseObj.data);
         }
-        const scheduleRef = firebase.db
-          .collection("schedule")
-          .doc(scheduleDoc.id);
+        const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
         await firebase.batchDelete(scheduleRef);
       }
       responseObj = await axios.post("/schedule", {
@@ -280,7 +245,7 @@ const SchedulePage = (props) => {
         second: secondSession,
         researcher2nd: availableSessions[secondSession.toLocaleString()][0],
         third: thirdSession,
-        researcher3rd: availableSessions[thirdSession.toLocaleString()][0],
+        researcher3rd: availableSessions[thirdSession.toLocaleString()][0]
       });
       errorAlert(responseObj.data);
 
@@ -288,7 +253,7 @@ const SchedulePage = (props) => {
         const scheduleRef = firebase.db.collection("schedule").doc();
         const theSession = {
           email: email.toLowerCase(),
-          session: firebase.firestore.Timestamp.fromDate(session),
+          session: firebase.firestore.Timestamp.fromDate(session)
         };
         if (session.getTime() === firstSession.getTime()) {
           theSession.id = responseObj.data.events[0].data.id;
@@ -313,29 +278,23 @@ const SchedulePage = (props) => {
       {submitted ? (
         <div className="DateDescription">
           <p>
-            Based on your specified availability, we just matched you with one
-            of our UX researchers for each session and sent you three Google
-            Calendar invitations. Please accept them as soon as possible. If any
-            of the sessions do not work for you, you can return to this page to
-            reschedule them only before your first session.
+            Based on your specified availability, we just matched you with one of our UX researchers for each session
+            and sent you three Google Calendar invitations. Please accept them as soon as possible. If any of the
+            sessions do not work for you, you can return to this page to reschedule them only before your first session.
           </p>
           <p>
-            For accepting the Google Calendar invites, please open each
-            invitation email, scroll all the way down to find the options to
-            respond to the Calendar invite, and click "Yes."
+            For accepting the Google Calendar invites, please open each invitation email, scroll all the way down to
+            find the options to respond to the Calendar invite, and click "Yes."
           </p>
           <p>
-            Note that accepting/declining the invitation through Outlook does
-            not work. You should only accept/reject the invitation through the
-            Yes/No links at the bottom of the Google Calendar invitation email.
+            Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject
+            the invitation through the Yes/No links at the bottom of the Google Calendar invitation email.
           </p>
         </div>
       ) : participatedBefore ? (
         <Alert severity="error">
-          You've participated in this study before or have scheduled a session
-          and cannot participate again or change the scheduled sessions! Please
-          convey your questions or concerns to Iman Yeckehzaare at
-          oneweb@umich.edu
+          You've participated in this study before or have scheduled a session and cannot participate again or change
+          the scheduled sessions! Please convey your questions or concerns to Iman Yeckehzaare at oneweb@umich.edu
         </Alert>
       ) : (
         <>
@@ -361,9 +320,8 @@ const SchedulePage = (props) => {
           <Alert severity="warning">
             <ul id="WarningPoints">
               <li>
-                Please specify your availability for our three UX experiment
-                sessions <strong>in your timezone</strong> to satisfy the
-                following criteria:
+                Please specify your availability for our three UX experiment sessions <strong>in your timezone</strong>{" "}
+                to satisfy the following criteria:
                 <ul>
                   <li>
                     <strong>
@@ -386,29 +344,23 @@ const SchedulePage = (props) => {
                 </ul>
               </li>
               <li>
-                As soon as you meet all the criteria, the SCHEDULE button will
-                be enabled and the time slots with ✅ will indicate your
-                sessions. You should click the SCHEDULE button and get the
-                confirmation message, otherwise, your sessions will not be
-                scheduled.
+                As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
+                will indicate your sessions. You should click the SCHEDULE button and get the confirmation message,
+                otherwise, your sessions will not be scheduled.
               </li>
               <li>
-                There is no UX researcher available to take the time slots
-                labeled with UNAVBL! You can only take the light blue ones.
+                There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take the
+                light blue ones.
               </li>
             </ul>
           </Alert>
           {schedule.length > 0 && !submitable && (
             <Alert severity="error">
               <ul id="WarningPoints">
+                <li>You have not specified enough of your availability to satisfy the above criteria.</li>
                 <li>
-                  You have not specified enough of your availability to satisfy
-                  the above criteria.
-                </li>
-                <li>
-                  If you don't have enough availability in the next two weeks,
-                  please return to this page in the following days to specify
-                  your available time slots.
+                  If you don't have enough availability in the next two weeks, please return to this page in the
+                  following days to specify your available time slots.
                 </li>
               </ul>
             </Alert>
@@ -434,11 +386,7 @@ const SchedulePage = (props) => {
               <div id="SignBtnContainer">
                 <Button
                   onClick={confirmClickOpen}
-                  className={
-                    submitable && !isSubmitting
-                      ? "Button SubmitButton"
-                      : "Button SubmitButton Disabled"
-                  }
+                  className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
                   variant="contained"
                   disabled={submitable && !isSubmitting ? null : true}
                 >
@@ -463,8 +411,8 @@ const SchedulePage = (props) => {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <div>
-              Press "Confirm" if you'd like to schedule the following three
-              sessions, or press "Cancel" to revise your sessions.
+              Press "Confirm" if you'd like to schedule the following three sessions, or press "Cancel" to revise your
+              sessions.
             </div>
             {firstSession && secondSession && thirdSession && (
               <ul>
