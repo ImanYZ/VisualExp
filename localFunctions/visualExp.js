@@ -291,6 +291,10 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
                 });
               }
             }
+            let recallGradeCurrentDeleteRef = db
+            .collection("recallGrades")
+            .doc(recallGradeDoc.id);
+          await batchDelete(recallGradeCurrentDeleteRef);
           }
           console.log({
             key: [
