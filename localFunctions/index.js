@@ -10,6 +10,7 @@ const {
   addRecallGradesColl,
   restructureProjectSpecs,
   checkRepeatedRecallGrades,
+  moveResearchersPoints,
 } = require("./visualExp");
 
 const app = express();
@@ -27,6 +28,7 @@ app.get(
   identifyDuplicateInstitutionDomains
 );
 app.get("/restructureProjectSpecs", restructureProjectSpecs);
+app.get("/moveResearchersPoints",moveResearchersPoints);
 
 const port = 8080;
 app.listen(port, () => {
