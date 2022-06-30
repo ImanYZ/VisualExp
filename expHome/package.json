@@ -59,6 +59,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@types/eslint": "^8.4.3",
     "react-error-overlay": "6.0.9"
   },
   "eslintConfig": {
