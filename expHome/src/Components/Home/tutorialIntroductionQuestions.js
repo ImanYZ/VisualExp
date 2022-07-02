@@ -454,7 +454,7 @@ export default {
         choices: {
           a: "Top contributors across the platform",
           b: "All contributors",
-          c: "Top contributors in your community"
+          c: "Top contributors in your community",
           d: "All contributors in your community",
         }
       }
