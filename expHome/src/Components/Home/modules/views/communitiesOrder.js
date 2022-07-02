@@ -629,6 +629,7 @@ export default [
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
     portfolio: true,
+    hasTest:true,
     qualifications: [
       `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
       `Instinct and intuition for good UI design.`,
