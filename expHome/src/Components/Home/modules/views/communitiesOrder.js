@@ -592,7 +592,7 @@ export default [
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
     portfolio: true,
-    hasTest:true,
+    hasTest: true,
     qualifications: [
       `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
       `Instinct and intuition for good UI design.`,
@@ -620,12 +620,16 @@ export default [
       {
         title: "Deep Learning (in Machine learning)",
         node: "DkS1Gz9mxKBbvZ5bs6he"
+      },
+      {
+        title: "Natural language processing",
+        node: "khCWqIXa9xQiojnEqHCT"
       }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
-    title: "Deep Learning",
+    title: "Natural Language Processing",
     width: "31%",
     leaders: [
       {
@@ -638,32 +642,7 @@ export default [
             url: "https://www.linkedin.com/in/ge-zhang-792797169/"
           }
         ]
-      },
-      {
-        name: "Xinrong Yao",
-        image: "Xinrong_Yao.jpeg",
-        about: ``,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/xinrong-yao-07aa071b1/"
-          }
-        ]
       }
-      // {
-      //   name: "Vatsal Chaudhari",
-      //   image: "Vatsal_Chaudhari.jpeg",
-      //   about: `I am a hardworking computer science student studying at The Ohio State University. As a student, I have learned to solve problems in creative ways. I am also an active member of Humanitarian Engineering Scholars, Competitive Programing Club, and Underwater Robotics Club.
-      //   In my spare time, I like to work on mobile app development. I am currently working on AcneTracker, which is an android app intended to help those with mild to severe acne. I am creating this app using Java and Android Studio.
-      //   I am eager to hear about potential career opportunities, so I would be pleased to chat about job openings in the computer science/engineering and software development area.
-      //   Areas of expertise: Java, Python, C++, Flutter, HTML5/CSS3, Mobile App Development, Web App Development, Git, Problem Solving, Mathematics.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/vatsalchaudhari/",
-      //     },
-      //   ],
-      // },
     ],
     YouTube: "J0y0tZzzuQ0",
     description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the deep learning area on 1Cademy, our collaborative research platform. This semester, we will explore natural language processing, which is a branch of artificial intelligence concerned with giving computers the ability to understand text and spoken words in much the same way human beings can. Our team members will dive into the Speech and Language Processing textbook and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
@@ -689,6 +668,95 @@ export default [
       `Constantly study the previously mentioned textbook, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
       `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week. `,
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
+  },
+  {
+    id: "Graph_Neural_Network",
+    tags: [
+      {
+        title: "Graph Neural Networks (GNNs)",
+        node: "s59mYbhSxRdWscDBoAaN"
+      }
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Graph_Neural_Network.jpg",
+    title: "Graph Neural Networks",
+    width: "50%",
+    leaders: [
+      {
+        name: "Tian Yan",
+        image: "Tian_Yan.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/tianyan2023/"
+          }
+        ]
+      },
+      {
+        name: "Xinrong Yao",
+        image: "Xinrong_Yao.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/xinrong-yao-07aa071b1/"
+          }
+        ]
+      }
+    ],
+    YouTube: "1J8xBUT1C7c",
+    description: `We are a group of
+    people who are passionate about GNN and eager to learn about the newest
+    developments. In this community, we consistently work on learning, presenting, and
+    communicating the most up-to-date knowledge about GNN, honing our research skills,
+    and conducting frontier research. Every week, each member will be assigned readings
+    on GNN, and each member will summarize their readings in the form of nodes and
+    connections on our platform 1cademy, and present their nodes at our weekly meeting. If
+    the intern is dedicated and has demonstrated good research ability in this process, we’ll
+    further invite you to our research team and you will have the opportunity to co-author
+    scientific papers.`,
+    accomplishments: ``,
+    gains: [
+      `You will improve your reading ability of scientific textbooks and papers.`,
+      `You will also learn
+      how to quickly grasp important ideas in a research paper and describe it to others.`,
+      `You will improve your research skills by constantly paraphrasing important concepts in
+      graph neural network, making connections between them, and learning most up-to-date
+      progress in this area.`,
+      `You will improve your communication skills by making weekly presentations of your
+      reading.`,
+      `You will have the opportunity to co-author research papers under the guidance of senior
+      researchers and scientists.`,
+      `You can start at any time and all work will be remote, and you will have an valuable
+      internship experience that you can write on your resume.`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and interest in deep learning, especially Graph Neural Network.`,
+      `Proficiency in at least one programming language, such as R, Python, C++, or Java.`,
+      `Have completed coursework in linear algebra and calculus.`,
+      `Have experience in deep learning through course work, projects, or internships.`,
+      `(Prefered) Have demonstrated experience in Graph Neural Network through course
+      work, projects, or internships.`,
+      `(Prefered) Have past research experience in deep learning, especially Graph Neural
+      Network.`
+    ],
+    responsibilities: [
+      `Finish your assigned weekly reading, and summarize your reading on our platform
+      1cademy. The book we are currently reading is Graph Representation Learning by
+      William L. Hamilton, and we also read various survey papers on graph neural network.
+      And if you have other reading materials on graph neural network that interest you more,
+      you can also summarize the readings by your choice.`,
+      `Join our weekly meeting, and present your summarized nodes during meeting. You are
+      also welcome to present any other summarization on graph neural network that interest
+      you.`,
+      `If you’re invited to our research team, you also need to collaborate with other team
+      members and finished your part of research work on time.`,
       `All interactions, task fulfillment, and communications will be remote.`
     ]
   },
