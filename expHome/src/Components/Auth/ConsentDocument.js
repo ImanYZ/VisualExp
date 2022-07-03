@@ -33,7 +33,7 @@ const ConsentDocument = props => {
           <strong>Benjamin Brown</strong>, Graduate student at San Jose State University, School of Information
         </li>
         <li>
-          <strong>Ethan Hiew</strong>, Undergraduate Cognitive Science (Computational Focus) student, at the University
+          <strong>Ethan Hiew</strong>, Undergraduate in Cognitive Science (with a Computational Emphasis) at University
           of California, Davis
         </li>
         <li>

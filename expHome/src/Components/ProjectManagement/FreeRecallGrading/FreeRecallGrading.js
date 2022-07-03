@@ -76,8 +76,8 @@ const FreeRecallGrading = props => {
       const recallGradeDocs = await firebase.db
         .collection(collName)
         .where("researchersNum", "<", 4)
-        .orderBy("user")
         .orderBy("session")
+        .orderBy("user")
         .limit(1000)
         .get();
 
