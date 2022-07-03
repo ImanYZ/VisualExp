@@ -19,7 +19,7 @@ import {
   choicesState
 } from "../../store/ExperimentAtoms";
 
-import { projectSpecsState } from "../../store/ProjectAtoms";
+import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
@@ -29,13 +29,15 @@ import { isEmail, getFullname, shuffleArray } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
+import AppConfig from "../../AppConfig";
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [leading, setLeading] = useRecoilState(leadingState);
-  const currentProject = useRecoilValue(currentProjectState);
+  const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
+  const [project, setProject] = useRecoilState(projectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [phase, setPhase] = useRecoilState(phaseState);
   const [step, setStep] = useRecoilState(stepState);
@@ -107,7 +109,6 @@ const Auth = props => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
-      console.log("FULL NAME => ", fuName);
       if ("leading" in userData && userData.leading.length > 0) {
         setLeading(userData.leading);
       }
@@ -155,6 +156,13 @@ const Auth = props => {
           id: userRef.id,
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         });
+      }
+      // when user is not a researcher update the project so that
+      // it loads the projectSpecs of the project that is assigned to a user.
+      if (userData && !researcherDoc.exists) {
+        const proj = userData.project || AppConfig.defaultProject;
+        setCurrentProject(proj);
+        setProject(proj);
       }
     } else {
       userNotExists = true;
