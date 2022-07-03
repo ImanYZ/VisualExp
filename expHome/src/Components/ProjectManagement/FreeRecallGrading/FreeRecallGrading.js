@@ -73,7 +73,13 @@ const FreeRecallGrading = props => {
       if (project !== "H2K2") {
         collName += project;
       }
-      const recallGradeDocs = await firebase.db.collection(collName).where("researchersNum", "<", 4).limit(1000).get();
+      const recallGradeDocs = await firebase.db
+        .collection(collName)
+        .where("researchersNum", "<", 4)
+        .orderBy("user")
+        .orderBy("session")
+        .limit(1000)
+        .get();
 
       if (recallGradeDocs.docs.length === 0) {
         setUser(null);
