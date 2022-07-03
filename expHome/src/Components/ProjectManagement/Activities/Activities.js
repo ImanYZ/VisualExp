@@ -19,6 +19,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
@@ -38,13 +39,14 @@ const AdminAccessPages = [
   { page: 'Intellectual', view: <ExpenseReports /> },
   { page: 'Experiments', view: <ManageEvents /> }
 ];
-
+if(activePage === "CodeFeedback") return <CodeFeedback/>;
 const CommonPages = [
   { page: 'Intellectual', view: <IntellectualPoints /> },
   { page: 'Experiments', view: <ExperimentPoints /> },
   { page: 'AddInstructor', view: <AddInstructor /> },
   { page: '1Cademy', view: <OneCademy /> },
-  { page: 'FreeRecallGrading', view: <FreeRecallGrading /> }
+  { page: 'FreeRecallGrading', view: <FreeRecallGrading /> },
+  { page:'CodeFeedback',view:<CodeFeedback/>}
 ];
 
 const Activities = (props) => {
