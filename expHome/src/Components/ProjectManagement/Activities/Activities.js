@@ -4,21 +4,17 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 
-import {
-  firebaseState,
-  emailState,
-  fullnameState,
-  isAdminState,
-} from "../../../store/AuthAtoms";
+import { firebaseState, emailState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
   projectState,
   projectsState,
   projectSpecsState,
   activePageState,
-  notAResearcherState,
+  notAResearcherState
 } from "../../../store/ProjectAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
@@ -32,22 +28,23 @@ import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
 
-const ShowLeaderBoardForAdmin = ['1Cademy', 'AddInstructor', 'FreeRecallGrading'];
+const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "FreeRecallGrading"];
 
 const AdminAccessPages = [
-  { page: 'Intellectual', view: <ExpenseReports /> },
-  { page: 'Experiments', view: <ManageEvents /> }
+  { page: "Intellectual", view: <ExpenseReports /> },
+  { page: "Experiments", view: <ManageEvents /> }
 ];
 
 const CommonPages = [
-  { page: 'Intellectual', view: <IntellectualPoints /> },
-  { page: 'Experiments', view: <ExperimentPoints /> },
-  { page: 'AddInstructor', view: <AddInstructor /> },
-  { page: '1Cademy', view: <OneCademy /> },
-  { page: 'FreeRecallGrading', view: <FreeRecallGrading /> }
+  { page: "Intellectual", view: <IntellectualPoints /> },
+  { page: "Experiments", view: <ExperimentPoints /> },
+  { page: "AddInstructor", view: <AddInstructor /> },
+  { page: "1Cademy", view: <OneCademy /> },
+  { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
+  { page: "CodeFeedback", view: <CodeFeedback /> }
 ];
 
-const Activities = (props) => {
+const Activities = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
@@ -73,9 +70,9 @@ const Activities = (props) => {
   useEffect(() => {
     if (project && fullname) {
       const researchersQuery = firebase.db.collection("researchers");
-      const researchersSnapshot = researchersQuery.onSnapshot((snapshot) => {
+      const researchersSnapshot = researchersQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setResearchersChanges((oldResearchersChanges) => {
+        setResearchersChanges(oldResearchersChanges => {
           return [...oldResearchersChanges, ...docChanges];
         });
         console.log("researchersSnapshot");
@@ -95,13 +92,10 @@ const Activities = (props) => {
       let resears = [...researchers];
       for (let change of tempResearchersChanges) {
         if (change.type === "removed") {
-          resears = resears.filter((resear) => resear.id !== change.doc.id);
+          resears = resears.filter(resear => resear.id !== change.doc.id);
         } else {
           const researData = change.doc.data();
-          if (
-            project in (researData?.projects || {}) &&
-            researData?.projects?.[project]?.active
-          ) {
+          if (project in (researData?.projects || {}) && researData?.projects?.[project]?.active) {
             const projectData = researData.projects[project];
             let totalPoints = 0;
             let expPoints = 0;
@@ -165,7 +159,7 @@ const Activities = (props) => {
                 intellectualPoints,
                 instructorsPoints,
                 commentsPoints,
-                gradingPoints,
+                gradingPoints
               });
             }
           }
@@ -177,11 +171,11 @@ const Activities = (props) => {
     }
   }, [project, researchers, researchersChanges]);
 
-  const expandLeaderboard = (event) => {
+  const expandLeaderboard = event => {
     setExpanded(!expanded);
   };
 
-  const isResearcherCriteriaMet = (resear) => {
+  const isResearcherCriteriaMet = resear => {
     let met = true;
     for (let key in projectPoints) {
       if ((resear[key] || 0) < projectPoints[key]) {
@@ -192,7 +186,7 @@ const Activities = (props) => {
     return met;
   };
 
-  const makeResearcherChipContent = (resear) => {
+  const makeResearcherChipContent = resear => {
     const content = [];
 
     if (projectPoints.onePoints) {
@@ -200,11 +194,7 @@ const Activities = (props) => {
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1Cademy" />{" "}
-          <span
-            className={
-              resear.onePoints >= projectPoints.onePoints ? "GreenText" : ""
-            }
-          >
+          <span className={resear.onePoints >= projectPoints.onePoints ? "GreenText" : ""}>
             {formatPoints(resear.onePoints)}
           </span>
         </>
@@ -214,13 +204,7 @@ const Activities = (props) => {
     if (projectPoints.intellectualPoints) {
       console.log("projectPoints.intellectualPoints");
       content.push(
-        <span
-          className={
-            resear.intellectualPoints >= projectPoints.intellectualPoints
-              ? "GreenText"
-              : ""
-          }
-        >
+        <span className={resear.intellectualPoints >= projectPoints.intellectualPoints ? "GreenText" : ""}>
           {"🎓 " + formatPoints(resear.intellectualPoints)}
         </span>
       );
@@ -237,11 +221,7 @@ const Activities = (props) => {
 
     if (projectPoints.expPoints) {
       content.push(
-        <span
-          className={
-            resear.expPoints >= projectPoints.expPoints ? "GreenText" : ""
-          }
-        >
+        <span className={resear.expPoints >= projectPoints.expPoints ? "GreenText" : ""}>
           {"👨‍🔬 " + formatPoints(resear.expPoints)}
         </span>
       );
@@ -249,13 +229,7 @@ const Activities = (props) => {
 
     if (projectPoints.commentsPoints) {
       content.push(
-        <span
-          className={
-            resear.commentsPoints >= projectPoints.commentsPoints
-              ? "GreenText"
-              : ""
-          }
-        >
+        <span className={resear.commentsPoints >= projectPoints.commentsPoints ? "GreenText" : ""}>
           {"💬 " + formatPoints(resear.commentsPoints)}
         </span>
       );
@@ -263,13 +237,7 @@ const Activities = (props) => {
 
     if (projectPoints.gradingPoints) {
       content.push(
-        <span
-          className={
-            resear.gradingPoints >= projectPoints.gradingPoints
-              ? "GreenText"
-              : ""
-          }
-        >
+        <span className={resear.gradingPoints >= projectPoints.gradingPoints ? "GreenText" : ""}>
           {"🧠 " + formatPoints(resear.gradingPoints)}
         </span>
       );
@@ -306,17 +274,12 @@ const Activities = (props) => {
   })();
 
   if (notAResearcher) {
-    return (
-      <h1>
-        You're not a researcher on{" "}
-        {projects.length > 0 ? `the project ${project}!` : "any project!"}
-      </h1>
-    );
+    return <h1>You're not a researcher on {projects.length > 0 ? `the project ${project}!` : "any project!"}</h1>;
   }
 
   return (
     <div id="ActivitiesContainer">
-      {showLeaderBoard &&
+      {showLeaderBoard && (
         <div className="Columns40_60">
           <Alert severity="warning">
             <ProjectPoints projectPoints={projectPoints} />
@@ -336,7 +299,7 @@ const Activities = (props) => {
             makeResearcherChipContent={makeResearcherChipContent}
           />
         </div>
-      }
+      )}
       {currentPage}
     </div>
   );
