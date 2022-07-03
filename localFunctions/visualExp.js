@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { app } = require("firebase-admin");
 const fs = require("fs");
 
 const {
@@ -60,6 +61,7 @@ exports.addRecallGradesColl = async (req, res) => {
       } else {
         recallGrades[recallGradeKey] = {
           ...fRData,
+          approved :false,
           researchers: [fRData.researcher],
           researchersNum: 1,
           grades: [fRData.grade],
@@ -68,6 +70,7 @@ exports.addRecallGradesColl = async (req, res) => {
         delete recallGrades[recallGradeKey]["grade"];
       }
     }
+    
     // The issue is that every time we call this function, we start from the
     // first users document and go to the end again and again. To solve this
     // issue, I believe we should do something similar to what we did for the
@@ -200,27 +203,201 @@ exports.addRecallGradesColl = async (req, res) => {
 
 exports.checkRepeatedRecallGrades = async (req, res) => {
   try {
-let counter = 0;
-const recallGrades = {};
-
-for(let numberlimit = 1; i < 1000000; numberlimit+1000){
-let recallDoc = await  db.collection("recallGrades")
-      .orderBy("createdAt")
-      .limit(numberlimit);
-    
-let lastVisibleRecallGradesDoc = recallDoc.docs[recallDoc.docs.length - 1];
-    console.log("Starting");
-let recallGradeDocs = await db.collection("recallGrades")
+    const recallGrades = {};
+    const duplicate =[];
+    let recallGradeDocsInitial= await db
+    .collection("recallGrades")
     .orderBy("createdAt")
-    .startAfter(lastVisibleRecallGradesDoc)
-    .limit(100)
+    .limit(1)
     .get();
+  let documentsNumber=1;
+  let lastVisibleRecallGradesDoc=recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];;
+  
+  console.log("Starting");
+  while(lastVisibleRecallGradesDoc){
+  
+  recallGradeDocs = await db
+          .collection("recallGrades")
+          .orderBy("createdAt")
+          .startAfter(lastVisibleRecallGradesDoc)
+          .limit(40000)
+          .get();
+    
+  
+    lastVisibleRecallGradesDoc =
+    recallGradeDocs.docs[recallGradeDocs.docs.length - 1];     
+   
+  
+  
+    console.log(documentsNumber);
+    documentsNumber = documentsNumber+40000;
 
-    for (let recallGradeDoc of recallGradeDocs.docs) {
-      if (counter % 1000 === 0) {
-        console.log(counter);
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+        const recallGradeData = recallGradeDoc.data();
+        if (
+          [
+            recallGradeData.user,
+            recallGradeData.session,
+            recallGradeData.project,
+            recallGradeData.condition,
+            recallGradeData.passage,
+            recallGradeData.phrase,
+          ] in recallGrades
+        ) {
+          const previousRecallGrade =
+            recallGrades[
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
+            ];
+            console.log(recallGradeDoc.id,previousRecallGrade.id);
+            duplicate.push(recallGradeDoc.id);            
+        } else {
+          recallGrades[
+            [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ]
+          ] = { data: recallGradeData, id: recallGradeDoc.id };
+        }
       }
-      counter += 1;
+    }
+
+    console.log("Done.");
+    return res.status(200).json({ done: true });
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+
+exports.deleteDuplicatesWithNoVotes = async(req, res)=>{
+try{
+ 
+  const recallGrades = {};
+  const duplicate =[];
+  let recallGradeDocsInitial= await db
+  .collection("recallGrades")
+  .orderBy("createdAt")
+  .limit(1)
+  .get();
+let documentsNumber=1;
+let lastVisibleRecallGradesDoc=recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];;
+
+console.log("Starting");
+while(lastVisibleRecallGradesDoc){
+
+recallGradeDocs = await db
+        .collection("recallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleRecallGradesDoc)
+        .limit(40000)
+        .get();
+  
+
+  lastVisibleRecallGradesDoc =
+  recallGradeDocs.docs[recallGradeDocs.docs.length - 1];     
+ 
+
+
+  console.log(documentsNumber);
+  documentsNumber = documentsNumber+40000;
+    
+  for (let recallGradeDoc of recallGradeDocs.docs) {
+
+    const recallGradeData = recallGradeDoc.data();
+    if (
+      [
+        recallGradeData.user,
+        recallGradeData.session,
+        recallGradeData.project,
+        recallGradeData.condition,
+        recallGradeData.passage,
+        recallGradeData.phrase,
+      ] in recallGrades
+    ) {
+      if(recallGradeData.researchersNum===0){
+        console.log(recallGradeDoc.id);
+        duplicate.push(recallGradeDoc.id);
+        let recallGradeDeleteRef = db
+        .collection("recallGrades")
+        .doc(recallGradeDoc.id); 
+        await batchDelete(recallGradeDeleteRef);
+
+      }
+      
+    }else{  
+      recallGrades[
+      [
+        recallGradeData.user,
+        recallGradeData.session,
+        recallGradeData.project,
+        recallGradeData.condition,
+        recallGradeData.passage,
+        recallGradeData.phrase,
+      ]
+    ] = recallGradeData;}
+  
+  }
+}
+  
+await commitBatch();
+console.log(duplicate.length);
+console.log("Done");
+
+
+}catch(err){
+  console.log({ err });
+  return res.status(500).json({ err });
+}
+
+}
+
+exports.deleteDuplicatesWithVotes = async(req, res)=>{
+  try{
+   
+    const recallGrades = {};
+    const duplicate =[];
+    let recallGradeDocsInitial= await db
+    .collection("recallGrades")
+    .orderBy("createdAt")
+    .limit(1)
+    .get();
+  let documentsNumber=1;
+  let lastVisibleRecallGradesDoc=recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];;
+  
+  console.log("Starting");
+  while(lastVisibleRecallGradesDoc){
+  
+  recallGradeDocs = await db
+          .collection("recallGrades")
+          .orderBy("createdAt")
+          .startAfter(lastVisibleRecallGradesDoc)
+          .limit(40000)
+          .get();
+    
+  
+    lastVisibleRecallGradesDoc =
+    recallGradeDocs.docs[recallGradeDocs.docs.length - 1];     
+   
+  
+  
+    console.log(documentsNumber);
+    documentsNumber = documentsNumber+40000;
+  
+      
+    for (let recallGradeDoc of recallGradeDocs.docs) {
+  
       const recallGradeData = recallGradeDoc.data();
       if (
         [
@@ -232,19 +409,60 @@ let recallGradeDocs = await db.collection("recallGrades")
           recallGradeData.phrase,
         ] in recallGrades
       ) {
-        console.log({
-          key: [
-            recallGradeData.user,
-            recallGradeData.session,
-            recallGradeData.project,
-            recallGradeData.condition,
-            recallGradeData.passage,
-            recallGradeData.phrase,
-          ],
-          id: recallGradeDoc.id,
-        });
-      }
-      recallGrades[
+        const previousRecallGrade =
+            recallGrades[
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
+            ];
+          let previousRecallGradeRef = db
+            .collection("recallGrades")
+            .doc(previousRecallGrade.id);
+          let recallGradeDeleteRef = db
+            .collection("recallGrades")
+            .doc(recallGradeDoc.id);
+        if(recallGradeData.researchersNum<4 && !(recallGradeData.researchersNum===0)){
+
+          duplicate.push(recallGradeDoc.id);
+          console.log(recallGradeDoc.id,previousRecallGrade.id)
+          for(let resIdx=0;resIdx<recallGradeData.researchersNum;resIdx++){
+            if (
+              !(previousRecallGrade.data.researchers.includes(
+                recallGradeData.researchers[resIdx])
+              )
+            ) {
+              previousRecallGrade.data.researchers.push(
+                recallGradeData.researchers[resIdx]
+              );
+              previousRecallGrade.data.grades.push(
+                recallGradeData.grades[resIdx]
+              );
+              previousRecallGrade.data.researchersNum =
+                previousRecallGrade.data.researchersNum + 1;
+            }
+          }
+      
+          recallGrades[
+            [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ]
+          ] = {data:previousRecallGrade.data, id:previousRecallGrade.id}
+          await batchDelete(recallGradeDeleteRef);
+          await batchUpdate(previousRecallGradeRef,previousRecallGrade.data);
+        }
+        
+      }else{  
+        recallGrades[
         [
           recallGradeData.user,
           recallGradeData.session,
@@ -253,52 +471,95 @@ let recallGradeDocs = await db.collection("recallGrades")
           recallGradeData.passage,
           recallGradeData.phrase,
         ]
-      ] = recallGradeData;
+      ] = {data:recallGradeData, id:recallGradeDoc.id};}
+    
     }
-    console.log("Done.");
-  } catch (err) {
+  }
+    
+  await commitBatch();
+  console.log(duplicate.length);
+  console.log("Done");
+  
+  
+  }catch(err){
     console.log({ err });
     return res.status(500).json({ err });
   }
-  return res.status(200).json({ done: true });
-}  
-};
+  
+  }
 
-exports.restructureProjectSpecs = async (req, res) => {
-  const documents = {
-    H2K2: {
-      points: {
-        commentsPoints: 100,
-        expPoints: 100,
-        gradingPoints: 100,
-        instructorsPoints: 100,
-        intellectualPoints: 100,
-        onePoints: 100,
-      },
-    },
-    Annotating: {
-      points: {
-        commentsPoints: 400,
-        expPoints: 400,
-        gradingPoints: 400,
-        instructorsPoints: 400,
-        intellectualPoints: 400,
-        onePoints: 400,
-      },
-    },
+exports.moveResearchersPoints = async () => {
+    let researchers = [
+      "Ethan Hiew",
+      "Huijia Zheng",
+      "Jiayue Mao",
+  
+      "Louwis Truong",
+  
+      "Shaobo Liang",
+  
+      "Shivani Lamba",
+  
+      "Sofia Azham",
+  
+      "Xiaowen Yuan",
+  
+      "Yizhou Chao",
+    ];
+  
+    for (let res of researchers) {
+      let docResearcherdoc = await db.collection("researchers").doc(res).get();
+      let data = docResearcherdoc.data();
+      let researcherUpdate = {
+        ...data,
+        projects: {
+          H2L2: {
+            ...data.projects["H2K2"],
+          },
+        },
+      };
+      let docResearcherRef = db.collection("researchers").doc(res);
+      await batchUpdate(docResearcherRef, researcherUpdate);
+    }
+  
+    await commitBatch();
   };
 
-  try {
-    for (proj of Object.keys(documents)) {
-      const projectSpecs = db.collection("projectSpecs").doc(proj);
-      await batchSet(projectSpecs, documents[proj]);
+exports.restructureProjectSpecs = async (req, res) => {
+    const documents = {
+      H2K2: {
+        points: {
+          commentsPoints: 100,
+          expPoints: 100,
+          gradingPoints: 100,
+          instructorsPoints: 100,
+          intellectualPoints: 100,
+          onePoints: 100,
+        },
+      },
+      Annotating: {
+        points: {
+          commentsPoints: 400,
+          expPoints: 400,
+          gradingPoints: 400,
+          instructorsPoints: 400,
+          intellectualPoints: 400,
+          onePoints: 400,
+        },
+      },
+    };
+  
+    try {
+      for (proj of Object.keys(documents)) {
+        const projectSpecs = db.collection("projectSpecs").doc(proj);
+        await batchSet(projectSpecs, documents[proj]);
+      }
+  
+      await commitBatch();
+    } catch (err) {
+      console.log({ err });
+      return res.status(500).json({ err });
     }
-
-    await commitBatch();
-  } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ err });
-  }
-
-  return res.status(200).json({ done: true });
-};
+  
+    return res.status(200).json({ done: true });
+  };
