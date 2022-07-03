@@ -12,14 +12,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
+import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import SelectSessions from "./SelectSessions";
 
 import { isEmail } from "../../utils";
 
 import "./SchedulePage.css";
+import AppConfig from "../../AppConfig";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -73,6 +75,7 @@ const SchedulePage = props => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
+  const projectSpecs = useRecoilValue(projectSpecsState);
 
   useEffect(() => {
     const loadSchedule = async () => {
@@ -381,6 +384,9 @@ const SchedulePage = props => {
                   setSecondSession={setSecondSession}
                   setThirdSession={setThirdSession}
                   setSubmitable={setSubmitable}
+                  hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+                  sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+                  daysLater={projectSpecs.daysLater || AppConfig.daysLater}
                 />
               </div>
               <div id="SignBtnContainer">
