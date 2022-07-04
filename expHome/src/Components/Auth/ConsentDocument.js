@@ -33,7 +33,7 @@ const ConsentDocument = props => {
           <strong>Benjamin Brown</strong>, Graduate student at San Jose State University, School of Information
         </li>
         <li>
-          <strong>Ethan Hiew</strong>, Undergraduate Cognitive Science (Computational Focus) student, at the University
+          <strong>Ethan Hiew</strong>, Undergraduate in Cognitive Science (with a Computational Emphasis) at University
           of California, Davis
         </li>
         <li>
@@ -62,8 +62,8 @@ const ConsentDocument = props => {
           Engineering
         </li>
         <li>
-          <strong>Shaobo Liang</strong>, B.A. in Cognitive Science, Computer Science, and Philosophy - Johns Hopkins
-          University
+          <strong>Shaobo Liang</strong>, Undergraduate in Cognitive Science, Computer Science, and Philosophy at Johns
+          Hopkins University
         </li>
         <li>
           <strong>Shivani Lamba</strong>, Shivani Lamba, Bachelor's of Science in Psychology, Loyola University Chicago,
