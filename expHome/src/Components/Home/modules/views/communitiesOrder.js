@@ -17,7 +17,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Cognitive_Psychology.jpeg",
     title: "UX Research in Cognitive Psychology of Learning",
-    width: "40%",
+    width: "34%",
     leaders: [
       {
         name: "Iman YeckehZaare",
@@ -147,7 +147,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
-    width: "30%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Amelia Henriques",
@@ -226,7 +226,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
-    width: "30%",
+    width: "33%",
     leaders: [
       {
         name: "Liza Shokhrin",
@@ -285,7 +285,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
-    width: "30%",
+    width: "34%",
     leaders: [
       {
         name: "Madeline Paige Jacoby",
@@ -346,7 +346,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
-    width: "40%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Victoria Mulligan",
@@ -417,7 +417,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
-    width: "30%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Keltie O'Malley",
@@ -562,7 +562,7 @@ export default [
     weekly: [],
     url: "/static/Communities/UI_Design.jpg",
     title: "UI Design",
-    width: "35%",
+    width: "33%",
     leaders: [
       {
         name: "Ember Shan",
@@ -630,7 +630,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Natural Language Processing",
-    width: "31%",
+    width: "33%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -685,7 +685,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Graph_Neural_Network.jpg",
     title: "Graph Neural Networks",
-    width: "50%",
+    width: "34%",
     leaders: [
       {
         name: "Tian Yan",
@@ -739,7 +739,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Financial Technology",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Xinrong Yao",
@@ -787,7 +787,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Responsible_AI.jpg",
     title: "Responsible AI",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Lanjing Ye",
@@ -894,7 +894,7 @@ export default [
     weekly: [],
     url: "/static/LibraryBackground.jpg",
     title: "Liaison Librarians",
-    width: "100%",
+    width: "50%",
     leaders: [
       {
         name: "Ben Brown",
@@ -918,17 +918,17 @@ export default [
       //     },
       //   ],
       // },
-      {
-        name: "Grace Victoria Ramstad",
-        image: "Grace_Victoria_Ramstad.jpeg",
-        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/grace-ramstad-05342099/"
-          }
-        ]
-      },
+      // {
+      //   name: "Grace Victoria Ramstad",
+      //   image: "Grace_Victoria_Ramstad.jpeg",
+      //   about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/grace-ramstad-05342099/"
+      //     }
+      //   ]
+      // },
       {
         name: "Sarah B Licht",
         image: "Sarah_B_Licht.jpeg",
