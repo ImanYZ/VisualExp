@@ -75,17 +75,15 @@ const FreeRecallGrading = props => {
       }
       const recallGradeDocs = await firebase.db
         .collection(collName)
-        .orderBy("done")
+        .where("done", "==", false)
         .orderBy("user")
         .orderBy("session")
         .limit(1000)
         .get();
-    
-      
-       
-    let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1]; 
 
-     console.log(recallGradeDocs.docs.length);
+      let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1];
+
+      console.log(recallGradeDocs.docs.length);
       if (firstVisibleRecallGradesDoc.data().done === true) {
         setUser(null);
         setCondition(null);
@@ -121,12 +119,12 @@ const FreeRecallGrading = props => {
           const passageData = passageDoc.data();
           const userDoc = await firebase.db.collection("users").doc(recallGradeData.user).get();
           const userData = userDoc.data();
-          if(!("recallreText" in userData.pConditions[0]) || !("recallreText" in userData.pConditions[1]) || 
-          !("recall3DaysreText" in userData.pConditions[0]) || !("recall3DaysreText" in userData.pConditions[1])||
-          !("recall1WeekreText" in userData.pConditions[0])|| !("recall1WeekreText" in userData.pConditions[1])){
-            continue;
-          }
-          console.log({user:recallGradeData.user,session:recallGradeData.session,passage:recallGradeData.passage,respone:recallGradeData.response});
+          console.log({
+            user: recallGradeData.user,
+            session: recallGradeData.session,
+            passage: recallGradeData.passage,
+            respone: recallGradeData.response
+          });
           let passaIdx = 0;
           for (; passaIdx < userData.pConditions.length; passaIdx++) {
             if (userData.pConditions[passaIdx].passage === recallGradeData.passage) {
