@@ -339,6 +339,7 @@ const App = () => {
     }
     
 const recallGradeData = {
+    done : false,
     condition,
     createdAt:currentTime,
     grades:[],
