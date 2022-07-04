@@ -488,41 +488,106 @@ exports.deleteDuplicatesWithVotes = async(req, res)=>{
   
   }
 
-exports.moveResearchersPoints = async () => {
-    let researchers = [
-      "Ethan Hiew",
-      "Huijia Zheng",
-      "Jiayue Mao",
+exports.addDoneFeildToRecallGrades = async(req,res)=>{
+  try{
+    let recallGradeDocsInitial= await db
+    .collection("recallGrades")
+    .orderBy("createdAt")
+    .limit(1)
+    .get();
+  let documentsNumber=1;
+  let lastVisibleRecallGradesDoc=recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];;
   
-      "Louwis Truong",
+  console.log("Starting");
+  while(lastVisibleRecallGradesDoc){
   
-      "Shaobo Liang",
+  recallGradeDocs = await db
+          .collection("recallGrades")
+          .orderBy("createdAt")
+          .startAfter(lastVisibleRecallGradesDoc)
+          .limit(40000)
+          .get();
+    
   
-      "Shivani Lamba",
+    lastVisibleRecallGradesDoc =
+    recallGradeDocs.docs[recallGradeDocs.docs.length - 1];     
+   
   
-      "Sofia Azham",
   
-      "Xiaowen Yuan",
+    console.log(documentsNumber);
+    documentsNumber = documentsNumber+40000;
   
-      "Yizhou Chao",
-    ];
-  
-    for (let res of researchers) {
-      let docResearcherdoc = await db.collection("researchers").doc(res).get();
-      let data = docResearcherdoc.data();
-      let researcherUpdate = {
-        ...data,
-        projects: {
-          H2L2: {
-            ...data.projects["H2K2"],
-          },
-        },
-      };
-      let docResearcherRef = db.collection("researchers").doc(res);
-      await batchUpdate(docResearcherRef, researcherUpdate);
+      
+    for (let recallGradeDoc of recallGradeDocs.docs) {
+     let recallGradeData = recallGradeDoc.data();
+     let recallUpdate ={}
+     if(recallGradeData.researchersNum>=4){
+      recallUpdate ={
+        done : true,
+        ...recallGradeData
+       }
+     }else{
+      recallUpdate ={
+        done : false,
+        ...recallGradeData
+       }
+     }
+     let recallGradeRef = db
+     .collection("recallGrades")
+     .doc(recallGradeDoc.id);
+     console.log(recallGradeDoc.id);
+     await batchUpdate(recallGradeRef,recallUpdate);
     }
+  }  
   
-    await commitBatch();
+  
+  await commitBatch();
+ 
+  console.log("Done");
+  
+  
+  }catch(err){
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+}
+
+exports.moveResearchersPoints = async () => {
+    // let researchers = [
+    //   "Ethan Hiew",
+    //   "Huijia Zheng",
+    //   "Jiayue Mao",
+  
+    //   "Louwis Truong",
+  
+    //   "Shaobo Liang",
+  
+    //   "Shivani Lamba",
+  
+    //   "Sofia Azham",
+  
+    //   "Xiaowen Yuan",
+  
+    //   "Yizhou Chao",
+    // ];
+  
+    // for (let res of researchers) {
+      let docResearcherdoc = await db.collection("researchers").doc("Ethan Hiew").get();
+      let data = docResearcherdoc.data();
+      // let researcherUpdate = {
+      //   ...data,
+      //   projects: {
+      //     H2L2: {
+      //       ...data.projects["H2K2"],
+      //     },
+      //   },
+      // };
+      console.log(data);
+      // let docResearcherRef = db.collection("researchers").doc(res);
+      // await batchUpdate(docResearcherRef, researcherUpdate);
+    // }
+  
+    // await commitBatch();
   };
 
 exports.restructureProjectSpecs = async (req, res) => {
