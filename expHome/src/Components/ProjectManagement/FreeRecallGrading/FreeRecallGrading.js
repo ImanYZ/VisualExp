@@ -75,13 +75,15 @@ const FreeRecallGrading = props => {
       }
       const recallGradeDocs = await firebase.db
         .collection(collName)
-        .where("researchersNum", "<", 4)
-        .orderBy("session")
+        .orderBy("done")
         .orderBy("user")
+        .orderBy("session")
         .limit(1000)
         .get();
+    let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1]; 
 
-      if (recallGradeDocs.docs.length === 0) {
+     console.log(recallGradeDocs.docs.length);
+      if (firstVisibleRecallGradesDoc.data().done === true) {
         setUser(null);
         setCondition(null);
         setPassage(null);
