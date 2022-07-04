@@ -75,13 +75,16 @@ const FreeRecallGrading = props => {
       }
       const recallGradeDocs = await firebase.db
         .collection(collName)
-        .where("researchersNum", "<", 4)
-        .orderBy("session")
+        .where("done", "==", false)
         .orderBy("user")
+        .orderBy("session")
         .limit(1000)
         .get();
 
-      if (recallGradeDocs.docs.length === 0) {
+      let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1];
+
+      console.log(recallGradeDocs.docs.length);
+      if (firstVisibleRecallGradesDoc.data().done === true) {
         setUser(null);
         setCondition(null);
         setPassage(null);
@@ -116,6 +119,12 @@ const FreeRecallGrading = props => {
           const passageData = passageDoc.data();
           const userDoc = await firebase.db.collection("users").doc(recallGradeData.user).get();
           const userData = userDoc.data();
+          console.log({
+            user: recallGradeData.user,
+            session: recallGradeData.session,
+            passage: recallGradeData.passage,
+            respone: recallGradeData.response
+          });
           let passaIdx = 0;
           for (; passaIdx < userData.pConditions.length; passaIdx++) {
             if (userData.pConditions[passaIdx].passage === recallGradeData.passage) {
