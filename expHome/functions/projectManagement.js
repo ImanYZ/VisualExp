@@ -1330,13 +1330,9 @@ exports.gradeFreeRecall = async (req, res) => {
           }
           // Finally, we should create the recallGrades doc for this new grade.
           //this done variable if for testing if 4 researchers have voted on this 
-          let done =false;
-          if( recallGradeData.researchersNum + 1>=4){
-              done =true;
-          }
           t.update(recallGradeRef, {
             ...recallGradeUpdates,
-            done:done,
+            done:recallGradeData.researchersNum >=3,
             researchers: [...recallGradeData.researchers, fullname],
             grades: [...recallGradeData.grades, grade],
             researchersNum: recallGradeData.researchersNum + 1,
