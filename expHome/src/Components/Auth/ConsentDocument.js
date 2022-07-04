@@ -62,8 +62,8 @@ const ConsentDocument = props => {
           Engineering
         </li>
         <li>
-          <strong>Shaobo Liang</strong>, B.A. in Cognitive Science, Computer Science, and Philosophy - Johns Hopkins
-          University
+          <strong>Shaobo Liang</strong>, Undergraduate in Cognitive Science, Computer Science, and Philosophy at Johns
+          Hopkins University
         </li>
         <li>
           <strong>Shivani Lamba</strong>, Shivani Lamba, Bachelor's of Science in Psychology, Loyola University Chicago,
