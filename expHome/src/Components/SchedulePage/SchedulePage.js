@@ -241,14 +241,24 @@ const SchedulePage = props => {
         const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
         await firebase.batchDelete(scheduleRef);
       }
+      // We randomly pick one of the available researchers in each session and assign them to run this session.
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         first: firstSession,
-        researcher1st: availableSessions[firstSession.toLocaleString()][0],
+        researcher1st:
+          availableSessions[firstSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[firstSession.toLocaleString()].length)
+          ],
         second: secondSession,
-        researcher2nd: availableSessions[secondSession.toLocaleString()][0],
+        researcher2nd:
+          availableSessions[secondSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[secondSession.toLocaleString()].length)
+          ],
         third: thirdSession,
-        researcher3rd: availableSessions[thirdSession.toLocaleString()][0]
+        researcher3rd:
+          availableSessions[thirdSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[thirdSession.toLocaleString()].length)
+          ]
       });
       errorAlert(responseObj.data);
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { Equation } from "react-equation";
 
 export default {
   ["Cognitive_Psychology"]: {
@@ -1524,7 +1525,7 @@ export default {
   ["UI_Design"]: {
     UI_Design: {
       title: "UI Test",
-      url: "",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FMUI_Accessibility.pdf?alt=media&token=53fe5836-45fc-4ffa-abca-cf7059b88f65",
       questions: {
         what_is_the_name_of: {
           stem: (
@@ -1737,6 +1738,360 @@ export default {
             d: "A/B testing"
           }
         }
+      }
+    }
+  },
+  ["Graph_Neural_Network"]: {
+    Heterogeneous_Graph_Attention_Network: {
+      title: "Heterogeneous Graph Attention Network",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGNNsub-quiz-TianYan.pdf?alt=media&token=7a7b8064-02fe-474d-a3bf-69311a58f7da",
+      questions: {
+        Suppose_there_is_a_heterogeneous_graph_that_has_types_of_nodes_how_many_types_of_meta_path_you_can_define_in_this_graph:
+          {
+            stem: `1. Suppose there is a heterogeneous graph that has 3 types of nodes, how many types of
+          meta-path you can define in this graph at most? Only consider the meta-paths that have
+          a length of exactly 3, and have the same type of nodes at the start and end.`,
+            answers: ["b"],
+            choices: {
+              a: "3",
+              b: "6",
+              c: "18",
+              d: "2"
+            }
+          },
+        In_Figure_1_which_pair_of_meta_path_based_neighbors_is_based_on_meta_path_Movie_director_movie: {
+          stem: `2. In Figure 1, which pair of meta-path based neighbors is based on meta-path “Movie-
+          director-movie”?`,
+          answers: ["a"],
+          choices: {
+            a: "m1-m2",
+            b: "m1-m3",
+            c: "m1-a1",
+            d: "m1-d1"
+          }
+        },
+        Which_statement_is_correct: {
+          stem: `3. Which statement is correct?`,
+          answers: ["c"],
+          choices: {
+            a: "In node-level attention stage, the transformation matrix M is edge type specific.",
+            b: "Node’s meta-path based neighbors doesn’t’ include itself.",
+            c: "In node-level attention stage, the importance between meta-path basedneighbors are normalized to get the weight coefficients.",
+            d: "Node level attention vector is another name for the node level weight coefficients."
+          }
+        },
+        Which_loss_function_did_this_paper_use: {
+          stem: `4. Which loss function did this paper use?`,
+          answers: ["d"],
+          choices: {
+            a: "Binary Cross-Entropy Loss",
+            b: "Hinge Loss",
+            c: "Mean Square Error",
+            d: "Multiclass Cross-Entropy Loss"
+          }
+        },
+        Which_statement_about_model_in_the_paper_is_incorrect: {
+          stem: `5.Which statement about model in the paper is incorrect?`,
+          answers: ["c"],
+          choices: {
+            a: "Testing data can appear in the graph of training data",
+            b: "This is a semi-supervised training model",
+            c: "Each node in the graph of training data is labelled",
+            d: "Each node in the graph of training data has input feature."
+          }
+        }
+      }
+    }
+  },
+  ["Financial_Technology"]: {
+    A_brief_survey_of_Cryptocurrency_systems: {
+      title: "A brief survey of Cryptocurrency systems",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FA_brief_survey_of_Cryptocurrency_systems.pdf?alt=media&token=048e3faf-e0dd-4f31-bdf3-cf8d4c3778cb",
+      questions: {
+        When_was_the_first_decentralized_Cryptocurrency_implemented: {
+          stem: `1. Suppose there is a heterogeneous graph that has 3 types of nodes, how many types of
+        meta-path you can define in this graph at most? Only consider the meta-paths that have
+        a length of exactly 3, and have the same type of nodes at the start and end.`,
+          answers: ["c"],
+          choices: {
+            a: "2020",
+            b: "1998",
+            c: "2009",
+            d: "All of the above"
+          }
+        },
+        Which_of_the_following_statements_according_to_this_paper_is_true_about_the_user_s_private_key: {
+          stem: `2. Which of the following statements, according to this paper, is true about the user’s private key?`,
+          answers: ["d"],
+          choices: {
+            a: "The user’s private key is contained in his wallet",
+            b: "The user’s private key proves ownership",
+            c: "The user’s private key is used to sign transactions",
+            d: "All of the above"
+          }
+        },
+        What_is_referred_to_as_the_act_of_mining_in_the_context_of_this_paper: {
+          stem: `3. What is referred to as the act of mining in the context of this paper?`,
+          answers: ["c"],
+          choices: {
+            a: "The process of obtaining coal or other minerals from a mine.",
+            b: "A required verification step for clearing transaction records from the public ledger",
+            c: "The process of introducing new Cryptocurrency units in the system.",
+            d: "All of the above."
+          }
+        },
+        Which_of_the_following_statements_according_to_this_paper_is_true: {
+          stem: `4. Which of the following statements, according to this paper, is true?`,
+          answers: ["c"],
+          choices: {
+            a: "There exist several linear paths from the first block of a blockchain to the current block",
+            b: "All cryptocurrencies focus on restricting the validation of transactions per unit time",
+            c: "Bitcoin mining uses Proof of Work",
+            d: "All of the above"
+          }
+        },
+        Which_of_the_following_are_Cryptocurrency_systems_examined_in_this_paper: {
+          stem: `5.Which of the following are Cryptocurrency systems examined in this paper?`,
+          answers: ["a"],
+          choices: {
+            a: "Peercoin.",
+            b: "Polkadot.",
+            c: "Dogecoin.",
+            d: "All of the above."
+          }
+        },
+        What_happens_if_two_blocks_are_created_only_a_few_seconds_apart: {
+          stem: `6.What happens if two blocks are created only a few seconds apart?`,
+          answers: ["b"],
+          choices: {
+            a: "One of the blocks is ignored at random.",
+            b: "The block received first is added to the Blockchain.",
+            c: "A fork is used to split the Blockchain into two sequences.",
+            d: "All of the above."
+          }
+        },
+        This_paper_states_that_Proof_of_Stake_is_vulnerable_to_the_Nothing_at_Stake_Problem_what_issue_does_this_problem_specifically_refer_to:
+          {
+            stem: `7.This paper states that Proof of Stake is vulnerable to the Nothing-at Stake Problem, what issue does this problem specifically refer to?`,
+            answers: ["d"],
+            choices: {
+              a: "When miners have no currency left in the system and vote for a wrong transaction.",
+              b: "When miners have nothing to lose and create multiple nodes to try to validate an invalid transaction.",
+              c: "When miners try to double spend currency when they have no currency left in the system.",
+              d: "All of the above."
+            }
+          },
+        Which_of_the_following_are_advantages_of_using_the_Scrypt_mining_algorithm: {
+          stem: `8.Which of the following are advantages of using the Scrypt mining algorithm?`,
+          answers: ["a"],
+          choices: {
+            a: "Scrypt makes it such that attackers would need more memory to attack faster.",
+            b: "Scrypt had been successfully implemented as a Proof of Stake verification.",
+            c: "Scrypt is computationally intensive.",
+            d: "All of the above."
+          }
+        },
+        According_to_Figure_4_what_is_the_most_common_resource_intensive_task_used_by_the_set_of_listed_Cryptocurrencies:
+          {
+            stem: `9.According to Figure 4, what is the most common resource-intensive task used by the set of listed Cryptocurrencies?`,
+            answers: ["a"],
+            choices: {
+              a: "Proof of Stake.",
+              b: "Proof of Identity.",
+              c: "Proof of Retrievability.",
+              d: "Proof of Work."
+            }
+          },
+        Which_Cryptocurrency_was_the_first_to_use_Scrypt_as_its_mining_algorithm: {
+          stem: `10.Which Cryptocurrency was the first to use Scrypt as its mining algorithm?`,
+          answers: ["a"],
+          choices: {
+            a: "Bitcoin.",
+            b: "Dogecoin.",
+            c: "Dogecoin.",
+            d: "All of the above."
+          }
+        }
+      }
+    }
+  },
+  ["Responsible_AI"]: {
+    The_role_of_artificial_intelligence_in_mitigating_bias_to_enhance_diversity_and_inclusion: {
+      title: "The role of artificial intelligence in mitigating bias to enhance diversity and inclusion",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20role%20of%20artificial%20intelligence%20in%20mitigating%20bias%20to%20enhance%20diversity%20and%20inclusion.pdf?alt=media&token=6a1e5b50-baa0-4e9a-b64f-63d1e28f96c5",
+      questions: {
+        Today_what_potential_do_AI_solutions_have_that_enable_more_diverse_and_inclusive_workplaces: {
+          stem: `1. Today, what potential do AI solutions have that enable more diverse and inclusive workplaces?`,
+          answers: ["b"],
+          choices: {
+            a: "Advanced algorithms",
+            b: "Mitigate bias",
+            c: "Convenience",
+            d: "All of the above"
+          }
+        },
+        According_to_the_similarity_attraction_paradigm_why_does_a_diverse_group_tend_to_have_more_conflict: {
+          stem: `2. According to the similarity attraction paradigm, why does a diverse group tend to have more conflict?`,
+          answers: ["a"],
+          choices: {
+            a: "People don’t prefer to work with people who are unlike them",
+            b: "Increased turnover of employees.",
+            c: "Members usually bring different cognitive attributes",
+            d: "None of the above"
+          }
+        },
+        What_does_social_identity_theory_suggest: {
+          stem: `3. What does social identity theory suggest?`,
+          answers: ["d"],
+          choices: {
+            a: "People’s social identity is classified by factors including their current economic status.",
+            b: "People tend to classify people who are like them as ‘out-group’ members because theyare competitors",
+            c: "In-group members tend to experience negative outcomes than out-group members.",
+            d: "People tend to classify themselves and others into demographic categories."
+          }
+        },
+        What_are_the_benefits_of_inclusivity: {
+          stem: `4. What are the benefits of inclusivity`,
+          answers: ["d"],
+          choices: {
+            a: "Ensure compliance as a minimum",
+            b: "Create better customer experiences",
+            c: "Increase access to desired skills",
+            d: "All of the above"
+          }
+        },
+        In_formal_employment_decision_making_processes_how_can_bias_be_present: {
+          stem: `5.In formal employment decision-making processes, how can bias be present?`,
+          answers: ["d"],
+          choices: {
+            a: "Job advertisements in male-dominated fields use more masculine wording, and as aresult, appear to be less appealing to women.",
+            b: "People tend to describe good managers in masculine terms.",
+            c: "Elder workers tend to receive lower performances scores although they are as productive as their younger colleagues.",
+            d: "All of the above."
+          }
+        },
+        Which_of_the_following_can_be_true_about_microaggression: {
+          stem: `6.Which of the following can be true about microaggression?`,
+          answers: ["c"],
+          choices: {
+            a: "Microaggression refers to verbal slights in daily life.",
+            b: "Microaggression is seldom intentional.",
+            c: "Microaggression prevents a company from building a D&I workplace.",
+            d: "All of the above."
+          }
+        },
+        Why_do_we_need_to_think_critically_about_AI_based_tools: {
+          stem: `7.Why do we need to think critically about AI-based tools?`,
+          answers: ["d"],
+          choices: {
+            a: "Some AI-based hiring tools show biases against certain groups of job applicants",
+            b: "AI is trained with machine learning algorithms that are created by humans.",
+            c: "the development of AI solutions requires humans to make decisions.",
+            d: "All of the above."
+          }
+        },
+        Which_of_the_following_is_true_when_AI_is_used_to_mitigate_bias: {
+          stem: `8.Which of the following is true when AI is used to mitigate bias?`,
+          answers: ["c"],
+          choices: {
+            a: " Machines can have an inherent bias that inhibits D&I.",
+            b: "AI can spontaneously remove the attributes that lead to bias.",
+            c: "AI can learn how to detect unintentional and unconscious biases.",
+            d: "AI doesn’t inherit bias from humans on objective tasks including resume scanning."
+          }
+        },
+        Which_of_the_following_is_not_a_reasonable_consideration_that_helps_evaluate_progress_on_our_journey_to_inclusivity:
+          {
+            stem: `9.Which of the following is not a reasonable consideration that helps evaluate progress on our journey to inclusivity?`,
+            answers: ["c"],
+            choices: {
+              a: "Ensure equal access to opportunities.",
+              b: "Build a diverse organization.",
+              c: "Make efficient employment decisions.",
+              d: "Create an inclusive organizational culture."
+            }
+          },
+        Which_of_the_following_can_be_critical_actions_for_success_in_using_AI_to_enhance_DI: {
+          stem: `10.Which of the following can be critical action(s) for success in using AI to enhance D&I?`,
+          answers: ["d"],
+          choices: {
+            a: "involve experienced industrial-organizational psychologists and data scientists.",
+            b: "Use an AI-enabled framework to ensure a consistent and objective benchmark for assessing employees and job candidates alike.",
+            c: "Adjust model features based on its algorithm outputs to mitigate bias.",
+            d: "All of the above."
+          }
+        }
+      }
+    }
+  },
+  ["Computer_Vision"]: {
+    Computer_Vision_excerpt: {
+      title: "Computer Vision excerpt",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FComputer%20Vision%20excerpt.pdf?alt=media&token=4f5865c0-8488-4920-918e-75d696a2befa",
+      questions: {
+        _learning_requires_labeled_data_in_the_form_of_paired_inputs_and_outputs: {
+          stem: `1. ___________ learning requires labeled data in the form of paired inputs and outputs`,
+          answers: ["a"],
+          choices: {
+            a: "Supervised",
+            b: "Unsupervised"
+          }
+        },
+        Deep_networks_were_originally_developed_for: {
+          stem: `2.Deep networks were originally developed for ________`,
+          answers: ["c"],
+          choices: {
+            a: "Semantic segmentation.",
+            b: "Motion estimation.",
+            c: "Image classification",
+            d: "Image denoising"
+          }
+        },
+        What_is_the_end_goal_of_training_a_machine_learning_model: {
+          stem: `3.What is the end goal of training a machine learning model?`,
+          answers: ["a"],
+          choices: {
+            a: "Have a trained model that can accurately label new, unseen inputs.",
+            b: "Have a trained model with perfect prediction statistics on training inputs",
+            c: "Have a model trained to the point where its parameters are fixed"
+          }
+        },
+        In_machine_learning_when_teaching_a_model_to_predict_data_why_do_we_use_training_data_distribution_as_a_proxy_for_the_real_world_distribution:
+          {
+            stem: `4. In machine learning, when teaching a model to predict data, why do we use training data distribution as a proxy for the real-world distribution `,
+            answers: ["b"],
+            choices: {
+              a: "We assume that our training data is the true probability representation of the real-world data we are estimating",
+              b: "We usually do not have access to the true probability distribution over the inputs, so we assume the training data is a fair approximation with some margin of error",
+              c: "Due to the mechanism of the network model, we do not actually care about the true real-world distribution when training the model"
+            }
+          },
+        In_the_expected_risk_function: {
+          stem: (
+            <>
+              <p>5. In the expected risk function, </p>
+              <Equation value="E_Risk(w)=1/N L(y_i,f(x_i,w))" />
+              <p></p>
+              <Equation value="what is denoted by f(x_i,w)"/><>?</>
+            </>
+          ),
+          answers: ["c"],
+          choices: {
+            a: "Difference between the true label of the output and the predicted label.",
+            b: "The true label of the output.",
+            c: "The predicted label of the output."
+          }
+        },
+        Out_of_centering_standardizing_and_whitening_input_data_which_preprocessing_step_is_the_most_computationally_expensive:
+          {
+            stem: `6. Out of centering, standardizing, and whitening input data, which preprocessing step is the most computationally expensive?`,
+            answers: ["c"],
+            choices: {
+              a: "Centering.",
+              b: "Standardizing.",
+              c: "Whitening."
+            }
+          }
       }
     }
   },
