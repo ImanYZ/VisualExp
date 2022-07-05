@@ -295,7 +295,6 @@ const App = () => {
     const keywordsText = tokenize(keywords.toLowerCase());
     const mainText = tokenize(text.toLowerCase());
     const recalledText = tokenize(reText.toLowerCase());
-
     for (let t1 of keywordsText) {
       if (recalledText.includes(t1)) {
         score += 1;
@@ -321,7 +320,7 @@ const App = () => {
     // Only in the third session, after making sure that the user has submitted
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
-    // user.
+    // user
     if (thirdSession) {
       userData = {
         ...userData,
@@ -347,7 +346,7 @@ const App = () => {
         }
       }
       if (allResponsesReady) {
-        for (let pCond of userData.pConditions.length) {
+        for (let pCond of userData.pConditions) {
           passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
           passageData = passageDoc.data();
           for (let session of ["1st", "2nd", "3rd"]) {
@@ -853,7 +852,6 @@ const App = () => {
       }, 400);
     }
   };
-  console.log({ fullname, passage, condition, pConURL, step, phase });
   return (
     fullname &&
     passage &&
