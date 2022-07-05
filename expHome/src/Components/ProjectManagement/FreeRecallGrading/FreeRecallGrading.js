@@ -83,7 +83,7 @@ const FreeRecallGrading = props => {
 
       let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1];
 
-      console.log(recallGradeDocs.docs.length);
+      
       if (firstVisibleRecallGradesDoc.data().done === true) {
         setUser(null);
         setCondition(null);
