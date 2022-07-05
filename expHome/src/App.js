@@ -295,7 +295,7 @@ const App = () => {
     const keywordsText = tokenize(keywords.toLowerCase());
     const mainText = tokenize(text.toLowerCase());
     const recalledText = tokenize(reText.toLowerCase());
-
+    console.log('298')
     for (let t1 of keywordsText) {
       if (recalledText.includes(t1)) {
         score += 1;
@@ -309,6 +309,7 @@ const App = () => {
         prefieldName = "recall1Week";
       }
     }
+    console.log({prefieldName});
     pConditions[phase] = {
       ...pConditions[phase],
       [prefieldName + "reText"]: reText,
@@ -321,13 +322,15 @@ const App = () => {
     // Only in the third session, after making sure that the user has submitted
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
-    // user.
+    // user
+    console.log('325');
     if (thirdSession) {
       userData = {
         ...userData,
         ...userUpdates,
         pConditions
       };
+      console.log({ userData });
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
@@ -341,13 +344,17 @@ const App = () => {
         collName += userData.project;
       }
       let allResponsesReady = true;
+      console.log('entered allResponsesReady::::::: 344');
       for (let pCond of userData.pConditions) {
+        console.log('pCond', { pCond })
         if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
           allResponsesReady = false;
         }
       }
       if (allResponsesReady) {
-        for (let pCond of userData.pConditions.length) {
+        console.log('entered allResponsesReady');
+        for (let pCond of userData.pConditions) {
+          console.log('entered allResponsesReady');
           passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
           passageData = passageDoc.data();
           for (let session of ["1st", "2nd", "3rd"]) {
@@ -853,7 +860,7 @@ const App = () => {
       }, 400);
     }
   };
-  console.log({ fullname, passage, condition, pConURL, step, phase });
+  // console.log({ fullname, passage, condition, pConURL, step, phase });
   return (
     fullname &&
     passage &&
