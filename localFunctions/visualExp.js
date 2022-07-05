@@ -281,14 +281,17 @@ exports.deleteIncompleteRecallGrades = async (req, res) => {
   try {
     // First, retrieve all the users' data so that we don't need to repeadedly
     // retrieve them from the database every time we need one.
+    let dateOfThePilotStudy = "01/21/2022 19:00:00";
     const userDocs = await db.collection("users").get();
     const deletableUsers = [];
     for (let userDoc of userDocs.docs) {
       const userData = userDoc.data();
       let allResponsesReady = true;
       if (userData.pConditions) {
+        const afterPilotStudy = ((Date.parse(dateOfThePilotStudy)/1000)<((Date.parse((userData.createdAt).toDate()))/1000));
         for (let pCond of userData.pConditions) {
-          if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond)) {
+          if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) ||
+          ((!("recall1WeekreText" in pCond))&&(afterPilotStudy))) {
             allResponsesReady = false;
           }
         }
@@ -335,6 +338,10 @@ exports.deleteIncompleteRecallGrades = async (req, res) => {
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
         if (deletableUsers.includes(recallGradeData.user)) {
+          let recallGradeDeleteRef = db
+          .collection("recallGrades")
+          .doc(recallGradeDoc.id);
+          await batchDelete(recallGradeDeleteRef);
           console.log({
             responseGradeId: recallGradeDoc.id,
           });
@@ -343,7 +350,10 @@ exports.deleteIncompleteRecallGrades = async (req, res) => {
       lastVisibleRecallGradesDoc =
         recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
     }
-
+    console.log("*********************");
+    console.log("Started to commit!");
+    console.log("*********************");
+    await commitBatch();
     console.log("Done.");
     return res.status(200).json({ done: true });
   } catch (err) {
