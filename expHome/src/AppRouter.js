@@ -9,7 +9,7 @@ import {
   fullnameState,
   themeState,
   themeOSState,
-  leadingState,
+  leadingState
 } from "./store/AuthAtoms";
 import { secondSessionState, thirdSessionState } from "./store/ExperimentAtoms";
 
@@ -39,7 +39,7 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 
-const AppRouter = (props) => {
+const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const emailVerified = useRecoilValue(emailVerifiedState);
@@ -57,10 +57,7 @@ const AppRouter = (props) => {
   useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {
       const currentTime = new Date().getTime();
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", email)
-        .get();
+      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email).get();
       let duringSession = false;
       if (scheduleDocs.docs.length > 0) {
         for (let scheduleDoc of scheduleDocs.docs) {
@@ -96,7 +93,7 @@ const AppRouter = (props) => {
         const userData = userDoc.data();
         if (!("lastLoad" in userData) || !isToday(userData.lastLoad.toDate())) {
           await userRef.update({
-            lastLoad: firebase.firestore.Timestamp.fromDate(new Date()),
+            lastLoad: firebase.firestore.Timestamp.fromDate(new Date())
           });
           window.location.reload(true);
         }
@@ -137,10 +134,7 @@ const AppRouter = (props) => {
       };
 
       window.addEventListener("keydown", function (e) {
-        if (
-          e.keyCode === 114 ||
-          ((e.ctrlKey || e.metaKey) && e.keyCode === 70)
-        ) {
+        if (e.keyCode === 114 || ((e.ctrlKey || e.metaKey) && e.keyCode === 70)) {
           e.preventDefault();
         }
       });
@@ -180,96 +174,52 @@ const AppRouter = (props) => {
           <Route path="/withdraw/*" element={<Withdraw />} />
           {leading.length > 0 && (
             <>
-              <Route
-                path="/tutorialfeedback/*"
-                element={<TutorialFeedback />}
-              />
-              <Route
-                path="/CommunityApplications/*"
-                element={<CommunityApplications communiIds={leading} />}
-              />
+              <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
+              <Route path="/CommunityApplications/*" element={<CommunityApplications communiIds={leading} />} />
             </>
           )}
         </>
       )}
       <Route path="/communities/" element={<Communities />} />
-      {communitiesOrder.map((communi, idx) => (
+      {communitiesOrder.map(communi => (
         <React.Fragment key={communi.id}>
           <Route
             path={"/community/" + communi.id}
-            element={<Communities commIdx={idx} />}
+            element={<Communities commId={communi.id} communiTitle={communi.title} />}
           />
           <Route
-            path={
-              "/interestedFaculty/" + communi.id + "/:condition/:instructorId"
-            }
-            element={
-              <InstructorYes
-                community={communitiesOrder[idx].title}
-                leader={communitiesOrder[idx].leaders[0].name}
-              />
-            }
+            path={"/interestedFaculty/" + communi.id + "/:condition/:instructorId"}
+            element={<InstructorYes community={communi.title} leader={communi.leaders[0].name} />}
           />
           {fullname && emailVerified === "Verified" && (
             <Route
               path={"/paperTest/" + communi.id}
-              element={
-                <PaperTest
-                  communiId={communi.id}
-                  communiTitle={communi.title}
-                />
-              }
+              element={<PaperTest communiId={communi.id} communiTitle={communi.title} />}
             />
           )}
         </React.Fragment>
       ))}
-      <Route
-        path={"/notInterestedFaculty/:instructorId"}
-        element={<InstructorNo />}
-      />
-      <Route
-        path={"/interestedFacultyLater/:instructorId"}
-        element={<InstructorLater />}
-      />
-      <Route
-        path="/*"
-        element={<RouterNav duringAnExperiment={duringAnExperiment} />}
-      >
+      <Route path={"/notInterestedFaculty/:instructorId"} element={<InstructorNo />} />
+      <Route path={"/interestedFacultyLater/:instructorId"} element={<InstructorLater />} />
+      <Route path="/*" element={<RouterNav duringAnExperiment={duringAnExperiment} />}>
         {fullname && email && emailVerified === "Verified" ? (
           <>
             {duringAnExperiment ? (
               <Route path="*" element={<App />} />
             ) : (
               <>
-                <Route
-                  path="Activities/Experiments"
-                  element={<Activities activityName="Experiments" />}
-                />
-                <Route
-                  path="Activities/AddInstructor"
-                  element={<Activities activityName="AddInstructor" />}
-                />
-                <Route
-                  path="Activities/1Cademy"
-                  element={<Activities activityName="1Cademy" />}
-                />
-                <Route
-                  path="Activities/FreeRecallGrading"
-                  element={<Activities activityName="FreeRecallGrading" />}
-                />
-                <Route
-                  path="Activities/*"
-                  element={<Activities activityName="Intellectual" />}
-                />
+                <Route path="Activities/Experiments" element={<Activities activityName="Experiments" />} />
+                <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
+                <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
+                <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
+                <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
                 <Route
                   path="LifeLog"
                   element={
                     email === "oneweb@umich.edu" ? (
                       <LifeLogger />
                     ) : (
-                      <div className="Error">
-                        You don't have permission to open this page!
-                      </div>
+                      <div className="Error">You don't have permission to open this page!</div>
                     )
                   }
                 />
@@ -279,9 +229,8 @@ const AppRouter = (props) => {
                   element={
                     startedFirstSession ? (
                       <div className="Error">
-                        At this point, you cannot change your scheduled
-                        sessions! Please convey your questions or concerns to
-                        Iman Yeckehzaare at oneweb@umich.edu
+                        At this point, you cannot change your scheduled sessions! Please convey your questions or
+                        concerns to Iman Yeckehzaare at oneweb@umich.edu
                       </div>
                     ) : (
                       <SchedulePage />
