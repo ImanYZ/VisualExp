@@ -1531,7 +1531,7 @@ export default {
           stem: (
             <>
               1. Please skim through this web page:
-              <a href="https://mui.com/material-ui/customization/color/">
+              <a href="https://mui.com/material-ui/customization/color/" target="_blank">
                 https://mui.com/material-ui/customization/color/
               </a>{" "}
               and answer this question: what is the name of #616161? (select one)
@@ -1549,7 +1549,7 @@ export default {
           stem: (
             <>
               2. Read this web page:{" "}
-              <a href="https://m3.material.io/foundations/accessible-design/accessibility-basics">
+              <a href="https://m3.material.io/foundations/accessible-design/accessibility-basics" target="_blank">
                 https://m3.material.io/foundations/accessible-design/accessibility-basics
               </a>{" "}
               and answer: Why should we avoid using non-standard elements? (select one)
@@ -1567,7 +1567,7 @@ export default {
           stem: (
             <>
               3. Read this article on chips:{" "}
-              <a href="https://m3.material.io/components/chips/guidelines">
+              <a href="https://m3.material.io/components/chips/guidelines" target="_blank">
                 https://m3.material.io/components/chips/guidelines
               </a>{" "}
               and answer: what are chips used for? (select multiple)
@@ -1585,11 +1585,11 @@ export default {
           stem: (
             <>
               4. If you are not familiar with Figma components, please watch this video:{" "}
-              <a href="https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma">
+              <a href="https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma" target="_blank">
                 https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma
               </a>
               . Then answer the question: How do you break the link between the instance and its main component? (select
-              one
+              one)
             </>
           ),
           answers: ["c"],
@@ -1604,7 +1604,7 @@ export default {
           stem: (
             <>
               5. Duplicate and finish the Figma playground file:
-              <a href="https://www.figma.com/community/file/1033456279024883078">
+              <a href="https://www.figma.com/community/file/1033456279024883078" target="_blank">
                 https://www.figma.com/community/file/1033456279024883078
               </a>{" "}
               (keep pressing N to view the frames like a ppt). Then answer: How to create an interactive toggle button
@@ -1623,7 +1623,7 @@ export default {
           stem: (
             <>
               6. Read this article on Figma’s Auto Layout:{" "}
-              <a href="https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties">
+              <a href="https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties" target="_blank">
                 https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties
               </a>{" "}
               and answer: What is the auto layout used for? (select one)
@@ -1641,7 +1641,7 @@ export default {
           stem: (
             <>
               7. Duplicate and finish the Figma file:
-              <a href="https://www.figma.com/community/file/784448220678228461.">
+              <a href="https://www.figma.com/community/file/784448220678228461" target="_blank">
                 https://www.figma.com/community/file/784448220678228461.
               </a>
               "Then answer: What is the best practice to make the blue-filled box occupy the entire width of the
@@ -1663,7 +1663,7 @@ export default {
             stem: (
               <>
                 8. Duplicate and finish the Figma playground file:
-                <a href="https://www.figma.com/community/file/1100581138025393004">
+                <a href="https://www.figma.com/community/file/1100581138025393004" target="_blank">
                   https://www.figma.com/community/file/1100581138025393004
                 </a>{" "}
                 and answer: _____ to toggle between showing and hiding the text in a component; _____ to change the icon
