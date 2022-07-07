@@ -15,6 +15,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
+import { toWords } from "number-to-words";
 
 import SelectSessions from "./SelectSessions";
 
@@ -56,6 +57,41 @@ const sessionFormatter = (start, minutes) => {
       hour12: false
     })
   );
+};
+
+const formatSlotTime = (hourlyChunks = 2, slotCount = 0) => {
+  let str = "for ";
+  let mins = 0,
+    hours = 0;
+  const slotSize = 60 / hourlyChunks;
+  const totalMinutes = slotCount * slotSize;
+  if (totalMinutes >= 60) {
+    mins = totalMinutes % 60;
+    hours = (totalMinutes - mins) / 60;
+  } else {
+    mins = totalMinutes;
+  }
+  if (hours > 0) {
+    if (hours === 1) {
+      str += `${toWords(hours)} hour `;
+    } else {
+      str += `${toWords(hours)} hours `;
+    }
+  }
+
+  if (hours > 0 && mins > 0) {
+    str += "and ";
+  }
+
+  if (mins > 0) {
+    str += `${toWords(mins)} minutes `;
+  }
+  if (slotCount === 1) {
+    str += `(${toWords(slotCount)} slot)`;
+  } else {
+    str += `(${toWords(slotCount)} consecutive slots)`;
+  }
+  return str;
 };
 
 const SchedulePage = props => {
@@ -258,7 +294,8 @@ const SchedulePage = props => {
         researcher3rd:
           availableSessions[thirdSession.toLocaleString()][
             Math.floor(Math.random() * availableSessions[thirdSession.toLocaleString()].length)
-          ]
+          ],
+        project: userData.project
       });
       errorAlert(responseObj.data);
 
@@ -285,6 +322,8 @@ const SchedulePage = props => {
     }
     setIsSubmitting(false);
   };
+
+  const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
 
   return (
     <div id="SchedulePageContainer">
@@ -340,19 +379,21 @@ const SchedulePage = props => {
                     <strong>
                       1<sup>st</sup> session
                     </strong>{" "}
-                    for an hour (two consecutive slots)
+                    {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[0])}
                   </li>
                   <li>
                     <strong>
                       2<sup>nd</sup> session
                     </strong>
-                    , 3 days later, for 30 minutes (one slot)
+                    , {projectSpecs?.daysLater[0] || AppConfig.daysLater[0]} days later,{" "}
+                    {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[1])}
                   </li>
                   <li>
                     <strong>
                       3<sup>rd</sup> session
                     </strong>
-                    , 7 days later, for 30 minutes (one slot)
+                    , {projectSpecs?.daysLater[1] || AppConfig.daysLater[1]} days later,{" "}
+                    {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[1])}
                   </li>
                 </ul>
               </li>
@@ -434,15 +475,24 @@ const SchedulePage = props => {
               <ul>
                 <li>
                   1<sup>st</sup>
-                  {sessionFormatter(firstSession, 60)}
+                  {sessionFormatter(
+                    firstSession,
+                    slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
+                  )}
                 </li>
                 <li>
                   2<sup>nd</sup>
-                  {sessionFormatter(secondSession, 30)}
+                  {sessionFormatter(
+                    secondSession,
+                    slotDuration * (projectSpecs?.sessionDuration?.[1] || AppConfig.defaultSessionDuration[1])
+                  )}
                 </li>
                 <li>
                   3<sup>rd</sup>
-                  {sessionFormatter(thirdSession, 30)}
+                  {sessionFormatter(
+                    thirdSession,
+                    slotDuration * (projectSpecs?.sessionDuration?.[2] || AppConfig.defaultSessionDuration[2])
+                  )}
                 </li>
               </ul>
             )}
