@@ -1,4 +1,15 @@
 {
-  "indexes": [],
+  "indexes": [
+    { 
+      "collectionGroup": "recallGrades",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "done", "order": "ASCENDING" },
+        { "fieldPath": "passage", "order": "ASCENDING" },
+        { "fieldPath": "user", "order": "ASCENDING" },
+        { "fieldPath": "session", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }
