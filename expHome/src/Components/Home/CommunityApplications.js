@@ -23,7 +23,7 @@ import PagesNavbar from "./PagesNavbar";
 import SnackbarComp from "../SnackbarComp";
 import PDFView from "./modules/components/PDFView";
 import { OneKPlusOutlined } from "@mui/icons-material";
-
+import communitiesOrder from "../Home/modules/views/communitiesOrder";
 const applicationsColms = [
   {
     field: "community",
@@ -252,7 +252,7 @@ const applicationsColms = [
 const CommunityApplications = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-
+  
   const [applicationsColumns, setApplicationsColumns] =
     useState(applicationsColms);
   const [applications, setApplications] = useState([]);
@@ -262,7 +262,8 @@ const CommunityApplications = (props) => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
+  const leading = useRecoilValue(leadingState);
+  let showPortfolio = false;
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
       setApplicationsColumns([
@@ -296,6 +297,7 @@ const CommunityApplications = (props) => {
     }
   }, [fullname]);
 
+
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
       const appliSnapshots = [];
@@ -312,10 +314,19 @@ const CommunityApplications = (props) => {
           communiIdx++
         ) {
           communiIds.push(props.communiIds[communiIdx]);
+          let comm = communitiesOrder.find((elm)=>elm.id ===props.communiIds[communiIdx]);
+          if(comm.portfolio){
+            showPortfolio = true;
+          }
+        }
+        if(!showPortfolio){
+          setApplicationsColumns(
+          applicationsColumns.filter((elem)=>elem.field!="portfolio")
+          )
         }
         const applicationsQuery = firebase.db
           .collection("applications")
-          .where("communiId", "in", communiIds);
+          .where("communiId", "in",communiIds);
         appliSnapshots.push(
           applicationsQuery.onSnapshot((snapshot) => {
             const docChanges = snapshot.docChanges();
@@ -405,6 +416,8 @@ const CommunityApplications = (props) => {
             }
             if ("Portfolio" in userData && userData.Portfolio) {
               newApplic.portfolio = userData.Portfolio;
+            }else if("portfolioUrl"in applicData && applicData.portfolioUrl){
+              newApplic.portfolio = applicData.portfolioUrl;
             }
             if ("pConditions" in userData && userData.pConditions) {
               for (let pCondition of userData.pConditions) {
