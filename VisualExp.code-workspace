@@ -1,16 +1,7 @@
 {
-    "folders": [
-        {
-            "name": "expHome",
-            "path": "./expHome"
-        },
-        {
-            "name": "localFunctions",
-            "path": "./localFunctions"
-        },
-        {
-            "name": "VisualExp",
-            "path": "."
-        },
-    ]
+  "folders": [
+    {
+      "path": "."
+    }
+  ]
 }
