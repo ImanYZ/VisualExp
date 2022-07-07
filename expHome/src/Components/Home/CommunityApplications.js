@@ -1,9 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-
-import Paper from "@mui/material/Paper";
-import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
@@ -21,9 +17,8 @@ import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 import SnackbarComp from "../SnackbarComp";
-import PDFView from "./modules/components/PDFView";
-import { OneKPlusOutlined } from "@mui/icons-material";
 import communitiesOrder from "../Home/modules/views/communitiesOrder";
+
 const applicationsColms = [
   {
     field: "community",
@@ -252,7 +247,7 @@ const applicationsColms = [
 const CommunityApplications = (props) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  
+
   const [applicationsColumns, setApplicationsColumns] =
     useState(applicationsColms);
   const [applications, setApplications] = useState([]);
@@ -262,8 +257,8 @@ const CommunityApplications = (props) => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const leading = useRecoilValue(leadingState);
-  let showPortfolio = false;
+  const [showPortfolio, setShowPortfolio] = useState(false);
+
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
       setApplicationsColumns([
@@ -314,19 +309,19 @@ const CommunityApplications = (props) => {
           communiIdx++
         ) {
           communiIds.push(props.communiIds[communiIdx]);
-          let comm = communitiesOrder.find((elm)=>elm.id ===props.communiIds[communiIdx]);
-          if(comm.portfolio){
-            showPortfolio = true;
+          const comm = communitiesOrder.find((elm) => elm.id === props.communiIds[communiIdx]);
+          if (comm.portfolio) {
+            setShowPortfolio(true);
           }
         }
-        if(!showPortfolio){
-          setApplicationsColumns(
-          applicationsColumns.filter((elem)=>elem.field!="portfolio")
-          )
+
+        if (!showPortfolio) {
+          const filterApplicationCols = applicationsColumns.filter((elem) => elem.field !== "portfolio");
+          setApplicationsColumns(filterApplicationCols);
         }
         const applicationsQuery = firebase.db
           .collection("applications")
-          .where("communiId", "in",communiIds);
+          .where("communiId", "in", communiIds);
         appliSnapshots.push(
           applicationsQuery.onSnapshot((snapshot) => {
             const docChanges = snapshot.docChanges();
@@ -416,7 +411,7 @@ const CommunityApplications = (props) => {
             }
             if ("Portfolio" in userData && userData.Portfolio) {
               newApplic.portfolio = userData.Portfolio;
-            }else if("portfolioUrl"in applicData && applicData.portfolioUrl){
+            } else if ("portfolioUrl" in applicData && applicData.portfolioUrl) {
               newApplic.portfolio = applicData.portfolioUrl;
             }
             if ("pConditions" in userData && userData.pConditions) {
