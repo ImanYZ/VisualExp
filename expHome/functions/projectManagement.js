@@ -1,28 +1,15 @@
 const fs = require("fs");
 const csv = require("fast-csv");
 
-const {
-  admin,
-  db,
-  commitBatch,
-  batchSet,
-  batchUpdate,
-  batchDelete,
-} = require("./admin");
+const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
 const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
-const {
-  isToday,
-  strToBoolean,
-  getActivityTimeStamps,
-  getIn30Minutes,
-  getDateString,
-} = require("./utils");
+const { isToday, strToBoolean, getActivityTimeStamps, getIn30Minutes, getDateString } = require("./utils");
 const {
   reschEventNotificationEmail,
   researcherEventNotificationEmail,
   eventNotificationEmail,
   notAttendedEmail,
-  remindResearcherToSpecifyAvailability,
+  remindResearcherToSpecifyAvailability
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
 
@@ -35,13 +22,13 @@ const researchers = [
   { fullname: "Yi Cui", email: "chloecui@umich.edu" },
   { fullname: "Jasmine Wu", email: "jasminewu56@gmail.com" },
   { fullname: "Rani Kang", email: "qk2003@nyu.edu" },
-  { fullname: "Molly Kraine", email: "krainem@umich.edu" },
+  { fullname: "Molly Kraine", email: "krainem@umich.edu" }
 ];
 
 const voteFn = async (voter, activity, vote) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-    await db.runTransaction(async (t) => {
+    await db.runTransaction(async t => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
       const activityRef = db.collection("activities").doc(activity);
@@ -49,16 +36,10 @@ const voteFn = async (voter, activity, vote) => {
       if (activityDoc.exists && voterDoc.exists) {
         const voterData = voterDoc.data();
         const activityData = activityDoc.data();
-        const researcherRef = db
-          .collection("researchers")
-          .doc(activityData.fullname);
+        const researcherRef = db.collection("researchers").doc(activityData.fullname);
         const researcherDoc = await t.get(researcherRef);
         const researcherData = researcherDoc.data();
-        const voteQuery = db
-          .collection("votes")
-          .where("activity", "==", activity)
-          .where("voter", "==", voter)
-          .limit(1);
+        const voteQuery = db.collection("votes").where("activity", "==", activity).where("voter", "==", voter).limit(1);
         const voteDocs = await t.get(voteQuery);
         let upVote = false;
         let noVote = false;
@@ -79,7 +60,7 @@ const voteFn = async (voter, activity, vote) => {
           newVoteData = {
             upVote: newUpVote,
             noVote: newNoVote,
-            updatedAt: currentTime,
+            updatedAt: currentTime
           };
           t.update(voteRef, newVoteData);
         } else {
@@ -91,14 +72,14 @@ const voteFn = async (voter, activity, vote) => {
             upVote: newUpVote,
             noVote: newNoVote,
             voter,
-            createdAt: currentTime,
+            createdAt: currentTime
           };
           t.set(voteRef, newVoteData);
         }
         const voteLogRef = db.collection("voteLogs").doc();
         t.set(voteLogRef, {
           ...newVoteData,
-          id: voteRef.id,
+          id: voteRef.id
         });
         let upVoteVal = 0;
         let noVoteVal = 0;
@@ -123,16 +104,16 @@ const voteFn = async (voter, activity, vote) => {
             [activityData.project]: {
               ...voterData.projects[activityData.project],
               upVotes: upVotes + upVoteVal,
-              noVotes: noVotes + noVoteVal,
-            },
-          },
+              noVotes: noVotes + noVoteVal
+            }
+          }
         };
         t.update(voterRef, voterProjectUpdates);
         const voterLogRef = db.collection("researcherLogs").doc();
         t.set(voterLogRef, {
           ...voterProjectUpdates,
           updatedAt: currentTime,
-          id: voterRef.id,
+          id: voterRef.id
         });
         let points = 0;
         if (researcherData.projects[activityData.project].points) {
@@ -143,16 +124,16 @@ const voteFn = async (voter, activity, vote) => {
             ...researcherData.projects,
             [activityData.project]: {
               ...researcherData.projects[activityData.project],
-              points: points + upVoteVal,
-            },
-          },
+              points: points + upVoteVal
+            }
+          }
         };
         t.update(researcherRef, researcherProjectUpdates);
         const researcherLogRef = db.collection("researcherLogs").doc();
         t.set(researcherLogRef, {
           ...researcherProjectUpdates,
           updatedAt: currentTime,
-          id: researcherRef.id,
+          id: researcherRef.id
         });
         let activityUpVotes = 0;
         if (activityData.upVotes) {
@@ -164,14 +145,14 @@ const voteFn = async (voter, activity, vote) => {
         }
         const activityUpdates = {
           upVotes: activityUpVotes + upVoteVal,
-          noVotes: activityNoVotes + noVoteVal,
+          noVotes: activityNoVotes + noVoteVal
         };
         t.update(activityRef, activityUpdates);
         const activityLogRef = db.collection("activityLogs").doc();
         t.set(activityLogRef, {
           id: activityRef.id,
           updatedAt: currentTime,
-          ...activityUpdates,
+          ...activityUpdates
         });
       }
     });
@@ -185,14 +166,8 @@ exports.voteEndpoint = async (req, res) => {
     const activity = req.body.activity;
     const vote = req.body.vote;
     if (activity && vote) {
-      const authUser = await admin
-        .auth()
-        .verifyIdToken(req.headers.authorization);
-      const userDocs = await db
-        .collection("users")
-        .where("uid", "==", authUser.uid)
-        .limit(1)
-        .get();
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
         await voteFn(userDocs.docs[0].id, activity, vote);
       }
@@ -208,51 +183,70 @@ exports.voteActivityReset = async (req, res) => {
   try {
     const activity = req.body.activity;
     if (activity) {
-      const authUser = await admin
-        .auth()
-        .verifyIdToken(req.headers.authorization);
-      const userDocs = await db
-        .collection("users")
-        .where("uid", "==", authUser.uid)
-        .limit(1)
-        .get();
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
         const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-        await db.runTransaction(async (t) => {
+        await db.runTransaction(async t => {
           const activityRef = db.collection("activities").doc(activity);
           const activityDoc = await t.get(activityRef);
           if (activityDoc.exists) {
-            const voteQuery = db
-              .collection("votes")
-              .where("activity", "==", activity);
+            const voteQuery = db.collection("votes").where("activity", "==", activity);
             const voteDocs = await t.get(voteQuery);
             for (let voteDoc of voteDocs.docs) {
               const voteRef = db.collection("votes").doc(voteDoc.id);
               const newVoteData = {
                 upVote: false,
                 noVote: false,
-                updatedAt: currentTime,
+                updatedAt: currentTime
               };
               t.update(voteRef, newVoteData);
               const voteLogRef = db.collection("voteLogs").doc();
               t.set(voteLogRef, {
                 ...newVoteData,
-                id: voteRef.id,
+                id: voteRef.id
               });
             }
             const activityUpdates = {
               upVotes: 0,
-              noVotes: 0,
+              noVotes: 0
             };
             t.update(activityRef, activityUpdates);
             const activityLogRef = db.collection("activityLogs").doc();
             t.set(activityLogRef, {
               id: activityRef.id,
               updatedAt: currentTime,
-              ...activityUpdates,
+              ...activityUpdates
             });
           }
         });
+      }
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ err });
+  }
+};
+
+exports.markPaidEndpoint = async (req, res) => {
+  try {
+    const activities = req.body.activities;
+    if (activities) {
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
+      if (userDocs.docs.length > 0) {
+        const researcherDoc = await db.collection("researchers").doc(userDocs.docs[0].id).get();
+        if (researcherDoc.exists) {
+          const researcherData = researcherDoc.data();
+          if (researcherData.isAdmin) {
+            for (let acti of activities) {
+              const activityRef = db.collection("activities").doc(acti.id);
+              await batchUpdate(activityRef, { paid: true });
+            }
+            await commitBatch();
+          }
+        }
       }
     }
     return res.status(200).json({});
@@ -266,16 +260,11 @@ exports.deleteActivity = async (req, res) => {
   try {
     const activity = req.body.activity;
     if (activity) {
-      const authUser = await admin
-        .auth()
-        .verifyIdToken(req.headers.authorization);
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       try {
         const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-        await db.runTransaction(async (t) => {
-          const userQuery = db
-            .collection("users")
-            .where("uid", "==", authUser.uid)
-            .limit(1);
+        await db.runTransaction(async t => {
+          const userQuery = db.collection("users").where("uid", "==", authUser.uid).limit(1);
           const userDocs = await t.get(userQuery);
           if (userDocs.docs.length > 0) {
             const fullname = userDocs.docs[0].id;
@@ -286,9 +275,7 @@ exports.deleteActivity = async (req, res) => {
             const activityDoc = await t.get(activityRef);
             const activityData = activityDoc.data();
             if (activityData.fullname === fullname) {
-              const votesQuery = db
-                .collection("votes")
-                .where("activity", "==", activity);
+              const votesQuery = db.collection("votes").where("activity", "==", activity);
               const voteDocs = await t.get(votesQuery);
               const voteRefsToDelete = [];
               const voterUpdates = [];
@@ -296,13 +283,11 @@ exports.deleteActivity = async (req, res) => {
                 const voteRef = db.collection("votes").doc(voteDoc.id);
                 voteRefsToDelete.push(voteRef);
                 const voteData = voteDoc.data();
-                const voterRef = db
-                  .collection("researchers")
-                  .doc(voteData.voter);
+                const voterRef = db.collection("researchers").doc(voteData.voter);
                 const voterDoc = await t.get(voterRef);
                 const voterData = voterDoc.data();
                 const voterUpdateData = {
-                  projects: voterData.projects,
+                  projects: voterData.projects
                 };
                 if (voteData.upVote) {
                   voterUpdateData.projects[voteData.project].upVotes -= 1;
@@ -311,14 +296,14 @@ exports.deleteActivity = async (req, res) => {
                 }
                 voterUpdates.push({
                   voterRef,
-                  voterUpdateData,
+                  voterUpdateData
                 });
               }
               for (let voteRefToDelete of voteRefsToDelete) {
                 const voteLogRef = db.collection("voteLogs").doc();
                 t.set(voteLogRef, {
                   id: voteRefToDelete.id,
-                  deleted: true,
+                  deleted: true
                 });
                 t.delete(voteRefToDelete);
               }
@@ -327,7 +312,7 @@ exports.deleteActivity = async (req, res) => {
                 const voterLogRef = db.collection("researcherLogs").doc();
                 t.set(voterLogRef, {
                   id: voterUpdate.voterRef.id,
-                  ...voterUpdate.voterUpdateData,
+                  ...voterUpdate.voterUpdateData
                 });
               }
               const pointsUpdate = {
@@ -335,22 +320,20 @@ exports.deleteActivity = async (req, res) => {
                   ...researcherData.projects,
                   [activityData.project]: {
                     ...researcherData.projects[activityData.project],
-                    points:
-                      researcherData.projects[activityData.project].points -
-                      activityData.upVotes,
-                  },
-                },
+                    points: researcherData.projects[activityData.project].points - activityData.upVotes
+                  }
+                }
               };
               t.update(researcherRef, pointsUpdate);
               const researcherLogRef = db.collection("researcherLogs").doc();
               t.set(researcherLogRef, {
                 id: researcherRef.id,
-                ...pointsUpdate,
+                ...pointsUpdate
               });
               const activityLogRef = db.collection("activityLogs").doc();
               t.set(activityLogRef, {
                 id: activityRef.id,
-                deleted: true,
+                deleted: true
               });
               t.delete(activityRef);
             }
@@ -370,7 +353,7 @@ exports.deleteActivity = async (req, res) => {
 const voteInstructorFn = async (voter, instructor, vote, comment) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-    await db.runTransaction(async (t) => {
+    await db.runTransaction(async t => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
       const instructorRef = db.collection("instructors").doc(instructor);
@@ -403,7 +386,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           newVoteData = {
             upVote: newUpVote,
             downVote: newDownVote,
-            updatedAt: currentTime,
+            updatedAt: currentTime
           };
           if (comment) {
             newVoteData.comment = comment;
@@ -418,7 +401,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
-            createdAt: currentTime,
+            createdAt: currentTime
           };
           if (comment) {
             newVoteData.comment = comment;
@@ -428,7 +411,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
         const voteLogRef = db.collection("instructorVoteLogs").doc();
         t.set(voteLogRef, {
           ...newVoteData,
-          id: voteRef.id,
+          id: voteRef.id
         });
         let upVoteVal = 0;
         let downVoteVal = 0;
@@ -441,13 +424,11 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
         }
         let upVotes = 0;
         if (voterData.projects[instructorData.project].instructorUpVotes) {
-          upVotes =
-            voterData.projects[instructorData.project].instructorUpVotes;
+          upVotes = voterData.projects[instructorData.project].instructorUpVotes;
         }
         let downVotes = 0;
         if (voterData.projects[instructorData.project].instructorDownVotes) {
-          downVotes =
-            voterData.projects[instructorData.project].instructorDownVotes;
+          downVotes = voterData.projects[instructorData.project].instructorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
@@ -455,16 +436,16 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
             [instructorData.project]: {
               ...voterData.projects[instructorData.project],
               instructorUpVotes: upVotes + upVoteVal,
-              instructorDownVotes: downVotes + downVoteVal,
-            },
-          },
+              instructorDownVotes: downVotes + downVoteVal
+            }
+          }
         };
         t.update(voterRef, voterProjectUpdates);
         const voterLogRef = db.collection("researcherLogs").doc();
         t.set(voterLogRef, {
           ...voterProjectUpdates,
           updatedAt: currentTime,
-          id: voterRef.id,
+          id: voterRef.id
         });
         let instructorUpVotes = 0;
         if (instructorData.upVotes) {
@@ -476,15 +457,13 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
         }
         const instructorUpdates = {
           upVotes: instructorUpVotes + upVoteVal,
-          downVotes: instructorDownVotes + downVoteVal,
+          downVotes: instructorDownVotes + downVoteVal
         };
         if (comment) {
           if (!("comments" in instructorData)) {
             instructorUpdates.comments = [comment];
           } else if (voteData && voteData.comment !== comment) {
-            instructorUpdates.comments = instructorData.comments.filter(
-              (comm) => comm !== voteData.comment
-            );
+            instructorUpdates.comments = instructorData.comments.filter(comm => comm !== voteData.comment);
             instructorUpdates.comments.push(comment);
           }
         }
@@ -493,7 +472,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
         t.set(instructorLogRef, {
           id: instructorRef.id,
           updatedAt: currentTime,
-          ...instructorUpdates,
+          ...instructorUpdates
         });
       }
     });
@@ -508,14 +487,8 @@ exports.voteInstructorEndpoint = async (req, res) => {
     const vote = req.body.vote;
     const comment = req.body.comment;
     if (instructor && vote) {
-      const authUser = await admin
-        .auth()
-        .verifyIdToken(req.headers.authorization);
-      const userDocs = await db
-        .collection("users")
-        .where("uid", "==", authUser.uid)
-        .limit(1)
-        .get();
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
         await voteInstructorFn(userDocs.docs[0].id, instructor, vote, comment);
       }
@@ -531,48 +504,40 @@ exports.voteInstructorReset = async (req, res) => {
   try {
     const instructor = req.body.instructor;
     if (instructor) {
-      const authUser = await admin
-        .auth()
-        .verifyIdToken(req.headers.authorization);
-      const userDocs = await db
-        .collection("users")
-        .where("uid", "==", authUser.uid)
-        .limit(1)
-        .get();
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
         const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-        await db.runTransaction(async (t) => {
+        await db.runTransaction(async t => {
           const instructorRef = db.collection("instructors").doc(instructor);
           const instructorDoc = await t.get(instructorRef);
           if (instructorDoc.exists) {
-            const voteQuery = db
-              .collection("instructorVotes")
-              .where("instructor", "==", instructor);
+            const voteQuery = db.collection("instructorVotes").where("instructor", "==", instructor);
             const voteDocs = await t.get(voteQuery);
             for (let voteDoc of voteDocs.docs) {
               const voteRef = db.collection("instructorVotes").doc(voteDoc.id);
               const newVoteData = {
                 upVote: false,
                 downVote: false,
-                updatedAt: currentTime,
+                updatedAt: currentTime
               };
               t.update(voteRef, newVoteData);
               const voteLogRef = db.collection("instructorVoteLogs").doc();
               t.set(voteLogRef, {
                 ...newVoteData,
-                id: voteRef.id,
+                id: voteRef.id
               });
             }
             const instructorUpdates = {
               upVotes: 0,
-              downVotes: 0,
+              downVotes: 0
             };
             t.update(instructorRef, instructorUpdates);
             const instructorLogRef = db.collection("instructorLogs").doc();
             t.set(instructorLogRef, {
               id: instructorRef.id,
               updatedAt: currentTime,
-              ...instructorUpdates,
+              ...instructorUpdates
             });
           }
         });
@@ -1067,38 +1032,24 @@ exports.loadTimesheetVotes = async (req, res) => {
           preResearcherIdx = researcherIdx;
           const fullname = researchers[researcherIdx].fullname;
           let rowIdx = 0;
-          const ws = fs.createReadStream(
-            "datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " +
-              fullname +
-              ".csv"
-          );
+          const ws = fs.createReadStream("datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " + fullname + ".csv");
           const parser = csv
             .parseStream(ws, { headers: true })
-            .on("error", (error) => {
+            .on("error", error => {
               console.error(error);
               return res.status(500).json({ error });
             })
-            .on("data", async (row) => {
+            .on("data", async row => {
               console.log(rowIdx);
               parser.pause();
               if (row["Date"] && row["Time In"] && row["Time Out"]) {
                 const activityDate = new Date(row["Date"]);
-                const startTime = new Date(
-                  row["Date"] + " " + row["Time In"] + ":00"
-                );
-                const endTime = new Date(
-                  row["Date"] + " " + row["Time Out"] + ":00"
-                );
+                const startTime = new Date(row["Date"] + " " + row["Time In"] + ":00");
+                const endTime = new Date(row["Date"] + " " + row["Time Out"] + ":00");
                 const timeStamps = getIn30Minutes(startTime, endTime);
                 for (let { sTime, eTime } of timeStamps) {
-                  const { sTimestamp, eTimestamp } = getActivityTimeStamps(
-                    activityDate,
-                    sTime,
-                    eTime
-                  );
-                  const currentTime = admin.firestore.Timestamp.fromDate(
-                    new Date()
-                  );
+                  const { sTimestamp, eTimestamp } = getActivityTimeStamps(activityDate, sTime, eTime);
+                  const currentTime = admin.firestore.Timestamp.fromDate(new Date());
                   const activityRef = db.collection("activities").doc();
                   const docObj = {
                     fullname,
@@ -1108,16 +1059,13 @@ exports.loadTimesheetVotes = async (req, res) => {
                     description: row["Description"],
                     tags: [],
                     upVotes: 0,
-                    createdAt: currentTime,
+                    createdAt: currentTime
                   };
                   await activityRef.set(docObj);
                   const activityLogRef = db.collection("activityLog").doc();
                   await activityLogRef.set({ docObj });
                   for (let researcher of researchers) {
-                    if (
-                      researcher.fullname in row &&
-                      strToBoolean(row[researcher.fullname])
-                    ) {
+                    if (researcher.fullname in row && strToBoolean(row[researcher.fullname])) {
                       await vote(researcher.fullname, activityRef.id, "upVote");
                     }
                   }
@@ -1126,7 +1074,7 @@ exports.loadTimesheetVotes = async (req, res) => {
               rowIdx += 1;
               parser.resume();
             })
-            .on("end", async (row) => {
+            .on("end", async row => {
               const endInterval = setInterval(() => {
                 if (rowIdx >= 970) {
                   clearInterval(endInterval);
@@ -1179,7 +1127,7 @@ exports.gradeFreeRecall = async (req, res) => {
       const phrase = req.body.phrase;
       const session = req.body.session;
       const phraseNum = req.body.phraseNum;
-      await db.runTransaction(async (t) => {
+      await db.runTransaction(async t => {
         // Accumulate all the transaction writes in an array to commit all of them
         // after all the reads to abide by the Firestore transaction law
         // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
@@ -1193,9 +1141,7 @@ exports.gradeFreeRecall = async (req, res) => {
         const thisResearcherUpdates = thisResearcherData.projects[project];
         // The very first update we need to apply is to increment the number of
         // times they have graded a free-recall response.
-        thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum
-          ? thisResearcherUpdates.gradingNum + 1
-          : 1;
+        thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum ? thisResearcherUpdates.gradingNum + 1 : 1;
         // recallGrades collection is huge and it's extremely inefficient to
         // search through it if all the docs for all projects are in the same
         // collection. Also, when querying them to find the appropriate doc to
@@ -1218,9 +1164,7 @@ exports.gradeFreeRecall = async (req, res) => {
           .where("passage", "==", passageId)
           .where("phrase", "==", phrase);
         const recallGradeDocs = await t.get(recallGradeQuery);
-        const recallGradeRef = db
-          .collection(collName)
-          .doc(recallGradeDocs.docs[0].id);
+        const recallGradeRef = db.collection(collName).doc(recallGradeDocs.docs[0].id);
         const recallGradeData = recallGradeDocs.docs[0].data();
         if (!recallGradeData.researchers.includes(fullname)) {
           const recallGradeUpdates = {};
@@ -1278,111 +1222,88 @@ exports.gradeFreeRecall = async (req, res) => {
                   // We should add up points here because each free recall response
                   // may get multiple points from each of the key phrases identified
                   // in it.
-                  theGrade +=
-                    userUpdates.pConditions[passageIdx][recallResponse];
+                  theGrade += userUpdates.pConditions[passageIdx][recallResponse];
                 }
                 userUpdates.pConditions[passageIdx][recallResponse] = theGrade;
                 // Depending on how many key phrases were in the passage, we should
                 // calculate the free-recall response ratio.
-                userUpdates.pConditions[passageIdx][recallResponse + "Ratio"] =
-                  theGrade / phraseNum;
+                userUpdates.pConditions[passageIdx][recallResponse + "Ratio"] = theGrade / phraseNum;
+                transactionWrites.push({
+                  type: "update",
+                  refObj: userRef,
+                  updateObj: userUpdates
+                });
               }
-              transactionWrites.push({
-                type: "update",
-                refObj: userRef,
-                updateObj: userUpdates,
-              });
               // For both identified >= 3 AND notIdentified >= 3 cases, we should give
               // a point to each of the researchers who unanimously
               // identified/notIdentified this phrase in this free recall response.
-              for (
-                let fResearcherIdx = 0;
-                fResearcherIdx < recallGradeData.researchers.length;
-                fResearcherIdx++
-              ) {
-                const researcherRef = db
-                  .collection("researchers")
-                  .doc(recallGradeData.researchers[fResearcherIdx]);
+              for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
+                const researcherRef = db.collection("researchers").doc(recallGradeData.researchers[fResearcherIdx]);
                 const researcherDoc = await t.get(researcherRef);
                 const researcherData = researcherDoc.data();
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
-                  (notIdentified >= 3 &&
-                    !recallGradeData.grades[fResearcherIdx])
+                  (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
                 ) {
                   // Approve the recallGrade for all the researchers who
                   // unanimously identified/notIdentified this phrase in this free
                   // recall response.
                   recallGradeUpdates.approved = approved;
-                  researcherData.projects[project].gradingPoints =
-                    researcherData.projects[project].gradingPoints
-                      ? researcherData.projects[project].gradingPoints + 0.5
-                      : 0.5;
+                  researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                    ? researcherData.projects[project].gradingPoints + 0.5
+                    : 0.5;
                   transactionWrites.push({
                     type: "update",
                     refObj: researcherRef,
                     updateObj: {
-                      projects: researcherData.projects,
-                    },
+                      projects: researcherData.projects
+                    }
                   });
                 }
                 // If there are exactly 3 researchers who graded the same, but only
                 // this researcher's grade (Yes/No) is different from the majority of
                 // grades; we should give the opposing researcher a negative point.
                 else if (
-                  (identified === 3 &&
-                    !recallGradeData.grades[fResearcherIdx]) ||
-                  (notIdentified === 3 &&
-                    recallGradeData.grades[fResearcherIdx])
+                  (identified === 3 && !recallGradeData.grades[fResearcherIdx]) ||
+                  (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
                 ) {
-                  researcherData.projects[project].gradingPoints =
-                    researcherData.projects[project].gradingPoints
-                      ? researcherData.projects[project].gradingPoints - 0.5
-                      : -0.5;
-                  researcherData.projects[project].negativeGradingPoints =
-                    researcherData.projects[project].negativeGradingPoints
-                      ? researcherData.projects[project].negativeGradingPoints +
-                        0.5
-                      : 0.5;
+                  researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                    ? researcherData.projects[project].gradingPoints - 0.5
+                    : -0.5;
+                  researcherData.projects[project].negativeGradingPoints = researcherData.projects[project]
+                    .negativeGradingPoints
+                    ? researcherData.projects[project].negativeGradingPoints + 0.5
+                    : 0.5;
                   transactionWrites.push({
                     type: "update",
                     refObj: researcherRef,
                     updateObj: {
-                      projects: researcherData.projects,
-                    },
+                      projects: researcherData.projects
+                    }
                   });
                 }
               }
               // If the authenticated researcher has graded the same as the majority
               // of grades:
-              if (
-                (identified >= 3 && grade) ||
-                (notIdentified >= 3 && !grade)
-              ) {
+              if ((identified >= 3 && grade) || (notIdentified >= 3 && !grade)) {
                 // Because it's approved, we should also give the authenticated
                 // researcher a point. We should update thisResearcherUpdates and
                 // commit all the updates at the end to their document.
-                thisResearcherUpdates.gradingPoints =
-                  thisResearcherUpdates.gradingPoints
-                    ? thisResearcherUpdates.gradingPoints + 0.5
-                    : 0.5;
+                thisResearcherUpdates.gradingPoints = thisResearcherUpdates.gradingPoints
+                  ? thisResearcherUpdates.gradingPoints + 0.5
+                  : 0.5;
               }
               // If there are exactly 3 researchers who graded the same, but only the
               // authenticated researcher's grade (Yes/No) is different from the
               // majority of grades; we should give the the authenticated researcher a
               // negative point.
-              else if (
-                (identified === 3 && !grade) ||
-                (notIdentified === 3 && grade)
-              ) {
-                thisResearcherUpdates.gradingPoints =
-                  thisResearcherUpdates.gradingPoints
-                    ? thisResearcherUpdates.gradingPoints - 0.5
-                    : -0.5;
-                thisResearcherUpdates.negativeGradingPoints =
-                  thisResearcherUpdates.negativeGradingPoints
-                    ? thisResearcherUpdates.negativeGradingPoints + 0.5
-                    : 0.5;
+              else if ((identified === 3 && !grade) || (notIdentified === 3 && grade)) {
+                thisResearcherUpdates.gradingPoints = thisResearcherUpdates.gradingPoints
+                  ? thisResearcherUpdates.gradingPoints - 0.5
+                  : -0.5;
+                thisResearcherUpdates.negativeGradingPoints = thisResearcherUpdates.negativeGradingPoints
+                  ? thisResearcherUpdates.negativeGradingPoints + 0.5
+                  : 0.5;
               }
             }
           }
@@ -1394,9 +1315,9 @@ exports.gradeFreeRecall = async (req, res) => {
             updateObj: {
               projects: {
                 ...thisResearcherData.projects,
-                [project]: thisResearcherUpdates,
-              },
-            },
+                [project]: thisResearcherUpdates
+              }
+            }
           });
           for (let transactionWrite of transactionWrites) {
             if (transactionWrite.type === "update") {
@@ -1408,12 +1329,14 @@ exports.gradeFreeRecall = async (req, res) => {
             }
           }
           // Finally, we should create the recallGrades doc for this new grade.
+          //this done variable if for testing if 4 researchers have voted on this
           t.update(recallGradeRef, {
             ...recallGradeUpdates,
+            done: recallGradeData.researchersNum >= 3,
             researchers: [...recallGradeData.researchers, fullname],
             grades: [...recallGradeData.grades, grade],
             researchersNum: recallGradeData.researchersNum + 1,
-            updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+            updatedAt: admin.firestore.Timestamp.fromDate(new Date())
           });
         }
       });
@@ -1425,7 +1348,7 @@ exports.gradeFreeRecall = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
-exports.assignExperimentSessionsPoints = async (context) => {
+exports.assignExperimentSessionsPoints = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -1454,18 +1377,12 @@ exports.assignExperimentSessionsPoints = async (context) => {
               }
             }
             let tenDaysLater = new Date();
-            tenDaysLater = new Date(
-              tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000
-            );
+            tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
               // Send a reminder email to a researcher that they have not specified
               // their availability for the next ten days and ask them to specify it.
               setTimeout(() => {
-                remindResearcherToSpecifyAvailability(
-                  researcherData.email,
-                  researcherDoc.id,
-                  "ten"
-                );
+                remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
               }, waitTime);
               // Increase waitTime by a random integer between 1 to 4 seconds.
               waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
@@ -1475,13 +1392,11 @@ exports.assignExperimentSessionsPoints = async (context) => {
         researchersInfo.push({
           fullname: researcherDoc.id,
           email: researcherData.email,
-          projects: Object.keys(researcherData.projects),
+          projects: Object.keys(researcherData.projects)
         });
       }
     }
-    const oneWebIdx = researchersInfo.findIndex(
-      (researcher) => researcher.email.toLowerCase() === "oneweb@umich.edu"
-    );
+    const oneWebIdx = researchersInfo.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu");
     const usersInfo = [];
     const usersDocs = await db.collection("users").get();
     for (let userDoc of usersDocs.docs) {
@@ -1489,7 +1404,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
       usersInfo.push({
         fullname: userDoc.id,
         email: userData.email,
-        project: userData.project,
+        project: userData.project
       });
     }
     const pastEvents = await allPastEvents();
@@ -1502,26 +1417,17 @@ exports.assignExperimentSessionsPoints = async (context) => {
           for (let attendee of pastEvent.attendees) {
             attendees.push(attendee.email);
             const rIdx = researchersInfo.findIndex(
-              (researcher) =>
-                researcher.email.toLowerCase() === attendee.email.toLowerCase()
+              researcher => researcher.email.toLowerCase() === attendee.email.toLowerCase()
             );
             if (rIdx !== -1) {
               researcherObjs.push(researchersInfo[rIdx]);
             }
-            const uIdx = usersInfo.findIndex(
-              (user) =>
-                user.email.toLowerCase() === attendee.email.toLowerCase()
-            );
+            const uIdx = usersInfo.findIndex(user => user.email.toLowerCase() === attendee.email.toLowerCase());
             if (uIdx !== -1) {
               userObj = usersInfo[uIdx];
             }
           }
-          if (
-            researcherObjs.findIndex(
-              (researcher) =>
-                researcher.email.toLowerCase() === "oneweb@umich.edu"
-            ) === -1
-          ) {
+          if (researcherObjs.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu") === -1) {
             researcherObjs.push(researchersInfo[oneWebIdx]);
           }
           if (userObj && researcherObjs.length > 0) {
@@ -1530,14 +1436,8 @@ exports.assignExperimentSessionsPoints = async (context) => {
               if (researcherObj.projects.includes(project)) {
                 const sTime = new Date(pastEvent.start.dateTime);
                 const eTime = new Date(pastEvent.end.dateTime);
-                const { sTimestamp, eTimestamp } = getActivityTimeStamps(
-                  sTime,
-                  sTime,
-                  eTime
-                );
-                const currentTime = admin.firestore.Timestamp.fromDate(
-                  new Date()
-                );
+                const { sTimestamp, eTimestamp } = getActivityTimeStamps(sTime, sTime, eTime);
+                const currentTime = admin.firestore.Timestamp.fromDate(new Date());
                 const expSessionDocs = await db
                   .collection("expSessions")
                   .where("attendees", "==", attendees)
@@ -1549,34 +1449,29 @@ exports.assignExperimentSessionsPoints = async (context) => {
                     points = 16;
                   }
                   try {
-                    await db.runTransaction(async (t) => {
-                      const researcherRef = db
-                        .collection("researchers")
-                        .doc(researcherObj.fullname);
+                    await db.runTransaction(async t => {
+                      const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
                       const researcherDoc = await t.get(researcherRef);
                       const researcherData = researcherDoc.data();
                       let researcherExpPoints = 0;
                       if (researcherData.projects[project].expPoints) {
-                        researcherExpPoints =
-                          researcherData.projects[project].expPoints;
+                        researcherExpPoints = researcherData.projects[project].expPoints;
                       }
                       const researcherProjectUpdates = {
                         projects: {
                           ...researcherData.projects,
                           [project]: {
                             ...researcherData.projects[project],
-                            expPoints: researcherExpPoints + points,
-                          },
-                        },
+                            expPoints: researcherExpPoints + points
+                          }
+                        }
                       };
                       t.update(researcherRef, researcherProjectUpdates);
-                      const researcherLogRef = db
-                        .collection("researcherLogs")
-                        .doc();
+                      const researcherLogRef = db.collection("researcherLogs").doc();
                       t.set(researcherLogRef, {
                         ...researcherProjectUpdates,
                         id: researcherRef.id,
-                        updatedAt: currentTime,
+                        updatedAt: currentTime
                       });
                       const expSessionRef = db.collection("expSessions").doc();
                       t.set(expSessionRef, {
@@ -1585,7 +1480,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
                         points,
                         sTime: sTimestamp,
                         eTime: eTimestamp,
-                        createdAt: currentTime,
+                        createdAt: currentTime
                       });
                     });
                   } catch (e) {
@@ -1610,7 +1505,7 @@ exports.assignExperimentSessionsPoints = async (context) => {
 // This is called in a pubsub every 25 hours.
 // Email reminders to researchers that they have not added/voted any instructors
 // over the past week and ask them to add/vote instructors and administrators.
-exports.remindAddingInstructorsAdministrators = async (context) => {
+exports.remindAddingInstructorsAdministrators = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -1640,9 +1535,7 @@ exports.remindAddingInstructorsAdministrators = async (context) => {
               }
             }
             let tenDaysLater = new Date();
-            tenDaysLater = new Date(
-              tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000
-            );
+            tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
               // Send a reminder email to a researcher that they have not accepted
               // or even declined the Google Calendar invitation and asks them to
@@ -1654,8 +1547,7 @@ exports.remindAddingInstructorsAdministrators = async (context) => {
                   participant.email,
                   hoursLeft,
                   order,
-                  attendee.responseStatus === "declined" ||
-                    attendee.responseStatus === "tentative"
+                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
                 );
               }, waitTime);
               // Increase waitTime by a random integer between 1 to 4 seconds.
@@ -1679,7 +1571,7 @@ exports.remindAddingInstructorsAdministrators = async (context) => {
 // - Reschedule if they have declined them
 // For passed Google Calendar events, to:
 // - Reschedule if they have missed or declined them.
-exports.remindCalendarInvitations = async (context) => {
+exports.remindCalendarInvitations = async context => {
   try {
     // researchers = an object of emails as keys and the corresponding fullnames as values.
     const researchers = {};
@@ -1708,7 +1600,7 @@ exports.remindCalendarInvitations = async (context) => {
       delete scheduleData.id;
       schedule[scheduleEventId] = {
         ...scheduleData,
-        schId: scheduleDoc.id,
+        schId: scheduleDoc.id
       };
     }
     // We don't want to send many emails at once, because it may drive Gmail crazy.
@@ -1725,14 +1617,10 @@ exports.remindCalendarInvitations = async (context) => {
       const startTime = new Date(ev.start.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       // Find the scheduled session corresponding to this event.
-      if (
-        ev.id in schedule &&
-        "attendees" in ev &&
-        Array.isArray(ev.attendees)
-      ) {
+      if (ev.id in schedule && "attendees" in ev && Array.isArray(ev.attendees)) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase(),
+          email: schedule[ev.id].email.toLowerCase()
         };
         const order = schedule[ev.id].order;
         for (let attendee of ev.attendees) {
@@ -1749,8 +1637,7 @@ exports.remindCalendarInvitations = async (context) => {
                   participant.email,
                   hoursLeft,
                   order,
-                  attendee.responseStatus === "declined" ||
-                    attendee.responseStatus === "tentative"
+                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
                 );
               }, waitTime);
               // Increase waitTime by a random integer between 1 to 4 seconds.
@@ -1760,10 +1647,7 @@ exports.remindCalendarInvitations = async (context) => {
             else if (attendee.email.toLowerCase() === participant.email) {
               // The only way to get the user data, like their firstname, which
               // sessions they have completed so far, ... is through "users"
-              const userDocs = await db
-                .collection("users")
-                .where("email", "==", attendee.email.toLowerCase())
-                .get();
+              const userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
               if (userDocs.docs.length > 0) {
                 const userData = userDocs.docs[0].data();
                 participant.firstname = userData.firstname;
@@ -1794,10 +1678,7 @@ exports.remindCalendarInvitations = async (context) => {
                   participant.thirdDone = false;
                 }
                 // We consider "declined" and "tentative" responses as declined.
-                if (
-                  attendee.responseStatus === "declined" ||
-                  attendee.responseStatus === "tentative"
-                ) {
+                if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
                   // If they have declined the 1st session, but they are not done
                   // with the 1st session:
                   if (order === "1st" && !participant.firstDone) {
@@ -1856,12 +1737,10 @@ exports.remindCalendarInvitations = async (context) => {
                     // the 3rd session without completing the 2nd one.
                     await deleteEvent(ev.id);
                     // Also, remove the Calendar event id and order from their schedule doc.
-                    const scheduleRef = db
-                      .collection("schedule")
-                      .doc(schedule[ev.id].schId);
+                    const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
                     await scheduleRef.update({
                       id: admin.firestore.FieldValue.delete(),
-                      order: admin.firestore.FieldValue.delete(),
+                      order: admin.firestore.FieldValue.delete()
                     });
                   } else {
                     setTimeout(() => {
@@ -1905,7 +1784,7 @@ exports.remindCalendarInvitations = async (context) => {
       ) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase(),
+          email: schedule[ev.id].email.toLowerCase()
         };
         const order = schedule[ev.id].order;
         for (let attendee of ev.attendees) {
@@ -1914,10 +1793,7 @@ exports.remindCalendarInvitations = async (context) => {
             participant.responseStatus = attendee.responseStatus;
             // The only way to get the user data, like their firstname, which
             // sessions they have completed so far, ... is through "users"
-            const userDocs = await db
-              .collection("users")
-              .where("email", "==", attendee.email.toLowerCase())
-              .get();
+            const userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
             if (userDocs.docs.length > 0) {
               const userData = userDocs.docs[0].data();
               participant.firstname = userData.firstname;
@@ -1953,8 +1829,7 @@ exports.remindCalendarInvitations = async (context) => {
                     participant.courseName,
                     hoursLeft,
                     false,
-                    attendee.responseStatus === "declined" ||
-                      attendee.responseStatus === "tentative",
+                    attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
                     null
                   );
                 }, waitTime);
@@ -1965,29 +1840,18 @@ exports.remindCalendarInvitations = async (context) => {
                 // the 3rd session without completing the 2nd one.
                 await deleteEvent(ev.id);
                 // Also, remove the Calendar event id and order from their schedule doc.
-                const scheduleRef = db
-                  .collection("schedule")
-                  .doc(schedule[ev.id].schId);
+                const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
                 await scheduleRef.update({
                   id: admin.firestore.FieldValue.delete(),
-                  order: admin.firestore.FieldValue.delete(),
+                  order: admin.firestore.FieldValue.delete()
                 });
               } else if (isToday(startTime)) {
                 // Only if it is a 2nd/3rd session that was scheduled today, but they
                 // missed it, we email them to reschedule their session on the same day;
                 // otherwise, we will withdraw their application.
-                if (
-                  (order === "2nd" && !participant.secondDone) ||
-                  (order === "3rd" && !participant.thirdDone)
-                ) {
+                if ((order === "2nd" && !participant.secondDone) || (order === "3rd" && !participant.thirdDone)) {
                   setTimeout(() => {
-                    notAttendedEmail(
-                      participant.email,
-                      participant.firstname,
-                      false,
-                      participant.courseName,
-                      order
-                    );
+                    notAttendedEmail(participant.email, participant.firstname, false, participant.courseName, order);
                   }, waitTime);
                   waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
                 }

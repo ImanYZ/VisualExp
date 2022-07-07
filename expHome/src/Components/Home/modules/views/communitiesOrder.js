@@ -6,18 +6,18 @@ export default [
     tags: [
       {
         title: "Cognitive Psychology",
-        node: "jTz0wx46dQsbPURkQ0cl",
+        node: "jTz0wx46dQsbPURkQ0cl"
       },
       {
         title: "Knowledge Visualization",
-        node: "WgF7yr5q7tJc54apVQSr",
-      },
+        node: "WgF7yr5q7tJc54apVQSr"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Cognitive_Psychology.jpeg",
     title: "UX Research in Cognitive Psychology of Learning",
-    width: "61%",
+    width: "34%",
     leaders: [
       {
         name: "Iman YeckehZaare",
@@ -26,119 +26,82 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/oneweb/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/oneweb/"
+          }
+        ]
+      }
     ],
     YouTube: "B6q-LYXvNCg",
     description: `We study the UX Research and Cognitive Psychology literature on learning and memorizing. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
     accomplishments: (
       <div>
-        <p>
-          We have recently published the following papers in ACM conferences:
-        </p>
+        <p>We have recently published the following papers in ACM conferences:</p>
         <ul>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907"
-              target="_blank"
-            >
-              YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P.
-              (2022). Semester-level Spacing but Not Procrastination Affected
-              Student Exam Performance. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907" target="_blank">
+              YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P. (2022). Semester-level Spacing but Not
+              Procrastination Affected Student Exam Performance. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 12th International Conference on Learning
-                Analytics and Knowledge (LAK&#8216;22) online, March 21-25,
-                2022. ACM.
+                Proceedings of the 12th International Conference on Learning Analytics and Knowledge (LAK&#8216;22)
+                online, March 21-25, 2022. ACM.
               </span>
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408"
-              target="_blank"
-            >
-              YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
-              Retrieval-based Teaching Incentivizes Spacing and Improves Grades
-              in Computer Science Education. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408" target="_blank">
+              YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022). Retrieval-based Teaching Incentivizes Spacing and
+              Improves Grades in Computer Science Education. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 53rd ACM Technical Symposium on Computer
-                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
-                Providence, RI, USA. ACM.
+                Proceedings of the 53rd ACM Technical Symposium on Computer Science Education V. 1 (SIGCSE 2022), March
+                3--5, 2022, Providence, RI, USA. ACM.
               </span>
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313"
-              target="_blank"
-            >
-              YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K., &amp; Fox,
-              E. (2022). Another Victim of COVID-19: Computer Science Education.
-              In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313" target="_blank">
+              YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K., &amp; Fox, E. (2022). Another Victim of COVID-19:
+              Computer Science Education. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 53rd ACM Technical Symposium on Computer
-                Science Education V. 1 (SIGCSE 2022), March 3--5, 2022,
-                Providence, RI, USA. ACM.
+                Proceedings of the 53rd ACM Technical Symposium on Computer Science Education V. 1 (SIGCSE 2022), March
+                3--5, 2022, Providence, RI, USA. ACM.
               </span>
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760"
-              target="_blank"
-            >
-              YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak, C., Kwon,
-              K., ... &amp; Silverstein, N. (2021, August). Incentivized Spacing
-              and Gender in Computer Science Education. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760" target="_blank">
+              YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak, C., Kwon, K., ... &amp; Silverstein, N. (2021,
+              August). Incentivized Spacing and Gender in Computer Science Education. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 17th ACM Conference on International
-                Computing Education Research
+                Proceedings of the 17th ACM Conference on International Computing Education Research
               </span>{" "}
               (pp. 18-28).
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882"
-              target="_blank"
-            >
-              Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020, April).
-              QMaps: Engaging Students in Voluntary Question Generation and
-              Linking. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882" target="_blank">
+              Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020, April). QMaps: Engaging Students in Voluntary
+              Question Generation and Linking. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 2020 CHI Conference on Human Factors in
-                Computing Systems
+                Proceedings of the 2020 CHI Conference on Human Factors in Computing Systems
               </span>{" "}
               (pp. 1-14).
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411"
-              target="_blank"
-            >
-              YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019, July). A
-              spaced, interleaved retrieval practice tool that is motivating and
-              effective. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411" target="_blank">
+              YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019, July). A spaced, interleaved retrieval practice
+              tool that is motivating and effective. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 2019 ACM Conference on International
-                Computing Education Research
+                Proceedings of the 2019 ACM Conference on International Computing Education Research
               </span>{" "}
               (pp. 71-79).
             </a>
           </li>
           <li>
-            <a
-              href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417"
-              target="_blank"
-            >
-              YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed and
-              Studying: Gendered Pathways to Success. In{" "}
+            <a href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417" target="_blank">
+              YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed and Studying: Gendered Pathways to Success. In{" "}
               <span style={{ fontStyle: "italic" }}>
-                Proceedings of the 50th ACM Technical Symposium on Computer
-                Science Education
+                Proceedings of the 50th ACM Technical Symposium on Computer Science Education
               </span>{" "}
               (pp. 693-698).
             </a>
@@ -152,14 +115,14 @@ export default [
       `Get involved in all aspects of conducting an online controlled experiment under the supervision of Iman YeckehZaare.`,
       `Learn about a mixed-method study including both qualitative and quantitative data, and analysis to prepare for future Ph.D. programs in related disciplines.`,
       `Work towards publishing research on cognitive psychology of learning and memory in reputable venues.`,
-      `Have opportunities to take on leadership roles within the community.`,
+      `Have opportunities to take on leadership roles within the community.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to education, learning science, cognitive psychology, memory science, statistics, or econometrics`,
-      `Fluency in writing and reading in English`,
+      `Fluency in writing and reading in English`
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
@@ -169,22 +132,22 @@ export default [
       `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
       `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
       `Present the essence of what you learn from the related papers and book chapters in weekly meetings for further discussion.`,
-      `Co-author the final research paper to submit to reputable conferences/journals.`,
-    ],
+      `Co-author the final research paper to submit to reputable conferences/journals.`
+    ]
   },
   {
     id: "Educational_Organizational_Psychology",
     tags: [
       {
         title: "Educational Psychology",
-        node: "L35Nac3iqGKuqGnn0xdD",
-      },
+        node: "L35Nac3iqGKuqGnn0xdD"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
-    width: "39%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Amelia Henriques",
@@ -204,10 +167,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/desireecomer/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/desireecomer/"
+          }
+        ]
+      }
       // {
       //   name: "Asia Luboyeski",
       //   image: "Asia_Luboyeski.jpg",
@@ -232,7 +195,7 @@ export default [
       `Propose and collaboratively work on solutions to identified problems `,
       `Work towards publishing research on education, learning science, industrial-organizational psychology, and cognitive psychology`,
       `Work remotely with all interactions, task fulfillment, and communications with other interns.`,
-      `Have opportunities to take on leadership roles within the community.`,
+      `Have opportunities to take on leadership roles within the community.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
@@ -240,7 +203,7 @@ export default [
     qualifications: [
       `Academic background and knowledge in topics related to education, learning science, industrial-organizational psychology, or cognitive psychology.`,
       `Fluency in writing and reading in English (will have to summarize research articles).`,
-      `Experience and willingness to work in collaborative environments.`,
+      `Experience and willingness to work in collaborative environments.`
     ],
     responsibilities: [
       `Be enthusiastic to engage in critical thinking to collaborate and publish research on the topics currently being explored in the community.`,
@@ -248,36 +211,36 @@ export default [
       `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
       `Must be prepared and willing to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, epidemiologists, and cognitive and behavioral scientists.`,
       `Presenting the essence of what you learn in weekly meetings for further discussion, at least once a month.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Clinical_Psychology",
     tags: [
       {
         title: "Clinical Psychology",
-        node: "2DRAaqsjnWaZ7KL10UKb",
-      },
+        node: "2DRAaqsjnWaZ7KL10UKb"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
-        name: "Victoria Mulligan",
-        image: "Victoria_Mulligan.jpg",
-        about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
+        name: "Liza Shokhrin",
+        image: "Liza_Shokhrin.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/elisaveta-liza-shokhrin-0066251bb/"
+          }
+        ]
+      }
     ],
-    YouTube: "K5R17uFWINo",
+    YouTube: "M4Xkm0vD7uk",
     description: `The Clinical Psychology community explores research related to mental illness/disorders, mental health treatment, and psychopathology of individuals across the lifespan. Clinical psychology is interdisciplinary and can intersect with various fields such as neuroscience, cognitive psychology, and social psychology. We encourage interns to dive into research that they have particular interest in (e.g., child psychopathology), share their findings, and collaborate with other interns. This internship is designed to motivate independent research, gain research skills such as analysis and interpretation, and work towards conducting research.
     1Cademy allows interns to present their research findings, gain feedback from other interns, and learn how to communicate their findings in a concise and articulate manner.`,
     accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of clinical psychology and strengthen research skills to prepare for a future in the clinical psychology field.`,
@@ -285,7 +248,7 @@ export default [
       `Gain valuable research skills and experience, such as paper analysis, summarization, and making connections between disciplines.`,
       `Work towards publishing research on topics related to clinical psychology.`,
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
-      `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
+      `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
     // coursera: "https://www.coursera.org/learn/talkmentalillness",
@@ -295,7 +258,7 @@ export default [
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
       `Willingness to present work at weekly meetings.`,
       `Able to commit to approximately 5-10 hours of work each week.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`,
+      `Fluency in writing and reading in English (will have to summarize research articles).`
     ],
     responsibilities: [
       `Read and summarize textbook chapters and scientific journal articles.`,
@@ -303,58 +266,58 @@ export default [
       `Contribute concise summaries of information to the online 1Cademy platform.`,
       `Attend weekly online meetings.`,
       `Contribute in meetings by presenting work and engaging in discussions.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Health_Psychology",
     tags: [
       {
         title: "Psychology",
-        node: "owiurXq2sPdbHTC3zWHq",
+        node: "owiurXq2sPdbHTC3zWHq"
       },
       {
         title: "Health Psychology",
-        node: "7kScwzjwIaxgBv1RyjVM",
-      },
+        node: "7kScwzjwIaxgBv1RyjVM"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
-    width: "50%",
+    width: "34%",
     leaders: [
       {
-        name: "Madeline Paige Jacoby",
-        image: "Madeline_Paige_Jacoby.png",
-        about: `Madeline is currently a junior at Syracuse University majoring in Psychology and minoring in Human Development and Family Science. Her research interests include behavioral therapy practices and the media in relation to mental health and eating disorders. Madeline has been working with 1Cademy since January of 2021 and is currently a co-leader of the Health Psychology community. In the past, she has also worked with the Educational Psychology community and the Social/Political Psychology community.`,
+        name: "Jolie Safier Smith",
+        image: "Jolie_Safier_Smith.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/madeline-jacoby-40a36a20b/",
-          },
-        ],
+            url: "https://www.linkedin.com/in/jolie-smith-0200ba243/"
+          }
+        ]
       },
       {
-        name: "Megan Rush",
-        image: "Megan_Rush.jpg",
-        about: `Megan is currently a junior at the University of Michigan studying Biopsychology, Cognition, and Neuroscience. Her research interests are the neural basis for mental illnesses such as anxiety and depression, as well as how different treatment methods rewire the brain to treat mental illnesses. She has been working with 1Cademy since summer 2021. In addition to co-leading the Health Psychology community, she has also worked on the Social/Political Psychology community.`,
+        name: "Carson James Clark",
+        image: "Carson_James_Clark.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/megan-rush-6338ab227/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/carson-clark-b393b7243/"
+          }
+        ]
+      }
     ],
-    YouTube: "gJUMN4vIxN4",
+    YouTube: "j8K8s-AKxTQ",
     description: `The goal of the health psychology community is to inspire the development of key research skills while conducting a review of health psychology literature. Using credible, scholarly articles, we are exploring various topics within the field of health psychology, including: behavioral therapies for mental illness, the intersection of race and gender in the healthcare industry, what motivates people to maintain a healthy lifestyle, and the complex role of the media in health. As we compile our research using 1Cademy, we hope to discover patterns and gaps in the literature that could be addressed in a future study of our own design. Each week, interns read an article, summarize it using 1Cademy, present their findings to the group, and engage in thoughtful discussion about themes present in their article.`,
     accomplishments: `We are still in the preliminary stages of our exploration into the current literature in health psychology. Our team has investigated various topics including the many applications of cognitive-behavioral therapy, the emerging problem of climate grief, the effectiveness of telehealth as a psychotherapy alternative, and LGBTQ+ experiences in healthcare. Recently, we have shifted our attention to reorganizing our section of the larger map, creating an easy-to-follow outline of topics in health psychology. Our next steps will be researching articles relating to other general subsections of the field, such as patient-provider relationships, the psychological impact of chronic illnesses, and impacts of nutrition on overall health.`,
     gains: [
       `Develop key research skills, such as paper analysis, summarization, and making connections between disciplines `,
       `Explore recent health psychology literature, with topics including (but not limited to): Behavioral therapies for medical disorders, race and gender in healthcare, mental health, or the psychological component of maintaining a healthy lifestyle. `,
       `Experience a flexible and collaborative work environment, with all work being done remotely `,
-      `Work towards publishing research on health psychology.`,
+      `Work towards publishing research on health psychology.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in health psychology or a related field, and complete a Coursera MOOC and give us access to their certificate.`,
     // coursera: "https://www.coursera.org/learn/positive-psychiatry",
@@ -362,28 +325,28 @@ export default [
     qualifications: [
       `Knowledge and interest in topics related to the field of health psychology `,
       `Fluency in reading and writing in English (written summaries of research articles necessary) `,
-      `Ability to work successfully in a collaborative environment and willingness to present findings to the team each week.`,
+      `Ability to work successfully in a collaborative environment and willingness to present findings to the team each week.`
     ],
     responsibilities: [
       `Regularly study textbooks and research papers, summarize them, and add notes to the collaborative platform `,
       `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, epidemiologists, and cognitive and behavioral scientists. `,
       `Attend weekly meetings and engage in meaningful discussion about the articles presented. `,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Neuroscience",
     tags: [
       {
         title: "Behavioral Neuroscience",
-        node: "EotqbmSg4XdYq5U5BQCP",
-      },
+        node: "EotqbmSg4XdYq5U5BQCP"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Neuroscience.jpg",
     title: "Neuroscience",
-    width: "61%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Victoria Mulligan",
@@ -403,10 +366,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/"
+          }
+        ]
+      }
     ],
     YouTube: "Mj45B59k4fo",
     description: `Students, educators, and researchers, join our large-scale interdisciplinary movement to collaboratively develop, visualize, and organize learning and research materials in your field of interest online for improving education. We are an interdisciplinary group of researchers through the University of Michigan who have been iteratively developing an online research and learning community called 1Cademy.`,
@@ -420,7 +383,7 @@ export default [
       `Learn concepts and theory in neuroscience `,
       `Develop a positive community-wide reputation for your engagement (over 500+ users from various disciplines) which is displayed on our leaderboard. `,
       `Be publicly accredited for any work you produce for years to come. `,
-      `Individual contributions will be available through google search and cite your name (and other search engines)`,
+      `Individual contributions will be available through google search and cite your name (and other search engines)`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
     hasTest: true,
@@ -428,7 +391,7 @@ export default [
       `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
       `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
       `Curiosity for other types of fields, and a readiness to learn more about them. `,
-      `Experience and willingness to work in large-scale collaborative environments. `,
+      `Experience and willingness to work in large-scale collaborative environments. `
     ],
     responsibilities: [
       `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
@@ -439,22 +402,22 @@ export default [
       `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
       `Expected 5hrs a week minimum to retain the internship.`,
       `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Disability_Studies",
     tags: [
       {
         title: "Disability Studies",
-        node: "Y4HihWopCsKNaVZSr6s0",
-      },
+        node: "Y4HihWopCsKNaVZSr6s0"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
-    width: "39%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Keltie O'Malley",
@@ -474,10 +437,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/rishabh-verma-3782691b7/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/rishabh-verma-3782691b7/"
+          }
+        ]
+      }
     ],
     YouTube: "otW11GyQ4dY",
     description: `The Disability Studies community explores past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
@@ -495,7 +458,7 @@ export default [
       `Gain valuable research skills and experience, such as paper analysis, summarization, and making connections between disciplines.`,
       `Work towards publishing research on topics related to disability.`,
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
-      `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`,
+      `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5 GPA to apply for this position. All majors are welcome to apply. A personal or academic interest in disability is highly preferred, and answer our quiz questions to evaluate their domain knowledge.`,
     hasTest: true,
@@ -504,7 +467,7 @@ export default [
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
       `Willingness to present work at weekly meetings.`,
       `Able to commit to approximately 5-10 hours of work each week.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`,
+      `Fluency in writing and reading in English (will have to summarize research articles).`
     ],
     responsibilities: [
       `Read and summarize textbook chapters and scientific journal articles.`,
@@ -512,26 +475,26 @@ export default [
       `Contribute concise summaries of information to the online 1Cademy platform.`,
       `Attend weekly online meetings.`,
       `Contribute in meetings by presenting work and engaging in discussions.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Social_Psychology",
     tags: [
       {
         title: "Social psychology",
-        node: "FyQoGIdVVeDHvn1lHOZL",
+        node: "FyQoGIdVVeDHvn1lHOZL"
       },
       {
         title: "Behavioral Economics",
-        node: "zFZ2Rvnvp4TyJE7g0vUZ",
-      },
+        node: "zFZ2Rvnvp4TyJE7g0vUZ"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Social_Psychology.jpg",
     title: "Behavioral Economics & Social Psychology",
-    width: "50%",
+    width: "34%",
     leaders: [
       {
         name: "Alex Nikolaidis Konstas",
@@ -540,9 +503,9 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/alex-nikolaidis-konstas-3894a7207/",
-          },
-        ],
+            url: "https://www.linkedin.com/in/alex-nikolaidis-konstas-3894a7207/"
+          }
+        ]
       },
       {
         name: "Iman YeckehZaare",
@@ -551,10 +514,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/oneweb/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/oneweb/"
+          }
+        ]
+      }
     ],
     YouTube: "73Uk2Nsgbgg",
     description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
@@ -565,14 +528,14 @@ export default [
       `Get involved in all aspects of conducting an online controlled experiment.`,
       `Learn about conducting a controlled online experiment to prepare for future Ph.D. programs in related disciplines.`,
       `Work towards publishing research on behavioral economics and social psychology in reputable venues.`,
-      `Have opportunities to take on leadership roles within the community.`,
+      `Have opportunities to take on leadership roles within the community.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in disciplines related to behavioral economics or social psychology, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
     hasTest: true,
     qualifications: [
       `A strong academic background in topics related to behavioral economics or social psychology`,
-      `Fluency in writing and reading in English`,
+      `Fluency in writing and reading in English`
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
@@ -580,26 +543,94 @@ export default [
       `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
       `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
       `Present the essence of what you learn from the related papers and book chapters in weekly meetings for further discussion.`,
-      `Co-author the final research paper to submit to reputable conferences/journals.`,
+      `Co-author the final research paper to submit to reputable conferences/journals.`
+    ]
+  },
+  {
+    id: "UI_Design",
+    tags: [
+      {
+        title: "Design Science",
+        node: "y1GorOIkFb255Oiqm9k3"
+      },
+      {
+        title: "User Interface Design",
+        node: "1wyXrpreH942fh2MfnEd"
+      }
     ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/UI_Design.jpg",
+    title: "UI Design",
+    width: "33%",
+    leaders: [
+      {
+        name: "Ember Shan",
+        image: "Ember Shan.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/ember-shan-9b6156194/"
+          }
+        ]
+      }
+    ],
+    YouTube: "auTcD8jLHwU",
+    description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
+    accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
+    sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
+    We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
+    gains: [
+      `Gain user interface prototyping/design experience.`,
+      `Gain experience collaborating with an interdisciplinary group of people.`,
+      `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
+      `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
+      `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
+      `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
+      `Successful interns would continue with taking leadership roles.`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
+    portfolio: true,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
+      `Instinct and intuition for good UI design.`,
+      `Experience creating and prototyping UI designs (using Figma).`,
+      `Understanding of key graphic design principles.`,
+      `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
+      `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`
+    ],
+    responsibilities: [
+      `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
+      `Provide input on any/all UI designs/mockups.`,
+      `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
+      `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
+      `Attend weekly meetings.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Deep_Learning",
     tags: [
       {
         title: "Data Science",
-        node: "FJfzAX7zbgQS8jU5XcEk",
+        node: "FJfzAX7zbgQS8jU5XcEk"
       },
       {
         title: "Deep Learning (in Machine learning)",
-        node: "DkS1Gz9mxKBbvZ5bs6he",
+        node: "DkS1Gz9mxKBbvZ5bs6he"
       },
+      {
+        title: "Natural language processing",
+        node: "khCWqIXa9xQiojnEqHCT"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
-    title: "Deep Learning",
-    width: "50%",
+    title: "Natural Language Processing",
+    width: "33%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -608,45 +639,20 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/ge-zhang-792797169/",
-          },
-        ],
-      },
-      {
-        name: "Xinrong Yao",
-        image: "Xinrong_Yao.jpeg",
-        about: ``,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/xinrong-yao-07aa071b1/",
-          },
-        ],
-      },
-      // {
-      //   name: "Vatsal Chaudhari",
-      //   image: "Vatsal_Chaudhari.jpeg",
-      //   about: `I am a hardworking computer science student studying at The Ohio State University. As a student, I have learned to solve problems in creative ways. I am also an active member of Humanitarian Engineering Scholars, Competitive Programing Club, and Underwater Robotics Club.
-      //   In my spare time, I like to work on mobile app development. I am currently working on AcneTracker, which is an android app intended to help those with mild to severe acne. I am creating this app using Java and Android Studio.
-      //   I am eager to hear about potential career opportunities, so I would be pleased to chat about job openings in the computer science/engineering and software development area.
-      //   Areas of expertise: Java, Python, C++, Flutter, HTML5/CSS3, Mobile App Development, Web App Development, Git, Problem Solving, Mathematics.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/vatsalchaudhari/",
-      //     },
-      //   ],
-      // },
+            url: "https://www.linkedin.com/in/ge-zhang-792797169/"
+          }
+        ]
+      }
     ],
     YouTube: "J0y0tZzzuQ0",
-    description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the deep learning area on 1Cademy, our collaborative research platform. This semester, we will explore natural language processing, which is a branch of artificial intelligence concerned with giving computers the ability to understand text and spoken words in much the same way human beings can. Our team members will dive into the Speech and Language Processing textbook and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
+    description: `Welcome to the Natural Language Processing(NLP) Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different nlp topics by going through selected survey papers selected from A Survey of Surveys project(https://github.com/NiuTrans/ABigSurvey). Our team members will dive into these survey papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
     accomplishments: `In our research teams, we work on versatile projects, share our ideas, and collaboratively develop research ideas that not only boost our knowledge in deep learning but also give us the possibility to publish research papers in the most prestigious conferences and journals. Recently we completed a knowledge tracing paper and submitted it to SIGCSE, one of the top conferences in computer science education. Our team consists of machine learning enthusiasts and we would be more than happy to share our passion for machine learning and work together with anyone who has a keen interest and qualifications in deep learning.`,
     gains: [
-      `You will spend the majority of the fall semester going through the Speech and Language Processing textbook to deeply learn about natural language processing. No prior experience is required.`,
-      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines). `,
-      `Top contributors to our community would have the opportunity to co-author research papers in the field. `,
-      `All interactions, task fulfillment, and communications will be online. `,
-      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `,
+      `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required.`,
+      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
+      `Top contributors to our community would have the opportunity to co-author research papers in the field.`,
+      `All interactions, task fulfillment, and communications will be online.`,
+      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
     hasTest: true,
@@ -655,29 +661,240 @@ export default [
       `Proficiency in Python (or R) and linear algebra.`,
       `Displayed interest in machine learning through university-level coursework.`,
       `(Preferred) Previous research experience, or other relevant involvement.`,
-      `(Preferred) Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning. `,
+      `(Preferred) Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning.`,
       `(Preferred) Background in Natural Language Processing (NLP)`,
+      `(Preferred) Background in Linguistics`
+    ],
+    responsibilities: [
+      `Constantly study the reading assignments, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
+      `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week.`,
+      `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
+      `All interactions, task fulfillment, and communications will be remote.`,
+      `Enthusiastically participate in the research assignments if needed.`
+    ]
+  },
+  {
+    id: "Graph_Neural_Network",
+    tags: [
+      {
+        title: "Graph Neural Networks (GNNs)",
+        node: "s59mYbhSxRdWscDBoAaN"
+      }
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Graph_Neural_Network.jpg",
+    title: "Graph Neural Networks",
+    width: "34%",
+    leaders: [
+      {
+        name: "Tian Yan",
+        image: "Tian_Yan.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/tianyan2023/"
+          }
+        ]
+      }
+    ],
+    YouTube: "1J8xBUT1C7c",
+    description: `We are a group of people who are passionate about GNN and eager to learn about the newest developments. In this community, we consistently work on learning, presenting, and communicating the most up-to-date knowledge about GNN, honing our research skills, and conducting frontier research. Every week, each member will be assigned readings on GNN, and each member will summarize their readings in the form of nodes and connections on our platform 1cademy, and present their nodes at our weekly meeting. If the intern is dedicated and has demonstrated good research ability in this process, we'll further invite you to our research team and you will have the opportunity to co-author scientific papers.`,
+    accomplishments: ``,
+    gains: [
+      `You will improve your reading ability of scientific textbooks and papers.`,
+      `You will also learn how to quickly grasp important ideas in a research paper and describe it to others.`,
+      `You will improve your research skills by constantly paraphrasing important concepts in graph neural network, making connections between them, and learning most up-to-date progress in this area.`,
+      `You will improve your communication skills by making weekly presentations of your reading.`,
+      `You will have the opportunity to co-author research papers under the guidance of senior researchers and scientists.`,
+      `You can start at any time and all work will be remote, and you will have an valuable internship experience that you can write on your resume.`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and interest in deep learning, especially Graph Neural Network.`,
+      `Proficiency in at least one programming language, such as R, Python, C++, or Java.`,
+      `Have completed coursework in linear algebra and calculus.`,
+      `Have experience in deep learning through course work, projects, or internships.`,
+      `(Prefered) Have demonstrated experience in Graph Neural Network through course work, projects, or internships.`,
+      `(Prefered) Have past research experience in deep learning, especially Graph Neural Network.`
+    ],
+    responsibilities: [
+      `Finish your assigned weekly reading, and summarize your reading on our platform 1cademy. The book we are currently reading is Graph Representation Learning by William L. Hamilton, and we also read various survey papers on graph neural network. And if you have other reading materials on graph neural network that interest you more, you can also summarize the readings by your choice.`,
+      `Join our weekly meeting, and present your summarized nodes during meeting. You are also welcome to present any other summarization on graph neural network that interest you.`,
+      `If you're invited to our research team, you also need to collaborate with other team members and finished your part of research work on time.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
+  },
+  {
+    id: "Financial_Technology",
+    tags: [
+      {
+        title: "Financial Technology",
+        node: "s2hC6oeafzTAuEsFc4FC"
+      }
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Cryptoeconomics.jpg",
+    title: "Financial Technology",
+    width: "33%",
+    leaders: [
+      {
+        name: "Xinrong Yao",
+        image: "Xinrong_Yao.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/xinrong-yao-07aa071b1/"
+          }
+        ]
+      }
+    ],
+    YouTube: "4p2QeiPVMzw",
+    description: `Welcome to the Financial Technology and Cryptocurrency Community! Our community predominantly contributes to the areas of fintech, cryptocurrencies, and micro-econometrics on 1Cademy, our collaborative research platform. We dive into the current textbook or research papers in these areas, break them down into granular knowledge pieces in the form of nodes, connect them to the larger context of research, and present our learnings to other community members. We also work on concrete research ideas and co-author research papers to submit to reputable journals and conferences.`,
+    accomplishments: ``,
+    gains: [
+      `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
+      `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
+      `Work towards having the opportunity of co-authoring research papers in the field.`,
+      `Have opportunities to take on leadership roles within the community.`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and enthusiasm for topics related to machine learning, finance, and/or cryptocurrency, displayed through research, projects, or coursework experiences`,
+      `Proficiency in Python (or R or some other common programming language)`
+    ],
+    responsibilities: [
+      `Consistently study current textbook or research papers, summarize chapters or sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
+      `Attend weekly team meetings to discuss the research and present your efforts throughout the week.`,
+      `Be prepared and excited to collaborate with our other team members from diverse backgrounds.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
+  },
+  {
+    id: "Responsible_AI",
+    tags: [
+      {
+        title: "Artifical Intelligence",
+        node: "s2hC6oeafzTAuEsFc4FC"
+      }
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Responsible_AI.jpg",
+    title: "Responsible AI",
+    width: "33%",
+    leaders: [
+      {
+        name: "Lanjing Ye",
+        image: "Lanjing_Ye.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/lanjing-ye-320581232/"
+          }
+        ]
+      }
+    ],
+    YouTube: "bOyiP9Lo094",
+    description: `Welcome to the Equity and Inclusion in AI Community! Our community predominantly contributes to the Artificial Intelligence area on 1Cademy, our collaborative research platform. We will explore the progress of addressing bias and discrimination in the area of Artificial Intelligence, and learn about the efforts to pursue inclusiveness in the research field. Our team members will dive into the Equity and Inclusion in AI textbook and present what they've been learning each week by walking us through the nodes they designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas and projects.`,
+    accomplishments: ``,
+    gains: [
+      `You will spend the majority of the fall semester going through the Equity and Inclusion in AI textbook to deeply learn about the AI research areas. No prior experience is required.`,
+      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
+      `Top contributors to our community would have the opportunity to co-author research papers in the field.`,
+      `All interactions, task fulfillment, and communications will be online.`,
+      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program.`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and enthusiasm for topics related to computer science and artificial intelligence.`,
+      `Displayed interest in computer science through university-level coursework.`,
+      `Proficiency in at least one programming language.`,
+      `(Preferred) Previous research experience, or other relevant involvement.`,
+      `(Preferred) Background in artificial intelligence.`
     ],
     responsibilities: [
       `Constantly study the previously mentioned textbook, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
-      `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week. `,
+      `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week.`,
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
+  },
+  {
+    id: "Computer_Vision",
+    tags: [
+      {
+        title: "Computer Vision",
+        node: "xwHB94ALORWhaoDLr6yd"
+      }
     ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Computer_Vision.jpg",
+    title: "Computer Vision",
+    width: "50%",
+    leaders: [
+      {
+        name: "Adam Nik",
+        image: "Adam_Nik.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/adam-nik-7a9436235/"
+          }
+        ]
+      }
+    ],
+    YouTube: "dDuYg9in7Bg",
+    description: `Welcome to the Computer Vision Community! We are a sub-community under the Deep Learning Community here at 1Cademy and work to explore various research topics and ideas in the field of computer vision. As part of the Computer Vision Community, team members will be tasked with reading and learning from various computer vision research papers and textbooks and will present what they learn to the rest of the community. Additionally, as part of the Computer Vision Community at 1Cademy, interns will be invited to join small research groups to work on concrete research ideas.`,
+    accomplishments: ``,
+    gains: [
+      `Develop key research skills, such as paper analysis, summarization, and making connections between disciplines`,
+      `Explore state-of-the-art computer vision literature and survey papers to gain a concrete understanding of the current state and techniques of the field`,
+      `Work towards publishing research papers within the field of computer vision`,
+      `Experience a flexible and collaborative work environment, with all work being done remotely`
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+    hasTest: true,
+    qualifications: [
+      `Knowledge and enthusiasm for topics related to machine learning and computer vision`,
+      `Proficiency in Python and background in linear algebra`,
+      `Displayed interest in machine learning or similar computer science topics through
+      university-level coursework.`,
+      `(Preferred) Previous research experience, or other relevant involvement.`
+    ],
+    responsibilities: [
+      `Regularly study textbooks and research papers, summarize them, and add notes to the
+      1cademy collaborative platform.`,
+      `Must be prepared and excited to collaborate with our already established team of
+      computer scientists, information scientists, and statisticians.`,
+      `Attend two-hour weekly team meetings to discuss the research and present your efforts
+      throughout the week.`,
+      `Be flexible and able to meet and work in a small research group once placed.`,
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
   },
   {
     id: "Liaison_Librarians",
     tags: [
       {
         title: "Library Science",
-        node: "gRRpc1O61kMszcrW07lW",
-      },
+        node: "gRRpc1O61kMszcrW07lW"
+      }
     ],
     allTime: [],
     weekly: [],
     url: "/static/LibraryBackground.jpg",
     title: "Liaison Librarians",
-    width: "100%",
+    width: "50%",
     leaders: [
       {
         name: "Ben Brown",
@@ -686,9 +903,9 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/benjamin-brown-b8b5611a7/",
-          },
-        ],
+            url: "https://www.linkedin.com/in/benjamin-brown-b8b5611a7/"
+          }
+        ]
       },
       // {
       //   name: "Gail Grot",
@@ -701,17 +918,17 @@ export default [
       //     },
       //   ],
       // },
-      {
-        name: "Grace Victoria Ramstad",
-        image: "Grace_Victoria_Ramstad.jpeg",
-        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/grace-ramstad-05342099/",
-          },
-        ],
-      },
+      // {
+      //   name: "Grace Victoria Ramstad",
+      //   image: "Grace_Victoria_Ramstad.jpeg",
+      //   about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/grace-ramstad-05342099/"
+      //     }
+      //   ]
+      // },
       {
         name: "Sarah B Licht",
         image: "Sarah_B_Licht.jpeg",
@@ -719,9 +936,9 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/sarah-licht-84343316b/",
-          },
-        ],
+            url: "https://www.linkedin.com/in/sarah-licht-84343316b/"
+          }
+        ]
       },
       // {
       //   name: "Stephanie Sandoval",
@@ -748,10 +965,10 @@ export default [
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/viktoria-r-b2a18314b/",
-          },
-        ],
-      },
+            url: "https://www.linkedin.com/in/viktoria-r-b2a18314b/"
+          }
+        ]
+      }
     ],
     YouTube: "-dQOuGeu0IQ",
     description: `The 1Cademy Librarian community supports the information processes of all the communities on the 1Cademy platform. We do this by liaising with the co-leaders and interns from each community to help them develop their area of the map and information literacy skills. This work supports communities across all fields of focus in three ways:
@@ -767,7 +984,7 @@ export default [
       `Give guidance on best practices in knowledge organization and information literacy`,
       `Work with our development team on improving online research/learning `,
       `Collaboratively identify and resolve content gaps on the knowledge map`,
-      `Connect with a team of passionate researchers from different fields and schools`,
+      `Connect with a team of passionate researchers from different fields and schools`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. Interns applying for this position should have a passion for helping other's develop their information processes.`,
     qualifications: [
@@ -779,7 +996,7 @@ export default [
       `Students in the field of Library Science, Information Science, or related disciplines`,
       `Critical thinking and problem-solving skills `,
       `Ability to engage in group discourse to ideate and resolve complex issues`,
-      `Motivated to complete tasks asynchronously`,
+      `Motivated to complete tasks asynchronously`
     ],
     responsibilities: [
       `Use the 1Cademy platform to organize and manage information `,
@@ -789,9 +1006,9 @@ export default [
       `Work with a team of UX designers to develop tutorials and guides for platform use`,
       `Develop Information Search Process (ISP) and Information Literacy Instruction (ILI) guides`,
       `Work remotely for all interactions, task fulfillment, and communications `,
-      `All interactions, task fulfillment, and communications will be remote.`,
-    ],
-  },
+      `All interactions, task fulfillment, and communications will be remote.`
+    ]
+  }
   // {
   //   id: "Mindfulness",
   //   tags: [
@@ -1300,70 +1517,6 @@ export default [
   //     `All interactions, task fulfillment, and communications will be remote.`,
   //   ],
   // },
-  // {
-  //   id: "UI_Design",
-  //   tags: [
-  //     {
-  //       title: "Design Science",
-  //       node: "y1GorOIkFb255Oiqm9k3",
-  //     },
-  //     {
-  //       title: "User Interface Design",
-  //       node: "1wyXrpreH942fh2MfnEd",
-  //     },
-  //   ],
-  //   allTime: [],
-  //   weekly: [],
-  //   url: "/static/Communities/UI_Design.jpg",
-  //   title: "UI Design",
-  //   width: "35%",
-  //   leaders: [
-  //     {
-  //       name: "Shannon Kenny",
-  //       image: "Shannon_Kenny.jpeg",
-  //       about: `I'm an aspiring UI designer with a passion for user centered design. I'm currently a graduate student at the University of Michigan getting my Masters in User Experience Research & Design. I'm looking for a full time job once I graduate where I can meaningfully contribute in a UI Design and prototyping role. My undergrad at U of M gave me a background in computer science and cognitive science with a major in UX Design. I'm an experienced Peer Mentor with a demonstrated history of leadership and collaboration in both small and large organizations. Skilled in UI design, prototyping, web design, graphic design, HTML, CSS, Python, C++, communication, problem solving, and client relationships. #design #uxdesign #uidesign #usability`,
-  //       websites: [
-  //         {
-  //           name: "LinkedIn",
-  //           url: "https://www.linkedin.com/in/shannon-kenny/",
-  //         },
-  //       ],
-  //     },
-  //   ],
-  //   YouTube: "3JZnwTXEq0g",
-  //   description: `The UI Design community works to improve the user interface of 1Cademy while simultaneously learning about relevant design concepts. We do this by collaborating with teammates on projects throughout the week, then sharing that progress with the entire team meeting every week to receive feedback. Interns learn how to apply important UI concepts to designs, collaborate on design creation, share and receive constructive feedback on designs, and create working prototypes using Figma.`,
-  //   accomplishments: `So far, we have designed and improved elements of 1Cademy such as:
-  //   sidebar navigation, tooltips, user profile, mobile view, lightmode, presentation Mode, and homepage.
-  //   We have summarized information from Google's Material Design Guidelines, and continued on to explore independent research articles. We allow interns to find specific topics that interest them and explore that area, accomplishing a flexible and personally rewarding environment.`,
-  //   gains: [
-  //     `Gain user interface prototyping/design experience.`,
-  //     `Gain experience collaborating with an interdisciplinary group of people.`,
-  //     `Gain experience creating/presenting mockups and clearly articulating important UI concepts to others in the community.`,
-  //     `Develop crucial skills in research and development (analysis, summarization, making connections, iterative development).`,
-  //     `Make a difference by identifying UI issues and proposing/applying innovative solutions to the 1Cademy platform.`,
-  //     `Collaborate with others to develop/improve various UI design features, and improve any currently used graphics or create new visually appealing graphics as needed.`,
-  //     `Successful interns would continue with taking leadership roles.`,
-  //   ],
-  //   requirements: `In addition to the 1Cademy general application process, we require our interns to carefully study Google's Material Design documentation and submit their most current resume, unofficial transcript, and online portfolio.`,
-  //   portfolio: true,
-  //   qualifications: [
-  //     `Knowledge and enthusiasm for topics related to UI research/design, technology, social/online communities, and cognitive psychology.`,
-  //     `Instinct and intuition for good UI design.`,
-  //     `Experience creating and prototyping UI designs (using Figma).`,
-  //     `Understanding of key graphic design principles.`,
-  //     `Experience in Adobe Photoshop, Illustrator, and InDesign (or other similar graphic design software).`,
-  //     `Experience and willingness to work in collaborative environments (need to share your opinion as well as listen to others).`,
-  //   ],
-  //   responsibilities: [
-  //     `Collaborate with others to develop and/or improve both the UI design and graphic design of the platform, share these prototypes/mockups with the community.`,
-  //     `Provide input on any/all UI designs/mockups.`,
-  //     `Gather knowledge from books and papers regarding best UI practices, summarize important ideas you find, and share/explain these findings with the community in weekly meetings for further discussion (using 1Cademy). This is our team's mechanism to better learn the current design of the platform and collaboratively improve our design knowledge.`,
-  //     `Must be prepared and excited to collaborate with our team of computer scientists, web developers, UX researchers, UI designers, graphic designers, data scientists, epidemiologists, and cognitive and behavioral scientists.`,
-  //     `Attend weekly meetings.`,
-  //     `All interactions, task fulfillment, and communications will be remote.`,
-  //   ],
-  // },
-  // {
   //   id: "UX_Research",
   //   tags: [
   //     {

@@ -10,11 +10,8 @@ import { firebaseConfig, firebaseOneConfig } from "./config";
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
-const isFirestoreDeadlineError = (err) => {
-  return (
-    err.message.includes("DEADLINE_EXCEEDED") ||
-    err.message.includes("Received RST_STREAM")
-  );
+const isFirestoreDeadlineError = err => {
+  return err.message.includes("DEADLINE_EXCEEDED") || err.message.includes("Received RST_STREAM");
 };
 
 class Firebase {
@@ -141,20 +138,15 @@ class Firebase {
   // add token as authorization for every request to the server
   // validate if user is a valid user
   async idToken() {
-    const userToken = await this.auth.currentUser.getIdToken(
-      /* forceRefresh */ true
-    );
+    const userToken = await this.auth.currentUser.getIdToken(/* forceRefresh */ true);
     axios.defaults.headers.common["Authorization"] = userToken;
   }
 
   // register user with email and password
   async register(email, password, fullname) {
-    const newUser = await this.auth.createUserWithEmailAndPassword(
-      email,
-      password
-    );
+    const newUser = await this.auth.createUserWithEmailAndPassword(email, password);
     await newUser.user.updateProfile({
-      displayName: fullname,
+      displayName: fullname
     });
     await this.idToken();
     return newUser.user;

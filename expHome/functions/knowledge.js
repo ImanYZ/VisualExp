@@ -10,6 +10,7 @@ const {
   batchDelete,
 } = require("./admin_Knowledge");
 const { getTypedCollections } = require("./getTypedCollections");
+const { typesenseIndex } = require("./typsenseIndex");
 
 // On 1Cademy.com nodes do not have their list of contributors and institutions
 // assigned to them. We should run this function every 25 hours in a PubSub to
@@ -356,6 +357,19 @@ exports.updateInstitutions = async (context) => {
     return null;
   } catch (err) {
     console.log({ err });
+    return null;
+  }
+};
+
+// This function should run periodically to update the typesense index and keep the data updated in Typesense.
+// A better option is to create firebase functions to trigger on write requests on the collections.
+// We cannot do that currently. So this function is our best option for the moment.
+exports.updateTypesenseIndex = async (context) => {
+  try {
+    await typesenseIndex();
+    return null;
+  } catch (error) {
+    console.log({ error });
     return null;
   }
 };
