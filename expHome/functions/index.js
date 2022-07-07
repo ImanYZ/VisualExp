@@ -23,6 +23,7 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   gradeFreeRecall,
+  markPaidEndpoint,
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -46,6 +47,7 @@ const {
 const {
   assignNodeContributorsInstitutionsStats,
   updateInstitutions,
+  updateTypesenseIndex,
 } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
@@ -77,6 +79,7 @@ app.post("/instructorNo", instructorNo);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.post("/vote", voteEndpoint);
+app.post("/markPaid", markPaidEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
@@ -161,3 +164,11 @@ exports.updateInstitutions = functions
   })
   .pubsub.schedule("every 25 hours")
   .onRun(updateInstitutions);
+
+// exports.updateTypesenseIndex = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520,
+//   })
+//   .pubsub.schedule("every 10 minutes")
+//   .onRun(updateTypesenseIndex);

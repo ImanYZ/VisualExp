@@ -1,8 +1,9 @@
 import { atom } from "recoil";
+import AppConfig from '../AppConfig'
 
 export const currentProjectState = atom({
   key: "currentProjectState",
-  default: "H2K2",
+  default: AppConfig.defaultProject,
 });
 
 export const hasScheduledState = atom({

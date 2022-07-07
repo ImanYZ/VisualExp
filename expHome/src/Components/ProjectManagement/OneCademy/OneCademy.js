@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import { red, green } from "@mui/material/colors";
 
-import { isEmail } from "../../../utils/utils";
+import { isEmail } from "../../../utils";
 import withRoot from "../../Home/modules/withRoot";
 
 import {
@@ -19,7 +19,7 @@ import {
   emailOneState,
 } from "../../../store/OneCademyAtoms";
 
-import { notAResearcherState } from "../../../store/ProjectAtoms";
+import { notAResearcherState, projectSpecsState } from "../../../store/ProjectAtoms";
 
 import ValidatedInput from "../../ValidatedInput/ValidatedInput";
 
@@ -37,6 +37,8 @@ const OneCademy = (props) => {
   const notAResearcher = useRecoilValue(notAResearcherState);
   const [username, setUsername] = useRecoilState(usernameState);
   const [email, setEmail] = useRecoilState(emailOneState);
+  const projectSpecs = useRecoilValue(projectSpecsState);
+  const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
   const [password, setPassword] = useState("");
   const [invalidAuth, setInvalidAuth] = useState(false);
@@ -45,11 +47,8 @@ const OneCademy = (props) => {
   const [sNodesChanged, setSNodesChanged] = useState(false);
 
   useEffect(() => {
-    if (firebase && !notAResearcher && username) {
-      const usersQuery = firebase.db.collection("users").where("deTag", "==", {
-        node: "WgF7yr5q7tJc54apVQSr",
-        title: "Knowledge Visualization",
-      });
+    if (firebase && !notAResearcher && username && haveProjectSpecs) {
+      const usersQuery = firebase.db.collection("users").where("deTag", "==", projectSpecs.deTag);
       const usersSnapshot = usersQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
         setUsersChanges((oldUsersChanges) => {
@@ -61,7 +60,7 @@ const OneCademy = (props) => {
         usersSnapshot();
       };
     }
-  }, [firebase, notAResearcher, username]);
+  }, [firebase, notAResearcher, username, projectSpecs]);
 
   useEffect(() => {
     if (!notAResearcher && usersChanges.length > 0) {
