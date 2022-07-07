@@ -40,6 +40,7 @@
     "react-animate-on-scroll": "^2.1.5",
     "react-animation-on-scroll": "^2.1.0",
     "react-dom": "^17.0.2",
+    "react-equation": "^1.0.0-rc.1",
     "react-router-dom": "^6.0.2",
     "react-schedule-selector": "^2.0.0",
     "react-scripts": "^5.0.1",
@@ -47,6 +48,7 @@
     "recoil": "^0.5.2",
     "stopword": "^1.0.11",
     "styled-components": "^5.3.3",
+    "typesense": "^1.2.2",
     "web-vitals": "^1.1.2",
     "wink-porter2-stemmer": "^2.0.1",
     "wink-tokenizer": "^5.2.3"
@@ -58,6 +60,7 @@
     "eject": "react-scripts eject"
   },
   "devDependencies": {
+    "@types/eslint": "^8.4.3",
     "react-error-overlay": "6.0.9"
   },
   "eslintConfig": {

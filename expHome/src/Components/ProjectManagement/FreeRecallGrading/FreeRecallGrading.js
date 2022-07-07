@@ -10,11 +10,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import withRoot from "../../Home/modules/withRoot";
 
-import {
-  firebaseState,
-  fullnameState,
-  isAdminState,
-} from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 
 import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
 
@@ -32,7 +28,7 @@ import SnackbarComp from "../../SnackbarComp";
 //   researchers, if a researcher has identified a key phrase in a specific
 //   free-recall response, but the other three researchers have not identified
 //   the phrase, the former researcher gets a 🧟 negative point.
-const FreeRecallGrading = (props) => {
+const FreeRecallGrading = props => {
   const firebase = useRecoilValue(firebaseState);
   const notAResearcher = useRecoilValue(notAResearcherState);
   const fullname = useRecoilValue(fullnameState);
@@ -79,11 +75,28 @@ const FreeRecallGrading = (props) => {
       }
       const recallGradeDocs = await firebase.db
         .collection(collName)
-        .where("researchersNum", "<", 4)
+        .where("done", "==", false)
+        .orderBy("passage")
+        .orderBy("user")
+        .orderBy("session")
         .limit(1000)
         .get();
+
+      if (recallGradeDocs.docs.length === 0) {
+        setUser(null);
+        setCondition(null);
+        setPassage(null);
+        setPassageIdx(null);
+        setPassageId(null);
+        setPhrase(null);
+        setPhraseNum(null);
+        setSession(null);
+        setResponse(null);
+        return;
+      }
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
+
         if (
           recallGradeData.user !== fullname &&
           (recallGradeData.researchersNum === 0 ||
@@ -94,29 +107,25 @@ const FreeRecallGrading = (props) => {
               // If there are at least two other researchers who graded
               // this, the 2nd researcher should not be the same as
               // the authenticated researcher.
-              (recallGradeData.researchersNum < 2 ||
-                recallGradeData.researchers[1] !== fullname) &&
+              (recallGradeData.researchersNum < 2 || recallGradeData.researchers[1] !== fullname) &&
               // If there are at least three other researchers who graded
               // this, the 3rd researcher should not be the same as
               // the authenticated researcher.
-              (recallGradeData.researchersNum < 3 ||
-                recallGradeData.researchers[2] !== fullname)))
+              (recallGradeData.researchersNum < 3 || recallGradeData.researchers[2] !== fullname)))
         ) {
-          const passageDoc = await firebase.db
-            .collection("passages")
-            .doc(recallGradeData.passage)
-            .get();
+          const passageDoc = await firebase.db.collection("passages").doc(recallGradeData.passage).get();
           const passageData = passageDoc.data();
-          const userDoc = await firebase.db
-            .collection("users")
-            .doc(recallGradeData.user)
-            .get();
+          const userDoc = await firebase.db.collection("users").doc(recallGradeData.user).get();
           const userData = userDoc.data();
+          console.log({
+            user: recallGradeData.user,
+            session: recallGradeData.session,
+            passage: recallGradeData.passage,
+            respone: recallGradeData.response
+          });
           let passaIdx = 0;
           for (; passaIdx < userData.pConditions.length; passaIdx++) {
-            if (
-              userData.pConditions[passaIdx].passage === recallGradeData.passage
-            ) {
+            if (userData.pConditions[passaIdx].passage === recallGradeData.passage) {
               break;
             }
           }
@@ -147,36 +156,27 @@ const FreeRecallGrading = (props) => {
             default:
             // code block
           }
-          setTimeout(() => {
-            setSubmitting(false);
-          }, 4000);
+          // setTimeout(() => {
+          setSubmitting(false);
+          // }, 4000);
           // ASA we find a free-recall response that is not evaluated by at least
           // four researchers, we set this flag to true to stop searching.
           return null;
         }
       }
     };
-    if (firebase && !notAResearcher) {
+    if (firebase && !notAResearcher && project) {
       retrieveFreeRecallResponse();
     }
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase, notAResearcher, retrieveNext]);
+  }, [project, firebase, notAResearcher, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
-  const gradeIt = (grade) => async (event) => {
-    if (
-      !submitting &&
-      fullname &&
-      passageId &&
-      condition &&
-      phrase &&
-      session &&
-      phraseNum &&
-      response
-    ) {
+  const gradeIt = grade => async event => {
+    if (!submitting && fullname && passageId && condition && phrase && session && phraseNum && response) {
       setSubmitting(true);
       try {
         await firebase.idToken();
@@ -191,16 +191,14 @@ const FreeRecallGrading = (props) => {
           phrase,
           session,
           phraseNum,
-          response,
+          response
         });
         // Increment retrieveNext to get the next free-recall response to grade.
-        setRetrieveNext((oldValue) => oldValue + 1);
+        setRetrieveNext(oldValue => oldValue + 1);
         setSnackbarMessage("You successfully submitted your evaluation!");
       } catch (err) {
         console.error(err);
-        setSnackbarMessage(
-          "Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!"
-        );
+        setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
       }
     }
   };
@@ -210,95 +208,58 @@ const FreeRecallGrading = (props) => {
       <Alert severity="success">
         <ul>
           <li>
-            Four researchers examine whether each key phrase from a passage is
-            mentioned in each free-recall response.
+            Four researchers examine whether each key phrase from a passage is mentioned in each free-recall response.
           </li>
           <li>
-            If at least 3 out of 4 researchers identify a specific key phrase in
-            a free-recall response by a participant:
+            If at least 3 out of 4 researchers identify a specific key phrase in a free-recall response by a
+            participant:
             <ul>
-              <li>
-                The participant receives a point for recalling that key phrase
-                about the passage.
-              </li>
-              <li>
-                Each of those 3 or 4 researchers receives a 0.5 🧠 point towards
-                this research activity.
-              </li>
+              <li>The participant receives a point for recalling that key phrase about the passage.</li>
+              <li>Each of those 3 or 4 researchers receives a 0.5 🧠 point towards this research activity.</li>
             </ul>
           </li>
           <li>
-            If exactly 3 out of 4 researchers agree on existance (non-existance)
-            of a specific key phrase in a free-recall response by a participant,
-            but the 4th researcher opposes their majority of vote, the opposing
-            researcher gets a 0.5 🧟 negative point. Note that you don't know
-            the grades that others have cast, but if the 3 other researchers
-            give this case a Yes (or No) and you give it a No (or Yes), you'll
-            get a 0.5 🧟 negative point.
+            If exactly 3 out of 4 researchers agree on existance (non-existance) of a specific key phrase in a
+            free-recall response by a participant, but the 4th researcher opposes their majority of vote, the opposing
+            researcher gets a 0.5 🧟 negative point. Note that you don't know the grades that others have cast, but if
+            the 3 other researchers give this case a Yes (or No) and you give it a No (or Yes), you'll get a 0.5 🧟
+            negative point.
           </li>
         </ul>
       </Alert>
       <Paper style={{ paddingBottom: "19px" }}>
         <p>
-          Please identify whether this participant has mentioned the following
-          key phrase from the original passage:
+          Please identify whether this participant has mentioned the following key phrase from the original passage:
         </p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {phrase}
-        </Paper>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{phrase}</Paper>
         <p>Here is their free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {response}
-        </Paper>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{response}</Paper>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: "19px",
+            marginTop: "19px"
           }}
         >
-          <Button
-            onClick={gradeIt(false)}
-            className="Button"
-            variant="contained"
-            color="error"
-            disabled={submitting}
-          >
-            {submitting ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              "👎 No"
-            )}
+          <Button onClick={gradeIt(false)} className="Button" variant="contained" color="error" disabled={submitting}>
+            {submitting ? <CircularProgress color="warning" size="16px" /> : "👎 No"}
           </Button>
-          <Button
-            onClick={gradeIt(true)}
-            className="Button"
-            variant="contained"
-            color="success"
-            disabled={submitting}
-          >
-            {submitting ? (
-              <CircularProgress color="warning" size="16px" />
-            ) : (
-              "👍 Yes"
-            )}
+          <Button onClick={gradeIt(true)} className="Button" variant="contained" color="success" disabled={submitting}>
+            {submitting ? <CircularProgress color="warning" size="16px" /> : "👍 Yes"}
           </Button>
         </div>
         <p>The original passage is:</p>
         <Paper
           style={{
             padding: "10px 19px 10px 19px",
-            margin: "19px 19px 70px 19px",
+            margin: "19px 19px 70px 19px"
           }}
         >
           {passage}
         </Paper>
       </Paper>
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </div>
   );
 };
