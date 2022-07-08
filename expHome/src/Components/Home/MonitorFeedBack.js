@@ -201,7 +201,6 @@ const MonitorFeedBack = (props) => {
         appData = appDoc.data();
         const key = clickedCell.id.split("@")[2];
         const question = clickedCell.id.split("@")[1];
-        console.log(clickedCell.id);
         let appUpdate = {
           ...appData,
           attempts: {
@@ -218,14 +217,9 @@ const MonitorFeedBack = (props) => {
             },
           },
         };
-
-        console.log({ appUpdate });
-       console.log(clickedCell.id.split("@")[0]);
-        let applicationRef  = await firebase.db.collection("applications").doc(clickedCell.id.split("@")[0]);
+      let applicationRef  = await firebase.db.collection("applications").doc(clickedCell.id.split("@")[0]);
         await applicationRef.update(appUpdate);
-
       }
-     
     }
   };
 
