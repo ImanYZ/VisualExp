@@ -49,28 +49,30 @@ exports.schedule = async (req, res) => {
       if (!projectSpecs.exists) {
         throw new Error("Project Specs not found.");
       }
+      const projectSpecsData = projectSpecs.data();
       // 1 hour / 2 = 30 mins
-      const slotDuration = 60 / (projectSpecs.hourlyChunks || 2);
+      const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
       let order = "1st";
       let researcher = researcher1st;
       let start = new Date(req.body.first);
       // adding slotDuration * number of slots for first session
-      let end = new Date(start.getTime() + slotDuration * (projectSpecs.sessionDuration?.[0] || 2) * 60000);
+      let end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[0] || 2) * 60000);
       for (let session = 1; session < 4; session++) {
         if (session === 2) {
           order = "2nd";
           researcher = researcher2nd;
           start = new Date(req.body.second);
           // adding slotDuration * number of slots for second session
-          end = new Date(start.getTime() + slotDuration * (projectSpecs.sessionDuration?.[1] || 1) * 60000);
+          end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[1] || 1) * 60000);
         } else if (session === 3) {
           order = "3rd";
           researcher = researcher3rd;
           start = new Date(req.body.third);
           // adding slotDuration * number of slots for third session
-          end = new Date(start.getTime() + slotDuration * (projectSpecs.sessionDuration?.[1] || 1) * 60000);
+          end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[2] || 1) * 60000);
         }
+
         const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
         events.push(eventCreated);
       }
