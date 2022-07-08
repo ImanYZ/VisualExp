@@ -34,7 +34,7 @@ const applicationscolumns = [
 
   {
     field: "explanation",
-    headerName: "Explanation",
+    headerName: "Difficulty Reported",
     width: 220,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -220,7 +220,7 @@ const MonitorFeedBack = (props) => {
         };
 
         console.log({ appUpdate });
-
+       console.log(clickedCell.id.split("@")[0]);
         let applicationRef  = await firebase.db.collection("applications").doc(clickedCell.id.split("@")[0]);
         await applicationRef.update(appUpdate);
 
