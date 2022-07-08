@@ -8,19 +8,16 @@ import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import communitiesPapers from "./modules/views/communitiesPapers";
+import communitiesOrder from "./modules/views/communitiesOrder";
+
+const ATTEMPTKEYS = {
+  CONGRATULATIONS: 'Congratulations'
+};
 
 const applicationscolumns = [
   {
     field: "Community",
     headerName: "Community",
-    width: 220,
-    renderCell: (cellValues) => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
-  {
-    field: "title",
-    headerName: "Title",
     width: 220,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -113,26 +110,28 @@ const MonitorFeedBack = (props) => {
       let apps = [...applications];
 
       for (let change of tempAplicationsChanges) {
+        // type: 'removed' || 'added'
         if (change.type === "removed") {
           apps = apps.filter((app) => app.id.split("@")[0] !== change.doc.id);
         } else {
           const applicaData = change.doc.data();
-
-          if (applicaData.attempts) {
-            const keys = Object.keys(applicaData.attempts).filter((ele) => {
-              return ele != "Congratulations";
-            });
-
+          
+          const checkCommunityForUser = (props.communiIds || []).includes(applicaData.communiId);
+          if (applicaData.attempts && checkCommunityForUser) {
+            const keys = Object.keys(applicaData.attempts).filter((ele) => ele !== ATTEMPTKEYS.CONGRATULATIONS);
+        
             for (let key of keys) {
+          
               if (applicaData.attempts[key].questions) {
                 let quests = Object.keys(applicaData.attempts[key].questions);
-
+              
                 for (let question of quests) {
                   if (
                     applicaData.attempts[key].questions[question].explanation
-                  ) {
+                    ) {
+             
                     const newApp = {
-                      Community: applicaData.communiId,
+                      Community: communitiesOrder.find((elm)=>elm.id===applicaData.communiId).title,
                       question:
                         communitiesPapers[applicaData.communiId][key].questions[
                           question
@@ -142,30 +141,18 @@ const MonitorFeedBack = (props) => {
                         applicaData.attempts[key].questions[question]
                           .explanation,
                       Leader: applicaData.leader,
-                      checked: "◻",
-                      checkedBy: "",
                       posted: applicaData.createdAt.toDate(),
-                      title:
-                        communitiesPapers[applicaData.communiId][key].title,
-                      id: change.doc.id + "@" + question,
+                      id: `${change.doc.id}@${question}@${key}`,
+                      checked: applicaData.attempts[key].questions[question].checked ? "✅" : "◻",
+                      checkedBy: applicaData.attempts[key].questions[question].checkedBy ?
+                        applicaData.attempts[key].questions[question].checkedBy : "",
                     };
-
-                    if (
-                      "checked" in
-                        applicaData.attempts[key].questions[question] &&
-                      applicaData.attempts[key].questions[question].checked
-                    ) {
-                      newApp.checked = "✅";
-                      newApp.checkedBy =
-                        applicaData.attempts[key].questions[question].checkedBy;
-                    } else {
-                      newApp.checked = "◻";
-                      newApp.checkedBy = "";
-                    }
+         
                     const appIdx = applications.findIndex(
-                      (app) => app.id === change.doc.id + "@" + question
+                      (app) => app.id === `${change.doc.id}@${question}@${key}`,
                     );
-                    if (appIdx !== -1) {
+
+                    if (appIdx >= 0) {
                       apps[appIdx] = {
                         ...apps[appIdx],
                         ...newApp,
@@ -180,64 +167,65 @@ const MonitorFeedBack = (props) => {
               }
             }
           }
+          // }
         }
       }
-
       setApplications(apps);
     }
   }, [applications, applicationsChanges]);
 
   const checkApplication = async (clickedCell) => {
+    
     if (clickedCell.field === "checked") {
-      try {
-        let apps = [...applications];
-        const appIdx = apps.findIndex((acti) => acti.id === clickedCell.id);
-        const isChecked = apps[appIdx][clickedCell.field] === "✅";
-        console.log(apps[appIdx]);
-        if (appIdx !== -1 && apps[appIdx][clickedCell.field] !== "O") {
-          const id = clickedCell.id.split("@")[0];
 
-          apps[appIdx] = {
-            ...apps[appIdx],
-            [clickedCell.field]: "O",
-          };
-          setApplications(apps);
-          let appData = [];
+      let apps = [...applications];
+      const appIdx = apps.findIndex((acti) => acti.id === clickedCell.id);
+      const isChecked = apps[appIdx][clickedCell.field] === "✅";
+ 
+      if (appIdx >= 0 && apps[appIdx][clickedCell.field] !== "O") {
+        const id = clickedCell.id.split("@")[0];
 
-          const appDoc = await firebase.db
-            .collection("applications")
-            .doc(id)
-            .get();
+        apps[appIdx] = {
+          ...apps[appIdx],
+          checked: isChecked ? "◻" : "✅",
+          checkedBy: isChecked ? "" : fullname,
+        };
+        setApplications(apps);
+        let appData = [];
 
-          appData = appDoc.data();
-          const question = clickedCell.id.split("@")[1];
+        const appDoc = await firebase.db
+          .collection("applications")
+          .doc(id)
+          .get();
 
-          //we make theses changes in the collection applicants so that for the question that has an explanation
-          //and the leader have checked
-
-          const appUpdate = {
-            ...appData,
-            attempts: {
-              ...appData.attempts,
-              [apps[appIdx].key]: {
-                questions: {
-                  ...appData.attempts[apps[appIdx].key].questions,
-                  [question]: {
-                    ...appData.attempts[apps[appIdx].key].questions[question],
-                    checked: !isChecked,
-                    checkedBy: fullname,
-                  },
+        appData = appDoc.data();
+        const key = clickedCell.id.split("@")[2];
+        const question = clickedCell.id.split("@")[1];
+        console.log(clickedCell.id);
+        let appUpdate = {
+          ...appData,
+          attempts: {
+            ...appData.attempts,
+            [key]: {
+              questions: {
+                ...appData.attempts[key].questions,
+                [question]: {
+                  ...appData.attempts[key].questions[question],
+                  checked: !isChecked,
+                  checkedBy: isChecked? "":fullname,
                 },
               },
             },
-          };
-          setApplications(apps);
-          let appRef = await firebase.db.collection("applications").doc(id);
-          await appRef.update(appUpdate);
-        }
-      } catch (err) {
-        console.error(err);
+          },
+        };
+
+        console.log({ appUpdate });
+
+        let applicationRef  = await firebase.db.collection("applications").doc(clickedCell.id.split("@")[0]);
+        await applicationRef.update(appUpdate);
+
       }
+     
     }
   };
 
