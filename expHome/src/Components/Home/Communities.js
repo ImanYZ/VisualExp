@@ -32,16 +32,14 @@ const accumulatePoints = (groups, reputationData, user, points) => {
   for (let communi of groups) {
     for (let deTag of communi.tags) {
       if (reputationData.tag === deTag.title) {
-        const userIdx = communi.allTime.findIndex(
-          (obj) => obj.uname === reputationData.uname
-        );
+        const userIdx = communi.allTime.findIndex(obj => obj.uname === reputationData.uname);
         if (userIdx !== -1) {
           communi.allTime[userIdx].points += points;
         } else {
           communi.allTime.push({
             uname: reputationData.uname,
             ...user,
-            points,
+            points
           });
         }
       }
@@ -49,7 +47,7 @@ const accumulatePoints = (groups, reputationData, user, points) => {
   }
 };
 
-const Communities = (props) => {
+const Communities = props => {
   const firebase = useRecoilValue(firebaseOneState);
 
   const [reputationsChanges, setReputationsChanges] = useState([]);
@@ -62,23 +60,24 @@ const Communities = (props) => {
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
-    if (props.commIdx !== undefined) {
-      setCommunities((oldCommunities) => {
-        let newCommunities = [...oldCommunities];
-        const theCommunity = newCommunities.splice(props.commIdx, 1);
-        newCommunities = [...theCommunity, ...newCommunities];
-        return newCommunities;
+    if (props.commId !== undefined) {
+      setCommunities(oldCommunities => {
+        const commIdx = oldCommunities.findIndex(communi => communi.id === props.commId);
+        if (commIdx !== -1) {
+          return [oldCommunities[commIdx], ...oldCommunities.filter(communi => communi.id !== props.commId)];
+        }
+        return oldCommunities;
       });
       setExpanded(0);
     }
-  }, [props.commIdx]);
+  }, [props.commId]);
 
   useEffect(() => {
     if (firebase) {
       const usersQuery = firebase.db.collection("users");
-      const usersSnapshot = usersQuery.onSnapshot((snapshot) => {
+      const usersSnapshot = usersQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setUsersChanges((oldUsersChanges) => {
+        setUsersChanges(oldUsersChanges => {
           return [...oldUsersChanges, ...docChanges];
         });
       });
@@ -104,7 +103,7 @@ const Communities = (props) => {
           members[change.doc.id] = {
             uname: userData.uname,
             fullname: userData.fName + " " + userData.lName,
-            imageUrl: userData.imageUrl,
+            imageUrl: userData.imageUrl
           };
         }
       }
@@ -116,9 +115,9 @@ const Communities = (props) => {
   useEffect(() => {
     if (firebase && usersLoaded) {
       const reputationsQuery = firebase.db.collection("reputations");
-      const reputationsSnapshot = reputationsQuery.onSnapshot((snapshot) => {
+      const reputationsSnapshot = reputationsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setReputationsChanges((oldReputationsChanges) => {
+        setReputationsChanges(oldReputationsChanges => {
           return [...oldReputationsChanges, ...docChanges];
         });
       });
@@ -158,12 +157,7 @@ const Communities = (props) => {
               accumulatePoints(groups, reputationData, user, points);
               rpts[reputationData.uname][reputationData.tag] = points;
             } else {
-              accumulatePoints(
-                groups,
-                reputationData,
-                user,
-                points - rpts[reputationData.uname][reputationData.tag]
-              );
+              accumulatePoints(groups, reputationData, user, points - rpts[reputationData.uname][reputationData.tag]);
               rpts[reputationData.uname][reputationData.tag] = points;
             }
           }
@@ -178,19 +172,15 @@ const Communities = (props) => {
     }
   }, [reputationsChanges, reputations, communities]);
 
-  const handleChange = (idx) => (event, newExpanded) => {
+  const handleChange = idx => (event, newExpanded) => {
     if (idx !== -1) {
-      window.history.replaceState(
-        null,
-        communities[idx].title,
-        "/community/" + communities[idx].id
-      );
+      window.history.replaceState(null, communities[idx].title, "/community/" + communities[idx].id);
     }
     setExpanded(newExpanded ? idx : false);
     window.document.getElementById("ScrollableContainer").scroll({
       top: 100 + idx * 55,
       left: 0,
-      behavior: "smooth",
+      behavior: "smooth"
     });
   };
 
@@ -198,49 +188,29 @@ const Communities = (props) => {
     <PagesNavbar
       communities={true}
       thisPage={
-        props.commIdx &&
-        communities[props.commIdx] &&
-        communities[props.commIdx].title
-          ? communities[props.commIdx].title
-          : "Communities"
+        expanded !== false ? communities[expanded].title : props.communiTitle ? props.communiTitle : "Communities"
       }
     >
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy Communities
       </Typography>
       {communities.map((communi, idx) => (
-        <Accordion
-          key={communi.id}
-          expanded={expanded === idx}
-          onChange={handleChange(idx)}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-          >
-            <Typography
-              variant="h5"
-              gutterBottom
-              align="center"
-              sx={{ fontWeight: "700" }}
-            >
+        <Accordion key={communi.id} expanded={expanded === idx} onChange={handleChange(idx)}>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+            <Typography variant="h5" gutterBottom align="center" sx={{ fontWeight: "700" }}>
               {communi.title}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
             {expanded === idx && (
-              <Masonry
-                columns={{ xs: 1, md: 2, lg: 2, xl: 3 }}
-                spacing={{ xs: 1, md: 2.2 }}
-              >
+              <Masonry columns={{ xs: 1, md: 2, lg: 2, xl: 3 }} spacing={{ xs: 1, md: 2.2 }}>
                 <Paper sx={{ padding: "10px", mb: "19px" }}>
                   <Typography
                     variant="h5"
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "19px",
+                      pb: "19px"
                     }}
                   >
                     Community Introduction
@@ -253,20 +223,15 @@ const Communities = (props) => {
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "19px",
+                      pb: "19px"
                     }}
                   >
                     Community Description
                   </Typography>
-                  {typeof communi.description === "object" &&
-                  communi.description !== null ? (
+                  {typeof communi.description === "object" && communi.description !== null ? (
                     communi.description
                   ) : (
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: "left" }}>
                       {communi.description}
                     </Typography>
                   )}
@@ -280,16 +245,12 @@ const Communities = (props) => {
                         component="div"
                         sx={{
                           pt: "19px",
-                          pb: "19px",
+                          pb: "19px"
                         }}
                       >
                         Community Accomplishments
                       </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ textAlign: "left" }}
-                      >
+                      <Typography variant="body2" color="text.secondary" sx={{ textAlign: "left" }}>
                         {communi.accomplishments}
                       </Typography>
                     </Paper>
@@ -300,7 +261,7 @@ const Communities = (props) => {
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "19px",
+                      pb: "19px"
                     }}
                   >
                     By Joining Us, You Will ...
@@ -349,7 +310,7 @@ const Communities = (props) => {
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "19px",
+                      pb: "19px"
                     }}
                   >
                     Qualifications
@@ -360,22 +321,14 @@ const Communities = (props) => {
                         return <li key={qIdx}>{qualifi}</li>;
                       })}
                     <li>
-                      Complete the three online sessions of one of our ongoing
-                      research studies, as a participant, to better learn how we
-                      conduct our experiments.
+                      Complete the three online sessions of one of our ongoing research studies, as a participant, to
+                      better learn how we conduct our experiments.
                     </li>
+                    <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
+                    <li>Explain in a few paragraphs why you apply to this specific community.</li>
                     <li>
-                      Submit your most current resume and unofficial
-                      transcripts, indicating a GPA above 3.4/4.0
-                    </li>
-                    <li>
-                      Explain in a few paragraphs why you apply to this specific
-                      community.
-                    </li>
-                    <li>
-                      Complete our community-specific quiz by answering a set of
-                      questions about some research papers or book chapters and
-                      get a satisfying score.
+                      Complete our community-specific quiz by answering a set of questions about some research papers or
+                      book chapters and get a satisfying score.
                     </li>
                     {communi.coursera && (
                       <li>
@@ -383,8 +336,7 @@ const Communities = (props) => {
                         <a href={communi.coursera} target="_blank">
                           this Coursera course
                         </a>{" "}
-                        and upload your certificate as a part of the
-                        application.
+                        and upload your certificate as a part of the application.
                       </li>
                     )}
                   </ul>
@@ -395,7 +347,7 @@ const Communities = (props) => {
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "19px",
+                      pb: "19px"
                     }}
                   >
                     Responsibilities
@@ -421,7 +373,7 @@ const Communities = (props) => {
                   <Paper
                     sx={{
                       m: "2.5px",
-                      minHeight: "130px",
+                      minHeight: "130px"
                     }}
                   >
                     <Typography
@@ -430,7 +382,7 @@ const Communities = (props) => {
                       sx={{
                         display: "block",
                         padding: "19px 0px 0px 19px",
-                        fontStyle: "italic",
+                        fontStyle: "italic"
                       }}
                     >
                       Community Leader{communi.leaders.length > 1 ? "s" : ""}
@@ -442,7 +394,7 @@ const Communities = (props) => {
                         flexWrap: "wrap",
                         listStyle: "none",
                         p: 0.5,
-                        m: 0,
+                        m: 0
                       }}
                       component="ul"
                     >
@@ -454,18 +406,16 @@ const Communities = (props) => {
                                 sx={{
                                   height: "109px",
                                   margin: "10px",
-                                  borderRadius: "58px",
+                                  borderRadius: "58px"
                                 }}
                                 icon={
                                   <Avatar
-                                    src={
-                                      "/static/CommunityLeaders/" + leader.image
-                                    }
+                                    src={"/static/CommunityLeaders/" + leader.image}
                                     alt={leader.name}
                                     sx={{
                                       width: "100px",
                                       height: "100px",
-                                      mr: 2.5,
+                                      mr: 2.5
                                     }}
                                   />
                                 }
@@ -485,11 +435,7 @@ const Communities = (props) => {
                                             target="_blank"
                                             aria-label={wSite.name}
                                           >
-                                            {wSite.name === "LinkedIn" ? (
-                                              <LinkedInIcon />
-                                            ) : (
-                                              <LinkIcon />
-                                            )}
+                                            {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
                                           </IconButton>
                                         );
                                       })}
@@ -518,7 +464,7 @@ const Communities = (props) => {
                     sx={{
                       m: "2.5px",
                       mt: "10px",
-                      minHeight: "130px",
+                      minHeight: "130px"
                     }}
                   >
                     <Typography
@@ -527,7 +473,7 @@ const Communities = (props) => {
                       sx={{
                         display: "block",
                         padding: "19px 0px 0px 19px",
-                        fontStyle: "italic",
+                        fontStyle: "italic"
                       }}
                     >
                       Leaderboard (Only those with &gt; 25 points)
@@ -539,7 +485,7 @@ const Communities = (props) => {
                         flexWrap: "wrap",
                         listStyle: "none",
                         p: 0.5,
-                        m: 0,
+                        m: 0
                       }}
                       component="ul"
                     >
@@ -551,7 +497,7 @@ const Communities = (props) => {
                                 sx={{
                                   height: "49px",
                                   margin: "4px",
-                                  borderRadius: "28px",
+                                  borderRadius: "28px"
                                 }}
                                 icon={
                                   <Avatar
@@ -560,7 +506,7 @@ const Communities = (props) => {
                                     sx={{
                                       width: "40px",
                                       height: "40px",
-                                      mr: 2.5,
+                                      mr: 2.5
                                     }}
                                   />
                                 }
@@ -572,11 +518,7 @@ const Communities = (props) => {
                                     </Typography>
                                     <Typography variant="body2" component="div">
                                       {idx < 3 ? "🏆" : "✔️"}
-                                      {" " +
-                                        Math.round(
-                                          (member.points + Number.EPSILON) * 100
-                                        ) /
-                                          100}
+                                      {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
                                     </Typography>
                                   </>
                                 }
@@ -672,7 +614,7 @@ const Communities = (props) => {
                     component="div"
                     sx={{
                       pt: "19px",
-                      pb: "0px",
+                      pb: "0px"
                     }}
                   >
                     Apply to Join this Community

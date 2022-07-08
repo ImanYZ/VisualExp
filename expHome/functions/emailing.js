@@ -4,12 +4,7 @@ const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
 
-const {
-  getFullname,
-  generateUID,
-  nextWeek,
-  capitalizeFirstLetter,
-} = require("./utils");
+const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
 
@@ -21,8 +16,8 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: process.env.EMAIL,
-    pass: process.env.EMAILPASS,
-  },
+    pass: process.env.EMAILPASS
+  }
 });
 
 // To personalize the email tracking links, we need to inclue the fullname as a part of the URL.
@@ -37,10 +32,8 @@ const getFullnameURI = (firstname, lastname) => {
 };
 
 // Return the UMSI logo as a response stream.
-const loadUmichLogo = (res) => {
-  const file = storage
-    .bucket("visualexp-a7d2c.appspot.com")
-    .file("UMSI_Logo.png");
+const loadUmichLogo = res => {
+  const file = storage.bucket("visualexp-a7d2c.appspot.com").file("UMSI_Logo.png");
   let readStream = file.createReadStream();
 
   res.setHeader("content-type", "image/png");
@@ -48,11 +41,11 @@ const loadUmichLogo = (res) => {
 };
 
 // When an individual opens their email, we should log it in contacts collection.
-const emailOpenedIndividual = async (fullname) => {
+const emailOpenedIndividual = async fullname => {
   const contactRef = db.collection("contacts").doc(fullname);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
-    updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
   });
 };
 
@@ -66,11 +59,11 @@ exports.loadImageIndividual = (req, res) => {
 };
 
 // When an instructor opens their email, we should log it in instructors collection.
-const emailOpenedInstructor = async (instructorId) => {
+const emailOpenedInstructor = async instructorId => {
   const contactRef = db.collection("instructors").doc(instructorId);
   await contactRef.update({
     openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
-    updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
   });
 };
 
@@ -95,15 +88,7 @@ exports.sendPersonalInvitations = async (req, res) => {
       if (contactIdx < contactDocs.docs.length) {
         contactDoc = contactDocs.docs[contactIdx];
         contactIdx += 1;
-        const {
-          firstname,
-          lastname,
-          email,
-          from1Cademy,
-          emailSent,
-          openedEmail,
-          reminders,
-        } = contactDoc.data();
+        const { firstname, lastname, email, from1Cademy, emailSent, openedEmail, reminders } = contactDoc.data();
         console.log({ firstname, lastname, emailSent, openedEmail, reminders });
         if (!emailSent || (!openedEmail && (!reminders || reminders < 3))) {
           const fullname = getFullname(firstname, lastname);
@@ -147,7 +132,7 @@ exports.sendPersonalInvitations = async (req, res) => {
                 <img src="https://1cademy.us/api/loadImage/individual/${
                   getFullnameURI(firstname, lastname) + "/" + generateUID()
                 }"
-                width="420" height="37"><br></div></div></div>`,
+                width="420" height="37"><br></div></div></div>`
             };
             transporter.sendMail(mailOptions, async (error, data) => {
               if (error) {
@@ -158,12 +143,12 @@ exports.sendPersonalInvitations = async (req, res) => {
                 if (!reminders) {
                   await contactRef.update({
                     emailSent: admin.firestore.Timestamp.fromDate(new Date()),
-                    reminders: 0,
+                    reminders: 0
                   });
                 } else {
                   await contactRef.update({
                     emailSent: admin.firestore.Timestamp.fromDate(new Date()),
-                    reminders: reminders + 1,
+                    reminders: reminders + 1
                   });
                 }
               }
@@ -185,17 +170,23 @@ exports.sendPersonalInvitations = async (req, res) => {
 // This is the only dictionary in the backend that maps community id and titles.
 const communityTitles = {
   Cognitive_Psychology: "UX Research in Cognitive Psychology of Learning",
-  Educational_Organizational_Psychology:
-    "Educational/Organizational Psychology",
+  UX_Research: "UX Research in Cognitive Psychology of Learning",
+  Educational_Organizational_Psychology: "Educational/Organizational Psychology",
   Clinical_Psychology: "Clinical Psychology",
   Mindfulness: "Mindfulness",
   Health_Psychology: "Health Psychology",
   Neuroscience: "Neuroscience",
   Disability_Studies: "Disability Studies",
-  Social_Political_Psychology: "Social/Political Psychology",
-  // Cryptoeconomics: "Cryptoeconomics",
+  Social_Political_Psychology: "Behavioral Economics & Social Psychology",
+  Social_Psychology: "Behavioral Economics & Social Psychology",
+  UI_Design: "UI Design",
+  Cryptoeconomics: "Cryptoeconomics",
+  Financial_Technology: "Finance",
   Deep_Learning: "Deep Learning",
-  Liaison_Librarians: "Liaison Librarians",
+  Graph_Neural_Network: "Graph Neural Networks",
+  Responsible_AI: "Artifical Intelligence",
+  Computer_Vision: "Computer Vision",
+  Liaison_Librarians: "Liaison Librarians"
 };
 
 // This should be called by a pubsub scheduler every 25 hours.
@@ -219,9 +210,7 @@ exports.inviteInstructors = async (req, res) => {
         // We have not sent them any emails or less than 4 reminders
         (!instructorData.reminders || instructorData.reminders < 4) &&
         // Their next reminder is not scheduled yet, or it should have been sent before now.
-        (!instructorData.nextReminder ||
-          instructorData.nextReminder.toDate().getTime() <
-            new Date().getTime()) &&
+        (!instructorData.nextReminder || instructorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
         // They have not already clicked any of the options in their email.
         !instructorData.yes &&
         !instructorData.no &&
@@ -236,9 +225,7 @@ exports.inviteInstructors = async (req, res) => {
         } else {
           // To assign an experimental condition to this instructor, we have to find
           // the condition that is assigned to the fewest number of instructors so far.
-          let instructorConditionsDocs = await db
-            .collection("instructorConditions")
-            .get();
+          let instructorConditionsDocs = await db.collection("instructorConditions").get();
           instructorConditionsDocs = instructorConditionsDocs.docs;
           minCondNum = instructorConditionsDocs[0].data().num;
           minCondition = instructorConditionsDocs[0].id;
@@ -263,9 +250,7 @@ exports.inviteInstructors = async (req, res) => {
                 : minCondition === "learn"
                 ? "Learn Collaboratively at"
                 : "Present Your Research at"
-            } Our Multi-School ${
-              communityTitles[instructorData.major]
-            } Community`,
+            } Our Multi-School ${communityTitles[instructorData.major]} Community`,
             html: `<p>Hello ${
               instructorData.prefix +
               ". " +
@@ -294,9 +279,7 @@ exports.inviteInstructors = async (req, res) => {
                 <li><a href="https://1cademy.us/interestedFaculty/${
                   // These are all sending requests to the client side.
                   instructorData.major
-                }/${minCondition}/${
-              instructorDoc.id
-            }" target="_blank">Yes, I'd like to invite my students.</a></li>
+                }/${minCondition}/${instructorDoc.id}" target="_blank">Yes, I'd like to invite my students.</a></li>
                 <li><a href="https://1cademy.us/interestedFacultyLater/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
@@ -318,7 +301,7 @@ exports.inviteInstructors = async (req, res) => {
                 // of the emails without the user's knowlege, so those would be false positives for us.
                 instructorDoc.id + "/" + generateUID()
               }"
-              width="420" height="37"><br></div></div></div>`,
+              width="420" height="37"><br></div></div></div>`
           };
           transporter.sendMail(mailOptions, async (error, data) => {
             if (error) {
@@ -330,24 +313,20 @@ exports.inviteInstructors = async (req, res) => {
               if (minCondNum !== -1) {
                 // If the email is successfully sent:
                 // 1) Update the num value in the corresponding instructorConditions document;
-                const instructorConditionRef = db
-                  .collection("instructorConditions")
-                  .doc(minCondition);
+                const instructorConditionRef = db.collection("instructorConditions").doc(minCondition);
                 await instructorConditionRef.update({
-                  num: admin.firestore.FieldValue.increment(1),
+                  num: admin.firestore.FieldValue.increment(1)
                 });
               }
               // 2) Update the corresponding instructor document.
-              const instructorRef = db
-                .collection("instructors")
-                .doc(instructorDoc.id);
+              const instructorRef = db.collection("instructors").doc(instructorDoc.id);
               await instructorRef.update({
                 condition: minCondition,
                 emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
                 // The next reminder should be sent one week later.
                 nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
-                updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+                updatedAt: admin.firestore.Timestamp.fromDate(new Date())
               });
             }
           });
@@ -376,7 +355,7 @@ exports.instructorYes = async (req, res) => {
         yes: true,
         no: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -399,7 +378,7 @@ exports.instructorNo = async (req, res) => {
         no: true,
         yes: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -432,7 +411,7 @@ exports.instructorLater = async (req, res) => {
           no: false,
           yes: false,
           reminder: admin.firestore.Timestamp.fromDate(reminder),
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
         });
       } else {
         // If reminder does not exist, we should still log that the instructor
@@ -441,7 +420,7 @@ exports.instructorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
         });
       }
     }
@@ -453,7 +432,7 @@ exports.instructorLater = async (req, res) => {
 
 // Convert hoursLeft to days and hours left writen in English for the
 // reminder email subject lines.
-const hoursToDaysHoursStr = (hoursLeft) => {
+const hoursToDaysHoursStr = hoursLeft => {
   let days = 0;
   hoursLeft = Math.floor(hoursLeft);
   if (hoursLeft < 1) {
@@ -469,17 +448,10 @@ const hoursToDaysHoursStr = (hoursLeft) => {
       (days > 1 ? days : "a") +
       " day" +
       (days > 1 ? "s" : "") +
-      (hoursLeft > 0
-        ? " and " +
-          (hoursLeft > 1 ? hoursLeft : "an") +
-          " hour" +
-          (hoursLeft > 1 ? "s" : "")
-        : "")
+      (hoursLeft > 0 ? " and " + (hoursLeft > 1 ? hoursLeft : "an") + " hour" + (hoursLeft > 1 ? "s" : "") : "")
     );
   }
-  return (
-    (hoursLeft > 1 ? hoursLeft : "an") + " hour" + (hoursLeft > 1 ? "s" : "")
-  );
+  return (hoursLeft > 1 ? hoursLeft : "an") + " hour" + (hoursLeft > 1 ? "s" : "");
 };
 
 const eventNotificationEmail = async (
@@ -510,9 +482,7 @@ const eventNotificationEmail = async (
             " Session of the UX Research Experiment Which Will Begin in " +
             hoursLeft +
             "!"
-          : "Your UX Research Experiment Session Will Begin in " +
-            hoursLeft +
-            "!"),
+          : "Your UX Research Experiment Session Will Begin in " + hoursLeft + "!"),
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
       <p></p>
@@ -549,7 +519,7 @@ const eventNotificationEmail = async (
       </p>
       <p></p>
       <p>Best regards,</p>
-      ` + signatureHTML,
+      ` + signatureHTML
     };
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
@@ -574,14 +544,7 @@ exports.eventNotificationEmail = eventNotificationEmail;
 // Sends a reminder email to a researcher that they have not accepted
 // or even declined the Google Calendar invitation and asks them to
 // accept it or ask someone else to take it.
-exports.researcherEventNotificationEmail = async (
-  email,
-  fullname,
-  participant,
-  hoursLeft,
-  order,
-  declined
-) => {
+exports.researcherEventNotificationEmail = async (email, fullname, participant, hoursLeft, order, declined) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
@@ -590,20 +553,8 @@ exports.researcherEventNotificationEmail = async (
       subject:
         "[1Cademy] " +
         (declined
-          ? "You've Declined Your " +
-            order +
-            " Session with " +
-            participant +
-            " Which Will Begin in " +
-            hoursLeft +
-            "!"
-          : "Please Accept Your " +
-            order +
-            " Session with " +
-            participant +
-            " Which Will Begin in " +
-            hoursLeft +
-            "!"),
+          ? "You've Declined Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"
+          : "Please Accept Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"),
       html:
         `<p>Hi ${fullname},</p>
       <p></p>
@@ -632,7 +583,7 @@ exports.researcherEventNotificationEmail = async (
       </p>
       <p></p>
       <p>Best regards,</p>
-      ` + signatureHTML,
+      ` + signatureHTML
     };
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
@@ -653,13 +604,7 @@ exports.researcherEventNotificationEmail = async (
   }
 };
 
-exports.notAttendedEmail = async (
-  email,
-  firstname,
-  from1Cademy,
-  courseName,
-  order
-) => {
+exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, order) => {
   try {
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -683,7 +628,7 @@ exports.notAttendedEmail = async (
         <p>Please reply to this email if you have any questions or concerns.</p>
 <p></p>
 <p>Best regards,</p>
-` + signatureHTML,
+` + signatureHTML
     };
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
@@ -764,10 +709,7 @@ const reschEventNotificationEmail = async (
 ) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
-    const scheduleDocs = await db
-      .collection("schedule")
-      .where("email", "==", email)
-      .get();
+    const scheduleDocs = await db.collection("schedule").where("email", "==", email).get();
     for (let scheduleDoc of scheduleDocs.docs) {
       const scheduleData = scheduleDoc.data();
       if (scheduleData.id) {
@@ -775,7 +717,7 @@ const reschEventNotificationEmail = async (
         const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
         await scheduleRef.update({
           id: admin.firestore.FieldValue.delete(),
-          order: admin.firestore.FieldValue.delete(),
+          order: admin.firestore.FieldValue.delete()
         });
       }
     }
@@ -805,7 +747,7 @@ ${
 </p>
 <p></p>
 <p>Best regards,</p>
-` + signatureHTML,
+` + signatureHTML
     };
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
@@ -843,25 +785,11 @@ exports.rescheduleEventNotificationEmail = (req, res) => {
     if ("hoursLeft" in req.body) {
       hoursLeft = req.body.hoursLeft;
     }
-    reschEventNotificationEmail(
-      email,
-      firstname,
-      from1Cademy,
-      courseName,
-      hoursLeft,
-      true,
-      true,
-      res
-    );
+    reschEventNotificationEmail(email, firstname, from1Cademy, courseName, hoursLeft, true, true, res);
   }
 };
 
-exports.emailCommunityLeader = async (
-  email,
-  firstname,
-  communiId,
-  applicants
-) => {
+exports.emailCommunityLeader = async (email, firstname, communiId, applicants) => {
   try {
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -875,7 +803,7 @@ exports.emailCommunityLeader = async (
         } complete applications to review in your ${communiId} community:</p>
         <ul>
         ${applicants
-          .map((applicant) => {
+          .map(applicant => {
             return `<li>${applicant}</li>`;
           })
           .join("")}
@@ -895,7 +823,7 @@ exports.emailCommunityLeader = async (
         </ul>
         <p></p>
         <p>Best regards,</p>
-        ` + signatureHTML,
+        ` + signatureHTML
     };
     return transporter.sendMail(mailOptions, async (error, data) => {
       if (error) {
@@ -907,7 +835,7 @@ exports.emailCommunityLeader = async (
   }
 };
 
-exports.emailImanToInviteApplicants = async (needInvite) => {
+exports.emailImanToInviteApplicants = async needInvite => {
   try {
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -921,7 +849,7 @@ exports.emailImanToInviteApplicants = async (needInvite) => {
         } Confirmed applications to Invite to Microsoft Teams:</p>
         <ul>
         ${needInvite
-          .map((application) => {
+          .map(application => {
             return `<li>${application.communiId}, ${application.applicant}</li>`;
           })
           .join("")}
@@ -930,7 +858,7 @@ exports.emailImanToInviteApplicants = async (needInvite) => {
           <a href="https://1cademy.us/CommunityApplications" target='_blank'>this link</a>.</p>
         <p></p>
         <p>Best regards,</p>
-        ` + signatureHTML,
+        ` + signatureHTML
     };
     return transporter.sendMail(mailOptions, async (error, data) => {
       if (error) {
@@ -942,15 +870,7 @@ exports.emailImanToInviteApplicants = async (needInvite) => {
   }
 };
 
-exports.emailApplicationStatus = async (
-  email,
-  firstname,
-  fullname,
-  reminders,
-  subject,
-  content,
-  hyperlink
-) => {
+exports.emailApplicationStatus = async (email, firstname, fullname, reminders, subject, content, hyperlink) => {
   try {
     const nWeek = nextWeek();
     const mailOptions = {
@@ -970,7 +890,7 @@ exports.emailApplicationStatus = async (
 <p>Please reply to this email if you have any questions or concerns.</p>
 <p></p>
 <p>Best regards,</p>
-` + signatureHTML,
+` + signatureHTML
     };
     return transporter.sendMail(mailOptions, async (error, data) => {
       if (error) {
@@ -980,7 +900,7 @@ exports.emailApplicationStatus = async (
       const userDoc = await userRef.get();
       await userRef.update({
         reminders: reminders + 1,
-        reminder: admin.firestore.Timestamp.fromDate(nWeek),
+        reminder: admin.firestore.Timestamp.fromDate(nWeek)
       });
     });
   } catch (err) {
@@ -993,8 +913,7 @@ exports.remindResearcherToSpecifyAvailability = (email, fullname, days) => {
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
-      subject:
-        "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
+      subject: "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
       html:
         `<p>Hi ${fullname},</p>
         <p></p>
@@ -1003,7 +922,7 @@ exports.remindResearcherToSpecifyAvailability = (email, fullname, days) => {
         <p>Please open <a href="https://1cademy.us/Activities/Experiments" target='_blank'>our experiments scheduling page</a> and specify your availability in the next ${days} days.</p>
         <p></p>
         <p>Best regards,</p>
-        ` + signatureHTML,
+        ` + signatureHTML
     };
     return transporter.sendMail(mailOptions, async (error, data) => {
       if (error) {
