@@ -14,7 +14,6 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
-import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
@@ -41,7 +40,6 @@ const CommonPages = [
   { page: "AddInstructor", view: <AddInstructor /> },
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
-  { page: "CodeFeedback", view: <CodeFeedback /> }
 ];
 
 const Activities = props => {

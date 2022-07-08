@@ -288,29 +288,29 @@ export default [
     width: "34%",
     leaders: [
       {
-        name: "Madeline Paige Jacoby",
-        image: "Madeline_Paige_Jacoby.png",
-        about: `Madeline is currently a junior at Syracuse University majoring in Psychology and minoring in Human Development and Family Science. Her research interests include behavioral therapy practices and the media in relation to mental health and eating disorders. Madeline has been working with 1Cademy since January of 2021 and is currently a co-leader of the Health Psychology community. In the past, she has also worked with the Educational Psychology community and the Social/Political Psychology community.`,
+        name: "Jolie Safier Smith",
+        image: "Jolie_Safier_Smith.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/madeline-jacoby-40a36a20b/"
+            url: "https://www.linkedin.com/in/jolie-smith-0200ba243/"
           }
         ]
       },
       {
-        name: "Megan Rush",
-        image: "Megan_Rush.jpg",
-        about: `Megan is currently a junior at the University of Michigan studying Biopsychology, Cognition, and Neuroscience. Her research interests are the neural basis for mental illnesses such as anxiety and depression, as well as how different treatment methods rewire the brain to treat mental illnesses. She has been working with 1Cademy since summer 2021. In addition to co-leading the Health Psychology community, she has also worked on the Social/Political Psychology community.`,
+        name: "Carson James Clark",
+        image: "Carson_James_Clark.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/megan-rush-6338ab227/"
+            url: "https://www.linkedin.com/in/carson-clark-b393b7243/"
           }
         ]
       }
     ],
-    YouTube: "gJUMN4vIxN4",
+    YouTube: "j8K8s-AKxTQ",
     description: `The goal of the health psychology community is to inspire the development of key research skills while conducting a review of health psychology literature. Using credible, scholarly articles, we are exploring various topics within the field of health psychology, including: behavioral therapies for mental illness, the intersection of race and gender in the healthcare industry, what motivates people to maintain a healthy lifestyle, and the complex role of the media in health. As we compile our research using 1Cademy, we hope to discover patterns and gaps in the literature that could be addressed in a future study of our own design. Each week, interns read an article, summarize it using 1Cademy, present their findings to the group, and engage in thoughtful discussion about themes present in their article.`,
     accomplishments: `We are still in the preliminary stages of our exploration into the current literature in health psychology. Our team has investigated various topics including the many applications of cognitive-behavioral therapy, the emerging problem of climate grief, the effectiveness of telehealth as a psychotherapy alternative, and LGBTQ+ experiences in healthcare. Recently, we have shifted our attention to reorganizing our section of the larger map, creating an easy-to-follow outline of topics in health psychology. Our next steps will be researching articles relating to other general subsections of the field, such as patient-provider relationships, the psychological impact of chronic illnesses, and impacts of nutrition on overall health.`,
     gains: [
