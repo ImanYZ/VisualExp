@@ -23,6 +23,7 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   gradeFreeRecall,
+  bulkGradeFreeRecall,
   markPaidEndpoint,
 } = require("./projectManagement");
 const {
@@ -85,6 +86,7 @@ app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.post("/gradeFreeRecall", gradeFreeRecall);
+app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
