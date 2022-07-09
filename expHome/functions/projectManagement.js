@@ -1244,7 +1244,7 @@ exports.gradeFreeRecall = async (req, res) => {
                 const researcherData = researcherDoc.data();
                 // fetch all the researcher projects and 
                 // check if it has in payload or not.
-                const researcherProjects = Object.keys(researcherData.projects).map(x => x);
+                const researcherProjects = Object.keys(researcherData.projects);
                 const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
