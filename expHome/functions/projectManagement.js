@@ -1328,25 +1328,25 @@ exports.gradeFreeRecall = async (req, res) => {
               }
             }
           });
-          // for (let transactionWrite of transactionWrites) {
-          //   if (transactionWrite.type === "update") {
-          //     t.update(transactionWrite.refObj, transactionWrite.updateObj);
-          //   } else if (transactionWrite.type === "set") {
-          //     t.set(transactionWrite.refObj, transactionWrite.updateObj);
-          //   } else if (transactionWrite.type === "delete") {
-          //     t.delete(transactionWrite.refObj);
-          //   }
-          // }
+          for (let transactionWrite of transactionWrites) {
+            if (transactionWrite.type === "update") {
+              t.update(transactionWrite.refObj, transactionWrite.updateObj);
+            } else if (transactionWrite.type === "set") {
+              t.set(transactionWrite.refObj, transactionWrite.updateObj);
+            } else if (transactionWrite.type === "delete") {
+              t.delete(transactionWrite.refObj);
+            }
+          }
           // Finally, we should create the recallGrades doc for this new grade.
           // this done variable if for testing if 4 researchers have voted on this
-          // t.update(recallGradeRef, {
-          //   ...recallGradeUpdates,
-          //   done: recallGradeData.researchersNum >= 3,
-          //   researchers: [...recallGradeData.researchers, fullname],
-          //   grades: [...recallGradeData.grades, grade],
-          //   researchersNum: recallGradeData.researchersNum + 1,
-          //   updatedAt: admin.firestore.Timestamp.fromDate(new Date())
-          // });
+          t.update(recallGradeRef, {
+            ...recallGradeUpdates,
+            done: recallGradeData.researchersNum >= 3,
+            researchers: [...recallGradeData.researchers, fullname],
+            grades: [...recallGradeData.grades, grade],
+            researchersNum: recallGradeData.researchersNum + 1,
+            updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          });
         }
       });
     }
