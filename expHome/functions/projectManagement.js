@@ -175,7 +175,7 @@ exports.voteEndpoint = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -225,7 +225,7 @@ exports.voteActivityReset = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -252,7 +252,7 @@ exports.markPaidEndpoint = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -346,7 +346,7 @@ exports.deleteActivity = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -496,7 +496,7 @@ exports.voteInstructorEndpoint = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -546,7 +546,7 @@ exports.voteInstructorReset = async (req, res) => {
     return res.status(200).json({});
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
 };
 
@@ -585,7 +585,7 @@ exports.voteInstructorReset = async (req, res) => {
 //     return res.status(200).json({});
 //   } catch (err) {
 //     console.error(err);
-//     return res.status(500).json({ err });
+//     return res.status(500).json({ errMsg: err.message });
 //   }
 // };
 
@@ -773,7 +773,7 @@ exports.voteInstructorReset = async (req, res) => {
 //     return res.status(200).json({});
 //   } catch (err) {
 //     console.error(err);
-//     return res.status(500).json({ err });
+//     return res.status(500).json({ errMsg: err.message });
 //   }
 // };
 
@@ -1016,7 +1016,7 @@ exports.voteInstructorReset = async (req, res) => {
 //     }
 //   } catch (err) {
 //     console.log({ err });
-//     return res.status(500).json({ err });
+//     return res.status(500).json({ errMsg: err.message });
 //   }
 //   return res.status(500).json({ done: true });
 // };
@@ -1094,7 +1094,7 @@ exports.loadTimesheetVotes = async (req, res) => {
     }, 1000);
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
   return res.status(500).json({ done: true });
 };
@@ -1328,34 +1328,68 @@ exports.gradeFreeRecall = async (req, res) => {
               }
             }
           });
-          for (let transactionWrite of transactionWrites) {
-            if (transactionWrite.type === "update") {
-              t.update(transactionWrite.refObj, transactionWrite.updateObj);
-            } else if (transactionWrite.type === "set") {
-              t.set(transactionWrite.refObj, transactionWrite.updateObj);
-            } else if (transactionWrite.type === "delete") {
-              t.delete(transactionWrite.refObj);
-            }
-          }
+          // for (let transactionWrite of transactionWrites) {
+          //   if (transactionWrite.type === "update") {
+          //     t.update(transactionWrite.refObj, transactionWrite.updateObj);
+          //   } else if (transactionWrite.type === "set") {
+          //     t.set(transactionWrite.refObj, transactionWrite.updateObj);
+          //   } else if (transactionWrite.type === "delete") {
+          //     t.delete(transactionWrite.refObj);
+          //   }
+          // }
           // Finally, we should create the recallGrades doc for this new grade.
           // this done variable if for testing if 4 researchers have voted on this
-          t.update(recallGradeRef, {
-            ...recallGradeUpdates,
-            done: recallGradeData.researchersNum >= 3,
-            researchers: [...recallGradeData.researchers, fullname],
-            grades: [...recallGradeData.grades, grade],
-            researchersNum: recallGradeData.researchersNum + 1,
-            updatedAt: admin.firestore.Timestamp.fromDate(new Date())
-          });
+          // t.update(recallGradeRef, {
+          //   ...recallGradeUpdates,
+          //   done: recallGradeData.researchersNum >= 3,
+          //   researchers: [...recallGradeData.researchers, fullname],
+          //   grades: [...recallGradeData.grades, grade],
+          //   researchersNum: recallGradeData.researchersNum + 1,
+          //   updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          // });
         }
       });
     }
   } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ err });
+    return res.status(500).json({ errMsg: err.message });
   }
   return res.status(200).json({ done: true });
 };
+
+exports.bulkGradeFreeRecall = async (req, res) => {
+  // new Promise phrase. resolve.
+  // reject.
+  // promise.all
+  // if(req.body){
+  //   let recallGrades = req.body;
+  //   let passageId = recallGrades[0].passageId;
+  //   let project = recallGrades[0].project;
+  //   let user = recallGrades[0].user;
+  //   const passageData = db.collection("passages").doc(passageId).get().data();
+  //   // const phraseNum = passageData.phrases.findIndex(elem => elem === req.body.phase);
+  //   // const phraseNum = passageData.phrases.length;
+  //   const userData = (await db.collection("users").doc(`${user}`).get()).data();
+// 6rc4k1su3txN6ZK4CJ0h
+  // let passageIdx=0;
+
+  // recallGrades.map(x => {
+  //   x.passageIdx = userData.pConditions.findIndex(ele =>)
+  //  });
+  //  for (; passageIdx < userData.pConditions.length; passageIdx++) {
+  //   // if (userData.pConditions[passaIdx].passage === passageId) {
+  //   //   break;
+  //   // }
+  // }
+  //   let collName = "recallGrades";
+  //     if (project !== "H2K2") {
+  //       collName += project;
+  //     }
+  // }
+  
+
+  console.log('reqreqreq', req.body);
+  return res.status(200).json({ successGrades: [phrases, grades], failedGrades= [phrases, grades] });
+}
 
 exports.assignExperimentSessionsPoints = async context => {
   try {
