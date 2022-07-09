@@ -644,7 +644,7 @@ export default [
         ]
       }
     ],
-    YouTube: "J0y0tZzzuQ0",
+    YouTube: "sOWCWObstrs",
     description: `Welcome to the Natural Language Processing(NLP) Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different nlp topics by going through selected survey papers selected from A Survey of Surveys project(https://github.com/NiuTrans/ABigSurvey). Our team members will dive into these survey papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
     accomplishments: `In our research teams, we work on versatile projects, share our ideas, and collaboratively develop research ideas that not only boost our knowledge in deep learning but also give us the possibility to publish research papers in the most prestigious conferences and journals. Recently we completed a knowledge tracing paper and submitted it to SIGCSE, one of the top conferences in computer science education. Our team consists of machine learning enthusiasts and we would be more than happy to share our passion for machine learning and work together with anyone who has a keen interest and qualifications in deep learning.`,
     gains: [
@@ -801,30 +801,29 @@ export default [
         ]
       }
     ],
-    YouTube: "bOyiP9Lo094",
-    description: `Welcome to the Equity and Inclusion in AI Community! Our community predominantly contributes to the Artificial Intelligence area on 1Cademy, our collaborative research platform. We will explore the progress of addressing bias and discrimination in the area of Artificial Intelligence, and learn about the efforts to pursue inclusiveness in the research field. Our team members will dive into the Equity and Inclusion in AI textbook and present what they've been learning each week by walking us through the nodes they designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas and projects.`,
+    YouTube: "nq0IehyU76Y",
+    description: `Welcome to the Responsible AI Team! Our community predominantly contributes to the Artificial Intelligence area on 1Cademy, our collaborative research platform. We will explore the existing literature and contributions already made in the field of Responsible Artificial Intelligence, including a prospect toward what is yet to be reached. We will learn approaches to making AI systems transparent, fair, secure, and inclusive in the research field. Our team members will dive into the Responsible AI textbooks, survey papers, and journals to gain a concrete understanding of the current state and techniques in the field. Team members will present what they've been learning each week by walking us through the nodes they designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas and projects.`,
     accomplishments: ``,
     gains: [
-      `You will spend the majority of the fall semester going through the Equity and Inclusion in AI textbook to deeply learn about the AI research areas. No prior experience is required.`,
+      `You will spend the majority of the time going through the Responsible AI textbooks, research papers, and journals to deeply learn about the current progress in the field.`,
       `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
       `Top contributors to our community would have the opportunity to co-author research papers in the field.`,
-      `All interactions, task fulfillment, and communications will be online.`,
-      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program.`
+      `Experience a flexible and collaborative work environment, with all work being done remotely.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
     hasTest: true,
     qualifications: [
-      `Knowledge and enthusiasm for topics related to computer science and artificial intelligence.`,
+      `Knowledge and enthusiasm for topics related to computer science and responsible AI.`,
       `Displayed interest in computer science through university-level coursework.`,
-      `Proficiency in at least one programming language.`,
+      `Proficiency in at least one programming language, such as R, Python, C++, or Java.`,
       `(Preferred) Previous research experience, or other relevant involvement.`,
       `(Preferred) Background in artificial intelligence.`
     ],
     responsibilities: [
-      `Constantly study the previously mentioned textbook, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
+      `Constantly study the previously mentioned textbook, research papers, and journals. Summarize chapters and sections, and share the essence of what you learn with our research team in a hierarchically organized fashion.`,
       `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week.`,
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
-      `All interactions, task fulfillment, and communications will be remote.`
+      `All interactions, task fulfillment, and communications will be remote. You are expected to fulfill the task assigned promptly.`
     ]
   },
   {
