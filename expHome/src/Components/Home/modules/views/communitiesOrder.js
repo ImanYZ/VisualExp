@@ -646,7 +646,17 @@ export default [
     ],
     YouTube: "sOWCWObstrs",
     description: `Welcome to the Natural Language Processing(NLP) Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different nlp topics by going through selected survey papers selected from A Survey of Surveys project(https://github.com/NiuTrans/ABigSurvey). Our team members will dive into these survey papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
-    accomplishments: `In our research teams, we work on versatile projects, share our ideas, and collaboratively develop research ideas that not only boost our knowledge in deep learning but also give us the possibility to publish research papers in the most prestigious conferences and journals. Recently we completed a knowledge tracing paper and submitted it to SIGCSE, one of the top conferences in computer science education. Our team consists of machine learning enthusiasts and we would be more than happy to share our passion for machine learning and work together with anyone who has a keen interest and qualifications in deep learning.`,
+    accomplishments: (
+      <div>
+        We have recently published:{" "}
+        <a href="https://arxiv.org/pdf/2206.03702.pdf">
+          Wang Z, Zhang G, Lashkarashvili N. 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of
+          Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv preprint
+          arXiv:2206.03702, 2022.
+        </a>{" "}
+        Will appear on Semeval 2022.
+      </div>
+    ),
     gains: [
       `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required.`,
       `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
