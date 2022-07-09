@@ -1135,7 +1135,7 @@ exports.gradeFreeRecall = async (req, res) => {
         // Because there will be multiple places to update this researcher data,
         // we should accumulate all the updates for this researcher to commit them
         // at the end of the transaction.
-        const thisResearcherRef = db.collection("researchers").doc(fullname);
+        const thisResearcherRef = db.collection("researchers").doc(`${fullname}`);
         const thisResearcherDoc = await t.get(thisResearcherRef);
         const thisResearcherData = thisResearcherDoc.data();
         const thisResearcherUpdates = thisResearcherData.projects[project];
@@ -1164,7 +1164,8 @@ exports.gradeFreeRecall = async (req, res) => {
           .where("passage", "==", passageId)
           .where("phrase", "==", phrase);
         const recallGradeDocs = await t.get(recallGradeQuery);
-        const recallGradeRef = db.collection(collName).doc(recallGradeDocs.docs[0].id);
+        console.log('Getting data from recallGrade Doc Id', `${recallGradeDocs.docs[0].id}`)
+        const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
         const recallGradeData = recallGradeDocs.docs[0].data();
         if (!recallGradeData.researchers.includes(fullname)) {
           const recallGradeUpdates = {};
@@ -1190,7 +1191,7 @@ exports.gradeFreeRecall = async (req, res) => {
             // response.
             approved = identified >= 3 || notIdentified >= 3;
             if (approved) {
-              const userRef = db.collection("users").doc(user);
+              const userRef = db.collection("users").doc(`${user}`);
               const userDoc = await t.get(userRef);
               const userData = userDoc.data();
               const userUpdates = {};
@@ -1238,9 +1239,13 @@ exports.gradeFreeRecall = async (req, res) => {
               // a point to each of the researchers who unanimously
               // identified/notIdentified this phrase in this free recall response.
               for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-                const researcherRef = db.collection("researchers").doc(recallGradeData.researchers[fResearcherIdx]);
+                const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
                 const researcherDoc = await t.get(researcherRef);
                 const researcherData = researcherDoc.data();
+                // fetch all the researcher projects and 
+                // check if it has in payload or not.
+                const researcherProjects = Object.keys(researcherData.projects);
+                const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
                   (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
@@ -1249,16 +1254,18 @@ exports.gradeFreeRecall = async (req, res) => {
                   // unanimously identified/notIdentified this phrase in this free
                   // recall response.
                   recallGradeUpdates.approved = approved;
-                  researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
-                    ? researcherData.projects[project].gradingPoints + 0.5
-                    : 0.5;
-                  transactionWrites.push({
-                    type: "update",
-                    refObj: researcherRef,
-                    updateObj: {
-                      projects: researcherData.projects
-                    }
-                  });
+                  if (researcherHasProjectFromPayloadProject) {
+                    researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                      ? researcherData.projects[project].gradingPoints + 0.5
+                      : 0.5;
+                    transactionWrites.push({
+                      type: "update",
+                      refObj: researcherRef,
+                      updateObj: {
+                        projects: researcherData.projects
+                      }
+                    });
+                  }
                 }
                 // If there are exactly 3 researchers who graded the same, but only
                 // this researcher's grade (Yes/No) is different from the majority of
@@ -1267,20 +1274,22 @@ exports.gradeFreeRecall = async (req, res) => {
                   (identified === 3 && !recallGradeData.grades[fResearcherIdx]) ||
                   (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
                 ) {
-                  researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
-                    ? researcherData.projects[project].gradingPoints - 0.5
-                    : -0.5;
-                  researcherData.projects[project].negativeGradingPoints = researcherData.projects[project]
-                    .negativeGradingPoints
-                    ? researcherData.projects[project].negativeGradingPoints + 0.5
-                    : 0.5;
-                  transactionWrites.push({
-                    type: "update",
-                    refObj: researcherRef,
-                    updateObj: {
-                      projects: researcherData.projects
-                    }
-                  });
+                  if (researcherHasProjectFromPayloadProject) {
+                    researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                      ? researcherData.projects[project].gradingPoints - 0.5
+                      : -0.5;
+                    researcherData.projects[project].negativeGradingPoints = researcherData.projects[project]
+                      .negativeGradingPoints
+                      ? researcherData.projects[project].negativeGradingPoints + 0.5
+                      : 0.5;
+                    transactionWrites.push({
+                      type: "update",
+                      refObj: researcherRef,
+                      updateObj: {
+                        projects: researcherData.projects
+                      }
+                    });
+                  }
                 }
               }
               // If the authenticated researcher has graded the same as the majority
@@ -1329,7 +1338,7 @@ exports.gradeFreeRecall = async (req, res) => {
             }
           }
           // Finally, we should create the recallGrades doc for this new grade.
-          //this done variable if for testing if 4 researchers have voted on this
+          // this done variable if for testing if 4 researchers have voted on this
           t.update(recallGradeRef, {
             ...recallGradeUpdates,
             done: recallGradeData.researchersNum >= 3,
@@ -1866,6 +1875,7 @@ exports.remindCalendarInvitations = async context => {
     return null;
   }
 };
+
 // Deprecated
 // exports.updateNotTakenSessions = async (context) => {
 //   try {
