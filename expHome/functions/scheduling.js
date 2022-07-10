@@ -5,6 +5,7 @@ require("dotenv").config();
 const { insertEvent, getEvent, getEvents, deleteEvent, insertLifeLogEvent } = require("./GoogleCalendar");
 
 const { pad2Num } = require("./utils");
+const { toOrdinal } = require("number-to-words");
 
 const createExperimentEvent = async (email, researcher, order, start, end) => {
   const summary = "[1Cademy] UX Research Experiment - " + order + " Session";
@@ -29,21 +30,9 @@ const createExperimentEvent = async (email, researcher, order, start, end) => {
 // Schedule the 3 experiment sessions
 exports.schedule = async (req, res) => {
   try {
-    if (
-      "email" in req.body &&
-      "first" in req.body &&
-      "researcher1st" in req.body &&
-      "second" in req.body &&
-      "researcher2nd" in req.body &&
-      "third" in req.body &&
-      "researcher3rd" in req.body &&
-      "project" in req.body
-    ) {
+    if ("email" in req.body && "sessions" in req.body && "project" in req.body) {
       const events = [];
       const email = req.body.email;
-      const researcher1st = req.body.researcher1st;
-      const researcher2nd = req.body.researcher2nd;
-      const researcher3rd = req.body.researcher3rd;
 
       const projectSpecs = await db.collection("projectSpecs").doc(req.body.project).get();
       if (!projectSpecs.exists) {
@@ -53,27 +42,12 @@ exports.schedule = async (req, res) => {
       // 1 hour / 2 = 30 mins
       const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
-      let order = "1st";
-      let researcher = researcher1st;
-      let start = new Date(req.body.first);
-      // adding slotDuration * number of slots for first session
-      let end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[0] || 2) * 60000);
-      for (let session = 1; session < 4; session++) {
-        if (session === 2) {
-          order = "2nd";
-          researcher = researcher2nd;
-          start = new Date(req.body.second);
-          // adding slotDuration * number of slots for second session
-          end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[1] || 1) * 60000);
-        } else if (session === 3) {
-          order = "3rd";
-          researcher = researcher3rd;
-          start = new Date(req.body.third);
-          // adding slotDuration * number of slots for third session
-          end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[2] || 1) * 60000);
-        }
-
-        const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
+      for (let i = 0; i < req.body.sessions.length; ++i) {
+        const sess = req.body.sessions[i];
+        const start = new Date(sess.startDate);
+        // adding slotDuration * number of slots for the session
+        const end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[i] || 2) * 60000);
+        const eventCreated = await createExperimentEvent(email, sess.researcher, toOrdinal(i + 1), start, end);
         events.push(eventCreated);
       }
       return res.status(200).json({ events });
