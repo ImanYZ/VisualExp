@@ -105,12 +105,9 @@ const FreeRecallGrading = props => {
             setFirstFiveRecallGrades(firstFve);
             const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
             setPassageData(passageDoc.data());
-            console.log(firstFve);
             break;
           }
-
           firstFve.push({ data: recallGradeData, grade: false });
-
         }
       }
       setSubmitting(false);
@@ -135,9 +132,9 @@ const FreeRecallGrading = props => {
       const userData = (await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()).data();
       let passageIdx = 0;
 
-       for (; passageIdx < userData.pConditions.length; passageIdx++) {
-         if (userData.pConditions[passageIdx].passage === firstFiveRecallGrades[0].data.passage) {
-         break;
+      for (; passageIdx < userData.pConditions.length; passageIdx++) {
+        if (userData.pConditions[passageIdx].passage === firstFiveRecallGrades[0].data.passage) {
+          break;
         }
       }
       const freeRecallGradeBulkData = {
@@ -155,6 +152,7 @@ const FreeRecallGrading = props => {
 
       await firebase.idToken();
       await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
+      setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
       setRetrieveNext(oldValue => oldValue + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
