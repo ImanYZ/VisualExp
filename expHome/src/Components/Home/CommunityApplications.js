@@ -1,9 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-
-import Paper from "@mui/material/Paper";
-import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
@@ -17,9 +13,8 @@ import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 import SnackbarComp from "../SnackbarComp";
-import PDFView from "./modules/components/PDFView";
-import { OneKPlusOutlined } from "@mui/icons-material";
 import communitiesOrder from "../Home/modules/views/communitiesOrder";
+
 const applicationsColms = [
   {
     field: "community",
@@ -204,7 +199,8 @@ const CommunityApplications = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [applicationsColumns, setApplicationsColumns] = useState(applicationsColms);
+  const [applicationsColumns, setApplicationsColumns] =
+    useState(applicationsColms);
   const [applications, setApplications] = useState([]);
   const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
@@ -212,8 +208,8 @@ const CommunityApplications = props => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const leading = useRecoilValue(leadingState);
-  let showPortfolio = false;
+  const [showPortfolio, setShowPortfolio] = useState(false);
+
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
       setApplicationsColumns([
@@ -254,15 +250,19 @@ const CommunityApplications = props => {
           communiIdx++
         ) {
           communiIds.push(props.communiIds[communiIdx]);
-          let comm = communitiesOrder.find(elm => elm.id === props.communiIds[communiIdx]);
+          const comm = communitiesOrder.find((elm) => elm.id === props.communiIds[communiIdx]);
           if (comm.portfolio) {
-            showPortfolio = true;
+            setShowPortfolio(true);
           }
         }
+
         if (!showPortfolio) {
-          setApplicationsColumns(applicationsColumns.filter(elem => elem.field != "portfolio"));
+          const filterApplicationCols = applicationsColumns.filter((elem) => elem.field !== "portfolio");
+          setApplicationsColumns(filterApplicationCols);
         }
-        const applicationsQuery = firebase.db.collection("applications").where("communiId", "in", communiIds);
+        const applicationsQuery = firebase.db
+          .collection("applications")
+          .where("communiId", "in", communiIds);
         appliSnapshots.push(
           applicationsQuery.onSnapshot(snapshot => {
             const docChanges = snapshot.docChanges();
