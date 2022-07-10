@@ -208,7 +208,7 @@ const CommunityApplications = props => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [showPortfolio, setShowPortfolio] = useState(false);
+
 
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
@@ -242,6 +242,7 @@ const CommunityApplications = props => {
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
       const appliSnapshots = [];
+      let showPortfolio = false;
       for (let communiBatch = 0; communiBatch < props.communiIds.length / 10; communiBatch++) {
         const communiIds = [];
         for (
@@ -252,10 +253,9 @@ const CommunityApplications = props => {
           communiIds.push(props.communiIds[communiIdx]);
           const comm = communitiesOrder.find((elm) => elm.id === props.communiIds[communiIdx]);
           if (comm.portfolio) {
-            setShowPortfolio(true);
+            showPortfolio = true;
           }
         }
-
         if (!showPortfolio) {
           const filterApplicationCols = applicationsColumns.filter((elem) => elem.field !== "portfolio");
           setApplicationsColumns(filterApplicationCols);
