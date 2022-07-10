@@ -214,8 +214,7 @@ const Auth = props => {
       ) {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
-      nullPassage = passagesDocs[passIdx].id;
-
+      nullPassage = passagesDocs[passIdx]?.id || "";
       let questions;
       for (let { condition, passage } of minPConditions) {
         // eslint-disable-next-line no-loop-func
@@ -259,13 +258,13 @@ const Auth = props => {
         phase: 0,
         step: 1,
         pConditions: minPConditions,
-        currentPCon: minPConditions[0],
+        currentPCon: minPConditions[0] || "",
         nullPassage,
         choices: initChoices,
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       };
-      setPassage(minPConditions[0].passage);
-      setCondition(minPConditions[0].condition);
+      setPassage(minPConditions[0]?.passage);
+      setCondition(minPConditions[0]?.condition);
       setNullPassage(nullPassage);
       setPhase(0);
       setStep(1);

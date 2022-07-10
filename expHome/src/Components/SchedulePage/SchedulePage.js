@@ -15,7 +15,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
-import { toWords } from "number-to-words";
+import { toWords, toOrdinal } from "number-to-words";
 
 import SelectSessions from "./SelectSessions";
 
@@ -103,6 +103,7 @@ const SchedulePage = props => {
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const [selectedSession, setSelectedSession] = useState([]);
   const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
@@ -277,24 +278,21 @@ const SchedulePage = props => {
         const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
         await firebase.batchDelete(scheduleRef);
       }
-      // We randomly pick one of the available researchers in each session and assign them to run this session.
-      responseObj = await axios.post("/schedule", {
+
+      const sessions = selectedSession.map(s => {
+        return {
+          startDate: s,
+          researcher:
+            availableSessions[s.toLocaleString()][
+              // We randomly pick one of the available researchers in each session and assign them to run this session.
+              Math.floor(Math.random() * availableSessions[s.toLocaleString()].length)
+            ]
+        };
+      });
+
+      responseObj = await axios.post("http://localhost:5001/visualexp-5d2c6/us-central1/api/schedule", {
         email: email.toLowerCase(),
-        first: firstSession,
-        researcher1st:
-          availableSessions[firstSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[firstSession.toLocaleString()].length)
-          ],
-        second: secondSession,
-        researcher2nd:
-          availableSessions[secondSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[secondSession.toLocaleString()].length)
-          ],
-        third: thirdSession,
-        researcher3rd:
-          availableSessions[thirdSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[thirdSession.toLocaleString()].length)
-          ],
+        sessions,
         project: userData.project
       });
       errorAlert(responseObj.data);
@@ -305,19 +303,16 @@ const SchedulePage = props => {
           email: email.toLowerCase(),
           session: firebase.firestore.Timestamp.fromDate(session)
         };
-        if (session.getTime() === firstSession.getTime()) {
-          theSession.id = responseObj.data.events[0].data.id;
-          theSession.order = "1st";
-        } else if (session.getTime() === secondSession.getTime()) {
-          theSession.id = responseObj.data.events[1].data.id;
-          theSession.order = "2nd";
-        } else if (session.getTime() === thirdSession.getTime()) {
-          theSession.id = responseObj.data.events[2].data.id;
-          theSession.order = "3rd";
+
+        const sessionIndex = selectedSession.findIndex(s => s.getTime() === session.getTime());
+        if (sessionIndex > -1) {
+          theSession.order = toOrdinal(sessionIndex + 1);
+          theSession.id = responseObj.data.events[sessionIndex].data.id;
         }
         await firebase.batchSet(scheduleRef, theSession);
       }
       await firebase.commitBatch();
+
       setSubmitted(true);
     }
     setIsSubmitting(false);
@@ -325,6 +320,24 @@ const SchedulePage = props => {
 
   const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
 
+  const renderInformation = () => {
+    let infos = [];
+
+    for (let i = 0; i < projectSpecs.numberOfSessions; ++i) {
+      infos.push(
+        <li>
+          <strong>
+            {i + 1}
+            <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup> session
+          </strong>{" "}
+          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter,` : null}
+          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i])}
+        </li>
+      );
+    }
+
+    return infos;
+  };
   return (
     <div id="SchedulePageContainer">
       {submitted ? (
@@ -374,28 +387,7 @@ const SchedulePage = props => {
               <li>
                 Please specify your availability for our three UX experiment sessions <strong>in your timezone</strong>{" "}
                 to satisfy the following criteria:
-                <ul>
-                  <li>
-                    <strong>
-                      1<sup>st</sup> session
-                    </strong>{" "}
-                    {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[0])}
-                  </li>
-                  <li>
-                    <strong>
-                      2<sup>nd</sup> session
-                    </strong>
-                    , {projectSpecs?.daysLater[0] || AppConfig.daysLater[0]} days later,{" "}
-                    {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[1])}
-                  </li>
-                  <li>
-                    <strong>
-                      3<sup>rd</sup> session
-                    </strong>
-                    , {projectSpecs?.daysLater[1] || AppConfig.daysLater[1]} days later,{" "}
-                    {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[1])}
-                  </li>
-                </ul>
+                <ul>{renderInformation()}</ul>
               </li>
               <li>
                 As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
@@ -427,14 +419,11 @@ const SchedulePage = props => {
                   numDays={16}
                   schedule={schedule}
                   setSchedule={setSchedule}
+                  selectedSession={selectedSession}
+                  setSelectedSession={setSelectedSession}
                   availableSessions={availableSessions}
-                  firstSession={firstSession}
-                  secondSession={secondSession}
-                  thirdSession={thirdSession}
-                  setFirstSession={setFirstSession}
-                  setSecondSession={setSecondSession}
-                  setThirdSession={setThirdSession}
                   setSubmitable={setSubmitable}
+                  numberOfSessions={projectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
                   hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
                   sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
                   daysLater={projectSpecs.daysLater || AppConfig.daysLater}

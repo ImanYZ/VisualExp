@@ -91,41 +91,36 @@ const SelectSessions = props => {
       // the user does not select anything or their selection does not
       // satisfy the criteria, we keep the previous values for
       // props.firstSession, props.secondSession, and props.thirdSession.
-      let fSession = null;
-      let sSession = null;
-      let tSession = null;
 
+      let hasAllSessions = true;
+      const sessions = [];
       // 60 / 2 = 30 (mins)
       const slotDuration = 60 / props.hourlyChunks;
-      // firstSlot = the first slot of the first consecutive occurence
-      const firstSlot = consecutiveTimeSlotsExists(orderedSch, props.sessionDuration[0], slotDuration);
-      if (firstSlot) {
-        // filter out all the slots for the second session
-        const schForSecondSession = orderedSch.filter(s => daysLater(firstSlot, s, props.daysLater[0]));
-        // secondSlot = the first slot of the first consecutive occurence in the schForSecondSession
-        const secondSlot = consecutiveTimeSlotsExists(schForSecondSession, props.sessionDuration[1], slotDuration);
-        //if second slot Exists then look for third slot
-        if (secondSlot) {
-          // filter out all the slots for the third session
-          const schForThirdSession = orderedSch.filter(s => daysLater(firstSlot, s, props.daysLater[1]));
-          // thirdSlot = the first slot of the first consecutive occurence in the schForThirdSession
-          const thirdSlot = consecutiveTimeSlotsExists(schForThirdSession, props.sessionDuration[2], slotDuration);
 
-          // if all theree slots exist then we can continue to submit
-          if (thirdSlot) {
-            fSession = firstSlot;
-            sSession = secondSlot;
-            tSession = thirdSlot;
-          }
+      for (let i = 0; i < props.numberOfSessions; ++i) {
+        let session = null;
+        if (i === 0) {
+          // checking the first session
+          session = consecutiveTimeSlotsExists(orderedSch, props.sessionDuration[0], slotDuration);
+        } else {
+          const scheduleForNextDay = orderedSch.filter(s => daysLater(sessions[0], s, props.daysLater[i - 1]));
+          session = consecutiveTimeSlotsExists(scheduleForNextDay, props.sessionDuration[i], slotDuration);
         }
+
+        if (!session) {
+          hasAllSessions = false;
+          break;
+        }
+
+        sessions.push(session);
       }
-      props.setFirstSession(fSession);
-      props.setSecondSession(sSession);
-      props.setThirdSession(tSession);
-      if (sSession && tSession) {
+
+      if (hasAllSessions) {
         props.setSubmitable(true);
+        props.setSelectedSession(sessions);
       } else {
         props.setSubmitable(false);
+        props.setSelectedSession([]);
       }
     }
   }, [props.schedule]);
@@ -142,51 +137,23 @@ const SelectSessions = props => {
     // or third sessions, we check-mark it to show the user which
     // sessions they are going to attend.
 
-    let hasFirstSession = false;
-    let hasSecondSession = false;
-    let hasThirdSession = false;
-
+    let scheduledSession = false;
     if (availableSess) {
-      if (props.firstSession) {
-        for (let i = 0; i < props.sessionDuration[0]; ++i) {
-          const minsToSubtract = (60 / props.hourlyChunks) * i;
-          const check =
-            props.firstSession.getTime() === new Date(datetime.getTime() - minsToSubtract * 60000).getTime();
+      for (let i = 0; i < props.selectedSession.length; ++i) {
+        const sess = props.selectedSession[i];
+        for (let j = 0; j < props.sessionDuration[i]; ++j) {
+          const minsToSubtract = (60 / props.hourlyChunks) * j;
+          const check = sess.getTime() === new Date(datetime.getTime() - minsToSubtract * 60000).getTime();
           if (check) {
-            hasFirstSession = true;
+            scheduledSession = true;
+            break;
           }
         }
-      }
-
-      if (props.secondSession) {
-        for (let i = 0; i < props.sessionDuration[1]; ++i) {
-          const minsToSubtract = (60 / props.hourlyChunks) * i;
-          const check =
-            props.secondSession.getTime() === new Date(datetime.getTime() - minsToSubtract * 60000).getTime();
-          if (check) {
-            hasSecondSession = true;
-          }
-        }
-      }
-
-      if (props.thirdSession) {
-        for (let i = 0; i < props.sessionDuration[2]; ++i) {
-          const minsToSubtract = (60 / props.hourlyChunks) * i;
-          const check =
-            props.thirdSession.getTime() === new Date(datetime.getTime() - minsToSubtract * 60000).getTime();
-          if (check) {
-            hasThirdSession = true;
-          }
-        }
+        //stopping loop from executing further
+        if (scheduledSession) break;
       }
     }
 
-    const scheduledSession = hasFirstSession || hasSecondSession || hasThirdSession;
-    // (props.firstSession &&
-    //   (props.firstSession.getTime() === datetime.getTime() ||
-    //     props.firstSession.getTime() === new Date(datetime.getTime() - 30 * 60000).getTime())) ||
-    // (props.secondSession && props.secondSession.getTime() === datetime.getTime()) ||
-    // (props.thirdSession && props.thirdSession.getTime() === datetime.getTime());
     return (
       <div
         className={
@@ -257,9 +224,7 @@ export default React.memo(SelectSessions, (prevProps, nextProps) => {
     // So, we only rerender this component if the length of schedule changes
     // or any of the other props get changed.
     prevProps.schedule.length === nextProps.schedule.length &&
-    prevProps.firstSession === nextProps.firstSession &&
-    prevProps.secondSession === nextProps.secondSession &&
-    prevProps.thirdSession === nextProps.thirdSession &&
+    prevProps.selectedSession.length === nextProps.selectedSession.length &&
     prevProps.startDate === nextProps.startDate &&
     prevProps.numDays === nextProps.numDays
   );
