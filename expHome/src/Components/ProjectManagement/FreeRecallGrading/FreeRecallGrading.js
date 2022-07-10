@@ -209,8 +209,7 @@ const FreeRecallGrading = props => {
         </p>
 
         {firstFiveRecallGrades?.map((row, index) => (
-<<<<<<< Updated upstream
-          <div>
+          <div key={index}>
             <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
               <Box sx={{ display: "inline", mr: "19px" }}>
                 NO
@@ -219,10 +218,6 @@ const FreeRecallGrading = props => {
               </Box>
               <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
             </Paper>
-=======
-          <div key={index}>
-            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>NO<Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />YES{row.data.phrase}</Paper>
->>>>>>> Stashed changes
           </div>
         ))}
         <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
