@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 
 import axios from "axios";
 
+import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
@@ -101,7 +102,10 @@ const FreeRecallGrading = props => {
               // the authenticated researcher.
               (recallGradeData.researchersNum < 3 || recallGradeData.researchers[2] !== fullname)))
         ) {
-          if ((firstFve.length > 0) && ((firstFve.length === 5) || (recallGradeData.response !== firstFve[0].data.response))) {
+          if (
+            firstFve.length > 0 &&
+            (firstFve.length === 5 || recallGradeData.response !== firstFve[0].data.response)
+          ) {
             setFirstFiveRecallGrades(firstFve);
             const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
             setPassageData(passageDoc.data());
@@ -125,11 +129,13 @@ const FreeRecallGrading = props => {
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
-  const gradeIt = async (event) => {
+  const gradeIt = async event => {
     setSubmitting(true);
     try {
       const phrasesGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
-      const userData = (await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()).data();
+      const userData = (
+        await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()
+      ).data();
       let passageIdx = 0;
 
       for (; passageIdx < userData.pConditions.length; passageIdx++) {
@@ -162,11 +168,11 @@ const FreeRecallGrading = props => {
     }
   };
 
-  const handleGradeChange = (index) => {
+  const handleGradeChange = index => {
     const grades = [...firstFiveRecallGrades];
     grades[index].grade = !firstFiveRecallGrades[index].grade;
     setFirstFiveRecallGrades(grades);
-  }
+  };
 
   return (
     <div id="FreeRecallGrading">
@@ -193,23 +199,30 @@ const FreeRecallGrading = props => {
         </ul>
       </Alert>
       <Paper style={{ paddingBottom: "19px" }}>
+        <p>1- Carefully read this free-recall response:</p>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+          {firstFiveRecallGrades[0]?.data.response}
+        </Paper>
         <p>
-          Please identify whether this participant has mentioned the following key phrases from the original passage:
+          2- Identify whether this participant has mentioned the following key phrases from the original passage in
+          their free-recall response, and then submit your answers:
         </p>
 
         {firstFiveRecallGrades?.map((row, index) => (
           <div>
-
-            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>NO<Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />YES{row.data.phrase}</Paper>
+            <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+              <Box sx={{ display: "inline", mr: "19px" }}>
+                NO
+                <Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />
+                YES
+              </Box>
+              <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
+            </Paper>
           </div>
         ))}
         <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
           {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
         </Button>
-        <p>Here is their free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {firstFiveRecallGrades[0]?.data.response}
-        </Paper>
         <div
           style={{
             display: "flex",
@@ -219,9 +232,7 @@ const FreeRecallGrading = props => {
             position: "relative",
             left: "45%"
           }}
-        >
-
-        </div>
+        ></div>
         <p>The original passage is:</p>
         <Paper
           style={{
