@@ -209,7 +209,7 @@ const FreeRecallGrading = props => {
         </p>
 
         {firstFiveRecallGrades?.map((row, index) => (
-          <div>
+          <div key={index}>
             <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
               <Box sx={{ display: "inline", mr: "19px" }}>
                 NO
