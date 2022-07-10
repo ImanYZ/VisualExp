@@ -51,7 +51,7 @@ const FreeRecallGrading = props => {
   const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [firstFiveRecallGrades, setFirstFiveRecallGrades] = useState([]);
-  const [retrieveNext,setRetrieveNext]=useState(0);
+  const [retrieveNext, setRetrieveNext] = useState(0);
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
@@ -124,7 +124,7 @@ const FreeRecallGrading = props => {
     }
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase,retrieveNext]);
+  }, [firebase, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
@@ -209,7 +209,6 @@ const FreeRecallGrading = props => {
         </p>
 
         {firstFiveRecallGrades?.map((row, index) => (
-<<<<<<< Updated upstream
           <div>
             <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
               <Box sx={{ display: "inline", mr: "19px" }}>
@@ -219,10 +218,6 @@ const FreeRecallGrading = props => {
               </Box>
               <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
             </Paper>
-=======
-          <div key={index}>
-            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>NO<Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />YES{row.data.phrase}</Paper>
->>>>>>> Stashed changes
           </div>
         ))}
         <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
