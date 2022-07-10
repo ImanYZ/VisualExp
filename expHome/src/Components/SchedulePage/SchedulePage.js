@@ -290,7 +290,7 @@ const SchedulePage = props => {
         };
       });
 
-      responseObj = await axios.post("http://localhost:5001/visualexp-5d2c6/us-central1/api/schedule", {
+      responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         sessions,
         project: userData.project
