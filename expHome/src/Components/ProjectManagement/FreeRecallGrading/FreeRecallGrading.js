@@ -41,7 +41,6 @@ const FreeRecallGrading = props => {
   // answer, we should retrive the next free-recall response for them to
   // evaluate. This states helps us signal the useEffect to invoke
   // retrieveFreeRecallResponse.
-  const [retrieveNext, setRetrieveNext] = useState(0);
   // We need to set these states to identify which phrase is assigned to which
   // participant's free-recall response by which researcher, ... to be able to
   // assign these values to the corresponding recallGrades document when
@@ -52,6 +51,7 @@ const FreeRecallGrading = props => {
   const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [firstFiveRecallGrades, setFirstFiveRecallGrades] = useState([]);
+  const [retrieveNext,setRetrieveNext]=useState(0);
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
@@ -124,7 +124,7 @@ const FreeRecallGrading = props => {
     }
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase]);
+  }, [firebase,retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
@@ -209,6 +209,7 @@ const FreeRecallGrading = props => {
         </p>
 
         {firstFiveRecallGrades?.map((row, index) => (
+<<<<<<< Updated upstream
           <div>
             <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
               <Box sx={{ display: "inline", mr: "19px" }}>
@@ -218,6 +219,10 @@ const FreeRecallGrading = props => {
               </Box>
               <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
             </Paper>
+=======
+          <div key={index}>
+            <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>NO<Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />YES{row.data.phrase}</Paper>
+>>>>>>> Stashed changes
           </div>
         ))}
         <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
