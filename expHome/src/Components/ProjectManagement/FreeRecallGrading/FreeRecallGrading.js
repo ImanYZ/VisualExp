@@ -46,20 +46,11 @@ const FreeRecallGrading = props => {
   // assign these values to the corresponding recallGrades document when
   // submitting the researcher's evaluation of this phrase in this free-recall
   // response.
-  // const [user, setUser] = useState(null);
-  // const [condition, setCondition] = useState(null);
   const [passageData, setPassageData] = useState({});
-  // const [passageId, setPassageId] = useState(null);
-  // const [passageIdx, setPassageIdx] = useState(null);
-  // const [session, setSession] = useState(null);
-  // const [phrase, setPhrase] = useState(null);
-  // const [phraseNum, setPhraseNum] = useState(0);
   // const [response, setResponse] = useState(null);
   const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  // const [responseSave, setResponseSave] = useState("");
   const [firstFiveRecallGrades, setFirstFiveRecallGrades] = useState([]);
-  // const [votesRecallGrades, setVotesRecallGrades] = useState([]);
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
@@ -149,7 +140,7 @@ const FreeRecallGrading = props => {
          break;
         }
       }
-      const freeRecallData = {
+      const freeRecallGradeBulkData = {
         fullname,
         project,
         phraseNum: passageData?.phrases?.length,
@@ -162,10 +153,8 @@ const FreeRecallGrading = props => {
         response: firstFiveRecallGrades[0].data.response
       };
 
-      console.log({ freeRecallData });
-
-      // await firebase.idToken();
-      // await axios.post("/gradeFreeRecall", firstFiveRecallGrades);
+      await firebase.idToken();
+      await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
       // Increment retrieveNext to get the next free-recall response to grade.
       setRetrieveNext(oldValue => oldValue + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
