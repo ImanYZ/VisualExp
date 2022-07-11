@@ -187,7 +187,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const session = req.body.session;
       const phraseNum = req.body.phraseNum;
       // const response = req.body.response,
-      await db.runTransaction(async t => {
+      db.runTransaction(async t => {
         // Accumulate all the transaction writes in an array to commit all of them
         // after all the reads to abide by the Firestore transaction law
         // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
@@ -217,10 +217,10 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         // We need to check whether each of the other researchers have identified
         // the phrase in this free-recall response.
         console.log('phrasesWithGrades', phrasesWithGrades);
+        const transactionWrites = [];
         for (let phraseGrade of phrasesWithGrades) {
 
           console.log("=>");
-          const transactionWrites = [];
           const recallGradeQuery = db
             .collection(collName)
             .where("user", "==", user)
@@ -407,25 +407,25 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               }
             });
           }
-          console.log({transactionWrites})
-          for (let transactionWrite of transactionWrites) {
-            if (transactionWrite.type === "update") {
-              t.update(transactionWrite.refObj, transactionWrite.updateObj);
-            } else if (transactionWrite.type === "set") {
-              t.set(transactionWrite.refObj, transactionWrite.updateObj);
-            } else if (transactionWrite.type === "delete") {
-              t.delete(transactionWrite.refObj);
-            }
-          }
 
           console.log("make  ac ommmit");
           // Finally, we should create the recallGrades doc for this new grade.
           // this done variable if for testing if 4 researchers have voted on this
         }
-        // return { phrasesWithGrades }
-      }).then((x) => {
-        console.log('x', x);
-        return res.status(200).json({ successData: x });
+        console.log({ transactionWrites })
+        for (let transactionWrite of transactionWrites) {
+          if (transactionWrite.type === "update") {
+            t.update(transactionWrite.refObj, transactionWrite.updateObj);
+          } else if (transactionWrite.type === "set") {
+            t.set(transactionWrite.refObj, transactionWrite.updateObj);
+          } else if (transactionWrite.type === "delete") {
+            t.delete(transactionWrite.refObj);
+          }
+        }
+      }).then(() => {
+        return res.status(200).json({ success: true, endpoint: 'Bulk Upload' });
+      }).catch((err) => {
+        return res.status(500).json({ errMsg: err.message });
       });
     }
   } catch (err) {
