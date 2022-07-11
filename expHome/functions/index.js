@@ -22,7 +22,6 @@ const {
   assignExperimentSessionsPoints,
   remindCalendarInvitations,
   // updateNotTakenSessions,
-  gradeFreeRecall,
   bulkGradeFreeRecall,
   markPaidEndpoint,
 } = require("./projectManagement");
@@ -85,7 +84,6 @@ app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
-app.post("/gradeFreeRecall", gradeFreeRecall);
 app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 
 // Emailing
