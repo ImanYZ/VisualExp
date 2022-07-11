@@ -226,7 +226,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         const userUpdates = userData;
 
         // researcher references
-        const researcherData = [];
+        const reserchersUpdates = {};
 
 
 
@@ -313,32 +313,31 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                 // a point to each of the researchers who unanimously
                 // identified/notIdentified this phrase in this free recall response.
                 for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-                  const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
-                  const researcherDoc = await t.get(researcherRef);
-                  const researcherData = researcherDoc.data();
+                  if(!(recallGradeData.researchers[fResearcherIdx] in reserchersUpdates)){
+                    const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
+                    const researcherDoc = await t.get(researcherRef);
+                    const researcherData = researcherDoc.data();
+                    reserchersUpdates[recallGradeData.researchers[fResearcherIdx]]=researcherData;
+                  }
+                 
                   // fetch all the researcher projects and 
                   // check if it has in payload or not.
-                  const researcherProjects = Object.keys(researcherData.projects);
+                  const researchersUpdate= reserchersUpdates[recallGradeData.researchers[fResearcherIdx]];
+                  const researcherProjects = Object.keys(researchersUpdate.projects);
                   const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
                   if (
-                    (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
-                    (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
+                    (identified >= 3 && researchersUpdate.grades[fResearcherIdx]) ||
+                    (notIdentified >= 3 && !researchersUpdate.grades[fResearcherIdx])
                   ) {
                     // Approve the recallGrade for all the researchers who
                     // unanimously identified/notIdentified this phrase in this free
                     // recall response.
                     recallGradeUpdates.approved = approved;
                     if (researcherHasProjectFromPayloadProject) {
-                      researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                      researchersUpdate.projects[project].gradingPoints = researchersUpdate.projects[project].gradingPoints
                         ? researcherData.projects[project].gradingPoints + 0.5
                         : 0.5;
-                      transactionWrites.push({
-                        type: "update",
-                        refObj: researcherRef,
-                        updateObj: {
-                          projects: researcherData.projects
-                        }
-                      });
+                        reserchersUpdates[recallGradeData.researchers[fResearcherIdx]] = researchersUpdate;
                     }
                   }
                   // If there are exactly 3 researchers who graded the same, but only
@@ -349,23 +348,18 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                     (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
                   ) {
                     if (researcherHasProjectFromPayloadProject) {
-                      researcherData.projects[project].gradingPoints = researcherData.projects[project].gradingPoints
+                      researchersUpdate.projects[project].gradingPoints = researchersUpdate.projects[project].gradingPoints
                         ? researcherData.projects[project].gradingPoints - 0.5
                         : -0.5;
-                      researcherData.projects[project].negativeGradingPoints = researcherData.projects[project]
+                        researchersUpdate.projects[project].negativeGradingPoints = researchersUpdate.projects[project]
                         .negativeGradingPoints
-                        ? researcherData.projects[project].negativeGradingPoints + 0.5
+                        ? researchersUpdate.projects[project].negativeGradingPoints + 0.5
                         : 0.5;
-                      transactionWrites.push({
-                        type: "update",
-                        refObj: researcherRef,
-                        updateObj: {
-                          projects: researcherData.projects
-                        }
-                      });
+                      reserchersUpdates[recallGradeData.researchers[fResearcherIdx]] = researchersUpdate;
                     }
                   }
-                }
+                
+              }
                 // If the authenticated researcher has graded the same as the majority
                 // of grades:
                 if ((identified >= 3 && phraseGrade.grade) || (notIdentified >= 3 && !phraseGrade.grade)) {
@@ -408,11 +402,18 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           console.log("make  ac ommmit");
           // Finally, we should create the recallGrades doc for this new grade.
           // this done variable if for testing if 4 researchers have voted on this
+        }// for loop ends above
+     
+        
+        for(let obj of Object.keys(reserchersUpdates)){
+          const thisResearcherRef = await db.collection("researchers").doc(`${obj}`);
+          transactionWrites.push({
+            type: "update",
+            refObj: thisResearcherRef,
+            updateObj: reserchersUpdates[obj];
+          });
         }
-
-
-
-        // for loop ends above
+        
         transactionWrites.push({
           type: "update",
           refObj: userRef,
