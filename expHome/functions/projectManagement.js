@@ -161,6 +161,9 @@ const voteFn = async (voter, activity, vote) => {
   }
 };
 
+// This Function is used to vote the phrases in bulk 
+// helps to give the points accordingly to every researcher
+// It updates researcher, reCallGrade and user data accordingly.
 exports.bulkGradeFreeRecall = async (req, res) => {
   if (
     "phrasesWithGrades" in req.body &&
@@ -256,10 +259,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
             // response.
             approved = identified >= 3 || notIdentified >= 3;
             if (approved) {
-              // const userRef = db.collection("users").doc(`${user}`);
-              // const userDoc = await t.get(userRef);
-              // const userData = userDoc.data();
-              // const userUpdates = {};
               // If identified >= 3, we should give the participant their free-recall
               // point.
               if (identified >= 3) {
@@ -282,9 +281,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                 }
                 // The only piece of the user data that should be modified is
                 // pCondition based on the point received.
-                // userUpdates.pConditions = userData.pConditions;
                 let theGrade = 1;
-                // console.log({ userData, userUpdates: userUpdates.pConditions[passageIdx], passageIdx, recallResponse })
                 if (recallResponse && userUpdates.pConditions[passageIdx][recallResponse]) {
                   // We should add up points here because each free recall response
                   // may get multiple points from each of the key phrases identified
@@ -301,7 +298,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               // identified/notIdentified this phrase in this free recall response.
               for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
                 if (!otherResearchersData[recallGradeData.researchers[fResearcherIdx]]) {
-                  console.log('new researcher::::', recallGradeData.researchers[fResearcherIdx]);
+                  console.log('NEW RESEARCHER ADDED::::', recallGradeData.researchers[fResearcherIdx]);
                   const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
                   const researcherDoc = await t.get(researcherRef);
                   const researcherData = researcherDoc.data();
@@ -313,7 +310,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                 const researcherObj = otherResearchersData[recallGradeData.researchers[fResearcherIdx]];
                 const researcherProjects = Object.keys(researcherObj.projects);
                 const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
-                console.log('researcherObj', { recallGradeData });
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
                   (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
@@ -375,7 +371,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           // this done variable if for testing if 4 researchers have voted on this
           transactionWrites.push({
             type: "update",
-            // id: phraseGrade.phrase,
             refObj: recallGradeRef,
             updateObj: {
               ...recallGradeUpdates,
@@ -395,7 +390,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         const researcherRef = await db.collection("researchers").doc(`${researcherId}`);
         transactionWrites.push({
           type: "update",
-          // id: researcherId,
           refObj: researcherRef,
           updateObj: otherResearchersData[researcherId]
         });
@@ -404,7 +398,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       // write user transactions
       transactionWrites.push({
         type: "update",
-        // id: userData.uid,
         refObj: userRef,
         updateObj: userUpdates
       });
@@ -424,7 +417,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       // After accumulating all the updates for the authenticated researcher,
       // now we can update their document's.
       for (let transactionWrite of transactionWrites) {
-        // console.log("transactionWrite:::::", transactionWrite.refObj);
         if (transactionWrite.type === "update") {
           t.update(transactionWrite.refObj, transactionWrite.updateObj);
         } else if (transactionWrite.type === "set") {
@@ -433,7 +425,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           t.delete(transactionWrite.refObj);
         }
       }
-      // return {}
     }).then(() => {
       return res.status(200).json({ success: true, endpoint: 'Bulk Upload', successData: req.body.phrasesWithGrades });
     }).catch((err) => {
@@ -1323,7 +1314,6 @@ exports.loadTimesheetVotes = async (req, res) => {
               return res.status(500).json({ error });
             })
             .on("data", async row => {
-              console.log(rowIdx);
               parser.pause();
               if (row["Date"] && row["Time In"] && row["Time Out"]) {
                 const activityDate = new Date(row["Date"]);
