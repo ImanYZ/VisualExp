@@ -122,6 +122,9 @@ const FreeRecallGrading = props => {
     if (firebase && !notAResearcher && project) {
       retrieveFreeRecallResponse();
     }
+
+    // cleanup function
+    return () => retrieveFreeRecallResponse();
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
   }, [firebase, fullname, notAResearcher, project, retrieveNext]);
@@ -133,8 +136,9 @@ const FreeRecallGrading = props => {
     setSubmitting(true);
     try {
       const phrasesWithGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
-      const userRef = firebase.db.collection("users");
-      const userData = userRef.doc(`${firstFiveRecallGrades[0].data.user}`).get().data();
+      const userData = (
+        await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()
+      ).data();
       let passageIdx = 0;
 
       for (; passageIdx < userData.pConditions.length; passageIdx++) {
