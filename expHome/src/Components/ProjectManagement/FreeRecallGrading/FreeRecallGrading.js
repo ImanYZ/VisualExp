@@ -55,138 +55,117 @@ const FreeRecallGrading = props => {
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
-    console.log("researcherChangeCount==>", props.researcherChangeCount);
-    console.log("firstFiveRecallGrades length==>", firstFiveRecallGrades.length);
-    if (props.researcherChangeCount - 1 === firstFiveRecallGrades.length) {
-      if (firebase && !notAResearcher && project) {
-        console.log("useEffect for the firebase ");
-
-        retrieveFreeRecallResponse();
+    const retrieveFreeRecallResponse = async () => {
+      // recallGrades collection is huge and it's extremely inefficient to
+      // search through it if all the docs for all projects are in the same
+      // collection. Also, when querying them to find the appropriate doc to
+      // show the authenticated researcher to grade, we cannot combine the
+      // where clause on the project and the researchersNum < 4. As a
+      // solution, we separated the collections per project, other than the
+      // H2K2 project that we have already populated the data in and it's very
+      // costly to rename.
+      const firstFve = [];
+      let collName = "recallGrades";
+      if (project !== "H2K2") {
+        collName += project;
       }
+      const recallGradeDocs = await firebase.db
+        .collection(collName)
+        .where("done", "==", false)
+        .orderBy("passage")
+        .orderBy("user")
+        .orderBy("session")
+        .limit(1000)
+        .get();
+
+      if (recallGradeDocs.docs.length === 0) {
+        setFirstFiveRecallGrades([]);
+        return;
+      }
+
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+        const recallGradeData = recallGradeDoc.data();
+
+        if (
+          recallGradeData.user !== fullname &&
+          (recallGradeData.researchersNum === 0 ||
+            // If there is at least one other researcher who graded
+            // this, the 1st researcher should not be the same as
+            // the authenticated researcher.
+            (recallGradeData.researchers[0] !== fullname &&
+              // If there are at least two other researchers who graded
+              // this, the 2nd researcher should not be the same as
+              // the authenticated researcher.
+              (recallGradeData.researchersNum < 2 || recallGradeData.researchers[1] !== fullname) &&
+              // If there are at least three other researchers who graded
+              // this, the 3rd researcher should not be the same as
+              // the authenticated researcher.
+              (recallGradeData.researchersNum < 3 || recallGradeData.researchers[2] !== fullname)))
+        ) {
+          if (
+            firstFve.length > 0 &&
+            (firstFve.length === 5 || recallGradeData.response !== firstFve[0].data.response)
+          ) {
+            setFirstFiveRecallGrades(firstFve);
+            const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
+            setPassageData(passageDoc.data());
+            break;
+          }
+          firstFve.push({ data: recallGradeData, grade: false });
+        }
+      }
+      setSubmitting(false);
+      // ASA we find five free-recall phrases for a particular response
+      // we set this flag to true to stop searching.
+      return null;
+    };
+    if (firebase && !notAResearcher && project) {
+      retrieveFreeRecallResponse();
     }
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [props.researcherChangeCount, firebase]);
-
-  const retrieveFreeRecallResponse = async () => {
-    setFirstFiveRecallGrades([]);
-    console.log("retrieveFreeRecallResponse called");
-    // recallGrades collection is huge and it's extremely inefficient to
-    // search through it if all the docs for all projects are in the same
-    // collection. Also, when querying them to find the appropriate doc to
-    // show the authenticated researcher to grade, we cannot combine the
-    // where clause on the project and the researchersNum < 4. As a
-    // solution, we separated the collections per project, other than the
-    // H2K2 project that we have already populated the data in and it's very
-    // costly to rename.
-    const firstFve = [];
-    let collName = "recallGrades";
-    if (project !== "H2K2") {
-      collName += project;
-    }
-
-    const recallGradesQuery = firebase.db
-      .collection(collName)
-      .where("done", "==", false)
-      .orderBy("passage")
-      .orderBy("user")
-      .orderBy("session")
-      .limit(1000);
-
-    const recallGradeDocs = await firebase.db
-      .collection(collName)
-      .where("done", "==", false)
-      .orderBy("passage")
-      .orderBy("user")
-      .orderBy("session")
-      .limit(1000)
-      .get();
-
-    if (recallGradeDocs.docs.length === 0) {
-      setFirstFiveRecallGrades([]);
-      return;
-    }
-
-    for (let recallGradeDoc of recallGradeDocs.docs) {
-      const recallGradeData = recallGradeDoc.data();
-
-      if (
-        recallGradeData.user !== fullname &&
-        (recallGradeData.researchersNum === 0 ||
-          // If there is at least one other researcher who graded
-          // this, the 1st researcher should not be the same as
-          // the authenticated researcher.
-          (recallGradeData.researchers[0] !== fullname &&
-            // If there are at least two other researchers who graded
-            // this, the 2nd researcher should not be the same as
-            // the authenticated researcher.
-            (recallGradeData.researchersNum < 2 || recallGradeData.researchers[1] !== fullname) &&
-            // If there are at least three other researchers who graded
-            // this, the 3rd researcher should not be the same as
-            // the authenticated researcher.
-            (recallGradeData.researchersNum < 3 || recallGradeData.researchers[2] !== fullname)))
-      ) {
-        if (firstFve.length > 0 && (firstFve.length === 5 || recallGradeData.response !== firstFve[0].data.response)) {
-          setFirstFiveRecallGrades(firstFve);
-          const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
-          setPassageData(passageDoc.data());
-          break;
-        }
-        firstFve.push({ data: recallGradeData, grade: false });
-      }
-    }
-    setSubmitting(false);
-    // ASA we find five free-recall phrases for a particular response
-    // we set this flag to true to stop searching.
-    return null;
-  };
+  }, [firebase, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = async event => {
     setSubmitting(true);
+    try {
+      const phrasesGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
+      const userData = (
+        await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()
+      ).data();
+      let passageIdx = 0;
 
-    const phrasesGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
-    const userData = (await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()).data();
-    let passageIdx = 0;
-
-    for (; passageIdx < userData.pConditions.length; passageIdx++) {
-      if (userData.pConditions[passageIdx].passage === firstFiveRecallGrades[0].data.passage) {
-        break;
-      }
-    }
-    const freeRecallGradeBulkData = {
-      fullname,
-      project,
-      phraseNum: passageData?.phrases?.length,
-      user: firstFiveRecallGrades[0].data.user,
-      passageId: firstFiveRecallGrades[0].data.passage,
-      passageIdx,
-      condition: firstFiveRecallGrades[0].data.condition,
-      phrasesGrades,
-      session: firstFiveRecallGrades[0].data.session,
-      response: firstFiveRecallGrades[0].data.response
-    };
-
-    await firebase.idToken();
-    axios
-      .post("/bulkGradeFreeRecall", freeRecallGradeBulkData)
-      .then(x => {
-        console.log(x);
-        if (x.data.successData) {
-          // Increment retrieveNext to get the next free-recall response to grade.
-
-          setRetrieveNext(oldValue => oldValue + 1);
-
-          props.setResearcherChangeCount(1);
-          setSnackbarMessage("You successfully submitted your evaluation!");
+      for (; passageIdx < userData.pConditions.length; passageIdx++) {
+        if (userData.pConditions[passageIdx].passage === firstFiveRecallGrades[0].data.passage) {
+          break;
         }
-      })
-      .catch(err => {
-        console.error(err);
-        setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
-      });
+      }
+      const freeRecallGradeBulkData = {
+        fullname,
+        project,
+        phraseNum: passageData?.phrases?.length,
+        user: firstFiveRecallGrades[0].data.user,
+        passageId: firstFiveRecallGrades[0].data.passage,
+        passageIdx,
+        condition: firstFiveRecallGrades[0].data.condition,
+        phrasesGrades,
+        session: firstFiveRecallGrades[0].data.session,
+        response: firstFiveRecallGrades[0].data.response
+      };
+
+      await firebase.idToken();
+      await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
+      setSubmitting(false);
+      // Increment retrieveNext to get the next free-recall response to grade.
+      setRetrieveNext(oldValue => oldValue + 1);
+      setSnackbarMessage("You successfully submitted your evaluation!");
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
+    }
   };
 
   const handleGradeChange = index => {
@@ -195,7 +174,7 @@ const FreeRecallGrading = props => {
     setFirstFiveRecallGrades(grades);
   };
 
-  // console.log(retrieveNext);
+  
   return (
     <div id="FreeRecallGrading">
       <Alert severity="success">
@@ -230,19 +209,18 @@ const FreeRecallGrading = props => {
           their free-recall response, and then submit your answers:
         </p>
 
-        {firstFiveRecallGrades?.length > 0 &&
-          firstFiveRecallGrades?.map((row, index) => (
-            <div key={index}>
-              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
-                <Box sx={{ display: "inline", mr: "19px" }}>
-                  NO
-                  <Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />
-                  YES
-                </Box>
-                <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
-              </Paper>
-            </div>
-          ))}
+        {firstFiveRecallGrades?.map((row, index) => (
+          <div key={index}>
+            <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+              <Box sx={{ display: "inline", mr: "19px" }}>
+                NO
+                <Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />
+                YES
+              </Box>
+              <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
+            </Paper>
+          </div>
+        ))}
         <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
           {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
         </Button>
