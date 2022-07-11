@@ -122,17 +122,20 @@ const FreeRecallGrading = props => {
     if (firebase && !notAResearcher && project) {
       retrieveFreeRecallResponse();
     }
+
+    // cleanup function
+    return () => retrieveFreeRecallResponse();
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase, retrieveNext]);
+  }, [firebase, fullname, notAResearcher, project, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
-  const gradeIt = async event => {
+  const gradeIt = async () => {
     setSubmitting(true);
     try {
-      const phrasesGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
+      const phrasesWithGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
       const userData = (
         await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()
       ).data();
@@ -151,7 +154,7 @@ const FreeRecallGrading = props => {
         passageId: firstFiveRecallGrades[0].data.passage,
         passageIdx,
         condition: firstFiveRecallGrades[0].data.condition,
-        phrasesGrades,
+        phrasesWithGrades,
         session: firstFiveRecallGrades[0].data.session,
         response: firstFiveRecallGrades[0].data.response
       };
