@@ -56,7 +56,6 @@ const Activities = props => {
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
-  const [researcherChangeCount, setResearcherChangeCount] = useState(0);
 
   const projectPoints = projectSpecs?.points || {};
 
@@ -74,7 +73,6 @@ const Activities = props => {
         setResearchersChanges(oldResearchersChanges => {
           return [...oldResearchersChanges, ...docChanges];
         });
-        setResearcherChangeCount(oldValue => oldValue + 1);
         console.log("researchersSnapshot");
       });
       console.log("researchersSnapshot useEffect");
@@ -263,9 +261,6 @@ const Activities = props => {
     if (isAdmin && adminPageIndex >= 0) {
       return AdminAccessPages[adminPageIndex]?.view;
     } else if (commonPageIndex >= 0) {
-      if (CommonPages[commonPageIndex].page === 'FreeRecallGrading') {
-        return <FreeRecallGrading researcherChangeCount={researcherChangeCount} setResearcherChangeCount={setResearcherChangeCount} />;;
-      }
       return CommonPages[commonPageIndex]?.view;
     }
     return null;
