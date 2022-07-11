@@ -199,8 +199,7 @@ const CommunityApplications = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [applicationsColumns, setApplicationsColumns] =
-    useState(applicationsColms);
+  const [applicationsColumns, setApplicationsColumns] = useState(applicationsColms);
   const [applications, setApplications] = useState([]);
   const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
@@ -208,7 +207,6 @@ const CommunityApplications = props => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
 
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
@@ -251,18 +249,16 @@ const CommunityApplications = props => {
           communiIdx++
         ) {
           communiIds.push(props.communiIds[communiIdx]);
-          const comm = communitiesOrder.find((elm) => elm.id === props.communiIds[communiIdx]);
+          const comm = communitiesOrder.find(elm => elm.id === props.communiIds[communiIdx]);
           if (comm.portfolio) {
             showPortfolio = true;
           }
         }
         if (!showPortfolio) {
-          const filterApplicationCols = applicationsColumns.filter((elem) => elem.field !== "portfolio");
+          const filterApplicationCols = applicationsColumns.filter(elem => elem.field !== "portfolio");
           setApplicationsColumns(filterApplicationCols);
         }
-        const applicationsQuery = firebase.db
-          .collection("applications")
-          .where("communiId", "in", communiIds);
+        const applicationsQuery = firebase.db.collection("applications").where("communiId", "in", communiIds);
         appliSnapshots.push(
           applicationsQuery.onSnapshot(snapshot => {
             const docChanges = snapshot.docChanges();
