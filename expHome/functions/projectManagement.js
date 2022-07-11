@@ -218,6 +218,19 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         // the phrase in this free-recall response.
         console.log('phrasesWithGrades', phrasesWithGrades);
         const transactionWrites = [];
+        
+        // user references
+        const userRef = db.collection("users").doc(`${user}`);
+        const userDoc = await t.get(userRef);
+        const userData = userDoc.data();
+        const userUpdates = userData;
+
+        // researcher references
+        const researcherData = [];
+
+
+
+        // phraseGrade loop
         for (let phraseGrade of phrasesWithGrades) {
 
           console.log("=>");
@@ -256,10 +269,10 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               // response.
               approved = identified >= 3 || notIdentified >= 3;
               if (approved) {
-                const userRef = db.collection("users").doc(`${user}`);
-                const userDoc = await t.get(userRef);
-                const userData = userDoc.data();
-                const userUpdates = {};
+                // const userRef = db.collection("users").doc(`${user}`);
+                // const userDoc = await t.get(userRef);
+                // const userData = userDoc.data();
+                // const userUpdates = {};
                 // If identified >= 3, we should give the participant their free-recall
                 // point.
                 if (identified >= 3) {
@@ -282,7 +295,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   }
                   // The only piece of the user data that should be modified is
                   // pCondition based on the point received.
-                  userUpdates.pConditions = userData.pConditions;
+                  // userUpdates.pConditions = userData.pConditions;
                   let theGrade = 1;
                   // console.log({ userData, userUpdates: userUpdates.pConditions[passageIdx], passageIdx, recallResponse })
                   if (recallResponse && userUpdates.pConditions[passageIdx][recallResponse]) {
@@ -295,11 +308,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   // Depending on how many key phrases were in the passage, we should
                   // calculate the free-recall response ratio.
                   userUpdates.pConditions[passageIdx][recallResponse + "Ratio"] = theGrade / phraseNum;
-                  transactionWrites.push({
-                    type: "update",
-                    refObj: userRef,
-                    updateObj: userUpdates
-                  });
                 }
                 // For both identified >= 3 AND notIdentified >= 3 cases, we should give
                 // a point to each of the researchers who unanimously
@@ -386,16 +394,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
             // now we can update their document.
             transactionWrites.push({
               type: "update",
-              refObj: thisResearcherRef,
-              updateObj: {
-                projects: {
-                  ...thisResearcherData.projects,
-                  [project]: thisResearcherUpdates
-                }
-              }
-            });
-            transactionWrites.push({
-              type: "update",
               refObj: recallGradeRef,
               updateObj: {
                 ...recallGradeUpdates,
@@ -407,11 +405,29 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               }
             });
           }
-
           console.log("make  ac ommmit");
           // Finally, we should create the recallGrades doc for this new grade.
           // this done variable if for testing if 4 researchers have voted on this
         }
+
+
+
+        // for loop ends above
+        transactionWrites.push({
+          type: "update",
+          refObj: userRef,
+          updateObj: userUpdates
+        });
+        transactionWrites.push({
+          type: "update",
+          refObj: thisResearcherRef,
+          updateObj: {
+            projects: {
+              ...thisResearcherData.projects,
+              [project]: thisResearcherUpdates
+            }
+          }
+        });
         console.log({ transactionWrites })
         for (let transactionWrite of transactionWrites) {
           if (transactionWrite.type === "update") {
