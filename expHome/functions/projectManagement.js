@@ -1295,87 +1295,87 @@ exports.voteInstructorReset = async (req, res) => {
 //   return res.status(500).json({ done: true });
 // };
 
-exports.loadTimesheetVotes = async (req, res) => {
-  try {
-    const project = "H2K2";
-    let researcherIdx = 0;
-    let preResearcherIdx = -1;
-    const researcherInterval = setInterval(() => {
-      if (researcherIdx < researchers.length) {
-        if (preResearcherIdx !== researcherIdx) {
-          preResearcherIdx = researcherIdx;
-          const fullname = researchers[researcherIdx].fullname;
-          let rowIdx = 0;
-          const ws = fs.createReadStream("datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " + fullname + ".csv");
-          const parser = csv
-            .parseStream(ws, { headers: true })
-            .on("error", error => {
-              console.error(error);
-              return res.status(500).json({ error });
-            })
-            .on("data", async row => {
-              parser.pause();
-              if (row["Date"] && row["Time In"] && row["Time Out"]) {
-                const activityDate = new Date(row["Date"]);
-                const startTime = new Date(row["Date"] + " " + row["Time In"] + ":00");
-                const endTime = new Date(row["Date"] + " " + row["Time Out"] + ":00");
-                const timeStamps = getIn30Minutes(startTime, endTime);
-                for (let { sTime, eTime } of timeStamps) {
-                  const { sTimestamp, eTimestamp } = getActivityTimeStamps(activityDate, sTime, eTime);
-                  const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-                  const activityRef = db.collection("activities").doc();
-                  const docObj = {
-                    fullname,
-                    project,
-                    sTime: sTimestamp,
-                    eTime: eTimestamp,
-                    description: row["Description"],
-                    tags: [],
-                    upVotes: 0,
-                    createdAt: currentTime
-                  };
-                  await activityRef.set(docObj);
-                  const activityLogRef = db.collection("activityLog").doc();
-                  await activityLogRef.set({ docObj });
-                  for (let researcher of researchers) {
-                    if (researcher.fullname in row && strToBoolean(row[researcher.fullname])) {
-                      await vote(researcher.fullname, activityRef.id, "upVote");
-                    }
-                  }
-                }
-              }
-              rowIdx += 1;
-              parser.resume();
-            })
-            .on("end", async row => {
-              const endInterval = setInterval(() => {
-                if (rowIdx >= 970) {
-                  clearInterval(endInterval);
-                  setTimeout(async () => {
-                    rowIdx = 0;
-                    setTimeout(() => {
-                      researcherIdx += 1;
-                    }, 4000);
-                  }, 1000);
-                }
-              }, 1000);
-            });
-        }
-      } else {
-        clearInterval(researcherInterval);
-      }
-    }, 1000);
-  } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ errMsg: err.message });
-  }
-  return res.status(500).json({ done: true });
-};
+// exports.loadTimesheetVotes = async (req, res) => {
+//   try {
+//     const project = "H2K2";
+//     let researcherIdx = 0;
+//     let preResearcherIdx = -1;
+//     const researcherInterval = setInterval(() => {
+//       if (researcherIdx < researchers.length) {
+//         if (preResearcherIdx !== researcherIdx) {
+//           preResearcherIdx = researcherIdx;
+//           const fullname = researchers[researcherIdx].fullname;
+//           let rowIdx = 0;
+//           const ws = fs.createReadStream("datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " + fullname + ".csv");
+//           const parser = csv
+//             .parseStream(ws, { headers: true })
+//             .on("error", error => {
+//               console.error(error);
+//               return res.status(500).json({ error });
+//             })
+//             .on("data", async row => {
+//               console.log(rowIdx);
+//               parser.pause();
+//               if (row["Date"] && row["Time In"] && row["Time Out"]) {
+//                 const activityDate = new Date(row["Date"]);
+//                 const startTime = new Date(row["Date"] + " " + row["Time In"] + ":00");
+//                 const endTime = new Date(row["Date"] + " " + row["Time Out"] + ":00");
+//                 const timeStamps = getIn30Minutes(startTime, endTime);
+//                 for (let { sTime, eTime } of timeStamps) {
+//                   const { sTimestamp, eTimestamp } = getActivityTimeStamps(activityDate, sTime, eTime);
+//                   const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+//                   const activityRef = db.collection("activities").doc();
+//                   const docObj = {
+//                     fullname,
+//                     project,
+//                     sTime: sTimestamp,
+//                     eTime: eTimestamp,
+//                     description: row["Description"],
+//                     tags: [],
+//                     upVotes: 0,
+//                     createdAt: currentTime
+//                   };
+//                   await activityRef.set(docObj);
+//                   const activityLogRef = db.collection("activityLog").doc();
+//                   await activityLogRef.set({ docObj });
+//                   for (let researcher of researchers) {
+//                     if (researcher.fullname in row && strToBoolean(row[researcher.fullname])) {
+//                       await vote(researcher.fullname, activityRef.id, "upVote");
+//                     }
+//                   }
+//                 }
+//               }
+//               rowIdx += 1;
+//               parser.resume();
+//             })
+//             .on("end", async row => {
+//               const endInterval = setInterval(() => {
+//                 if (rowIdx >= 970) {
+//                   clearInterval(endInterval);
+//                   setTimeout(async () => {
+//                     rowIdx = 0;
+//                     setTimeout(() => {
+//                       researcherIdx += 1;
+//                     }, 4000);
+//                   }, 1000);
+//                 }
+//               }, 1000);
+//             });
+//         }
+//       } else {
+//         clearInterval(researcherInterval);
+//       }
+//     }, 1000);
+//   } catch (err) {
+//     console.log({ err });
+//     return res.status(500).json({ errMsg: err.message });
+//   }
+//   return res.status(500).json({ done: true });
+// };
 
 // Clicking the Yes or No buttons in FreeRecallGrading.js under
 // ProjectManagement would trigger this function. grade can be either true,
 // meaning the researcher responded Yes, or false if they responded No.
-
 
 exports.assignExperimentSessionsPoints = async context => {
   try {
