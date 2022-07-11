@@ -201,7 +201,9 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
           const thisResearcherUpdates = thisResearcherData.projects[project];
           // The very first update we need to apply is to increment the number of
           // times they have graded a free-recall response.
-          thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum ? thisResearcherUpdates.gradingNum + 1 : 1;
+          thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum
+            ? thisResearcherUpdates.gradingNum + 1
+            : 1;
           // recallGrades collection is huge and it's extremely inefficient to
           // search through it if all the docs for all projects are in the same
           // collection. Also, when querying them to find the appropriate doc to
@@ -224,7 +226,7 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
             .where("passage", "==", passageId)
             .where("phrase", "==", phrase);
           const recallGradeDocs = await t.get(recallGradeQuery);
-          console.log('Getting data from recallGrade Doc Id', `${recallGradeDocs.docs[0].id}`)
+          console.log("Getting data from recallGrade Doc Id", `${recallGradeDocs.docs[0].id}`);
           const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
           const recallGradeData = recallGradeDocs.docs[0].data();
           if (!recallGradeData.researchers.includes(fullname)) {
@@ -300,10 +302,12 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
                 // a point to each of the researchers who unanimously
                 // identified/notIdentified this phrase in this free recall response.
                 for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-                  const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
+                  const researcherRef = db
+                    .collection("researchers")
+                    .doc(`${recallGradeData.researchers[fResearcherIdx]}`);
                   const researcherDoc = await t.get(researcherRef);
                   const researcherData = researcherDoc.data();
-                  // fetch all the researcher projects and 
+                  // fetch all the researcher projects and
                   // check if it has in payload or not.
                   const researcherProjects = Object.keys(researcherData.projects);
                   const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
@@ -416,7 +420,7 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
       reject(new Error(err.message));
     }
   });
-}
+};
 
 exports.voteEndpoint = async (req, res) => {
   try {
@@ -1278,83 +1282,83 @@ exports.voteInstructorReset = async (req, res) => {
 //   return res.status(500).json({ done: true });
 // };
 
-exports.loadTimesheetVotes = async (req, res) => {
-  try {
-    const project = "H2K2";
-    let researcherIdx = 0;
-    let preResearcherIdx = -1;
-    const researcherInterval = setInterval(() => {
-      if (researcherIdx < researchers.length) {
-        if (preResearcherIdx !== researcherIdx) {
-          preResearcherIdx = researcherIdx;
-          const fullname = researchers[researcherIdx].fullname;
-          let rowIdx = 0;
-          const ws = fs.createReadStream("datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " + fullname + ".csv");
-          const parser = csv
-            .parseStream(ws, { headers: true })
-            .on("error", error => {
-              console.error(error);
-              return res.status(500).json({ error });
-            })
-            .on("data", async row => {
-              console.log(rowIdx);
-              parser.pause();
-              if (row["Date"] && row["Time In"] && row["Time Out"]) {
-                const activityDate = new Date(row["Date"]);
-                const startTime = new Date(row["Date"] + " " + row["Time In"] + ":00");
-                const endTime = new Date(row["Date"] + " " + row["Time Out"] + ":00");
-                const timeStamps = getIn30Minutes(startTime, endTime);
-                for (let { sTime, eTime } of timeStamps) {
-                  const { sTimestamp, eTimestamp } = getActivityTimeStamps(activityDate, sTime, eTime);
-                  const currentTime = admin.firestore.Timestamp.fromDate(new Date());
-                  const activityRef = db.collection("activities").doc();
-                  const docObj = {
-                    fullname,
-                    project,
-                    sTime: sTimestamp,
-                    eTime: eTimestamp,
-                    description: row["Description"],
-                    tags: [],
-                    upVotes: 0,
-                    createdAt: currentTime
-                  };
-                  await activityRef.set(docObj);
-                  const activityLogRef = db.collection("activityLog").doc();
-                  await activityLogRef.set({ docObj });
-                  for (let researcher of researchers) {
-                    if (researcher.fullname in row && strToBoolean(row[researcher.fullname])) {
-                      await vote(researcher.fullname, activityRef.id, "upVote");
-                    }
-                  }
-                }
-              }
-              rowIdx += 1;
-              parser.resume();
-            })
-            .on("end", async row => {
-              const endInterval = setInterval(() => {
-                if (rowIdx >= 970) {
-                  clearInterval(endInterval);
-                  setTimeout(async () => {
-                    rowIdx = 0;
-                    setTimeout(() => {
-                      researcherIdx += 1;
-                    }, 4000);
-                  }, 1000);
-                }
-              }, 1000);
-            });
-        }
-      } else {
-        clearInterval(researcherInterval);
-      }
-    }, 1000);
-  } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ errMsg: err.message });
-  }
-  return res.status(500).json({ done: true });
-};
+// exports.loadTimesheetVotes = async (req, res) => {
+//   try {
+//     const project = "H2K2";
+//     let researcherIdx = 0;
+//     let preResearcherIdx = -1;
+//     const researcherInterval = setInterval(() => {
+//       if (researcherIdx < researchers.length) {
+//         if (preResearcherIdx !== researcherIdx) {
+//           preResearcherIdx = researcherIdx;
+//           const fullname = researchers[researcherIdx].fullname;
+//           let rowIdx = 0;
+//           const ws = fs.createReadStream("datasets/Linear, Hybrid, or Non-linear Knowledge RCT - " + fullname + ".csv");
+//           const parser = csv
+//             .parseStream(ws, { headers: true })
+//             .on("error", error => {
+//               console.error(error);
+//               return res.status(500).json({ error });
+//             })
+//             .on("data", async row => {
+//               console.log(rowIdx);
+//               parser.pause();
+//               if (row["Date"] && row["Time In"] && row["Time Out"]) {
+//                 const activityDate = new Date(row["Date"]);
+//                 const startTime = new Date(row["Date"] + " " + row["Time In"] + ":00");
+//                 const endTime = new Date(row["Date"] + " " + row["Time Out"] + ":00");
+//                 const timeStamps = getIn30Minutes(startTime, endTime);
+//                 for (let { sTime, eTime } of timeStamps) {
+//                   const { sTimestamp, eTimestamp } = getActivityTimeStamps(activityDate, sTime, eTime);
+//                   const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+//                   const activityRef = db.collection("activities").doc();
+//                   const docObj = {
+//                     fullname,
+//                     project,
+//                     sTime: sTimestamp,
+//                     eTime: eTimestamp,
+//                     description: row["Description"],
+//                     tags: [],
+//                     upVotes: 0,
+//                     createdAt: currentTime
+//                   };
+//                   await activityRef.set(docObj);
+//                   const activityLogRef = db.collection("activityLog").doc();
+//                   await activityLogRef.set({ docObj });
+//                   for (let researcher of researchers) {
+//                     if (researcher.fullname in row && strToBoolean(row[researcher.fullname])) {
+//                       await vote(researcher.fullname, activityRef.id, "upVote");
+//                     }
+//                   }
+//                 }
+//               }
+//               rowIdx += 1;
+//               parser.resume();
+//             })
+//             .on("end", async row => {
+//               const endInterval = setInterval(() => {
+//                 if (rowIdx >= 970) {
+//                   clearInterval(endInterval);
+//                   setTimeout(async () => {
+//                     rowIdx = 0;
+//                     setTimeout(() => {
+//                       researcherIdx += 1;
+//                     }, 4000);
+//                   }, 1000);
+//                 }
+//               }, 1000);
+//             });
+//         }
+//       } else {
+//         clearInterval(researcherInterval);
+//       }
+//     }, 1000);
+//   } catch (err) {
+//     console.log({ err });
+//     return res.status(500).json({ errMsg: err.message });
+//   }
+//   return res.status(500).json({ done: true });
+// };
 
 // Clicking the Yes or No buttons in FreeRecallGrading.js under
 // ProjectManagement would trigger this function. grade can be either true,
@@ -1383,28 +1387,28 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     phraseNum: req.body.phraseNum,
     condition: req.body.condition,
     session: req.body.session,
-    response: req.body.response,
+    response: req.body.response
   }));
   const recallGradesPromises =
     Array.isArray(newRecallGradeArrays) &&
     newRecallGradeArrays?.map(
-      (recallObj) =>
+      recallObj =>
         new Promise(resolve => {
-          voteFreeRecallGradePhrase({ body: recallObj }).then((x) =>
-            resolve(x),
-          ).catch(err => {
-            return res.status(500).json({ errMsg: err.message });
-          });
-        }),
+          voteFreeRecallGradePhrase({ body: recallObj })
+            .then(x => resolve(x))
+            .catch(err => {
+              return res.status(500).json({ errMsg: err.message });
+            });
+        })
     );
-    try {
-      successData = await Promise.all(recallGradesPromises);
-    } catch (err) {
-      return res.status(500).json({ errMsg: err.message });
-    }
+  try {
+    successData = await Promise.all(recallGradesPromises);
+  } catch (err) {
+    return res.status(500).json({ errMsg: err.message });
+  }
 
   return res.status(200).json({ successData });
-}
+};
 
 exports.assignExperimentSessionsPoints = async context => {
   try {
