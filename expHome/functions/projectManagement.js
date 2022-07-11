@@ -161,61 +161,63 @@ const voteFn = async (voter, activity, vote) => {
   }
 };
 
-exports.bulkGradeFreeRecall = async (req,res) => {
-try{
+exports.bulkGradeFreeRecall = async (req, res) => {
+  try {
+    // console.log('::::::::::::',req.body)
 
-  if(
-  "phrasesWithGrades" in req.body &&
-  "fullname" in req.body &&
-  "project" in req.body &&
-  "user" in req.body &&
-  "passageId" in req.body &&
-  "passageIdx" in req.body &&
-  "condition" in req.body &&
-  "session" in req.body &&
-  "phraseNum" in req.body &&
-  "response" in req.body){
+    if (
+      "phrasesWithGrades" in req.body &&
+      "fullname" in req.body &&
+      "project" in req.body &&
+      "user" in req.body &&
+      "passageId" in req.body &&
+      "passageIdx" in req.body &&
+      "condition" in req.body &&
+      "session" in req.body &&
+      "phraseNum" in req.body &&
+      "response" in req.body) {
       console.log("here");
-        const phrasesWithGrades = req.body.phrasesGrades;
-        const fullname = req.body.fullname;
-        const project = req.body.project;
-        const user = req.body.user;
-        const condition = req.body.condition;
-        const passageId = req.body.passageId;
-        const passageIdx = req.body.passageIdx;
-        const session = req.body.session;
-        const phraseNum = req.body.phraseNum;
-        // const response = req.body.response,
-        await db.runTransaction(async t => {
-              // Accumulate all the transaction writes in an array to commit all of them
-          // after all the reads to abide by the Firestore transaction law
-          // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
-          
-          // Because there will be multiple places to update this researcher data,
-          // we should accumulate all the updates for this researcher to commit them
-          // at the end of the transaction.
-          const thisResearcherRef = db.collection("researchers").doc(`${fullname}`);
-          const thisResearcherDoc = await t.get(thisResearcherRef);
-          const thisResearcherData = thisResearcherDoc.data();
-          const thisResearcherUpdates = thisResearcherData.projects[project];
-          // The very first update we need to apply is to increment the number of
-          // times they have graded a free-recall response.
-          thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum ? thisResearcherUpdates.gradingNum + 1 : 1;
-          // recallGrades collection is huge and it's extremely inefficient to
-          // search through it if all the docs for all projects are in the same
-          // collection. Also, when querying them to find the appropriate doc to
-          // show the authenticated researcher to grade, we cannot combine the
-          // where clause on the project and the researchersNum < 4. As a
-          // solution, we separated the collections per project, other than the
-          // H2K2 project that we have already populated the data in and it's very
-          // costly to rename.
-          let collName = "recallGrades";
-          if (project !== "H2K2") {
-            collName += project;
-          }
-          // We need to check whether each of the other researchers have identified
-          // the phrase in this free-recall response.
-        for(let phraseGrade of phrasesWithGrades){
+      const phrasesWithGrades = req.body.phrasesWithGrades;
+      const fullname = req.body.fullname;
+      const project = req.body.project;
+      const user = req.body.user;
+      const condition = req.body.condition;
+      const passageId = req.body.passageId;
+      const passageIdx = req.body.passageIdx;
+      const session = req.body.session;
+      const phraseNum = req.body.phraseNum;
+      // const response = req.body.response,
+      await db.runTransaction(async t => {
+        // Accumulate all the transaction writes in an array to commit all of them
+        // after all the reads to abide by the Firestore transaction law
+        // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
+
+        // Because there will be multiple places to update this researcher data,
+        // we should accumulate all the updates for this researcher to commit them
+        // at the end of the transaction.
+        const thisResearcherRef = await db.collection("researchers").doc(`${fullname}`);
+        const thisResearcherDoc = await t.get(thisResearcherRef);
+        const thisResearcherData = thisResearcherDoc.data();
+        const thisResearcherUpdates = thisResearcherData.projects[project];
+        // The very first update we need to apply is to increment the number of
+        // times they have graded a free-recall response.
+        thisResearcherUpdates.gradingNum = thisResearcherUpdates.gradingNum ? thisResearcherUpdates.gradingNum + 1 : 1;
+        // recallGrades collection is huge and it's extremely inefficient to
+        // search through it if all the docs for all projects are in the same
+        // collection. Also, when querying them to find the appropriate doc to
+        // show the authenticated researcher to grade, we cannot combine the
+        // where clause on the project and the researchersNum < 4. As a
+        // solution, we separated the collections per project, other than the
+        // H2K2 project that we have already populated the data in and it's very
+        // costly to rename.
+        let collName = "recallGrades";
+        if (project !== "H2K2") {
+          collName += project;
+        }
+        // We need to check whether each of the other researchers have identified
+        // the phrase in this free-recall response.
+        console.log('phrasesWithGrades', phrasesWithGrades);
+        for (let phraseGrade of phrasesWithGrades) {
 
           console.log("=>");
           const transactionWrites = [];
@@ -228,7 +230,7 @@ try{
             .where("phrase", "==", phraseGrade.phrase);
           const recallGradeDocs = await t.get(recallGradeQuery);
           console.log('Getting data from recallGrade Doc Id', `${recallGradeDocs.docs[0].id}`)
-          const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
+          const recallGradeRef = await db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
           const recallGradeData = recallGradeDocs.docs[0].data();
           if (!recallGradeData.researchers.includes(fullname)) {
             const recallGradeUpdates = {};
@@ -358,7 +360,7 @@ try{
                 }
                 // If the authenticated researcher has graded the same as the majority
                 // of grades:
-                if ((identified >= 3 && grade) || (notIdentified >= 3 && !grade)) {
+                if ((identified >= 3 && phraseGrade.grade) || (notIdentified >= 3 && !phraseGrade.grade)) {
                   // Because it's approved, we should also give the authenticated
                   // researcher a point. We should update thisResearcherUpdates and
                   // commit all the updates at the end to their document.
@@ -370,7 +372,7 @@ try{
                 // authenticated researcher's grade (Yes/No) is different from the
                 // majority of grades; we should give the the authenticated researcher a
                 // negative point.
-                else if ((identified === 3 && !grade) || (notIdentified === 3 && grade)) {
+                else if ((identified === 3 && !phraseGrade.grade) || (notIdentified === 3 && phraseGrade.grade)) {
                   thisResearcherUpdates.gradingPoints = thisResearcherUpdates.gradingPoints
                     ? thisResearcherUpdates.gradingPoints - 0.5
                     : -0.5;
@@ -393,18 +395,19 @@ try{
               }
             });
             transactionWrites.push({
-              type:"update",
-              refObj:recallGradeRef,
-              updateObj:{
+              type: "update",
+              refObj: recallGradeRef,
+              updateObj: {
                 ...recallGradeUpdates,
                 done: recallGradeData.researchersNum >= 3,
                 researchers: [...recallGradeData.researchers, fullname],
-                grades: [...recallGradeData.grades, grade],
+                grades: [...recallGradeData.grades, phraseGrade.grade],
                 researchersNum: recallGradeData.researchersNum + 1,
                 updatedAt: admin.firestore.Timestamp.fromDate(new Date())
               }
-            })
+            });
           }
+          console.log({transactionWrites})
           for (let transactionWrite of transactionWrites) {
             if (transactionWrite.type === "update") {
               t.update(transactionWrite.refObj, transactionWrite.updateObj);
@@ -414,17 +417,21 @@ try{
               t.delete(transactionWrite.refObj);
             }
           }
-          console.log("make  ac ommmit");
-            // Finally, we should create the recallGrades doc for this new grade.
-            // this done variable if for testing if 4 researchers have voted on this
-        }
-    
-         
-        });
-}}catch(err){
-  return res.status(500).json({ errMsg: err.message });
-}
 
+          console.log("make  ac ommmit");
+          // Finally, we should create the recallGrades doc for this new grade.
+          // this done variable if for testing if 4 researchers have voted on this
+        }
+        // return { phrasesWithGrades }
+      }).then((x) => {
+        console.log('x', x);
+        return res.status(200).json({ successData: x });
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({ errMsg: err.message });
+  }
+  return res.status(200).json({ done: true });
 }
 
 
