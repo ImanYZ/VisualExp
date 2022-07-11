@@ -161,37 +161,36 @@ const voteFn = async (voter, activity, vote) => {
   }
 };
 
-const voteFreeRecallGradePhrase = async ({ body }) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      if (
-        "grade" in body &&
-        "fullname" in body &&
-        "project" in body &&
-        "user" in body &&
-        "passageId" in body &&
-        "passageIdx" in body &&
-        "condition" in body &&
-        "phrase" in body &&
-        "session" in body &&
-        "phraseNum" in body &&
-        "response" in body
-      ) {
-        const grade = body.grade;
-        const fullname = body.fullname;
-        const project = body.project;
-        const user = body.user;
-        const condition = body.condition;
-        const passageId = body.passageId;
-        const passageIdx = body.passageIdx;
-        const phrase = body.phrase;
-        const session = body.session;
-        const phraseNum = body.phraseNum;
+exports.bulkGradeFreeRecall = async (req,res) => {
+try{
+
+  if(
+  "phrasesWithGrades" in req.body &&
+  "fullname" in req.body &&
+  "project" in req.body &&
+  "user" in req.body &&
+  "passageId" in req.body &&
+  "passageIdx" in req.body &&
+  "condition" in req.body &&
+  "session" in req.body &&
+  "phraseNum" in req.body &&
+  "response" in req.body){
+      console.log("here");
+        const phrasesWithGrades = req.body.phrasesGrades;
+        const fullname = req.body.fullname;
+        const project = req.body.project;
+        const user = req.body.user;
+        const condition = req.body.condition;
+        const passageId = req.body.passageId;
+        const passageIdx = req.body.passageIdx;
+        const session = req.body.session;
+        const phraseNum = req.body.phraseNum;
+        // const response = req.body.response,
         await db.runTransaction(async t => {
-          // Accumulate all the transaction writes in an array to commit all of them
+              // Accumulate all the transaction writes in an array to commit all of them
           // after all the reads to abide by the Firestore transaction law
           // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
-          const transactionWrites = [];
+          
           // Because there will be multiple places to update this researcher data,
           // we should accumulate all the updates for this researcher to commit them
           // at the end of the transaction.
@@ -216,13 +215,17 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
           }
           // We need to check whether each of the other researchers have identified
           // the phrase in this free-recall response.
+        for(let phraseGrade of phrasesWithGrades){
+
+          console.log("=>");
+          const transactionWrites = [];
           const recallGradeQuery = db
             .collection(collName)
             .where("user", "==", user)
             .where("session", "==", session)
             .where("condition", "==", condition)
             .where("passage", "==", passageId)
-            .where("phrase", "==", phrase);
+            .where("phrase", "==", phraseGrade.phrase);
           const recallGradeDocs = await t.get(recallGradeQuery);
           console.log('Getting data from recallGrade Doc Id', `${recallGradeDocs.docs[0].id}`)
           const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
@@ -244,8 +247,8 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
                 identified += thisGrade;
                 notIdentified += !thisGrade;
               }
-              identified += grade;
-              notIdentified += !grade;
+              identified += phraseGrade.grade;
+              notIdentified += !phraseGrade.grade;
               // It should be approved if more than or equal to 3 researchers have
               // unanimously identified/not identified this phrase in this free-recall
               // response.
@@ -389,34 +392,41 @@ const voteFreeRecallGradePhrase = async ({ body }) => {
                 }
               }
             });
-            for (let transactionWrite of transactionWrites) {
-              if (transactionWrite.type === "update") {
-                t.update(transactionWrite.refObj, transactionWrite.updateObj);
-              } else if (transactionWrite.type === "set") {
-                t.set(transactionWrite.refObj, transactionWrite.updateObj);
-              } else if (transactionWrite.type === "delete") {
-                t.delete(transactionWrite.refObj);
+            transactionWrites.push({
+              type:"update",
+              refObj:recallGradeRef,
+              updateObj:{
+                ...recallGradeUpdates,
+                done: recallGradeData.researchersNum >= 3,
+                researchers: [...recallGradeData.researchers, fullname],
+                grades: [...recallGradeData.grades, grade],
+                researchersNum: recallGradeData.researchersNum + 1,
+                updatedAt: admin.firestore.Timestamp.fromDate(new Date())
               }
+            })
+          }
+          for (let transactionWrite of transactionWrites) {
+            if (transactionWrite.type === "update") {
+              t.update(transactionWrite.refObj, transactionWrite.updateObj);
+            } else if (transactionWrite.type === "set") {
+              t.set(transactionWrite.refObj, transactionWrite.updateObj);
+            } else if (transactionWrite.type === "delete") {
+              t.delete(transactionWrite.refObj);
             }
+          }
+          console.log("make  ac ommmit");
             // Finally, we should create the recallGrades doc for this new grade.
             // this done variable if for testing if 4 researchers have voted on this
-            t.update(recallGradeRef, {
-              ...recallGradeUpdates,
-              done: recallGradeData.researchersNum >= 3,
-              researchers: [...recallGradeData.researchers, fullname],
-              grades: [...recallGradeData.grades, grade],
-              researchersNum: recallGradeData.researchersNum + 1,
-              updatedAt: admin.firestore.Timestamp.fromDate(new Date())
-            });
-            resolve({ phrase, grade });
-          }
+        }
+    
+         
         });
-      }
-    } catch (err) {
-      reject(new Error(err.message));
-    }
-  });
+}}catch(err){
+  return res.status(500).json({ errMsg: err.message });
 }
+
+}
+
 
 exports.voteEndpoint = async (req, res) => {
   try {
@@ -1359,52 +1369,7 @@ exports.loadTimesheetVotes = async (req, res) => {
 // Clicking the Yes or No buttons in FreeRecallGrading.js under
 // ProjectManagement would trigger this function. grade can be either true,
 // meaning the researcher responded Yes, or false if they responded No.
-exports.gradeFreeRecall = async (req, res) => {
-  let successData;
-  try {
-    successData = await voteFreeRecallGradePhrase({ body: req.body });
-  } catch (err) {
-    return res.status(500).json({ errMsg: err.message });
-  }
-  return res.status(200).json({ successData });
-};
 
-exports.bulkGradeFreeRecall = async (req, res) => {
-  let successData;
-  const phrasesWithGrades = req.body.phrasesGrades;
-  const newRecallGradeArrays = phrasesWithGrades.map(x => ({
-    grade: x.grade,
-    phrase: x.phrase,
-    project: req.body.project,
-    passageId: req.body.passageId,
-    passageIdx: req.body.passageIdx,
-    user: req.body.user,
-    fullname: req.body.fullname,
-    phraseNum: req.body.phraseNum,
-    condition: req.body.condition,
-    session: req.body.session,
-    response: req.body.response,
-  }));
-  const recallGradesPromises =
-    Array.isArray(newRecallGradeArrays) &&
-    newRecallGradeArrays?.map(
-      (recallObj) =>
-        new Promise(resolve => {
-          voteFreeRecallGradePhrase({ body: recallObj }).then((x) =>
-            resolve(x),
-          ).catch(err => {
-            return res.status(500).json({ errMsg: err.message });
-          });
-        }),
-    );
-    try {
-      successData = await Promise.all(recallGradesPromises);
-    } catch (err) {
-      return res.status(500).json({ errMsg: err.message });
-    }
-
-  return res.status(200).json({ successData });
-}
 
 exports.assignExperimentSessionsPoints = async context => {
   try {
