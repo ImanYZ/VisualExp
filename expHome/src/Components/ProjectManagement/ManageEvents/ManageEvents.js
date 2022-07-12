@@ -21,6 +21,7 @@ import "./ManageEvents.css";
 
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 import AppConfig from "../../../AppConfig";
+import { toOrdinal } from "number-to-words";
 // import { firebaseOneState } from "../../../store/OneCademyAtoms";
 
 // Call this for sessions that the participant has not accepted the Google
@@ -308,10 +309,15 @@ const ManageEvents = props => {
   const [recall1stRatio, setRecall1stRatio] = useState(0);
   const [recall2ndRatio, setRecall2ndRatio] = useState(0);
   const [recall3rdRatio, setRecall3rdRatio] = useState(0);
+  const [allProjectSpecs, setAllProjectSpecs] = useState({});
+  const [currentProjectSpecs, setCurrentProjectSpecs] = useState({});
+  const [currentProject, setCurrentProject] = useState("");
+  const [selectedSession, setSelectedSession] = useState([]);
 
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
+
   useEffect(() => {
     const loadAvailabilities = async () => {
       const scheduleDocs = await firebase.db.collection("schedule").orderBy("id").get();
@@ -324,6 +330,22 @@ const ManageEvents = props => {
     };
     if (firebase) {
       loadAvailabilities();
+    }
+  }, [firebase]);
+
+  // get all Project SPecs so that we don't have to that again and again.
+  useEffect(() => {
+    const loadProjectSpecs = async () => {
+      const specs = await firebase.db.collection("projectSpecs").get();
+      const specsObj = {};
+      specs.forEach(spec => {
+        specsObj[spec.id] = spec.data();
+      });
+      setAllProjectSpecs(specsObj);
+    };
+
+    if (firebase) {
+      loadProjectSpecs();
     }
   }, [firebase]);
 
@@ -594,6 +616,9 @@ const ManageEvents = props => {
       const userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
       const userData = userDoc.data();
       const project = userData.project;
+      const projectSpecs = allProjectSpecs[project];
+      setCurrentProject(project);
+      setCurrentProjectSpecs(projectSpecs);
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
@@ -632,9 +657,10 @@ const ManageEvents = props => {
       // out which sessions are already taken and exclude them from availSessions.
       // We don't need to retrieve the events from Google Calendar again,
       // because we've already retrieved and saved them in `events` state.
+      const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
       for (let event of events) {
         const startTime = new Date(event.start).toLocaleString();
-        const startMinus30Min = new Date(event.start.getTime() - 30 * 60 * 1000);
+        const startMinus30Min = new Date(event.start.getTime() - slotDuration * 60 * 1000);
         // If the event has some attendees and the start timestamp is a key in availSessions,
         // we should remove all the attendees who are available researchers at this timestamp,
         // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
@@ -706,14 +732,10 @@ const ManageEvents = props => {
       let scheduleDocs, scheduleRef, responseObj;
       // We should check which of their scheduled sessions we'd like to change.
       // For each of the 1st, 2nd, and 3rd sessions:
-      for (let order of ["1st", "2nd", "3rd"]) {
+      for (let i = 0; i < selectedSession.length; ++i) {
         // sessi points to the state variable corresponding to the scheduled session.
-        let sessi = firstSession;
-        if (order === "2nd") {
-          sessi = secondSession;
-        } else if (order === "3rd") {
-          sessi = thirdSession;
-        }
+        const order = toOrdinal(i + 1);
+        let sessi = selectedSession[i];
         // Find the index of the event for the participant's corresponding session
         const eventIdx = events.findIndex(eve => eve.order === order && eve.participant === participant);
         // If we found their 1st/2nd/3rd session, but its start time is different
@@ -743,7 +765,9 @@ const ManageEvents = props => {
               email: participant,
               researcher: availableSessions[sessi.toLocaleString()][0],
               order,
-              session: sessi
+              session: sessi,
+              project: currentProject,
+              sessionIndex: i
             });
             errorAlert(responseObj.data);
             // Figure out whether the new session already exists in schedule
@@ -1028,17 +1052,14 @@ const ManageEvents = props => {
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
+              selectedSession={selectedSession}
+              setSelectedSession={setSelectedSession}
               availableSessions={availableSessions}
-              firstSession={firstSession}
-              secondSession={secondSession}
-              thirdSession={thirdSession}
-              setFirstSession={setFirstSession}
-              setSecondSession={setSecondSession}
-              setThirdSession={setThirdSession}
               setSubmitable={setSubmitable}
-              hourlyChunks={AppConfig.defaultHourlyChunks}
-              sessionDuration={AppConfig.defaultSessionDuration}
-              daysLater={AppConfig.daysLater}
+              numberOfSessions={currentProjectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+              hourlyChunks={currentProjectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+              sessionDuration={currentProjectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+              daysLater={currentProjectSpecs.daysLater || AppConfig.daysLater}
             />
           </div>
         )}
