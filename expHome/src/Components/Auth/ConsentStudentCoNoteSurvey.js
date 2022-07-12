@@ -115,18 +115,32 @@ const ConsentDocument = props => {
         </p>
 
         <p>
-          · We (the researchers) will analyze your responses to all of the questions in this survey, and the academic
-          records provided for researchers in the LARC database. · The Institutional Review Board (IRB) at U of M or
-          other federal agencies may review all the study data. This is to ensure we are following laws and ethical
-          guidelines. · We may share our findings in publications or presentations. If we do so, the results will be
-          anonymized, with no individual identifiers so that your information stays private. If we quote you, we will
-          use pseudonyms (fake names). · We may make our dataset public so other researchers can use it. This public
-          dataset will include only anonymized data with no linkage to individuals. · If you wish to exclude your data
-          from being used for further research, you may still participate in this study by informing one of the contacts
-          below.
+          <p>
+            · We (the researchers) will analyze your responses to all of the questions in this survey, and the academic
+            records provided for researchers in the LARC database.{" "}
+          </p>
+          <p>
+            · The Institutional Review Board (IRB) at U of M or other federal agencies may review all the study data.
+            This is to ensure we are following laws and ethical guidelines.{" "}
+          </p>
+          <p>
+            {" "}
+            · We may share our findings in publications or presentations. If we do so, the results will be anonymized,
+            with no individual identifiers so that your information stays private. If we quote you, we will use
+            pseudonyms (fake names).{" "}
+          </p>
+          <p>
+            {" "}
+            · We may make our dataset public so other researchers can use it. This public dataset will include only
+            anonymized data with no linkage to individuals.{" "}
+          </p>
+          <p>
+            · If you wish to exclude your data from being used for further research, you may still participate in this
+            study by informing one of the contacts below.
+          </p>
         </p>
-        <h2 >Contact Information</h2>
-      
+        <h2>Contact Information</h2>
+
         <p>
           To find out more about the study, to ask a question or express a concern about the study, or to talk about any
           problems you may have as a study subject, you may contact the researchers at StudyStrategies@umich.edu
@@ -185,7 +199,7 @@ const ConsentDocument = props => {
         <p>Phone: (+1) (734) 647-6333</p>
         <p>Faculty Advisor: Paul Resnick</p>
         <p>Email: presnick@umich.edu</p>
-    
+
         <h2>Agreement to Participate</h2>
 
         <p>
@@ -220,7 +234,7 @@ const ConsentDocument = props => {
           not want to answer and you do not need to explain the reason.
         </p>
         <p>
-          <strong> A — General study procedures: </strong>
+          <strong> A - General study procedures: </strong>
         </p>
         <p>
           Participants are contacted by email to participate in the study. They then can choose to participate or not.
@@ -310,16 +324,36 @@ const ConsentDocument = props => {
           <strong>10.1 Who can I contact about this study? </strong>
         </p>
         <p>
-          Principal Investigator: Iman Yechehzaare Mailing Address: Telephone: (734) 647-9458 You may also express a
-          question or concern about a study by contacting the Institutional Review Board listed below: University of
-          Michigan Medical School Institutional Review Board (IRBMED) 2800 Plymouth Road Building 520, Room 3214 Ann
-          Arbor, MI 48109-2800 Telephone: 734-763-4768 (For International Studies, include the appropriate calling
-          codes.) Fax: 734-763-1234 e-mail: irbmed@umich.edu If you are concerned about a possible violation of your
-          privacy or concerned about a study you may contact the University of Michigan Health System Compliance Help
-          Line at 1-866-990-0111. When you call or write about a concern, please provide as much information as
-          possible, including the name of the researcher, the IRBMED number (at the top of this form), and details about
-          the problem. This will help University officials to look into your concern. When reporting a concern, you do
-          not have to give your name unless you want to.
+          <p>Principal Investigator: Iman Yechehzaare</p>
+          <p>Mailing Address: Telephone: (734) 647-9458 </p>
+          <p>
+            You may also express a question or concern about a study by contacting the Institutional Review Board listed
+            below:
+          </p>
+
+          <p>
+            {" "}
+            University ofMichigan Medical School Institutional Review Board (IRBMED) 2800 Plymouth Road Building 520,
+            Room 3214
+          </p>
+          <p> Ann Arbor, MI 48109-2800 </p>
+
+          <p>
+            Telephone: 734-763-4768 (For International Studies, include the appropriate calling codes.)
+            <p>Fax: 734-763-1234 </p>
+            <p> e-mail: irbmed@umich.edu</p>
+          </p>
+
+          <p>
+            If you are concerned about a possible violation of your privacy or concerned about a study you may contact
+            the University of Michigan Health System Compliance Help Line at 1-866-990-0111.{" "}
+          </p>
+          <p>
+            When you call or write about a concern, please provide as much information as possible, including the name
+            of the researcher, the IRBMED number (at the top of this form), and details about the problem. This will
+            help University officials to look into your concern. When reporting a concern, you do not have to give your
+            name unless you want to.
+          </p>
         </p>
 
         <h3>11. RECORD OF INFORMATION PROVIDED</h3>
