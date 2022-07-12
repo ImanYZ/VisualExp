@@ -6,7 +6,7 @@ const ConsentDocument = props => {
   return (
     <div id="ConsentContainer">
       <h2>INFORMED CONSENT</h2>
-      <h2>Visualizing Relationships Between Paragraphs Compared to Novakian Concept Maps</h2>
+      <h2>How do Linear vs. Non-linear vs. hybrid representations of text affect scientific reading comprehension?</h2>
       <h2>HUM00201762</h2>
 
       <h3>Principal Investigator</h3>
