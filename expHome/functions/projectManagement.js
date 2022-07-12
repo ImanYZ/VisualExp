@@ -201,7 +201,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       // times they have graded a free-recall response.
       currentResearcherUpdates.gradingNum =
         currentResearcherUpdates.gradingNum ?
-          (currentResearcherUpdates.gradingNum + phrasesWithGrades.length) : 1;
+          (currentResearcherUpdates.gradingNum + phrasesWithGrades.length) : phrasesWithGrades.length;
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
