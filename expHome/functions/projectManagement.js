@@ -176,7 +176,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     "session" in req.body &&
     "phraseNum" in req.body &&
     "response" in req.body) {
-    const phrasesWithGrades = req.body.phrasesWithGrades;
+    const phrasesWithGrades = req.body.phrasesWithGrades || [];
     const fullname = req.body.fullname;
     const project = req.body.project;
     const user = req.body.user;
@@ -199,7 +199,9 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const currentResearcherUpdates = currentResearcherData.projects[project];
       // The very first update we need to apply is to increment the number of
       // times they have graded a free-recall response.
-      currentResearcherUpdates.gradingNum = currentResearcherUpdates.gradingNum ? currentResearcherUpdates.gradingNum + 1 : 1;
+      currentResearcherUpdates.gradingNum =
+        currentResearcherUpdates.gradingNum ?
+          (currentResearcherUpdates.gradingNum + phrasesWithGrades.length) : phrasesWithGrades.length;
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
