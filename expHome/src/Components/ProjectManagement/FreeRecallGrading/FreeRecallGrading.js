@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 import axios from "axios";
 
+import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
+import Switch from "@mui/material/Switch";
 
 import withRoot from "../../Home/modules/withRoot";
 
@@ -39,24 +41,17 @@ const FreeRecallGrading = props => {
   // answer, we should retrive the next free-recall response for them to
   // evaluate. This states helps us signal the useEffect to invoke
   // retrieveFreeRecallResponse.
-  const [retrieveNext, setRetrieveNext] = useState(0);
   // We need to set these states to identify which phrase is assigned to which
   // participant's free-recall response by which researcher, ... to be able to
   // assign these values to the corresponding recallGrades document when
   // submitting the researcher's evaluation of this phrase in this free-recall
   // response.
-  const [user, setUser] = useState(null);
-  const [condition, setCondition] = useState(null);
-  const [passage, setPassage] = useState(null);
-  const [passageId, setPassageId] = useState(null);
-  const [passageIdx, setPassageIdx] = useState(null);
-  const [session, setSession] = useState(null);
-  const [phrase, setPhrase] = useState(null);
-  const [phraseNum, setPhraseNum] = useState(0);
-  const [response, setResponse] = useState(null);
+  const [passageData, setPassageData] = useState({});
+  // const [response, setResponse] = useState(null);
   const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
+  const [firstFiveRecallGrades, setFirstFiveRecallGrades] = useState([]);
+  const [retrieveNext, setRetrieveNext] = useState(0);
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
@@ -69,6 +64,7 @@ const FreeRecallGrading = props => {
       // solution, we separated the collections per project, other than the
       // H2K2 project that we have already populated the data in and it's very
       // costly to rename.
+      const firstFve = [];
       let collName = "recallGrades";
       if (project !== "H2K2") {
         collName += project;
@@ -76,26 +72,17 @@ const FreeRecallGrading = props => {
       const recallGradeDocs = await firebase.db
         .collection(collName)
         .where("done", "==", false)
+        .orderBy("passage")
         .orderBy("user")
         .orderBy("session")
         .limit(1000)
         .get();
 
-      let firstVisibleRecallGradesDoc = recallGradeDocs.docs[1];
-
-      console.log(recallGradeDocs.docs.length);
-      if (firstVisibleRecallGradesDoc.data().done === true) {
-        setUser(null);
-        setCondition(null);
-        setPassage(null);
-        setPassageIdx(null);
-        setPassageId(null);
-        setPhrase(null);
-        setPhraseNum(null);
-        setSession(null);
-        setResponse(null);
+      if (recallGradeDocs.docs.length === 0) {
+        setFirstFiveRecallGrades([]);
         return;
       }
+
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
 
@@ -115,94 +102,79 @@ const FreeRecallGrading = props => {
               // the authenticated researcher.
               (recallGradeData.researchersNum < 3 || recallGradeData.researchers[2] !== fullname)))
         ) {
-          const passageDoc = await firebase.db.collection("passages").doc(recallGradeData.passage).get();
-          const passageData = passageDoc.data();
-          const userDoc = await firebase.db.collection("users").doc(recallGradeData.user).get();
-          const userData = userDoc.data();
-          console.log({
-            user: recallGradeData.user,
-            session: recallGradeData.session,
-            passage: recallGradeData.passage,
-            respone: recallGradeData.response
-          });
-          let passaIdx = 0;
-          for (; passaIdx < userData.pConditions.length; passaIdx++) {
-            if (userData.pConditions[passaIdx].passage === recallGradeData.passage) {
-              break;
-            }
+          if (
+            firstFve.length > 0 &&
+            (firstFve.length === 5 || recallGradeData.response !== firstFve[0].data.response)
+          ) {
+            setFirstFiveRecallGrades(firstFve);
+            const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
+            setPassageData(passageDoc.data());
+            break;
           }
-          // We need to set these states to identify which phrase is
-          // assigned to which participant's free-recall response by
-          // which researcher, ... to be able to assign these values
-          // to the corresponding freeRecallGrades document when
-          // submitting the researcher's evaluation of this phrase
-          // in this free-recall response.
-          setUser(recallGradeData.user);
-          setCondition(recallGradeData.condition);
-          setPassage(passageData.text);
-          setPassageIdx(passaIdx);
-          setPassageId(recallGradeData.passage);
-          setPhrase(recallGradeData.phrase);
-          setPhraseNum(passageData.phrases.length);
-          setSession(recallGradeData.session);
-          switch (recallGradeData.session) {
-            case "1st":
-              setResponse(userData.pConditions[passaIdx].recallreText);
-              break;
-            case "2nd":
-              setResponse(userData.pConditions[passaIdx].recall3DaysreText);
-              break;
-            case "3rd":
-              setResponse(userData.pConditions[passaIdx].recall1WeekreText);
-              break;
-            default:
-            // code block
-          }
-          // setTimeout(() => {
-          setSubmitting(false);
-          // }, 4000);
-          // ASA we find a free-recall response that is not evaluated by at least
-          // four researchers, we set this flag to true to stop searching.
-          return null;
+          firstFve.push({ data: recallGradeData, grade: false });
         }
       }
+      setSubmitting(false);
+      // ASA we find five free-recall phrases for a particular response
+      // we set this flag to true to stop searching.
+      return null;
     };
     if (firebase && !notAResearcher && project) {
       retrieveFreeRecallResponse();
     }
+
+    // cleanup function
+    return () => retrieveFreeRecallResponse();
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [project, firebase, notAResearcher, retrieveNext]);
+  }, [firebase, fullname, notAResearcher, project, retrieveNext]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
-  const gradeIt = grade => async event => {
-    if (!submitting && fullname && passageId && condition && phrase && session && phraseNum && response) {
-      setSubmitting(true);
-      try {
-        await firebase.idToken();
-        await axios.post("/gradeFreeRecall", {
-          grade,
-          fullname,
-          project,
-          user,
-          passageId,
-          passageIdx,
-          condition,
-          phrase,
-          session,
-          phraseNum,
-          response
-        });
-        // Increment retrieveNext to get the next free-recall response to grade.
-        setRetrieveNext(oldValue => oldValue + 1);
-        setSnackbarMessage("You successfully submitted your evaluation!");
-      } catch (err) {
-        console.error(err);
-        setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
+  const gradeIt = async () => {
+    setSubmitting(true);
+    try {
+      const phrasesWithGrades = firstFiveRecallGrades.map(recall => ({ phrase: recall.data.phrase, grade: recall.grade }));
+      const userData = (
+        await firebase.db.collection("users").doc(`${firstFiveRecallGrades[0].data.user}`).get()
+      ).data();
+      let passageIdx = 0;
+
+      for (; passageIdx < userData.pConditions.length; passageIdx++) {
+        if (userData.pConditions[passageIdx].passage === firstFiveRecallGrades[0].data.passage) {
+          break;
+        }
       }
+      const freeRecallGradeBulkData = {
+        fullname,
+        project,
+        phraseNum: passageData?.phrases?.length,
+        user: firstFiveRecallGrades[0].data.user,
+        passageId: firstFiveRecallGrades[0].data.passage,
+        passageIdx,
+        condition: firstFiveRecallGrades[0].data.condition,
+        phrasesWithGrades,
+        session: firstFiveRecallGrades[0].data.session,
+        response: firstFiveRecallGrades[0].data.response
+      };
+
+      await firebase.idToken();
+      await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
+      setSubmitting(false);
+      // Increment retrieveNext to get the next free-recall response to grade.
+      setRetrieveNext(oldValue => oldValue + 1);
+      setSnackbarMessage("You successfully submitted your evaluation!");
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
     }
+  };
+
+  const handleGradeChange = index => {
+    const grades = [...firstFiveRecallGrades];
+    grades[index].grade = !firstFiveRecallGrades[index].grade;
+    setFirstFiveRecallGrades(grades);
   };
 
   return (
@@ -230,27 +202,40 @@ const FreeRecallGrading = props => {
         </ul>
       </Alert>
       <Paper style={{ paddingBottom: "19px" }}>
+        <p>1- Carefully read this free-recall response:</p>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+          {firstFiveRecallGrades[0]?.data.response}
+        </Paper>
         <p>
-          Please identify whether this participant has mentioned the following key phrase from the original passage:
+          2- Identify whether this participant has mentioned the following key phrases from the original passage in
+          their free-recall response, and then submit your answers:
         </p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{phrase}</Paper>
-        <p>Here is their free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>{response}</Paper>
+
+        {firstFiveRecallGrades?.map((row, index) => (
+          <div key={index}>
+            <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+              <Box sx={{ display: "inline", mr: "19px" }}>
+                NO
+                <Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />
+                YES
+              </Box>
+              <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
+            </Paper>
+          </div>
+        ))}
+        <Button onClick={gradeIt} className="Button" variant="contained" color="success" disabled={submitting}>
+          {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
+        </Button>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: "19px"
+            marginTop: "19px",
+            position: "relative",
+            left: "45%"
           }}
-        >
-          <Button onClick={gradeIt(false)} className="Button" variant="contained" color="error" disabled={submitting}>
-            {submitting ? <CircularProgress color="warning" size="16px" /> : "👎 No"}
-          </Button>
-          <Button onClick={gradeIt(true)} className="Button" variant="contained" color="success" disabled={submitting}>
-            {submitting ? <CircularProgress color="warning" size="16px" /> : "👍 Yes"}
-          </Button>
-        </div>
+        ></div>
         <p>The original passage is:</p>
         <Paper
           style={{
@@ -258,7 +243,7 @@ const FreeRecallGrading = props => {
             margin: "19px 19px 70px 19px"
           }}
         >
-          {passage}
+          {passageData.text}
         </Paper>
       </Paper>
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
