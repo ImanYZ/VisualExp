@@ -946,78 +946,78 @@ export default [
       `Work remotely for all interactions, task fulfillment, and communications `,
       `All interactions, task fulfillment, and communications will be remote.`
     ]
-  },
-  {
-    id: "Neuroscience",
-    tags: [
-      {
-        title: "Behavioral Neuroscience",
-        node: "EotqbmSg4XdYq5U5BQCP"
-      }
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Neuroscience.jpg",
-    title: "Neuroscience",
-    width: "33%",
-    leaders: [
-      // {
-      //   name: "Victoria Mulligan",
-      //   image: "Victoria_Mulligan.jpg",
-      //   about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
-      //     },
-      //   ],
-      // },
-      {
-        name: "Amrit Das Pradhan",
-        image: "Amrit_Das_Pradhan.png",
-        about: `I am a third-year psychology major at Cal Poly SLO interested in pursuing a career in clinical neuropsychology. I joined 1Cademy in January 2021 as an intern for the Educational Psychology community. I helped create the Neuroscience Community and have been a co-leader since April 2021. Other than working with 1Cademy, I work as a research assistant in three labs: a neurogenesis lab where we study the effect of different factors on the creation of new neurons and neural cells in snakes, a memory lab where we run a multitude of studies related to memory, and a LGBTQ+ and mental health lab, where we examine problems surrounding mental health and the LGBTQ+ community in San Luis Obispo and come up with potential solutions.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/"
-          }
-        ]
-      }
-    ],
-    YouTube: "Mj45B59k4fo",
-    description: `Students, educators, and researchers, join our large-scale interdisciplinary movement to collaboratively develop, visualize, and organize learning and research materials in your field of interest online for improving education. We are an interdisciplinary group of researchers through the University of Michigan who have been iteratively developing an online research and learning community called 1Cademy.`,
-    accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of
-    behavioral neuroscience
-    and strengthen research skills to prepare for a future in the neuroscience field.`,
-    gains: [
-      `Gain experience using crucial skills in research (literature analysis, summarization, making connections between disciplines) `,
-      `Develop presentation skills and learn how to give concise descriptions of research and topics in neuroscience. `,
-      `Analyze literature and research to help contribute to research and education. `,
-      `Learn concepts and theory in neuroscience `,
-      `Develop a positive community-wide reputation for your engagement (over 500+ users from various disciplines) which is displayed on our leaderboard. `,
-      `Be publicly accredited for any work you produce for years to come. `,
-      `Individual contributions will be available through google search and cite your name (and other search engines)`
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
-    hasTest: true,
-    qualifications: [
-      `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
-      `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
-      `Curiosity for other types of fields, and a readiness to learn more about them. `,
-      `Experience and willingness to work in large-scale collaborative environments. `
-    ],
-    responsibilities: [
-      `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
-      `Give presentations over what you have researched in weekly meetings for further discussion.`,
-      `Generate ideas for future research in the field and point out areas of missing information or a gap in research.`,
-      `Actively utilizing 1Cademy to refine and properly structure the information.`,
-      `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group.`,
-      `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
-      `Expected 5hrs a week minimum to retain the internship.`,
-      `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
-      `All interactions, task fulfillment, and communications will be remote.`
-    ]
   }
+  // {
+  //   id: "Neuroscience",
+  //   tags: [
+  //     {
+  //       title: "Behavioral Neuroscience",
+  //       node: "EotqbmSg4XdYq5U5BQCP"
+  //     }
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Neuroscience.jpg",
+  //   title: "Neuroscience",
+  //   width: "33%",
+  //   leaders: [
+  //     // {
+  //     //   name: "Victoria Mulligan",
+  //     //   image: "Victoria_Mulligan.jpg",
+  //     //   about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
+  //     //   websites: [
+  //     //     {
+  //     //       name: "LinkedIn",
+  //     //       url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
+  //     //     },
+  //     //   ],
+  //     // },
+  //     {
+  //       name: "Amrit Das Pradhan",
+  //       image: "Amrit_Das_Pradhan.png",
+  //       about: `I am a third-year psychology major at Cal Poly SLO interested in pursuing a career in clinical neuropsychology. I joined 1Cademy in January 2021 as an intern for the Educational Psychology community. I helped create the Neuroscience Community and have been a co-leader since April 2021. Other than working with 1Cademy, I work as a research assistant in three labs: a neurogenesis lab where we study the effect of different factors on the creation of new neurons and neural cells in snakes, a memory lab where we run a multitude of studies related to memory, and a LGBTQ+ and mental health lab, where we examine problems surrounding mental health and the LGBTQ+ community in San Luis Obispo and come up with potential solutions.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/"
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   YouTube: "Mj45B59k4fo",
+  //   description: `Students, educators, and researchers, join our large-scale interdisciplinary movement to collaboratively develop, visualize, and organize learning and research materials in your field of interest online for improving education. We are an interdisciplinary group of researchers through the University of Michigan who have been iteratively developing an online research and learning community called 1Cademy.`,
+  //   accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of
+  //   behavioral neuroscience
+  //   and strengthen research skills to prepare for a future in the neuroscience field.`,
+  //   gains: [
+  //     `Gain experience using crucial skills in research (literature analysis, summarization, making connections between disciplines) `,
+  //     `Develop presentation skills and learn how to give concise descriptions of research and topics in neuroscience. `,
+  //     `Analyze literature and research to help contribute to research and education. `,
+  //     `Learn concepts and theory in neuroscience `,
+  //     `Develop a positive community-wide reputation for your engagement (over 500+ users from various disciplines) which is displayed on our leaderboard. `,
+  //     `Be publicly accredited for any work you produce for years to come. `,
+  //     `Individual contributions will be available through google search and cite your name (and other search engines)`
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
+  //     `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
+  //     `Curiosity for other types of fields, and a readiness to learn more about them. `,
+  //     `Experience and willingness to work in large-scale collaborative environments. `
+  //   ],
+  //   responsibilities: [
+  //     `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
+  //     `Give presentations over what you have researched in weekly meetings for further discussion.`,
+  //     `Generate ideas for future research in the field and point out areas of missing information or a gap in research.`,
+  //     `Actively utilizing 1Cademy to refine and properly structure the information.`,
+  //     `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group.`,
+  //     `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
+  //     `Expected 5hrs a week minimum to retain the internship.`,
+  //     `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
+  //     `All interactions, task fulfillment, and communications will be remote.`
+  //   ]
+  // }
   // {
   //   id: "Mindfulness",
   //   tags: [
