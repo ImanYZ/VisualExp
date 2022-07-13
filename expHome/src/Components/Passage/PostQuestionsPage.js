@@ -14,7 +14,7 @@ const PostQuestionsPage = props => {
     const userDoc = await firebase.db.collection("users").doc(fullname).get();
     const experiment = ["easyResponse", "activeCoding"];
     const random = Math.floor(Math.random() * experiment.length);
-    setExperimentType("easyResponse");
+    setExperimentType("activeCoding");
     console.log(random, experiment[random]);
   }, []);
 
@@ -35,7 +35,9 @@ const PostQuestionsPage = props => {
   if (experimentType === "activeCoding") {
     return (
       <div id="QuestionsInstructions">
-        <QualitativeCoding />
+        <QualitativeCoding
+          currentQIdx={props.currentQIdx}
+          questions={props.questions} />
       </div>
     );
   }
