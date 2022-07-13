@@ -34,6 +34,7 @@ import CommunityApplications from "./Components/Home/CommunityApplications";
 import InstructorYes from "./Components/Home/InstructorYes";
 import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
+import MonitorFeedBack from "./Components/Home/MonitorFeedBack";
 
 import { isToday } from "./utils/DateFunctions";
 
@@ -175,11 +176,14 @@ const AppRouter = props => {
           {leading.length > 0 && (
             <>
               <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
+
               <Route path="/CommunityApplications/*" element={<CommunityApplications communiIds={leading} />} />
+              <Route path={"/MonitorFeedBack/*"} element={<MonitorFeedBack communiIds={leading} />} />
             </>
           )}
         </>
       )}
+
       <Route path="/communities/" element={<Communities />} />
       {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
@@ -240,7 +244,10 @@ const AppRouter = props => {
             )}
           </>
         ) : (
-          <Route path="*" element={<AuthConsent />} />
+          <>
+            <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
+            <Route path="*" element={<AuthConsent />} />
+          </>
         )}
       </Route>
     </Routes>
