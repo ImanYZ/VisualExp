@@ -6,7 +6,7 @@ const ConsentDocument = props => {
   return (
     <div id="ConsentContainer">
       <h2>INFORMED CONSENT</h2>
-      <h2>Visualizing Relationships Between Paragraphs Compared to Novakian Concept Maps</h2>
+      <h2>How do Linear vs. Non-linear vs. hybrid representations of text affect scientific reading comprehension?</h2>
       <h2>HUM00201762</h2>
 
       <h3>Principal Investigator</h3>
@@ -23,6 +23,10 @@ const ConsentDocument = props => {
       <h3>Research Team</h3>
       <ul>
         <li>
+          <strong>Alexandra Christi Bateman</strong>, currently working toward her BS in psychology from Creighton
+          University's honors program.
+        </li>
+        <li>
           <strong>Amelia Henriques</strong>, Bachelor of Arts in Psychological Sciences and Human Development &amp;
           Family Sciences, University of Connecticut, College of Liberal Arts and Sciences
         </li>
@@ -33,11 +37,15 @@ const ConsentDocument = props => {
           <strong>Benjamin Brown</strong>, Graduate student at San Jose State University, School of Information
         </li>
         <li>
-          <strong>Ethan Hiew</strong>, Undergraduate in Cognitive Science (with a Computational Emphasis) at University
-          of California, Davis
+          <strong>Cynthia Lee</strong>, Bachelor of Science in Psychology &amp; Cognitive Science, University of
+          Michigan, School of Information
         </li>
         <li>
           <strong>Ember Shan</strong>, Undergraduate at University of Michigan, School of Information
+        </li>
+        <li>
+          <strong>Ethan Hiew</strong>, Undergraduate in Cognitive Science (with a Computational Emphasis) at University
+          of California, Davis
         </li>
         <li>
           <strong>Huijia Zheng</strong>, Undergraduate in Psychology and Cognitive Science Major, and Computer Science
@@ -51,6 +59,12 @@ const ConsentDocument = props => {
           The Media School
         </li>
         <li>
+          <strong>Joey Lin</strong>, Bachelor of Science in Neuroscience and Behavior at Vassar College
+        </li>
+        <li>
+          <strong>Lily Margaret DiBartolomeo</strong>, currently a rising senior receiving a BA in Psychology from NYU
+        </li>
+        <li>
           <strong>Louwis Truong</strong>, Bachelor of Science in Biology, University of Colorado Denver, College of
           Liberal Arts and Sciences
         </li>
@@ -60,6 +74,9 @@ const ConsentDocument = props => {
         <li>
           <strong>Qiaochu Kang</strong>, Master of Science in Information at New York University, Tandon School of
           Engineering
+        </li>
+        <li>
+          <strong>Roman Zapata</strong>, M.S. in Human-Computer Interaction DePaul University
         </li>
         <li>
           <strong>Shaobo Liang</strong>, Undergraduate in Cognitive Science, Computer Science, and Philosophy at Johns
@@ -87,7 +104,7 @@ const ConsentDocument = props => {
           <strong>Yizhou Chao</strong>, Master's student at Columbia University, Department of Economics
         </li>
         <li>
-          <strong>Ziyi Wang</strong>, Master's student at the University of Michigan, School of Information
+          <strong>Ziyi (Hilda) Wang</strong>, Master's student at the University of Michigan, School of Information
         </li>
         <li>
           <strong>Zoe Dunnum</strong>, Undergraduate at Michigan State University
