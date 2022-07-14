@@ -90,13 +90,13 @@ const AuthStudentCoNoteSurvey = props => {
           email: uEmail,
           firstname: fName,
           lastname: lName,
-          project: currentProject
+          project: "StudentCoNoteSurvey"
         };
       }
       if (!userNotExists && !userData.uid) {
         const userDataLog = {
           uid,
-          project: currentProject
+          project: "StudentCoNoteSurvey"
         };
         if (userData.firstname && userData.lastname) {
           await userRef.update(userDataLog);
@@ -131,7 +131,7 @@ const AuthStudentCoNoteSurvey = props => {
           email: uEmail,
           firstname,
           lastname: lName,
-          project: currentProject
+          project: "StudentCoNoteSurvey"
         };
       }
     }
