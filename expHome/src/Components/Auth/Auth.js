@@ -613,7 +613,7 @@ const Auth = props => {
                   onChange={event => setResetPasswordEmail(event.target.value)}
                   value={resetPasswordEmail}
                   errorMessage={passwordResetError}
-                  // autocomplete="off"
+                // autocomplete="off"
                 />
                 <Button
                   id="ForgotPasswordEmailButton"
