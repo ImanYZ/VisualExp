@@ -441,6 +441,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         return res.status(500).json({ errMsg: err.message, success: false });
       });
   }
+  return res.status(500).json({ errMsg: 'some parameters missing', success: false });
 };
 
 exports.voteEndpoint = async (req, res) => {
