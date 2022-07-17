@@ -66,11 +66,7 @@ const AuthConsent = props => {
             height: "100vh"
           }}
         >
-          {props.project && props.project === "StudentCoNoteSurvey" ? (
-            <AuthStudentCoNoteSurvey />
-          ) : (
-            <Auth {...props} />
-          )}
+          {props.project && props.project === "StudentCoNoteSurvey" ? <AuthStudentCoNoteSurvey /> : <Auth {...props} />}
         </Paper>
       </Grid>
     </Grid>

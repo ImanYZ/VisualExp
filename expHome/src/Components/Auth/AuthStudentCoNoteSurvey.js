@@ -21,12 +21,13 @@ import { isEmail, getFullname, shuffleArray } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
+import { useNavigate } from "react-router-dom";
 
 const AuthStudentCoNoteSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
-  const currentProject = useRecoilValue(currentProjectState);
+  const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
 
   const [firstname, setFirstname] = useState("");
@@ -53,6 +54,7 @@ const AuthStudentCoNoteSurvey = props => {
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
+  const navigate = useNavigate();
 
   useEffect(() => {
     setParticipatedBefore(false);
@@ -175,6 +177,7 @@ const AuthStudentCoNoteSurvey = props => {
         }
       } else {
         // User is signed out
+        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
@@ -272,6 +275,8 @@ const AuthStudentCoNoteSurvey = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
+      localStorage.setItem("isStudentCoNoteSurvey", "true");
+      navigate("/");
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
