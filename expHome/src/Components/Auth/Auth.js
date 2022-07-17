@@ -298,6 +298,7 @@ const Auth = props => {
         }
       } else {
         // User is signed out
+        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
