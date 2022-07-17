@@ -161,7 +161,7 @@ const voteFn = async (voter, activity, vote) => {
   }
 };
 
-// This Function is used to vote the phrases in bulk 
+// This Function is used to vote the phrases in bulk
 // helps to give the points accordingly to every researcher
 // It updates researcher, reCallGrade and user data accordingly.
 exports.bulkGradeFreeRecall = async (req, res) => {
@@ -175,7 +175,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     "condition" in req.body &&
     "session" in req.body &&
     "phraseNum" in req.body &&
-    "response" in req.body) {
+    "response" in req.body
+  ) {
     const phrasesWithGrades = req.body.phrasesWithGrades || [];
     const fullname = req.body.fullname;
     const project = req.body.project;
@@ -199,9 +200,9 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const currentResearcherUpdates = currentResearcherData.projects[project];
       // The very first update we need to apply is to increment the number of
       // times they have graded a free-recall response.
-      currentResearcherUpdates.gradingNum =
-        currentResearcherUpdates.gradingNum ?
-          (currentResearcherUpdates.gradingNum + phrasesWithGrades.length) : phrasesWithGrades.length;
+      currentResearcherUpdates.gradingNum = currentResearcherUpdates.gradingNum
+        ? currentResearcherUpdates.gradingNum + phrasesWithGrades.length
+        : phrasesWithGrades.length;
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
@@ -225,7 +226,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
 
       // phraseGrade loop
       for (let phraseGrade of phrasesWithGrades) {
-        console.log('phrase & grade::::', phraseGrade)
+        console.log("phrase & grade::::", phraseGrade);
         const recallGradeQuery = db
           .collection(collName)
           .where("user", "==", user)
@@ -234,7 +235,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           .where("passage", "==", passageId)
           .where("phrase", "==", phraseGrade.phrase);
         const recallGradeDocs = await t.get(recallGradeQuery);
-        console.log('Getting data from recallGrade Doc Id', `${recallGradeDocs.docs[0].id}`);
+        console.log("Getting data from recallGrade Doc Id", `${recallGradeDocs.docs[0].id}`);
         const recallGradeRef = await db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
         const recallGradeData = recallGradeDocs.docs[0].data();
         if (!recallGradeData.researchers.includes(fullname)) {
@@ -300,8 +301,10 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               // identified/notIdentified this phrase in this free recall response.
               for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
                 if (!otherResearchersData[recallGradeData.researchers[fResearcherIdx]]) {
-                  console.log('NEW RESEARCHER ADDED::::', recallGradeData.researchers[fResearcherIdx]);
-                  const researcherRef = db.collection("researchers").doc(`${recallGradeData.researchers[fResearcherIdx]}`);
+                  console.log("NEW RESEARCHER ADDED::::", recallGradeData.researchers[fResearcherIdx]);
+                  const researcherRef = db
+                    .collection("researchers")
+                    .doc(`${recallGradeData.researchers[fResearcherIdx]}`);
                   const researcherDoc = await t.get(researcherRef);
                   const researcherData = researcherDoc.data();
                   otherResearchersData[recallGradeData.researchers[fResearcherIdx]] = researcherData;
@@ -427,15 +430,19 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           t.delete(transactionWrite.refObj);
         }
       }
-    }).then(() => {
-      return res.status(200).json({ success: true, endpoint: 'Bulk Upload', successData: req.body.phrasesWithGrades });
-    }).catch((err) => {
-      console.log({ err })
-      return res.status(500).json({ errMsg: err.message, success: false });
-    });
+    })
+      .then(() => {
+        return res
+          .status(200)
+          .json({ success: true, endpoint: "Bulk Upload", successData: req.body.phrasesWithGrades });
+      })
+      .catch(err => {
+        console.log({ err });
+        return res.status(500).json({ errMsg: err.message, success: false });
+      });
   }
-}
-
+  return res.status(500).json({ errMsg: 'some parameters missing', success: false });
+};
 
 exports.voteEndpoint = async (req, res) => {
   try {
@@ -1558,10 +1565,11 @@ exports.remindAddingInstructorsAdministrators = async context => {
               .where("project", "==", project)
               .where("fullname", "==", researcherDoc.id)
               .get();
+            let lastAvailability;
             for (let resScheduleDoc of resScheduleDocs.docs) {
               const resScheduleData = resScheduleDoc.data();
               const theSession = resScheduleData.session.toDate();
-              if (theSession.getTime() > lastAvailability.getTime()) {
+              if (!lastAvailability || theSession.getTime() > lastAvailability.getTime()) {
                 lastAvailability = theSession;
               }
             }
