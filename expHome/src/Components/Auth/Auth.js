@@ -305,6 +305,7 @@ const Auth = props => {
         }
       } else {
         // User is signed out
+        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
@@ -620,7 +621,7 @@ const Auth = props => {
                   onChange={event => setResetPasswordEmail(event.target.value)}
                   value={resetPasswordEmail}
                   errorMessage={passwordResetError}
-                  // autocomplete="off"
+                // autocomplete="off"
                 />
                 <Button
                   id="ForgotPasswordEmailButton"
