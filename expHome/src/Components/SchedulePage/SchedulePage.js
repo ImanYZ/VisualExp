@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import axios from "axios";
 
@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 import { toWords, toOrdinal } from "number-to-words";
+import { projectState } from "../../store/ProjectAtoms";
+import { currentProjectState } from "../../store/ExperimentAtoms";
 
 import SelectSessions from "./SelectSessions";
 
@@ -111,6 +113,8 @@ const SchedulePage = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [globalProject, setGlobalProject] = useRecoilState(projectState);
+  const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(currentProjectState);
   const navigate = useNavigate();
   const projectSpecs = useRecoilValue(projectSpecsState);
 
@@ -118,8 +122,16 @@ const SchedulePage = props => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
+      const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
       // We need to first retrieve which project this user belongs to.
-      const userDoc = await firebase.db.collection("users").doc(fullname).get();
+      if (isStudentCoNoteSurvey === "true") {
+        setGlobalProject("StudentCoNoteSurvey");
+        setGlobalCurrentProject("StudentCoNoteSurvey");
+      }
+      const userDoc = await firebase.db
+        .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
+        .doc(fullname)
+        .get();
       const userData = userDoc.data();
       const project = userData.project;
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
