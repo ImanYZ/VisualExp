@@ -5,6 +5,7 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
 import Auth from "./Auth";
+import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
 import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 
@@ -65,7 +66,7 @@ const AuthConsent = props => {
             height: "100vh"
           }}
         >
-          <Auth {...props} />
+          {props.project && props.project === "StudentCoNoteSurvey" ? <AuthStudentCoNoteSurvey /> : <Auth {...props} />}
         </Paper>
       </Grid>
     </Grid>
