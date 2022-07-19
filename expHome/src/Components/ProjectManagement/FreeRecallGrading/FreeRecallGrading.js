@@ -181,7 +181,7 @@ const FreeRecallGrading = props => {
 
   return (
   (firstFiveRecallGrades.length === 0)?
-  ( <Alert severity="info" size="larg">
+  ( <Alert severity="info" size="large">
      <AlertTitle>Info</AlertTitle>
     Since the recall grades is done collaboratively, you should wait for a few days so that other researchers grade the recalls you've graded before .
   </Alert>):  
