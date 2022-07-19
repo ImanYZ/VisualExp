@@ -1,18 +1,18 @@
-import { atom } from "recoil";
-import { firebaseOne } from "../Components/firebase/firebase";
+import { atom } from 'recoil';
+import { firebaseOne } from '../Components/firebase/firebase';
 
 export const firebaseOneState = atom({
-  key: "firebaseOneState",
+  key: 'firebaseOneState',
   default: firebaseOne,
   dangerouslyAllowMutability: true,
 });
 
 export const emailOneState = atom({
-  key: "emailOneState",
-  default: "",
+  key: 'emailOneState',
+  default: '',
 });
 
 export const usernameState = atom({
-  key: "usernameState",
-  default: "",
+  key: 'usernameState',
+  default: '',
 });

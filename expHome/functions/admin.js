@@ -1,23 +1,23 @@
 // Imports the Google Cloud client library
-const { Storage } = require("@google-cloud/storage");
+const { Storage } = require('@google-cloud/storage');
 
 // Creates a client using Application Default Credentials
 const storage = new Storage();
 
 // The Firebase Admin SDK to access Firestore.
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 
 admin.initializeApp();
 
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
-const isFirestoreDeadlineError = (err) => {
+const isFirestoreDeadlineError = err => {
   console.log({ err });
   const errString = err.toString();
   return (
-    errString.includes("Error: 13 INTERNAL: Received RST_STREAM") ||
-    errString.includes("Error: 4 DEADLINE_EXCEEDED: Deadline exceeded")
+    errString.includes('Error: 13 INTERNAL: Received RST_STREAM') ||
+    errString.includes('Error: 4 DEADLINE_EXCEEDED: Deadline exceeded')
   );
 };
 
@@ -31,7 +31,7 @@ let isCommitting = false;
 
 // Commit and reset batchWrites and the counter.
 const makeCommitBatch = async () => {
-  console.log("makeCommitBatch");
+  console.log('makeCommitBatch');
   if (!isCommitting) {
     isCommitting = true;
     await batch.commit();
@@ -113,7 +113,7 @@ const batchUpdate = async (docRef, docData) => {
   }
 };
 
-const batchDelete = async (docRef) => {
+const batchDelete = async docRef => {
   if (!isCommitting) {
     batch.delete(docRef);
     await checkRestartBatchWriteCounts();

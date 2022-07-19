@@ -1,18 +1,18 @@
-import fbApp from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/firestore";
-import "firebase/compat/storage";
+import fbApp from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/storage';
 
-import axios from "axios";
+import axios from 'axios';
 
-import { firebaseConfig, firebaseOneConfig } from "./config";
+import { firebaseConfig, firebaseOneConfig } from './config';
 
 // Firestore does not accept more than 500 writes in a transaction or batch write.
 const MAX_TRANSACTION_WRITES = 499;
 
-const isFirestoreDeadlineError = err => {
-  return err.message.includes("DEADLINE_EXCEEDED") || err.message.includes("Received RST_STREAM");
-};
+const isFirestoreDeadlineError = err =>
+  err.message.includes('DEADLINE_EXCEEDED') ||
+  err.message.includes('Received RST_STREAM');
 
 class Firebase {
   constructor(fireConfig, instanceName) {
@@ -37,7 +37,7 @@ class Firebase {
 
   // Commit and reset batchWrites and the counter.
   async makeCommitBatch() {
-    console.log("makeCommitBatch");
+    console.log('makeCommitBatch');
     if (!this.isCommitting) {
       this.isCommitting = true;
       await this.batch.commit();
@@ -138,15 +138,20 @@ class Firebase {
   // add token as authorization for every request to the server
   // validate if user is a valid user
   async idToken() {
-    const userToken = await this.auth.currentUser.getIdToken(/* forceRefresh */ true);
-    axios.defaults.headers.common["Authorization"] = userToken;
+    const userToken = await this.auth.currentUser.getIdToken(
+      /* forceRefresh */ true,
+    );
+    axios.defaults.headers.common.Authorization = userToken;
   }
 
   // register user with email and password
   async register(email, password, fullname) {
-    const newUser = await this.auth.createUserWithEmailAndPassword(email, password);
+    const newUser = await this.auth.createUserWithEmailAndPassword(
+      email,
+      password,
+    );
     await newUser.user.updateProfile({
-      displayName: fullname
+      displayName: fullname,
     });
     await this.idToken();
     return newUser.user;
@@ -160,7 +165,7 @@ class Firebase {
 
   async logout() {
     await this.auth.signOut();
-    delete axios.defaults.headers.common["Authorization"];
+    delete axios.defaults.headers.common.Authorization;
   }
 
   async resetPassword(email) {
@@ -171,7 +176,7 @@ class Firebase {
 axios.defaults.baseURL =
   // "http://localhost:5001/visualexp-a7d2c/us-central1/api/";
   // "https://us-central1-visualexp-a7d2c.cloudfunctions.net/api";
-  "https://1cademy.us/api";
+  'https://1cademy.us/api';
 
 export const firebase = new Firebase(firebaseConfig);
-export const firebaseOne = new Firebase(firebaseOneConfig, "onecademy");
+export const firebaseOne = new Firebase(firebaseOneConfig, 'onecademy');

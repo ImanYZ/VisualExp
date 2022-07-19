@@ -1,57 +1,57 @@
-import { atom } from "recoil";
-import AppConfig from '../AppConfig'
+import { atom } from 'recoil';
+import AppConfig from '../AppConfig';
 
 export const currentProjectState = atom({
-  key: "currentProjectState",
+  key: 'currentProjectState',
   default: AppConfig.defaultProject,
 });
 
 export const hasScheduledState = atom({
-  key: "hasScheduledState",
+  key: 'hasScheduledState',
   default: false,
 });
 
 export const completedExperimentState = atom({
-  key: "completedExperimentState",
+  key: 'completedExperimentState',
   default: false,
 });
 
 export const phaseState = atom({
-  key: "phaseState",
+  key: 'phaseState',
   default: 0,
 });
 
 export const secondSessionState = atom({
-  key: "secondSessionState",
+  key: 'secondSessionState',
   default: false,
 });
 
 export const thirdSessionState = atom({
-  key: "thirdSessionState",
+  key: 'thirdSessionState',
   default: false,
 });
 
 export const stepState = atom({
-  key: "stepState",
+  key: 'stepState',
   default: 0,
 });
 
 export const passageState = atom({
-  key: "passageState",
-  default: "",
+  key: 'passageState',
+  default: '',
 });
 
 export const conditionState = atom({
-  key: "conditionState",
-  default: "",
+  key: 'conditionState',
+  default: '',
 });
 
 export const nullPassageState = atom({
-  key: "nullPassageState",
-  default: "",
+  key: 'nullPassageState',
+  default: '',
 });
 
 export const choicesState = atom({
-  key: "choicesState",
+  key: 'choicesState',
   default: [],
 });

@@ -1,5 +1,5 @@
-const axios = require("axios");
-const fs = require("fs");
+const axios = require('axios');
+const fs = require('fs');
 
 const {
   admin,
@@ -8,9 +8,9 @@ const {
   batchSet,
   batchUpdate,
   batchDelete,
-} = require("./admin_Knowledge");
-const { getTypedCollections } = require("./getTypedCollections");
-const { typesenseIndex } = require("./typsenseIndex");
+} = require('./admin_Knowledge');
+const { getTypedCollections } = require('./getTypedCollections');
+const { typesenseIndex } = require('./typsenseIndex');
 
 // On 1Cademy.com nodes do not have their list of contributors and institutions
 // assigned to them. We should run this function every 25 hours in a PubSub to
@@ -30,11 +30,11 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       proposals: 0,
       createdAt: new Date(),
     };
-    const userDocs = await db.collection("users").get();
-    for (let userDoc of userDocs.docs) {
+    const userDocs = await db.collection('users').get();
+    for (const userDoc of userDocs.docs) {
       const userData = userDoc.data();
       userInstitutions[userDoc.id] = userData.deInstit;
-      userFullnames[userDoc.id] = userData.fName + " " + userData.lName;
+      userFullnames[userDoc.id] = `${userData.fName} ${userData.lName}`;
       stats.users += 1;
       institutions.add(userData.deInstit);
     }
@@ -47,8 +47,8 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
     // Retrieving all the nodes data and saving them in nodesData, so that we don't
     // need to retrieve them one by one, over and over again.
     const nodesData = {};
-    const nodeDocs = await db.collection("nodes").get();
-    for (let nodeDoc of nodeDocs.docs) {
+    const nodeDocs = await db.collection('nodes').get();
+    for (const nodeDoc of nodeDocs.docs) {
       const nodeData = nodeDoc.data();
       nodesData[nodeDoc.id] = nodeData;
       stats.nodes += 1;
@@ -56,14 +56,14 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
         (nodeData.parents.length + nodeData.children.length) / 2 +
         nodeData.tags.length +
         nodeData.references.length;
-      for (let tag of nodeData.tags) {
+      for (const tag of nodeData.tags) {
         if (tag.node in tags) {
           tags[tag.node].push(nodeDoc.id);
         } else {
           tags[tag.node] = [];
         }
       }
-      for (let reference of nodeData.references) {
+      for (const reference of nodeData.references) {
         if (reference.node in references) {
           references[reference.node].push(nodeDoc.id);
         } else {
@@ -73,15 +73,15 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
     }
     // We should retrieve all the accepted versions for all types of nodes.
     const nodeTypes = [
-      "Concept",
-      "Code",
-      "Relation",
-      "Question",
-      "Reference",
-      "Idea",
+      'Concept',
+      'Code',
+      'Relation',
+      'Question',
+      'Reference',
+      'Idea',
     ];
-    for (let nodeType of nodeTypes) {
-      console.log("Started nodeType: ", nodeType);
+    for (const nodeType of nodeTypes) {
+      console.log('Started nodeType: ', nodeType);
       // We cannot update the reputations on nodes only looking at the
       // versions (proposals) that are not considerred yet, because the
       // pervious versions may get new votes. So, we accumulate all the
@@ -91,7 +91,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       const nodesUpdates = {};
       const { versionsColl } = getTypedCollections(db, nodeType);
       const versionDocs = await versionsColl.get();
-      for (let versionDoc of versionDocs.docs) {
+      for (const versionDoc of versionDocs.docs) {
         const versionData = versionDoc.data();
         stats.proposals += 1;
         // Only if the version is accepted and it has never been deleted, i.e.,
@@ -99,7 +99,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
         if (!versionData.deleted && versionData.accepted) {
           // We should add the proposer's id and institution
           // to the contributors and institutions arrays in the corresponding node.
-          const nodeRef = db.collection("nodes").doc(versionData.node);
+          const nodeRef = db.collection('nodes').doc(versionData.node);
           if (versionData.node in nodesData) {
             // Only if the node does not exist in nodesUpdates, we need to create it,
             // and add the nodeRef to be able to update the node at the end.
@@ -115,18 +115,18 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
             // A user may have multiple accepted proposals on a node. However,
             // We have to update the node multiple times for such a user because
             // we should update their reputation points on the node.
-            if (!("contributors" in nodesUpdates[versionData.node])) {
+            if (!('contributors' in nodesUpdates[versionData.node])) {
               nodesUpdates[versionData.node].contributors = {};
             }
-            if (!("institutions" in nodesUpdates[versionData.node])) {
+            if (!('institutions' in nodesUpdates[versionData.node])) {
               nodesUpdates[versionData.node].institutions = {};
             }
             // We also need to add the names of contributors and institutions in
             // separate fields to be able to directly query them.
-            if (!("contribNames" in nodesUpdates[versionData.node])) {
+            if (!('contribNames' in nodesUpdates[versionData.node])) {
               nodesUpdates[versionData.node].contribNames = [];
             }
-            if (!("institNames" in nodesUpdates[versionData.node])) {
+            if (!('institNames' in nodesUpdates[versionData.node])) {
               nodesUpdates[versionData.node].institNames = [];
             }
             if (
@@ -135,10 +135,10 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 nodesUpdates[versionData.node].contributors
               ) &&
               versionData.proposer in userFullnames &&
-              "imageUrl" in versionData
+              'imageUrl' in versionData
             ) {
               nodesUpdates[versionData.node].contribNames.push(
-                versionData.proposer
+                versionData.proposer,
               );
               nodesUpdates[versionData.node].contributors[
                 versionData.proposer
@@ -158,7 +158,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 )
               ) {
                 nodesUpdates[versionData.node].institNames.push(
-                  userInstitutions[versionData.proposer]
+                  userInstitutions[versionData.proposer],
                 );
                 nodesUpdates[versionData.node].institutions[
                   userInstitutions[versionData.proposer]
@@ -189,7 +189,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 versionData.corrects - versionData.wrongs;
             } else {
               contributors[versionData.proposer] = {
-                docRef: db.collection("users").doc(versionData.proposer),
+                docRef: db.collection('users').doc(versionData.proposer),
                 reputation: versionData.corrects - versionData.wrongs,
               };
             }
@@ -198,17 +198,17 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
                 versionData.corrects - versionData.wrongs;
             } else {
               const institutionDocs = await db
-                .collection("institutions")
+                .collection('institutions')
                 .where(
-                  "name",
-                  "==",
-                  institutions[userInstitutions[versionData.proposer]]
+                  'name',
+                  '==',
+                  institutions[userInstitutions[versionData.proposer]],
                 )
                 .get();
               if (institutionDocs.docs.length > 0) {
                 institutions[userInstitutions[versionData.proposer]] = {
                   docRef: db
-                    .collection("institutions")
+                    .collection('institutions')
                     .doc(institutionDocs.docs[0].id),
                   reputation: versionData.corrects - versionData.wrongs,
                 };
@@ -217,7 +217,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
           }
         }
       }
-      for (let nodeId in nodesUpdates) {
+      for (const nodeId in nodesUpdates) {
         await batchUpdate(nodesUpdates[nodeId].nodeRef, {
           contributors: nodesUpdates[nodeId].contributors,
           institutions: nodesUpdates[nodeId].institutions,
@@ -225,19 +225,19 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
           institNames: nodesUpdates[nodeId].institNames,
         });
       }
-      for (let contributorId in contributors) {
+      for (const contributorId in contributors) {
         await batchUpdate(contributors[contributorId].docRef, {
           totalPoints: contributors[contributorId].reputation,
         });
       }
-      for (let institutionName in institutions) {
+      for (const institutionName in institutions) {
         await batchUpdate(institutions[institutionName].docRef, {
           totalPoints: institutions[institutionName].reputation,
         });
       }
     }
     stats.links = Math.round(stats.links);
-    const statRef = db.collection("stats").doc();
+    const statRef = db.collection('stats').doc();
     await batchSet(statRef, stats);
     await commitBatch();
 
@@ -251,30 +251,30 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
 // On 1Cademy.com when users sign up, we do not make the corresponding changes
 // to the institutions collection. We should run this function every 25 hours in
 // a PubSub to assign these arrays.
-exports.updateInstitutions = async (context) => {
+exports.updateInstitutions = async context => {
   try {
     const rawdata = fs.readFileSync(
-      __dirname + "/datasets/edited_universities.json"
+      `${__dirname}/datasets/edited_universities.json`,
     );
     const institutionCountries = {};
-    for (let institObj of JSON.parse(rawdata)) {
+    for (const institObj of JSON.parse(rawdata)) {
       institutionCountries[institObj.name] = institObj.country;
     }
-    let userDocs = await db.collection("users").get();
+    let userDocs = await db.collection('users').get();
     userDocs = [...userDocs.docs];
-    for (let userDoc of userDocs) {
+    for (const userDoc of userDocs) {
       const userData = userDoc.data();
       if (!userData.institUpdated) {
-        const domainName = userData.email.match("@(.+)$")[0];
+        const domainName = userData.email.match('@(.+)$')[0];
         const instQuery = db
-          .collection("institutions")
-          .where("name", "==", userData.deInstit)
+          .collection('institutions')
+          .where('name', '==', userData.deInstit)
           .limit(1);
-        await db.runTransaction(async (t) => {
+        await db.runTransaction(async t => {
           const instDocs = await t.get(instQuery);
           if (instDocs.docs.length > 0) {
             const instRef = db
-              .collection("institutions")
+              .collection('institutions')
               .doc(instDocs.docs[0].id);
             const institData = instDocs.docs[0].data();
             if (!institData.users.includes(userDoc.id)) {
@@ -289,44 +289,41 @@ exports.updateInstitutions = async (context) => {
               });
             }
           } else {
-            const instRef = db.collection("institutions").doc();
+            const instRef = db.collection('institutions').doc();
             const country =
               userData.deInstit in institutionCountries
                 ? institutionCountries[userData.deInstit]
-                : "";
+                : '';
             let response = await axios.get(
               encodeURI(
-                "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
-                  userData.deInstit
-              )
+                `https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=${userData.deInstit}`,
+              ),
             );
             let geoLoc;
             if (
-              "results" in response.data &&
+              'results' in response.data &&
               Array.isArray(response.data.results) &&
               response.data.results.length > 0 &&
-              "geometry" in response.data.results[0]
+              'geometry' in response.data.results[0]
             ) {
               geoLoc = response.data.results[0].geometry.location;
             } else {
               response = await axios.get(
                 encodeURI(
-                  "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
-                    userData.deInstit +
-                    " Education"
-                )
+                  `https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=${userData.deInstit} Education`,
+                ),
               );
               if (
-                "results" in response.data &&
+                'results' in response.data &&
                 Array.isArray(response.data.results) &&
                 response.data.results.length > 0 &&
-                "geometry" in response.data.results[0]
+                'geometry' in response.data.results[0]
               ) {
                 geoLoc = response.data.results[0].geometry.location;
               } else {
                 geoLoc = {
-                  lng: "",
-                  lat: "",
+                  lng: '',
+                  lat: '',
                 };
                 console.log({
                   institution: userData.deInstit,
@@ -339,9 +336,7 @@ exports.updateInstitutions = async (context) => {
               lng: geoLoc.lng,
               lat: geoLoc.lat,
               logoURL: encodeURI(
-                "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
-                  userData.deInstit +
-                  ".png"
+                `https://storage.googleapis.com/onecademy-1.appspot.com/Logos/${userData.deInstit}.png`,
               ),
               domains: [domainName],
               name: userData.deInstit,
@@ -349,7 +344,7 @@ exports.updateInstitutions = async (context) => {
               usersNum: 1,
             });
           }
-          const userRef = db.collection("users").doc(userDoc.id);
+          const userRef = db.collection('users').doc(userDoc.id);
           t.update(userRef, { institUpdated: true });
         });
       }
@@ -364,7 +359,7 @@ exports.updateInstitutions = async (context) => {
 // This function should run periodically to update the typesense index and keep the data updated in Typesense.
 // A better option is to create firebase functions to trigger on write requests on the collections.
 // We cannot do that currently. So this function is our best option for the moment.
-exports.updateTypesenseIndex = async (context) => {
+exports.updateTypesenseIndex = async context => {
   try {
     await typesenseIndex();
     return null;
