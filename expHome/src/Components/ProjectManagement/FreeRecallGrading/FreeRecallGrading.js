@@ -53,6 +53,15 @@ const FreeRecallGrading = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [firstFiveRecallGrades, setFirstFiveRecallGrades] = useState([]);
   const [retrieveNext, setRetrieveNext] = useState(0);
+  const [limit, setLimit] = useState(1000);
+  
+
+  useEffect(()=>{
+    if((firstFiveRecallGrades.length === 0)&&(limit<=1000)){
+      setLimit(4000)
+ }
+  },[firstFiveRecallGrades,limit])
+
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   useEffect(() => {
@@ -76,7 +85,7 @@ const FreeRecallGrading = props => {
         .orderBy("passage")
         .orderBy("user")
         .orderBy("session")
-        .limit(4000)
+        .limit(limit)
         .get();
 
       if (recallGradeDocs.docs.length === 0) {
@@ -108,6 +117,7 @@ const FreeRecallGrading = props => {
             (firstFve.length === 5 || recallGradeData.response !== firstFve[0].data.response)
           ) {
             setFirstFiveRecallGrades(firstFve);
+
             const passageDoc = await firebase.db.collection("passages").doc(firstFve[0].data.passage).get();
             setPassageData(passageDoc.data());
             break;
@@ -128,7 +138,7 @@ const FreeRecallGrading = props => {
     return () => retrieveFreeRecallResponse();
     // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
     // should be called regardless of its value.
-  }, [firebase, fullname, notAResearcher, project, retrieveNext]);
+  }, [firebase, fullname, notAResearcher, project, retrieveNext,limit]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
