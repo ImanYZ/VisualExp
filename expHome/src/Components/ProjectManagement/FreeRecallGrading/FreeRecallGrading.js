@@ -5,6 +5,7 @@ import axios from "axios";
 
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
+import AlertTitle from '@mui/material/AlertTitle';
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -75,7 +76,7 @@ const FreeRecallGrading = props => {
         .orderBy("passage")
         .orderBy("user")
         .orderBy("session")
-        .limit(1000)
+        .limit(4000)
         .get();
 
       if (recallGradeDocs.docs.length === 0) {
@@ -85,7 +86,7 @@ const FreeRecallGrading = props => {
 
       for (let recallGradeDoc of recallGradeDocs.docs) {
         const recallGradeData = recallGradeDoc.data();
-
+       
         if (
           recallGradeData.user !== fullname &&
           (recallGradeData.researchersNum === 0 ||
@@ -114,7 +115,7 @@ const FreeRecallGrading = props => {
           firstFve.push({ data: recallGradeData, grade: false });
         }
       }
-      setSubmitting(false);
+      setSubmitting(false); 
       // ASA we find five free-recall phrases for a particular response
       // we set this flag to true to stop searching.
       return null;
@@ -177,7 +178,13 @@ const FreeRecallGrading = props => {
     setFirstFiveRecallGrades(grades);
   };
 
+
   return (
+  (firstFiveRecallGrades.length === 0)?
+  ( <Alert severity="info" size="larg">
+     <AlertTitle>Info</AlertTitle>
+    Since the recall grades is done collaboratively, you should wait for a few days so that other researchers grade the recalls you've graded before .
+  </Alert>):  
     <div id="FreeRecallGrading">
       <Alert severity="success">
         <ul>
