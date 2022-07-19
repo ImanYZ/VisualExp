@@ -1,67 +1,67 @@
 export default mapStyle = [
   {
-    featureType: "administrative",
-    elementType: "all",
+    featureType: 'administrative',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "administrative.country",
-    elementType: "geometry",
+    featureType: 'administrative.country',
+    elementType: 'geometry',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
       {
         lightness: 10,
       },
       {
-        color: "#eeeeee",
+        color: '#eeeeee',
       },
     ],
   },
   {
-    featureType: "administrative.country",
-    elementType: "labels",
+    featureType: 'administrative.country',
+    elementType: 'labels',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
     ],
   },
   {
-    featureType: "administrative.country",
-    elementType: "labels.text.fill",
+    featureType: 'administrative.country',
+    elementType: 'labels.text.fill',
     stylers: [
       {
-        color: "#949494",
+        color: '#949494',
       },
     ],
   },
   {
-    featureType: "administrative.country",
-    elementType: "labels.text.stroke",
+    featureType: 'administrative.country',
+    elementType: 'labels.text.stroke',
     stylers: [
       {
-        color: "#ffffff",
+        color: '#ffffff',
       },
     ],
   },
   {
-    featureType: "administrative.province",
-    elementType: "all",
+    featureType: 'administrative.province',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
     ],
   },
   {
-    featureType: "administrative.province",
-    elementType: "geometry",
+    featureType: 'administrative.province',
+    elementType: 'geometry',
     stylers: [
       {
         lightness: 50,
@@ -69,47 +69,47 @@ export default mapStyle = [
     ],
   },
   {
-    featureType: "administrative.province",
-    elementType: "labels",
+    featureType: 'administrative.province',
+    elementType: 'labels',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "administrative.locality",
-    elementType: "all",
+    featureType: 'administrative.locality',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "administrative.neighborhood",
-    elementType: "all",
+    featureType: 'administrative.neighborhood',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "administrative.land_parcel",
-    elementType: "all",
+    featureType: 'administrative.land_parcel',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "landscape",
-    elementType: "all",
+    featureType: 'landscape',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
       {
         saturation: -79,
@@ -118,20 +118,20 @@ export default mapStyle = [
     ],
   },
   {
-    featureType: "landscape.man_made",
-    elementType: "all",
+    featureType: 'landscape.man_made',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "landscape.natural",
-    elementType: "all",
+    featureType: 'landscape.natural',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
       {
         saturation: 3,
@@ -140,38 +140,38 @@ export default mapStyle = [
     ],
   },
   {
-    featureType: "landscape.natural.landcover",
-    elementType: "all",
+    featureType: 'landscape.natural.landcover',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "landscape.natural.terrain",
-    elementType: "all",
+    featureType: 'landscape.natural.terrain',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "poi",
-    elementType: "all",
+    featureType: 'poi',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "road",
-    elementType: "all",
+    featureType: 'road',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "on",
+        visibility: 'on',
       },
       {
         lightness: -58,
@@ -179,53 +179,53 @@ export default mapStyle = [
     ],
   },
   {
-    featureType: "road",
-    elementType: "labels",
+    featureType: 'road',
+    elementType: 'labels',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "road.highway",
-    elementType: "all",
+    featureType: 'road.highway',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "road.arterial",
-    elementType: "all",
+    featureType: 'road.arterial',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "road.local",
-    elementType: "all",
+    featureType: 'road.local',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "inherit",
+        visibility: 'inherit',
       },
     ],
   },
   {
-    featureType: "transit",
-    elementType: "all",
+    featureType: 'transit',
+    elementType: 'all',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },
   {
-    featureType: "water",
-    elementType: "all",
+    featureType: 'water',
+    elementType: 'all',
     stylers: [
       {
         saturation: -15,
@@ -233,20 +233,20 @@ export default mapStyle = [
     ],
   },
   {
-    featureType: "water",
-    elementType: "geometry",
+    featureType: 'water',
+    elementType: 'geometry',
     stylers: [
       {
-        color: "#222330",
+        color: '#222330',
       },
     ],
   },
   {
-    featureType: "water",
-    elementType: "labels.text",
+    featureType: 'water',
+    elementType: 'labels.text',
     stylers: [
       {
-        visibility: "off",
+        visibility: 'off',
       },
     ],
   },

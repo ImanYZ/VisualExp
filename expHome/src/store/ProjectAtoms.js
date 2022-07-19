@@ -1,82 +1,82 @@
-import { atom } from "recoil";
+import { atom } from 'recoil';
 import AppConfig from '../AppConfig';
 
 export const projectsState = atom({
-  key: "projectsState",
+  key: 'projectsState',
   default: [],
 });
 
 export const projectState = atom({
-  key: "projectState",
+  key: 'projectState',
   default: AppConfig.defaultProject,
 });
 
 export const projectSpecsState = atom({
-  key: "projectSpecs",
+  key: 'projectSpecs',
   default: {},
 });
 
 export const activePageState = atom({
-  key: "activePageState",
-  default: "Intellectual",
+  key: 'activePageState',
+  default: 'Intellectual',
 });
 
 export const notAResearcherState = atom({
-  key: "notAResearcherState",
+  key: 'notAResearcherState',
   default: true,
 });
 
 export const notTakenSessionsState = atom({
-  key: "notTakenSessionsState",
+  key: 'notTakenSessionsState',
   default: [],
 });
 
 export const notTakenSessionsLoadedState = atom({
-  key: "notTakenSessionsLoadedState",
+  key: 'notTakenSessionsLoadedState',
   default: false,
 });
 
 export const allTagsState = atom({
-  key: "allTagsState",
+  key: 'allTagsState',
   default: [],
 });
 
 export const allActivitiesState = atom({
-  key: "allActivitiesState",
+  key: 'allActivitiesState',
   default: [],
 });
 
 export const othersActivitiesState = atom({
-  key: "othersActivitiesState",
+  key: 'othersActivitiesState',
   default: [],
 });
 
 export const otherActivityState = atom({
-  key: "otherActivityState",
+  key: 'otherActivityState',
   default: {},
 });
 
 export const upVotedTodayState = atom({
-  key: "upVotedTodayState",
+  key: 'upVotedTodayState',
   default: 0,
 });
 
 export const instructorsState = atom({
-  key: "instructorsState",
+  key: 'instructorsState',
   default: [],
 });
 
 export const othersInstructorsState = atom({
-  key: "othersInstructorsState",
+  key: 'othersInstructorsState',
   default: [],
 });
 
 export const instructorsTodayState = atom({
-  key: "instructorsTodayState",
+  key: 'instructorsTodayState',
   default: 0,
 });
 
 export const upvotedInstructorsTodayState = atom({
-  key: "upvotedInstructorsTodayState",
+  key: 'upvotedInstructorsTodayState',
   default: 0,
 });

@@ -1,13 +1,12 @@
-const { admin, db } = require("./admin");
+const { admin, db } = require('./admin');
 
 // We're using fullname as id in some Firestore collections.
 // For these purposes, we need to escape some characters.
-const getFullname = (firstname, lastname) => {
-  return (firstname + " " + lastname)
-    .replace(".", "")
-    .replace("__", " ")
-    .replace("/", " ");
-};
+const getFullname = (firstname, lastname) =>
+  `${firstname} ${lastname}`
+    .replace('.', '')
+    .replace('__', ' ')
+    .replace('/', ' ');
 
 const getActivityTimeStamps = (aDate, sTime, eTime) => {
   const year = aDate.getFullYear();
@@ -29,7 +28,7 @@ const getIn30Minutes = (startTime, endTime) => {
   if (endTime.getTime() <= startTime.getTime() + 30 * 60 * 1000) {
     return [{ sTime: startTime, eTime: endTime }];
   }
-  let timeSlots = [];
+  const timeSlots = [];
   let eTime = startTime;
   let sTime = startTime;
   while (endTime.getTime() >= sTime.getTime() + 30 * 60 * 1000) {
@@ -40,36 +39,22 @@ const getIn30Minutes = (startTime, endTime) => {
   return timeSlots;
 };
 
-const strToBoolean = (str) => {
+const strToBoolean = str => {
   const str1 = str.toLowerCase();
-  if (!str1 || str1 === "false" || str1 === "f") {
+  if (!str1 || str1 === 'false' || str1 === 'f') {
     return false;
   }
   return true;
 };
 
-//generates random id;
+// generates random id;
 const generateUID = () => {
-  let s4 = () => {
-    return Math.floor((1 + Math.random()) * 0x10000)
+  const s4 = () =>
+    Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
       .substring(1);
-  };
-  //return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
-  return (
-    s4() +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    s4() +
-    s4()
-  );
+  // return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
+  return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
 };
 
 const datesAreOnSameDay = (first, second) =>
@@ -77,21 +62,17 @@ const datesAreOnSameDay = (first, second) =>
   first.getMonth() === second.getMonth() &&
   first.getDate() === second.getDate();
 
-const isToday = (theDate) => {
+const isToday = theDate => {
   const now = new Date();
   return datesAreOnSameDay(now, theDate);
 };
 
-const getDateString = (dateObj) => {
+const getDateString = dateObj => {
   const theDay = dateObj.getDate();
   const theMonth = dateObj.getMonth() + 1;
-  return (
-    dateObj.getFullYear() +
-    "-" +
-    (theMonth < 10 ? "0" + theMonth : theMonth) +
-    "-" +
-    (theDay < 10 ? "0" + theDay : theDay)
-  );
+  return `${dateObj.getFullYear()}-${
+    theMonth < 10 ? `0${theMonth}` : theMonth
+  }-${theDay < 10 ? `0${theDay}` : theDay}`;
 };
 
 const nextWeek = () => {
@@ -100,21 +81,16 @@ const nextWeek = () => {
   nextWeek = new Date(
     nextWeek.getFullYear(),
     nextWeek.getMonth(),
-    nextWeek.getDate()
+    nextWeek.getDate(),
   );
   return nextWeek;
 };
 
 // Removes leading and trailing whitespace from the string and capitalize its first character.
-const capitalizeFirstLetter = (string) => {
-  return (
-    string.trim().charAt(0).toUpperCase() + string.trim().slice(1).toLowerCase()
-  );
-};
+const capitalizeFirstLetter = string =>
+  string.trim().charAt(0).toUpperCase() + string.trim().slice(1).toLowerCase();
 
-const pad2Num = (number) => {
-  return (number < 10 ? "0" : "") + number;
-};
+const pad2Num = number => (number < 10 ? '0' : '') + number;
 
 module.exports = {
   strToBoolean,

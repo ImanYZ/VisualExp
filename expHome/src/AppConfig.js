@@ -1,5 +1,5 @@
 const AppConfig = {
-  defaultProject: "H2K2"
+  defaultProject: 'H2K2',
 };
 
 export default AppConfig;

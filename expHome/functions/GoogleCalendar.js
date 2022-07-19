@@ -1,7 +1,7 @@
-const { google } = require("googleapis");
-require("dotenv").config();
+const { google } = require('googleapis');
+require('dotenv').config();
 
-const { generateUID } = require("./utils");
+const { generateUID } = require('./utils');
 
 // Require oAuth2 from our google instance.
 const { OAuth2 } = google.auth;
@@ -9,7 +9,7 @@ const { OAuth2 } = google.auth;
 // Create a new instance of oAuth and set our Client ID & Client Secret.
 const oAuth2Client = new OAuth2(
   process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET
+  process.env.CLIENT_SECRET,
 );
 const calendarId = process.env.UX_CALENDAR_ID;
 
@@ -19,7 +19,7 @@ oAuth2Client.setCredentials({
 });
 
 // Create a new calender instance.
-const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
 
 // Insert new event to UX Google Calendar
 exports.insertEvent = async (
@@ -28,7 +28,7 @@ exports.insertEvent = async (
   summary,
   description,
   attendees,
-  colorId
+  colorId,
 ) => {
   const event = {
     summary,
@@ -50,32 +50,31 @@ exports.insertEvent = async (
     reminders: {
       useDefault: false,
       overrides: [
-        { method: "email", minutes: 24 * 60 },
-        { method: "popup", minutes: 10 },
+        { method: 'email', minutes: 24 * 60 },
+        { method: 'popup', minutes: 10 },
       ],
     },
     conferenceData: {
       createRequest: {
         conferenceSolutionKey: {
-          type: "hangoutsMeet",
+          type: 'hangoutsMeet',
         },
         requestId: generateUID(),
       },
     },
   };
   try {
-    let response = await calendar.events.insert({
-      calendarId: calendarId,
+    const response = await calendar.events.insert({
+      calendarId,
       conferenceDataVersion: 1,
       resource: event,
-      sendUpdates: "all",
+      sendUpdates: 'all',
     });
 
-    if (response["status"] == 200 && response["statusText"] === "OK") {
+    if (response.status == 200 && response.statusText === 'OK') {
       return response;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(`Error at insertEvent --> ${error}`);
     return false;
@@ -83,14 +82,14 @@ exports.insertEvent = async (
 };
 
 // Get a specific event
-exports.getEvent = async (eventId) => {
+exports.getEvent = async eventId => {
   try {
     const response = await calendar.events.get({
       calendarId,
       eventId,
     });
 
-    return response["data"];
+    return response.data;
   } catch (error) {
     console.log(`Error at getEvents --> ${error}`);
     return null;
@@ -126,14 +125,14 @@ exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
 };
 
 // Delete an event with eventID
-exports.deleteEvent = async (eventId) => {
+exports.deleteEvent = async eventId => {
   try {
-    let response = await calendar.events.delete({
-      calendarId: calendarId,
-      eventId: eventId,
+    const response = await calendar.events.delete({
+      calendarId,
+      eventId,
     });
 
-    if (response.data === "") {
+    if (response.data === '') {
       return true;
     }
   } catch (error) {
@@ -218,16 +217,15 @@ exports.insertLifeLogEvent = async (start, end, summary, description) => {
     },
   };
   try {
-    let response = await calendar.events.insert({
+    const response = await calendar.events.insert({
       calendarId: process.env.LIFE_LOGS_CALENDAR_ID,
       resource: event,
     });
 
-    if (response["status"] == 200 && response["statusText"] === "OK") {
+    if (response.status == 200 && response.statusText === 'OK') {
       return response;
-    } else {
-      return false;
     }
+    return false;
   } catch (error) {
     console.log(`Error at insertEvent --> ${error}`);
     return false;

@@ -1,10 +1,10 @@
-const { admin, db, storage } = require("./admin");
+const { admin, db, storage } = require('./admin');
 
-require("dotenv").config();
+require('dotenv').config();
 
 exports.card = (req, res) => {
   switch (req.method) {
-    case "GET":
+    case 'GET':
       let html_content = `
 <!DOCTYPE html>
     <html>
@@ -26,21 +26,21 @@ exports.card = (req, res) => {
     </body>
 </html>
         `;
-      res.writeHeader(200, { "Content-Type": "text/html" });
+      res.writeHeader(200, { 'Content-Type': 'text/html' });
       res.write(html_content);
       res.end();
       break;
-    case "PUT":
-      res.status(403).send("Forbidden!");
+    case 'PUT':
+      res.status(403).send('Forbidden!');
       break;
     default:
-      res.status(405).send({ error: "Something blew up!" });
+      res.status(405).send({ error: 'Something blew up!' });
       break;
   }
 };
 
-const misinformationExpRec = async (reqHeaders) => {
-  const misinformationExp = db.collection("misinformationExp").doc();
+const misinformationExpRec = async reqHeaders => {
+  const misinformationExp = db.collection('misinformationExp').doc();
   await misinformationExp.set({
     time: new Date(),
     reqHeaders,
@@ -49,24 +49,24 @@ const misinformationExpRec = async (reqHeaders) => {
 
 exports.image = (req, res) => {
   switch (req.method) {
-    case "GET":
-      console.log("Opened direct message at :" + new Date());
+    case 'GET':
+      console.log(`Opened direct message at :${new Date()}`);
       console.log({ headers: req.headers });
       misinformationExpRec(req.headers);
 
       const file = storage
-        .bucket("visualexp-a7d2c.appspot.com")
-        .file("fakenews.png");
-      let readStream = file.createReadStream();
+        .bucket('visualexp-a7d2c.appspot.com')
+        .file('fakenews.png');
+      const readStream = file.createReadStream();
 
-      res.setHeader("content-type", "image/png");
+      res.setHeader('content-type', 'image/png');
       readStream.pipe(res);
       break;
-    case "PUT":
-      res.status(403).send("Forbidden!");
+    case 'PUT':
+      res.status(403).send('Forbidden!');
       break;
     default:
-      res.status(405).send({ error: "Something blew up!" });
+      res.status(405).send({ error: 'Something blew up!' });
       break;
   }
 };
