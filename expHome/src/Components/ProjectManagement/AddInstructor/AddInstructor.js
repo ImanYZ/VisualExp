@@ -386,7 +386,6 @@ const AddInstructor = (props) => {
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
     upvotedInstructorsTodayState
   );
-  const [selectedProject, setSelectedProject] = useState(project);
   // States for the fileds that the authenticated researcher enters for each
   // instructor/school administrator.
   const [firstname, setFirstname] = useState("");
@@ -442,7 +441,6 @@ const AddInstructor = (props) => {
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
   useEffect(() => {
-    setSelectedProject(project);
     setSelectedRows([])
     setValues(initialState);
     setInvalidInstructor("");
@@ -455,7 +453,6 @@ const AddInstructor = (props) => {
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
-    console.log('loadInstitutions();');
     const loadInstitutions = async () => {
       if (institutions.length === 0) {
         const institutionsObj = await import(
@@ -475,13 +472,17 @@ const AddInstructor = (props) => {
   // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
     if (firebase && project) {
-      console.log('instructorsinstructors');
       setInstructors([]);
       setOthersInstructors([]);
       setInstructorsToday(0);
       setUpvotedInstructorsToday(0);
       setOtherInstructor({});
-      const instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
+      let instructorsQuery;
+      if (project === "Annotating") {
+        instructorsQuery = firebase.db.collection("instructors");
+      } else {
+        instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
+      }
       const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
         setInstructorsChanges((oldInstructorsChanges) => {
@@ -500,12 +501,19 @@ const AddInstructor = (props) => {
   // a new spashot listener to listen to all the instructor votes by the
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
-    console.log('firebase && project && fullname && instructorsLoaded');
     if (firebase && project && fullname && instructorsLoaded) {
-      const instructorVotesQuery = firebase.db
-        .collection("instructorVotes")
-        .where("voter", "==", fullname)
-        .where("project", "==", project);
+      let instructorVotesQuery;
+      if (project === "Annotating") {
+        instructorVotesQuery = firebase.db
+          .collection("instructorVotes")
+          .where("voter", "==", fullname)
+      } else {
+        instructorVotesQuery = firebase.db
+          .collection("instructorVotes")
+          .where("voter", "==", fullname)
+          .where("project", "==", project);
+      }
+
       const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(
         (snapshot) => {
           const docChanges = snapshot.docChanges();
@@ -524,13 +532,23 @@ const AddInstructor = (props) => {
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 16) {
       const today = getISODateString(new Date());
-      const dayUpVotesDocs = await firebase.db
-        .collection("dayInstructorUpVotes")
-        .where("project", "==", project)
-        .where("voter", "==", fullname)
-        .where("date", "==", today)
-        .limit(1)
-        .get();
+      let dayUpVotesDocs;
+      if (project === "Annotating") {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      } else {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("project", "==", project)
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      }
       if (dayUpVotesDocs.docs.length === 0) {
         try {
           const dayUpVoteRef = firebase.db
@@ -1121,13 +1139,23 @@ const AddInstructor = (props) => {
             const researcherDoc = await researcherRef.get();
             const researcherData = researcherDoc.data();
             const today = getISODateString(new Date());
-            const dayInstructorsDocs = await firebase.db
-              .collection("dayInstructors")
-              .where("project", "==", project)
-              .where("fullname", "==", fullname)
-              .where("date", "==", today)
-              .limit(1)
-              .get();
+            let dayInstructorsDocs;
+            if (project === "Annotating") {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            } else {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("project", "==", project)
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            }
 
             let instructorRef = firebase.db.collection("instructors").doc();
             if (updating) {
@@ -1726,31 +1754,16 @@ const AddInstructor = (props) => {
                 renderInput={renderInstitution}
               />
             )}
-            {!selectedRows.length &&
-              <TextField
-                sx={{ width: '100%' }}
-                className="TextField"
-                label="Interested Topic"
-                onChange={handleChange}
-                name="interestedTopic"
-                type="text"
-                value={values.interestedTopic}
-                onKeyPress={onKeyPress}
-              />
-            }
-            {selectedRows.length > 0 &&
-              selectedProject === 'Annotating' &&
-              <TextField
-                sx={{ width: '100%' }}
-                className="TextField"
-                label="Interested Topic"
-                onChange={handleChange}
-                name="interestedTopic"
-                type="text"
-                value={values.interestedTopic}
-                onKeyPress={onKeyPress}
-              />
-            }
+            <TextField
+              sx={{ width: '100%' }}
+              className="TextField"
+              label="Interested Topic"
+              onChange={handleChange}
+              name="interestedTopic"
+              type="text"
+              value={values.interestedTopic}
+              onKeyPress={onKeyPress}
+            />
             <TextareaAutosize
               ariaLabel="Extra Information Text box"
               minRows={4}
