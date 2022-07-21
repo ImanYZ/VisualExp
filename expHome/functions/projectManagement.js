@@ -432,6 +432,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       }
     })
       .then(() => {
+     
         return res
           .status(200)
           .json({ success: true, endpoint: "Bulk Upload", successData: req.body.phrasesWithGrades });
@@ -440,8 +441,10 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         console.log({ err });
         return res.status(500).json({ errMsg: err.message, success: false });
       });
+  }else{
+    return res.status(500).json({ errMsg: 'some parameters missing', success: false });
   }
-  return res.status(500).json({ errMsg: 'some parameters missing', success: false });
+
 };
 
 exports.voteEndpoint = async (req, res) => {
