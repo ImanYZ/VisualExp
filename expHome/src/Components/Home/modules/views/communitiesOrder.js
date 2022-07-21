@@ -413,16 +413,12 @@ export default [
       {
         title: "Social psychology",
         node: "FyQoGIdVVeDHvn1lHOZL"
-      },
-      {
-        title: "Behavioral Economics",
-        node: "zFZ2Rvnvp4TyJE7g0vUZ"
       }
     ],
     allTime: [],
     weekly: [],
     url: "/static/Communities/Social_Political_Psychology.jpg",
-    title: "Behavioral Economics & Social Psychology",
+    title: "Social & Political Psychology",
     width: "33%",
     leaders: [
       {
