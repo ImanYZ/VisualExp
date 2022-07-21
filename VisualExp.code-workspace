@@ -1,16 +1,20 @@
 {
-    "folders": [
-        {
-            "name": "expHome",
-            "path": "./expHome"
-        },
-        {
-            "name": "localFunctions",
-            "path": "./localFunctions"
-        },
-        {
-            "name": "VisualExp",
-            "path": "."
-        },
-    ]
+  "folders": [
+      {
+          "name": "exp home",
+          "path": "./expHome"
+      },
+      {
+          "name": "cloud functions",
+          "path": "./expHome/functions"
+      },
+      {
+          "name": "local functions",
+          "path": "./localFunctions"
+      },
+      {
+          "name": "visual experiment",
+          "path": "."
+      },
+  ]
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import axios from "axios";
 
@@ -12,8 +12,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
+import { projectState } from "../../store/ProjectAtoms";
+import { currentProjectState } from "../../store/ExperimentAtoms";
 
 import SelectSessions from "./SelectSessions";
 
@@ -72,14 +74,24 @@ const SchedulePage = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [globalProject, setGlobalProject] = useRecoilState(projectState);
+  const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(currentProjectState);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
+      const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
       // We need to first retrieve which project this user belongs to.
-      const userDoc = await firebase.db.collection("users").doc(fullname).get();
+      if (isStudentCoNoteSurvey === "true") {
+        setGlobalProject("StudentCoNoteSurvey");
+        setGlobalCurrentProject("StudentCoNoteSurvey");
+      }
+      const userDoc = await firebase.db
+        .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
+        .doc(fullname)
+        .get();
       const userData = userDoc.data();
       const project = userData.project;
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
@@ -238,14 +250,24 @@ const SchedulePage = props => {
         const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
         await firebase.batchDelete(scheduleRef);
       }
+      // We randomly pick one of the available researchers in each session and assign them to run this session.
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         first: firstSession,
-        researcher1st: availableSessions[firstSession.toLocaleString()][0],
+        researcher1st:
+          availableSessions[firstSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[firstSession.toLocaleString()].length)
+          ],
         second: secondSession,
-        researcher2nd: availableSessions[secondSession.toLocaleString()][0],
+        researcher2nd:
+          availableSessions[secondSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[secondSession.toLocaleString()].length)
+          ],
         third: thirdSession,
-        researcher3rd: availableSessions[thirdSession.toLocaleString()][0]
+        researcher3rd:
+          availableSessions[thirdSession.toLocaleString()][
+            Math.floor(Math.random() * availableSessions[thirdSession.toLocaleString()].length)
+          ]
       });
       errorAlert(responseObj.data);
 
