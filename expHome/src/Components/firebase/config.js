@@ -18,8 +18,14 @@ const firebaseProdConfig = {
   measurementId: "G-0BH5YRED86"
 };
 
+const config = (() => {
+  if (process.env.REACT_APP_ENV === "development") return firebaseDevConfig;
+  if (process.env.REACT_APP_ENV === "production") return firebaseProdConfig;
+  return firebaseDevConfig;
+})();
+
 // Your web app's Firebase configuration
-export const firebaseConfig = firebaseProdConfig;
+export const firebaseConfig = config;
 
 export const firebaseOneConfig = {
   apiKey: "AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE",

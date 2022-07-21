@@ -2,12 +2,21 @@
   "name": "visualexp",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start:dev": "env-cmd -f .env.develop react-scripts start",
+    "start:prod": "env-cmd -f .env.production react-scripts start",
+    "build:dev": "env-cmd -f .env.develop react-scripts build",
+    "build:prod": "env-cmd -f .env.production react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "dependencies": {
     "@date-io/date-fns": "^2.11.0",
     "@emotion/react": "^11.7.0",
     "@emotion/styled": "^11.6.0",
     "@google-cloud/storage": "^5.16.0",
     "@mui/icons-material": "^5.2.0",
+    "@mui/joy": "^5.0.0-alpha.37",
     "@mui/lab": "^5.0.0-alpha.57",
     "@mui/material": "^5.2.1",
     "@mui/styles": "^5.2.1",
@@ -40,6 +49,7 @@
     "react-animate-on-scroll": "^2.1.5",
     "react-animation-on-scroll": "^2.1.0",
     "react-dom": "^17.0.2",
+    "react-equation": "^1.0.0-rc.1",
     "react-router-dom": "^6.0.2",
     "react-schedule-selector": "^2.0.0",
     "react-scripts": "^5.0.1",
@@ -52,13 +62,9 @@
     "wink-porter2-stemmer": "^2.0.1",
     "wink-tokenizer": "^5.2.3"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
   "devDependencies": {
+    "@types/eslint": "^8.4.3",
+    "env-cmd": "^10.1.0",
     "react-error-overlay": "6.0.9"
   },
   "eslintConfig": {
