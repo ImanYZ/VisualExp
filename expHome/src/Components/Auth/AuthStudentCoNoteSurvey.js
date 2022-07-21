@@ -9,15 +9,7 @@ import Alert from "@mui/material/Alert";
 
 import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
 
-import {
-  currentProjectState,
-  phaseState,
-  stepState,
-  passageState,
-  conditionState,
-  nullPassageState,
-  choicesState
-} from "../../store/ExperimentAtoms";
+import { currentProjectState } from "../../store/ExperimentAtoms";
 
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
@@ -29,27 +21,19 @@ import { isEmail, getFullname, shuffleArray } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
+import { useNavigate } from "react-router-dom";
 
-const Auth = props => {
+const AuthStudentCoNoteSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
-  const [leading, setLeading] = useRecoilState(leadingState);
-  const currentProject = useRecoilValue(currentProjectState);
+  const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
-  const [phase, setPhase] = useRecoilState(phaseState);
-  const [step, setStep] = useRecoilState(stepState);
-  const [passage, setPassage] = useRecoilState(passageState);
-  const [condition, setCondition] = useRecoilState(conditionState);
-  const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
-  const [choices, setChoices] = useRecoilState(choicesState);
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [courses, setCourses] = useState([]);
-  const [course, setCourse] = useState("");
   const [isSignUp, setIsSignUp] = useState(0);
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [invalidAuth, setInvalidAuth] = useState(false);
@@ -70,18 +54,7 @@ const Auth = props => {
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
-
-  useEffect(() => {
-    const getCourses = async () => {
-      const coursesDocs = await firebase.db.collection("courses").get();
-      const tCourses = [];
-      for (let courseDoc of coursesDocs.docs) {
-        tCourses.push(courseDoc.id);
-      }
-      setCourses(tCourses);
-    };
-    getCourses();
-  }, [firebase]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setParticipatedBefore(false);
@@ -96,10 +69,10 @@ const Auth = props => {
     let userNotExists = false;
     let lName = lastname;
     let userData, userRef, fuName;
-    const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
+    const userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
     if (userDocs.docs.length > 0) {
       // Sign in and signed up:
-      userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
+      userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(userDocs.docs[0].id);
       userData = userDocs.docs[0].data();
       const fName = !userData.firstname ? firstname : userData.firstname;
       lName = !userData.lastname ? lastname : userData.lastname;
@@ -108,37 +81,22 @@ const Auth = props => {
       }
       fuName = getFullname(fName, lName);
       console.log("FULL NAME => ", fuName);
-      if ("leading" in userData && userData.leading.length > 0) {
-        setLeading(userData.leading);
-      }
+
       const researcherDoc = await firebase.db.collection("researchers").doc(fuName).get();
       if (!researcherDoc.exists) {
-        if (!("phase" in userData) || !("currentPCon" in userData)) {
-          userNotExists = true;
-          userData = {
-            uid,
-            email: uEmail,
-            firstname: fName,
-            lastname: lName,
-            project: currentProject
-          };
-          if (course) {
-            userData.course = course;
-          }
-        } else {
-          setPhase(userData.phase);
-          setStep(userData.step);
-          setPassage(userData.currentPCon.passage);
-          setCondition(userData.currentPCon.condition);
-          setNullPassage(userData.nullPassage);
-          setChoices(userData.choices);
-        }
+        userNotExists = true;
+        userData = {
+          uid,
+          email: uEmail,
+          firstname: fName,
+          lastname: lName,
+          project: "StudentCoNoteSurvey"
+        };
       }
       if (!userNotExists && !userData.uid) {
         const userDataLog = {
           uid,
-          project: currentProject,
-          course
+          project: "StudentCoNoteSurvey"
         };
         if (userData.firstname && userData.lastname) {
           await userRef.update(userDataLog);
@@ -161,106 +119,27 @@ const Auth = props => {
       // Only signed up:
       if (isSignUp === 1) {
         fuName = getFullname(firstname, lName);
-        let userD = await firebase.db.collection("users").doc(fuName).get();
+        let userD = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName).get();
         while (userD.exists) {
           lName = " " + lName;
           fuName = getFullname(firstname, lName);
-          userD = await firebase.db.collection("users").doc(fuName).get();
+          userD = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName).get();
         }
-        userRef = firebase.db.collection("users").doc(fuName);
+        userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName);
         userData = {
           uid,
           email: uEmail,
           firstname,
           lastname: lName,
-          project: currentProject
+          project: "StudentCoNoteSurvey"
         };
-        if (course) {
-          userData.course = course;
-        }
       }
     }
     if (userNotExists) {
-      const conditions = shuffleArray([...projectSpecs.conditions]); // ['H2', 'K2']
-      // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
-      // const minPassageNums = [10000, 10000]; // [166, 166]
-      const passagesResult = await firebase.db.collection("passages").get();
-
-      // passages that contains the current project
-      let passagesDocs = passagesResult.docs.filter(p => currentProject in p.data()?.projects);
-      // randomize Array order
-      passagesDocs = shuffleArray(passagesDocs);
-      const minPConditions = [];
-      conditions.forEach((con, i) => {
-        minPConditions.push({ condition: con, passage: passagesDocs[i].id });
-      });
-
-      // setting up a null passage that is not in minPConditions.
-      let nullPassage = "";
-      let passIdx = Math.floor(Math.random() * passagesDocs.length);
-      while (
-        minPConditions.some(
-          // eslint-disable-next-line no-loop-func
-          pCon => pCon.passage === passagesDocs[passIdx].id
-        )
-      ) {
-        passIdx = Math.floor(Math.random() * passagesDocs.length);
-      }
-      nullPassage = passagesDocs[passIdx].id;
-
-      let questions;
-      for (let { condition, passage } of minPConditions) {
-        // eslint-disable-next-line no-loop-func
-        await firebase.db.runTransaction(async t => {
-          const conditionRef = firebase.db.collection("conditions").doc(condition);
-          const conditionDoc = await t.get(conditionRef);
-          const passageRef = firebase.db.collection("passages").doc(passage);
-          const passageDoc = await t.get(passageRef);
-          const passageData = passageDoc.data();
-
-          if (conditionDoc.exists) {
-            const conditionData = conditionDoc.data();
-            t.update(conditionRef, {
-              [currentProject]: (conditionData[currentProject] || 0) + 1
-            });
-          } else {
-            t.set(conditionRef, { [currentProject]: 1 });
-          }
-
-          if (!questions) {
-            questions = passageData.questions;
-          }
-          let passageCondNum = 0;
-          if (passageData.projects[currentProject] && passageData.projects[currentProject][condition]) {
-            passageCondNum = passageData.projects[currentProject][condition];
-          }
-          t.update(passageRef, {
-            projects: {
-              ...passageData.projects,
-              [currentProject]: {
-                ...passageData.projects[currentProject],
-                [condition]: passageCondNum + 1
-              }
-            }
-          });
-        });
-      }
-      const initChoices = new Array(10).fill("");
       userData = {
         ...userData,
-        phase: 0,
-        step: 1,
-        pConditions: minPConditions,
-        currentPCon: minPConditions[0],
-        nullPassage,
-        choices: initChoices,
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       };
-      setPassage(minPConditions[0].passage);
-      setCondition(minPConditions[0].condition);
-      setNullPassage(nullPassage);
-      setPhase(0);
-      setStep(1);
       await firebase.batchSet(userRef, userData, { merge: true });
       const userLogRef = firebase.db.collection("userLogs").doc();
       await firebase.batchSet(userLogRef, {
@@ -302,15 +181,9 @@ const Auth = props => {
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
-        setPhase(0);
-        setStep(0);
-        setPassage("");
-        setCondition("");
-        setNullPassage("");
-        setChoices([]);
       }
     });
-  }, [firebase, firstname, lastname, currentProject, isSignUp, course, haveProjectSpecs]);
+  }, [firebase, firstname, lastname, currentProject, isSignUp, haveProjectSpecs]);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
@@ -389,10 +262,6 @@ const Auth = props => {
     setConfirmPassword(event.target.value);
   };
 
-  const courseChange = event => {
-    setCourse(event.target.value);
-  };
-
   const switchSignUp = (event, newValue) => {
     setIsSignUp(newValue);
   };
@@ -406,6 +275,8 @@ const Auth = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
+      localStorage.setItem("isStudentCoNoteSurvey", "true");
+      navigate("/");
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
@@ -614,7 +485,7 @@ const Auth = props => {
                   onChange={event => setResetPasswordEmail(event.target.value)}
                   value={resetPasswordEmail}
                   errorMessage={passwordResetError}
-                // autocomplete="off"
+                  // autocomplete="off"
                 />
                 <Button
                   id="ForgotPasswordEmailButton"
@@ -636,4 +507,4 @@ const Auth = props => {
   );
 };
 
-export default Auth;
+export default AuthStudentCoNoteSurvey;

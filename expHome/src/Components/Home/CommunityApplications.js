@@ -1,9 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-
-import Paper from "@mui/material/Paper";
-import Tooltip from "@mui/material/Tooltip";
-import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 
@@ -11,44 +7,39 @@ import MoreVert from "@mui/icons-material/MoreVert";
 
 import { DataGrid } from "@mui/x-data-grid";
 
-import {
-  firebaseState,
-  fullnameState,
-  leadingState,
-} from "../../store/AuthAtoms";
+import { firebaseState, fullnameState, leadingState } from "../../store/AuthAtoms";
 
 import GridCellToolTip from "../GridCellToolTip";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 import SnackbarComp from "../SnackbarComp";
-import PDFView from "./modules/components/PDFView";
-import { OneKPlusOutlined } from "@mui/icons-material";
+import communitiesOrder from "../Home/modules/views/communitiesOrder";
 
 const applicationsColms = [
   {
     field: "community",
     headerName: "Community",
     width: 190,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   { field: "createdAt", headerName: "Started", type: "dateTime", width: 190 },
   {
     field: "applicant",
     headerName: "Applicant",
     width: 190,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "email",
     headerName: "Email",
     width: 190,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "readingImmediate",
@@ -56,15 +47,9 @@ const applicationsColms = [
     type: "number",
     width: 100,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Reading Comprehension Immediate Score"
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} Tooltip="Reading Comprehension Immediate Score" />;
+    }
   },
   {
     field: "reading3Days",
@@ -72,7 +57,7 @@ const applicationsColms = [
     type: "number",
     width: 100,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
         <GridCellToolTip
           isLink={false}
@@ -80,7 +65,7 @@ const applicationsColms = [
           Tooltip="Reading Comprehension After Three Days Score"
         />
       );
-    },
+    }
   },
   {
     field: "reading1Week",
@@ -88,15 +73,11 @@ const applicationsColms = [
     type: "number",
     width: 100,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Reading Comprehension After One Week Score"
-        />
+        <GridCellToolTip isLink={false} cellValues={cellValues} Tooltip="Reading Comprehension After One Week Score" />
       );
-    },
+    }
   },
   {
     field: "tutorialWrongs",
@@ -104,22 +85,16 @@ const applicationsColms = [
     type: "number",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Tutorial Wrong Attemps"
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} Tooltip="Tutorial Wrong Attemps" />;
+    }
   },
   {
     field: "tutorialEnded",
     headerName: "Completed Tutorial",
     width: 40,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
         <GridCellToolTip
           isLink={false}
@@ -128,7 +103,7 @@ const applicationsColms = [
           cellValues={{ ...cellValues, value: cellValues.value ? "✅" : "" }}
         />
       );
-    },
+    }
   },
   {
     field: "quizWrongs",
@@ -136,125 +111,95 @@ const applicationsColms = [
     type: "number",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip="Quiz Wrong Attemps"
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} Tooltip="Quiz Wrong Attemps" />;
+    }
   },
   {
     field: "transcript",
     headerName: "Transcript",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "resume",
     headerName: "Resume",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "portfolio",
     headerName: "Portfolio",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "accepted",
     headerName: "Accepted",
     width: 40,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Accept"
-          cellValues={cellValues}
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} actionCell={true} Tooltip="Accept" cellValues={cellValues} />;
+    }
   },
   {
     field: "confirmed",
     headerName: "Confirmed",
     width: 40,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="The Applicant Confirmed"
-          cellValues={cellValues}
-        />
+        <GridCellToolTip isLink={false} actionCell={true} Tooltip="The Applicant Confirmed" cellValues={cellValues} />
       );
-    },
+    }
   },
   {
     field: "rejected",
     headerName: "Rejected",
     width: 40,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Reject"
-          cellValues={cellValues}
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} actionCell={true} Tooltip="Reject" cellValues={cellValues} />;
+    }
   },
   {
     field: "explanation",
     headerName: "Explanation",
     width: 280,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "leader",
     headerName: "Decision Made By",
     width: 190,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
-        <GridCellToolTip
-          isLink={false}
-          cellValues={cellValues}
-          Tooltip={"Decision made by " + cellValues.value}
-        />
+        <GridCellToolTip isLink={false} cellValues={cellValues} Tooltip={"Decision made by " + cellValues.value} />
       );
-    },
+    }
   },
   {
     field: "checkedAt",
     headerName: "Decision Made On",
     type: "dateTime",
-    width: 190,
-  },
+    width: 190
+  }
 ];
 
-const CommunityApplications = (props) => {
+const CommunityApplications = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
-  const [applicationsColumns, setApplicationsColumns] =
-    useState(applicationsColms);
+  const [applicationsColumns, setApplicationsColumns] = useState(applicationsColms);
   const [applications, setApplications] = useState([]);
   const [application, setApplication] = useState({});
   const [applicationsChanges, setApplicationsChanges] = useState([]);
@@ -272,7 +217,7 @@ const CommunityApplications = (props) => {
           headerName: "Invited",
           width: 10,
           disableColumnMenu: true,
-          renderCell: (cellValues) => {
+          renderCell: cellValues => {
             return (
               <div
                 style={{
@@ -280,18 +225,14 @@ const CommunityApplications = (props) => {
                   fontWeight: "bold",
                   cursor: cellValues.value === "O" ? "default" : "pointer",
                   width: "100%",
-                  textAlign: "center",
+                  textAlign: "center"
                 }}
               >
-                {cellValues.value === "O" ? (
-                  <CircularProgress color="warning" size="16px" />
-                ) : (
-                  cellValues.value
-                )}
+                {cellValues.value === "O" ? <CircularProgress color="warning" size="16px" /> : cellValues.value}
               </div>
             );
-          },
-        },
+          }
+        }
       ]);
     }
   }, [fullname]);
@@ -299,27 +240,29 @@ const CommunityApplications = (props) => {
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
       const appliSnapshots = [];
-      for (
-        let communiBatch = 0;
-        communiBatch < props.communiIds.length / 10;
-        communiBatch++
-      ) {
+      let showPortfolio = false;
+      for (let communiBatch = 0; communiBatch < props.communiIds.length / 10; communiBatch++) {
         const communiIds = [];
         for (
           let communiIdx = 10 * communiBatch;
-          communiIdx < 10 * (communiBatch + 1) &&
-          communiIdx < props.communiIds.length;
+          communiIdx < 10 * (communiBatch + 1) && communiIdx < props.communiIds.length;
           communiIdx++
         ) {
           communiIds.push(props.communiIds[communiIdx]);
+          const comm = communitiesOrder.find(elm => elm.id === props.communiIds[communiIdx]);
+          if (comm.portfolio) {
+            showPortfolio = true;
+          }
         }
-        const applicationsQuery = firebase.db
-          .collection("applications")
-          .where("communiId", "in", communiIds);
+        if (!showPortfolio) {
+          const filterApplicationCols = applicationsColumns.filter(elem => elem.field !== "portfolio");
+          setApplicationsColumns(filterApplicationCols);
+        }
+        const applicationsQuery = firebase.db.collection("applications").where("communiId", "in", communiIds);
         appliSnapshots.push(
-          applicationsQuery.onSnapshot((snapshot) => {
+          applicationsQuery.onSnapshot(snapshot => {
             const docChanges = snapshot.docChanges();
-            setApplicationsChanges((oldApplicationsChanges) => {
+            setApplicationsChanges(oldApplicationsChanges => {
               return [...oldApplicationsChanges, ...docChanges];
             });
             if (communiBatch >= Math.floor(props.communiIds.length / 10)) {
@@ -344,7 +287,7 @@ const CommunityApplications = (props) => {
       let applics = [...applications];
       for (let change of tempApplicationsChanges) {
         if (change.type === "removed") {
-          applics = applics.filter((applic) => applic.id !== change.doc.id);
+          applics = applics.filter(applic => applic.id !== change.doc.id);
         } else {
           const applicData = change.doc.data();
           if (applicData.ended) {
@@ -369,7 +312,7 @@ const CommunityApplications = (props) => {
               reading1Week: 0,
               tutorialWrongs: 0,
               tutorialEnded: false,
-              id: change.doc.id,
+              id: change.doc.id
             };
             if ("leader" in applicData && applicData.leader) {
               newApplic.leader = applicData.leader;
@@ -389,10 +332,7 @@ const CommunityApplications = (props) => {
             if ("invited" in applicData && applicData.invited) {
               newApplic.invited = "✉️";
             }
-            const userDoc = await firebase.db
-              .collection("users")
-              .doc(applicData.fullname)
-              .get();
+            const userDoc = await firebase.db.collection("users").doc(applicData.fullname).get();
             const userData = userDoc.data();
             if ("email" in userData && userData.email) {
               newApplic.email = userData.email;
@@ -405,25 +345,18 @@ const CommunityApplications = (props) => {
             }
             if ("Portfolio" in userData && userData.Portfolio) {
               newApplic.portfolio = userData.Portfolio;
+            } else if ("portfolioUrl" in applicData && applicData.portfolioUrl) {
+              newApplic.portfolio = applicData.portfolioUrl;
             }
             if ("pConditions" in userData && userData.pConditions) {
               for (let pCondition of userData.pConditions) {
-                if (
-                  "testScoreRatio" in pCondition &&
-                  pCondition.testScoreRatio
-                ) {
+                if ("testScoreRatio" in pCondition && pCondition.testScoreRatio) {
                   newApplic.readingImmediate += pCondition.testScoreRatio;
                 }
-                if (
-                  "test3DaysScoreRatio" in pCondition &&
-                  pCondition.test3DaysScoreRatio
-                ) {
+                if ("test3DaysScoreRatio" in pCondition && pCondition.test3DaysScoreRatio) {
                   newApplic.reading3Days += pCondition.test3DaysScoreRatio;
                 }
-                if (
-                  "test1WeekScoreRatio" in pCondition &&
-                  pCondition.test1WeekScoreRatio
-                ) {
+                if ("test1WeekScoreRatio" in pCondition && pCondition.test1WeekScoreRatio) {
                   newApplic.reading1Week += pCondition.test1WeekScoreRatio;
                 }
               }
@@ -431,10 +364,7 @@ const CommunityApplications = (props) => {
               newApplic.reading3Days = newApplic.reading3Days / 2;
               newApplic.reading1Week = newApplic.reading1Week / 2;
             }
-            const tutorialDoc = await firebase.db
-              .collection("tutorial")
-              .doc(applicData.fullname)
-              .get();
+            const tutorialDoc = await firebase.db.collection("tutorial").doc(applicData.fullname).get();
             if (tutorialDoc.exists) {
               const tutorialData = tutorialDoc.data();
               if ("wrongs" in tutorialData && tutorialData.wrongs) {
@@ -444,13 +374,11 @@ const CommunityApplications = (props) => {
                 newApplic.tutorialEnded = true;
               }
             }
-            const applicIdx = applications.findIndex(
-              (acti) => acti.id === change.doc.id
-            );
+            const applicIdx = applications.findIndex(acti => acti.id === change.doc.id);
             if (applicIdx !== -1) {
               applics[applicIdx] = {
                 ...applics[applicIdx],
-                ...newApplic,
+                ...newApplic
               };
             } else {
               applics.push(newApplic);
@@ -470,12 +398,7 @@ const CommunityApplications = (props) => {
   useEffect(() => {
     let theApplicant;
     for (let applic of applications) {
-      if (
-        applic.accepted === "◻" &&
-        applic.confirmed === "◻" &&
-        applic.rejected === "◻" &&
-        !theApplicant
-      ) {
+      if (applic.accepted === "◻" && applic.confirmed === "◻" && applic.rejected === "◻" && !theApplicant) {
         theApplicant = applic;
       }
     }
@@ -484,12 +407,10 @@ const CommunityApplications = (props) => {
     }
   }, [applications]);
 
-  const applicationsRowClick = (clickedRow) => {
+  const applicationsRowClick = clickedRow => {
     const theRow = clickedRow.row;
     if (theRow) {
-      const applicIdx = applications.findIndex(
-        (applic) => applic.id === clickedRow.id
-      );
+      const applicIdx = applications.findIndex(applic => applic.id === clickedRow.id);
       if (applicIdx !== -1) {
         setApplication(applications[applicIdx]);
       }
@@ -502,7 +423,7 @@ const CommunityApplications = (props) => {
         setSubmitting(true);
         try {
           let applics = [...applications];
-          const applicIdx = applics.findIndex((appli) => appli.id === applicId);
+          const applicIdx = applics.findIndex(appli => appli.id === applicId);
           if (applicIdx !== -1 && applics[applicIdx][voteType] !== "O") {
             const applicData = {};
             if (voteType === "accepted") {
@@ -516,32 +437,24 @@ const CommunityApplications = (props) => {
             }
             if (fullname !== "Iman YeckehZaare") {
               applicData.leader = fullname;
-              applicData.checkedAt = firebase.firestore.Timestamp.fromDate(
-                new Date()
-              );
+              applicData.checkedAt = firebase.firestore.Timestamp.fromDate(new Date());
             }
 
             applics[applicIdx] = {
               ...applics[applicIdx],
-              [voteType]: "O",
+              [voteType]: "O"
             };
             setApplications(applics);
-            const applicRef = firebase.db
-              .collection("applications")
-              .doc(applics[applicIdx].id);
+            const applicRef = firebase.db.collection("applications").doc(applics[applicIdx].id);
             await applicRef.update(applicData);
             if (voteType === "accepted") {
               setSnackbarMessage("You successfully accepted this applicant!");
             } else if (voteType === "confirmed") {
-              setSnackbarMessage(
-                "You successfully marked this applicant who confirmed joining us!"
-              );
+              setSnackbarMessage("You successfully marked this applicant who confirmed joining us!");
             } else if (voteType === "rejected") {
               setSnackbarMessage("You successfully rejected this applicant!");
             } else if (voteType === "invited") {
-              setSnackbarMessage(
-                "You successfully invited this applicant to Microsoft Teams!"
-              );
+              setSnackbarMessage("You successfully invited this applicant to Microsoft Teams!");
             }
           }
         } catch (err) {
@@ -553,12 +466,8 @@ const CommunityApplications = (props) => {
     }
   };
 
-  const checkApplication = (clickedCell) => {
-    if (
-      ["accepted", "confirmed", "rejected", "invited"].includes(
-        clickedCell.field
-      )
-    ) {
+  const checkApplication = clickedCell => {
+    if (["accepted", "confirmed", "rejected", "invited"].includes(clickedCell.field)) {
       checkApplicant(clickedCell.id, clickedCell.field)();
     }
   };
@@ -566,79 +475,66 @@ const CommunityApplications = (props) => {
   return (
     <PagesNavbar thisPage="Applications">
       <Typography variant="h3" gutterBottom marked="center" align="center">
-        Applications to Your{" "}
-        {props.communiIds.length > 1 ? "Communityies" : "Community"}
+        Applications to Your {props.communiIds.length > 1 ? "Communityies" : "Community"}
       </Typography>
       <Alert severity="success">
         <ul>
           <li>
-            <strong>Expanding each row:</strong> by default, the expanded
-            version of one of the applications that you have not
-            accepted/confirmed/rejected is shown below the table. If you click
-            any row, that application will be expanded below.
+            <strong>Expanding each row:</strong> by default, the expanded version of one of the applications that you
+            have not accepted/confirmed/rejected is shown below the table. If you click any row, that application will
+            be expanded below.
           </li>
           <li>
-            <strong>Reviewing:</strong> to review each application, BEFORE
-            clicking the accept ✅, confirmed 👍, or reject 🚫 buttons, please
-            send the applicant your community-specific acceptance/orientation or
-            rejection email through onecademy@umich.edu. Make sure you
-            coordinate with your co-leaders and do not double-contact applicants
-            (ex: you shouldn’t both email them to accept them, just one).
+            <strong>Reviewing:</strong> to review each application, BEFORE clicking the accept ✅, confirmed 👍, or
+            reject 🚫 buttons, please send the applicant your community-specific acceptance/orientation or rejection
+            email through onecademy@umich.edu. Make sure you coordinate with your co-leaders and do not double-contact
+            applicants (ex: you shouldn’t both email them to accept them, just one).
           </li>
           <li>
-            <strong>Accepting/confirming/rejecting:</strong> you can either
-            click the accept ✅, confirmed 👍, or reject 🚫 buttons to indicate
-            that you completed the review of each application.
+            <strong>Accepting/confirming/rejecting:</strong> you can either click the accept ✅, confirmed 👍, or reject
+            🚫 buttons to indicate that you completed the review of each application.
           </li>
           <li>
-            <strong>Inviting to Microsoft Teams:</strong> you do NOT need to
-            add/remove your interns in the interns' spreadsheet anymore. By only
-            clicking the confirmed 👍 button, you notify Iman to invite the
-            applicant to Microsoft Teams.
+            <strong>Inviting to Microsoft Teams:</strong> you do NOT need to add/remove your interns in the interns'
+            spreadsheet anymore. By only clicking the confirmed 👍 button, you notify Iman to invite the applicant to
+            Microsoft Teams.
           </li>
           <li>
-            <strong>Each row:</strong> shows you one of the applicants who have
-            completed every part of the application for your{" "}
-            {props.communiIds.length > 1 ? "communityies" : "community"}.
+            <strong>Each row:</strong> shows you one of the applicants who have completed every part of the application
+            for your {props.communiIds.length > 1 ? "communityies" : "community"}.
           </li>
           <li>
-            <strong>Each cell:</strong> hovering on each cell shows you the
-            content or its description as a tooltip.
+            <strong>Each cell:</strong> hovering on each cell shows you the content or its description as a tooltip.
           </li>
           <li>
-            <strong>Filtering and Sorting:</strong> by clicking each column
-            title, you can sort the table based on that column. Some columns
-            also give you an option to filter through their content by clicking{" "}
-            <MoreVert /> on the column title.
+            <strong>Filtering and Sorting:</strong> by clicking each column title, you can sort the table based on that
+            column. Some columns also give you an option to filter through their content by clicking <MoreVert /> on the
+            column title.
           </li>
           <li>
-            <strong>Wrong attempts:</strong> for the 1Cademy tutorial and
-            community-specific quiz, you can see the number of wrong attempts
-            for the 1cademy tutorial, and in a separate column the wrong
-            attempts. So, the lower the number, the better.
+            <strong>Wrong attempts:</strong> for the 1Cademy tutorial and community-specific quiz, you can see the
+            number of wrong attempts for the 1cademy tutorial, and in a separate column the wrong attempts. So, the
+            lower the number, the better.
           </li>
           <li>
-            <strong>Click links:</strong> to open their transcripts, resume, or
-            portfolios in a new browser tab w/o downloading.
+            <strong>Click links:</strong> to open their transcripts, resume, or portfolios in a new browser tab w/o
+            downloading.
           </li>
           <li>
-            <strong>Multiple leaders:</strong> if a community has multiple
-            leaders, and accepts/confirms/rejects someone, you will be able to
-            see who accepted/confirmed/rejected the applicant and when in the
-            last two columns.
+            <strong>Multiple leaders:</strong> if a community has multiple leaders, and accepts/confirms/rejects
+            someone, you will be able to see who accepted/confirmed/rejected the applicant and when in the last two
+            columns.
           </li>
           <li>
             <strong>Notes:</strong>
             <ul>
               <li>
-                Community leaders should manually send the acceptance or
-                rejection emails through onecademy@umich.edu, it will not
-                automatically email.
+                Community leaders should manually send the acceptance or rejection emails through onecademy@umich.edu,
+                it will not automatically email.
               </li>
               <li>
-                After clicking the accept ✅, confirmed 👍, or reject 🚫
-                buttons, if you change your decision, you should directly
-                contact Iman on Microsoft Teams.
+                After clicking the accept ✅, confirmed 👍, or reject 🚫 buttons, if you change your decision, you
+                should directly contact Iman on Microsoft Teams.
               </li>
             </ul>
           </li>
@@ -755,10 +651,7 @@ const CommunityApplications = (props) => {
           </div>
         </Paper>
       )} */}
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </PagesNavbar>
   );
 };
