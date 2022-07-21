@@ -13,6 +13,10 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
+import Sheet from "@mui/joy/Sheet";
+import { DataGrid } from "@mui/x-data-grid";
+import GridCellToolTip from "../../GridCellToolTip";
+
 
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
@@ -25,7 +29,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import Box from "@mui/material/Box";
 
-import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState,isAdminState } from "../../../store/AuthAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import { projectState } from "../../../store/ProjectAtoms";
 
@@ -39,30 +43,89 @@ const CodeFeedback = props => {
   const [codes, setCodes] = useState([]);
   const [feed, setFeed] = useState({});
   const [retrieveNext, setRetrieveNext] = useState(0);
-  const [submitting, setSubmitting] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [codeSelect, setCodeSelect] = useState([]);
-  const [quotesSelect, setQuotesSelect] = useState([]);
   const [checked, setChecked] = useState([]);
   const [sentences, setSentences] = useState([]);
   const [selected, setSelected] = useState(new Array(100).fill(false));
   const [quotesSelectedForCodes, setQuotesSelectedForCodes] = useState({});
-  const [selecte, setSelecte] = useState("Final review of content");
+  const [selecte, setSelecte] = useState(null);
   const [docId, setDocId] = useState("");
+  const isAdmin = useRecoilValue(isAdminState);
+  const [newCodes, setNewCodes] = useState([]);
+  const [newexperimentCodes,setNewexperimentCodes] =useState([]);
+
+
+  const codesColumn = [
+    {
+      field: "code",
+      headerName: "Code",
+      width: 220,
+      renderCell: cellValues => {
+        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      }
+    },
+    {
+      field: "checked",
+      headerName: "Approved",
+      width: 160,
+      disableColumnMenu: true,
+      renderCell: cellValues => {
+        return (
+          <GridCellToolTip isLink={false} actionCell={true} Tooltip="Click to check/uncheck!" cellValues={cellValues} />
+        );
+      }
+    }
+  ];
+
+
+  useEffect(async ()=>{
+    const feedbackCodeBooksDocs = await firebase.db
+    .collection("experimentCodes")
+    .where("project", "==", project)
+    .get();
+
+  let experimentCodes = [];
+  for (let Doc of feedbackCodeBooksDocs.docs) {
+    let data = Doc.data();
+    const newCode = {
+      code: data.code,
+      checked: data.approved ? "✅" : "◻",
+      id:Doc.id
+    };
+    experimentCodes.push(newCode);
+  }
+  setNewexperimentCodes(experimentCodes);
+  },[project]);
+
 
   useEffect(async () => {
-    const feedbackCodeBooksDocs = await firebase.db.collection("feedbackCodeBooks").get();
-    let coding = [];
+    let approvedFeedbackCodeBooks = [];
+    const feedbackCodeBooksDocs = await firebase.db
+      .collection("feedbackCodeBooks")
+      .where("project", "==", project)
+      .get();
+
+    let FeedbackCodeBooksCodes = [];
     console.log(feedbackCodeBooksDocs);
     for (let Doc of feedbackCodeBooksDocs.docs) {
       let data = Doc.data();
-      coding.push(data.code);
+      const newCode = {
+        code: data.code,
+        checked: data.approved ? "✅" : "◻",
+        id:Doc.id
+      };
+      FeedbackCodeBooksCodes.push(newCode);
+      if (data.approved) {
+        approvedFeedbackCodeBooks.push(data.code);
+      }
     }
-    console.log(coding.length);
-    setCodes(coding);
-    console.log(coding);
+    console.log(approvedFeedbackCodeBooks.length);
+    setCodes(approvedFeedbackCodeBooks);
+    setNewCodes(FeedbackCodeBooksCodes);
+    console.log(approvedFeedbackCodeBooks);
     let quotesSelectedForCode = { ...quotesSelectedForCodes };
-    for (let code of coding) {
+    for (let code of approvedFeedbackCodeBooks) {
       quotesSelectedForCode[code] = [];
     }
     setQuotesSelectedForCodes(quotesSelectedForCode);
@@ -71,24 +134,31 @@ const CodeFeedback = props => {
 
   useEffect(async () => {
     let foundResponse = false;
-    const feedbackCodesDocs = await firebase.db.collection("codefeedbacks").where("project", "==", project).get();
+    const feedbackCodesDocs = await firebase.db
+      .collection("codefeedbacks")
+      .where("approved", "==", false)
+      .where("project", "==", project)
+      .get();
 
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
       let response = feedbackData.explanation.split(".").filter(e => !["", " "].includes(e));
       setSentences(response);
-      if (!feedbackData.coders.includes(fullname)) {
-        setDocId(feedbackDoc.id);
+      setDocId(feedbackDoc.id);
+      console.log(feedbackDoc.id);
+      if (feedbackData.coders.includes(fullname)) {
+        foundResponse = true;
         const myCodes = Object.keys(feedbackData.codes[fullname]);
         for (let code of myCodes) {
           quotesSelectedForCodes[code] = feedbackData.codes[fullname][code];
         }
         setQuotesSelectedForCodes(quotesSelectedForCodes);
+      } else {
+        foundResponse = true;
       }
-      foundResponse = true;
-      setTimeout(() => {
-        setSubmitting(false);
-      }, 1000);
+
+      setSubmitting(false);
+
       if (foundResponse) {
         break;
       }
@@ -203,96 +273,200 @@ const CodeFeedback = props => {
         : [...feedbackCodeData.coders, fullname],
       codesVotes
     };
-    const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
+    let recievePoints = [];
+    let recieveNegativePoints = [];
+    const keys = Object.keys(feedbackCodeData.codesVotes);
+    console.log(keys);
+    console.log(feedbackCodeData.coders.length);
+    if (feedbackCodeData.coders.length === 3) {
+      for (let key of keys) {
+        if (feedbackCodeData.codesVotes[key].length >= 3) {
+          for (let researcher of feedbackCodeData.codesVotes[key]) {
+            recievePoints.push(researcher);
+          }
+        }else{
+          for (let researcher of feedbackCodeData.codesVotes[key]) {
+            recieveNegativePoints.push(researcher);
+          }
+            
+        }
+      }
+      console.log("recievePoints::::::::::::::::", recievePoints);
+    }
+    // const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
 
-    feedbackCodesRef.update(feedbackCodeUpdate);
+    // feedbackCodesRef.update(feedbackCodeUpdate);
     setRetrieveNext(oldValue => oldValue + 1);
     console.log(feedbackCodeUpdate);
   };
+
+  const checkCodeAdmin = async (clickedCell) => {
+    
+    if (clickedCell.field === "checked") {
+
+      let codesApp = [...newCodes];
+      const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
+      const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
+ 
+      if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
+        const id = clickedCell.id;
+
+        codesApp[appIdx] = {
+          ...codesApp[appIdx],
+          checked: isChecked ? "◻" : "✅",
+        };
+        setNewCodes(codesApp);
+  
+
+        const codesAppDoc = await firebase.db
+          .collection("feedbackCodeBooks")
+          .doc(id)
+          .get();
+
+        const codesAppData = codesAppDoc.data();
+    
+        let codeUpdate = {
+          ...codesAppData,
+          approved:!isChecked,
+        };
+      let feedbackCodeBookRef  = await firebase.db.collection("feedbackCodeBooks").doc(id);
+        await feedbackCodeBookRef.update(codeUpdate);
+      }
+    }
+  };
+  const checkCodeExperimentAdmin = async (clickedCell) => {
+    
+    if (clickedCell.field === "checked") {
+
+      let codesApp = [...newexperimentCodes];
+      const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
+      const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
+    
+      if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
+        const id = clickedCell.id;
+
+        codesApp[appIdx] = {
+          ...codesApp[appIdx],
+          checked: isChecked ? "◻" : "✅",
+        };
+        setNewexperimentCodes(codesApp);
+  
+
+        const codesAppDoc = await firebase.db
+          .collection("experimentCodes")
+          .doc(id)
+          .get();
+
+        const codesAppData = codesAppDoc.data();
+    
+        let codeUpdate = {
+          ...codesAppData,
+          approved:!isChecked,
+        };
+      let feedbackCodeBookRef  = await firebase.db.collection("experimentCodes").doc(id);
+        await feedbackCodeBookRef.update(codeUpdate);
+      }
+    }
+  };
+
+
+  console.log(quotesSelectedForCodes);
   return (
-    <Box sx={{ m: "13px 13px 40px 13px", p: "19px" }}>
-      <Typography variant="h5" margin-bottom="20px">
-        For each different code,please choose which response(s) contains the code:
-      </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          "& > :not(style)": {
-            m: 0,
-            width: 700,
-            height: "96%"
-          }
-        }}
-      >
+    <>
+      <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", height: 900 }}>
+        <Typography variant="h6" margin-bottom="20px">
+          For each different code,please choose which response(s) contains the code:
+        </Typography>
         <Box
           sx={{
-            width: 300,
-            height: "30px"
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: 0
           }}
         >
-          <Paper sx={{ m: "13px 13px 40px 13px", p: "19px" }} square={true}>
-            <List sx={{ width: "100%", maxWidth: 700, maxheight: 300, bgcolor: "background.paper" }}>
-              {codes.map((code, idx) => {
-                const labelId = `checkbox-list-label-${code}`;
+          <Box>
+            <Sheet variant="outlined" sx={{ position: "relative", overflow: "auto" }}>
+              <List
+                sx={{
+                  paddingBlock: 1,
+                  minWidth: 500,
+                  height: 500,
+                  "--List-decorator-width": "48px",
+                  "--List-item-paddingLeft": "1.5rem",
+                  "--List-item-paddingRight": "1rem"
+                }}
+              >
+                {codes.map((code, idx) => {
+                  const labelId = `checkbox-list-label-${code}`;
 
-                return (
-                  <ListItem key={idx} disablePadding selected={selected[codes.indexOf(code)]}>
-                    <ListItemButton role={undefined} onClick={() => codeSelected(codes.indexOf(code))}>
-                      <ListItemText id={labelId} primary={`${code}`} />
-                    </ListItemButton>
-                  </ListItem>
-                );
-              })}
-            </List>
-            <hr />
-            <div style={{ padding: "0px 25px 25px 25px" }}>
-              <Typography variant="h7" margin-bottom="20px">
-                If the code you're looking for does not exist in the list above, add it below :
-                <br />
-              </Typography>
+                  return (
+                    <ListItem key={idx} disablePadding selected={selected[codes.indexOf(code)]}>
+                      <ListItemButton role={undefined} onClick={() => codeSelected(codes.indexOf(code))}>
+                        <ListItemText id={labelId} primary={`${code}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Sheet>
 
-              <TextareaAutosize
-                style={{ width: "80%", alignItems: "center" }}
-                minRows={7}
-                placeholder={"Add your code here."}
-                onChange={codeChange}
-                value={newCode}
-              />
-            </div>
+            <Typography variant="h7">
+              If the code you're looking for does not exist in the list above, add it below :
+              <br />
+            </Typography>
+
+            <TextareaAutosize
+              style={{ width: "80%", alignItems: "center" }}
+              minRows={7}
+              placeholder={"Add your code here."}
+              onChange={codeChange}
+              value={newCode}
+            />
             <Button variant="contained" style={{ margin: "5px" }} onClick={addCode} disabled={creating}>
               {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
             </Button>
-          </Paper>
+          </Box>
+          <Box>
+            <Sheet variant="outlined" sx={{ position: "relative", overflow: "auto" }}>
+              <List
+                sx={{
+                  paddingBlock: 1,
+                  minWidth: 500,
+                  height: 500,
+
+                  "--List-decorator-width": "48px",
+                  "--List-item-paddingLeft": "1.5rem",
+                  "--List-item-paddingRight": "1rem"
+                }}
+              >
+                {sentences.map((value, idx) => {
+                  const labelId = `checkbox-list-label-${value}`;
+
+                  return (
+                    <ListItem key={value} disablePadding>
+                      <ListItemButton role={undefined} onClick={quotesSelected(value)} dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(value) !== -1 : false}
+                            tabIndex={-1}
+                            disableRipple
+                            inputProps={{ "aria-labelledby": labelId }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText id={labelId} primary={` ${value}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            </Sheet>
+          </Box>
         </Box>
-        <Paper sx={{ m: "13px 13px 40px 13px" }}>
-          <List sx={{ width: "100%", maxWidth: 700, bgcolor: "background.paper" }}>
-            {sentences.map((value, idx) => {
-              const labelId = `checkbox-list-label-${value}`;
-
-              return (
-                <ListItem key={value} disablePadding>
-                  <ListItemButton role={undefined} onClick={quotesSelected(value)} dense>
-                    <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={quotesSelectedForCodes[selecte].indexOf(value) !== -1}
-                        tabIndex={-1}
-                        disableRipple
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </ListItemIcon>
-                    <ListItemText id={labelId} primary={` ${value}`} />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
-        </Paper>
-
         <Button
           variant="contained"
-          style={{ margin: "10px" }}
+          style={{ margin: "19px 500px 500px 580px" }}
           onClick={submit}
           color="success"
           size="large"
@@ -300,8 +474,51 @@ const CodeFeedback = props => {
         >
           {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
         </Button>
+      </Paper>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          "& > :not(style)": {
+            m: 3,
+            m: 0,
+            width: 700,
+            height: "100%",
+          },
+            height: "96%",
+
+        }}
+      >
+      <Paper >
+        <Typography variant="h6" gutterBottom marked="center" align="center"> Code added by rsearchers </Typography>
+        <DataGrid
+          rows={newCodes}
+          columns={codesColumn}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          hideFooterSelectedRowCount
+          loading={false}
+          onCellClick={checkCodeAdmin}
+        />
+      </Paper>
+      <Paper>
+        <Typography variant="h6" gutterBottom marked="center" align="center">Code Added by Participants in the Experiment </Typography>
+        <DataGrid
+          rows={newexperimentCodes}
+          columns={codesColumn}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          hideFooterSelectedRowCount
+          loading={false}
+          onCellClick={checkCodeExperimentAdmin}
+        />
+      </Paper>
       </Box>
-    </Box>
+    </>
   );
 };
 export default CodeFeedback;
