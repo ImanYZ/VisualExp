@@ -112,11 +112,12 @@ const initialState = {
   webURL: "",
   GoogleScholar: "",
   citations: 0,
+  interestedTopic: ""
 };
 
 let lastCountry;
 
-const doNothing = () => {};
+const doNothing = () => { };
 
 const renderInstitution = (params) => (
   <TextField {...params} label="Institution" variant="outlined" />
@@ -190,6 +191,14 @@ let instructorsColumns = [
   {
     field: "institution",
     headerName: "Institution",
+    width: 130,
+    renderCell: (cellValues) => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    },
+  },
+  {
+    field: "interestedTopic",
+    headerName: "Interested Topic",
     width: 130,
     renderCell: (cellValues) => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -377,7 +386,6 @@ const AddInstructor = (props) => {
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
     upvotedInstructorsTodayState
   );
-
   // States for the fileds that the authenticated researcher enters for each
   // instructor/school administrator.
   const [firstname, setFirstname] = useState("");
@@ -432,10 +440,19 @@ const AddInstructor = (props) => {
 
   const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
 
+  useEffect(() => {
+    setSelectedRows([])
+    setValues(initialState);
+    setInvalidInstructor("");
+    setFirstname("");
+    setLastname("");
+    setEmail("");
+    setExplanation("");
+  }, [project]);
+
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
-    console.log('loadInstitutions();');
     const loadInstitutions = async () => {
       if (institutions.length === 0) {
         const institutionsObj = await import(
@@ -455,13 +472,17 @@ const AddInstructor = (props) => {
   // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
     if (firebase && project) {
-      console.log('instructorsinstructors');
       setInstructors([]);
       setOthersInstructors([]);
       setInstructorsToday(0);
       setUpvotedInstructorsToday(0);
       setOtherInstructor({});
-      const instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
+      let instructorsQuery;
+      if (project === "Annotating") {
+        instructorsQuery = firebase.db.collection("instructors");
+      } else {
+        instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
+      }
       const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
         setInstructorsChanges((oldInstructorsChanges) => {
@@ -480,12 +501,19 @@ const AddInstructor = (props) => {
   // a new spashot listener to listen to all the instructor votes by the
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
-    console.log('firebase && project && fullname && instructorsLoaded');
     if (firebase && project && fullname && instructorsLoaded) {
-      const instructorVotesQuery = firebase.db
-        .collection("instructorVotes")
-        .where("voter", "==", fullname)
-        .where("project", "==", project);
+      let instructorVotesQuery;
+      if (project === "Annotating") {
+        instructorVotesQuery = firebase.db
+          .collection("instructorVotes")
+          .where("voter", "==", fullname)
+      } else {
+        instructorVotesQuery = firebase.db
+          .collection("instructorVotes")
+          .where("voter", "==", fullname)
+          .where("project", "==", project);
+      }
+
       const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(
         (snapshot) => {
           const docChanges = snapshot.docChanges();
@@ -504,13 +532,23 @@ const AddInstructor = (props) => {
   const assignDayUpVotesPoint = async (nUpVotedToday) => {
     if (nUpVotedToday === 16) {
       const today = getISODateString(new Date());
-      const dayUpVotesDocs = await firebase.db
-        .collection("dayInstructorUpVotes")
-        .where("project", "==", project)
-        .where("voter", "==", fullname)
-        .where("date", "==", today)
-        .limit(1)
-        .get();
+      let dayUpVotesDocs;
+      if (project === "Annotating") {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      } else {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("project", "==", project)
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      }
       if (dayUpVotesDocs.docs.length === 0) {
         try {
           const dayUpVoteRef = firebase.db
@@ -554,7 +592,7 @@ const AddInstructor = (props) => {
           console.log("Transaction failure:", err);
           window.alert(
             "You did not get today's point for 16 upvotes on others' instructors. Copy the text of this complete message to Iman on Microsoft Teams. Do not take a screenshot. The error message is: " +
-              err
+            err
           );
         }
       }
@@ -564,7 +602,6 @@ const AddInstructor = (props) => {
   // Based on the changes to the instructors and votes comming from the database
   // listeners, make the corresponding changes to differnt states.
   useEffect(() => {
-    console.log('instructorsChanges');
     if (instructorsChanges.length > 0) {
       // We make a copy of all the instructor changes and delete all the content
       // of the instructorChanges, so that if new changes come from the database
@@ -787,7 +824,6 @@ const AddInstructor = (props) => {
   // equal to 3 votes from researchers, we should remove it from
   // othersInstructors.
   useEffect(() => {
-    console.log('othersInstructors');
     let theInstructor;
     let uInstructorsNum = 0;
     let oInsts = [...othersInstructors];
@@ -834,7 +870,6 @@ const AddInstructor = (props) => {
   // Validator useEffect: Based on the changes in the input field, we validate
   // them and generate corresponding error messages.
   useEffect(() => {
-    console.log('validwebURL');
     const validwebURL = isValidHttpUrl(values.webURL);
     const validGoogleScholar = isValidHttpUrl(values.GoogleScholar);
     const validEmail = isEmail(email);
@@ -842,20 +877,15 @@ const AddInstructor = (props) => {
     const validLastname = lastname.length > 1;
     if (alreadyExists) {
       setInvalidInstructor(
-        "This instructor with email address " +
-          email +
-          " is already invited to " +
-          "our experiment! Invite another instructor or school " +
-          "administrator please."
+        `This instructor with email address ${email} is already invited to our experiment! Invite another instructor or school administrator please.`
       );
     } else if (!validwebURL) {
       setInvalidInstructor(
-        "Please enter a valid website address that we can get this" +
-          "instructor/administrator's information from!"
+        `Please enter a valid website address that we can get this instructor/administrator's information from!`
       );
     } else if (isNaN(values.citations)) {
       setInvalidInstructor(
-        "Please enter a valid number of citations from their Google Scholar/ResearchGate profile!"
+        `Please enter a valid number of citations from their Google Scholar/ResearchGate profile!`
       );
     } else if (!validEmail) {
       setInvalidInstructor("Please enter a valid email address!");
@@ -875,6 +905,8 @@ const AddInstructor = (props) => {
       setInvalidInstructor("Please specify their related 1Cademy Community!");
     } else if (!values.position) {
       setInvalidInstructor("Please specify their position!");
+    } else if (!values.interestedTopic) {
+      setInvalidInstructor("Please enter your interested Topic!");
     } else {
       setInvalidInstructor("");
     }
@@ -892,6 +924,7 @@ const AddInstructor = (props) => {
     values.city,
     values.major,
     values.position,
+    values.interestedTopic
   ]);
 
   // This is for the vote buttons in the data grid that displays other
@@ -955,9 +988,7 @@ const AddInstructor = (props) => {
     }
   };
 
-  const changeComment = (event) => {
-    setComment(event.target.value);
-  };
+  const changeComment = (event) => setComment(event.target.value);
 
   const changeInstitution = (event, value) => setInstitution(value);
 
@@ -979,9 +1010,7 @@ const AddInstructor = (props) => {
     setEmail(event.target.value.toLowerCase());
   };
 
-  const explanationChange = (event) => {
-    setExplanation(event.target.value);
-  };
+  const explanationChange = (event) => setExplanation(event.target.value);
 
   // One handleChnage for all the text fields depending on the
   // event.target.name.
@@ -1041,7 +1070,7 @@ const AddInstructor = (props) => {
   // we should populate its data in the above fields so that they can update
   // their previously enterred information.
   const myInstructorsRowClick = (clickedRow) => {
-    const theRow = clickedRow.row;
+    const theRow = { ...clickedRow.row };
     if (theRow) {
       setSelectedRows([clickedRow.id]);
       setAlreadyExists(false);
@@ -1062,6 +1091,7 @@ const AddInstructor = (props) => {
         webURL: theRow.webURL,
         GoogleScholar: theRow.GoogleScholar,
         citations: theRow.citations,
+        interestedTopic: theRow.interestedTopic ? theRow.interestedTopic : ''
       });
     } else {
       clearInstructor("Nothing");
@@ -1076,7 +1106,7 @@ const AddInstructor = (props) => {
         // We use this flag to check if they updated their existing record to
         // reset its votes in the database.
         let gotUpdated = false;
-        await firebase.db.runTransaction(async (t) => {
+        await firebase.db.runTransaction(async (transaction) => {
           // First check whether the instructor already exists to make sure they
           // don't add duplicate entries.
           const instructorDocs = await firebase.db
@@ -1109,13 +1139,23 @@ const AddInstructor = (props) => {
             const researcherDoc = await researcherRef.get();
             const researcherData = researcherDoc.data();
             const today = getISODateString(new Date());
-            const dayInstructorsDocs = await firebase.db
-              .collection("dayInstructors")
-              .where("project", "==", project)
-              .where("fullname", "==", fullname)
-              .where("date", "==", today)
-              .limit(1)
-              .get();
+            let dayInstructorsDocs;
+            if (project === "Annotating") {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            } else {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("project", "==", project)
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            }
 
             let instructorRef = firebase.db.collection("instructors").doc();
             if (updating) {
@@ -1135,17 +1175,17 @@ const AddInstructor = (props) => {
             };
             if (updating) {
               instructorData.updatedAt = currentTime;
-              t.update(instructorRef, instructorData);
+              transaction.update(instructorRef, instructorData);
               gotUpdated = true;
             } else {
               instructorData.researcher = fullname;
               instructorData.createdAt = currentTime;
-              t.set(instructorRef, instructorData);
+              transaction.set(instructorRef, instructorData);
             }
             const instructorLogRef = firebase.db
               .collection("instructorsLogs")
               .doc();
-            t.set(instructorLogRef, {
+            transaction.set(instructorLogRef, {
               ...instructorData,
               id: instructorRef.id,
             });
@@ -1182,11 +1222,11 @@ const AddInstructor = (props) => {
                   researcherInstructors.projects[project].instructorsNum =
                     researcherData.projects[project].instructorsNum + 1;
                 }
-                t.update(researcherRef, researcherInstructors);
+                transaction.update(researcherRef, researcherInstructors);
                 const researcherLogRef = firebase.db
                   .collection("researcherLogs")
                   .doc();
-                t.set(researcherLogRef, {
+                transaction.set(researcherLogRef, {
                   ...researcherInstructors,
                   id: researcherRef.id,
                   updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -1209,11 +1249,11 @@ const AddInstructor = (props) => {
                   researcherInstructors.projects[project].instructorsNum =
                     researcherData.projects[project].instructorsNum + 1;
                 }
-                t.update(researcherRef, researcherInstructors);
+                transaction.update(researcherRef, researcherInstructors);
                 const researcherLogRef = firebase.db
                   .collection("researcherLogs")
                   .doc();
-                t.set(researcherLogRef, {
+                transaction.set(researcherLogRef, {
                   ...researcherInstructors,
                   id: researcherRef.id,
                   updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
@@ -1260,7 +1300,7 @@ const AddInstructor = (props) => {
           const instructorRef = firebase.db
             .collection("instructors")
             .doc(clickedCell.id);
-          const instructorDoc = await instructorRef.get();
+          // const instructorDoc = await instructorRef.get();
           await instructorRef.update({ deleted: true });
           setTimeout(() => {
             clearInstructor("Nothing");
@@ -1382,10 +1422,10 @@ const AddInstructor = (props) => {
                       sx={
                         otherInstructor.downVote === "👎"
                           ? {
-                              textDecoration: "line-through",
-                              color: "red",
-                              fontWeight: 700,
-                            }
+                            textDecoration: "line-through",
+                            color: "red",
+                            fontWeight: 700,
+                          }
                           : {}
                       }
                     >
@@ -1408,10 +1448,10 @@ const AddInstructor = (props) => {
                       sx={
                         otherInstructor.upVote === "👍"
                           ? {
-                              textDecoration: "line-through",
-                              color: "red",
-                              fontWeight: 700,
-                            }
+                            textDecoration: "line-through",
+                            color: "red",
+                            fontWeight: 700,
+                          }
                           : {}
                       }
                     >
@@ -1704,6 +1744,7 @@ const AddInstructor = (props) => {
             )}
             {institutions.length > 0 && (
               <Autocomplete
+                style={{ margin: '10px' }}
                 className="InstitutionAutocomplete"
                 value={institution}
                 onChange={changeInstitution}
@@ -1713,6 +1754,16 @@ const AddInstructor = (props) => {
                 renderInput={renderInstitution}
               />
             )}
+            <TextField
+              sx={{ width: '100%' }}
+              className="TextField"
+              label="Interested Topic"
+              onChange={handleChange}
+              name="interestedTopic"
+              type="text"
+              value={values.interestedTopic}
+              onKeyPress={onKeyPress}
+            />
             <TextareaAutosize
               ariaLabel="Extra Information Text box"
               minRows={4}
