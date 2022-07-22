@@ -41,7 +41,7 @@ const CommonPages = [
   { page: "AddInstructor", view: <AddInstructor /> },
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
-  {page:"CodeFeedback",view:<CodeFeedback/>},
+  { page: "CodeFeedback", view: <CodeFeedback /> },
 ];
 
 const Activities = props => {
