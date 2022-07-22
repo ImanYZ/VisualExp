@@ -13,6 +13,9 @@ const {
   moveResearchersPoints,
   deleteDuplicatesWithNoVotes,
   deleteDuplicatesWithVotes,
+  addDoneFeildToRecallGrades,
+  deleteIncompleteRecallGrades,
+  restructureFeedBackCode,
 } = require("./visualExp");
 
 const app = express();
@@ -30,9 +33,12 @@ app.get(
   identifyDuplicateInstitutionDomains
 );
 app.get("/restructureProjectSpecs", restructureProjectSpecs);
-app.get("/moveResearchersPoints",moveResearchersPoints);
-app.get("/deleteDuplicatesWithNoVotes",deleteDuplicatesWithNoVotes);
-app.get("/deleteDuplicatesWithVotes",deleteDuplicatesWithVotes);
+app.get("/moveResearchersPoints", moveResearchersPoints);
+app.get("/deleteDuplicatesWithNoVotes", deleteDuplicatesWithNoVotes);
+app.get("/deleteDuplicatesWithVotes", deleteDuplicatesWithVotes);
+app.get("/addDoneFeildToRecallGrades", addDoneFeildToRecallGrades);
+app.get("/deleteIncompleteRecallGrades", deleteIncompleteRecallGrades);
+app.get("/restructureFeedBackCode",restructureFeedBackCode);
 
 const port = 8080;
 app.listen(port, () => {

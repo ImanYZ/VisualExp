@@ -17,7 +17,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Cognitive_Psychology.jpeg",
     title: "UX Research in Cognitive Psychology of Learning",
-    width: "40%",
+    width: "34%",
     leaders: [
       {
         name: "Iman YeckehZaare",
@@ -147,7 +147,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Educational_Organizational_Psychology.jpg",
     title: "Educational/Organizational Psychology",
-    width: "30%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Amelia Henriques",
@@ -226,7 +226,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Clinical_Psychology.jpg",
     title: "Clinical Psychology",
-    width: "30%",
+    width: "33%",
     leaders: [
       {
         name: "Liza Shokhrin",
@@ -285,32 +285,32 @@ export default [
     weekly: [],
     url: "/static/Communities/Health_Psychology.png",
     title: "Health Psychology",
-    width: "30%",
+    width: "34%",
     leaders: [
       {
-        name: "Madeline Paige Jacoby",
-        image: "Madeline_Paige_Jacoby.png",
-        about: `Madeline is currently a junior at Syracuse University majoring in Psychology and minoring in Human Development and Family Science. Her research interests include behavioral therapy practices and the media in relation to mental health and eating disorders. Madeline has been working with 1Cademy since January of 2021 and is currently a co-leader of the Health Psychology community. In the past, she has also worked with the Educational Psychology community and the Social/Political Psychology community.`,
+        name: "Jolie Safier Smith",
+        image: "Jolie_Safier_Smith.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/madeline-jacoby-40a36a20b/"
+            url: "https://www.linkedin.com/in/jolie-smith-0200ba243/"
           }
         ]
       },
       {
-        name: "Megan Rush",
-        image: "Megan_Rush.jpg",
-        about: `Megan is currently a junior at the University of Michigan studying Biopsychology, Cognition, and Neuroscience. Her research interests are the neural basis for mental illnesses such as anxiety and depression, as well as how different treatment methods rewire the brain to treat mental illnesses. She has been working with 1Cademy since summer 2021. In addition to co-leading the Health Psychology community, she has also worked on the Social/Political Psychology community.`,
+        name: "Carson James Clark",
+        image: "Carson_James_Clark.jpeg",
+        about: ``,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/megan-rush-6338ab227/"
+            url: "https://www.linkedin.com/in/carson-clark-b393b7243/"
           }
         ]
       }
     ],
-    YouTube: "gJUMN4vIxN4",
+    YouTube: "j8K8s-AKxTQ",
     description: `The goal of the health psychology community is to inspire the development of key research skills while conducting a review of health psychology literature. Using credible, scholarly articles, we are exploring various topics within the field of health psychology, including: behavioral therapies for mental illness, the intersection of race and gender in the healthcare industry, what motivates people to maintain a healthy lifestyle, and the complex role of the media in health. As we compile our research using 1Cademy, we hope to discover patterns and gaps in the literature that could be addressed in a future study of our own design. Each week, interns read an article, summarize it using 1Cademy, present their findings to the group, and engage in thoughtful discussion about themes present in their article.`,
     accomplishments: `We are still in the preliminary stages of our exploration into the current literature in health psychology. Our team has investigated various topics including the many applications of cognitive-behavioral therapy, the emerging problem of climate grief, the effectiveness of telehealth as a psychotherapy alternative, and LGBTQ+ experiences in healthcare. Recently, we have shifted our attention to reorganizing our section of the larger map, creating an easy-to-follow outline of topics in health psychology. Our next steps will be researching articles relating to other general subsections of the field, such as patient-provider relationships, the psychological impact of chronic illnesses, and impacts of nutrition on overall health.`,
     gains: [
@@ -335,77 +335,6 @@ export default [
     ]
   },
   {
-    id: "Neuroscience",
-    tags: [
-      {
-        title: "Behavioral Neuroscience",
-        node: "EotqbmSg4XdYq5U5BQCP"
-      }
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Neuroscience.jpg",
-    title: "Neuroscience",
-    width: "40%",
-    leaders: [
-      // {
-      //   name: "Victoria Mulligan",
-      //   image: "Victoria_Mulligan.jpg",
-      //   about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
-      //     },
-      //   ],
-      // },
-      {
-        name: "Amrit Das Pradhan",
-        image: "Amrit_Das_Pradhan.png",
-        about: `I am a third-year psychology major at Cal Poly SLO interested in pursuing a career in clinical neuropsychology. I joined 1Cademy in January 2021 as an intern for the Educational Psychology community. I helped create the Neuroscience Community and have been a co-leader since April 2021. Other than working with 1Cademy, I work as a research assistant in three labs: a neurogenesis lab where we study the effect of different factors on the creation of new neurons and neural cells in snakes, a memory lab where we run a multitude of studies related to memory, and a LGBTQ+ and mental health lab, where we examine problems surrounding mental health and the LGBTQ+ community in San Luis Obispo and come up with potential solutions.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/"
-          }
-        ]
-      }
-    ],
-    YouTube: "Mj45B59k4fo",
-    description: `Students, educators, and researchers, join our large-scale interdisciplinary movement to collaboratively develop, visualize, and organize learning and research materials in your field of interest online for improving education. We are an interdisciplinary group of researchers through the University of Michigan who have been iteratively developing an online research and learning community called 1Cademy.`,
-    accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of 
-    behavioral neuroscience
-    and strengthen research skills to prepare for a future in the neuroscience field.`,
-    gains: [
-      `Gain experience using crucial skills in research (literature analysis, summarization, making connections between disciplines) `,
-      `Develop presentation skills and learn how to give concise descriptions of research and topics in neuroscience. `,
-      `Analyze literature and research to help contribute to research and education. `,
-      `Learn concepts and theory in neuroscience `,
-      `Develop a positive community-wide reputation for your engagement (over 500+ users from various disciplines) which is displayed on our leaderboard. `,
-      `Be publicly accredited for any work you produce for years to come. `,
-      `Individual contributions will be available through google search and cite your name (and other search engines)`
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
-    hasTest: true,
-    qualifications: [
-      `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
-      `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
-      `Curiosity for other types of fields, and a readiness to learn more about them. `,
-      `Experience and willingness to work in large-scale collaborative environments. `
-    ],
-    responsibilities: [
-      `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
-      `Give presentations over what you have researched in weekly meetings for further discussion.`,
-      `Generate ideas for future research in the field and point out areas of missing information or a gap in research.`,
-      `Actively utilizing 1Cademy to refine and properly structure the information.`,
-      `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group.`,
-      `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
-      `Expected 5hrs a week minimum to retain the internship.`,
-      `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
-      `All interactions, task fulfillment, and communications will be remote.`
-    ]
-  },
-  {
     id: "Disability_Studies",
     tags: [
       {
@@ -417,7 +346,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Disability_Studies.png",
     title: "Disability Studies",
-    width: "30%",
+    width: "33%",
     leaders: [
       // {
       //   name: "Keltie O'Malley",
@@ -484,17 +413,13 @@ export default [
       {
         title: "Social psychology",
         node: "FyQoGIdVVeDHvn1lHOZL"
-      },
-      {
-        title: "Behavioral Economics",
-        node: "zFZ2Rvnvp4TyJE7g0vUZ"
       }
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/Social_Psychology.jpg",
-    title: "Behavioral Economics & Social Psychology",
-    width: "34%",
+    url: "/static/Communities/Social_Political_Psychology.jpg",
+    title: "Social & Political Psychology",
+    width: "33%",
     leaders: [
       {
         name: "Alex Nikolaidis Konstas",
@@ -519,22 +444,22 @@ export default [
         ]
       }
     ],
-    YouTube: "73Uk2Nsgbgg",
-    description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    YouTube: "cFqStnIHVS4",
+    description: `The Social & Political Psychology community explores past research that investigates how misinformation is spread, why it is accepted, and how it can be reduced. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
     accomplishments: "",
     gains: [
       `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
       `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
       `Get involved in all aspects of conducting an online controlled experiment.`,
       `Learn about conducting a controlled online experiment to prepare for future Ph.D. programs in related disciplines.`,
-      `Work towards publishing research on behavioral economics and social psychology in reputable venues.`,
+      `Work towards publishing research on social/political psychology in reputable venues.`,
       `Have opportunities to take on leadership roles within the community.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in disciplines related to behavioral economics or social psychology, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
     hasTest: true,
     qualifications: [
-      `A strong academic background in topics related to behavioral economics or social psychology`,
+      `A strong academic background in topics related to social or political psychology`,
       `Fluency in writing and reading in English`
     ],
     responsibilities: [
@@ -562,7 +487,7 @@ export default [
     weekly: [],
     url: "/static/Communities/UI_Design.jpg",
     title: "UI Design",
-    width: "35%",
+    width: "34%",
     leaders: [
       {
         name: "Ember Shan",
@@ -630,7 +555,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Natural Language Processing",
-    width: "31%",
+    width: "33%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -644,9 +569,19 @@ export default [
         ]
       }
     ],
-    YouTube: "J0y0tZzzuQ0",
+    YouTube: "sOWCWObstrs",
     description: `Welcome to the Natural Language Processing(NLP) Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different nlp topics by going through selected survey papers selected from A Survey of Surveys project(https://github.com/NiuTrans/ABigSurvey). Our team members will dive into these survey papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
-    accomplishments: `In our research teams, we work on versatile projects, share our ideas, and collaboratively develop research ideas that not only boost our knowledge in deep learning but also give us the possibility to publish research papers in the most prestigious conferences and journals. Recently we completed a knowledge tracing paper and submitted it to SIGCSE, one of the top conferences in computer science education. Our team consists of machine learning enthusiasts and we would be more than happy to share our passion for machine learning and work together with anyone who has a keen interest and qualifications in deep learning.`,
+    accomplishments: (
+      <div>
+        We have recently published:{" "}
+        <a href="https://arxiv.org/pdf/2206.03702.pdf">
+          Wang Z, Zhang G, Lashkarashvili N. 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of
+          Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv preprint
+          arXiv:2206.03702, 2022.
+        </a>{" "}
+        Will appear on Semeval 2022.
+      </div>
+    ),
     gains: [
       `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required.`,
       `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
@@ -685,7 +620,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Graph_Neural_Network.jpg",
     title: "Graph Neural Networks",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Tian Yan",
@@ -739,7 +674,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Cryptoeconomics.jpg",
     title: "Financial Technology",
-    width: "50%",
+    width: "34%",
     leaders: [
       {
         name: "Xinrong Yao",
@@ -787,7 +722,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Responsible_AI.jpg",
     title: "Responsible AI",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Lanjing Ye",
@@ -801,30 +736,29 @@ export default [
         ]
       }
     ],
-    YouTube: "bOyiP9Lo094",
-    description: `Welcome to the Equity and Inclusion in AI Community! Our community predominantly contributes to the Artificial Intelligence area on 1Cademy, our collaborative research platform. We will explore the progress of addressing bias and discrimination in the area of Artificial Intelligence, and learn about the efforts to pursue inclusiveness in the research field. Our team members will dive into the Equity and Inclusion in AI textbook and present what they've been learning each week by walking us through the nodes they designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas and projects.`,
+    YouTube: "nq0IehyU76Y",
+    description: `Welcome to the Responsible AI Team! Our community predominantly contributes to the Artificial Intelligence area on 1Cademy, our collaborative research platform. We will explore the existing literature and contributions already made in the field of Responsible Artificial Intelligence, including a prospect toward what is yet to be reached. We will learn approaches to making AI systems transparent, fair, secure, and inclusive in the research field. Our team members will dive into the Responsible AI textbooks, survey papers, and journals to gain a concrete understanding of the current state and techniques in the field. Team members will present what they've been learning each week by walking us through the nodes they designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas and projects.`,
     accomplishments: ``,
     gains: [
-      `You will spend the majority of the fall semester going through the Equity and Inclusion in AI textbook to deeply learn about the AI research areas. No prior experience is required.`,
+      `You will spend the majority of the time going through the Responsible AI textbooks, research papers, and journals to deeply learn about the current progress in the field.`,
       `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
       `Top contributors to our community would have the opportunity to co-author research papers in the field.`,
-      `All interactions, task fulfillment, and communications will be online.`,
-      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program.`
+      `Experience a flexible and collaborative work environment, with all work being done remotely.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
     hasTest: true,
     qualifications: [
-      `Knowledge and enthusiasm for topics related to computer science and artificial intelligence.`,
+      `Knowledge and enthusiasm for topics related to computer science and responsible AI.`,
       `Displayed interest in computer science through university-level coursework.`,
-      `Proficiency in at least one programming language.`,
+      `Proficiency in at least one programming language, such as R, Python, C++, or Java.`,
       `(Preferred) Previous research experience, or other relevant involvement.`,
       `(Preferred) Background in artificial intelligence.`
     ],
     responsibilities: [
-      `Constantly study the previously mentioned textbook, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
+      `Constantly study the previously mentioned textbook, research papers, and journals. Summarize chapters and sections, and share the essence of what you learn with our research team in a hierarchically organized fashion.`,
       `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week.`,
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
-      `All interactions, task fulfillment, and communications will be remote.`
+      `All interactions, task fulfillment, and communications will be remote. You are expected to fulfill the task assigned promptly.`
     ]
   },
   {
@@ -839,7 +773,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Computer_Vision.jpg",
     title: "Computer Vision",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Adam Nik",
@@ -918,17 +852,17 @@ export default [
       //     },
       //   ],
       // },
-      {
-        name: "Grace Victoria Ramstad",
-        image: "Grace_Victoria_Ramstad.jpeg",
-        about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/grace-ramstad-05342099/"
-          }
-        ]
-      },
+      // {
+      //   name: "Grace Victoria Ramstad",
+      //   image: "Grace_Victoria_Ramstad.jpeg",
+      //   about: `I am a graduate of Georgetown University with a bachelor's degree in Sociology with focuses on Disability Studies and Education. I am currently working in the field of youth development in Stockholm, while working as a Liaison Librarian for 1Cademy. I have experience with program management, research, and administrative support, primarily in the context of higher education.`,
+      //   websites: [
+      //     {
+      //       name: "LinkedIn",
+      //       url: "https://www.linkedin.com/in/grace-ramstad-05342099/"
+      //     }
+      //   ]
+      // },
       {
         name: "Sarah B Licht",
         image: "Sarah_B_Licht.jpeg",
@@ -1009,6 +943,77 @@ export default [
       `All interactions, task fulfillment, and communications will be remote.`
     ]
   }
+  // {
+  //   id: "Neuroscience",
+  //   tags: [
+  //     {
+  //       title: "Behavioral Neuroscience",
+  //       node: "EotqbmSg4XdYq5U5BQCP"
+  //     }
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Neuroscience.jpg",
+  //   title: "Neuroscience",
+  //   width: "33%",
+  //   leaders: [
+  //     // {
+  //     //   name: "Victoria Mulligan",
+  //     //   image: "Victoria_Mulligan.jpg",
+  //     //   about: `I am working with the Child Development Lab as well as the Neuropsychology, Cognitive, and Clinical Neuroscience Lab. I am analyzing data using SPSS for one project that has been submitted to the EPA conference, and another project which has been submitted to the APA conference. In the NCCN lab, we are in the preliminary stages of conducting a dissertation regarding Long-Haul COVID-19. As part of this project, I am co-authoring a manuscript on mood, anxiety, and cognition in college students. My other responsibilities include conducting literature reviews, recruiting participants, and collecting and analyzing data.`,
+  //     //   websites: [
+  //     //     {
+  //     //       name: "LinkedIn",
+  //     //       url: "https://www.linkedin.com/in/victoria-mulligan-275851161/",
+  //     //     },
+  //     //   ],
+  //     // },
+  //     {
+  //       name: "Amrit Das Pradhan",
+  //       image: "Amrit_Das_Pradhan.png",
+  //       about: `I am a third-year psychology major at Cal Poly SLO interested in pursuing a career in clinical neuropsychology. I joined 1Cademy in January 2021 as an intern for the Educational Psychology community. I helped create the Neuroscience Community and have been a co-leader since April 2021. Other than working with 1Cademy, I work as a research assistant in three labs: a neurogenesis lab where we study the effect of different factors on the creation of new neurons and neural cells in snakes, a memory lab where we run a multitude of studies related to memory, and a LGBTQ+ and mental health lab, where we examine problems surrounding mental health and the LGBTQ+ community in San Luis Obispo and come up with potential solutions.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/amrit-pradhan-53abb9226/"
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   YouTube: "Mj45B59k4fo",
+  //   description: `Students, educators, and researchers, join our large-scale interdisciplinary movement to collaboratively develop, visualize, and organize learning and research materials in your field of interest online for improving education. We are an interdisciplinary group of researchers through the University of Michigan who have been iteratively developing an online research and learning community called 1Cademy.`,
+  //   accomplishments: `Our community is new. Join our interdisciplinary, transnational group of researchers who have been iteratively developing and executing empirical research on the large-scale, online collaborative platform 1Cademy. The goal of this research community is to investigate the various areas of
+  //   behavioral neuroscience
+  //   and strengthen research skills to prepare for a future in the neuroscience field.`,
+  //   gains: [
+  //     `Gain experience using crucial skills in research (literature analysis, summarization, making connections between disciplines) `,
+  //     `Develop presentation skills and learn how to give concise descriptions of research and topics in neuroscience. `,
+  //     `Analyze literature and research to help contribute to research and education. `,
+  //     `Learn concepts and theory in neuroscience `,
+  //     `Develop a positive community-wide reputation for your engagement (over 500+ users from various disciplines) which is displayed on our leaderboard. `,
+  //     `Be publicly accredited for any work you produce for years to come. `,
+  //     `Individual contributions will be available through google search and cite your name (and other search engines)`
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.0/4.0 GPA to apply for this position. Interns are required to have a degree path in neuroscience or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Understanding of basic concepts in neuroscience and ability to filter information into digestible chunks. `,
+  //     `An enthusiasm to write, visualize, and organize learning and research content and collaborate with different communities from a large spectrum of schools and disciplines. `,
+  //     `Curiosity for other types of fields, and a readiness to learn more about them. `,
+  //     `Experience and willingness to work in large-scale collaborative environments. `
+  //   ],
+  //   responsibilities: [
+  //     `Taking information from neuroscientific literature to map and hierarchically structure information in a coherent manner.`,
+  //     `Give presentations over what you have researched in weekly meetings for further discussion.`,
+  //     `Generate ideas for future research in the field and point out areas of missing information or a gap in research.`,
+  //     `Actively utilizing 1Cademy to refine and properly structure the information.`,
+  //     `Attend and actively participate in weekly meetings for the Neuroscience 1Cademy group.`,
+  //     `Regularly communicate and respond to communications with the group through Microsoft Teams.`,
+  //     `Expected 5hrs a week minimum to retain the internship.`,
+  //     `There will be weekly meetings where interns will present their findings and receive feedback from the group.`,
+  //     `All interactions, task fulfillment, and communications will be remote.`
+  //   ]
+  // }
   // {
   //   id: "Mindfulness",
   //   tags: [
