@@ -16,7 +16,7 @@ import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 
 function Index() {
-  const [section, setSection] = useState(-1);
+  const [section, setSection] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
 
   const updatePosition = (event) => {
