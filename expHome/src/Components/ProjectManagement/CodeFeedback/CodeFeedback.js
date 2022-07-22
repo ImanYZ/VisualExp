@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -17,9 +11,6 @@ import Sheet from "@mui/joy/Sheet";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
 
-
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 
 import Paper from "@mui/material/Paper";
@@ -29,13 +20,35 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import Box from "@mui/material/Box";
 
-import { firebaseState, fullnameState,isAdminState } from "../../../store/AuthAtoms";
-import SnackbarComp from "../../SnackbarComp";
+import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
+
+const codesColumn = [
+  {
+    field: "code",
+    headerName: "Code",
+    width: 220,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "checked",
+    headerName: "Approved",
+    width: 160,
+    disableColumnMenu: true,
+    renderCell: cellValues => {
+      return (
+        <GridCellToolTip isLink={false} actionCell={true} Tooltip="Click to check/uncheck!" cellValues={cellValues} />
+      );
+    }
+  }
+];
 
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
+  console.log('fullname', fullname);
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -53,52 +66,32 @@ const CodeFeedback = props => {
   const [docId, setDocId] = useState("");
   const isAdmin = useRecoilValue(isAdminState);
   const [newCodes, setNewCodes] = useState([]);
-  const [newexperimentCodes,setNewexperimentCodes] =useState([]);
+  const [newexperimentCodes, setNewexperimentCodes] = useState([]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+    if (project) {
 
-  const codesColumn = [
-    {
-      field: "code",
-      headerName: "Code",
-      width: 220,
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      const feedbackCodeBooksDocs = await firebase.db
+        .collection("experimentCodes")
+        .where("project", "==", project)
+        .get();
+
+      let experimentCodes = [];
+      for (let Doc of feedbackCodeBooksDocs.docs) {
+        let data = Doc.data();
+        const newCode = {
+          code: data.code,
+          checked: data.approved ? "✅" : "◻",
+          id: Doc.id
+        };
+        experimentCodes.push(newCode);
       }
-    },
-    {
-      field: "checked",
-      headerName: "Approved",
-      width: 160,
-      disableColumnMenu: true,
-      renderCell: cellValues => {
-        return (
-          <GridCellToolTip isLink={false} actionCell={true} Tooltip="Click to check/uncheck!" cellValues={cellValues} />
-        );
-      }
+      setNewexperimentCodes(experimentCodes);
     }
-  ];
+  }, [project]);
 
-
-  useEffect(async ()=>{
-    const feedbackCodeBooksDocs = await firebase.db
-    .collection("experimentCodes")
-    .where("project", "==", project)
-    .get();
-
-  let experimentCodes = [];
-  for (let Doc of feedbackCodeBooksDocs.docs) {
-    let data = Doc.data();
-    const newCode = {
-      code: data.code,
-      checked: data.approved ? "✅" : "◻",
-      id:Doc.id
-    };
-    experimentCodes.push(newCode);
-  }
-  setNewexperimentCodes(experimentCodes);
-  },[project]);
-
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     let approvedFeedbackCodeBooks = [];
     const feedbackCodeBooksDocs = await firebase.db
@@ -113,7 +106,7 @@ const CodeFeedback = props => {
       const newCode = {
         code: data.code,
         checked: data.approved ? "✅" : "◻",
-        id:Doc.id
+        id: Doc.id
       };
       FeedbackCodeBooksCodes.push(newCode);
       if (data.approved) {
@@ -129,9 +122,10 @@ const CodeFeedback = props => {
       quotesSelectedForCode[code] = [];
     }
     setQuotesSelectedForCodes(quotesSelectedForCode);
-    console.log(quotesSelectedForCode);
+    console.log({ quotesSelectedForCode });
   }, [project]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     let foundResponse = false;
     const feedbackCodesDocs = await firebase.db
@@ -145,8 +139,9 @@ const CodeFeedback = props => {
       let response = feedbackData.explanation.split(".").filter(e => !["", " "].includes(e));
       setSentences(response);
       setDocId(feedbackDoc.id);
-      console.log(feedbackDoc.id);
-      if (feedbackData.coders.includes(fullname)) {
+      console.log({ feedbackDoc: feedbackDoc.id });
+      const myCodesLength = Object.keys(feedbackData.codes[fullname]).length;
+      if (codes.length > myCodesLength && fullname) {
         foundResponse = true;
         const myCodes = Object.keys(feedbackData.codes[fullname]);
         for (let code of myCodes) {
@@ -165,15 +160,18 @@ const CodeFeedback = props => {
     }
   }, [firebase, retrieveNext, project]);
 
-  const codeChange = event => {
-    setNewCode(event.currentTarget.value);
-  };
+  // set new code.
+  const handleCodeChange = event => setNewCode(event.currentTarget.value);
 
-  const addCode = async () => {
+  // add new code to the database
+  const handleAddNewCode = async () => {
+    debugger;
     setCreating(true);
 
     const researcherRef = await firebase.db.collection("researchers").doc(fullname);
-    const researcherData = researcherRef.get().data();
+    const researcherGet = await researcherRef.get();
+    const researcherData = await researcherGet.data();
+    console.log({ researcherData });
 
     const researcherUpdates = {
       projects: {
@@ -187,11 +185,11 @@ const CodeFeedback = props => {
     const feedCodesRef = firebase.db.collection("feedbackCodes").doc();
 
     let codef = [];
-    for (let code of codes) {
-      codef.push(code.code);
-    }
+    codes.forEach(code => codef.push(code.code));
     if (!codef.includes(newCode) && newCode !== "") {
       codesRef.set({
+        approved: false,
+        project,
         code: newCode,
         coder: fullname,
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -216,19 +214,17 @@ const CodeFeedback = props => {
     await researcherRef.update(researcherUpdates);
 
     setNewCode("");
-    setTimeout(() => {
-      setCreating(false);
-    }, 1000);
+    setCreating(false);
   };
 
-  const codeSelected = async idx => {
-    let selecting = new Array(1000).fill(false);
+  const handleSelectedCode = async idx => {
+    let selecting = new Array(codes.length).fill(false);
     selecting[idx] = true;
     setSelected(selecting);
     setSelecte(codes[idx]);
   };
 
-  const quotesSelected = value => () => {
+  const handleQuotesSelected = value => () => {
     const currentIndex = quotesSelectedForCodes[selecte].indexOf(value);
     const newChecked = quotesSelectedForCodes[selecte];
 
@@ -241,28 +237,28 @@ const CodeFeedback = props => {
     let quotesSelectedForCode = { ...quotesSelectedForCodes };
     quotesSelectedForCode[selecte] = newChecked;
     setQuotesSelectedForCodes(quotesSelectedForCode);
-    console.log(quotesSelectedForCodes);
+    console.log({ quotesSelectedForCodes });
   };
 
-  //here we go through all the codes and check the ones
-  //that the voter have chosen and append them to his name in the codefeedbacks collection
-  const submit = async () => {
+  // here we go through all the codes and check the ones
+  // that the voter have chosen and append them to his name in the codefeedbacks collection
+  const handleSubmit = async () => {
     setSubmitting(true);
+    console.log({ docId });
     const feedbackCodesDoc = await firebase.db.collection("codefeedbacks").doc(docId).get();
     const feedbackCodeData = feedbackCodesDoc.data();
-    console.log(docId);
     let researcherVotes = {};
     let codesVotes = {};
-    console.log(quotesSelectedForCodes);
-    for (let code of codes) {
+    console.log({ quotesSelectedForCodes });
+    codes.forEach(code => {
       researcherVotes[code] = quotesSelectedForCodes[code];
       if (quotesSelectedForCodes[code].length !== 0) {
         codesVotes[code] = [fullname];
       } else {
         codesVotes[code] = [];
       }
-    }
-    console.log(feedbackCodeData.coders);
+    });
+    console.log({ coders: feedbackCodeData.coders });
     let feedbackCodeUpdate = {
       codes: {
         ...feedbackCodeData.codes,
@@ -276,78 +272,78 @@ const CodeFeedback = props => {
     let recievePoints = [];
     let recieveNegativePoints = [];
     const keys = Object.keys(feedbackCodeData.codesVotes);
-    console.log(keys);
-    console.log(feedbackCodeData.coders.length);
+    console.log({ keys });
+    console.log({ feedbackCodeData: feedbackCodeData.coders.length });
     if (feedbackCodeData.coders.length === 3) {
       for (let key of keys) {
         if (feedbackCodeData.codesVotes[key].length >= 3) {
           for (let researcher of feedbackCodeData.codesVotes[key]) {
             recievePoints.push(researcher);
           }
-        }else{
+        } else {
           for (let researcher of feedbackCodeData.codesVotes[key]) {
             recieveNegativePoints.push(researcher);
           }
-            
+
         }
       }
       console.log("recievePoints::::::::::::::::", recievePoints);
     }
 
-    for(let res of recieveNegativePoints){
+    for (let res of recieveNegativePoints) {
       const researcherRef = await firebase.db.collection("researchers").doc(res);
       const researcherData = researcherRef.get().data();
-  
-      const researcherUpdates = {
-        projects: {
-          ...researcherData.projects,
-          [project]: {
-            ...researcherData.projects[project]
-          }
-        }
-      };
-      if ("negativeFedbackCodes" in researcherUpdates.projects[project]) {
-        researcherUpdates.projects[project].negativeFedbackCodes += 0.5;
-      } else {
-        researcherUpdates.projects[project].positivePointsFedbackCodes = 0.5;
-      }
-      await researcherRef.update(researcherUpdates);
-    }
-    
-    for(let res of recievePoints){
-      const researcherRef = await firebase.db.collection("researchers").doc(res);
-      const researcherData = researcherRef.get().data();
-  
-      const researcherUpdates = {
-        projects: {
-          ...researcherData.projects,
-          [project]: {
-            ...researcherData.projects[project]
-          }
-        }
-      };
-      if ("positivePointsFedbackCodes" in researcherUpdates.projects[project]) {
-        researcherUpdates.projects[project].positivePointsFedbackCodes += 0.5;
-      } else {
-        researcherUpdates.projects[project].positivePointsFedbackCodes = 0.5;
-      }
-      await researcherRef.update(researcherUpdates);
-    }
-    // const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
 
-    // feedbackCodesRef.update(feedbackCodeUpdate);
+      const researcherUpdates = {
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project]
+          }
+        }
+      };
+      if ("negativeGradingPoints" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].negativeGradingPoints += 0.5;
+      } else {
+        researcherUpdates.projects[project].negativeGradingPoints = 0.5;
+      }
+      await researcherRef.update(researcherUpdates);
+    }
+
+    for (let res of recievePoints) {
+      const researcherRef = await firebase.db.collection("researchers").doc(res);
+      const researcherData = researcherRef.get().data();
+
+      const researcherUpdates = {
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project]
+          }
+        }
+      };
+      if ("positiveGradingPoints" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].positiveGradingPoints += 0.5;
+      } else {
+        researcherUpdates.projects[project].positiveGradingPoints = 0.5;
+      }
+      await researcherRef.update(researcherUpdates);
+    }
+    const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
+
+    feedbackCodesRef.update(feedbackCodeUpdate);
     setRetrieveNext(oldValue => oldValue + 1);
     console.log(feedbackCodeUpdate);
   };
 
   const checkCodeAdmin = async (clickedCell) => {
-    
+
     if (clickedCell.field === "checked") {
 
       let codesApp = [...newCodes];
       const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
       const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
- 
+
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
         const id = clickedCell.id;
 
@@ -356,7 +352,7 @@ const CodeFeedback = props => {
           checked: isChecked ? "◻" : "✅",
         };
         setNewCodes(codesApp);
-  
+
 
         const codesAppDoc = await firebase.db
           .collection("feedbackCodeBooks")
@@ -364,24 +360,25 @@ const CodeFeedback = props => {
           .get();
 
         const codesAppData = codesAppDoc.data();
-    
+
         let codeUpdate = {
           ...codesAppData,
-          approved:!isChecked,
+          approved: !isChecked,
         };
-      let feedbackCodeBookRef  = await firebase.db.collection("feedbackCodeBooks").doc(id);
+        let feedbackCodeBookRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
         await feedbackCodeBookRef.update(codeUpdate);
       }
     }
   };
+
   const checkCodeExperimentAdmin = async (clickedCell) => {
-    
+
     if (clickedCell.field === "checked") {
 
       let codesApp = [...newexperimentCodes];
       const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
       const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
-    
+
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
         const id = clickedCell.id;
 
@@ -390,7 +387,7 @@ const CodeFeedback = props => {
           checked: isChecked ? "◻" : "✅",
         };
         setNewexperimentCodes(codesApp);
-  
+
 
         const codesAppDoc = await firebase.db
           .collection("experimentCodes")
@@ -398,19 +395,18 @@ const CodeFeedback = props => {
           .get();
 
         const codesAppData = codesAppDoc.data();
-    
+
         let codeUpdate = {
           ...codesAppData,
-          approved:!isChecked,
+          approved: !isChecked,
         };
-      let feedbackCodeBookRef  = await firebase.db.collection("experimentCodes").doc(id);
+        let feedbackCodeBookRef = await firebase.db.collection("experimentCodes").doc(id);
         await feedbackCodeBookRef.update(codeUpdate);
       }
     }
   };
 
-
-  console.log(quotesSelectedForCodes);
+  console.log('RETURN:::::', { quotesSelectedForCodes });
   return (
     <>
       <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", height: 900 }}>
@@ -437,17 +433,13 @@ const CodeFeedback = props => {
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {codes.map((code, idx) => {
-                  const labelId = `checkbox-list-label-${code}`;
-
-                  return (
-                    <ListItem key={idx} disablePadding selected={selected[codes.indexOf(code)]}>
-                      <ListItemButton role={undefined} onClick={() => codeSelected(codes.indexOf(code))}>
-                        <ListItemText id={labelId} primary={`${code}`} />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                {codes.map((code, idx) => (
+                  <ListItem key={idx} disablePadding selected={selected[codes.indexOf(code)]}>
+                    <ListItemButton role={undefined} onClick={() => handleSelectedCode(codes.indexOf(code))}>
+                      <ListItemText id={`checkbox-list-label-${code}`} primary={`${code}`} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
               </List>
             </Sheet>
 
@@ -460,10 +452,10 @@ const CodeFeedback = props => {
               style={{ width: "80%", alignItems: "center" }}
               minRows={7}
               placeholder={"Add your code here."}
-              onChange={codeChange}
+              onChange={handleCodeChange}
               value={newCode}
             />
-            <Button variant="contained" style={{ margin: "5px" }} onClick={addCode} disabled={creating}>
+            <Button variant="contained" style={{ margin: "5px" }} onClick={handleAddNewCode} disabled={creating}>
               {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
             </Button>
           </Box>
@@ -485,7 +477,7 @@ const CodeFeedback = props => {
 
                   return (
                     <ListItem key={value} disablePadding>
-                      <ListItemButton role={undefined} onClick={quotesSelected(value)} dense>
+                      <ListItemButton role={undefined} onClick={handleQuotesSelected(value)} dense>
                         <ListItemIcon>
                           <Checkbox
                             edge="start"
@@ -506,8 +498,8 @@ const CodeFeedback = props => {
         </Box>
         <Button
           variant="contained"
-          style={{ margin: "19px 500px 500px 580px" }}
-          onClick={submit}
+          style={{ margin: "19px 500px 0 580px" }}
+          onClick={handleSubmit}
           color="success"
           size="large"
           disabled={submitting}
@@ -515,7 +507,7 @@ const CodeFeedback = props => {
           {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
         </Button>
       </Paper>
-      <Box
+      {fullname === "Iman YeckehZaare" && <Box
         sx={{
           display: "flex",
           flexWrap: "wrap",
@@ -525,39 +517,39 @@ const CodeFeedback = props => {
             width: 700,
             height: "100%",
           },
-            height: "96%",
+          height: "96%",
 
         }}
       >
-      <Paper >
-        <Typography variant="h6" gutterBottom marked="center" align="center"> Code added by rsearchers </Typography>
-        <DataGrid
-          rows={newCodes}
-          columns={codesColumn}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          autoPageSize
-          autoHeight
-          hideFooterSelectedRowCount
-          loading={false}
-          onCellClick={checkCodeAdmin}
-        />
-      </Paper>
-      <Paper>
-        <Typography variant="h6" gutterBottom marked="center" align="center">Code Added by Participants in the Experiment </Typography>
-        <DataGrid
-          rows={newexperimentCodes}
-          columns={codesColumn}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          autoPageSize
-          autoHeight
-          hideFooterSelectedRowCount
-          loading={false}
-          onCellClick={checkCodeExperimentAdmin}
-        />
-      </Paper>
-      </Box>
+        <Paper>
+          <Typography variant="h6" gutterBottom marked="center" align="center"> Code added by researchers </Typography>
+          <DataGrid
+            rows={newCodes}
+            columns={codesColumn}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            autoPageSize
+            autoHeight
+            hideFooterSelectedRowCount
+            loading={false}
+            onCellClick={checkCodeAdmin}
+          />
+        </Paper>
+        <Paper>
+          <Typography variant="h6" gutterBottom marked="center" align="center">Code Added by Participants in the Experiment </Typography>
+          <DataGrid
+            rows={newexperimentCodes}
+            columns={codesColumn}
+            pageSize={10}
+            rowsPerPageOptions={[10]}
+            autoPageSize
+            autoHeight
+            hideFooterSelectedRowCount
+            loading={false}
+            onCellClick={checkCodeExperimentAdmin}
+          />
+        </Paper>
+      </Box>}
     </>
   );
 };
