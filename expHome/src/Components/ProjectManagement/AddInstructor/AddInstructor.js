@@ -16,6 +16,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
+import MuiTypography from "@mui/material/Typography";
 
 import { DataGrid } from "@mui/x-data-grid";
 
@@ -31,7 +32,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-import CSCObjLoader from "./CSCObjLoader";
+// import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
@@ -402,8 +403,8 @@ const AddInstructor = props => {
   // entry.
   const [comment, setComment] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-
-  const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
+  const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
+  const [otherInstructorData, setOtherInstructorData] = useState({});
 
   useEffect(() => {
     setSelectedRows([]);
@@ -800,7 +801,10 @@ const AddInstructor = props => {
   const othersInstructorsRowClick = clickedRow => {
     const theRow = clickedRow.row;
     if (theRow) {
+      setOtherInstructorData(theRow);
       const instrIdx = othersInstructors.findIndex(othInstr => othInstr.id === clickedRow.id);
+      const topic = theRow.interestedTopic ? theRow.interestedTopic : "";
+      setOtherInterestedTopic(topic);
       if (instrIdx !== -1) {
         setOtherInstructor(othersInstructors[instrIdx]);
         setComment(othersInstructors[instrIdx].comment);
@@ -1210,31 +1214,76 @@ const AddInstructor = props => {
     }
   };
 
+  const handleOtherInterestedTopic = event => setOtherInterestedTopic(event.target.value);
+
+  const submitOtherInstructor = async () => {
+    const data = { ...otherInstructorData };
+    const otherInstructorRef = await firebase.db.collection("instructors").doc(data.id);
+    delete data.id;
+    const otherInstructorUpdate = {
+      interestedTopic: otherInterestedTopic,
+      ...data
+    };
+    await otherInstructorRef.update(otherInstructorUpdate);
+    setOtherInterestedTopic("");
+    setOtherInstructorData({});
+  };
+
   return (
     <>
       <h2>Instructors Added by Others:</h2>
       <div className="ColumnsAuto_Auto">
-        <div>
-          <Alert className="VoteActivityAlert" severity="success">
-            <ul>
-              <li>
-                <strong>You earn points for evaluating the instructors added by others:</strong> you receive one point
-                for every 16 upvotes you cast on the instructors added by your colleagues in every single day.
-              </li>
-              <li>
-                <strong>No partial or extra points:</strong> if on a single day you cast more than 16 upvotes, you'll
-                not receive any extra points. If you cast fewer than 16 upvotes, you'll not receive any partial points,
-                either.
-              </li>
-            </ul>
-          </Alert>
-          <Alert className="VoteActivityAlert" severity="error">
-            <h3>Downvotes:</h3>
-            <p>
-              If you find an instructor's information that does not match the information on their website, downvote
-              (👎) it. The researcher who has posted the incomplete/wrong information will be penalized.
-            </p>
-          </Alert>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <Alert className="VoteActivityAlert" severity="success">
+              <ul>
+                <li>
+                  <strong>You earn points for evaluating the instructors added by others:</strong> you receive one point
+                  for every 16 upvotes you cast on the instructors added by your colleagues in every single day.
+                </li>
+                <li>
+                  <strong>No partial or extra points:</strong> if on a single day you cast more than 16 upvotes, you'll
+                  not receive any extra points. If you cast fewer than 16 upvotes, you'll not receive any partial
+                  points, either.
+                </li>
+              </ul>
+            </Alert>
+            <Alert className="VoteActivityAlert" severity="error">
+              <h3>Downvotes:</h3>
+              <p>
+                If you find an instructor's information that does not match the information on their website, downvote
+                (👎) it. The researcher who has posted the incomplete/wrong information will be penalized.
+              </p>
+            </Alert>
+          </div>
+          {project === "Annotating" && (
+            <div>
+              <MuiTypography subtitle1="h2">
+                for the moment we need you to add the Intersted Topic for other Instructors previously added by
+                colleges.
+              </MuiTypography>
+              <Box sx={{ m: "10px 10px 10px 0", display: "flex" }}>
+                <TextField
+                  sx={{ m: "10px", flex: "1 1 auto" }}
+                  className="TextField"
+                  label="Interested Topic"
+                  onChange={handleOtherInterestedTopic}
+                  name="interestedTopic"
+                  value={otherInterestedTopic}
+                  disabled={!otherInstructorData?.email}
+                />
+                <Button
+                  sx={{ m: "10px" }}
+                  onClick={submitOtherInstructor}
+                  className={"Button SubmitButton"}
+                  variant="contained"
+                  disabled={!otherInstructorData?.email}
+                >
+                  {"Update Instructor"}
+                </Button>
+              </Box>
+            </div>
+          )}
         </div>
         {Object.keys(otherInstructor).length > 0 ? (
           <Paper className="VoteActivityPaper">
