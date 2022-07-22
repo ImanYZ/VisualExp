@@ -774,7 +774,10 @@ const AddInstructor = props => {
     let oInstsChanged = false;
     for (let oInstructor of othersInstructors) {
       if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-        if ((oInstructor.upVotes + oInstructor.downVotes >= 3)&&(project !== "Annotating")) {
+        if (
+          oInstructor.upVotes + oInstructor.downVotes >= 3 &&
+          (project !== "Annotating" || oInstructor.interestedTopic)
+        ) {
           oInsts = oInsts.filter(instruct => instruct.id !== oInstructor.id);
           oInstsChanged = true;
         } else {
@@ -1427,8 +1430,8 @@ const AddInstructor = props => {
                 important topic that they teach or research at their institution.
               </p>
               <p>
-                Please only enter one topic, which indicates the most interesting to this instructor/school
-                administrator.
+                Please only enter ONE TOPIC; i.e., a few words which indicate the most interesting to this
+                instructor/school administrator.
               </p>
             </Alert>
             <Alert className="VoteActivityAlert" severity="success">
@@ -1656,7 +1659,6 @@ const AddInstructor = props => {
               </Select>
             </FormControl>
             <TextField
-              sx={{ width: "100%" }}
               className="TextField"
               label="Topic of Interest"
               onChange={handleChange}
