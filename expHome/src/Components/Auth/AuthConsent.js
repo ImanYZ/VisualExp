@@ -5,11 +5,13 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
 import Auth from "./Auth";
+import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
+import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 
 import "./ConsentDocument.css";
 
-const AuthConsent = (props) => {
+const AuthConsent = props => {
   return (
     <Grid
       container
@@ -18,7 +20,7 @@ const AuthConsent = (props) => {
         width: "100%",
         height: "100vh",
         overflowY: { xs: "auto", md: "hidden" },
-        overflowX: "hidden",
+        overflowX: "hidden"
       }}
     >
       <Grid
@@ -27,7 +29,7 @@ const AuthConsent = (props) => {
         md={8}
         style={{
           overflowY: "hidden",
-          overflowX: "hidden",
+          overflowX: "hidden"
         }}
       >
         <Paper
@@ -36,10 +38,14 @@ const AuthConsent = (props) => {
             overflowX: "hidden",
             margin: "10px 0px 25px 10px",
             width: "100%",
-            height: "100vh",
+            height: "100vh"
           }}
         >
-          <ConsentDocument />
+          {props.project && props.project === "StudentCoNoteSurvey" ? (
+            <ConsentStudentCoNoteSurvey />
+          ) : (
+            <ConsentDocument />
+          )}
         </Paper>
       </Grid>
       <Grid
@@ -48,7 +54,7 @@ const AuthConsent = (props) => {
         md={4}
         style={{
           overflowY: "hidden",
-          overflowX: "hidden",
+          overflowX: "hidden"
         }}
       >
         <Paper
@@ -57,10 +63,10 @@ const AuthConsent = (props) => {
             overflowX: "hidden",
             margin: "10px 0px 25px 0px",
             width: "100%",
-            height: "100vh",
+            height: "100vh"
           }}
         >
-          <Auth {...props} />
+          {props.project && props.project === "StudentCoNoteSurvey" ? <AuthStudentCoNoteSurvey /> : <Auth {...props} />}
         </Paper>
       </Grid>
     </Grid>
