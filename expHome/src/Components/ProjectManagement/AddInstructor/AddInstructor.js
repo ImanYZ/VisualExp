@@ -774,7 +774,7 @@ const AddInstructor = props => {
     let oInstsChanged = false;
     for (let oInstructor of othersInstructors) {
       if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-        if (oInstructor.upVotes + oInstructor.downVotes >= 3) {
+        if ((oInstructor.upVotes + oInstructor.downVotes >= 3)&&(project !== "Annotating")) {
           oInsts = oInsts.filter(instruct => instruct.id !== oInstructor.id);
           oInstsChanged = true;
         } else {
