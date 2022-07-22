@@ -293,6 +293,46 @@ const CodeFeedback = props => {
       }
       console.log("recievePoints::::::::::::::::", recievePoints);
     }
+
+    for(let res of recieveNegativePoints){
+      const researcherRef = await firebase.db.collection("researchers").doc(res);
+      const researcherData = researcherRef.get().data();
+  
+      const researcherUpdates = {
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project]
+          }
+        }
+      };
+      if ("negativeFedbackCodes" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].negativeFedbackCodes += 0.5;
+      } else {
+        researcherUpdates.projects[project].positivePointsFedbackCodes = 0.5;
+      }
+      await researcherRef.update(researcherUpdates);
+    }
+    
+    for(let res of recievePoints){
+      const researcherRef = await firebase.db.collection("researchers").doc(res);
+      const researcherData = researcherRef.get().data();
+  
+      const researcherUpdates = {
+        projects: {
+          ...researcherData.projects,
+          [project]: {
+            ...researcherData.projects[project]
+          }
+        }
+      };
+      if ("positivePointsFedbackCodes" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].positivePointsFedbackCodes += 0.5;
+      } else {
+        researcherUpdates.projects[project].positivePointsFedbackCodes = 0.5;
+      }
+      await researcherRef.update(researcherUpdates);
+    }
     // const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
 
     // feedbackCodesRef.update(feedbackCodeUpdate);
