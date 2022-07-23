@@ -42,6 +42,7 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
+  lifeLogScheduler,
   ongoingEvents
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, updateInstitutions, updateTypesenseIndex } = require("./knowledge");
