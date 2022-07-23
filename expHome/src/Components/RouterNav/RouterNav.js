@@ -979,7 +979,7 @@ const RouterNav = props => {
                       </Tooltip>
                     ) : null}
 
-                    <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  negative point.</div>}>
+                    <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  🧟 negative point.</div>}>
                       <Button
                         id="CodeFeedback"
                         className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}

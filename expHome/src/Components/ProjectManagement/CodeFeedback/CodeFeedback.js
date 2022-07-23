@@ -145,7 +145,7 @@ const CodeFeedback = props => {
     for (let codeBook of feedbackCodeBooksDocs.docs) {
       approvedCodes.push(codeBook.data().code);
     }
-
+     
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
       const lengthSentence = feedbackData.explanation.split(".").length;
@@ -157,10 +157,11 @@ const CodeFeedback = props => {
       }
       
       console.log(feedbackData.explanation);
-      console.log("::::::::::::::::::split response:",feedbackData.explanation);
+      console.log("::::::::::::::::::::split response::::::::::::",feedbackData.explanation);
       setDocId(feedbackDoc.id);
 
-
+    //we check if the authenticated reserchers have aleardy casted his vote 
+    //if so we get all his recorded past choices
       if (feedbackData.coders.includes(fullname)) {
         const myCodes = Object.keys(feedbackData.codersChoices[fullname]);
         console.log(myCodes.length);
@@ -179,12 +180,28 @@ const CodeFeedback = props => {
           for (let code of myCodes) {
             quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
           }
+          for(let code of newCodes){
+            quotesSelectedForCodes[code] = [];
+          }
           setQuotesSelectedForCodes(quotesSelectedForCodes);
         }
+    // if the authenticated researcher didn't vote on this  explanation yet 
+    // we check if all the others coders who previously casted their vote that they checked 
+    //the new code added ,so that way we would know if we can show this explanation or not 
       } else {
+        setNewCodesAdded([]);
+        const allowOtherResearchersToVote = true;
+        for(let coder of feedbackData.coders){
+          const myCodes = Object.keys(feedbackData.codersChoices[coder]);
+          if(myCodes.length !== approvedCodes.length){
+            allowOtherResearchersToVote = false;
+          }
+        }
+        if(allowOtherResearchersToVote){
         console.log(feedbackDoc.id);
         setSentences(response);
         foundResponse = true;
+      }
       }
 
       setSubmitting(false);
@@ -563,7 +580,7 @@ const CodeFeedback = props => {
             <Box sx = {{margin:"0px 10px 60px 10px"}}>
         <Button
           variant="contained"
-          style={{ margin: "19px 500px 0 580px" }}
+          style={{ margin: "19px 500px 10px 580px" }}
           onClick={handleSubmit}
           color="success"
           size="large"
@@ -576,7 +593,7 @@ const CodeFeedback = props => {
    
       
       </Paper>
-      {fullname === "Sam Ouhra" && (
+      {fullname === "Iman YeckehZaare" && (
         <Box
           sx={{
             display: "flex",
@@ -587,7 +604,8 @@ const CodeFeedback = props => {
               width: 700,
               height: "100%"
             },
-            height: "96%"
+            height: "96%",
+            m:"50px 10px 100px 50px"
           }}
         >
           <Paper>
