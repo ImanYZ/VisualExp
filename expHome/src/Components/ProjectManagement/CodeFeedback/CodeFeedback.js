@@ -48,7 +48,7 @@ const codesColumn = [
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  console.log('fullname', fullname);
+  console.log("fullname", fullname);
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -60,18 +60,18 @@ const CodeFeedback = props => {
   const [creating, setCreating] = useState(false);
   const [checked, setChecked] = useState([]);
   const [sentences, setSentences] = useState([]);
-  const [selected, setSelected] = useState(new Array(100).fill(false));
+  const [selected, setSelected] = useState({});
   const [quotesSelectedForCodes, setQuotesSelectedForCodes] = useState({});
   const [selecte, setSelecte] = useState(null);
   const [docId, setDocId] = useState("");
   const isAdmin = useRecoilValue(isAdminState);
   const [newCodes, setNewCodes] = useState([]);
   const [newexperimentCodes, setNewexperimentCodes] = useState([]);
+  const [newCodesAdded, setNewCodesAdded]  = useState([]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     if (project) {
-
       const feedbackCodeBooksDocs = await firebase.db
         .collection("experimentCodes")
         .where("project", "==", project)
@@ -118,10 +118,13 @@ const CodeFeedback = props => {
     setNewCodes(FeedbackCodeBooksCodes);
     console.log(approvedFeedbackCodeBooks);
     let quotesSelectedForCode = { ...quotesSelectedForCodes };
+    let codesSelecting = {};
     for (let code of approvedFeedbackCodeBooks) {
       quotesSelectedForCode[code] = [];
+      codesSelecting[code] = false;
     }
     setQuotesSelectedForCodes(quotesSelectedForCode);
+    setSelected(codesSelecting);
     console.log({ quotesSelectedForCode });
   }, [project]);
 
@@ -129,26 +132,58 @@ const CodeFeedback = props => {
   useEffect(async () => {
     let foundResponse = false;
     const feedbackCodesDocs = await firebase.db
-      .collection("codefeedbacks")
+      .collection("feedbackCode")
       .where("approved", "==", false)
       .where("project", "==", project)
       .get();
+    const feedbackCodeBooksDocs = await firebase.db
+      .collection("feedbackCodeBooks")
+      .where("approved", "==", true)
+      .where("project", "==", project)
+      .get();
+    let approvedCodes = [];
+    for (let codeBook of feedbackCodeBooksDocs.docs) {
+      approvedCodes.push(codeBook.data().code);
+    }
 
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
-      let response = feedbackData.explanation.split(".").filter(e => !["", " "].includes(e));
-      setSentences(response);
+      const lengthSentence = feedbackData.explanation.split(".").length;
+       let response;
+      if(lengthSentence >1){   
+         response = feedbackData.explanation.split(".",lengthSentence-1);
+      }else{
+         response = feedbackData.explanation.split(".");
+      }
+      
+      console.log(feedbackData.explanation);
+      console.log("::::::::::::::::::split response:",feedbackData.explanation);
       setDocId(feedbackDoc.id);
-      console.log({ feedbackDoc: feedbackDoc.id });
-      const myCodesLength = Object.keys(feedbackData.codes[fullname]).length;
-      if (codes.length > myCodesLength && fullname) {
-        foundResponse = true;
-        const myCodes = Object.keys(feedbackData.codes[fullname]);
-        for (let code of myCodes) {
-          quotesSelectedForCodes[code] = feedbackData.codes[fullname][code];
+
+
+      if (feedbackData.coders.includes(fullname)) {
+        const myCodes = Object.keys(feedbackData.codersChoices[fullname]);
+        console.log(myCodes.length);
+        console.log(codes.length);
+        console.log(myCodes.length !== approvedCodes.length);
+        if (myCodes.length !== approvedCodes.length) {
+          let newCodes = [];
+          for(let code of approvedCodes){
+              if(!myCodes.includes(code)){
+                newCodes.push(code);
+              }
+          }
+          setNewCodesAdded(newCodes);
+          setSentences(response);
+          foundResponse = true;
+          for (let code of myCodes) {
+            quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
+          }
+          setQuotesSelectedForCodes(quotesSelectedForCodes);
         }
-        setQuotesSelectedForCodes(quotesSelectedForCodes);
       } else {
+        console.log(feedbackDoc.id);
+        setSentences(response);
         foundResponse = true;
       }
 
@@ -182,11 +217,7 @@ const CodeFeedback = props => {
       }
     };
     const codesRef = firebase.db.collection("feedbackCodeBooks").doc();
-    const feedCodesRef = firebase.db.collection("feedbackCodes").doc();
-
-    let codef = [];
-    codes.forEach(code => codef.push(code.code));
-    if (!codef.includes(newCode) && newCode !== "") {
+    if (!codes.includes(newCode) && newCode !== "") {
       codesRef.set({
         approved: false,
         project,
@@ -217,11 +248,15 @@ const CodeFeedback = props => {
     setCreating(false);
   };
 
-  const handleSelectedCode = async idx => {
-    let selecting = new Array(codes.length).fill(false);
-    selecting[idx] = true;
-    setSelected(selecting);
-    setSelecte(codes[idx]);
+  const handleSelectedCode = async code => {
+    console.log(code);
+    codes.forEach(thisCode => {
+      selected[thisCode] = false;
+    });
+    selected[code] = true;
+    console.log(selected);
+    setSelected(selected);
+    setSelecte(code);
   };
 
   const handleQuotesSelected = value => () => {
@@ -241,11 +276,11 @@ const CodeFeedback = props => {
   };
 
   // here we go through all the codes and check the ones
-  // that the voter have chosen and append them to his name in the codefeedbacks collection
+  // that the voter have chosen and append them to his name in the feedbackCode collection
   const handleSubmit = async () => {
     setSubmitting(true);
     console.log({ docId });
-    const feedbackCodesDoc = await firebase.db.collection("codefeedbacks").doc(docId).get();
+    const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docId).get();
     const feedbackCodeData = feedbackCodesDoc.data();
     let researcherVotes = {};
     let codesVotes = {};
@@ -260,14 +295,15 @@ const CodeFeedback = props => {
     });
     console.log({ coders: feedbackCodeData.coders });
     let feedbackCodeUpdate = {
-      codes: {
-        ...feedbackCodeData.codes,
+      codersChoices: {
+        ...feedbackCodeData.codersChoices,
         [fullname]: researcherVotes
       },
       coders: feedbackCodeData.coders.includes(fullname)
         ? feedbackCodeData.coders
         : [...feedbackCodeData.coders, fullname],
-      codesVotes
+      codesVotes,
+      updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
     };
     let recievePoints = [];
     let recieveNegativePoints = [];
@@ -284,7 +320,6 @@ const CodeFeedback = props => {
           for (let researcher of feedbackCodeData.codesVotes[key]) {
             recieveNegativePoints.push(researcher);
           }
-
         }
       }
       console.log("recievePoints::::::::::::::::", recievePoints);
@@ -302,10 +337,10 @@ const CodeFeedback = props => {
           }
         }
       };
-      if ("negativeGradingPoints" in researcherUpdates.projects[project]) {
-        researcherUpdates.projects[project].negativeGradingPoints += 0.5;
+      if ("negativeCodingPoints" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].negativeCodingPoints += 0.5;
       } else {
-        researcherUpdates.projects[project].negativeGradingPoints = 0.5;
+        researcherUpdates.projects[project].negativeCodingPoints = 0.5;
       }
       await researcherRef.update(researcherUpdates);
     }
@@ -322,26 +357,24 @@ const CodeFeedback = props => {
           }
         }
       };
-      if ("positiveGradingPoints" in researcherUpdates.projects[project]) {
-        researcherUpdates.projects[project].positiveGradingPoints += 0.5;
+      if ("positiveCodingPoints" in researcherUpdates.projects[project]) {
+        researcherUpdates.projects[project].positiveCodingPoints += 0.5;
       } else {
-        researcherUpdates.projects[project].positiveGradingPoints = 0.5;
+        researcherUpdates.projects[project].positiveCodingPoints = 0.5;
       }
       await researcherRef.update(researcherUpdates);
     }
-    const feedbackCodesRef = await firebase.db.collection("codefeedbacks").doc(docId);
+    const feedbackCodesRef = await firebase.db.collection("feedbackCode").doc(docId);
 
     feedbackCodesRef.update(feedbackCodeUpdate);
     setRetrieveNext(oldValue => oldValue + 1);
     console.log(feedbackCodeUpdate);
   };
 
-  const checkCodeAdmin = async (clickedCell) => {
-
+  const checkCodeAdmin = async clickedCell => {
     if (clickedCell.field === "checked") {
-
       let codesApp = [...newCodes];
-      const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
+      const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
       const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
 
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
@@ -349,21 +382,17 @@ const CodeFeedback = props => {
 
         codesApp[appIdx] = {
           ...codesApp[appIdx],
-          checked: isChecked ? "◻" : "✅",
+          checked: isChecked ? "◻" : "✅"
         };
         setNewCodes(codesApp);
 
-
-        const codesAppDoc = await firebase.db
-          .collection("feedbackCodeBooks")
-          .doc(id)
-          .get();
+        const codesAppDoc = await firebase.db.collection("feedbackCodeBooks").doc(id).get();
 
         const codesAppData = codesAppDoc.data();
 
         let codeUpdate = {
           ...codesAppData,
-          approved: !isChecked,
+          approved: !isChecked
         };
         let feedbackCodeBookRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
         await feedbackCodeBookRef.update(codeUpdate);
@@ -371,12 +400,10 @@ const CodeFeedback = props => {
     }
   };
 
-  const checkCodeExperimentAdmin = async (clickedCell) => {
-
+  const checkCodeExperimentAdmin = async clickedCell => {
     if (clickedCell.field === "checked") {
-
       let codesApp = [...newexperimentCodes];
-      const appIdx = codesApp.findIndex((acti) => acti.id === clickedCell.id);
+      const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
       const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
 
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
@@ -384,21 +411,17 @@ const CodeFeedback = props => {
 
         codesApp[appIdx] = {
           ...codesApp[appIdx],
-          checked: isChecked ? "◻" : "✅",
+          checked: isChecked ? "◻" : "✅"
         };
         setNewexperimentCodes(codesApp);
 
-
-        const codesAppDoc = await firebase.db
-          .collection("experimentCodes")
-          .doc(id)
-          .get();
+        const codesAppDoc = await firebase.db.collection("experimentCodes").doc(id).get();
 
         const codesAppData = codesAppDoc.data();
 
         let codeUpdate = {
           ...codesAppData,
-          approved: !isChecked,
+          approved: !isChecked
         };
         let feedbackCodeBookRef = await firebase.db.collection("experimentCodes").doc(id);
         await feedbackCodeBookRef.update(codeUpdate);
@@ -406,88 +429,110 @@ const CodeFeedback = props => {
     }
   };
 
-  console.log('RETURN:::::', { quotesSelectedForCodes });
+  console.log("RETURN:::::", { quotesSelectedForCodes });
   return (
     <>
+      <Typography variant="h6" margin-bottom="20px">
+        For each different code,please choose which response(s) contains the code:
+      </Typography>
+      {(newCodesAdded.length !== 0)&&(
+        <div>
+           <Typography variant="h6" margin-bottom="20px">
+           You have submited your Votes before for this response ,but for the past peroide new codes have been added ,
+           please add your choices for these codes and fell free to change your votes:
+         </Typography>
+
+         <List
+           sx={{
+             paddingBlock: 1,
+             maxWidth: 500,
+             "--List-decorator-width": "48px",
+             "--List-item-paddingLeft": "1.5rem",
+             "--List-item-paddingRight": "1rem"
+           }}
+         >
+           {newCodesAdded.map(code => (
+             <ListItem key={code} disablePadding selected={selected[code]}>
+               <ListItemButton
+               >
+                 <ListItemText id={`${code}`} primary={`${code}`} />
+               </ListItemButton>
+             </ListItem>
+           ))}
+         </List>
+   
+       </div>
+
+      ) }
+
       <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", height: 900 }}>
-        <Typography variant="h6" margin-bottom="20px">
-          For each different code,please choose which response(s) contains the code:
-        </Typography>
         <Box
           sx={{
             display: "flex",
             flexWrap: "wrap",
+            
+              width:"90%",
+           
             justifyContent: "center",
             gap: 0
           }}
         >
           <Box>
-            <Sheet variant="outlined" sx={{ position: "relative", overflow: "auto" }}>
+            <Sheet variant="outlined" sx={{  overflow: "auto" }}>
               <List
                 sx={{
                   paddingBlock: 1,
-                  minWidth: 500,
+                  maxWidth: 500,
                   height: 500,
                   "--List-decorator-width": "48px",
                   "--List-item-paddingLeft": "1.5rem",
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {codes.map((code, idx) => (
-                  <ListItem key={idx} disablePadding selected={selected[codes.indexOf(code)]}>
-                    <ListItemButton role={undefined} onClick={() => handleSelectedCode(codes.indexOf(code))}>
-                      <ListItemText id={`checkbox-list-label-${code}`} primary={`${code}`} />
+                {codes.map(code => (
+                  <ListItem key={code} disablePadding selected={selected[code]}>
+                    <ListItemButton
+                      value={code}
+                      onClick={() => {
+                        handleSelectedCode(code);
+                      }}
+                    >
+                      <ListItemText id={`${code}`} primary={`${code}`} />
                     </ListItemButton>
                   </ListItem>
                 ))}
               </List>
             </Sheet>
 
-            <Typography variant="h7">
-              If the code you're looking for does not exist in the list above, add it below :
-              <br />
-            </Typography>
-
-            <TextareaAutosize
-              style={{ width: "80%", alignItems: "center" }}
-              minRows={7}
-              placeholder={"Add your code here."}
-              onChange={handleCodeChange}
-              value={newCode}
-            />
-            <Button variant="contained" style={{ margin: "5px" }} onClick={handleAddNewCode} disabled={creating}>
-              {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
-            </Button>
+          
           </Box>
           <Box>
-            <Sheet variant="outlined" sx={{ position: "relative", overflow: "auto" }}>
+            <Sheet variant="outlined" >
               <List
                 sx={{
                   paddingBlock: 1,
-                  minWidth: 500,
+                  width: 700,
                   height: 500,
-
                   "--List-decorator-width": "48px",
                   "--List-item-paddingLeft": "1.5rem",
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {sentences.map((value, idx) => {
-                  const labelId = `checkbox-list-label-${value}`;
+                {sentences.map(sentence => {
+       
 
                   return (
-                    <ListItem key={value} disablePadding>
-                      <ListItemButton role={undefined} onClick={handleQuotesSelected(value)} dense>
+                    <ListItem key={sentence} disablePadding>
+                      <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
                         <ListItemIcon>
                           <Checkbox
                             edge="start"
-                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(value) !== -1 : false}
+                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
                             tabIndex={-1}
                             disableRipple
-                            inputProps={{ "aria-labelledby": labelId }}
                           />
                         </ListItemIcon>
-                        <ListItemText id={labelId} primary={` ${value}`} />
+                        <ListItemText id={sentence} primary={` ${sentence}`} />
                       </ListItemButton>
                     </ListItem>
                   );
@@ -496,6 +541,26 @@ const CodeFeedback = props => {
             </Sheet>
           </Box>
         </Box>
+       <Box style ={{width:600, margin:"60px 50px 50px 50px"}}>
+        <Box sx = {{padding:"10px 10px 20px 10px"}}>
+       <Typography variant="h7" >
+              If the code you're looking for does not exist in the list above, add it below :
+              <br />
+            </Typography>
+            </Box>
+            <TextareaAutosize
+              style={{ width: "80%", alignItems: "center" }}
+              minRows={7}
+              placeholder={"Add your code here."}
+              onChange={handleCodeChange}
+              value={newCode}
+            />
+            <Box>
+            <Button variant="contained" style={{ margin: "5px 5px 5px 5ox" }} onClick={handleAddNewCode} disabled={creating}>
+              {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+            </Button>
+            </Box>
+            <Box sx = {{margin:"0px 10px 60px 10px"}}>
         <Button
           variant="contained"
           style={{ margin: "19px 500px 0 580px" }}
@@ -506,50 +571,60 @@ const CodeFeedback = props => {
         >
           {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
         </Button>
+        </Box>  
+       </Box>
+   
+      
       </Paper>
-      {fullname === "Iman YeckehZaare" && <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          "& > :not(style)": {
-            m: 3,
-            m: 0,
-            width: 700,
-            height: "100%",
-          },
-          height: "96%",
-
-        }}
-      >
-        <Paper>
-          <Typography variant="h6" gutterBottom marked="center" align="center"> Code added by researchers </Typography>
-          <DataGrid
-            rows={newCodes}
-            columns={codesColumn}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            autoPageSize
-            autoHeight
-            hideFooterSelectedRowCount
-            loading={false}
-            onCellClick={checkCodeAdmin}
-          />
-        </Paper>
-        <Paper>
-          <Typography variant="h6" gutterBottom marked="center" align="center">Code Added by Participants in the Experiment </Typography>
-          <DataGrid
-            rows={newexperimentCodes}
-            columns={codesColumn}
-            pageSize={10}
-            rowsPerPageOptions={[10]}
-            autoPageSize
-            autoHeight
-            hideFooterSelectedRowCount
-            loading={false}
-            onCellClick={checkCodeExperimentAdmin}
-          />
-        </Paper>
-      </Box>}
+      {fullname === "Sam Ouhra" && (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            "& > :not(style)": {
+              m: 3,
+              m: 0,
+              width: 700,
+              height: "100%"
+            },
+            height: "96%"
+          }}
+        >
+          <Paper>
+            <Typography variant="h6" gutterBottom marked="center" align="center">
+              {" "}
+              Code added by researchers{" "}
+            </Typography>
+            <DataGrid
+              rows={newCodes}
+              columns={codesColumn}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              autoPageSize
+              autoHeight
+              hideFooterSelectedRowCount
+              loading={false}
+              onCellClick={checkCodeAdmin}
+            />
+          </Paper>
+          <Paper>
+            <Typography variant="h6" gutterBottom marked="center" align="center">
+              Code Added by Participants in the Experiment{" "}
+            </Typography>
+            <DataGrid
+              rows={newexperimentCodes}
+              columns={codesColumn}
+              pageSize={10}
+              rowsPerPageOptions={[10]}
+              autoPageSize
+              autoHeight
+              hideFooterSelectedRowCount
+              loading={false}
+              onCellClick={checkCodeExperimentAdmin}
+            />
+          </Paper>
+        </Box>
+      )}
     </>
   );
 };
