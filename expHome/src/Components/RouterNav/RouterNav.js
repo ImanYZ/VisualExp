@@ -101,7 +101,8 @@ const RouterNav = props => {
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
-  const [codesPoints, setCodesPoints] = useState(0);
+  const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
+  const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -202,10 +203,15 @@ const RouterNav = props => {
               } else {
                 setNegativeGradingPoints(0);
               }
-              if (theProject.codesPoints) {
-                setCodesPoints(theProject.codesPoints);
+              if (theProject.negativeCodingPoints) {
+                setNegativeCodesPionts(theProject.negativeCodingPoints);
               } else {
-                setCodesPoints(0);
+                setNegativeCodesPionts(0);
+              }
+              if (theProject.positiveCodingPoints) {
+                setPositiveCodesPoints(theProject.positiveCodingPoints);
+              } else {
+                setPositiveCodesPoints(0);
               }
             }
             if ("gradingNum" in theProject) {
@@ -973,13 +979,13 @@ const RouterNav = props => {
                       </Tooltip>
                     ) : null}
 
-                    <Tooltip title={<div>You've earned {codesPoints} total 💬 coding participants responses.</div>}>
+                    <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  negative point.</div>}>
                       <Button
                         id="CodeFeedback"
                         className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
                         onClick={event => navigate("/Activities/CodeFeedback")}
                       >
-                        💬 {codesPoints}
+                        💬 {positiveCodesPoints}<br /> 🧟 {negativeCodesPionts}
                       </Button>
                     </Tooltip>
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
