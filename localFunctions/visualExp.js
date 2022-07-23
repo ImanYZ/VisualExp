@@ -709,27 +709,6 @@ exports.restructureFeedBackCode = async (req, res) => {
       const feedKey = [fData.explanation, fData.fullname];
 
       if (feedKey in feedBack) {
-        const feedbackData = feedBack[feedKey];
-
-        // if (feedbackData.codesVotes[fData.code]) {
-        //   console.log("array array problem :>>>>>>>");
-        //   console.log(typeof feedbackData.codesVotes[fData.code]);
-        //   feedbackData.codesVotes[fData.code].push(fData.coder);
-        // } else {
-        //   feedbackData.codesVotes[fData.code] = [fData.coder];
-        // }
-
-        if (fData.coder in feedBack[feedKey].codes) {
-          feedBack[feedKey].codes[fData.coder] = {
-            ...feedBack[feedKey].codes[fData.coder],
-            [fData.code]: [],
-          };
-        } else {
-          feedBack[feedKey].coders = [...feedbackData.coders, fData.coder];
-          feedBack[feedKey].codes[fData.coder] = {
-            [fData.code]: [],
-          };
-        }
       } else {
         let codesVotes ={};
         for(let doc of feedbackCodeBooksdocs.docs){
@@ -739,8 +718,9 @@ exports.restructureFeedBackCode = async (req, res) => {
         // codesVotes[fData.code] = [fData.coder];
         console.log(codesVotes);
         feedBack[feedKey] = {
-          codes: { [fData.coder]: { [fData.code]: [] } },
-          coders: [fData.coder],
+          approved:false,
+          codersChoices: {},
+          coders: [],
           choice: fData.choice,
           project: fData.project,
           fullname: fData.fullname,
@@ -748,13 +728,14 @@ exports.restructureFeedBackCode = async (req, res) => {
           explanation: fData.explanation,
           createdAt: fData.createdAt,
           expIdx: fData.expIdx,
-          codesVotes
+          codesVotes,
+          updatedAt:new Date()
         };
       }
     }
 
     for (let rGKey in feedBack) {
-      const recallGradeRef = db.collection("codefeedbacks").doc();
+      const recallGradeRef = db.collection("feedbackCode").doc();
       console.log(feedBack[rGKey]);
       await batchSet(recallGradeRef, feedBack[rGKey]);
     }
