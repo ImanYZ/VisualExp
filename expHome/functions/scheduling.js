@@ -2,13 +2,7 @@ const { admin, db } = require("./admin");
 
 require("dotenv").config();
 
-const {
-  insertEvent,
-  getEvent,
-  getEvents,
-  deleteEvent,
-  insertLifeLogEvent,
-} = require("./GoogleCalendar");
+const { insertEvent, getEvent, getEvents, deleteEvent, insertLifeLogEvent } = require("./GoogleCalendar");
 
 const { pad2Num } = require("./utils");
 
@@ -28,14 +22,7 @@ const createExperimentEvent = async (email, researcher, order, start, end) => {
     "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
     "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
   const colorId = order === "1st" ? "4" : "3";
-  const eventCreated = await insertEvent(
-    start,
-    end,
-    summary,
-    description,
-    [{ email }, { email: researcher }],
-    colorId
-  );
+  const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
   return eventCreated;
 };
 
@@ -72,13 +59,7 @@ exports.schedule = async (req, res) => {
           start = new Date(req.body.third);
           end = new Date(start.getTime() + 30 * 60000);
         }
-        const eventCreated = await createExperimentEvent(
-          email,
-          researcher,
-          order,
-          start,
-          end
-        );
+        const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
         events.push(eventCreated);
       }
       return res.status(200).json({ events });
@@ -111,13 +92,7 @@ exports.scheduleSingleSession = async (req, res) => {
       } else if (order === "2nd" || order === "3rd") {
         end = new Date(start.getTime() + 30 * 60000);
       }
-      const eventCreated = await createExperimentEvent(
-        email,
-        researcher,
-        order,
-        start,
-        end
-      );
+      const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
       return res.status(200).json({ events: [eventCreated] });
     }
   } catch (err) {
@@ -156,12 +131,10 @@ exports.allPastEvents = async () => {
 };
 
 // Get all the events in the past specified number of days.
-exports.pastEvents = async (previousDays) => {
+exports.pastEvents = async previousDays => {
   try {
     let end = new Date();
-    const start = new Date(
-      end.getTime() - parseInt(previousDays) * 24 * 60 * 60 * 1000
-    );
+    const start = new Date(end.getTime() - parseInt(previousDays) * 24 * 60 * 60 * 1000);
     return await getEvents(start, end, "America/Detroit");
   } catch (err) {
     console.log({ err });
@@ -170,7 +143,7 @@ exports.pastEvents = async (previousDays) => {
 };
 
 // Get all the events in the next specified number of days.
-exports.futureEvents = async (nextDays) => {
+exports.futureEvents = async nextDays => {
   try {
     const start = new Date();
     let end = new Date();
@@ -187,12 +160,7 @@ exports.todayPastEvents = async () => {
   try {
     let start = new Date();
     start = new Date(
-      start.getFullYear() +
-        "-" +
-        pad2Num(start.getMonth() + 1) +
-        "-" +
-        pad2Num(start.getDate()) +
-        "T12:00:00.000Z"
+      start.getFullYear() + "-" + pad2Num(start.getMonth() + 1) + "-" + pad2Num(start.getDate()) + "T12:00:00.000Z"
     );
     let end = new Date();
     end = new Date(end.getTime() - 60 * 60 * 1000);
@@ -238,13 +206,44 @@ exports.deleteEvent = async (req, res) => {
 // Life Logging
 // ************
 
-// Schedule Life Logs
+exports.lifeLogScheduler = async context => {
+  try {
+    let end = new Date();
+    const currentTime = end.getTime();
+    const anHourAgo = new Date(end.getTime() - 60 * 60 * 1000);
+    const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+    const allEvents = await getEvents(start, end, "America/Detroit");
+    if (allEvents && allEvents.length > 0) {
+      let dark = 0,
+        light = 0;
+      const lifeLogDocs = await db.collection("lifeLog").get();
+      if (lifeLogDocs.docs.length > 0) {
+        const lifeLogData = lifeLogDocs.docs[0].data();
+        dark += lifeLogData.dark;
+        light += lifeLogData.light;
+      }
+      dark += 60;
+      for (let ev of allEvents) {
+        const startTime = new Date(ev.start.dateTime).getTime();
+        const endTime = new Date(ev.end.dateTime).getTime();
+        if (endTime <= currentTime && endTime >= anHourAgo && endTime > startTime) {
+          const minutes = Math.floor((endTime - startTime).getTime() / (60 * 1000));
+          light += minutes;
+        }
+      }
+      const lifeLogRef = db.collection("lifeLog").doc(lifeLogDocs.docs[0].id);
+      await lifeLogRef.update({ dark, light });
+    }
+  } catch (err) {
+    console.log({ err });
+  }
+  return null;
+};
+
 exports.scheduleLifeLog = async (req, res) => {
   try {
     console.log({ body: req.body });
-    const authUser = await admin
-      .auth()
-      .verifyIdToken(req.headers.authorization);
+    const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
     if (authUser.email === "oneweb@umich.edu") {
       let start, end;
       if (req.body.backwards) {
@@ -256,12 +255,7 @@ exports.scheduleLifeLog = async (req, res) => {
       }
       const summary = req.body.summary;
       const description = "";
-      const eventCreated = await insertLifeLogEvent(
-        start,
-        end,
-        summary,
-        description
-      );
+      const eventCreated = await insertLifeLogEvent(start, end, summary, description);
       return res.status(200).json({ done: true });
     }
   } catch (err) {
