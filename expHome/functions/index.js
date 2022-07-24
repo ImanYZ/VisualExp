@@ -11,7 +11,7 @@ const {
   feedbackData,
   loadContacts,
   reassignAllPConditionNums,
-  applicationReminder,
+  applicationReminder
 } = require("./users");
 const {
   voteEndpoint,
@@ -23,7 +23,7 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   bulkGradeFreeRecall,
-  markPaidEndpoint,
+  markPaidEndpoint
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -34,7 +34,7 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations,
+  sendPersonalInvitations
 } = require("./emailing");
 const {
   schedule,
@@ -42,13 +42,10 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
-  ongoingEvents,
+  lifeLogger,
+  ongoingEvents
 } = require("./scheduling");
-const {
-  assignNodeContributorsInstitutionsStats,
-  updateInstitutions,
-  updateTypesenseIndex,
-} = require("./knowledge");
+const { assignNodeContributorsInstitutionsStats, updateInstitutions, updateTypesenseIndex } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -112,14 +109,12 @@ app.get("/", (req, res) => {
 exports.api = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .https.onRequest(app);
 
 // Deleting a user document should trigger this function:
-exports.deleteUser = functions.firestore
-  .document("users/{fullname}")
-  .onDelete(deleteUser);
+exports.deleteUser = functions.firestore.document("users/{fullname}").onDelete(deleteUser);
 
 // exports.updateNotTakenSessionsScheduler = functions.pubsub
 //   .schedule("every 40 minutes")
@@ -128,7 +123,7 @@ exports.deleteUser = functions.firestore
 exports.assignExperimentSessionsPoints = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .pubsub.schedule("every 4 hours")
   .onRun(assignExperimentSessionsPoints);
@@ -136,7 +131,7 @@ exports.assignExperimentSessionsPoints = functions
 exports.remindCalendarInvitations = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .pubsub.schedule("every 4 hours")
   .onRun(remindCalendarInvitations);
@@ -144,7 +139,7 @@ exports.remindCalendarInvitations = functions
 exports.applicationReminder = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
@@ -152,7 +147,7 @@ exports.applicationReminder = functions
 exports.assignNodeContributorsInstitutionsStats = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .pubsub.schedule("every 25 hours")
   .onRun(assignNodeContributorsInstitutionsStats);
@@ -160,7 +155,7 @@ exports.assignNodeContributorsInstitutionsStats = functions
 exports.updateInstitutions = functions
   .runWith({
     memory: "1GB",
-    timeoutSeconds: 520,
+    timeoutSeconds: 520
   })
   .pubsub.schedule("every 25 hours")
   .onRun(updateInstitutions);
@@ -172,3 +167,6 @@ exports.updateInstitutions = functions
 //   })
 //   .pubsub.schedule("every 10 minutes")
 //   .onRun(updateTypesenseIndex);
+
+// LifeLog:
+exports.lifeLogger = functions.pubsub.schedule("every 60 minutes").onRun(lifeLogger);
