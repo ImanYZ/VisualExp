@@ -213,7 +213,7 @@ exports.deleteEvent = async (req, res) => {
 // Life Logging
 // ************
 
-exports.lifeLogScheduler = async context => {
+exports.lifeLogger = async context => {
   try {
     let end = new Date();
     const currentTime = end.getTime();
