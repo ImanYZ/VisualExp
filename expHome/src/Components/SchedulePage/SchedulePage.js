@@ -124,16 +124,17 @@ const SchedulePage = props => {
       setScheduleLoaded(false);
       const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
       // We need to first retrieve which project this user belongs to.
-      if (isStudentCoNoteSurvey === "true") {
-        setGlobalProject("StudentCoNoteSurvey");
-        setGlobalCurrentProject("StudentCoNoteSurvey");
-      }
+
       const userDoc = await firebase.db
         .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
         .doc(fullname)
         .get();
       const userData = userDoc.data();
       const project = userData.project;
+      if (isStudentCoNoteSurvey === "true") {
+        setGlobalProject(project);
+        setGlobalCurrentProject(project);
+      }
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
@@ -269,8 +270,12 @@ const SchedulePage = props => {
 
   const submitData = async () => {
     setIsSubmitting(true);
-    const userRef = firebase.db.collection("users").doc(fullname);
+    const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
+    const userRef = firebase.db
+      .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
+      .doc(fullname);
     const userDoc = await userRef.get();
+
     let responseObj = null;
     if (userDoc.exists) {
       const userData = userDoc.data();

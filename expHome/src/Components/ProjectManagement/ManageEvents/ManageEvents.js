@@ -396,7 +396,13 @@ const ManageEvents = props => {
         // experiment session.
         event.participant = availabilities[availabilitiesIdx].email.toLowerCase();
         event.order = availabilities[availabilitiesIdx].order;
-        const userDocs = await firebase.db.collection("users").where("email", "==", event.participant).get();
+        let userDocs = await firebase.db.collection("users").where("email", "==", event.participant).get();
+        if (userDocs.docs.length === 0) {
+          userDocs = await firebase.db
+            .collection("usersStudentCoNoteSurvey")
+            .where("email", "==", event.participant)
+            .get();
+        }
         if (userDocs.docs.length > 0) {
           const userData = userDocs.docs[0].data();
           // then, assign their firstname, and courseName, if exists.
@@ -472,7 +478,8 @@ const ManageEvents = props => {
       let recallSecondRatio = 0;
       let recallThirdRatio = 0;
       const userDocs = await firebase.db.collection("users").get();
-      for (let userDoc of userDocs.docs) {
+      const surveyUsers = await firebase.db.collection("usersStudentCoNoteSurvey").get();
+      for (let userDoc of [...surveyUsers.docs, ...userDocs.docs]) {
         const userData = userDoc.data();
         if ("createdAt" in userData && userData.createdAt.toDate() > new Date("1-14-2022")) {
           registered += 1;
@@ -608,108 +615,118 @@ const ManageEvents = props => {
   // to be able to update one of their scheduled sessions.
   const gridRowClick = async clickedRow => {
     const theRow = clickedRow.row;
-    if (theRow.participant) {
-      const email = theRow.participant;
-      setParticipant(email);
-      setScheduleLoaded(false);
-      // We need to first retrieve which project this user belongs to.
-      const userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
-      const userData = userDoc.data();
-      const project = userData.project;
-      const projectSpecs = allProjectSpecs[project];
-      setCurrentProject(project);
-      setCurrentProjectSpecs(projectSpecs);
-      // researchers = an object of fullnames as keys and the corresponding email addresses as values.
-      const researchers = {};
-      const researcherDocs = await firebase.db.collection("researchers").get();
-      for (let researcherDoc of researcherDocs.docs) {
-        const researcherData = researcherDoc.data();
-        // We only need the researchers who are active in the project that the user belongs to.
-        if (
-          "projects" in researcherData &&
-          project in researcherData.projects &&
-          researcherData.projects[project].active
-        ) {
-          researchers[researcherDoc.id] = researcherData.email;
+    try {
+      if (theRow.participant) {
+        const email = theRow.participant;
+        setParticipant(email);
+        setScheduleLoaded(false);
+        // We need to first retrieve which project this user belongs to.
+        let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
+        if (!userDoc.exists) {
+          userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(theRow.fullname).get();
         }
-      }
-      // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
-      // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
-      // that may include 0 to many researchers who are available at that session.
-      const availSessions = {};
-      // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db.collection("resSchedule").where("project", "==", project).get();
-      for (let resScheduleDoc of resScheduleDocs.docs) {
-        const resScheduleData = resScheduleDoc.data();
-        const resSession = resScheduleData.session.toDate();
-        const resSessionStr = resSession.toLocaleString();
-        // Only if the researcher is active in this project:
-        if (resScheduleData.fullname in researchers) {
-          // Add the available slots for the researcher's email.
-          if (resSessionStr in availSessions) {
-            availSessions[resSessionStr].push(researchers[resScheduleData.fullname]);
-          } else {
-            availSessions[resSessionStr] = [researchers[resScheduleData.fullname]];
+
+        const userData = userDoc.data();
+        const project = userData.project;
+        const projectSpecs = allProjectSpecs[project];
+        setCurrentProject(project);
+        setCurrentProjectSpecs(projectSpecs);
+        // researchers = an object of fullnames as keys and the corresponding email addresses as values.
+        const researchers = {};
+        const researcherDocs = await firebase.db.collection("researchers").get();
+        for (let researcherDoc of researcherDocs.docs) {
+          const researcherData = researcherDoc.data();
+          // We only need the researchers who are active in the project that the user belongs to.
+          if (
+            "projects" in researcherData &&
+            project in researcherData.projects &&
+            researcherData.projects[project].active
+          ) {
+            researchers[researcherDoc.id] = researcherData.email;
           }
         }
-      }
-      // We need to retrieve all the currently scheduled events to figure
-      // out which sessions are already taken and exclude them from availSessions.
-      // We don't need to retrieve the events from Google Calendar again,
-      // because we've already retrieved and saved them in `events` state.
-      const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
-      for (let event of events) {
-        const startTime = new Date(event.start).toLocaleString();
-        const startMinus30Min = new Date(event.start.getTime() - slotDuration * 60 * 1000);
-        // If the event has some attendees and the start timestamp is a key in availSessions,
-        // we should remove all the attendees who are available researchers at this timestamp,
-        // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
-        // this participnat and the participant is rescheduling their sessions,
-        // OR 30 minutes before this session was the 1st session for this participant.
-        // This latter check is necessary to handle the exception where there is a second
-        // session staring 30 minutes after this session. We should not remove that second
-        // time slot, otherwise the system would not show this as an available slot and the
-        // participant would not be able to take this one-hour slot for their 1st session.
-        if (
-          event.attendees &&
-          event.attendees.length > 0 &&
-          startTime in availSessions &&
-          availSessions[startTime].length > 0 &&
-          !event.attendees.includes(email) &&
-          events.findIndex(
-            eve =>
-              eve.start.getTime() === startMinus30Min.getTime() && eve.order === "1st" && eve.attendees.includes(email)
-          ) === -1
-        ) {
-          // We should remove all the attendees who are available researchers at this timestamp:
-          for (let attendee of event.attendees) {
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee);
+        // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
+        // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
+        // that may include 0 to many researchers who are available at that session.
+        const availSessions = {};
+        // Retrieve all the researchers' avaialbilities in this project.
+        const resScheduleDocs = await firebase.db.collection("resSchedule").where("project", "==", project).get();
+        for (let resScheduleDoc of resScheduleDocs.docs) {
+          const resScheduleData = resScheduleDoc.data();
+          const resSession = resScheduleData.session.toDate();
+          const resSessionStr = resSession.toLocaleString();
+          // Only if the researcher is active in this project:
+          if (resScheduleData.fullname in researchers) {
+            // Add the available slots for the researcher's email.
+            if (resSessionStr in availSessions) {
+              availSessions[resSessionStr].push(researchers[resScheduleData.fullname]);
+            } else {
+              availSessions[resSessionStr] = [researchers[resScheduleData.fullname]];
+            }
           }
         }
-      }
-      setAvailableSessions(availSessions);
-      // Retrieve all the available time slots that the participant previously specified,
-      // just to start from. They are supposed to modify these.
-      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
-      const sch = [];
-      // Define a copy of scheduleStart to find the earliest session for this participant.
-      let sStart = scheduleStart;
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        const session = scheduleData.session.toDate();
-        const sessionStr = session.toLocaleString();
-        sch.push(session);
-        if (session.getTime() < sStart.getTime()) {
-          sStart = session;
+        // We need to retrieve all the currently scheduled events to figure
+        // out which sessions are already taken and exclude them from availSessions.
+        // We don't need to retrieve the events from Google Calendar again,
+        // because we've already retrieved and saved them in `events` state.
+        const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
+        for (let event of events) {
+          const startTime = new Date(event.start).toLocaleString();
+          const startMinus30Min = new Date(event.start.getTime() - slotDuration * 60 * 1000);
+          // If the event has some attendees and the start timestamp is a key in availSessions,
+          // we should remove all the attendees who are available researchers at this timestamp,
+          // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
+          // this participnat and the participant is rescheduling their sessions,
+          // OR 30 minutes before this session was the 1st session for this participant.
+          // This latter check is necessary to handle the exception where there is a second
+          // session staring 30 minutes after this session. We should not remove that second
+          // time slot, otherwise the system would not show this as an available slot and the
+          // participant would not be able to take this one-hour slot for their 1st session.
+          if (
+            event.attendees &&
+            event.attendees.length > 0 &&
+            startTime in availSessions &&
+            availSessions[startTime].length > 0 &&
+            !event.attendees.includes(email) &&
+            events.findIndex(
+              eve =>
+                eve.start.getTime() === startMinus30Min.getTime() &&
+                eve.order === "1st" &&
+                eve.attendees.includes(email)
+            ) === -1
+          ) {
+            // We should remove all the attendees who are available researchers at this timestamp:
+            for (let attendee of event.attendees) {
+              availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee);
+            }
+          }
         }
+        setAvailableSessions(availSessions);
+        // Retrieve all the available time slots that the participant previously specified,
+        // just to start from. They are supposed to modify these.
+        const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
+        const sch = [];
+        // Define a copy of scheduleStart to find the earliest session for this participant.
+        let sStart = scheduleStart;
+        for (let scheduleDoc of scheduleDocs.docs) {
+          const scheduleData = scheduleDoc.data();
+          const session = scheduleData.session.toDate();
+          const sessionStr = session.toLocaleString();
+          sch.push(session);
+          if (session.getTime() < sStart.getTime()) {
+            sStart = session;
+          }
+        }
+        if (sch.length > 0) {
+          setSchedule(sch);
+          setScheduleStart(sStart);
+        }
+        setTimeout(() => {
+          setScheduleLoaded(true);
+        }, 400);
       }
-      if (sch.length > 0) {
-        setSchedule(sch);
-        setScheduleStart(sStart);
-      }
-      setTimeout(() => {
-        setScheduleLoaded(true);
-      }, 400);
+    } catch (err) {
+      console.log("Err => ", err);
     }
   };
 
