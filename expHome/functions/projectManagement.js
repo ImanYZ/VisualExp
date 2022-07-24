@@ -441,7 +441,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         return res.status(500).json({ errMsg: err.message, success: false });
       });
   }
-  return res.status(500).json({ errMsg: 'some parameters missing', success: false });
+  return res.status(500).json({ errMsg: "some parameters missing", success: false });
 };
 
 exports.voteEndpoint = async (req, res) => {
@@ -1437,7 +1437,8 @@ exports.assignExperimentSessionsPoints = async context => {
     const oneWebIdx = researchersInfo.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu");
     const usersInfo = [];
     const usersDocs = await db.collection("users").get();
-    for (let userDoc of usersDocs.docs) {
+    const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
+    for (let userDoc of [...surveyUsers.docs, ...usersDocs.docs]) {
       const userData = userDoc.data();
       usersInfo.push({
         fullname: userDoc.id,
@@ -1486,6 +1487,12 @@ exports.assignExperimentSessionsPoints = async context => {
                   if (eTime.getTime() > sTime.getTime() + 40 * 60 * 1000) {
                     points = 16;
                   }
+                  // this is temporary until the survey is over.
+                  // as this survey will have only one session
+                  if (project === "Annotating") {
+                    points = 1.5;
+                  }
+
                   try {
                     await db.runTransaction(async t => {
                       const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
@@ -1686,7 +1693,14 @@ exports.remindCalendarInvitations = async context => {
             else if (attendee.email.toLowerCase() === participant.email) {
               // The only way to get the user data, like their firstname, which
               // sessions they have completed so far, ... is through "users"
-              const userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
+              let userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
+              if (userDocs.docs.length === 0) {
+                userDocs = await db
+                  .collection("usersStudentCoNoteSurvey")
+                  .where("email", "==", attendee.email.toLowerCase())
+                  .get();
+              }
+
               if (userDocs.docs.length > 0) {
                 const userData = userDocs.docs[0].data();
                 participant.firstname = userData.firstname;
@@ -1716,6 +1730,7 @@ exports.remindCalendarInvitations = async context => {
                 } else {
                   participant.thirdDone = false;
                 }
+
                 // We consider "declined" and "tentative" responses as declined.
                 if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
                   // If they have declined the 1st session, but they are not done
@@ -1876,7 +1891,7 @@ exports.remindCalendarInvitations = async context => {
               } else if (order === "3rd" && !participant.secondDone) {
                 // If it's their 3rd session, but they did not complete their 2nd session:
                 // Delete the 3rd session, because logically they should not go through
-                // the 3rd session without completing the 2nd one.
+                // the 3rd session without completing the 2nd one .
                 await deleteEvent(ev.id);
                 // Also, remove the Calendar event id and order from their schedule doc.
                 const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
