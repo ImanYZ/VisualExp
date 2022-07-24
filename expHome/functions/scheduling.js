@@ -2,7 +2,14 @@ const { admin, db } = require("./admin");
 
 require("dotenv").config();
 
-const { insertEvent, getEvent, getEvents, deleteEvent, insertLifeLogEvent } = require("./GoogleCalendar");
+const {
+  insertEvent,
+  getEvent,
+  getEvents,
+  deleteEvent,
+  getLifeLogEvents,
+  insertLifeLogEvent
+} = require("./GoogleCalendar");
 
 const { pad2Num } = require("./utils");
 
@@ -212,7 +219,7 @@ exports.lifeLogScheduler = async context => {
     const currentTime = end.getTime();
     const anHourAgo = new Date(end.getTime() - 60 * 60 * 1000);
     const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
-    const allEvents = await getEvents(start, end, "America/Detroit");
+    const allEvents = await getLifeLogEvents(start, end, "America/Detroit");
     if (allEvents && allEvents.length > 0) {
       let dark = 0,
         light = 0;
