@@ -853,9 +853,12 @@ const AddInstructor = props => {
       setInvalidInstructor("Please specify their position!");
     } else if (!values.interestedTopic) {
       setInvalidInstructor("Please enter their Topic of Interest!");
-    } else {
+    } else if((values.interestedTopic.split(" ").length>8)){
+      setInvalidInstructor("Please enter Topic of Interest using less than 7 words!");
+    } else  {
       setInvalidInstructor("");
     }
+
   }, [
     alreadyExists,
     email,
