@@ -3,6 +3,8 @@ import { useRecoilValue } from "recoil";
 
 import axios from "axios";
 
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -39,7 +41,7 @@ const projectsLookup = {
   1489942475: "Professional",
   2219646374: "Exercise",
   2219646407: "Future",
-  2268637474: "1Cademy",
+  2268637474: "1Cademy"
 };
 
 const sectionsLookup = {
@@ -60,7 +62,7 @@ const sectionsLookup = {
   53657413: "Research",
   64902104: "Micro-task Management Project",
   64902131: "Citizen Science Project",
-  64902177: "Knowledge Representation Experiments",
+  64902177: "Knowledge Representation Experiments"
 };
 
 const LifeLogger = () => {
@@ -75,31 +77,29 @@ const LifeLogger = () => {
   const [duration, setDuration] = useState(1);
   const [backwards, setBackwards] = useState(true);
   const [mins, setMins] = useState(1);
+  const [lightProportion, setLightProportion] = useState(0);
   const [expiryTimestamp, setExpiryTimestamp] = useState(1);
 
   useEffect(() => {
     const getProjects = async () => {
       try {
-        const tDTasks = await axios.get(
-          "https://api.todoist.com/rest/v1/tasks",
-          {
-            headers: {
-              Authorization: `Bearer ${tDApiToken}`,
-            },
+        const tDTasks = await axios.get("https://api.todoist.com/rest/v1/tasks", {
+          headers: {
+            Authorization: `Bearer ${tDApiToken}`
           }
-        );
+        });
         const projs = {};
         for (let tsk of tDTasks.data) {
           if (tsk.project_id in projs) {
             if (tsk.section_id in projs[tsk.project_id].sections) {
               projs[tsk.project_id].sections[tsk.section_id].tasks.push({
                 id: tsk.id,
-                content: tsk.content,
+                content: tsk.content
               });
             } else {
               projs[tsk.project_id].sections[tsk.section_id] = {
                 tasks: [{ id: tsk.id, content: tsk.content }],
-                name: sectionsLookup[tsk.section_id],
+                name: sectionsLookup[tsk.section_id]
               };
             }
           } else {
@@ -107,10 +107,10 @@ const LifeLogger = () => {
               sections: {
                 [tsk.section_id]: {
                   tasks: [{ id: tsk.id, content: tsk.content }],
-                  name: sectionsLookup[tsk.section_id],
-                },
+                  name: sectionsLookup[tsk.section_id]
+                }
               },
-              name: projectsLookup[tsk.project_id],
+              name: projectsLookup[tsk.project_id]
             };
           }
         }
@@ -122,23 +122,43 @@ const LifeLogger = () => {
     getProjects();
   }, []);
 
-  const switchBackwards = (event) => {
+  useEffect(() => {
+    if (firebase) {
+      const lifeLogQuery = firebase.db.collection("lifeLog");
+      const lifeLogSnapshot = lifeLogQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        if (docChanges.length > 0) {
+          const { light, dark } = docChanges[0].doc.data();
+          let total = 1;
+          if (light + dark > 0) {
+            total = light + dark;
+          }
+          setLightProportion(Math.floor((light * 100) / total));
+        }
+      });
+      return () => {
+        lifeLogSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  const switchBackwards = event => {
     setBackwards(event.target.checked);
   };
 
-  const selectMins = (event) => {
+  const selectMins = event => {
     setMins(event.target.value);
     const time = new Date();
     time.setSeconds(time.getSeconds() + 60 * event.target.value);
     setExpiryTimestamp(time);
   };
 
-  const clickProject = (panel) => (event, isProjectExpanded) => {
+  const clickProject = panel => (event, isProjectExpanded) => {
     setProjectExpanded(isProjectExpanded ? panel : false);
     setSectionExpanded(false);
   };
 
-  const clickSection = (panel) => (event, isSectionExpanded) => {
+  const clickSection = panel => (event, isSectionExpanded) => {
     setSectionExpanded(isSectionExpanded ? panel : false);
   };
 
@@ -149,36 +169,33 @@ const LifeLogger = () => {
     setSent(false);
   };
 
-  const selectDuration = (event) => {
+  const selectDuration = event => {
     setDuration(event.target.value);
   };
 
-  const selectTask = (content, tId) => (event) => {
+  const selectTask = (content, tId) => event => {
     setSummary(content);
     if (tId) {
       setTaskId(tId);
     }
   };
 
-  const markComplete = async (event) => {
+  const markComplete = async event => {
     try {
       await firebase.idToken();
       axios.post("/scheduleLifeLog", {
         duration,
         summary,
-        backwards,
+        backwards
       });
       if (taskId) {
-        const tDTasks = await axios.post(
-          "https://api.todoist.com/rest/v1/tasks/" + taskId + "/close",
-          {
-            headers: {
-              Authorization: `Bearer ${tDApiToken}`,
-              ["X-Request-Id"]: uuidv4(),
-              ["Content-Type"]: "application/json",
-            },
+        const tDTasks = await axios.post("https://api.todoist.com/rest/v1/tasks/" + taskId + "/close", {
+          headers: {
+            Authorization: `Bearer ${tDApiToken}`,
+            ["X-Request-Id"]: uuidv4(),
+            ["Content-Type"]: "application/json"
           }
-        );
+        });
       }
       setSent(true);
     } catch (err) {
@@ -188,16 +205,18 @@ const LifeLogger = () => {
 
   return (
     <div id="LifeLoggerContainer">
+      <Paper sx={{ width: "100%", margin: "19px" }}>
+        <Paper
+          sx={{ backgroundColor: "#00aa44", width: lightProportion + "%", height: "40px", display: "inline-block" }}
+        ></Paper>
+        <Paper
+          sx={{ backgroundColor: "black", width: 100 - lightProportion + "%", height: "40px", display: "inline-block" }}
+        ></Paper>
+      </Paper>
       <div>
         <FormControl component="fieldset">
           <FormLabel component="legend">Minutes</FormLabel>
-          <RadioGroup
-            row
-            aria-label="Mins"
-            name="mins"
-            value={mins}
-            onChange={selectMins}
-          >
+          <RadioGroup row aria-label="Mins" name="mins" value={mins} onChange={selectMins}>
             <FormControlLabel value={1} control={<Radio />} label="1" />
             <FormControlLabel value={4} control={<Radio />} label="4" />
             <FormControlLabel value={10} control={<Radio />} label="10" />
@@ -212,13 +231,7 @@ const LifeLogger = () => {
         <div id="Summary">{summary}</div>
         <FormControl component="fieldset">
           <FormLabel component="legend">Minutes</FormLabel>
-          <RadioGroup
-            row
-            aria-label="Duration"
-            name="duration"
-            value={duration}
-            onChange={selectDuration}
-          >
+          <RadioGroup row aria-label="Duration" name="duration" value={duration} onChange={selectDuration}>
             <FormControlLabel value={1} control={<Radio />} label="1" />
             <FormControlLabel value={4} control={<Radio />} label="4" />
             <FormControlLabel value={10} control={<Radio />} label="10" />
@@ -239,15 +252,11 @@ const LifeLogger = () => {
             />
           </FormGroup>
         </FormControl>
-        <Button
-          onClick={markComplete}
-          className="Button SubmitButton"
-          variant="contained"
-        >
+        <Button onClick={markComplete} className="Button SubmitButton" variant="contained">
           Add Task
         </Button>
       </div>
-      {Object.keys(projects).map((prjK) => {
+      {Object.keys(projects).map(prjK => {
         return (
           <Accordion
             key={prjK}
@@ -263,7 +272,7 @@ const LifeLogger = () => {
               {projects[prjK].name}
             </AccordionSummary>
             <AccordionDetails>
-              {Object.keys(projects[prjK].sections).map((sectionK) => {
+              {Object.keys(projects[prjK].sections).map(sectionK => {
                 return (
                   <Accordion
                     key={sectionK}
@@ -279,24 +288,15 @@ const LifeLogger = () => {
                       {projects[prjK].sections[sectionK].name}
                     </AccordionSummary>
                     <AccordionDetails>
-                      {projects[prjK].name === "Health" &&
-                        projects[prjK].sections[sectionK].name === "1" && (
-                          <div className="TaskChip">
-                            <Chip
-                              label="💨"
-                              variant="outlined"
-                              onClick={selectTask("💨", null)}
-                            />
-                          </div>
-                        )}
-                      {projects[prjK].sections[sectionK].tasks.map((task) => {
+                      {projects[prjK].name === "Health" && projects[prjK].sections[sectionK].name === "1" && (
+                        <div className="TaskChip">
+                          <Chip label="💨" variant="outlined" onClick={selectTask("💨", null)} />
+                        </div>
+                      )}
+                      {projects[prjK].sections[sectionK].tasks.map(task => {
                         return (
                           <div key={task.id} className="TaskChip">
-                            <Chip
-                              label={task.content}
-                              variant="outlined"
-                              onClick={selectTask(task.content, task.id)}
-                            />
+                            <Chip label={task.content} variant="outlined" onClick={selectTask(task.content, task.id)} />
                           </div>
                         );
                       })}
@@ -310,11 +310,7 @@ const LifeLogger = () => {
       })}
       <div id="FooterGap"></div>
       <Snackbar open={sent} autoHideDuration={4000} onClose={closeSnackbar}>
-        <Alert
-          onClose={closeSnackbar}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
+        <Alert onClose={closeSnackbar} severity="success" sx={{ width: "100%" }}>
           {summary}
         </Alert>
       </Snackbar>

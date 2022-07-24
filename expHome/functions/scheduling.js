@@ -2,7 +2,14 @@ const { admin, db } = require("./admin");
 
 require("dotenv").config();
 
-const { insertEvent, getEvent, getEvents, deleteEvent, insertLifeLogEvent } = require("./GoogleCalendar");
+const {
+  insertEvent,
+  getEvent,
+  getEvents,
+  deleteEvent,
+  getLifeLogEvents,
+  insertLifeLogEvent
+} = require("./GoogleCalendar");
 
 const { pad2Num } = require("./utils");
 const { toOrdinal } = require("number-to-words");
@@ -211,7 +218,40 @@ exports.deleteEvent = async (req, res) => {
 // Life Logging
 // ************
 
-// Schedule Life Logs
+exports.lifeLogger = async context => {
+  try {
+    let end = new Date();
+    const currentTime = end.getTime();
+    const anHourAgo = new Date(end.getTime() - 60 * 60 * 1000);
+    const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+    const allEvents = await getLifeLogEvents(start, end, "America/Detroit");
+    if (allEvents && allEvents.length > 0) {
+      let dark = 0,
+        light = 0;
+      const lifeLogDocs = await db.collection("lifeLog").get();
+      if (lifeLogDocs.docs.length > 0) {
+        const lifeLogData = lifeLogDocs.docs[0].data();
+        dark += lifeLogData.dark;
+        light += lifeLogData.light;
+      }
+      dark += 60;
+      for (let ev of allEvents) {
+        const startTime = new Date(ev.start.dateTime).getTime();
+        const endTime = new Date(ev.end.dateTime).getTime();
+        if (endTime <= currentTime && endTime >= anHourAgo && endTime > startTime) {
+          const minutes = Math.floor((endTime - startTime).getTime() / (60 * 1000));
+          light += minutes;
+        }
+      }
+      const lifeLogRef = db.collection("lifeLog").doc(lifeLogDocs.docs[0].id);
+      await lifeLogRef.update({ dark, light });
+    }
+  } catch (err) {
+    console.log({ err });
+  }
+  return null;
+};
+
 exports.scheduleLifeLog = async (req, res) => {
   try {
     console.log({ body: req.body });
