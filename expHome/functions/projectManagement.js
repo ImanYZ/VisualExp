@@ -440,6 +440,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         console.log({ err });
         return res.status(500).json({ errMsg: err.message, success: false });
       });
+  } else {
+    return res.status(500).json({ errMsg: "some parameters missing", success: false });
   }
   return res.status(500).json({ errMsg: "some parameters missing", success: false });
 };
