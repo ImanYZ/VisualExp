@@ -207,11 +207,10 @@ const LifeLogger = () => {
     <div id="LifeLoggerContainer">
       <Paper sx={{ width: "100%", margin: "19px" }}>
         <Paper
-          sx={{ backgroundColor: "white", width: lightProportion - 1 + "%", height: "40px", display: "inline-block" }}
+          sx={{ backgroundColor: "#00aa44", width: lightProportion + "%", height: "40px", display: "inline-block" }}
         ></Paper>
-        <Paper sx={{ backgroundColor: "white", width: "1%", height: "40px", display: "inline-block" }}></Paper>
         <Paper
-          sx={{ backgroundColor: "black", width: 99 - lightProportion + "%", height: "40px", display: "inline-block" }}
+          sx={{ backgroundColor: "black", width: 100 - lightProportion + "%", height: "40px", display: "inline-block" }}
         ></Paper>
       </Paper>
       <div>
