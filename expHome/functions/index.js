@@ -42,7 +42,7 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
-  lifeLogger,
+  lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, updateInstitutions, updateTypesenseIndex } = require("./knowledge");
@@ -169,4 +169,4 @@ exports.updateInstitutions = functions
 //   .onRun(updateTypesenseIndex);
 
 // LifeLog:
-exports.lifeLogger = functions.pubsub.schedule("every 1 hours").onRun(lifeLogger);
+exports.lifeLoggerScheduler = functions.pubsub.schedule("every 1 hours").onRun(lifeLoggerScheduler);
