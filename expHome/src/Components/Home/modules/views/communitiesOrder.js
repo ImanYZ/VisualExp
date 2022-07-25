@@ -413,16 +413,12 @@ export default [
       {
         title: "Social psychology",
         node: "FyQoGIdVVeDHvn1lHOZL"
-      },
-      {
-        title: "Behavioral Economics",
-        node: "zFZ2Rvnvp4TyJE7g0vUZ"
       }
     ],
     allTime: [],
     weekly: [],
-    url: "/static/Communities/Social_Psychology.jpg",
-    title: "Behavioral Economics & Social Psychology",
+    url: "/static/Communities/Social_Political_Psychology.jpg",
+    title: "Social & Political Psychology",
     width: "33%",
     leaders: [
       {
@@ -448,22 +444,22 @@ export default [
         ]
       }
     ],
-    YouTube: "73Uk2Nsgbgg",
-    description: `We study Behavioral Economics and Social Psychology literature on incentives to contribute to public good. Using 1Cademy, we break down articles into granular knowledge pieces, connect them within a larger context of research, communicate our findings to other community members, and utilize our knowledge to conduct research. We conduct online controlled experiments using our research pipeline and co-author research papers to submit to reputable journals and conferences.`,
+    YouTube: "cFqStnIHVS4",
+    description: `The Social & Political Psychology community explores past research that investigates how misinformation is spread, why it is accepted, and how it can be reduced. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
     accomplishments: "",
     gains: [
       `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
       `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
       `Get involved in all aspects of conducting an online controlled experiment.`,
       `Learn about conducting a controlled online experiment to prepare for future Ph.D. programs in related disciplines.`,
-      `Work towards publishing research on behavioral economics and social psychology in reputable venues.`,
+      `Work towards publishing research on social/political psychology in reputable venues.`,
       `Have opportunities to take on leadership roles within the community.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in disciplines related to behavioral economics or social psychology, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
     hasTest: true,
     qualifications: [
-      `A strong academic background in topics related to behavioral economics or social psychology`,
+      `A strong academic background in topics related to social or political psychology`,
       `Fluency in writing and reading in English`
     ],
     responsibilities: [
