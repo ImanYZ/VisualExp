@@ -338,7 +338,8 @@ export default {
         }
       },
       Which_of_the_following_are_considered_a_method_of_opening_nodes: {
-        stem: quNum() + "Which of the following methods are used to add nodes to your personalized knowledge map view?",
+        stem:
+          quNum() + "Which of the following methods are used to display nodes to your personalized knowledge map view?",
         answers: ["a", "b", "c", "d", "e", "f", "g", "h", "j", "k"],
         choices: {
           a: "Search box",
@@ -455,7 +456,7 @@ export default {
           a: "Top contributors across the platform",
           b: "All contributors",
           c: "Top contributors in your community",
-          d: "All contributors in your community",
+          d: "All contributors in your community"
         }
       }
     }
