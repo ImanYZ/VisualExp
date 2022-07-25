@@ -39,7 +39,7 @@ const MCQuestion = props => {
   const retrieveFeedbackcodes = async () => {
     const experimentCodeDocs = await firebase.db
       .collection("experimentCodes")
-      .where("approved","==",true)
+      .where("approved", "==", true)
       .where("project", "==", project)
       .where("question", "==", curQuestion)
       .get();
@@ -103,10 +103,9 @@ const MCQuestion = props => {
 
   const explanationsChange = event => {
 
-      const newExp  = [...props.explanations];
-      newExp[props.currentQIdx].explanation = event.target.value;
-      props.setExplanations(newExp);
-      console.log(newExp);
+    const newExp = [...props.explanations];
+    newExp[props.currentQIdx].explanation = event.target.value;
+    props.setExplanations(newExp);
   };
 
   const question = props.questions[props.currentQIdx];
@@ -122,11 +121,10 @@ const MCQuestion = props => {
   const addCode = async () => {
     const newCodes = [...codes];
     newCodes.push(newCode);
-    console.log(newCodes);
     setCodes(newCodes);
     const experimentCodeRef = firebase.db.collection("experimentCodes").doc();
     experimentCodeRef.set({
-      approved:false,
+      approved: false,
       code: newCode,
       coder: fullname,
       project: project,
@@ -137,7 +135,6 @@ const MCQuestion = props => {
   };
 
   const choiceCodeChange = value => {
-    console.log(value);
     const currentIndex = codeChoice.indexOf(value);
     const newChecked = [...codeChoice];
     if (currentIndex === -1) {
@@ -146,31 +143,28 @@ const MCQuestion = props => {
       newChecked.splice(currentIndex, 1);
     }
     setCodeChoice(newChecked);
-    console.log(value);
     props.setExplanations(oldExp => {
       const newExp = [...oldExp];
       newExp[props.currentQIdx].codes = newChecked;
       return newExp;
     });
- 
+
   };
 
   const submit = () => {
     moveNext();
   };
 
-console.log(props.explanations[props.currentQIdx]);
- console.log( props.explanations[props.currentQIdx].explanation);
   return (
     <div
       style={
         props.explanations && props.explanations.length > 0
           ? {
-              height: "100vh",
-              overflowY: "auto",
-              overflowX: "hidden",
-              paddingRight: "10px"
-            }
+            height: "100vh",
+            overflowY: "auto",
+            overflowX: "hidden",
+            paddingRight: "10px"
+          }
           : {}
       }
     >
@@ -309,7 +303,7 @@ console.log(props.explanations[props.currentQIdx]);
         <Button
           id="QuestionSubmitBtn"
           onClick={props.nextStep}
-          disabled={!(allAnswered && (![5, 19].includes(props.step))) && !(allAnswered && (selectCodes) && ([5, 19].includes(props.step))) }
+          disabled={!(allAnswered && (![5, 19].includes(props.step))) && !(allAnswered && (selectCodes) && ([5, 19].includes(props.step)))}
           className={(allAnswered && (![5, 19].includes(props.step))) || (allAnswered && (selectCodes) && ([5, 19].includes(props.step))) ? "Button" : "Button Disabled"}
           variant="contained"
         >

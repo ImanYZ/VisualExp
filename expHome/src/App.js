@@ -139,7 +139,7 @@ const App = () => {
   // const [fromOptions, setFromOptions] = useState([]);
   // const [linkOptions, setLinkOptions] = useState([]);
   // const [toOptions, setToOptions] = useState([]);
-  const [explanations, setExplanations] = useState([{explanation:"",codes:[]}, {explanation:"",codes:[]}]);
+  const [explanations, setExplanations] = useState([{ explanation: "", codes: [] }, { explanation: "", codes: [] }]);
   const [birthDate, setBirthDate] = useState(null);
   const [major, setMajor] = useState({
     Major: "Information Sciences",
@@ -719,7 +719,7 @@ const App = () => {
           },
           19
         );
-        setExplanations([{explanation:"",codes:[]}, {xplanation:"",codes:[]}]);
+        setExplanations([{ explanation: "", codes: [] }, { xplanation: "", codes: [] }]);
         setTimer(30 * 60);
         break;
       case 19:
