@@ -213,7 +213,7 @@ exports.deleteEvent = async (req, res) => {
 // Life Logging
 // ************
 
-exports.lifeLogger = async context => {
+exports.lifeLoggerScheduler = async context => {
   try {
     let end = new Date();
     const currentTime = end.getTime();
@@ -234,7 +234,7 @@ exports.lifeLogger = async context => {
         const startTime = new Date(ev.start.dateTime).getTime();
         const endTime = new Date(ev.end.dateTime).getTime();
         if (endTime <= currentTime && endTime >= anHourAgo && endTime > startTime) {
-          const minutes = Math.floor((endTime - startTime) / (60 * 1000));
+          const minutes = Math.floor(((endTime - startTime) * 2) / (60 * 1000));
           light += minutes;
         }
       }
