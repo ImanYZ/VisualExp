@@ -95,12 +95,6 @@ const CodeFeedback = props => {
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
-  // useEffect(() => {
-  //   if (selectedCode) {
-  //     setUpdateCode(selectedCode);
-  //   }
-  // }, [selectedCode])
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     if (project) {
@@ -238,7 +232,7 @@ const CodeFeedback = props => {
       .get();
     const unApprovedData = feedbackCodeBooksDocs.docs.map(doc => doc.data().code);
     setUnApprovedNewCodes(unApprovedData);
-  }, [project, firebase, unApprovedNewCodes, fullname]);
+  }, [project, firebase, fullname]);
 
   // set new code.
   // const handleCodeChange = event => setNewCode(event.currentTarget.value);
@@ -469,19 +463,21 @@ const CodeFeedback = props => {
   };
 
   const handleDelete = async () => {
+    const unApprovedCode = [...unApprovedNewCodes];
     await firebase.db
-      .collection("feedbackCodeBooks")
-      .where("code", "==", selectedCode)
-      .where("project", "==", project)
-      .where("coder", "==", fullname)
-      .get()
-      .then(async (doc) => {
-        const [codeDoc] = doc.docs;
-        await codeDoc.ref.delete()
+    .collection("feedbackCodeBooks")
+    .where("code", "==", selectedCode)
+    .where("project", "==", project)
+    .where("coder", "==", fullname)
+    .get()
+    .then(async (doc) => {
+      const [codeDoc] = doc.docs;
+      await codeDoc.ref.delete()
+      const updatedUnApprovedCode = unApprovedCode.filter(elem => elem !== selectedCode);
         setSnackbarMessage("code successfully deleted!");
         setUpdateCode("");
         setSelectedCode("")
-        setUnApprovedNewCodes([]);
+        setUnApprovedNewCodes(updatedUnApprovedCode);
         handleCloseDeleteModal();
       })
       .catch(err => {
@@ -506,31 +502,36 @@ const CodeFeedback = props => {
       return;
     }
 
-    // update the document based on selected code
-    firebase.db
-      .collection("feedbackCodeBooks")
-      .where("code", "==", selectedCode)
-      .where("project", "==", project)
-      .where("coder", "==", fullname)
-      .get()
-      .then(async (doc) => {
-        const [codeDoc] = doc.docs;
-        const codeData = codeDoc.data();
-        const codeUpdate = {
-          ...codeData,
-          code: updateCode,
-        }
-        codeDoc.ref.update(codeUpdate);
-        setUpdateCode("");
-        setSelectedCode("")
-        setUnApprovedNewCodes([]);
-        handleCloseEditModal();
-        setSnackbarMessage("Your code updated!");
-      })
-      .catch(err => {
-        console.error(err);
-        setSnackbarMessage("There is some error while updating your code, please try after some time!");
-      });
+    const index = unApprovedCode.findIndex(elem => elem === selectedCode);
+    if (index >= 0) {
+      // update the document based on selected code
+      firebase.db
+        .collection("feedbackCodeBooks")
+        .where("code", "==", selectedCode)
+        .where("project", "==", project)
+        .where("coder", "==", fullname)
+        .get()
+        .then(async (doc) => {
+          const [codeDoc] = doc.docs;
+          const codeData = codeDoc.data();
+          const codeUpdate = {
+            ...codeData,
+            code: updateCode,
+          };
+          codeDoc.ref.update(codeUpdate);
+          unApprovedCode[index] = updateCode;
+          setUpdateCode("");
+          setSelectedCode("");
+          setUnApprovedNewCodes(unApprovedCode);
+          handleCloseEditModal();
+          setSnackbarMessage("Your code updated!");
+        })
+        .catch(err => {
+          console.error(err);
+          setSnackbarMessage("There is some error while updating your code, please try after some time!");
+        });
+
+    }
   }
 
   return (
