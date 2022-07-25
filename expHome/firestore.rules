@@ -168,5 +168,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /lifeLog/{lifeLogId} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }
