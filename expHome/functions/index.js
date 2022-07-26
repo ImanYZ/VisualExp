@@ -42,10 +42,9 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
-  lifeLoggerScheduler,
+  lifeLogger,
   ongoingEvents
 } = require("./scheduling");
-const { assignNodeContributorsInstitutionsStats, updateInstitutions, updateTypesenseIndex } = require("./knowledge");
 const { card, image } = require("./misinformationExp");
 
 process.env.TZ = "America/Detroit";
@@ -144,22 +143,6 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-exports.assignNodeContributorsInstitutionsStats = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 25 hours")
-  .onRun(assignNodeContributorsInstitutionsStats);
-
-exports.updateInstitutions = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 25 hours")
-  .onRun(updateInstitutions);
-
 // exports.updateTypesenseIndex = functions
 //   .runWith({
 //     memory: "1GB",
@@ -169,4 +152,4 @@ exports.updateInstitutions = functions
 //   .onRun(updateTypesenseIndex);
 
 // LifeLog:
-exports.lifeLoggerScheduler = functions.pubsub.schedule("every 1 hours").onRun(lifeLoggerScheduler);
+exports.lifeLogger = functions.pubsub.schedule("every hour").onRun(lifeLogger);
