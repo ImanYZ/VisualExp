@@ -122,16 +122,19 @@ const SchedulePage = props => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
+      let isStudentCoNoteSurvey = false;
       // We need to first retrieve which project this user belongs to.
 
-      const userDoc = await firebase.db
-        .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
-        .doc(fullname)
-        .get();
+      let userDoc = await firebase.db.collection("users").doc(fullname).get();
+
+      if (!userDoc.exists) {
+        userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
+        isStudentCoNoteSurvey = true;
+      }
       const userData = userDoc.data();
       const project = userData.project;
-      if (isStudentCoNoteSurvey === "true") {
+
+      if (isStudentCoNoteSurvey) {
         setGlobalProject(project);
         setGlobalCurrentProject(project);
       }
@@ -307,7 +310,7 @@ const SchedulePage = props => {
         };
       });
 
-      responseObj = await axios.post("/schedule", {
+      responseObj = await axios.post("http://localhost:5001/visualexp-5d2c6/us-central1/api/schedule", {
         email: email.toLowerCase(),
         sessions,
         project: userData.project
@@ -382,7 +385,7 @@ const SchedulePage = props => {
         <>
           {/* <div className="DateDescription">
               In the table below, please specify as many time slots as possible
-              in your timezone.
+              in your timezone. 
             </div>
             <div className="DateDescription">
               Based on your availability, we will match you with one of our UX
