@@ -35,6 +35,7 @@ const MCQuestion = props => {
   const [newCode, setNewCode] = useState("");
   const [codeChoice, setCodeChoice] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
+  const [explanation, setExplanation] = useState("");
   const question = props.questions[props.currentQIdx];
   const choice = choices[props.currentQIdx];
   const curQuestion = props.currentQIdx + 1;
@@ -49,7 +50,7 @@ const MCQuestion = props => {
       .where("project", "==", project)
       .where("question", "==", curQuestion)
       .get();
-    const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
+    const codesHere = experimentCodeDocs.docs.map((doc) =>  doc.data().code);
     setCodes(codesHere);
   };
 
@@ -79,7 +80,8 @@ const MCQuestion = props => {
   };
 
   const moveNext = () => {
-    if (selectCodes || ![5, 19].includes(props.step)) {
+   
+    if (selectCodes || !([5, 19].includes(props.step))) {
       const qsLeft = [];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
         if (!choices[qIdx]) {
@@ -93,6 +95,7 @@ const MCQuestion = props => {
       }
       setSelectCodes(false);
       retrieveFeedbackcodes();
+      setExplanation("");
     } else {
       retrieveFeedbackcodes();
       setSelectCodes(true);
@@ -107,6 +110,7 @@ const MCQuestion = props => {
     const newExp = [...props.explanations];
     newExp[props.currentQIdx].explanation = event.target.value;
     props.setExplanations(newExp);
+    setExplanation(event.target.value);
   };
 
   const codeChange = event => {
@@ -192,7 +196,7 @@ const MCQuestion = props => {
               />
             ))}
           </RadioGroup>
-          {props.explanations && props.explanations.length > 0 && (
+          {(props.explanations && props.explanations.length > 0 && !selectCodes) ?(
             <>
               <h3>Why do you think so?</h3>
               <TextareaAutosize
@@ -201,10 +205,10 @@ const MCQuestion = props => {
                 minRows={7}
                 placeholder={"Please Explain Why?"}
                 onChange={explanationsChange}
-                value={props.explanations[props.currentQIdx].explanation}
+                value={explanation}
               />
             </>
-          )}
+          ):null}
 
           {[5, 19].includes(props.step) && selectCodes ? (
             <div>
