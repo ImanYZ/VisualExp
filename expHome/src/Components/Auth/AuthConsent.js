@@ -6,12 +6,20 @@ import Grid from "@mui/material/Grid";
 
 import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
+import AuthInstructorCoNoteSurvey from "./AuthInstructorCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
 import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 
 import "./ConsentDocument.css";
 
 const AuthConsent = props => {
+  let authComponent = <Auth {...props} />;
+  if (props.project === "StudentCoNoteSurvey") {
+    authComponent = <AuthStudentCoNoteSurvey />;
+  } else if (props.project === "InstructorCoNoteSurvey") {
+    authComponent = <AuthInstructorCoNoteSurvey />;
+  }
+
   return (
     <Grid
       container
@@ -66,7 +74,7 @@ const AuthConsent = props => {
             height: "100vh"
           }}
         >
-          {props.project && props.project === "StudentCoNoteSurvey" ? <AuthStudentCoNoteSurvey /> : <Auth {...props} />}
+          {authComponent}
         </Paper>
       </Grid>
     </Grid>
