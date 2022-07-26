@@ -80,19 +80,7 @@ const AuthStudentCoNoteSurvey = props => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
-      console.log("FULL NAME => ", fuName);
 
-      const researcherDoc = await firebase.db.collection("researchers").doc(fuName).get();
-      if (!researcherDoc.exists) {
-        userNotExists = true;
-        userData = {
-          uid,
-          email: uEmail,
-          firstname: fName,
-          lastname: lName,
-          project: currentProject
-        };
-      }
       if (!userNotExists && !userData.uid) {
         const userDataLog = {
           uid,
@@ -152,6 +140,7 @@ const AuthStudentCoNoteSurvey = props => {
     setLastname(lName);
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
+    navigate("/");
   };
 
   useEffect(() => {
@@ -177,7 +166,6 @@ const AuthStudentCoNoteSurvey = props => {
         }
       } else {
         // User is signed out
-        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
@@ -275,7 +263,6 @@ const AuthStudentCoNoteSurvey = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
-      localStorage.setItem("isStudentCoNoteSurvey", "true");
       navigate("/");
     } catch (err) {
       console.log({ err });

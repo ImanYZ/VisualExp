@@ -99,15 +99,19 @@ const Auth = props => {
     let lName = lastname;
     let userData, userRef, fuName;
 
-    const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
-    const userDocs = await firebase.db
-      .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
-      .where("email", "==", uEmail)
-      .get();
+    let isStudentCoNoteSurvey = false;
+    let userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
+      if (userDocs.docs.length > 0) {
+        isStudentCoNoteSurvey = true;
+      }
+    }
     if (userDocs.docs.length > 0) {
       // Sign in and signed up:
       userRef = firebase.db
-        .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
+        .collection(isStudentCoNoteSurvey ? "usersStudentCoNoteSurvey" : "users")
         .doc(userDocs.docs[0].id);
       userData = userDocs.docs[0].data();
       const fName = !userData.firstname ? firstname : userData.firstname;
@@ -136,7 +140,7 @@ const Auth = props => {
           // because if the user signed up for the survey.
           // the user document will not have these fields
           // so there is no benefit of running this block
-        } else if (isStudentCoNoteSurvey !== "true") {
+        } else if (!isStudentCoNoteSurvey) {
           setPhase(userData.phase);
           setStep(userData.step);
           setPassage(userData.currentPCon.passage);
@@ -318,7 +322,6 @@ const Auth = props => {
         }
       } else {
         // User is signed out
-        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
