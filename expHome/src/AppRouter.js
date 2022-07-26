@@ -217,6 +217,7 @@ const AppRouter = props => {
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
                 <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
                 <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
+                {email === "oneweb@umich.edu" && <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />}
                 <Route
                   path="LifeLog"
                   element={

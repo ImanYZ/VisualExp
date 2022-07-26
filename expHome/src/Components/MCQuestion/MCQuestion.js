@@ -216,12 +216,10 @@ const MCQuestion = props => {
           {[5, 19].includes(props.step) && selectCodes ? (
             <div>
               <h3>collaborative coding:</h3>
-
               <hr id="QuestionHeaderSeparator" />
               <FormControl id="QuestionContent" component="fieldset">
                 <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
-                  Please select a code that you think is related to your answer above and add more codes that will help
-                  other participant to choose from :
+                  Why do you think the passage you chose was easier to read ? Select as many as you wish:
                 </FormLabel>
                 <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
                   {codes.map(value => {
@@ -261,7 +259,7 @@ const MCQuestion = props => {
                 />
               </FormControl>
               <hr id="QuestionHeaderSeparator" />
-              <Button onClick={addCode} disabled={false} className={"Button"} variant="contained">
+              <Button onClick={addCode} disabled={!newCode || newCode === ""} className={"Button"} variant="contained">
                 Add Code
               </Button>
             </div>
