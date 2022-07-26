@@ -245,6 +245,7 @@ const AppRouter = props => {
           </>
         ) : (
           <>
+            <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
             <Route path="*" element={<AuthConsent />} />
           </>

@@ -1439,7 +1439,8 @@ exports.assignExperimentSessionsPoints = async context => {
     const usersInfo = [];
     const usersDocs = await db.collection("users").get();
     const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
-    for (let userDoc of [...surveyUsers.docs, ...usersDocs.docs]) {
+    const surveyInstructors = await db.collection("usersInstructorCoNoteSurvey").get();
+    for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...usersDocs.docs]) {
       const userData = userDoc.data();
       usersInfo.push({
         fullname: userDoc.id,
@@ -1695,6 +1696,14 @@ exports.remindCalendarInvitations = async context => {
               // The only way to get the user data, like their firstname, which
               // sessions they have completed so far, ... is through "users"
               let userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
+
+              if (userDocs.docs.length === 0) {
+                userDocs = await db
+                  .collection("usersInstructorCoNoteSurvey")
+                  .where("email", "==", attendee.email.toLowerCase())
+                  .get();
+              }
+
               if (userDocs.docs.length === 0) {
                 userDocs = await db
                   .collection("usersStudentCoNoteSurvey")

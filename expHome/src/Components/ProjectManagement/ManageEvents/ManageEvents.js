@@ -399,6 +399,12 @@ const ManageEvents = props => {
         let userDocs = await firebase.db.collection("users").where("email", "==", event.participant).get();
         if (userDocs.docs.length === 0) {
           userDocs = await firebase.db
+            .collection("usersInstructorCoNoteSurvey")
+            .where("email", "==", event.participant)
+            .get();
+        }
+        if (userDocs.docs.length === 0) {
+          userDocs = await firebase.db
             .collection("usersStudentCoNoteSurvey")
             .where("email", "==", event.participant)
             .get();
@@ -478,8 +484,9 @@ const ManageEvents = props => {
       let recallSecondRatio = 0;
       let recallThirdRatio = 0;
       const userDocs = await firebase.db.collection("users").get();
+      const surveyInstructors = await firebase.db.collection("usersInstructorCoNoteSurvey").get();
       const surveyUsers = await firebase.db.collection("usersStudentCoNoteSurvey").get();
-      for (let userDoc of [...surveyUsers.docs, ...userDocs.docs]) {
+      for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...userDocs.docs]) {
         const userData = userDoc.data();
         if ("createdAt" in userData && userData.createdAt.toDate() > new Date("1-14-2022")) {
           registered += 1;
@@ -622,6 +629,9 @@ const ManageEvents = props => {
         setScheduleLoaded(false);
         // We need to first retrieve which project this user belongs to.
         let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
+        if (!userDoc.exists) {
+          userDoc = await firebase.db.collection("usersInstructorCoNoteSurvey").doc(theRow.fullname).get();
+        }
         if (!userDoc.exists) {
           userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(theRow.fullname).get();
         }

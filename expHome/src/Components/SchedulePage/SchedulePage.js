@@ -122,19 +122,23 @@ const SchedulePage = props => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      let isStudentCoNoteSurvey = false;
+      let isSurvey = false;
       // We need to first retrieve which project this user belongs to.
 
       let userDoc = await firebase.db.collection("users").doc(fullname).get();
 
       if (!userDoc.exists) {
+        userDoc = await firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname).get();
+        isSurvey = true;
+      }
+
+      if (!userDoc.exists) {
         userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
-        isStudentCoNoteSurvey = true;
+        isSurvey = true;
       }
       const userData = userDoc.data();
       const project = userData.project;
-
-      if (isStudentCoNoteSurvey) {
+      if (isSurvey) {
         setGlobalProject(project);
         setGlobalCurrentProject(project);
       }
@@ -273,11 +277,19 @@ const SchedulePage = props => {
 
   const submitData = async () => {
     setIsSubmitting(true);
-    const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
-    const userRef = firebase.db
-      .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
-      .doc(fullname);
-    const userDoc = await userRef.get();
+
+    const userRef = firebase.db.collection("users").doc(fullname);
+    let userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      const userRef = firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname);
+      userDoc = await userRef.get();
+    }
+
+    if (!userDoc.exists) {
+      const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
+      userDoc = await userRef.get();
+    }
 
     let responseObj = null;
     if (userDoc.exists) {
@@ -358,6 +370,33 @@ const SchedulePage = props => {
 
     return infos;
   };
+
+  const renderConfirmation = () => {
+    return (
+      <>
+        <div>
+          Press "Confirm" if you'd like to schedule the following{" "}
+          {`${toWords(selectedSession.length)} ${selectedSession.length > 1 ? "sessions" : "session"}`}, or press
+          "Cancel" to revise your sessions.
+        </div>
+        <ul>
+          {selectedSession.map((session, i) => {
+            return (
+              <li>
+                {i + 1}
+                <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
+                {sessionFormatter(
+                  selectedSession[0],
+                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    );
+  };
+
   return (
     <div id="SchedulePageContainer">
       {submitted ? (
@@ -475,37 +514,7 @@ const SchedulePage = props => {
       >
         <DialogTitle id="alert-dialog-title">{"Please Confirm!"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <div>
-              Press "Confirm" if you'd like to schedule the following three sessions, or press "Cancel" to revise your
-              sessions.
-            </div>
-            {firstSession && secondSession && thirdSession && (
-              <ul>
-                <li>
-                  1<sup>st</sup>
-                  {sessionFormatter(
-                    firstSession,
-                    slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
-                  )}
-                </li>
-                <li>
-                  2<sup>nd</sup>
-                  {sessionFormatter(
-                    secondSession,
-                    slotDuration * (projectSpecs?.sessionDuration?.[1] || AppConfig.defaultSessionDuration[1])
-                  )}
-                </li>
-                <li>
-                  3<sup>rd</sup>
-                  {sessionFormatter(
-                    thirdSession,
-                    slotDuration * (projectSpecs?.sessionDuration?.[2] || AppConfig.defaultSessionDuration[2])
-                  )}
-                </li>
-              </ul>
-            )}
-          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">{renderConfirmation()}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={confirmClose("Cancelled")}>Cancel</Button>
