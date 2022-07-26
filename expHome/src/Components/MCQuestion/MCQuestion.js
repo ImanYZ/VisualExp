@@ -35,6 +35,12 @@ const MCQuestion = props => {
   const [newCode, setNewCode] = useState("");
   const [codeChoice, setCodeChoice] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
+  const question = props.questions[props.currentQIdx];
+  const choice = choices[props.currentQIdx];
+  const curQuestion = props.currentQIdx + 1;
+  const size = props.questions.length;
+  const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
+  const previousAvailable = props.currentQIdx !== 0;
 
   const retrieveFeedbackcodes = async () => {
     const experimentCodeDocs = await firebase.db
@@ -43,11 +49,7 @@ const MCQuestion = props => {
       .where("project", "==", project)
       .where("question", "==", curQuestion)
       .get();
-    let codesHere = [];
-    for (let Doc of experimentCodeDocs.docs) {
-      let data = Doc.data();
-      codesHere.push(data.code);
-    }
+    const codesHere = experimentCodeDocs.docs.map(async (doc) => await doc.data().code);
     setCodes(codesHere);
   };
 
@@ -102,18 +104,10 @@ const MCQuestion = props => {
   };
 
   const explanationsChange = event => {
-
     const newExp = [...props.explanations];
     newExp[props.currentQIdx].explanation = event.target.value;
     props.setExplanations(newExp);
   };
-
-  const question = props.questions[props.currentQIdx];
-  const choice = choices[props.currentQIdx];
-  const curQuestion = props.currentQIdx + 1;
-  const size = props.questions.length;
-  const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
-  const previousAvailable = props.currentQIdx !== 0;
 
   const codeChange = event => {
     setNewCode(event.currentTarget.value);
@@ -148,7 +142,6 @@ const MCQuestion = props => {
       newExp[props.currentQIdx].codes = newChecked;
       return newExp;
     });
-
   };
 
   const submit = () => {
