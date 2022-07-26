@@ -985,6 +985,16 @@ const RouterNav = props => {
                   </Box> */}
                   </>
                 )}
+             {fullname === "Iman YeckehZaare" &&
+                  (<Tooltip title={<div>You've can approve codes added by researchers and participants here 💬 </div>}>
+                      <Button
+                        id="CodeFeedback"
+                        className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
+                        onClick={event => navigate("/Activities/CodeFeedback")}
+                      >
+                        💬 
+                      </Button>
+                    </Tooltip>)}
                 {fullname && (
                   <Tooltip title="Account">
                     <IconButton
@@ -1001,6 +1011,8 @@ const RouterNav = props => {
                     </IconButton>
                   </Tooltip>
                 )}
+
+          
               </Box>
             </Toolbar>
           </AppBar>
