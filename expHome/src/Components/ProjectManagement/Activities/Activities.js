@@ -20,6 +20,7 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import CodeFeedback from "../CodeFeedback/CodeFeedback"
 import { LeaderBoard, ProjectPoints } from "./components";
 import { formatPoints } from "../../../utils";
 
@@ -40,6 +41,7 @@ const CommonPages = [
   { page: "AddInstructor", view: <AddInstructor /> },
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
+  { page: "CodeFeedback", view: <CodeFeedback /> },
 ];
 
 const Activities = props => {
