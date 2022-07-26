@@ -49,7 +49,7 @@ const MCQuestion = props => {
       .where("project", "==", project)
       .where("question", "==", curQuestion)
       .get();
-    const codesHere = experimentCodeDocs.docs.map(async (doc) => await doc.data().code);
+    const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
     setCodes(codesHere);
   };
 
@@ -79,7 +79,7 @@ const MCQuestion = props => {
   };
 
   const moveNext = () => {
-    if (selectCodes || !([5, 19].includes(props.step))) {
+    if (selectCodes || ![5, 19].includes(props.step)) {
       const qsLeft = [];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
         if (!choices[qIdx]) {
@@ -153,11 +153,11 @@ const MCQuestion = props => {
       style={
         props.explanations && props.explanations.length > 0
           ? {
-            height: "100vh",
-            overflowY: "auto",
-            overflowX: "hidden",
-            paddingRight: "10px"
-          }
+              height: "100vh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              paddingRight: "10px"
+            }
           : {}
       }
     >
@@ -208,11 +208,11 @@ const MCQuestion = props => {
 
           {[5, 19].includes(props.step) && selectCodes ? (
             <div>
-              <h3>collaborative coding:</h3>
+              <h3>Code Your Feedback:</h3>
               <hr id="QuestionHeaderSeparator" />
               <FormControl id="QuestionContent" component="fieldset">
                 <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
-                  Why do you think the passage you chose was easier to read ? Select as many as you wish:
+                  Please select some of the following options or enter new ones to better explain your feedback:
                 </FormLabel>
                 <List sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}>
                   {codes.map(value => {
@@ -294,8 +294,16 @@ const MCQuestion = props => {
         <Button
           id="QuestionSubmitBtn"
           onClick={props.nextStep}
-          disabled={!(allAnswered && (![5, 19].includes(props.step))) && !(allAnswered && (selectCodes) && ([5, 19].includes(props.step)))}
-          className={(allAnswered && (![5, 19].includes(props.step))) || (allAnswered && (selectCodes) && ([5, 19].includes(props.step))) ? "Button" : "Button Disabled"}
+          disabled={
+            !(allAnswered && ![5, 19].includes(props.step)) &&
+            !(allAnswered && selectCodes && [5, 19].includes(props.step))
+          }
+          className={
+            (allAnswered && ![5, 19].includes(props.step)) ||
+            (allAnswered && selectCodes && [5, 19].includes(props.step))
+              ? "Button"
+              : "Button Disabled"
+          }
           variant="contained"
         >
           Submit &amp; Continue!
