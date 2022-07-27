@@ -819,6 +819,7 @@ const CodeFeedback = props => {
         </Box>
       )}
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
+      {/* Edit Code Researcher Modal */}
       <Modal
         open={openEditModal}
         onClose={handleCloseEditModal}
@@ -855,6 +856,7 @@ const CodeFeedback = props => {
           </Box>
         </Box>
       </Modal>
+      {/* Edit Code Admin Modal */}
       <Modal
         open={openAdminEditModal}
         onClose={handleCloseAdminEditModal}
@@ -891,6 +893,7 @@ const CodeFeedback = props => {
           </Box>
         </Box>
       </Modal>
+      {/* Delete Code Confirmation Modal */}
       <Modal
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
