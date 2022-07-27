@@ -745,7 +745,16 @@ const ManageEvents = props => {
     setIsSubmitting(true);
     // First, we get the user's data to make sure they had not previously
     // completed all the three experiment sessions.
-    const userDocs = await firebase.db.collection("users").where("email", "==", participant).get();
+    let userDocs = await firebase.db.collection("users").where("email", "==", participant).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("usersInstructorCoNoteSurvey").where("email", "==", participant).get();
+    }
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", participant).get();
+    }
+
     if (userDocs.docs.length > 0) {
       const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
       const userData = userDocs.docs[0].data();
