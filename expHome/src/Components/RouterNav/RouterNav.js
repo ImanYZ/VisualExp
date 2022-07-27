@@ -957,13 +957,13 @@ const RouterNav = props => {
                               existance or non-existance of a specific phrase in a free-recall response.
                             </div>
                             <div>
-                              From that total 🧠 points, we've already excluded your negative {negativeGradingPoints} 🧟
+                              From that total 🧠 points, we've already excluded your negative {negativeGradingPoints} ❌
                               points.
                             </div>
                             <div>
                               This means, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed on
                               existance (non-existance) of a specific key phrase in a free-recall response by a
-                              participant, but you opposed their majority of votes. So, you got a 0.5 🧟 negative point
+                              participant, but you opposed their majority of votes. So, you got a 0.5 ❌ negative point
                               for each of those cases.
                             </div>
                           </div>
@@ -974,7 +974,7 @@ const RouterNav = props => {
                           className={activePage === "FreeRecallGrading" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/FreeRecallGrading")}
                         >
-                          🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
+                          🧠 {gradingPoints} <br /> ❌ {negativeGradingPoints}
                         </Button>
                       </Tooltip>
                     ) : null}
@@ -1006,6 +1006,17 @@ const RouterNav = props => {
                     </Tooltip>
                   </Box> */}
                   </>
+                )}
+                {fullname === "Iman YeckehZaare" && (
+                  <Tooltip title={<div>You've can approve codes added by researchers and participants here 💬 </div>}>
+                    <Button
+                      id="CodeFeedback"
+                      className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
+                      onClick={event => navigate("/Activities/CodeFeedback")}
+                    >
+                      💬
+                    </Button>
+                  </Tooltip>
                 )}
                 {fullname && (
                   <Tooltip title="Account">
