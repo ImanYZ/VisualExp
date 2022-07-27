@@ -17,7 +17,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import { firebaseState, fullnameState, isAdminState } from "../../store/AuthAtoms";
+import { firebaseState, fullnameState, isAdminState, emailState } from "../../store/AuthAtoms";
 
 import { firebaseOneState, usernameState, emailOneState } from "../../store/OneCademyAtoms";
 
@@ -62,6 +62,7 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
 const RouterNav = props => {
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
+  const userEmail = useRecoilValue(emailState);
   const [username, setUsername] = useRecoilState(usernameState);
   const [email, setEmail] = useRecoilState(emailOneState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
@@ -101,6 +102,8 @@ const RouterNav = props => {
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
+  const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
+  const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -200,6 +203,16 @@ const RouterNav = props => {
                 setNegativeGradingPoints(theProject.negativeGradingPoints);
               } else {
                 setNegativeGradingPoints(0);
+              }
+              if (theProject.negativeCodingPoints) {
+                setNegativeCodesPionts(theProject.negativeCodingPoints);
+              } else {
+                setNegativeCodesPionts(0);
+              }
+              if (theProject.positiveCodingPoints) {
+                setPositiveCodesPoints(theProject.positiveCodingPoints);
+              } else {
+                setPositiveCodesPoints(0);
               }
             }
             if ("gradingNum" in theProject) {
@@ -684,7 +697,7 @@ const RouterNav = props => {
         <MenuItem
           key={`${proj}MenuItem`}
           selected={index === projectIndex}
-          // onClick={(event) => changeProject(event, index)}
+        // onClick={(event) => changeProject(event, index)}
         >
           {proj}
           <Switch
@@ -768,9 +781,8 @@ const RouterNav = props => {
                     >
                       {projectPoints.onePoints ? (
                         <Tooltip
-                          title={`You've submitted ${
-                            proposalsNums[username] ? proposalsNums[username].num : ""
-                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          title={`You've submitted ${proposalsNums[username] ? proposalsNums[username].num : ""
+                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
                             # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
@@ -966,6 +978,17 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
+                    {userEmail === "oneweb@umich.edu" && (
+                      <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  🧟 negative point.</div>}>
+                        <Button
+                          id="CodeFeedback"
+                          className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
+                          onClick={event => navigate("/Activities/CodeFeedback")}
+                        >
+                          💬 {positiveCodesPoints}<br /> 🧟 {negativeCodesPionts}
+                        </Button>
+                      </Tooltip>
+                    )}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
@@ -984,17 +1007,6 @@ const RouterNav = props => {
                     </Tooltip>
                   </Box> */}
                   </>
-                )}
-                {fullname === "Iman YeckehZaare" && (
-                  <Tooltip title={<div>You've can approve codes added by researchers and participants here 💬 </div>}>
-                    <Button
-                      id="CodeFeedback"
-                      className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
-                      onClick={event => navigate("/Activities/CodeFeedback")}
-                    >
-                      💬
-                    </Button>
-                  </Tooltip>
                 )}
                 {fullname && (
                   <Tooltip title="Account">
