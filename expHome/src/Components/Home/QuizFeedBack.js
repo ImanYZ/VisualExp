@@ -41,11 +41,6 @@ const applicationscolumns = [
     }
   },
   {
-    field: "Leader",
-    headerName: "Leader",
-    width: 190
-  },
-  {
     field: "applicant",
     headerName: "applicant",
     width: 220,
@@ -126,7 +121,6 @@ const QuizFeedBack = props => {
                       question: communitiesPapers[applicaData.communiId][key].questions[question].stem,
                       applicant: applicaData.fullname,
                       explanation: applicaData.attempts[key].questions[question].explanation,
-                      Leader: applicaData.leader,
                       posted: applicaData.createdAt.toDate(),
                       id: `${change.doc.id}@${question}@${key}`,
                       checked: applicaData.attempts[key].questions[question].checked ? "✅" : "◻",
