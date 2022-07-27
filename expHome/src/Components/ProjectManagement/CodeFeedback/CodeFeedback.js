@@ -115,6 +115,15 @@ const CodeFeedback = props => {
       }
     },
     {
+      field: "title",
+      headerName: "Title",
+      renderCell: cellValues => {
+        return (
+          <GridCellToolTip isLink={false} cellValues={cellValues} />
+        );
+      }
+    },
+    {
       field: "action",
       headerName: "Action",
       renderCell: cellValues => {
@@ -156,7 +165,7 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "participant",
+          title: "Participant",
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
@@ -169,7 +178,7 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "researcher",
+          title: "Researcher",
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
@@ -299,8 +308,8 @@ const CodeFeedback = props => {
     const codesRef = firebase.db.collection("feedbackCodeBooks").doc();
     if (!approvedCodes.includes(newCode) && newCode !== "") {
       codesRef.set({
-        approved: false,
         project,
+        approved: false,
         code: newCode,
         coder: fullname,
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -450,7 +459,7 @@ const CodeFeedback = props => {
   const handleCellClick = async clickedCell => {
     if (clickedCell.field === "checked") {
       let collection;
-      if (clickedCell.row.title === "participant") {
+      if (clickedCell.row.title === "Participant") {
         collection = "experimentCodes";
       } else {
         collection = "feedbackCodeBooks";
@@ -553,10 +562,9 @@ const CodeFeedback = props => {
   }
 
   const handleAdminEdit = async () => {
-    console.log('adminCodeData', adminCodeData);
     if (adminCodeData?.code && adminCodeData?.title) {
       let collection;
-      if (adminCodeData.title === "participant") {
+      if (adminCodeData.title === "Participant") {
         collection = "experimentCodes";
       } else {
         collection = "feedbackCodeBooks";
@@ -587,11 +595,15 @@ const CodeFeedback = props => {
               code: updateCode,
             };
             codeDoc.ref.update(codeUpdate);
-            experimentCodes[index] = updateCode;
-            setAllExperimentsCodes(experimentCodes);
-            setSnackbarMessage(`Code updated for ${adminCodeData.coder}!`);
-            setAdminCodeData({});
+            const updatedExperimentCode = {
+              ...adminCodeData,
+              code: updateCode
+            }
+            experimentCodes[index] = updatedExperimentCode;
+            setSnackbarMessage(`Code updated for ${updatedExperimentCode.coder}!`);
             setUpdateCode("");
+            setAdminCodeData({});
+            setAllExperimentsCodes(experimentCodes);
             handleCloseAdminEditModal();
           })
           .catch(err => {
@@ -724,8 +736,6 @@ const CodeFeedback = props => {
                 ))}
               </List>
             </Sheet>
-
-
           </Box>
           <Box>
             <Sheet variant="outlined" >
