@@ -11,7 +11,7 @@ import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingSt
 
 import { currentProjectState } from "../../store/ExperimentAtoms";
 
-import { projectSpecsState } from "../../store/ProjectAtoms";
+import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
@@ -22,12 +22,14 @@ import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
+import AppConfig from "../../AppConfig";
 
 const AuthStudentCoNoteSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
+  const [project, setProject] = useRecoilState(projectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
 
   const [firstname, setFirstname] = useState("");
@@ -80,23 +82,11 @@ const AuthStudentCoNoteSurvey = props => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
-      console.log("FULL NAME => ", fuName);
 
-      const researcherDoc = await firebase.db.collection("researchers").doc(fuName).get();
-      if (!researcherDoc.exists) {
-        userNotExists = true;
-        userData = {
-          uid,
-          email: uEmail,
-          firstname: fName,
-          lastname: lName,
-          project: "StudentCoNoteSurvey"
-        };
-      }
       if (!userNotExists && !userData.uid) {
         const userDataLog = {
           uid,
-          project: "StudentCoNoteSurvey"
+          project: AppConfig.defaultSurveyProject
         };
         if (userData.firstname && userData.lastname) {
           await userRef.update(userDataLog);
@@ -131,7 +121,7 @@ const AuthStudentCoNoteSurvey = props => {
           email: uEmail,
           firstname,
           lastname: lName,
-          project: "StudentCoNoteSurvey"
+          project: AppConfig.defaultSurveyProject
         };
       }
     }
@@ -152,6 +142,9 @@ const AuthStudentCoNoteSurvey = props => {
     setLastname(lName);
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
+    setCurrentProject(userData.project);
+    setProject(userData.project);
+    navigate("/");
   };
 
   useEffect(() => {
@@ -177,7 +170,6 @@ const AuthStudentCoNoteSurvey = props => {
         }
       } else {
         // User is signed out
-        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
@@ -275,7 +267,6 @@ const AuthStudentCoNoteSurvey = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
-      localStorage.setItem("isStudentCoNoteSurvey", "true");
       navigate("/");
     } catch (err) {
       console.log({ err });

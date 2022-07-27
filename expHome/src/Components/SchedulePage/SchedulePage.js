@@ -14,6 +14,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useNavigate } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
+import { projectSpecsState } from "../../store/ProjectAtoms";
+import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import { currentProjectState } from "../../store/ExperimentAtoms";
 
@@ -22,6 +24,7 @@ import SelectSessions from "./SelectSessions";
 import { isEmail } from "../../utils";
 
 import "./SchedulePage.css";
+import AppConfig from "../../AppConfig";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -58,6 +61,41 @@ const sessionFormatter = (start, minutes) => {
   );
 };
 
+const formatSlotTime = (hourlyChunks = 2, slotCount = 0) => {
+  let str = "for ";
+  let mins = 0,
+    hours = 0;
+  const slotSize = 60 / hourlyChunks;
+  const totalMinutes = slotCount * slotSize;
+  if (totalMinutes >= 60) {
+    mins = totalMinutes % 60;
+    hours = (totalMinutes - mins) / 60;
+  } else {
+    mins = totalMinutes;
+  }
+  if (hours > 0) {
+    if (hours === 1) {
+      str += `${toWords(hours)} hour `;
+    } else {
+      str += `${toWords(hours)} hours `;
+    }
+  }
+
+  if (hours > 0 && mins > 0) {
+    str += "and ";
+  }
+
+  if (mins > 0) {
+    str += `${toWords(mins)} minutes `;
+  }
+  if (slotCount === 1) {
+    str += `(${toWords(slotCount)} slot)`;
+  } else {
+    str += `(${toWords(slotCount)} consecutive slots)`;
+  }
+  return str;
+};
+
 const SchedulePage = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
@@ -67,6 +105,7 @@ const SchedulePage = props => {
   const [participatedBefore, setParticipatedBefore] = useState(false);
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
+  const [selectedSession, setSelectedSession] = useState([]);
   const [firstSession, setFirstSession] = useState(null);
   const [secondSession, setSecondSession] = useState(null);
   const [thirdSession, setThirdSession] = useState(null);
@@ -77,23 +116,32 @@ const SchedulePage = props => {
   const [globalProject, setGlobalProject] = useRecoilState(projectState);
   const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(currentProjectState);
   const navigate = useNavigate();
+  const projectSpecs = useRecoilValue(projectSpecsState);
 
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      const isStudentCoNoteSurvey = localStorage.getItem("isStudentCoNoteSurvey");
+      let isSurvey = false;
       // We need to first retrieve which project this user belongs to.
-      if (isStudentCoNoteSurvey === "true") {
-        setGlobalProject("StudentCoNoteSurvey");
-        setGlobalCurrentProject("StudentCoNoteSurvey");
+
+      let userDoc = await firebase.db.collection("users").doc(fullname).get();
+
+      if (!userDoc.exists) {
+        userDoc = await firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname).get();
+        isSurvey = true;
       }
-      const userDoc = await firebase.db
-        .collection(isStudentCoNoteSurvey === "true" ? "usersStudentCoNoteSurvey" : "users")
-        .doc(fullname)
-        .get();
+
+      if (!userDoc.exists) {
+        userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
+        isSurvey = true;
+      }
       const userData = userDoc.data();
       const project = userData.project;
+      if (isSurvey) {
+        setGlobalProject(project);
+        setGlobalCurrentProject(project);
+      }
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
@@ -229,8 +277,20 @@ const SchedulePage = props => {
 
   const submitData = async () => {
     setIsSubmitting(true);
+
     const userRef = firebase.db.collection("users").doc(fullname);
-    const userDoc = await userRef.get();
+    let userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      const userRef = firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname);
+      userDoc = await userRef.get();
+    }
+
+    if (!userDoc.exists) {
+      const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
+      userDoc = await userRef.get();
+    }
+
     let responseObj = null;
     if (userDoc.exists) {
       const userData = userDoc.data();
@@ -250,24 +310,22 @@ const SchedulePage = props => {
         const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
         await firebase.batchDelete(scheduleRef);
       }
-      // We randomly pick one of the available researchers in each session and assign them to run this session.
+
+      const sessions = selectedSession.map(s => {
+        return {
+          startDate: s,
+          researcher:
+            availableSessions[s.toLocaleString()][
+              // We randomly pick one of the available researchers in each session and assign them to run this session.
+              Math.floor(Math.random() * availableSessions[s.toLocaleString()].length)
+            ]
+        };
+      });
+
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
-        first: firstSession,
-        researcher1st:
-          availableSessions[firstSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[firstSession.toLocaleString()].length)
-          ],
-        second: secondSession,
-        researcher2nd:
-          availableSessions[secondSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[secondSession.toLocaleString()].length)
-          ],
-        third: thirdSession,
-        researcher3rd:
-          availableSessions[thirdSession.toLocaleString()][
-            Math.floor(Math.random() * availableSessions[thirdSession.toLocaleString()].length)
-          ]
+        sessions,
+        project: userData.project
       });
       errorAlert(responseObj.data);
 
@@ -277,22 +335,66 @@ const SchedulePage = props => {
           email: email.toLowerCase(),
           session: firebase.firestore.Timestamp.fromDate(session)
         };
-        if (session.getTime() === firstSession.getTime()) {
-          theSession.id = responseObj.data.events[0].data.id;
-          theSession.order = "1st";
-        } else if (session.getTime() === secondSession.getTime()) {
-          theSession.id = responseObj.data.events[1].data.id;
-          theSession.order = "2nd";
-        } else if (session.getTime() === thirdSession.getTime()) {
-          theSession.id = responseObj.data.events[2].data.id;
-          theSession.order = "3rd";
+
+        const sessionIndex = selectedSession.findIndex(s => s.getTime() === session.getTime());
+        if (sessionIndex > -1) {
+          theSession.order = toOrdinal(sessionIndex + 1);
+          theSession.id = responseObj.data.events[sessionIndex].data.id;
         }
         await firebase.batchSet(scheduleRef, theSession);
       }
       await firebase.commitBatch();
+
       setSubmitted(true);
     }
     setIsSubmitting(false);
+  };
+
+  const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
+
+  const renderInformation = () => {
+    let infos = [];
+
+    for (let i = 0; i < projectSpecs.numberOfSessions; ++i) {
+      infos.push(
+        <li>
+          <strong>
+            {i + 1}
+            <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup> session
+          </strong>{" "}
+          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter,` : null}
+          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i])}
+        </li>
+      );
+    }
+
+    return infos;
+  };
+
+  const renderConfirmation = () => {
+    return (
+      <>
+        <div>
+          Press "Confirm" if you'd like to schedule the following{" "}
+          {`${toWords(selectedSession.length)} ${selectedSession.length > 1 ? "sessions" : "session"}`}, or press
+          "Cancel" to revise your sessions.
+        </div>
+        <ul>
+          {selectedSession.map((session, i) => {
+            return (
+              <li>
+                {i + 1}
+                <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
+                {sessionFormatter(
+                  selectedSession[0],
+                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    );
   };
 
   return (
@@ -322,7 +424,7 @@ const SchedulePage = props => {
         <>
           {/* <div className="DateDescription">
               In the table below, please specify as many time slots as possible
-              in your timezone.
+              in your timezone. 
             </div>
             <div className="DateDescription">
               Based on your availability, we will match you with one of our UX
@@ -344,26 +446,7 @@ const SchedulePage = props => {
               <li>
                 Please specify your availability for our three UX experiment sessions <strong>in your timezone</strong>{" "}
                 to satisfy the following criteria:
-                <ul>
-                  <li>
-                    <strong>
-                      1<sup>st</sup> session
-                    </strong>{" "}
-                    for an hour (two consecutive slots)
-                  </li>
-                  <li>
-                    <strong>
-                      2<sup>nd</sup> session
-                    </strong>
-                    , 3 days later, for 30 minutes (one slot)
-                  </li>
-                  <li>
-                    <strong>
-                      3<sup>rd</sup> session
-                    </strong>
-                    , 7 days later, for 30 minutes (one slot)
-                  </li>
-                </ul>
+                <ul>{renderInformation()}</ul>
               </li>
               <li>
                 As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
@@ -395,14 +478,14 @@ const SchedulePage = props => {
                   numDays={16}
                   schedule={schedule}
                   setSchedule={setSchedule}
+                  selectedSession={selectedSession}
+                  setSelectedSession={setSelectedSession}
                   availableSessions={availableSessions}
-                  firstSession={firstSession}
-                  secondSession={secondSession}
-                  thirdSession={thirdSession}
-                  setFirstSession={setFirstSession}
-                  setSecondSession={setSecondSession}
-                  setThirdSession={setThirdSession}
                   setSubmitable={setSubmitable}
+                  numberOfSessions={projectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+                  hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+                  sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+                  daysLater={projectSpecs.daysLater || AppConfig.daysLater}
                 />
               </div>
               <div id="SignBtnContainer">
@@ -431,28 +514,7 @@ const SchedulePage = props => {
       >
         <DialogTitle id="alert-dialog-title">{"Please Confirm!"}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <div>
-              Press "Confirm" if you'd like to schedule the following three sessions, or press "Cancel" to revise your
-              sessions.
-            </div>
-            {firstSession && secondSession && thirdSession && (
-              <ul>
-                <li>
-                  1<sup>st</sup>
-                  {sessionFormatter(firstSession, 60)}
-                </li>
-                <li>
-                  2<sup>nd</sup>
-                  {sessionFormatter(secondSession, 30)}
-                </li>
-                <li>
-                  3<sup>rd</sup>
-                  {sessionFormatter(thirdSession, 30)}
-                </li>
-              </ul>
-            )}
-          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">{renderConfirmation()}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={confirmClose("Cancelled")}>Cancel</Button>

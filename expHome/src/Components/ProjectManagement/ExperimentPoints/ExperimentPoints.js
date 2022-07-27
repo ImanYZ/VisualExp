@@ -10,13 +10,10 @@ import Alert from "@mui/material/Alert";
 
 import { DataGrid } from "@mui/x-data-grid";
 
-import {
-  firebaseState,
-  emailState,
-  fullnameState,
-} from "../../../store/AuthAtoms";
+import { firebaseState, emailState, fullnameState } from "../../../store/AuthAtoms";
 import {
   projectState,
+  projectSpecsState
   // notTakenSessionsState,
   // notTakenSessionsLoadedState,
 } from "../../../store/ProjectAtoms";
@@ -28,11 +25,12 @@ import ResearcherAvailabilities from "./ResearcherAvailabilities";
 import { getISODateString } from "../../../utils/DateFunctions";
 
 import "./ExperimentPoints.css";
+import AppConfig from "../../../AppConfig";
 
 // Call this for sessions that the participant has not accepted the Google
 // Calendar invite yet, or should have been in the session but they have not
 // shown up yet.
-const sendEventNotificationEmail = (params) => async (event) => {
+const sendEventNotificationEmail = params => async event => {
   await axios.post("/sendEventNotificationEmail", params);
 };
 
@@ -42,14 +40,14 @@ const participantsColumns = [
   {
     field: "participant", // email address
     headerName: "Participant",
-    width: 190,
+    width: 190
   },
   {
     field: "acceptedNum",
     headerName: "Acc Num",
     type: "number",
     width: 70,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       // If we're waiting for this participant, clicking this button
       // would email them a notification.
       return cellValues.row.weAreWaiting ? (
@@ -60,7 +58,7 @@ const participantsColumns = [
             firstname: cellValues.row.firstname,
             weAreWaiting: cellValues.row.weAreWaiting,
             hangoutLink: cellValues.row.hangoutLink,
-            courseName: cellValues.row.courseName,
+            courseName: cellValues.row.courseName
           })}
           className="Button Red NotificationBtn"
           variant="contained"
@@ -70,8 +68,8 @@ const participantsColumns = [
       ) : (
         cellValues.value + " A"
       );
-    },
-  },
+    }
+  }
 ];
 
 const expSessionsColumns = [
@@ -81,11 +79,11 @@ const expSessionsColumns = [
     field: "attendees",
     headerName: "Attendees",
     width: 400,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
-  { field: "points", headerName: "Points", type: "number", width: 130 },
+  { field: "points", headerName: "Points", type: "number", width: 130 }
 ];
 
 // const notTakenSessionsColumns = [
@@ -97,13 +95,9 @@ const expSessionsColumns = [
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
-tomorrow = new Date(
-  tomorrow.getFullYear(),
-  tomorrow.getMonth(),
-  tomorrow.getDate()
-);
+tomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
 
-const ExperimentPoints = (props) => {
+const ExperimentPoints = props => {
   const firebase = useRecoilValue(firebaseState);
   const email = useRecoilValue(emailState);
   const fullname = useRecoilValue(fullnameState);
@@ -120,9 +114,9 @@ const ExperimentPoints = (props) => {
   const [expSessions, setExpSessions] = useState([]);
   const [dailyPoints, setDailyPoints] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
+  const projectSpecs = useRecoilValue(projectSpecsState);
 
   useEffect(() => {
-    console.log('expSessionsChanges');
     if (expSessionsChanges.length > 0) {
       const tempExpSessionsChanges = [...expSessionsChanges];
       setExpSessionsChanges([]);
@@ -130,7 +124,7 @@ const ExperimentPoints = (props) => {
       let dPoints = [...dailyPoints];
       for (let change of tempExpSessionsChanges) {
         if (change.type === "removed") {
-          eSessions = eSessions.filter((eSe) => eSe.id !== change.doc.id);
+          eSessions = eSessions.filter(eSe => eSe.id !== change.doc.id);
         } else {
           const eSessionData = change.doc.data();
           if (eSessionData.attendees.includes(email)) {
@@ -139,22 +133,20 @@ const ExperimentPoints = (props) => {
               start: eSessionData.sTime.toDate(),
               end: eSessionData.eTime.toDate(),
               attendees: eSessionData.attendees.join(", "),
-              points: eSessionData.points,
+              points: eSessionData.points
             };
-            const eSessionIdx = eSessions.findIndex(
-              (eSe) => eSe.id === change.doc.id
-            );
+            const eSessionIdx = eSessions.findIndex(eSe => eSe.id === change.doc.id);
             if (eSessionIdx === -1) {
               eSessions.push(eSessionObj);
             } else {
               eSessions[eSessionIdx] = eSessionObj;
             }
             const theDate = getISODateString(eSessionData.sTime.toDate());
-            const dPointIdx = dPoints.findIndex((eSe) => eSe.day === theDate);
+            const dPointIdx = dPoints.findIndex(eSe => eSe.day === theDate);
             if (dPointIdx === -1) {
               dPoints.push({
                 day: theDate,
-                value: eSessionData.points,
+                value: eSessionData.points
               });
             } else {
               dPoints[dPointIdx].value += eSessionData.points;
@@ -169,14 +161,12 @@ const ExperimentPoints = (props) => {
   }, [email, expSessions, dailyPoints, expSessionsChanges]);
 
   useEffect(() => {
-    console.log('expSessions');
+    console.log("expSessions");
     if (project && fullname) {
-      const expSessionsQuery = firebase.db
-        .collection("expSessions")
-        .where("project", "==", project);
-      const expSessionsSnapshot = expSessionsQuery.onSnapshot((snapshot) => {
+      const expSessionsQuery = firebase.db.collection("expSessions").where("project", "==", project);
+      const expSessionsSnapshot = expSessionsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setExpSessionsChanges((oldExpSessionsChanges) => {
+        setExpSessionsChanges(oldExpSessionsChanges => {
           return [...oldExpSessionsChanges, ...docChanges];
         });
       });
@@ -188,22 +178,16 @@ const ExperimentPoints = (props) => {
   }, [project, fullname]);
 
   useEffect(() => {
-    console.log('resScheduleresSchedule');
+    console.log("resScheduleresSchedule");
     const loadSchedule = async () => {
       setScheduleLoaded(false);
-      const scheduleDocs = await firebase.db
-        .collection("resSchedule")
-        .where("session", ">=", tomorrow)
-        .get();
+      const scheduleDocs = await firebase.db.collection("resSchedule").where("session", ">=", tomorrow).get();
       const sch = [];
       let lastSession = new Date();
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
         const session = scheduleData.session.toDate();
-        if (
-          scheduleData.project === project &&
-          scheduleData.fullname === fullname
-        ) {
+        if (scheduleData.project === project && scheduleData.fullname === fullname) {
           sch.push(session);
           if (session > lastSession) {
             lastSession = session;
@@ -213,9 +197,7 @@ const ExperimentPoints = (props) => {
       if (sch.length > 0) {
         setSchedule(sch);
         let eightDaysLater = new Date();
-        eightDaysLater = new Date(
-          eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
-        );
+        eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
         if (lastSession.getTime() < eightDaysLater.getTime()) {
           setScheduleError(true);
         }
@@ -237,9 +219,7 @@ const ExperimentPoints = (props) => {
       .where("project", "==", project)
       .get();
     for (let scheduleDoc of scheduleDocs.docs) {
-      const scheduleRef = firebase.db
-        .collection("resSchedule")
-        .doc(scheduleDoc.id);
+      const scheduleRef = firebase.db.collection("resSchedule").doc(scheduleDoc.id);
       await firebase.batchDelete(scheduleRef);
     }
     let lastSession = new Date();
@@ -251,16 +231,14 @@ const ExperimentPoints = (props) => {
       const theSession = {
         fullname,
         project,
-        session: firebase.firestore.Timestamp.fromDate(session),
+        session: firebase.firestore.Timestamp.fromDate(session)
       };
       await firebase.batchSet(scheduleRef, theSession);
     }
     await firebase.commitBatch();
     setIsSubmitting(false);
     let eightDaysLater = new Date();
-    eightDaysLater = new Date(
-      eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000
-    );
+    eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
     if (lastSession.getTime() < eightDaysLater.getTime()) {
       setScheduleError(true);
       setSnackbarMessage(
@@ -268,9 +246,7 @@ const ExperimentPoints = (props) => {
       );
     } else {
       setScheduleError(false);
-      setSnackbarMessage(
-        "Your availability is successfully saved in the database!"
-      );
+      setSnackbarMessage("Your availability is successfully saved in the database!");
     }
   };
 
@@ -278,37 +254,27 @@ const ExperimentPoints = (props) => {
     <>
       <Alert severity="success">
         <h2>Specify Your Weekly Availability:</h2>
+        <p>Please specify your availability in YOUR TIMEZONE in the table below on a weekly basis.</p>
         <p>
-          Please specify your availability in YOUR TIMEZONE in the table below
-          on a weekly basis.
-        </p>
-        <p>
-          This way, when participants schedule their new sessions, our system
-          will only let them choose time-slots when we have at least one
-          available researcher.
+          This way, when participants schedule their new sessions, our system will only let them choose time-slots when
+          we have at least one available researcher.
         </p>
       </Alert>
       <Alert severity="error">
         <h2>Notes:</h2>
         <p>
-          Until all our researchers specify their availabilities, we cannot
-          deploy this new scheduling system for the participants, so please keep
-          taking the sessions on Google Calendar.
+          Until all our researchers specify their availabilities, we cannot deploy this new scheduling system for the
+          participants, so please keep taking the sessions on Google Calendar.
         </p>
         <p>
-          This system is smart enough to know in which sessions you are running
-          experiments. So, please do not remove your experiment sessions from
-          your availabilities below.
+          This system is smart enough to know in which sessions you are running experiments. So, please do not remove
+          your experiment sessions from your availabilities below.
         </p>
-        <p>
-          Don't forget to click the "Submit" button after specifying your
-          availability.
-        </p>
+        <p>Don't forget to click the "Submit" button after specifying your availability.</p>
         {scheduleError && (
           <h2>
-            Please specify your availability for at least the next 10 days,
-            otherwise there will not be enough available sessions for the
-            participants to schedule their 3rd session!
+            Please specify your availability for at least the next 10 days, otherwise there will not be enough available
+            sessions for the participants to schedule their 3rd session!
           </h2>
         )}
       </Alert>
@@ -319,22 +285,19 @@ const ExperimentPoints = (props) => {
             numDays={16}
             schedule={schedule}
             setSchedule={setSchedule}
+            hourlyChunks={projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks}
           />
           <div
             style={{
               position: "fixed",
               bottom: "0px",
               left: "46%",
-              marginBottom: "10px",
+              marginBottom: "10px"
             }}
           >
             <Button
               onClick={submitData}
-              className={
-                !isSubmitting
-                  ? "Button SubmitButton"
-                  : "Button SubmitButton Disabled"
-              }
+              className={!isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
               variant="contained"
               disabled={!isSubmitting ? null : true}
             >
@@ -446,22 +409,18 @@ const ExperimentPoints = (props) => {
       <Alert severity="warning">
         <h2>Points:</h2>
         <p>
-          You receive 16 points for running every first session and 7 points for
-          running every second or third session. Points are assigned
-          automatically. You do not need to take any further actions on this
-          page.
+          You receive 16 points for running every first session and 7 points for running every second or third session.
+          Points are assigned automatically. You do not need to take any further actions on this page.
         </p>
         <h2>Update time:</h2>
         <p>
-          We update the table below on a weekly basis. Don't panic if the
-          sessions you ran are not in the table yet.
+          We update the table below on a weekly basis. Don't panic if the sessions you ran are not in the table yet.
         </p>
         <h2>Calendar visualization:</h2>
         <p>
-          Each small square indicates a day. The shades of the color indicate
-          the number of points you earned on that day. You can hover your mouse
-          over each of the green squares to see the exact date and the number of
-          points you earned on that day.
+          Each small square indicates a day. The shades of the color indicate the number of points you earned on that
+          day. You can hover your mouse over each of the green squares to see the exact date and the number of points
+          you earned on that day.
         </p>
       </Alert>
       <div id="DataVisualization">
@@ -485,8 +444,8 @@ const ExperimentPoints = (props) => {
               itemWidth: 42,
               itemHeight: 36,
               itemsSpacing: 14,
-              itemDirection: "right-to-left",
-            },
+              itemDirection: "right-to-left"
+            }
           ]}
         />
       </div>
@@ -502,10 +461,7 @@ const ExperimentPoints = (props) => {
           loading={!expSessionsLoaded}
         />
       </div>
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </>
   );
 };

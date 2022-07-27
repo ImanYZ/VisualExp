@@ -185,15 +185,14 @@ const AppRouter = props => {
       )}
 
       <Route path="/communities/" element={<Communities />} />
-      {communitiesOrder.map(communi => (
+      {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
-          <Route
-            path={"/community/" + communi.id}
-            element={<Communities commId={communi.id} communiTitle={communi.title} />}
-          />
+          <Route path={"/community/" + communi.id} element={<Communities commIdx={idx} />} />
           <Route
             path={"/interestedFaculty/" + communi.id + "/:condition/:instructorId"}
-            element={<InstructorYes community={communi.title} leader={communi.leaders[0].name} />}
+            element={
+              <InstructorYes community={communitiesOrder[idx].title} leader={communitiesOrder[idx].leaders[0].name} />
+            }
           />
           {fullname && emailVerified === "Verified" && (
             <Route
@@ -249,6 +248,7 @@ const AppRouter = props => {
           </>
         ) : (
           <>
+            <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
             <Route path="*" element={<AuthConsent />} />
           </>
