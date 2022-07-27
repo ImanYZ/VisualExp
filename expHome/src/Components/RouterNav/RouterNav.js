@@ -978,7 +978,7 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-
+                {fullname === "Iman YeckehZaare" && (
                     <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  🧟 negative point.</div>}>
                       <Button
                         id="CodeFeedback"
@@ -987,7 +987,7 @@ const RouterNav = props => {
                       >
                         💬 {positiveCodesPoints}<br /> 🧟 {negativeCodesPionts}
                       </Button>
-                    </Tooltip>
+                    </Tooltip>  )}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
@@ -1006,17 +1006,6 @@ const RouterNav = props => {
                     </Tooltip>
                   </Box> */}
                   </>
-                )}
-                {fullname === "Iman YeckehZaare" && (
-                  <Tooltip title={<div>You've can approve codes added by researchers and participants here 💬 </div>}>
-                    <Button
-                      id="CodeFeedback"
-                      className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
-                      onClick={event => navigate("/Activities/CodeFeedback")}
-                    >
-                      💬
-                    </Button>
-                  </Tooltip>
                 )}
                 {fullname && (
                   <Tooltip title="Account">
