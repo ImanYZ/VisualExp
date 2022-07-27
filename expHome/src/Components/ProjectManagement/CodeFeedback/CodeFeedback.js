@@ -124,7 +124,6 @@ const CodeFeedback = props => {
             aria-label="edit"
             onClick={() => {
               setUpdateCode(cellValues.row.code);
-              setSelectedCode(cellValues.row.code);
               setAdminCodeData(cellValues.row);
               handleOpenAdminEditModal();
             }}
@@ -556,6 +555,12 @@ const CodeFeedback = props => {
   const handleAdminEdit = async () => {
     console.log('adminCodeData', adminCodeData);
     if (adminCodeData?.code && adminCodeData?.title) {
+      let collection;
+      if (adminCodeData.title === "participant") {
+        collection = "experimentCodes";
+      } else {
+        collection = "feedbackCodeBooks";
+      }
       const experimentCodes = [...allExperimentCodes];
 
       // check if the code already exists in approvedCode or unapprovedCode
@@ -569,7 +574,7 @@ const CodeFeedback = props => {
       if (index >= 0) {
         // update the document based on selected code
         firebase.db
-          .collection("feedbackCodeBooks")
+          .collection(collection)
           .where("code", "==", adminCodeData.code)
           .where("project", "==", project)
           .where("coder", "==", adminCodeData.coder)
@@ -583,11 +588,11 @@ const CodeFeedback = props => {
             };
             codeDoc.ref.update(codeUpdate);
             experimentCodes[index] = updateCode;
-            setUpdateCode("");
-            setSelectedCode("");
             setAllExperimentsCodes(experimentCodes);
+            setSnackbarMessage(`Code updated for ${adminCodeData.coder}!`);
+            setAdminCodeData({});
+            setUpdateCode("");
             handleCloseAdminEditModal();
-            setSnackbarMessage("Your code updated!");
           })
           .catch(err => {
             console.error(err);
