@@ -565,7 +565,7 @@ const CodeFeedback = props => {
         return;
       }
 
-      const index = experimentCodes.findIndex(elem => elem === selectedCode);
+      const index = experimentCodes.findIndex(elem => elem === adminCodeData.code);
       if (index >= 0) {
         // update the document based on selected code
         firebase.db
