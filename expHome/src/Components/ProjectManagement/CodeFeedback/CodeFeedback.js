@@ -438,9 +438,9 @@ const CodeFeedback = props => {
           }
         };
         if ("positiveCodingPoints" in researcherUpdates.projects[project]) {
-          researcherUpdates.projects[project].positiveCodingPoints += 0.5;
+          researcherUpdates.projects[project].positiveCodingPoints += 0.25;
         } else {
-          researcherUpdates.projects[project].positiveCodingPoints = 0.5;
+          researcherUpdates.projects[project].positiveCodingPoints = 0.25;
         }
         await researcherRef.update(researcherUpdates);
       }
