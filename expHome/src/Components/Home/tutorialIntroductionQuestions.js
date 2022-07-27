@@ -52,6 +52,38 @@ export default {
         </p>
       </div>
     ),
+    stem:(
+      <div>
+         <p>
+         Say you want to learn a new topic, like data science. Where would you start? Do you look at available courses? Books? 
+         Videos? Something else? After that, what do you do next? Because there is a vast amount of knowledge on the internet, 
+         trying to learn a new topic online can be like a scavenger hunt and jumping from source to source is tough, overwhelming, and tiresome. 
+         </p>
+         <p>
+         Whatever topic someone would want to learn is explained somewhere on the web, but we still pay for textbooks and courses because they provide us with learning pathways. 
+         However, these only have a few authors, and are difficult to improve or update.
+         </p>
+         <p>
+         1Cademy provides a platform for students, instructors, and researchers to collaboratively design learning pathways on every topic on a single shared knowledge graph. 
+         1Cademy is an interactive learning and research community that's crowdsourced by all kinds of different schools and disciplines. These disciplines make up the many research communities in 1Cademy with students and researchers from a large number of schools and research institutions. 
+         These researchers and students share what they find helpful on 1Cademy and meet on a weekly basis to discuss their topics of interest.
+         </p>
+         <img src="/static/tutorial/1CademyIntroductionFundamentals.png" width="100%" />
+          <p>We learn about state-of-the-art topics and find connections that help us form new research ideas. 
+            With a node-based knowledge map system, 1Cademy helps us start learning from advanced topics and go backwards through the prerequisites as needed. This is how researchers start learning new topics. 
+          They specify targets and only learn those prerequisites that are necessary to help them achieve their objectives</p>
+          <p>Each node contains a single block of information. Just summarize, cite the sources, and submit. 
+            Nodes can then be linked to other nodes, to link the highest level concepts of a topic down to its most richly detailed nuance.
+             1Cademy allows users to develop a personalized view of the shared knowledge graph to facilitate exploratory search. 
+             This way users can still navigate through concepts and their prerequisites to learn without having to look up key terms they may not know.</p>
+          <p>Everything on 1Cademy gets peer-reviewed and users vote on each node for its accuracy and dependability - the more upvotes the better.
+             If a node is downvoted enough, users can propose changes, give it an overhaul, or remove it entirely. 1Cademy members are constantly evaluating the effectiveness of content and learning pathways.
+              If someone believes they've found an easier way to explain a concept, they propose it on 1Cademy and the community decides which method is more effective.
+             This way over time, learning through 1Cademy gets easier because any time you may second guess your learning the whole community has your back.</p>
+         <p>Lastly, everything you do on 1Cademy is reflected through the reputation point system. Climb to the top of your community's leaderboard by helping others learn more effectively and in turn deepening your own knowledge. 
+          Every section of 1Cademy encourages fairness and accuracy. Now imagine that new topic you want to study. Doesn't the pathway for learning sound so much easier through 1Cademy? Come join this rapidly evolving community of researchers on your pathway to success.</p>
+      </div>
+),
     video: "vkNx-QUmbNI",
     questions: {
       How_can_1Cademy_help_us: {
@@ -156,6 +188,25 @@ export default {
         </ul>
       </div>
     ),
+    stem:(
+      <div>
+         <p>
+         This is the first video in a series that will cover what a node is on 1Cademy.
+          A node is a single, rectangular box that contains a unit of information that is presented in the title and described in the content.
+         </p>
+         <p>
+         A node represents the smallest unit of knowledge on 1Cademy. Nodes can be used to connect to other nodes. 
+         Every node contains a header, footer, proposer, and type. 
+         There are several node types, including a concept node.
+         </p>
+         <img src="/static/tutorial/WhatIsaNodeOn1Cademy.png" width="100%" />
+         <p>
+         A concept node defines a single concept of information and its definition. Relation nodes compare and explain a relationship between two topics or explain the relationship relating to multiple concepts. Reference nodes display a cited source in an APA format. Idea nodes are new, original ideas that are not summarized from a external source or contain any needed citations. 
+         Question nodes ask a multiple-choice question that user's answer by selecting the options provided. 
+         </p>
+         
+      </div>
+),
     video: "exLS4UadfFU",
     questions: {
       What_is_all_knowledge_on_1Cademy_summarized_into: {
@@ -207,6 +258,17 @@ export default {
     title: newSec() + "1Cademy Introduction: The Shared Knowledge Graph",
     description: "First, please watch this video to learn more about how the 1Cademy knowledge map is organized.",
     video: "Yc3VOpFb8Gc",
+    stem:(
+      <div>
+         <p>
+         The shared knowledge graph is the large shared graph of nodes and prerequisite relations between them. 1Cademy users generate evaluate and improve nodes by proposing changes to the graph. The shared knowledge graph on 1Cademy contains every single node that has been proposed and accepted by 1Cademy users. 
+         </p>
+         <p>
+         It is important to note that every user has access to the contents of the shared knowledge graph, but what a user sees on their 1Cademy knowledge map is known as the personalized knowledge map view.
+         </p>
+        
+      </div>
+    ),
     questions: {
       Users_generate_evaluate_and__: {
         stem: quNum() + "Users generate, evaluate, and ________________ nodes by proposing changes to the graph.",
@@ -243,6 +305,18 @@ export default {
     description:
       "This next video is about creating your own personal knowledge map view from the nodes created in the 1Cademy knowledge graph.",
     video: "IzLaiIboPVE",
+    stem:(
+      <div>
+         <p>
+         1Cademy’s personalized knowledge map view is a visualization of certain nodes and prerequisite links between them which is hierarchically organized and personalized for a specific 1Cademy user. The personalized knowledge map supports four overarching learning activities: navigation, summarization, evaluation, and improvement.
+         </p>
+         <p>
+         Every user's personalized knowledge map view will be different and unique to them. If you choose to hide a node from your map, your personalized knowledge map view will change. It is important to note that closing or hiding a node on your knowledge map will not affect another user's map. Your personalized knowledge map can look like anything you would like it to. If you prefer to have very little nodes in view, you can do that. If you would rather have many nodes open, you can choose to leave as many nodes open as you would like on your map (examples of different knowledge maps shown in video). There are endless ways in which your personalized knowledge map view can be organized, it just depends on what you personally like.
+         </p>
+         <img src="/static/tutorial/PersonalizingYourKnowledgeMap1.png" width="100%" />
+         <img src="/static/tutorial/PersonalizingYourKnowledgeMap2.png" width="100%" />
+      </div>
+    ),
     questions: {
       True_or_False_Closing_a_node_on_your_map_view_changes_everyone_else_s_map_view: {
         stem: quNum() + "True or False? Closing a node on your map view changes everyone else's map view.",
@@ -279,6 +353,21 @@ export default {
     title: newSec() + "1Cademy Introduction: Ways to View Nodes on Your Personalized Map",
     description: "This video explains the different ways nodes can be viewed while you're on 1Cademy",
     video: "6Auq_ZFVD7Q",
+    stem:(
+      <div>
+         <p>
+         A closed node on 1Cademy only has its title visible. To open it, select the left-most button in the node header. 
+         </p>
+         <img src="/static/tutorial/WaystoViewNodesonYourPersonalizedMap1.png" width="100%" />
+         <p>
+         After opening, you will be able to read the content of the node. To close it again, select the same left-most button in the node header.
+         </p>
+         <img src="/static/tutorial/WaystoViewNodesonYourPersonalizedMap2.png" width="100%" />
+         <p>
+         To hide all the offspring of a node, select the middle button in the node header to quickly hide all of the children from your view of the map. Finally, if you want to hide a single node from your view of the map, you can select the “x” button (the right-most button) in the node header to hide it. Examples are explained further in the video.
+         </p>
+      </div>
+    ),
     questions: {
       Which_icon_closes_collapses_a_node_on_your_personalized_knowledge_map_view: {
         stem: quNum() + "Which icon closes (collapses) a node on your personalized knowledge map view?",
@@ -326,6 +415,26 @@ export default {
     title: newSec() + "1Cademy Introduction: Opening Nodes on 1Cademy",
     description: "This video goes over the ways a user can open nodes on 1Cademy.",
     video: "zXedPM2xPCc",
+    stem:(
+      <div>
+         <p>
+         We are going to go over the 10 different ways you can open up a node on your personalized view of the knowledge map.
+         </p>
+         <p>
+         <p>1. Using the search function you can search for any key term on the map. If a node has the term in its title, it will show up in the results. Click on a result to open up that node</p>
+         <p>2. You can use your notifications tab to track any updates made to nodes you've contributed to. To open up a node that someone has voted on or edited, you can click on the notification.</p>
+         <p>3. If you've bookmarked any nodes, when a change is made to the bookmarked node it will show up in the bookmarked updates tab and you can click on it directly to open it on your map.</p>
+         <p>4. The pending list will show all of the pending proposals within your tag. If you open the pending proposals bar, you will see pending proposals listed. Click on one to open up the node which the pending proposal was made to.</p>
+         <p>5. You can also use the chat feature to link nodes so that people can easily access them. Any user of 1Cademy can easily open up a linked node sent in the chat.</p>
+         <p>6. Another way to open up nodes is by going to a user profile by clicking on a profile picture in the leaderboard. Once the profile loads, you can scroll down to see all of the past proposals this user has made. You can click on any proposal to open up that node.</p>
+         <p>7. On any of your open nodes, you can click to view the parent links. To open parents, go to the button underneath the parents or prerequisites section of a node and click on it.</p>
+         <p>8. On any of your open nodes, you can click to view the child links. To open the children, you can either select one of the children listed in the children section of the node or you can select the “All children” button to open up all of them.</p>
+         <p>9. You can also go to the tags and citations section to open up the node that contains the reference. Click on the title listed under “References” to open up the reference node.</p>
+         <p>10. To open up the tag for a node, go to the tags and citation section of a node and click on any of the tags listed under the “Tags” section. </p>
+         </p>
+        
+      </div>
+    ),
     questions: {
       How_many_ways_are_there_to_open_nodes_on_1Cademy: {
         stem: quNum() + "How many ways are there to open nodes on 1Cademy?",
@@ -465,6 +574,19 @@ export default {
     title: newSec() + "1Cademy Introduction: Changing Your Profile Picture",
     description: "We highly encourage you to upload your profile picture by following the procedure in this video.",
     video: "oRv8CEjF1Bw",
+    stem:(
+      <div>
+         <p>
+         Having a profile picture increases your social presence within 1Cademy, therefore it is recommended (but not required) to upload a profile picture of yourself. To change your profile picture, go to the sidebar that is on the left of the page and click on your current profile picture. 
+         </p>
+         <img src="/static/tutorial/ChangingYourProfilePicture1.png" width="100%" />
+         <p>
+         This will bring up your user profile. Next, click on your profile picture again and a file finder window will appear allowing you to browse your files for a new profile picture. 
+         </p>
+         <img src="/static/tutorial/ChangingYourProfilePicture2.png" width="100%" />
+        <p>Once you have your desired image located and selected, you can click “open” to upload your new picture. Once you change your profile picture, every node you have proposed will now have a new profile picture in the footer.</p>
+      </div>
+    ),
     questions: {
       Which_choices_are_true_regarding_your_profile_picture_on_1Cademy: {
         stem: quNum() + "Which choices are true regarding your profile picture on 1Cademy?",
@@ -482,6 +604,20 @@ export default {
     title: newSec() + "1Cademy Introduction: Bookmarking and Marking Nodes as Studied",
     description: "This video goes over how to bookmark nodes and how to mark nodes as studied.",
     video: "ohhJvJ0yhqs",
+    stem:(
+      <div>
+         <p>
+         In this section, we are going to go over marking a node as studied and bookmarking. These two functions are intertwined as marking a node as studied will affect your bookmarks. Marking a node as studied can be a great way to track your progress as you navigate through the 1Cademy map. Any unstudied node on the map will have a red border (this is the default state). When you have gone over a node's content and feel confident with the information, you can click on the envelope icon in the node footer and the border will turn yellow, therefore marking it as studied. It is important to note that if a node you marked as studied is changed in any way, it will default back to the not studied state with a red border. 
+         </p>
+         <img src="/static/tutorial/BookmarkingandMarkingNodesasStudied1.png" width="100%" />
+         <img src="/static/tutorial/BookmarkingandMarkingNodesasStudied2.png" width="100%" />
+         <p>
+         This is why bookmarking can be important because it will help you keep track of nodes that you like that have been updated. When you have found a node on the map that you think is particularly useful, you can bookmark it to be notified of any proposed changes. To bookmark a node, click on the banner icon in the node footer. Any changes to a bookmarked node are reflected in the “bookmarked updates” tab in the sidebar that is to the left of the screen.
+         </p>
+         <img src="/static/tutorial/BookmarkingandMarkingNodesasStudied3.png" width="100%" />
+         <p>A node will only appear in the bookmarked updates tab when it is marked as not studied. To easily navigate to a node in your bookmarked updates tab, click on the node title. Once you have reviewed the changes that have been made to the node you can mark the node as studied again it will disappear from the bookmarked updates tab (until it is edited again). If you do not want to have a node bookmarked anymore, you can simply click on the banner icon again.</p>
+      </div>
+    ),
     questions: {
       Which_icon_at_the_node_footer_should_you_click_to_mark_a_node_as_studied: {
         stem: quNum() + "Which icon in the node footer should you click to mark a node as studied?",
@@ -555,6 +691,18 @@ export default {
     title: newSec() + "1Cademy Introduction: Chatroom",
     description: "In this video, we go over how to use the 1Cademy chatroom.",
     video: "BSmoSN4RTxk",
+    stem:(
+      <div>
+         <p>
+         The chat room feature can be used to send text, images, or specific nodes. All 1Cademy users have access to the chat room, and all the messages sent can be seen by every user. This fosters a collaborative environment and allows users to easily communicate. To access the chat room, go to the sidebar on the left side of the screen and click on “chat.” 
+         </p>
+         <img src="/static/tutorial/Chatroom.png" width="100%" />
+         <p>
+         To send a message, simply type what you would like to say and click “message” to post it. To send an image in the chat, click on the “image” button and a file browser window will appear allowing you to choose an image to send. To post a specific node first make sure that the node you want to post is open, then click on the “node” button. Next, click on the node that you would like to post. To navigate to nodes that other users have sent in the chat, click on the node titles and the node will open on your map.
+         </p>
+        
+      </div>
+    ),
     questions: {
       What_kind_of_messages_can_be_sent_in_the_chatroom: {
         stem: quNum() + "What kind of messages can be sent in the chatroom?",
@@ -593,6 +741,17 @@ export default {
     title: newSec() + "1Cademy Introduction: Search Engine",
     description: "This video goes over how to use the search tool on 1Cademy.",
     video: "WRUld8vA3i4",
+    stem:(
+      <div>
+         <p>In 1Cademy, you can use the search tool to find a specific node, reference, or topic. To search for a node, first click on the orange “search” icon in the sidebar that's to the left of the screen. Then, select the tag you would like to conduct your search in. By default, 1Cademy will search only within your current community tag. If you'd like to search all the tags, unselect all the options. If you’d like to search within multiple tags, you are able to select more than one. </p>
+         <img src="/static/tutorial/SearchEngine1.png" width="100%" />
+         <p>
+         After selecting your tag(s), select the types of nodes you want to search from the drop down menu that's next to the search bar.
+         </p>
+         <img src="/static/tutorial/SearchEngine2.png" width="100%" />
+        <p>Now you're ready to type in what you'd like to search. Once you have your key word or phrase typed out, click on the magnifying glass icon. You will now see a list of results listed in the sidebar.To open one of these results click on the title and it will appear on your map.</p>
+      </div>
+    ),
     questions: {
       How_do_you_search_within_all_community_tags: {
         stem: quNum() + "How do you search within all community tags?",
@@ -619,6 +778,13 @@ export default {
     description:
       "Now, it is time for you to change your default tag. Please watch this video to help you change it to the correct community tag that you are a member of, otherwise you'll not receive points on the community leaderboard.",
     video: "D_2A4s__SfM",
+    stem:(
+      <div>
+         <p>To change your 1Cademy community membership, the first thing you will need to do is to make sure the node you want to tag your community membership as is open on your map. If it is not, you can easily use the search function to perform a keyword search and open it up. Once you have the default tag open on your map, you can now change your community membership by first going to user profile and clicking on your community membership or tag. </p>
+         <p>After you click this button, you will see a prompt in red that says “click the node you would like to link to.” Now all you have to do is click the node you would like to set as your community tag. When you exit out of your user profile, you will see that your leaderboard in the sidebar also reflects this change.</p>
+         <img src="/static/tutorial/ChangingYourDefaultCommunityTag.png" width="100%" />
+      </div>
+    ),
     questions: {
       How_can_you_change_your_default_tag_on_1Cademy: {
         stem: (
@@ -679,6 +845,15 @@ export default {
     title: newSec() + "1Cademy Nodes: Node Header",
     description: "This video goes over the node header.",
     video: "m6qIjU4tpL4",
+    stem:(
+      <div>
+         <p>To close a node, select the far left button on the header toolbar. This will minimize the node, only displaying the node header, title, and part of the footer.</p>
+         <img src="/static/tutorial/NodeHeader1.png" width="100%" />
+         <p>To open the node back up select the same button.</p>
+         <img src="/static/tutorial/NodeHeader2.png" width="100%" />
+         <p>When the node you are viewing has children open, you can select the middle button in the node header to hide all the offsprings of the node. The right-most button in the header you can use to hide the node completely from your map.</p>
+      </div>
+    ),
     questions: {
       What_functions_are_in_the_node_header: {
         stem: quNum() + "What functions are in the node header?",
@@ -697,6 +872,17 @@ export default {
     title: newSec() + "1Cademy Nodes: Node Footer",
     description: "This video goes over the node footer.",
     video: "mhj3OeF1iFQ",
+    stem:(
+      <div>
+       
+         <p>There are many icons and buttons along the node footer. First, on the far left you will see the top contributor or proposer of the node. Next to the profile picture, is an icon that shows the node type. Next to that, you will see the adjust node height button. You can select this when your nodes are overlapping and you cannot read your content. To the right of that, you will see the narration button. Select this to have the node content read out loud for you. After the narration button, there is the version history button with the calendar icon. When you select this, a sidebar will pop up showing you all the previous versions and edits proposed on a node. You can also see when the last edit was made next to the calendar icon.</p>
+         <img src="/static/tutorial/NodeFooter1.png" width="100%" />
+         <p>The pencil button will allow you to edit the node’s content directly or add a child node. The number next to the pencil indicates how many different proposed edits have been made to this node. Next you will see the tags and citations button. If you click this, you will be able to see the references and the different tags associated with a node.</p>
+         <img src="/static/tutorial/NodeFooter2.png" width="100%" />
+         <p>To the right of that you will see the downvote button. If you find that a node is not organized properly, inaccurate, or unhelpful, you can vote to delete it. Alternatively, the upvote button will allow you to vote to prevent further changes. You should use this for nodes that you find helpful. Note that up/downvoting a node directly impacts all the accepted proposals in the edit history of the node, proportionally based on their total upvotes minus downvotes. This consequently impacts the reputation points of the users who contributed those proposals. This is because in the history of evolution of a node, each accepted proposal has contributed to the extent that it has received upvotes minus downvotes and users' expressions of helpfulness/unhelpfulness of each nodes should impact all the proposals that have contributed to the evolution of the node.</p>
+         <p>The next button, a banner icon, allows you to bookmark a node for later use. Next, you can use the envelope button to mark a node as studied. This is a great way to track your progress as you navigate through the map. Finally, you can click the right-most button to view the parents and children of a node.</p>
+      </div>
+    ),
     questions: {
       Which_icon_should_you_click_to_get_access_to_the_node_s_parent_and_child_links: {
         stem: quNum() + "Which icon should you click to get access to the node's parent and child links?",
@@ -772,6 +958,11 @@ export default {
   Nodes_Node_Body: {
     title: newSec() + "1Cademy Nodes: Node Body",
     description: "This video goes over the node body.",
+    stem:(
+      <div>
+         <p>The body of a node includes its title and content. First, the title of each node should clearly, concisely, and comprehensively introduce the information that will be elaborated on in the content. Creating a complete and clear node title improves the searchability and the comprehensibility of the node itself. Next, the content of the node should elaborate on the information presented in the node title. This information should also be clear, concise, and comprehensive.</p>
+      </div>
+    ),
     video: "pRK5SpjMPlI",
     questions: {
       What_components_does_the_node_body_contain: {
@@ -800,6 +991,13 @@ export default {
     title: newSec() + "1Cademy Nodes: Types of Nodes",
     description: "This video goes over the types of nodes.",
     video: "UD9kCb9LKWU",
+    stem:(
+      <div>
+         <p>There are six different types of nodes on 1Cademy: concept, relation, question, code, reference, and idea. You can tell the type of node by looking at the icon next to a profile picture on the bottom left hand corner of each node. </p>
+         <img src="/static/tutorial/TypesofNodes.png" width="100%" />
+         <p>Each type of node presents a certain piece of information. For example, a concept node defines a concept from an external source. However, an idea node shows an original thought or idea from the proposer.</p>
+      </div>
+    ),
     questions: {
       Which_of_the_following_types_of_nodes_exist_on_1Cademy: {
         stem: quNum() + "Which of the following types of nodes exist on 1Cademy?",
@@ -820,6 +1018,14 @@ export default {
     title: newSec() + "1Cademy Nodes: Concept Nodes",
     description: "This video introduces the purpose of concept nodes on 1Cademy.",
     video: "stRxLxXVsGw",
+    stem:(
+      <div>
+         <p> A concept node displays a single concept and its definition. You can tell if a node is showing a concept by hovering over the icon that is next to the profile picture on the bottom left-hand corner of the node.</p>
+         <img src="/static/tutorial/ConceptNodes.png" width="100%" />
+         <p>There are two different types of concepts that you will find on 1Cademy. A superordinate which is a general topic and subordinate which is a specific category. Language is an example of a superordinate concept as it is a general topic that includes a lot of other more specific concepts. </p>
+         <p>An example of a subordinate concept includes language comprehension because it is a subordinate topic within the superordinate topic: language. It is important to note that it does not matter whether a concept is superordinate or subordinate, all concepts on 1Cademy will be indicated by the concept node</p>
+      </div>
+    ),
     questions: {
       A_concept_node: {
         stem: quNum() + "A concept node:",
@@ -849,6 +1055,17 @@ export default {
     description:
       "Understanding the difference between relation nodes and concept nodes can be difficult. Please watch this video to gain a deeper understanding of the differences between these two types of nodes.",
     video: "Z9TzJUuLj9A",
+    stem:(
+      <div>
+         <p>Learning the difference between concept nodes and relation nodes on 1Cademy is one of the biggest challenges while proposing content on the knowledge graph. So, here are a few methods for figuring out whether a new node you are proposing should be a concept or a relation node. The first step is to think through what layout your node will have. Many relation nodes will be in the form of bulleted lists while concept nodes will most be be in paragraph form. However, this is not always the case as every once in a while you will have a bulleted list that is actually a concept node or a relation node that is in paragraph form. So even though knowing the the layout of your node can help in a terms of a realizing whether it is a concept node or a relation node, there are still more steps and critical thing necessary to truly nail down what type of node your node should be.</p>
+         <p>The second step is to think through what the purpose of your node will be. If the node exists to introduce a new piece of information onto the map, it is a concept node. While all child nodes are related to their parent node, concept nodes define or describe a piece of information that can stand on its own. For example, even though the node “homelessness and runaways” is informed by the node “library as a place” by a virtue of being its child, it still shows a singular piece of information that can exist on its own and thus is a concept node.</p>
+         <img src="/static/tutorial/RelationNodesvsConceptNodes1.png" width="100%" />
+         <p>However, a relation node will reflect either how two or more nodes are connected to one another. Or, if it is a bulleted list, all of the bullets will relate to one another as a function of what the what the node is attempting to communicate. So if either of those cases are a true, then that is a a good sign that your node will be a relation node.</p>
+         <img src="/static/tutorial/RelationNodesvsConceptNodes2.png" width="100%" />
+         <p>However, there are cases where a node with the layout and purpose of a concept node are still a relation node so more evaluation and critical thinking about the node may still be necessary.</p>
+         <p>The final step and perhaps the most difficult, is to understand the transformative nature of the node you are proposing. What this means is if adding the node changes the meaning or conceptualization of the nodes that come before it. For example adding a concept node after a parent node does not change anything about the meaning of the parent node or how we conceptualize it. However, a relation node is transformative and will change our conceptualization of its parent nodes. For an example, we examine the node “Contested Definitions of Non-Formal and Informal Education” (shown in video). At first glance, it may seem like a concept node. It has the layout most often ascribed to concept nodes and it shows a singular idea that arguably can stand on its own. However, what makes it a relation node is its transformative nature. Through this node, the conceptualization of its parents, that being “non-formal education” and “informal education,” is changed and the node itself shows a relationship between the definitions of non-formal and informal education. So, in fact, the “Contested Definitions of Non-Formal and Informal Education” node is a relation node. This is definitely the most difficult way to comprehend the difference between concept and and relation nodes and is the one that requires the most critical thinking, but it is the most useful especially when you are proposing a node that arguably could either be a concept or a relation node.</p>
+      </div>
+    ),
     questions: {
       A_relation_node____________topics_and_a_concept_node___________topics: {
         stem: quNum() + "A relation node __________ topics, and a concept node _________ topics.",
@@ -907,6 +1124,14 @@ export default {
     title: newSec() + "1Cademy Nodes: Code Nodes",
     description: "This video goes over the purpose of code nodes on 1Cademy and how to create them.",
     video: "C0r6W2gC_Wc",
+    stem:(
+      <div>
+         <p>A code node displays a code snippet of a specified programming language. You can tell if a node is a code node by hovering over the icon located next to the profile picture on the bottom left hand corner.</p>
+         <img src="/static/tutorial/CodeNodes.png" width="100%" />
+         <p>There are four languages that can be specified in codenodes on 1Cademy: Python, R, HTML, and Javascript (examples shown in video). It is important to note that each node is color-coded according to the specified language.</p>
+        
+      </div>
+    ),
     questions: {
       What_languages_can_be_specified_in_code_nodes: {
         stem: quNum() + "What languages can be specified in code nodes?",
@@ -946,6 +1171,15 @@ export default {
       </div>
     ),
     video: "2mFzBfEX9mE",
+    stem:(
+      <div>
+         <p> In this video, we discuss reference nodes. A reference node contains a single citation that references a source used to summarize information. On 1Cademy, reference nodes cannot cite a book chapter, video section, or webpage. </p>
+         <p>The icon shown on the screen in the bottom corner of the node indicates the node type as a reference node. Reference nodes are always cited in an APA format. They include citations for videos, scholarly articles, books, websites, and audio.</p>
+         <p>So, to create a reference node, first you want to click the pencil icon to edit, then you are going to click reference child node. From there you are going to add the title, and in the content put your APA source. In the node, you can add your reason for adding the child reference node and ensure your tags are correct then click propose.</p>
+         <img src="/static/tutorial/ReferenceNodes.png" width="100%" />
+         <p>Shown in the video are examples of videos, scholarly articles, books, webpages, and audio cited into reference nodes. You can cite the specific section of references within a specific node, including a concept, relation, and question node but do not add the specific section of a reference into a reference node. A reference node only contains a single APA citation for the resource used. All citations and reference nodes on 1Cademy are in APA format. </p>
+      </div>
+    ),
     questions: {
       What_format_of_citation_should_be_used_in_reference_nodes: {
         stem: quNum() + "What format of citation should be used in reference nodes?",
@@ -997,6 +1231,12 @@ export default {
       </div>
     ),
     video: "5dXSNS4npFk",
+    stem:(
+      <div>
+         <p>An idea node shows a user's original thoughts or ideas that are not adapted from any external resources. These can be research ideas providing feedback on a node or used for note taking.</p>
+         <img src="/static/tutorial/IdeaNodes.png" width="100%" />
+      </div>
+    ),
     questions: {
       For_what_purpose_should_we_propose_an_idea_node_on_1Cademy: {
         stem: quNum() + "For what purpose should we propose an idea node on 1Cademy?",
@@ -1038,6 +1278,13 @@ export default {
       </div>
     ),
     video: "4lgJqIr1BJA",
+    stem:(
+      <div>
+         <p>A question node contains a user-generated multiple choice question that users can answer by directly selecting one or more options.</p>
+         <img src="/static/tutorial/QuestionNodes.png" width="100%" />
+         <p>When a user selects an answer (either correctly or incorrectly), there is feedback written by the creator of the question explaining why the answer is correct or incorrect.</p>
+      </div>
+    ),
     questions: {
       For_what_purpose_should_we_propose_a_question_node_on_1Cademy: {
         stem: quNum() + "For what purpose should we propose a question node on 1Cademy?",
@@ -1077,6 +1324,21 @@ export default {
       </div>
     ),
     video: "jhFAmGAr2fU",
+    stem:(
+      <div>
+         <p>As a single user, the first thing you need to do is make sure that you set your community tag. As you can see, mine is psychology and to change it I need to click on my profile picture and select the tag button. Here I've decided that I no longer want to be a part of the psychology community and that I'm going to switch to sociology. Once I click the button, you'll see that I'm prompted in red to click the node I would like to link to and I would like to link to sociology. Once it loads, you'll see an update on my profile and when I exit out of my profile you will also see it update on my sidebar. </p>
+         <p>Next thing I have to do is add a reference node, so first I have to identify where all the sociology references are, in this case, they are linked to the relation node sociology references. I select the propose version of this node and then pick the reference child node option and when I do I'll get a blank node that allows me to copy in the citation and the title</p>
+         <img src="/static/tutorial/GettingStartedAsaUser1.png" width="100%" />
+         <p>I've already added my reference node so I'm going to go ahead and cancel that. Now that I've added my citation, I'm going to look at the information I want to summarize. So, there are two different kinds of social structures, one is horizontal and one is vertical and I would like to add the horizontal social structure term to the map.</p>
+        <p>First, I need to find the prerequisite link, the immediate prerequisite link, so starting out in sociology, I'm going to start opening children until I distill the information far enough where I find the immediate prerequisite. I see that sociological structures are already added as a child so I'm going to go ahead and open that and see what it has to offer. I see that sociological structures are the different structures that societies are organized in and they can either be classified as horizontal or vertical. This is exactly where I want to add my content, I'll look at the children that already exist just to make sure that the information I want to add is not already on the map. So, I'll click to view the parent and child nodes and I see that the horizontal social structure has not been added as a child yet. So, I'll propose an edit to add a concept node, because horizontal social structures is a concept, and I'll see a blank node pop up.</p>    
+        <img src="/static/tutorial/GettingStartedAsaUser2.png" width="100%" />
+        <img src="/static/tutorial/GettingStartedAsaUser3.png" width="100%" />
+        <p>You want to title your node as specifically, clearly, and concisely as possible. I'm going to just title the child node by what i'm defining, which is the horizontal social structure and then I need to define it in my own words. All content on 1Cademy should be paraphrased in your own words to help your learning and make sure that we're not actually plagiarizing. So the horizontal structure lets me refer to my source again, which is the social relationships and the social and physical characteristics of communities to which individuals belong. In my own words, I'm going to talk about how horizontal social structures refer to the relationships and communities that are connected to individuals. </p>
+        <p>This is the first draft of my node, later we'll talk about the peer review process and I'm counting on the other people in my community to come in and help me improve this node as best we can, but for now what i'm going to do is go ahead and cite my reference. All you have to do is click cite an existing reference and then select the reference node that you want to cite, also this is chapter 1.2 Understanding Society, so i'm going to specify the chapter, page number or the url that you want to use. I'm going to propose the node and I'll see that it now exists.</p>
+        <img src="/static/tutorial/GettingStartedAsaUser4.png" width="100%" />
+        <img src="/static/tutorial/GettingStartedAsaUser5.png" width="100%" />
+      </div>
+    ),
     questions: {
       What_should_your_first_step_be_as_a_new_user_on_1Cademy: {
         stem: quNum() + "What should your first step be as a new user on 1Cademy?",
@@ -1141,6 +1403,15 @@ export default {
     title: newSec() + "1Cademy Proposal System: Prerequisite Linking on 1Cademy",
     description: "This video defines prerequisite linking and how it is used on 1Cademy",
     video: "76MSksNQYN0",
+    stem:(
+      <div>
+         <p>To help you better understand the structure of information on 1Cademy, we are going to go over prerequisite linking. First, we're going to break down the term and then we will define it within the context of 1Cademy. Breaking down the term “prerequisite linking,” we see that “prerequisite” is the knowledge or information required before one can proceed to learning any new knowledge or information. So for example, you need to learn <strong>how to count</strong> (prerequisite information) before you can learn <strong>how to add</strong>  (new information). Then, “linking” is defined as connecting one thing to something else - like moving from counting to adding.</p>
+         <img src="/static/tutorial/PrerequisiteLinkingon1Cademy1.png" width="100%" />
+         <p>When we put the terms together, we see that prerequisite linking is when new units of information are connected to foundational units of information. These foundational units need to be learned before one can move onto the new units. </p>
+         <img src="/static/tutorial/PrerequisiteLinkingon1Cademy2.png" width="100%" />
+         <p>Prerequisite linking on 1Cademy is defined as: the nodes are organized in a hierarchy where what is needed to learn a concept is connected as a parent node. Looking at an example on the 1Cademy map, you can see that you need to know what concepts are before learning what a conceptual model is, and you need to know what a conceptual model is before you can understand concept mapping. You will see that the parent nodes are linked on the left, and the green arrow denotes the child node linked on the right (example is explained in the video).</p>
+      </div>
+    ),
     questions: {
       What_do_you_think_the_phrase_prerequisite_relation_means: {
         stem: quNum() + 'What does the phrase "prerequisite link" mean? (Please select all that apply.)',
@@ -1206,6 +1477,15 @@ export default {
     description:
       "This video goes over how to find the immediate prerequisite information when you want to add nodes to the 1Cademy map.",
     video: "2idtxBKxS08",
+    stem:(
+      <div>
+         <p>The first step in adding a new node to 1Cademy is finding the immediate prerequisite or the parent node. All parent nodes should contain the direct or immediate prerequisite information that a user needs to understand or learn through a follow-up child node. Users must first find or add the parent node that contains the immediate prerequisite information to the child node that they want to add. </p>
+         <p>You can check to see if the immediate prerequisite already exists on the map or you can add or link the prerequisites that are necessary for the information that you want to add. First, do a search for the immediate prerequisite, using the search feature. You can watch the video by using the search feature on 1Cademy to help you out. If you use a search feature you can perform a keyword search to look for terms that might be in an immediate prerequisite node.</p>
+         <p>A user can also click through the links in the area that they want to add their node to and as they click through the links they might find that the immediate prerequisite already exists. If your immediate prerequisite does not already exist in your area of the map, or if it does exist somewhere else, what you're going to have to do is link it to your area of the map.</p>
+         <p>Alternatively, you could add a node to your area of the map and link your child node there. Sometimes, you will have to go through all the ancestor or all the prerequisites available within the topic. These ancestors may provide prerequisite information but they may not provide the direct or immediate prerequisite information, therefore, you should go through these nodes until you find the gap in knowledge and add your own prerequisites.</p>
+         <p>So, the direct information needed for your new child node will now exist on the map. Those are the two main ways you can either look to see if an immediate prerequisite already exists, add or link your own prerequisites to make sure that your new child node has the direct prerequisite information it needs so that users can learn through the links on 1Cademy without any gaps in knowledge.</p>
+      </div>
+    ),
     questions: {
       When_can_a_node_be_defined_as_a_parent_node_on_1Cademy: {
         stem: quNum() + "When can a node be defined as a parent node on 1Cademy?",
@@ -1233,6 +1513,15 @@ export default {
     description:
       "This video goes over the process a user might go through while trying to find an immediate prerequisite node.",
     video: "fc6varqBW4s",
+    stem:(
+      <div>
+         <p>To begin, I want to add the node open access publishing to the map. I searched for open access publishing and it doesn't show up, but open access does and I know that open access offers prerequisite knowledge to my proposed node.</p>
+         <img src="/static/tutorial/DemonstrationofFindingtheImmediatePrerequisite1.png" width="100%" />
+         <p>I click on open access to go to that node and here I can see what relationships it has by viewing the parent and child nodes. I can also navigate to this prerequisite node by browsing through the map.</p>
+         <img src="/static/tutorial/DemonstrationofFindingtheImmediatePrerequisite2.png" width="100%" />
+         <p>Let's start with the node, types of librarianship and move over to the academic librarianship node, as I think this is a common topic in that field, then we move to topics in Academic Librarianship, which takes us to open access. I need to know what open access is before I can understand the concept of open access publishing, so I want to add open access publishing as a child node to open access; however, after considering what open access entails I realize there are many other topics in open access. So, it would be better to add a child relation node to open access for topics and open access first. Alternatively, we could link any appropriate prerequisite that already exists on the map by editing that node to add open access as a parent once the knowledge gap is filled with the appropriate prerequisite nodes. Then, I can link my open access publishing node to the topics in the open access node as a child concept node.</p>
+      </div>
+    ),
     questions: {
       What_is_the_first_step_in_finding_a_parent_node_on_1Cademy: {
         stem: quNum() + "When proposing a new node, what is the first step to find a potential parent node?",
@@ -1250,6 +1539,11 @@ export default {
     description:
       "Now that you are well versed in prerequisite and immediate prerequisite linking, it is time to learn about proposals on 1Cademy.",
     video: "9dKL7ojJvro",
+    stem:(
+      <div>
+         <p>The proposal system enables the creation, evaluation, and improvement of nodes and prerequisite links on the 1Cademy shared knowledge graph. It also supports peer review and reputation building through proposing and editing notes as well as voting on node proposals. A node proposal on 1Cademy is needed to add a new node or modify an existing node on the shared knowledge graph.</p>
+      </div>
+    ),
     questions: {
       For_what_purposes_should_we_submit_a_proposal_on_1Cademy: {
         stem: quNum() + "For what purpose(s) should we submit a proposal on 1Cademy?",
@@ -1273,6 +1567,15 @@ export default {
     title: newSec() + "1Cademy Proposal System: Proposing a Child Node on 1Cademy",
     description: "This video gives an overview of the steps to proposing a child node on 1Cademy.",
     video: "bhMvCqXbvbg",
+    stem:(
+      <div>
+         <p>To propose a child node, you first need to find the immediate prerequisite or parent node and click the pencil button to propose a change to that parent node. </p>
+         <img src="/static/tutorial/ProposingaChildNodeon1Cademy1.png" width="100%" />
+         <p>When you click the pencil button, a list of child node types will pop up on the left-hand side. Then, select which type of node you want to propose, and a template will show up on your map.</p>
+         <img src="/static/tutorial/ProposingaChildNodeon1Cademy2.png" width="100%" />
+         <p> Now you can fill in the title and the content in the new node template. Next, you will want to link a reference node to cite the information you are summarizing in the title and content. You will also want to check the tag of the node to make sure it is tagged in the correct area on 1Cademy. Finally, check to make sure all the information is correct and click the green propose button in the bottom left-hand side of the node, and that is how you propose a child node on 1Cademy.</p>
+      </div>
+    ),
     questions: {
       How_many_steps_are_there_to_proposing_a_child_node_on_1Cademy: {
         stem: quNum() + "How many steps are there to proposing a child node on 1Cademy?",
@@ -1290,6 +1593,18 @@ export default {
     title: newSec() + "1Cademy Proposal System: Proposing an edit on 1Cademy",
     description: "This video goes over how to propose an edit to a node on 1Cademy.",
     video: "rb0-ZvYTavE",
+    stem:(
+      <div>
+         <p>It is recommended that you consider editing a node before downvoting it, especially if you think it could be improved. First, go to the node that you want to propose an edit for and select the pencil icon from the bottom menu. The left sidebar will open, showing you the options available. At the bottom of the list, you will see the edit or improve this node option, and beneath this list, you will see any currently pending proposals where you're welcome to vote on proposals.</p>
+         <img src="/static/tutorial/ProposinganEditon1Cademy1.png" width="100%" />
+         <p>Select the “edit or improve this node option”, and you will be returned to your selected node, which is now available for editing. Here, you can change the title. This will open the search option on the left so you can check for existing nodes with that title. You can also alter the content within the node and provide a reason for the proposed edit so that others can review your recommendation and vote on your proposed edit.</p>
+         <p>If you look beneath the explanation field, at the bottom of the node, you will see the “references and tags” option is open, revealing that you can delete current links to a reference, enter a page number for the existing reference, enter a timestamp for voice or video material, and you can cite an existing reference. When you select “cite an existing reference”, you will see a message appear that instructs you to click the node you'd like to link to then navigate over to the desired reference node and you click it, which returns you to your edit proposal node now showing the added citation.</p>
+         <img src="/static/tutorial/ProposinganEditon1Cademy2.png" width="100%" />
+         <p>If you look to the node’s bottom right, you see the current tags, which you can also remove or add an existing tag. In adding an existing tag, this option will instruct you to click the node you'd like to link to, navigate to the desired node, and select. The new tag will appear in the edit proposal node. When you select the image icon, it will open your local file explorer so that you can select your proposed image. You can also select the parent and child nodes to view on the left; you have the option of linking to an existing parent. Once selected, you are prompted to click the node you want to add as a parent. On the right, you have the option to remove existing child nodes or link to an existing child node which will also ask you to click the node to be added as a child node.</p>
+         <img src="/static/tutorial/ProposinganEditon1Cademy3.png" width="100%" />
+         <p>If you want to remove a parent node from your current edit proposal node, select a new parent node here before proposing a separate edit to remove this child node from the old parent node. Once you are satisfied with your proposed edits, you can click the propose button or cancel if you have changed your mind, and this is how you propose an edit in 1Cademy.</p>
+      </div>
+    ),
     questions: {
       What_can_users_edit_in_a_node: {
         stem: quNum() + "What can users edit in a node?",
@@ -1331,6 +1646,14 @@ export default {
       </div>
     ),
     video: "KaKYHZgQ7aM",
+    stem:(
+      <div>
+         <p>Once you make a proposal it will either be immediately accepted or sent to the pending proposals list. The route it takes depends on how many upvotes and downvotes there are for the edited node. The total number of downvotes is subtracted from the total number of upvotes. If this number is less than three, any proposals will automatically be accepted and if this number is more than three, such as with the Library Science node, which has eight upvotes and zeroes downvotes, the proposal will go to the pending proposals list.</p>
+         <p>The pending proposal list is based on your community tag and can be found on the sidebar. In evaluating a pending proposal, click on the proposal in the pending list, the node that the proposal is for will pop up. Then, click propose/evaluate versions of this node, located at the bottom of the node, and click on the pending proposal you want to evaluate.</p>
+         <p>Evaluate whether you think the proposal is helpful or unhelpful by looking at the parent or ancestor nodes to understand the node you are editing. The proposal will be accepted when it receives a sum of upvotes minus downvotes equal to over half the sum of upvotes minus downvotes to the node it is changing. So, for the Focuses of Library Science node that has thirteen upvotes, any proposal will need to get seven upvotes to go through. </p>
+         <p>Pending proposals cannot be downvoted off of the pending proposals list. To evaluate them, you should open the list of pending proposals on a specific node by clicking the pencil button on the node. Pending proposals will continue to get up or down votes until they either qualify as an accepted edit or the original creator deletes the proposal.</p>
+      </div>
+    ),
     questions: {
       Can_a_node_be_downvoted_off_the_pending_proposals_list: {
         stem: quNum() + "Can a node be downvoted directly off the pending proposals list?",
@@ -1429,6 +1752,19 @@ export default {
       </div>
     ),
     video: "zrVh93YXHfY",
+    stem:(
+      <div>
+         <p>Research papers are structured differently than a textbook. We want to ensure we know how to summarize research papers and apply that information when proposing nodes on 1Cademy. The general process for proposing new information to the platform is to find the appropriate area of the map. Then, propose a reference node for your source. Next, find the immediate prerequisite for the new content you'd like to add and propose your nodes.</p>
+         <p>Some considerations for research papers; make sure to summarize the paper's findings as discrete concepts and relations. You don't want to have multiple concepts all in the same node. You also don't need to propose a node for every section of the research paper. You don't need to have a methods node or an analysis node but include nodes based on the concepts rather than the structure of the paper. That means you don't need to summarize the entire paper when you're adding new content from it on the platform. Focus mostly on the findings, their discussion, and what they contributed to the body of knowledge for the field they’re studying.</p>
+         <p>For example, take a paper about teaching specifically about Dialogic Pedagogy. Pedagogy is an approach to teaching. Dialogic means discussion based. So, for this example, I would work in the education area on the 1Cademy platform. Once you have found the specific topics your paper focuses on, use the search tool, or navigate through the nodes on the platform to find where your content will need to be added.</p>       
+         <img src="/static/tutorial/SummarizingaPaperon1Cademy1.png" width="100%" />
+          <p>The first thing you will add is a reference node. That way you can use this node when you're citing later nodes. Each broad topic on 1Cademy should have a reference parent node, and this is where you'll add the reference node for your paper. It is important to make sure you use APA format when you are adding this new reference node. Once you have done that, your next step is to find the specific nodes that will be the immediate prerequisite for the content you want to add. Make sure that you're not duplicating content that already exists on the map. If the immediate prerequisite that you need doesn't exist, then you can always propose it.</p>
+          <img src="/static/tutorial/SummarizingaPaperon1Cademy2.png" width="100%" />     
+         <p> Your next step is to propose the nodes. Make sure that you are paraphrasing or summarizing information. We don't use direct quotes on 1Cademy. You also should be citing the page numbers for the paper when adding content for each node. Keep in mind what concepts the research paper is contributing to the larger body of knowledge for the field. For example, in the earlier mentioned pedagogy paper, what new concepts is the paper contributing to the field of education?</p>
+         <img src="/static/tutorial/SummarizingaPaperon1Cademy3.png" width="100%" /> 
+         <p>Still using the pedagogy paper as an example, on 1Cademy, there are no nodes about the pedagogy paper’s methods, specifically there are no nodes about the literature review. All of the information has been summarized conceptually. However, there is an immediate prerequisite node called Discussion in Education. The prerequisite already existed, so I did not need to create a prerequisite for myself. The paper went over several different features of discussion in education, discussing some theories of dialogic teaching. I then added some nodes after these child relation nodes about dialogism and sociocultural theory of learning. I found that the third theory it discusses, social constructivism, already exists and linked it to my relation node Theories of Dialogistic Teaching as a child node. I have also added nodes on the features of dialogic teaching and obstacles to dialogic teaching that the paper discusses, but I do not have any specific nodes based on the structure of the paper, only concepts proposed or discussed in the paper.</p>
+      </div>
+    ),
     questions: {
       When_summarizing_a_research_paper_should_you_propose_nodes_about_each_section_in_the_paper: {
         stem: quNum() + "When summarizing a research paper, should you propose nodes about each section in the paper?",
