@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
+import { DataGrid } from "@mui/x-data-grid";
+import GridCellToolTip from "../../GridCellToolTip";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -8,21 +10,15 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Sheet from "@mui/joy/Sheet";
-import { DataGrid } from "@mui/x-data-grid";
-import GridCellToolTip from "../../GridCellToolTip";
 
 import Typography from "@mui/material/Typography";
 import IconButton from '@mui/material/IconButton';
 
 import Paper from "@mui/material/Paper";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
-import Button from "@mui/material/Button";
-import CircularProgress from "@mui/material/CircularProgress";
-
 import Box from "@mui/material/Box";
 import Modal from '@mui/material/Modal';
 
-import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
+import { firebaseState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -66,7 +62,8 @@ const codesColumn = [
 
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
-  const fullname = useRecoilValue(fullnameState);
+  // const fullname = useRecoilValue(fullnameState);
+  const email = useRecoilValue(emailState);
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
