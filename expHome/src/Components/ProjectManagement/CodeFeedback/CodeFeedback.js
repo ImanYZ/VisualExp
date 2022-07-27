@@ -106,6 +106,16 @@ const CodeFeedback = props => {
       }
     },
     {
+      field: "title",
+      headerName: "Title",
+      width: "200",
+      renderCell: cellValues => {
+        return (
+          <GridCellToolTip isLink={false} cellValues={cellValues} />
+        );
+      }
+    },
+    {
       field: "question",
       headerName: "Question",
       renderCell: cellValues => {
