@@ -559,13 +559,13 @@ const CodeFeedback = props => {
       const experimentCodes = [...allExperimentCodes];
 
       // check if the code already exists in approvedCode or unapprovedCode
-      const checkIfCodeExist = experimentCodes.some(elem => elem === updateCode);
+      const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
       if (checkIfCodeExist) {
         setSnackbarMessage("This code already exists, please try some other code");
         return;
       }
 
-      const index = experimentCodes.findIndex(elem => elem === adminCodeData.code);
+      const index = experimentCodes.findIndex(elem => elem.code === adminCodeData.code);
       if (index >= 0) {
         // update the document based on selected code
         firebase.db
