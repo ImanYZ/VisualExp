@@ -985,7 +985,7 @@ const RouterNav = props => {
                           className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/CodeFeedback")}
                         >
-                          💬 {positiveCodesPoints}<br /> 🧟 {negativeCodesPionts}
+                          💬 {positiveCodesPoints}<br /> ❌ {negativeCodesPionts}
                         </Button>
                       </Tooltip>
                     )}
