@@ -139,7 +139,10 @@ const App = () => {
   // const [fromOptions, setFromOptions] = useState([]);
   // const [linkOptions, setLinkOptions] = useState([]);
   // const [toOptions, setToOptions] = useState([]);
-  const [explanations, setExplanations] = useState(["", ""]);
+  const [explanations, setExplanations] = useState([
+    { explanation: "", codes: [] },
+    { explanation: "", codes: [] }
+  ]);
   const [birthDate, setBirthDate] = useState(null);
   const [major, setMajor] = useState({
     Major: "Information Sciences",
@@ -719,7 +722,10 @@ const App = () => {
           },
           19
         );
-        setExplanations(["", ""]);
+        setExplanations([
+          { explanation: "", codes: [] },
+          { explanation: "", codes: [] }
+        ]);
         setTimer(30 * 60);
         break;
       case 19:
@@ -869,6 +875,7 @@ const App = () => {
             nextStep={nextStep}
             explanations={explanations}
             setExplanations={setExplanations}
+            step={step}
           />
         ) : [6, 8, 12, 15].includes(step) ? (
           // <ConceptMapping cMap={cMap} />

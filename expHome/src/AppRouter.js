@@ -34,7 +34,7 @@ import CommunityApplications from "./Components/Home/CommunityApplications";
 import InstructorYes from "./Components/Home/InstructorYes";
 import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
-import MonitorFeedBack from "./Components/Home/MonitorFeedBack";
+import QuizFeedBack from "./Components/Home/QuizFeedBack";
 
 import { isToday } from "./utils/DateFunctions";
 
@@ -178,7 +178,7 @@ const AppRouter = props => {
               <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
 
               <Route path="/CommunityApplications/*" element={<CommunityApplications communiIds={leading} />} />
-              <Route path={"/MonitorFeedBack/*"} element={<MonitorFeedBack communiIds={leading} />} />
+              <Route path={"/QuizFeedBack/*"} element={<QuizFeedBack communiIds={leading} />} />
             </>
           )}
         </>
@@ -217,7 +217,9 @@ const AppRouter = props => {
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
                 <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
                 <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
-                <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback"/>}/>
+                {email === "oneweb@umich.edu" && (
+                  <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
+                )}
                 <Route
                   path="LifeLog"
                   element={

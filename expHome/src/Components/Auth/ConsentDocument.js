@@ -41,6 +41,9 @@ const ConsentDocument = props => {
           Michigan, School of Information
         </li>
         <li>
+          <strong>Ellie Bossenberger</strong>, Undergraduate in Psychology at Oakland University, Auburn Hills, MI
+        </li>
+        <li>
           <strong>Ember Shan</strong>, Undergraduate at University of Michigan, School of Information
         </li>
         <li>
@@ -62,6 +65,9 @@ const ConsentDocument = props => {
           <strong>Joey Lin</strong>, Bachelor of Science in Neuroscience and Behavior at Vassar College
         </li>
         <li>
+          <strong>Leah ONeill</strong>, Undergraduate at Roosevelt University
+        </li>
+        <li>
           <strong>Lily Margaret DiBartolomeo</strong>, currently a rising senior receiving a BA in Psychology from NYU
         </li>
         <li>
@@ -74,6 +80,9 @@ const ConsentDocument = props => {
         <li>
           <strong>Qiaochu Kang</strong>, Master of Science in Information at New York University, Tandon School of
           Engineering
+        </li>
+        <li>
+          <strong>Rehana Naik Olson</strong>, B.A. in Psychology Carleton College, Northfield, MN
         </li>
         <li>
           <strong>Roman Zapata</strong>, M.S. in Human-Computer Interaction DePaul University
