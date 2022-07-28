@@ -42,7 +42,7 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
-  lifeLogger,
+  lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
 const { card, image } = require("./misinformationExp");
@@ -152,4 +152,4 @@ exports.applicationReminder = functions
 //   .onRun(updateTypesenseIndex);
 
 // LifeLog:
-exports.lifeLogger = functions.pubsub.schedule("every hour").onRun(lifeLogger);
+exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
