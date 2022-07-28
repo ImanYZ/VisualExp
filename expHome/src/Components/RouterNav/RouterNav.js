@@ -697,7 +697,7 @@ const RouterNav = props => {
         <MenuItem
           key={`${proj}MenuItem`}
           selected={index === projectIndex}
-        // onClick={(event) => changeProject(event, index)}
+          // onClick={(event) => changeProject(event, index)}
         >
           {proj}
           <Switch
@@ -781,8 +781,9 @@ const RouterNav = props => {
                     >
                       {projectPoints.onePoints ? (
                         <Tooltip
-                          title={`You've submitted ${proposalsNums[username] ? proposalsNums[username].num : ""
-                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          title={`You've submitted ${
+                            proposalsNums[username] ? proposalsNums[username].num : ""
+                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
                             # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
@@ -979,13 +980,21 @@ const RouterNav = props => {
                       </Tooltip>
                     ) : null}
                     {userEmail === "oneweb@umich.edu" && (
-                      <Tooltip title={<div>You've earned {positiveCodesPoints} total 💬 coding participants responses and {negativeCodesPionts}  🧟 negative point.</div>}>
+                      <Tooltip
+                        title={
+                          <div>
+                            You've earned {positiveCodesPoints} total 💬 coding participants responses and{" "}
+                            {negativeCodesPionts} ❌ negative point.
+                          </div>
+                        }
+                      >
                         <Button
                           id="CodeFeedback"
                           className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/CodeFeedback")}
                         >
-                          💬 {positiveCodesPoints}<br /> ❌ {negativeCodesPionts}
+                          💬 {positiveCodesPoints}
+                          <br /> ❌ {negativeCodesPionts}
                         </Button>
                       </Tooltip>
                     )}
