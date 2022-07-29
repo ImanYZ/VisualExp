@@ -630,37 +630,39 @@ const CodeFeedback = props => {
 
     const feedbackCodeBooksRed = firebase.db.collection("feedbackCodeBooks");
     const questionArray = [1, 2];
-    questionArray.map(async (x, index) => {
-      feedbackCodeBooksRed.add({
-        project,
-        approved: true,
-        code: updateCode,
-        coder: fullname,
-        title: "Researcher",
-        question: (index + 1),
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-      }).then((docRef) => {
-        const experimentCode = {
-          id: docRef.id,
+    try {
+      await questionArray.map(async (x, index) => {
+        const docRef = await feedbackCodeBooksRed.add({
+          project,
+          approved: true,
           code: updateCode,
           coder: fullname,
           title: "Researcher",
           question: (index + 1),
-          checked: "✅"
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+        if (docRef.id) {
+          const experimentCode = {
+            id: docRef.id,
+            code: updateCode,
+            coder: fullname,
+            title: "Researcher",
+            question: (index + 1),
+            checked: "✅"
+          }
+          experimentCodes.push(experimentCode);
         }
-        experimentCodes.push(experimentCode);
-        setAllExperimentsCodes(experimentCodes);
         if (index + 1 === questionArray.length) {
           setUpdateCode("");
           setAdminCodeData({});
           handleCloseAdminAddModal();
+          setAllExperimentsCodes(experimentCodes);
           setSnackbarMessage(`Code Add to both Questions!`);
         }
-      })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-        })
-    });
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   }
 
   return (
@@ -735,8 +737,8 @@ const CodeFeedback = props => {
               "--List-item-paddingRight": "1rem"
             }}
           >
-            {approvedNewCodes.map(code => (
-              <ListItem key={code} disablePadding selected={selected[code]}>
+            {approvedNewCodes.map((code, index) => (
+              <ListItem key={index} disablePadding selected={selected[code]}>
                 <ListItemButton
                 >
                   <ListItemText id={`${code}`} primary={`${code}`} />
@@ -770,8 +772,8 @@ const CodeFeedback = props => {
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {approvedCodes.map(code => (
-                  <ListItem key={code} disablePadding selected={selected[code]}>
+                {approvedCodes.map((code, index) => (
+                  <ListItem key={index} disablePadding selected={selected[code]}>
                     <ListItemButton
                       value={code}
                       onClick={() => {
@@ -797,8 +799,8 @@ const CodeFeedback = props => {
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {sentences.map(sentence => (
-                  <ListItem key={sentence} disablePadding>
+                {sentences.map((sentence, index) => (
+                  <ListItem key={index} disablePadding>
                     <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
                       <ListItemIcon>
                         <Checkbox
@@ -967,7 +969,7 @@ const CodeFeedback = props => {
               style={{ width: '90%' }}
               minRows={5}
               value={updateCode}
-              placeholder={"Update the code here."}
+              placeholder={"Add the code here."}
               onChange={(event) => setUpdateCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
