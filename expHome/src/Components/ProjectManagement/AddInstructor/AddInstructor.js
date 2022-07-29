@@ -16,43 +16,33 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
+import MuiTypography from "@mui/material/Typography";
 
 import { DataGrid } from "@mui/x-data-grid";
 
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
-import {
-  firebaseState,
-  fullnameState,
-  isAdminState,
-} from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
   projectState,
   instructorsState,
   othersInstructorsState,
   instructorsTodayState,
-  upvotedInstructorsTodayState,
+  upvotedInstructorsTodayState
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-import CSCObjLoader from "./CSCObjLoader";
+// import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
-import {
-  isEmail,
-  isToday,
-  isValidHttpUrl,
-  getISODateString
-} from "../../../utils";
+import { isEmail, isToday, isValidHttpUrl, getISODateString } from "../../../utils";
 
 import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
 import "./AddInstructor.css";
 
-const CountryStateCity = React.lazy(() =>
-  import("./CountryStateCity/CountryStateCity")
-);
+const CountryStateCity = React.lazy(() => import("./CountryStateCity/CountryStateCity"));
 
 const prefixes = [
   "1st Lt",
@@ -80,7 +70,7 @@ const prefixes = [
   "Prof",
   "Rabbi",
   "Rev",
-  "Sister",
+  "Sister"
 ];
 
 const occupations = ["Instructor", "Administrator"];
@@ -99,7 +89,7 @@ const occupations = ["Instructor", "Administrator"];
 //   "PHILOSOPHY, RELIGION, & THEOLOGY",
 //   "SOCIAL SCIENCES & LAW",
 // ];
-const majors = communities.map((communi) => communi.title);
+const majors = communities.map(communi => communi.title);
 
 const initialState = {
   country: "🇺🇸 United States;US",
@@ -112,22 +102,21 @@ const initialState = {
   webURL: "",
   GoogleScholar: "",
   citations: 0,
+  interestedTopic: ""
 };
 
 let lastCountry;
 
 const doNothing = () => {};
 
-const renderInstitution = (params) => (
-  <TextField {...params} label="Institution" variant="outlined" />
-);
+const renderInstitution = params => <TextField {...params} label="Institution" variant="outlined" />;
 
-const getCountry = (c) => {
+const getCountry = c => {
   const matches = c.match(/(.+);[A-Z]+/);
   return matches.length > 1 ? matches[1] : "";
 };
 
-const getStateId = (s) => {
+const getStateId = s => {
   const matches = s.match(/(.+);[A-Z]+;[A-Z]+/);
   return matches.length > 1 ? matches[1] : "";
 };
@@ -137,93 +126,101 @@ let instructorsColumns = [
     field: "GoogleScholar",
     headerName: "Google Scholar/ResearchGate Address",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "citations",
     headerName: "Citations",
     type: "number",
-    width: 100,
+    width: 100
   },
   {
     field: "webURL",
     headerName: "Website Address",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={true} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "prefix",
     headerName: "Prefix",
     width: 70,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "firstname",
     headerName: "Firstname",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "lastname",
     headerName: "Lastname",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "email",
     headerName: "Email",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "institution",
     headerName: "Institution",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
+  },
+  {
+    field: "interestedTopic",
+    headerName: "Topic of Interest",
+    width: 130,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
   },
   {
     field: "occupation",
     headerName: "Occupation",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "position",
     headerName: "Position",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "major",
     headerName: "1Cademy Community",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "country",
     headerName: "Country",
     width: 130,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
         <GridCellToolTip
           isLink={false}
@@ -231,13 +228,13 @@ let instructorsColumns = [
           Tooltip={cellValues.value ? getCountry(cellValues.value) : ""}
         />
       );
-    },
+    }
   },
   {
     field: "stateInfo",
     headerName: "State",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return (
         <GridCellToolTip
           isLink={false}
@@ -245,16 +242,16 @@ let instructorsColumns = [
           Tooltip={cellValues.value ? getStateId(cellValues.value) : ""}
         />
       );
-    },
+    }
   },
   {
     field: "city",
     headerName: "City",
     width: 100,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
+    }
+  }
   // {
   //   field: "deleteButton",
   //   headerName: "Delete",
@@ -274,41 +271,27 @@ let othersInstructorsColumns = [
     headerName: "Up Vote",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Up Vote"
-          cellValues={cellValues}
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} actionCell={true} Tooltip="Up Vote" cellValues={cellValues} />;
+    }
   },
   {
     field: "downVote",
     headerName: "Down Vote",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
-      return (
-        <GridCellToolTip
-          isLink={false}
-          actionCell={true}
-          Tooltip="Down Vote"
-          cellValues={cellValues}
-        />
-      );
-    },
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} actionCell={true} Tooltip="Down Vote" cellValues={cellValues} />;
+    }
   },
   {
     field: "comment",
     headerName: "comment",
     width: 250,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
+    }
+  }
 ];
 
 const extraColumns = [
@@ -318,9 +301,9 @@ const extraColumns = [
     type: "number",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "downVotes",
@@ -328,32 +311,32 @@ const extraColumns = [
     type: "number",
     width: 10,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "comments",
     headerName: "comments",
     width: 250,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "explanation",
     headerName: "Extra Information",
     width: 250,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
-  },
+    }
+  }
 ];
 
 instructorsColumns = [...instructorsColumns, ...extraColumns];
 othersInstructorsColumns = [...othersInstructorsColumns, ...extraColumns];
 
-const AddInstructor = (props) => {
+const AddInstructor = props => {
   const firebase = useRecoilValue(firebaseState);
   // The authenticated researcher fullname
   const fullname = useRecoilValue(fullnameState);
@@ -364,29 +347,20 @@ const AddInstructor = (props) => {
   const [instructors, setInstructors] = useRecoilState(instructorsState);
   // The instructors/school administrators added by researchers other than this
   // authenticated researcher
-  const [othersInstructors, setOthersInstructors] = useRecoilState(
-    othersInstructorsState
-  );
+  const [othersInstructors, setOthersInstructors] = useRecoilState(othersInstructorsState);
   // The instructors/school administrators added by this authenticated
   // researcher today.
-  const [instructorsToday, setInstructorsToday] = useRecoilState(
-    instructorsTodayState
-  );
+  const [instructorsToday, setInstructorsToday] = useRecoilState(instructorsTodayState);
   // The instructors/school administrators added by other researchers that this
   // authenticated researcher upvoted today.
-  const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(
-    upvotedInstructorsTodayState
-  );
-
+  const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(upvotedInstructorsTodayState);
   // States for the fileds that the authenticated researcher enters for each
   // instructor/school administrator.
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [explanation, setExplanation] = useState("");
-  const [institution, setInstitution] = useState(
-    "University of Michigan - Ann Arbor"
-  );
+  const [institution, setInstitution] = useState("University of Michigan - Ann Arbor");
   const [institutionInput, setInstitutionInput] = useState("");
   // Every other filed value that the authenticated user can add/modify goes
   // into this state.
@@ -429,21 +403,28 @@ const AddInstructor = (props) => {
   // entry.
   const [comment, setComment] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
+  const [otherInstructorData, setOtherInstructorData] = useState({});
 
-  const loadCSCObj = CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
+  useEffect(() => {
+    setSelectedRows([]);
+    setValues(initialState);
+    setInvalidInstructor("");
+    setFirstname("");
+    setLastname("");
+    setEmail("");
+    setExplanation("");
+  }, [project]);
 
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
-    console.log('loadInstitutions();');
     const loadInstitutions = async () => {
       if (institutions.length === 0) {
-        const institutionsObj = await import(
-          "../../../assets/edited_universities.json"
-        );
+        const institutionsObj = await import("../../../assets/edited_universities.json");
         let institutionsList = institutionsObj.default
-          .filter((l) => ["United States", "Canada"].includes(l.country))
-          .map((l) => l.name);
+          .filter(l => ["United States", "Canada"].includes(l.country))
+          .map(l => l.name);
         institutionsList = [...new Set(institutionsList)];
         setInstitutions(institutionsList);
       }
@@ -455,16 +436,20 @@ const AddInstructor = (props) => {
   // them in instructorsChanges. After that, set INstructorsLoaded to true.
   useEffect(() => {
     if (firebase && project) {
-      console.log('instructorsinstructors');
       setInstructors([]);
       setOthersInstructors([]);
       setInstructorsToday(0);
       setUpvotedInstructorsToday(0);
       setOtherInstructor({});
-      const instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
-      const instructorsSnapshot = instructorsQuery.onSnapshot((snapshot) => {
+      let instructorsQuery;
+      if (project === "Annotating") {
+        instructorsQuery = firebase.db.collection("instructors");
+      } else {
+        instructorsQuery = firebase.db.collection("instructors").where("project", "==", project);
+      }
+      const instructorsSnapshot = instructorsQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setInstructorsChanges((oldInstructorsChanges) => {
+        setInstructorsChanges(oldInstructorsChanges => {
           return [...oldInstructorsChanges, ...docChanges];
         });
         setInstructorsLoaded(true);
@@ -480,20 +465,23 @@ const AddInstructor = (props) => {
   // a new spashot listener to listen to all the instructor votes by the
   // authenticated researcher and save all of them in votesChanges.
   useEffect(() => {
-    console.log('firebase && project && fullname && instructorsLoaded');
     if (firebase && project && fullname && instructorsLoaded) {
-      const instructorVotesQuery = firebase.db
-        .collection("instructorVotes")
-        .where("voter", "==", fullname)
-        .where("project", "==", project);
-      const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(
-        (snapshot) => {
-          const docChanges = snapshot.docChanges();
-          setVotesChanges((oldVotesChanges) => {
-            return [...oldVotesChanges, ...docChanges];
-          });
-        }
-      );
+      let instructorVotesQuery;
+      if (project === "Annotating") {
+        instructorVotesQuery = firebase.db.collection("instructorVotes").where("voter", "==", fullname);
+      } else {
+        instructorVotesQuery = firebase.db
+          .collection("instructorVotes")
+          .where("voter", "==", fullname)
+          .where("project", "==", project);
+      }
+
+      const instructorVotesSnapshot = instructorVotesQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        setVotesChanges(oldVotesChanges => {
+          return [...oldVotesChanges, ...docChanges];
+        });
+      });
       return () => {
         setVotesChanges([]);
         instructorVotesSnapshot();
@@ -501,30 +489,36 @@ const AddInstructor = (props) => {
     }
   }, [firebase, project, fullname, instructorsLoaded]);
 
-  const assignDayUpVotesPoint = async (nUpVotedToday) => {
+  const assignDayUpVotesPoint = async nUpVotedToday => {
     if (nUpVotedToday === 16) {
       const today = getISODateString(new Date());
-      const dayUpVotesDocs = await firebase.db
-        .collection("dayInstructorUpVotes")
-        .where("project", "==", project)
-        .where("voter", "==", fullname)
-        .where("date", "==", today)
-        .limit(1)
-        .get();
+      let dayUpVotesDocs;
+      if (project === "Annotating") {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      } else {
+        dayUpVotesDocs = await firebase.db
+          .collection("dayInstructorUpVotes")
+          .where("project", "==", project)
+          .where("voter", "==", fullname)
+          .where("date", "==", today)
+          .limit(1)
+          .get();
+      }
       if (dayUpVotesDocs.docs.length === 0) {
         try {
-          const dayUpVoteRef = firebase.db
-            .collection("dayInstructorUpVotes")
-            .doc();
+          const dayUpVoteRef = firebase.db.collection("dayInstructorUpVotes").doc();
           await dayUpVoteRef.set({
             project,
             voter: fullname,
-            date: today,
+            date: today
           });
-          await firebase.db.runTransaction(async (t) => {
-            const researcherRef = firebase.db
-              .collection("researchers")
-              .doc(fullname);
+          await firebase.db.runTransaction(async t => {
+            const researcherRef = firebase.db.collection("researchers").doc(fullname);
             const researcherDoc = await t.get(researcherRef);
             const researcherData = researcherDoc.data();
             const researcherDayUpVotePoints = {
@@ -532,22 +526,20 @@ const AddInstructor = (props) => {
                 ...researcherData.projects,
                 [project]: {
                   ...researcherData.projects[project],
-                  dayInstructorUpVotes: 1,
-                },
-              },
+                  dayInstructorUpVotes: 1
+                }
+              }
             };
             if ("dayInstructorUpVotes" in researcherData.projects[project]) {
               researcherDayUpVotePoints.projects[project].dayInstructorUpVotes =
                 researcherData.projects[project].dayInstructorUpVotes + 1;
             }
             t.update(researcherRef, researcherDayUpVotePoints);
-            const researcherLogRef = firebase.db
-              .collection("researcherLogs")
-              .doc();
+            const researcherLogRef = firebase.db.collection("researcherLogs").doc();
             t.set(researcherLogRef, {
               ...researcherDayUpVotePoints,
               id: researcherRef.id,
-              updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
             });
           });
         } catch (err) {
@@ -564,7 +556,6 @@ const AddInstructor = (props) => {
   // Based on the changes to the instructors and votes comming from the database
   // listeners, make the corresponding changes to differnt states.
   useEffect(() => {
-    console.log('instructorsChanges');
     if (instructorsChanges.length > 0) {
       // We make a copy of all the instructor changes and delete all the content
       // of the instructorChanges, so that if new changes come from the database
@@ -582,18 +573,14 @@ const AddInstructor = (props) => {
           // If the instructor was added by the authenticated researcher:
           if (instructorData.fullname === fullname) {
             // Then, we need to remove it from instructors.
-            const instructorIdx = insts.findIndex(
-              (instruct) => instruct.id === change.doc.id
-            );
+            const instructorIdx = insts.findIndex(instruct => instruct.id === change.doc.id);
             if (instructorIdx !== -1) {
               insts.splice(instructorIdx, 1);
             }
           } else {
             // If the instructor was added by other researchers:
             // Then, we need to remove it from othersInstructors.
-            const instructorIdx = oInsts.findIndex(
-              (instruct) => instruct.id === change.doc.id
-            );
+            const instructorIdx = oInsts.findIndex(instruct => instruct.id === change.doc.id);
             if (instructorIdx !== -1) {
               oInsts.splice(instructorIdx, 1);
             }
@@ -608,17 +595,15 @@ const AddInstructor = (props) => {
               comments: [],
               ...instructorData,
               // deleteButton: "❌",
-              id: change.doc.id,
+              id: change.doc.id
             };
-            const instructorIdx = insts.findIndex(
-              (instruct) => instruct.id === change.doc.id
-            );
+            const instructorIdx = insts.findIndex(instruct => instruct.id === change.doc.id);
             // If the instructor previously existed in the instructors, we just
             // need to update it to the new values.
             if (instructorIdx !== -1) {
               insts[instructorIdx] = {
                 ...insts[instructorIdx],
-                ...newInstructor,
+                ...newInstructor
               };
             } else {
               // If the instructor did not previously exist in the instructors,
@@ -638,18 +623,16 @@ const AddInstructor = (props) => {
             const newInstructor = {
               comments: [],
               ...instructorData,
-              id: change.doc.id,
+              id: change.doc.id
             };
             // We check whether the instructor object already exists in
             // othersInstructors, and if it exists, what is its index to update
             // it.
-            const instructorIdx = oInsts.findIndex(
-              (instruct) => instruct.id === change.doc.id
-            );
+            const instructorIdx = oInsts.findIndex(instruct => instruct.id === change.doc.id);
             if (instructorIdx !== -1) {
               oInsts[instructorIdx] = {
                 ...oInsts[instructorIdx],
-                ...newInstructor,
+                ...newInstructor
               };
             } else {
               // If it does not exist, we just push it together with default
@@ -660,7 +643,7 @@ const AddInstructor = (props) => {
                 ...newInstructor,
                 upVote: "◻",
                 downVote: "◻",
-                currentVote: 0,
+                currentVote: 0
               });
             }
           }
@@ -696,9 +679,7 @@ const AddInstructor = (props) => {
         // They only vote on the instructors/school administrators added by
         // other researchers. So, we should find and update the corresponding
         // object in othersInstructors.
-        const oInstsIdx = oInsts.findIndex(
-          (instr) => instr.id === voteData.instructor
-        );
+        const oInstsIdx = oInsts.findIndex(instr => instr.id === voteData.instructor);
         if (change.type === "removed") {
           // If the vote is removed and othersInstructor exists, we should reset
           // its votes and comment and decrement nUpVotedToday only if
@@ -735,7 +716,7 @@ const AddInstructor = (props) => {
               comment: voteData.comment ? voteData.comment : "",
               upVote: voteData.upVote ? "👍" : "◻",
               downVote: voteData.downVote ? "👎" : "◻",
-              currentVote: voteData.upVote - voteData.downVote,
+              currentVote: voteData.upVote - voteData.downVote
             };
           } else {
             // If the othersInstructor object does not exist, create it with
@@ -753,7 +734,7 @@ const AddInstructor = (props) => {
               explanation: "",
               institution: "",
               ...initialState,
-              id: voteData.instructor,
+              id: voteData.instructor
             });
           }
         }
@@ -776,7 +757,7 @@ const AddInstructor = (props) => {
     instructorsChanges,
     othersInstructors,
     fullname,
-    project,
+    project
   ]);
 
   // Every time a chnage happens to othersInstructors, we should look for the
@@ -787,15 +768,17 @@ const AddInstructor = (props) => {
   // equal to 3 votes from researchers, we should remove it from
   // othersInstructors.
   useEffect(() => {
-    console.log('othersInstructors');
     let theInstructor;
     let uInstructorsNum = 0;
     let oInsts = [...othersInstructors];
     let oInstsChanged = false;
     for (let oInstructor of othersInstructors) {
       if (oInstructor.upVote === "◻" && oInstructor.downVote === "◻") {
-        if (oInstructor.upVotes + oInstructor.downVotes >= 3) {
-          oInsts = oInsts.filter((instruct) => instruct.id !== oInstructor.id);
+        if (
+          oInstructor.upVotes + oInstructor.downVotes >= 3 &&
+          (project !== "Annotating" || oInstructor.interestedTopic)
+        ) {
+          oInsts = oInsts.filter(instruct => instruct.id !== oInstructor.id);
           oInstsChanged = true;
         } else {
           if (!theInstructor) {
@@ -818,12 +801,13 @@ const AddInstructor = (props) => {
   // instructors' data grid, we should load that as the other instructor to show
   // it in the upper box to facilitate evaluating (voting) it by the
   // authenticated researcher.
-  const othersInstructorsRowClick = (clickedRow) => {
+  const othersInstructorsRowClick = clickedRow => {
     const theRow = clickedRow.row;
     if (theRow) {
-      const instrIdx = othersInstructors.findIndex(
-        (othInstr) => othInstr.id === clickedRow.id
-      );
+      setOtherInstructorData(theRow);
+      const instrIdx = othersInstructors.findIndex(othInstr => othInstr.id === clickedRow.id);
+      const topic = theRow.interestedTopic ? theRow.interestedTopic : "";
+      setOtherInterestedTopic(topic);
       if (instrIdx !== -1) {
         setOtherInstructor(othersInstructors[instrIdx]);
         setComment(othersInstructors[instrIdx].comment);
@@ -834,7 +818,6 @@ const AddInstructor = (props) => {
   // Validator useEffect: Based on the changes in the input field, we validate
   // them and generate corresponding error messages.
   useEffect(() => {
-    console.log('validwebURL');
     const validwebURL = isValidHttpUrl(values.webURL);
     const validGoogleScholar = isValidHttpUrl(values.GoogleScholar);
     const validEmail = isEmail(email);
@@ -842,21 +825,14 @@ const AddInstructor = (props) => {
     const validLastname = lastname.length > 1;
     if (alreadyExists) {
       setInvalidInstructor(
-        "This instructor with email address " +
-          email +
-          " is already invited to " +
-          "our experiment! Invite another instructor or school " +
-          "administrator please."
+        `This instructor with email address ${email} is already invited to our experiment! Invite another instructor or school administrator please.`
       );
     } else if (!validwebURL) {
       setInvalidInstructor(
-        "Please enter a valid website address that we can get this" +
-          "instructor/administrator's information from!"
+        `Please enter a valid website address that we can get this instructor/administrator's information from!`
       );
     } else if (isNaN(values.citations)) {
-      setInvalidInstructor(
-        "Please enter a valid number of citations from their Google Scholar/ResearchGate profile!"
-      );
+      setInvalidInstructor(`Please enter a valid number of citations from their Google Scholar/ResearchGate profile!`);
     } else if (!validEmail) {
       setInvalidInstructor("Please enter a valid email address!");
     } else if (!validFirstname) {
@@ -875,6 +851,12 @@ const AddInstructor = (props) => {
       setInvalidInstructor("Please specify their related 1Cademy Community!");
     } else if (!values.position) {
       setInvalidInstructor("Please specify their position!");
+    } else if (!values.interestedTopic) {
+      setInvalidInstructor("Please enter their Topic of Interest!");
+    } else if (values.interestedTopic.split(" ").length > 8 || values.interestedTopic.split(",").length > 8) {
+      setInvalidInstructor(
+        "Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this instructor/school administrator."
+      );
     } else {
       setInvalidInstructor("");
     }
@@ -892,24 +874,20 @@ const AddInstructor = (props) => {
     values.city,
     values.major,
     values.position,
+    values.interestedTopic
   ]);
 
   // This is for the vote buttons in the data grid that displays other
   // instructors.
-  const voteOthersInstructors = async (clickedCell) => {
+  const voteOthersInstructors = async clickedCell => {
     if (clickedCell.field === "upVote" || clickedCell.field === "downVote") {
       try {
         let oInstructors = [...othersInstructors];
-        const instructorIdx = oInstructors.findIndex(
-          (instr) => instr.id === clickedCell.id
-        );
-        if (
-          instructorIdx !== -1 &&
-          oInstructors[instructorIdx][clickedCell.field] !== "O"
-        ) {
+        const instructorIdx = oInstructors.findIndex(instr => instr.id === clickedCell.id);
+        if (instructorIdx !== -1 && oInstructors[instructorIdx][clickedCell.field] !== "O") {
           oInstructors[instructorIdx] = {
             ...oInstructors[instructorIdx],
-            [clickedCell.field]: "O",
+            [clickedCell.field]: "O"
           };
           setOthersInstructors(oInstructors);
           // We need to refresh the Firebase Auth idToken because in the
@@ -918,12 +896,10 @@ const AddInstructor = (props) => {
           await firebase.idToken();
           await axios.post("/voteInstructor", {
             instructor: clickedCell.id,
-            vote: clickedCell.field,
+            vote: clickedCell.field
           });
           setComment("");
-          setSnackbarMessage(
-            "You successfully voted for others' instructor/administrator!"
-          );
+          setSnackbarMessage("You successfully voted for others' instructor/administrator!");
         }
       } catch (err) {
         console.error(err);
@@ -932,7 +908,7 @@ const AddInstructor = (props) => {
   };
 
   // This is for the vote buttons in the box above the page that displays the single other instructor.
-  const voteOtherInstructor = (instructorId, voteType) => async (event) => {
+  const voteOtherInstructor = (instructorId, voteType) => async event => {
     try {
       if (!otherVoting) {
         setOtherVoting(true);
@@ -943,11 +919,9 @@ const AddInstructor = (props) => {
         await axios.post("/voteInstructor", {
           instructor: instructorId,
           vote: voteType,
-          comment,
+          comment
         });
-        setSnackbarMessage(
-          "You successfully voted for others' instructor/administrator!"
-        );
+        setSnackbarMessage("You successfully voted for others' instructor/administrator!");
         setOtherVoting(false);
       }
     } catch (err) {
@@ -955,44 +929,40 @@ const AddInstructor = (props) => {
     }
   };
 
-  const changeComment = (event) => {
-    setComment(event.target.value);
-  };
+  const changeComment = event => setComment(event.target.value);
 
   const changeInstitution = (event, value) => setInstitution(value);
 
   const changeInstitutionInput = (event, value) => setInstitutionInput(value);
 
-  const firstnameChange = (event) => {
+  const firstnameChange = event => {
     let fName = event.target.value;
     fName = fName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
     setFirstname(fName);
   };
 
-  const lastnameChange = (event) => {
+  const lastnameChange = event => {
     let lName = event.target.value;
     lName = lName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
     setLastname(lName);
   };
 
-  const emailChange = (event) => {
+  const emailChange = event => {
     setEmail(event.target.value.toLowerCase());
   };
 
-  const explanationChange = (event) => {
-    setExplanation(event.target.value);
-  };
+  const explanationChange = event => setExplanation(event.target.value);
 
   // One handleChnage for all the text fields depending on the
   // event.target.name.
-  const handleChange = (event) => {
+  const handleChange = event => {
     if ("persist" in event) {
       event.persist();
     }
-    setValues((previousValues) => {
+    setValues(previousValues => {
       const newValues = {
         ...previousValues,
-        [event.target.name]: event.target.value,
+        [event.target.name]: event.target.value
       };
       return newValues;
     });
@@ -1001,11 +971,8 @@ const AddInstructor = (props) => {
   // When emailBlur happens, we should check whether this instructor/school
   // administrator was enterred before. In that case, we should return an error
   // message to prevent entering duplicate records.
-  const emailBlur = async (event) => {
-    const instructorDocs = await firebase.db
-      .collection("instructors")
-      .where("email", "==", email)
-      .get();
+  const emailBlur = async event => {
+    const instructorDocs = await firebase.db.collection("instructors").where("email", "==", email).get();
     if (instructorDocs.docs.length > 0) {
       const instructorData = instructorDocs.docs[0].data();
       if (instructorData.deleted) {
@@ -1018,7 +985,7 @@ const AddInstructor = (props) => {
     }
   };
 
-  const clearInstructor = (event) => {
+  const clearInstructor = event => {
     setSelectedRows([]);
     setAlreadyExists(false);
     setInvalidInstructor("");
@@ -1032,7 +999,7 @@ const AddInstructor = (props) => {
       country: values.country,
       stateInfo: values.stateInfo,
       city: values.city,
-      major: values.major,
+      major: values.major
     });
   };
 
@@ -1040,8 +1007,8 @@ const AddInstructor = (props) => {
   // contains the instructors/school administrators that they enterred before,
   // we should populate its data in the above fields so that they can update
   // their previously enterred information.
-  const myInstructorsRowClick = (clickedRow) => {
-    const theRow = clickedRow.row;
+  const myInstructorsRowClick = clickedRow => {
+    const theRow = { ...clickedRow.row };
     if (theRow) {
       setSelectedRows([clickedRow.id]);
       setAlreadyExists(false);
@@ -1062,13 +1029,14 @@ const AddInstructor = (props) => {
         webURL: theRow.webURL,
         GoogleScholar: theRow.GoogleScholar,
         citations: theRow.citations,
+        interestedTopic: theRow.interestedTopic ? theRow.interestedTopic : ""
       });
     } else {
       clearInstructor("Nothing");
     }
   };
 
-  const submitInstructor = async (event) => {
+  const submitInstructor = async event => {
     if (!invalidInstructor) {
       // If a row is selected, it means they're trying to update the record.
       const updating = selectedRows.length > 0;
@@ -1076,13 +1044,10 @@ const AddInstructor = (props) => {
         // We use this flag to check if they updated their existing record to
         // reset its votes in the database.
         let gotUpdated = false;
-        await firebase.db.runTransaction(async (t) => {
+        await firebase.db.runTransaction(async transaction => {
           // First check whether the instructor already exists to make sure they
           // don't add duplicate entries.
-          const instructorDocs = await firebase.db
-            .collection("instructors")
-            .where("email", "==", email)
-            .get();
+          const instructorDocs = await firebase.db.collection("instructors").where("email", "==", email).get();
           let instructorExists = false;
           if (instructorDocs.docs.length > 0) {
             const instructorData = instructorDocs.docs[0].data();
@@ -1100,28 +1065,32 @@ const AddInstructor = (props) => {
           if (instructorExists) {
             setAlreadyExists(true);
           } else {
-            const currentTime = firebase.firestore.Timestamp.fromDate(
-              new Date()
-            );
-            const researcherRef = firebase.db
-              .collection("researchers")
-              .doc(fullname);
+            const currentTime = firebase.firestore.Timestamp.fromDate(new Date());
+            const researcherRef = firebase.db.collection("researchers").doc(fullname);
             const researcherDoc = await researcherRef.get();
             const researcherData = researcherDoc.data();
             const today = getISODateString(new Date());
-            const dayInstructorsDocs = await firebase.db
-              .collection("dayInstructors")
-              .where("project", "==", project)
-              .where("fullname", "==", fullname)
-              .where("date", "==", today)
-              .limit(1)
-              .get();
+            let dayInstructorsDocs;
+            if (project === "Annotating") {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            } else {
+              dayInstructorsDocs = await firebase.db
+                .collection("dayInstructors")
+                .where("project", "==", project)
+                .where("fullname", "==", fullname)
+                .where("date", "==", today)
+                .limit(1)
+                .get();
+            }
 
             let instructorRef = firebase.db.collection("instructors").doc();
             if (updating) {
-              instructorRef = firebase.db
-                .collection("instructors")
-                .doc(selectedRows[0]);
+              instructorRef = firebase.db.collection("instructors").doc(selectedRows[0]);
             }
             const instructorData = {
               project,
@@ -1131,38 +1100,31 @@ const AddInstructor = (props) => {
               email,
               explanation,
               institution,
-              ...values,
+              ...values
             };
             if (updating) {
               instructorData.updatedAt = currentTime;
-              t.update(instructorRef, instructorData);
+              transaction.update(instructorRef, instructorData);
               gotUpdated = true;
             } else {
               instructorData.researcher = fullname;
               instructorData.createdAt = currentTime;
-              t.set(instructorRef, instructorData);
+              transaction.set(instructorRef, instructorData);
             }
-            const instructorLogRef = firebase.db
-              .collection("instructorsLogs")
-              .doc();
-            t.set(instructorLogRef, {
+            const instructorLogRef = firebase.db.collection("instructorsLogs").doc();
+            transaction.set(instructorLogRef, {
               ...instructorData,
-              id: instructorRef.id,
+              id: instructorRef.id
             });
             if (!updating) {
               // If they collect 7 instructors/school administrators' information
               // in a single day, we should giv them a point.
-              if (
-                instructorsToday === 6 &&
-                dayInstructorsDocs.docs.length === 0
-              ) {
-                const dayInstructorRef = firebase.db
-                  .collection("dayInstructors")
-                  .doc();
+              if (instructorsToday === 6 && dayInstructorsDocs.docs.length === 0) {
+                const dayInstructorRef = firebase.db.collection("dayInstructors").doc();
                 await dayInstructorRef.set({
                   project,
                   fullname,
-                  date: today,
+                  date: today
                 });
                 const researcherInstructors = {
                   projects: {
@@ -1170,9 +1132,9 @@ const AddInstructor = (props) => {
                     [project]: {
                       ...researcherData.projects[project],
                       instructors: 1,
-                      instructorsNum: 1,
-                    },
-                  },
+                      instructorsNum: 1
+                    }
+                  }
                 };
                 if ("instructors" in researcherData.projects[project]) {
                   researcherInstructors.projects[project].instructors =
@@ -1182,14 +1144,12 @@ const AddInstructor = (props) => {
                   researcherInstructors.projects[project].instructorsNum =
                     researcherData.projects[project].instructorsNum + 1;
                 }
-                t.update(researcherRef, researcherInstructors);
-                const researcherLogRef = firebase.db
-                  .collection("researcherLogs")
-                  .doc();
-                t.set(researcherLogRef, {
+                transaction.update(researcherRef, researcherInstructors);
+                const researcherLogRef = firebase.db.collection("researcherLogs").doc();
+                transaction.set(researcherLogRef, {
                   ...researcherInstructors,
                   id: researcherRef.id,
-                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
                 });
               } else {
                 // Even if we don't give the authenticated researher a point for
@@ -1201,35 +1161,31 @@ const AddInstructor = (props) => {
                     ...researcherData.projects,
                     [project]: {
                       ...researcherData.projects[project],
-                      instructorsNum: 1,
-                    },
-                  },
+                      instructorsNum: 1
+                    }
+                  }
                 };
                 if ("instructorsNum" in researcherData.projects[project]) {
                   researcherInstructors.projects[project].instructorsNum =
                     researcherData.projects[project].instructorsNum + 1;
                 }
-                t.update(researcherRef, researcherInstructors);
-                const researcherLogRef = firebase.db
-                  .collection("researcherLogs")
-                  .doc();
-                t.set(researcherLogRef, {
+                transaction.update(researcherRef, researcherInstructors);
+                const researcherLogRef = firebase.db.collection("researcherLogs").doc();
+                transaction.set(researcherLogRef, {
                   ...researcherInstructors,
                   id: researcherRef.id,
-                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+                  updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
                 });
               }
             }
-            setSnackbarMessage(
-              "You successfully submitted your instructor/administrator!"
-            );
+            setSnackbarMessage("You successfully submitted your instructor/administrator!");
             clearInstructor("Nothing");
           }
         });
         if (gotUpdated) {
           await firebase.idToken();
           await axios.post("/voteInstructorReset", {
-            instructor: selectedRows[0],
+            instructor: selectedRows[0]
           });
         }
       } catch (e) {
@@ -1238,29 +1194,22 @@ const AddInstructor = (props) => {
     }
   };
 
-  const onKeyPress = (event) => {
+  const onKeyPress = event => {
     if (event.key === "Enter" && !invalidInstructor) {
       submitInstructor();
     }
   };
 
-  const deleteInstructor = async (clickedCell) => {
+  const deleteInstructor = async clickedCell => {
     if (clickedCell.field === "deleteButton") {
       try {
         let instructs = [...instructors];
-        const instructorIdx = instructs.findIndex(
-          (instruct) => instruct.id === clickedCell.id
-        );
-        if (
-          instructorIdx !== -1 &&
-          instructs[instructorIdx][clickedCell.field] !== "O"
-        ) {
+        const instructorIdx = instructs.findIndex(instruct => instruct.id === clickedCell.id);
+        if (instructorIdx !== -1 && instructs[instructorIdx][clickedCell.field] !== "O") {
           instructs[instructorIdx][clickedCell.field] = "O";
           setInstructors(instructs);
-          const instructorRef = firebase.db
-            .collection("instructors")
-            .doc(clickedCell.id);
-          const instructorDoc = await instructorRef.get();
+          const instructorRef = firebase.db.collection("instructors").doc(clickedCell.id);
+          // const instructorDoc = await instructorRef.get();
           await instructorRef.update({ deleted: true });
           setTimeout(() => {
             clearInstructor("Nothing");
@@ -1272,37 +1221,90 @@ const AddInstructor = (props) => {
     }
   };
 
+  const handleOtherInterestedTopic = event => setOtherInterestedTopic(event.target.value);
+
+  const submitOtherInstructor = async () => {
+    const data = { ...otherInstructorData };
+    const otherInstructorRef = await firebase.db.collection("instructors").doc(data.id);
+    delete data.id;
+    const otherInstructorUpdate = {
+      interestedTopic: otherInterestedTopic,
+      ...data
+    };
+    await otherInstructorRef.update(otherInstructorUpdate);
+    setOtherInterestedTopic("");
+    setOtherInstructorData({});
+  };
+
   return (
     <>
       <h2>Instructors Added by Others:</h2>
       <div className="ColumnsAuto_Auto">
-        <div>
-          <Alert className="VoteActivityAlert" severity="success">
-            <ul>
-              <li>
-                <strong>
-                  You earn points for evaluating the instructors added by
-                  others:
-                </strong>{" "}
-                you receive one point for every 16 upvotes you cast on the
-                instructors added by your colleagues in every single day.
-              </li>
-              <li>
-                <strong>No partial or extra points:</strong> if on a single day
-                you cast more than 16 upvotes, you'll not receive any extra
-                points. If you cast fewer than 16 upvotes, you'll not receive
-                any partial points, either.
-              </li>
-            </ul>
-          </Alert>
-          <Alert className="VoteActivityAlert" severity="error">
-            <h3>Downvotes:</h3>
-            <p>
-              If you find an instructor's information that does not match the
-              information on their website, downvote (👎) it. The researcher who
-              has posted the incomplete/wrong information will be penalized.
-            </p>
-          </Alert>
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div>
+            <Alert className="VoteActivityAlert" severity="success">
+              <ul>
+                <li>
+                  <strong>You earn points for evaluating the instructors added by others:</strong> you receive one point
+                  for every 16 upvotes you cast on the instructors added by your colleagues in every single day.
+                </li>
+                <li>
+                  <strong>No partial or extra points:</strong> if on a single day you cast more than 16 upvotes, you'll
+                  not receive any extra points. If you cast fewer than 16 upvotes, you'll not receive any partial
+                  points, either.
+                </li>
+              </ul>
+            </Alert>
+            <Alert className="VoteActivityAlert" severity="error">
+              <h3>Downvotes:</h3>
+              <p>
+                If you find an instructor's information that does not match the information on their website, downvote
+                (👎) it. The researcher who has posted the incomplete/wrong information will be penalized.
+              </p>
+            </Alert>
+          </div>
+          {project === "Annotating" && (
+            <div>
+              <MuiTypography subtitle1="h2">
+                For the moment we need you to add the Intersted Topic for other Instructors previously added by other
+                researcher. Please you're only allowed to enter an Intersted Topic that doesn't containe more than 7
+                words:
+              </MuiTypography>
+              {(otherInterestedTopic.split(" ").length > 8 || otherInterestedTopic.split(",").length > 8) && (
+                <Alert className="VoteActivityAlert" severity="error">
+                  <h3>Reminder:</h3>
+                  <p>
+                    Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this
+                    instructor/school administrator.
+                  </p>
+                </Alert>
+              )}
+              <Box sx={{ m: "10px 10px 10px 0", display: "flex" }}>
+                <TextField
+                  sx={{ m: "10px", flex: "1 1 auto" }}
+                  className="TextField"
+                  label="Interested Topic"
+                  onChange={handleOtherInterestedTopic}
+                  name="interestedTopic"
+                  value={otherInterestedTopic}
+                  disabled={!otherInstructorData?.email}
+                />
+                <Button
+                  sx={{ m: "10px" }}
+                  onClick={submitOtherInstructor}
+                  className={"Button SubmitButton"}
+                  variant="contained"
+                  disabled={
+                    !otherInstructorData?.email ||
+                    otherInterestedTopic.split(" ").length > 8 ||
+                    otherInterestedTopic.split(",").length > 8
+                  }
+                >
+                  {"Update Instructor"}
+                </Button>
+              </Box>
+            </div>
+          )}
         </div>
         {Object.keys(otherInstructor).length > 0 ? (
           <Paper className="VoteActivityPaper">
@@ -1341,10 +1343,7 @@ const AddInstructor = (props) => {
                 otherInstructor.institution}
             </p>
             {!majors.includes(otherInstructor.major) && (
-              <Alert severity="error">
-                This researcher needs to update the 1Cademy Community for this
-                instructor!
-              </Alert>
+              <Alert severity="error">This researcher needs to update the 1Cademy Community for this instructor!</Alert>
             )}
             <p>
               {getCountry(otherInstructor.country) +
@@ -1364,9 +1363,7 @@ const AddInstructor = (props) => {
               onChange={changeComment}
               value={comment}
             />
-            <Box sx={{ textAlign: "center" }}>
-              To submit your comment, click one of the vote buttons!
-            </Box>
+            <Box sx={{ textAlign: "center" }}>To submit your comment, click one of the vote buttons!</Box>
             <div id="VoteOtherFooter">
               <Tooltip title="Skip" placement="top">
                 <Button
@@ -1384,7 +1381,7 @@ const AddInstructor = (props) => {
                           ? {
                               textDecoration: "line-through",
                               color: "red",
-                              fontWeight: 700,
+                              fontWeight: 700
                             }
                           : {}
                       }
@@ -1410,7 +1407,7 @@ const AddInstructor = (props) => {
                           ? {
                               textDecoration: "line-through",
                               color: "red",
-                              fontWeight: 700,
+                              fontWeight: 700
                             }
                           : {}
                       }
@@ -1443,136 +1440,124 @@ const AddInstructor = (props) => {
       </div>
       <div id="AddInstructor">
         <div className="Columns40_60">
-          <Alert className="VoteActivityAlert" severity="success">
-            <h2>Prefixes:</h2>
-            <p>
-              If there is any declaration of their prefix on their profile page,
-              we should use that exact prefix, otherwise, add "Prof." However,
-              if someone is a Dean or has any administrative position other than
-              instructor, they should not be called a Prof.
-            </p>
-            <h2>Google Scholar / ResearchGate Profile:</h2>
-            <p>
-              First try to find the Google Scholar Profile info for the
-              instructor/administrator through the following instructions:
-            </p>
-            <ul>
-              <li>
-                Before starting the activity, first install{" "}
-                <a
-                  href="https://chrome.google.com/webstore/detail/google-scholar-button/ldipcbpaocekfooobnbcddclnhejkcpn?hl=en"
-                  target="_blank"
-                >
-                  the Google Scholar Chrome Extension
-                </a>
-              </li>
-              <li>
-                Select the name of the instructor/administrator on their
-                website, then click the Google Scholar Chrome Extension icon{" "}
-                <img
-                  src={GoogleScholarIcon}
-                  alt="Google Scholar Icon"
-                  width="40px"
-                  sx={{ mb: "-25px" }}
-                />{" "}
-                at the top right corner of your Google Chrome browser.
-              </li>
-              <li>
-                The Google Scholar Chrome Extension shows you a few search
-                results of publications by this instructor/administrator. Just
-                ignore them and click the expand button <FullscreenIcon /> at
-                the bottom of the search results.
-              </li>
-              <li>
-                On top of the search results, you should see "User profiles for
-                [the name]." Right below it, you should find the link to their
-                Google Scholar profile and below it, their number of citations.
-              </li>
-              <li>
-                Copy their Google Scholar profile address and their number of
-                citations to the input boxes on the right.
-              </li>
-            </ul>
-            <div>
-              If they do not have a Google Scholar profile, report their
-              ResearchGate info through the following instructions:
+          <Box>
+            <Alert className="VoteActivityAlert" severity="error">
+              <h3>TOPIC of INTEREST:</h3>
+              <p>
+                In addition to the 1Cademy community we specify for each instructor, we should also enter the most
+                important topic that they teach or research at their institution.
+              </p>
+              <p>
+                Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this
+                instructor/school administrator.
+              </p>
+            </Alert>
+            <Alert className="VoteActivityAlert" severity="success">
+              <h2>Prefixes:</h2>
+              <p>
+                If there is any declaration of their prefix on their profile page, we should use that exact prefix,
+                otherwise, add "Prof." However, if someone is a Dean or has any administrative position other than
+                instructor, they should not be called a Prof.
+              </p>
+              <h2>Google Scholar / ResearchGate Profile:</h2>
+              <p>
+                First try to find the Google Scholar Profile info for the instructor/administrator through the following
+                instructions:
+              </p>
               <ul>
                 <li>
-                  Open{" "}
+                  Before starting the activity, first install{" "}
                   <a
-                    href="https://www.google.com/search?q=site%3Ahttps%3A%2F%2Fwww.researchgate.net"
+                    href="https://chrome.google.com/webstore/detail/google-scholar-button/ldipcbpaocekfooobnbcddclnhejkcpn?hl=en"
                     target="_blank"
                   >
-                    Google Search restricted to only the content of ResearchGate
-                    website
-                  </a>{" "}
-                  in your Internet browser. Then search the full name of the
-                  instructor/administrator plus their school name. Doing this is
-                  as easy as typing "site:https://www.researchgate.net FULLNAME
-                  SCHOOL_NAME" in Google Search. Note that you should replace
-                  FULLNAME and SCHOOL_NAME in this query string. Also, don't
-                  miss the first part of the query string
-                  "site:https://www.researchgate.net " that restrics your search
-                  to only the content of the ResearchGate website.
+                    the Google Scholar Chrome Extension
+                  </a>
                 </li>
                 <li>
-                  In the list of Google Search results, click their ResearchGate
-                  profile page. If there are multiple profiles for people with
-                  the same name, please choose the right one based on their
-                  institution and profile picture.
+                  Select the name of the instructor/administrator on their website, then click the Google Scholar Chrome
+                  Extension icon{" "}
+                  <img src={GoogleScholarIcon} alt="Google Scholar Icon" width="40px" sx={{ mb: "-25px" }} /> at the top
+                  right corner of your Google Chrome browser.
                 </li>
                 <li>
-                  In their ResearchGate profile page, you should be able to find
-                  their number of citations either:
-                  <ul>
-                    <li>
-                      In the middle of the page, there should be a section
-                      titled "Stats overview"
-                    </li>
-                    <li>
-                      Or, on the right sidebar, you should be able to find a
-                      section titled "Publication Stats."
-                    </li>
-                  </ul>
-                  From either of these sections, copy their number of citations
-                  in the corresponding input boxes.
+                  The Google Scholar Chrome Extension shows you a few search results of publications by this
+                  instructor/administrator. Just ignore them and click the expand button <FullscreenIcon /> at the
+                  bottom of the search results.
                 </li>
                 <li>
-                  Copy the URL of this webpage in the corresponding input box.
+                  On top of the search results, you should see "User profiles for [the name]." Right below it, you
+                  should find the link to their Google Scholar profile and below it, their number of citations.
+                </li>
+                <li>
+                  Copy their Google Scholar profile address and their number of citations to the input boxes on the
+                  right.
                 </li>
               </ul>
-            </div>
-            <p>
-              <strong>Note:</strong> If they don't have have either a Google
-              Scholar or a ResearchGate profile, leave the address empty and
-              enter 0 for their number of citations.
-            </p>
-          </Alert>
+              <div>
+                If they do not have a Google Scholar profile, report their ResearchGate info through the following
+                instructions:
+                <ul>
+                  <li>
+                    Open{" "}
+                    <a href="https://www.google.com/search?q=site%3Ahttps%3A%2F%2Fwww.researchgate.net" target="_blank">
+                      Google Search restricted to only the content of ResearchGate website
+                    </a>{" "}
+                    in your Internet browser. Then search the full name of the instructor/administrator plus their
+                    school name. Doing this is as easy as typing "site:https://www.researchgate.net FULLNAME
+                    SCHOOL_NAME" in Google Search. Note that you should replace FULLNAME and SCHOOL_NAME in this query
+                    string. Also, don't miss the first part of the query string "site:https://www.researchgate.net "
+                    that restrics your search to only the content of the ResearchGate website.
+                  </li>
+                  <li>
+                    In the list of Google Search results, click their ResearchGate profile page. If there are multiple
+                    profiles for people with the same name, please choose the right one based on their institution and
+                    profile picture.
+                  </li>
+                  <li>
+                    In their ResearchGate profile page, you should be able to find their number of citations either:
+                    <ul>
+                      <li>In the middle of the page, there should be a section titled "Stats overview"</li>
+                      <li>
+                        Or, on the right sidebar, you should be able to find a section titled "Publication Stats."
+                      </li>
+                    </ul>
+                    From either of these sections, copy their number of citations in the corresponding input boxes.
+                  </li>
+                  <li>Copy the URL of this webpage in the corresponding input box.</li>
+                </ul>
+              </div>
+              <p>
+                <strong>Note:</strong> If they don't have have either a Google Scholar or a ResearchGate profile, leave
+                the address empty and enter 0 for their number of citations.
+              </p>
+            </Alert>
+          </Box>
           <Paper className="VoteActivityPaper">
             <Alert className="VoteActivityAlert" severity="warning">
               <h2>Who to add:</h2>
               <p>
-                Enter a US-based college/university instructor/administrator's
-                information that relate to our 1Cademy communities:
+                Enter a US-based college/university instructor/administrator's information that relate to our 1Cademy
+                communities:
               </p>
               <ul>
-                {majors.map((maj) => {
+                {majors.map(maj => {
                   return <li key={maj}>{maj}</li>;
                 })}
               </ul>
               <h2>Earning points:</h2>
               <ul>
                 <li>
-                  <strong>Only 1 point per day:</strong> to earn the point of
-                  each day, you need to add 7 instructors' contact information.
+                  <strong>Only 1 point per day:</strong> to earn the point of each day, you need to add 7 instructors'
+                  contact information.
                 </li>
                 <li>
-                  <strong>No partial points:</strong> if you add fewer than 7
-                  instructors on a day, you'll not earn any partial points.
+                  <strong>No partial points:</strong> if you add fewer than 7 instructors on a day, you'll not earn any
+                  partial points.
                 </li>
                 <li>
-                  <strong>No extra points:</strong> if you add more than 7
-                  instructors on a day, you'll not earn any extra points.
+                  <strong>No extra points:</strong> if you add more than 7 instructors on a day, you'll not earn any
+                  extra points.
                 </li>
               </ul>
             </Alert>
@@ -1611,7 +1596,7 @@ const AddInstructor = (props) => {
                 name="prefix"
                 onChange={handleChange}
               >
-                {prefixes.map((pref) => {
+                {prefixes.map(pref => {
                   return (
                     <MenuItem key={pref} value={pref}>
                       {pref}
@@ -1655,7 +1640,7 @@ const AddInstructor = (props) => {
                 name="occupation"
                 onChange={handleChange}
               >
-                {occupations.map((pref) => {
+                {occupations.map(pref => {
                   return (
                     <MenuItem key={pref} value={pref}>
                       {pref}
@@ -1682,7 +1667,7 @@ const AddInstructor = (props) => {
                 name="major"
                 onChange={handleChange}
               >
-                {majors.map((cour) => {
+                {majors.map(cour => {
                   return (
                     <MenuItem key={cour} value={cour}>
                       {cour}
@@ -1691,6 +1676,15 @@ const AddInstructor = (props) => {
                 })}
               </Select>
             </FormControl>
+            <TextField
+              className="TextField"
+              label="Topic of Interest"
+              onChange={handleChange}
+              name="interestedTopic"
+              type="text"
+              value={values.interestedTopic}
+              onKeyPress={onKeyPress}
+            />
             {CSCObj && allCountries.length > 0 && (
               <Suspense fallback={<div></div>}>
                 <CountryStateCity
@@ -1704,6 +1698,7 @@ const AddInstructor = (props) => {
             )}
             {institutions.length > 0 && (
               <Autocomplete
+                style={{ margin: "10px" }}
                 className="InstitutionAutocomplete"
                 value={institution}
                 onChange={changeInstitution}
@@ -1722,29 +1717,17 @@ const AddInstructor = (props) => {
               value={explanation}
             />
             <div>
-              {invalidInstructor && (
-                <div className="Error">{invalidInstructor}</div>
-              )}
+              {invalidInstructor && <div className="Error">{invalidInstructor}</div>}
               <Button
                 onClick={submitInstructor}
-                className={
-                  !invalidInstructor
-                    ? "Button SubmitButton"
-                    : "Button SubmitButton Disabled"
-                }
+                className={!invalidInstructor ? "Button SubmitButton" : "Button SubmitButton Disabled"}
                 variant="contained"
                 disabled={!invalidInstructor ? null : true}
               >
-                {selectedRows.length === 0
-                  ? "Add Instructor"
-                  : "Update Instructor"}
+                {selectedRows.length === 0 ? "Add Instructor" : "Update Instructor"}
               </Button>
               {selectedRows.length > 0 && (
-                <Button
-                  className="Button ClearButton"
-                  onClick={clearInstructor}
-                  variant="contained"
-                >
+                <Button className="Button ClearButton" onClick={clearInstructor} variant="contained">
                   Clear Selection
                 </Button>
               )}
@@ -1763,17 +1746,14 @@ const AddInstructor = (props) => {
             loading={!instructorsLoaded}
             onRowClick={myInstructorsRowClick}
             onCellClick={deleteInstructor}
-            onSelectionChange={(newSelection) => {
+            onSelectionChange={newSelection => {
               setSelectedRows(newSelection.rowIds);
             }}
             selectionModel={selectedRows}
           />
         </div>
       </div>
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </>
   );
 };

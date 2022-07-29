@@ -550,6 +550,16 @@ const Tutorial = (props) => {
                         </Typography>
                       </Alert>
                       {instr.video && <YoutubeEmbed embedId={instr.video} />}
+                      <Typography
+                          variant="body2"
+                          component="div"
+                          sx={{
+                            fontSize: "19px",
+                          }}
+                        >
+                           {instr.stem}
+                        </Typography>
+                     
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>

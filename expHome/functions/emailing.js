@@ -214,29 +214,28 @@ exports.inviteInstructors = async (req, res) => {
         // They have not already clicked any of the options in their email.
         !instructorData.yes &&
         !instructorData.no &&
-        !instructorData.introduced &&
-        // There exists a community corresponding to the one wechose for them.
-        instructorData.major in communityTitles
+        !instructorData.alreadyTalked &&
+        instructorData.interestedTopic
       ) {
-        let minCondition,
-          minCondNum = -1;
-        if (instructorData.condition) {
-          minCondition = instructorData.condition;
-        } else {
-          // To assign an experimental condition to this instructor, we have to find
-          // the condition that is assigned to the fewest number of instructors so far.
-          let instructorConditionsDocs = await db.collection("instructorConditions").get();
-          instructorConditionsDocs = instructorConditionsDocs.docs;
-          minCondNum = instructorConditionsDocs[0].data().num;
-          minCondition = instructorConditionsDocs[0].id;
-          for (let instructorConditionDoc of instructorConditionsDocs) {
-            let instructorConditionData = instructorConditionDoc.data();
-            if (instructorConditionData.num < minCondNum) {
-              minCondNum = instructorConditionData.num;
-              minCondition = instructorConditionDoc.id;
-            }
-          }
-        }
+        // let minCondition,
+        //   minCondNum = -1;
+        // if (instructorData.condition) {
+        //   minCondition = instructorData.condition;
+        // } else {
+        //   // To assign an experimental condition to this instructor, we have to find
+        //   // the condition that is assigned to the fewest number of instructors so far.
+        //   let instructorConditionsDocs = await db.collection("instructorConditions").get();
+        //   instructorConditionsDocs = instructorConditionsDocs.docs;
+        //   minCondNum = instructorConditionsDocs[0].data().num;
+        //   minCondition = instructorConditionsDocs[0].id;
+        //   for (let instructorConditionDoc of instructorConditionsDocs) {
+        //     let instructorConditionData = instructorConditionDoc.data();
+        //     if (instructorConditionData.num < minCondNum) {
+        //       minCondNum = instructorConditionData.num;
+        //       minCondition = instructorConditionDoc.id;
+        //     }
+        //   }
+        // }
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
         // postpones sending the next email until the next waitTime.
@@ -244,13 +243,7 @@ exports.inviteInstructors = async (req, res) => {
           const mailOptions = {
             from: process.env.EMAIL,
             to: instructorData.email,
-            subject: `Inviting Your Students to ${
-              minCondition === "contribute"
-                ? "Contribute to"
-                : minCondition === "learn"
-                ? "Learn Collaboratively at"
-                : "Present Your Research at"
-            } Our Multi-School ${communityTitles[instructorData.major]} Community`,
+            subject: `A Large-scale Collaborative Note-taking Platform for ${instructorData.interestedTopic} Learning/Research`,
             html: `<p>Hello ${
               instructorData.prefix +
               ". " +
@@ -259,26 +252,16 @@ exports.inviteInstructors = async (req, res) => {
               capitalizeFirstLetter(instructorData.lastname)
             },</p>
               <p></p>
-              <p>We are inviting your students to join and <strong>${
-                minCondition === "contribute"
-                  ? "contribute to"
-                  : minCondition === "learn"
-                  ? "learn collaboratively at"
-                  : "present your research at"
-              }</strong> our multi-school <a href="https://1cademy.us/community/${
-              instructorData.major
-            }" target="_blank">${
-              communityTitles[instructorData.major]
-            } community</a>. Several large communities of student researchers from different schools in the US are 
-            remotely collaborating through our <a href="https://1cademy.us/home" target="_blank">1Cademy</a> platform
-            at the University of Michigan School of Information. 
-            You can find more information about our communities and the application process at https://1cademy.us/home</p>
+              <p>We all want our students to master and retain knowledge from their courses. Note-taking in general, and increasingly collaborative note-taking, can play vital roles in deepening students' learning and retention.</p>
               <p></p>
-              <p>Please choose one of the following options regarding your preference:</p>
+              <p>We are a research group at the University of Michigan, School of Information, who have developed an online platform for collaborative learning and research, called 1Cademy. <a href="https://1cademy.us/home" target="_blank">On this page</a>, you can find more information about 1Cademy. So far, 1,490 students from 144 schools in the US have joined 1Cademy to organize and share knowledge learned from their courses and research papers. Over the past 13 years, we have found a set of norms and guidelines that improve students' collaborative note-taking, and incorporated them into the design of our platform. You can search through <a href="https://node.1cademy.us" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students.</p>
+              <p>We would like to provide you and your students with 1Cademy for free, and work with you to implement the features that can specifically help your course or research team. To ensure that 1Cademy is a learning environment conducive to you and your students, it is important  for us to learn about your needs and experiences with collaborative note-taking.</p>
+              <p></p>
+              <p>If this is of interest to you, we'd be delighted to have a meeting with you. To schedule an appointment, please click one of the following links or directly reply to this email.</p>
               <ul>
                 <li><a href="https://1cademy.us/interestedFaculty/${
                   // These are all sending requests to the client side.
-                  instructorData.major
+                  instructorData.interestedTopic
                 }/${minCondition}/${instructorDoc.id}" target="_blank">Yes, I'd like to invite my students.</a></li>
                 <li><a href="https://1cademy.us/interestedFacultyLater/${
                   // These are all sending requests to the client side.
@@ -308,20 +291,20 @@ exports.inviteInstructors = async (req, res) => {
               console.log({ error });
               return res.status(500).json({ error });
             } else {
-              // minCondNum === -1 signals that we had previously assigned a condition to
-              // the instructor and we do not need to assign any experimental conditions again.
-              if (minCondNum !== -1) {
-                // If the email is successfully sent:
-                // 1) Update the num value in the corresponding instructorConditions document;
-                const instructorConditionRef = db.collection("instructorConditions").doc(minCondition);
-                await instructorConditionRef.update({
-                  num: admin.firestore.FieldValue.increment(1)
-                });
-              }
+              // // minCondNum === -1 signals that we had previously assigned a condition to
+              // // the instructor and we do not need to assign any experimental conditions again.
+              // if (minCondNum !== -1) {
+              //   // If the email is successfully sent:
+              //   // 1) Update the num value in the corresponding instructorConditions document;
+              //   const instructorConditionRef = db.collection("instructorConditions").doc(minCondition);
+              //   await instructorConditionRef.update({
+              //     num: admin.firestore.FieldValue.increment(1)
+              //   });
+              // }
               // 2) Update the corresponding instructor document.
               const instructorRef = db.collection("instructors").doc(instructorDoc.id);
               await instructorRef.update({
-                condition: minCondition,
+                // condition: minCondition,
                 emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
                 // The next reminder should be sent one week later.

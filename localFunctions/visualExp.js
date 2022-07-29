@@ -288,10 +288,15 @@ exports.deleteIncompleteRecallGrades = async (req, res) => {
       const userData = userDoc.data();
       let allResponsesReady = true;
       if (userData.pConditions) {
-        const afterPilotStudy = ((Date.parse(dateOfThePilotStudy)/1000)<((Date.parse((userData.createdAt).toDate()))/1000));
+        const afterPilotStudy =
+          Date.parse(dateOfThePilotStudy) / 1000 <
+          Date.parse(userData.createdAt.toDate()) / 1000;
         for (let pCond of userData.pConditions) {
-          if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) ||
-          ((!("recall1WeekreText" in pCond))&&(afterPilotStudy))) {
+          if (
+            !("recallreText" in pCond) ||
+            !("recall3DaysreText" in pCond) ||
+            (!("recall1WeekreText" in pCond) && afterPilotStudy)
+          ) {
             allResponsesReady = false;
           }
         }
@@ -339,8 +344,8 @@ exports.deleteIncompleteRecallGrades = async (req, res) => {
         const recallGradeData = recallGradeDoc.data();
         if (deletableUsers.includes(recallGradeData.user)) {
           let recallGradeDeleteRef = db
-          .collection("recallGrades")
-          .doc(recallGradeDoc.id);
+            .collection("recallGrades")
+            .doc(recallGradeDoc.id);
           await batchDelete(recallGradeDeleteRef);
           console.log({
             responseGradeId: recallGradeDoc.id,
@@ -691,3 +696,126 @@ exports.restructureProjectSpecs = async (req, res) => {
 
   return res.status(200).json({ done: true });
 };
+
+exports.restructureFeedBackCode = async (req, res) => {
+  try {
+    const feedBack = {};
+    console.log("starting");
+    let feedbackCodesDocs = await db.collection("feedbackCodes").get();
+    let feedbackCodeBooksdocs = await db.collection("feedbackCodeBooks").get();
+
+    for (let feedbackCodesDoc of feedbackCodesDocs.docs) {
+      const fData = feedbackCodesDoc.data();
+      const feedKey = [fData.explanation, fData.fullname];
+
+      if (feedKey in feedBack) {
+      } else {
+        let codesVotes ={};
+        for(let doc of feedbackCodeBooksdocs.docs){
+          const data = doc.data();
+          codesVotes[data.code] = [];
+        }
+        // codesVotes[fData.code] = [fData.coder];
+        console.log(codesVotes);
+        feedBack[feedKey] = {
+          approved:false,
+          codersChoices: {},
+          coders: [],
+          choice: fData.choice,
+          project: fData.project,
+          fullname: fData.fullname,
+          session: fData.session,
+          explanation: fData.explanation,
+          createdAt: fData.createdAt,
+          expIdx: fData.expIdx,
+          codesVotes,
+          updatedAt:new Date()
+        };
+      }
+    }
+
+    for (let rGKey in feedBack) {
+      const recallGradeRef = db.collection("feedbackCode").doc();
+      console.log(feedBack[rGKey]);
+      await batchSet(recallGradeRef, feedBack[rGKey]);
+    }
+    console.log("*********************");
+    console.log("Started to commit!");
+    console.log("*********************");
+    await commitBatch();
+    console.log("Done.");
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
+
+
+// exports.restructureFeedBackCode = async (req, res) => {
+//   try {
+//     const feedBack = {};
+//     console.log("starting");
+//     let feedbackCodesDocs = await db.collection("codefeedbacks").get();
+   
+
+//     for (let feedbackCodesDoc of feedbackCodesDocs.docs) {
+//       const fData = feedbackCodesDoc.data();
+//       const feedKey = [fData.explanation, fData.fullname];
+
+//       if (feedKey in feedBack) {
+//         const feedbackData = feedBack[feedKey];
+
+
+//         if (fData.coder in feedBack[feedKey].codes) {
+//           feedBack[feedKey].codes[fData.coder] = {
+//             ...feedBack[feedKey].codes[fData.coder],
+//             [fData.code]: [],
+//           };
+//         } else {
+//           feedBack[feedKey].coders = [...feedbackData.coders, fData.coder];
+//           feedBack[feedKey].codes[fData.coder] = {
+//             [fData.code]: [],
+//           };
+//         }
+//       } else {
+//         let codesVotes ={};
+//         for(let doc of feedbackCodeBooksdocs.docs){
+//           const data = doc.data();
+//           codesVotes[data.code] = [];
+//         }
+
+//         console.log(codesVotes);
+//         feedBack[feedKey] = {
+//           codes: { [fData.coder]: { [fData.code]: [] } },
+//           coders: [fData.coder],
+//           choice: fData.choice,
+//           project: fData.project,
+//           fullname: fData.fullname,
+//           session: fData.session,
+//           explanation: fData.explanation,
+//           createdAt: fData.createdAt,
+//           expIdx: fData.expIdx,
+//           codesVotes
+//         };
+//       }
+//     }
+
+//     for (let rGKey in feedBack) {
+//       const recallGradeRef = db.collection("codefeedbacks").doc();
+//       console.log(feedBack[rGKey]);
+//       await batchSet(recallGradeRef, feedBack[rGKey]);
+//     }
+//     console.log("*********************");
+//     console.log("Started to commit!");
+//     console.log("*********************");
+//     await commitBatch();
+//     console.log("Done.");
+//   } catch (err) {
+//     console.log({ err });
+//     return res.status(500).json({ err });
+//   }
+//   return res.status(200).json({ done: true });
+// };
+

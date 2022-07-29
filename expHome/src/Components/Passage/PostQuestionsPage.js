@@ -1,8 +1,7 @@
 import React from "react";
-
 import MCQuestion from "../MCQuestion/MCQuestion";
-
 import "./Passage.css";
+
 
 const PostQuestionsPage = (props) => {
   return (
@@ -14,6 +13,7 @@ const PostQuestionsPage = (props) => {
         nextStep={props.nextStep}
         explanations={props.explanations}
         setExplanations={props.setExplanations}
+        step={props.step}
       />
     </div>
   );
