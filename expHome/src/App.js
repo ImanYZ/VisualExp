@@ -152,10 +152,12 @@ const App = () => {
   const [language, setLanguage] = useState("English");
   const [gender, setGender] = useState("");
   const [ethnicity, setEthnicity] = useState([]);
+  const [personalityTraits, setPersonalityTraits]=useState({});
   const [genderOtherValue, setGenderOtherValue] = useState("");
   const [ethnicityOtherValue, setEthnicityOtherValue] = useState("");
   const [error, setError] = useState("");
   const [scores, setScores] = useState([]);
+  const [answeredPersonalTrait, setAnsweredPersonalTrait] = useState(false);
 
   const educationChange = event => {
     setEducation(event.target.value);
@@ -586,6 +588,7 @@ const App = () => {
               birthDate,
               education,
               language,
+              personalityTraits,
               gender: gender === "Not listed (Please specify)" ? genderOtherValue : gender,
               ethnicity: ethnicityArray,
               major: major.Major,
@@ -898,6 +901,9 @@ const App = () => {
             languageChange={languageChange}
             genderChange={genderChange}
             ethnicityChange={ethnicityChange}
+            setPersonalityTraits={setPersonalityTraits}
+            setAnsweredPersonalTrait={setAnsweredPersonalTrait}
+            answeredPersonalTrait={answeredPersonalTrait}
           />
         ) : null}
         {step === 1 ? (
@@ -922,6 +928,7 @@ const App = () => {
             nextStep={nextStep}
             error={error}
             scores={scores}
+            answeredPersonalTrait={answeredPersonalTrait}
           />
         )}
       </div>
