@@ -68,11 +68,14 @@ const CodeFeedback = props => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openAdminEditModal, setOpenEditAdminModal] = useState(false);
+  const [openAdminAddModal, setOpenAddAdminModal] = useState(false);
 
   const handleOpenEditModal = () => setOpenEditModal(true);
   const handleCloseEditModal = () => setOpenEditModal(false);
   const handleOpenAdminEditModal = () => setOpenEditAdminModal(true);
   const handleCloseAdminEditModal = () => setOpenEditAdminModal(false);
+  const handleOpenAdminAddModal = () => setOpenAddAdminModal(true);
+  const handleCloseAdminAddModal = () => setOpenAddAdminModal(false);
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
@@ -88,7 +91,6 @@ const CodeFeedback = props => {
     {
       field: "checked",
       headerName: "Approved/UnApproved",
-      width: "200",
       renderCell: cellValues => {
         return (
           <GridCellToolTip isLink={false} actionCell={true} cellValues={cellValues} />
@@ -98,7 +100,6 @@ const CodeFeedback = props => {
     {
       field: "coder",
       headerName: "Coder",
-      width: "200",
       renderCell: cellValues => {
         return (
           <GridCellToolTip isLink={false} cellValues={cellValues} />
@@ -285,9 +286,6 @@ const CodeFeedback = props => {
     const unApprovedData = feedbackCodeBooksDocs.docs.map(doc => doc.data().code);
     setUnApprovedNewCodes(unApprovedData);
   }, [project, firebase, fullname]);
-
-  // set new code.
-  // const handleCodeChange = event => setNewCode(event.currentTarget.value);
 
   // add new code to the database
   const handleAddNewCode = async () => {
@@ -614,6 +612,49 @@ const CodeFeedback = props => {
     }
   }
 
+  const handleAdminAddNewCode = async () => {
+    const experimentCodes = [...allExperimentCodes];
+    // check if the code already exists in approvedCode or unapprovedCode
+    const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
+    if (checkIfCodeExist) {
+      setSnackbarMessage("This code already exists, please try some other code");
+      return;
+    }
+
+    const feedbackCodeBooksRed = firebase.db.collection("feedbackCodeBooks");
+    const questionArray = [1, 2];
+    questionArray.map(async (x, index) => {
+      feedbackCodeBooksRed.add({
+        approved: true,
+        code: updateCode,
+        coder: fullname,
+        title: "Researcher",
+        question: (index + 1),
+        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+      }).then((docRef) => {
+        const experimentCode = {
+          id: docRef.id,
+          code: updateCode,
+          coder: fullname,
+          title: "Researcher",
+          question: (index + 1),
+          checked: "✅"
+        }
+        experimentCodes.push(experimentCode);
+        setAllExperimentsCodes(experimentCodes);
+        if (index + 1 === questionArray.length) {
+          setUpdateCode("");
+          setAdminCodeData({});
+          handleCloseAdminAddModal();
+          setSnackbarMessage(`Code Add to both Questions!`);
+        }
+      })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+        })
+    });
+  }
+
   return (
     <>
       {(unApprovedNewCodes.length > 0) && (
@@ -663,7 +704,7 @@ const CodeFeedback = props => {
                     </>
                   }>
                   <ListItemButton>
-                    <ListItemText sx={{ width: "95%" }} multiline id={idx} primary={code} />
+                    <ListItemText sx={{ width: "95%" }} multiline="true" id={idx} primary={code} />
                   </ListItemButton>
                 </ListItem>
               ))}
@@ -700,12 +741,11 @@ const CodeFeedback = props => {
       <Typography variant="h6" margin-bottom="20px">
         For each different code, please choose which response(s) contains the code:
       </Typography>
-      <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", height: 900 }}>
+      <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px" }}>
         <Box
           sx={{
             display: "flex",
             flexWrap: "wrap",
-            width: "90%",
             justifyContent: "center",
             gap: 0
           }}
@@ -804,6 +844,9 @@ const CodeFeedback = props => {
       {email === "oneweb@umich.edu" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
+            <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
+              Add New Code
+            </Button>
             <DataGrid
               rows={allExperimentCodes}
               columns={codesColumn}
@@ -887,6 +930,43 @@ const CodeFeedback = props => {
                 Update
               </Button>
               <Button className="Button Red" variant="contained" onClick={handleCloseAdminEditModal}>
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+      {/* Add Code Admin Modal */}
+      <Modal
+        open={openAdminAddModal}
+        onClose={handleCloseAdminAddModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          ...modalStyle,
+          width: '500px',
+          height: '250px',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between"
+        }}>
+          <Typography variant="h6" margin-bottom="20px">
+            Your Code will be added for both questions
+          </Typography>
+          <Box>
+            <TextareaAutosize
+              style={{ width: '90%' }}
+              minRows={5}
+              value={updateCode}
+              placeholder={"Update the code here."}
+              onChange={(event) => setUpdateCode(event.currentTarget.value)}
+            />
+            <Box sx={{ textAlign: "center" }}>
+              <Button disabled={!updateCode} className="Button" variant="contained" onClick={handleAdminAddNewCode}>
+                Add
+              </Button>
+              <Button className="Button Red" variant="contained" onClick={handleCloseAdminAddModal}>
                 Cancel
               </Button>
             </Box>
