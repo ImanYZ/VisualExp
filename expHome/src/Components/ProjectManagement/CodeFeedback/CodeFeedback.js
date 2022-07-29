@@ -199,7 +199,6 @@ const CodeFeedback = props => {
       }
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelected(codesSelecting);
-
     }
   }, [project]);
 
@@ -626,6 +625,7 @@ const CodeFeedback = props => {
     const questionArray = [1, 2];
     questionArray.map(async (x, index) => {
       feedbackCodeBooksRed.add({
+        project,
         approved: true,
         code: updateCode,
         coder: fullname,
