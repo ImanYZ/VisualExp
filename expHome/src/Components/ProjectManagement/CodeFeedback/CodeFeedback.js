@@ -21,6 +21,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Modal from '@mui/material/Modal';
 
+import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
@@ -93,7 +94,7 @@ const CodeFeedback = props => {
       headerName: "Approved/UnApproved",
       renderCell: cellValues => {
         return (
-          <GridCellToolTip isLink={false} actionCell={true} cellValues={cellValues} />
+          <GridCellToolTip isLink={false} toolTip={false} actionCell={true} cellValues={cellValues} />
         );
       }
     },
@@ -150,15 +151,12 @@ const CodeFeedback = props => {
     if (project) {
       let allCodes = [];
       let approvedFeedbackCodeBooks = [];
-      const experimentCodesDocs = await firebase.db
-        .collection("experimentCodes")
-        .where("project", "==", project)
-        .get();
-      const feedbackCodeBooksDocs = await firebase.db
-        .collection("feedbackCodeBooks")
-        .where("project", "==", project)
-        .get();
+      const experimentCodesRef = firebase.db.collection("experimentCodes")
+      const feedbackCodeBooksRef = firebase.db.collection("feedbackCodeBooks");
 
+      const experimentCodesDocs = await experimentCodesRef
+        .where("project", "==", project)
+        .get();
 
       for (let Doc of experimentCodesDocs.docs) {
         let data = Doc.data();
@@ -166,12 +164,16 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "Participant",
+          title: data && data.title ? data.title : '',
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
         allCodes.push(newCode);
       }
+
+      const feedbackCodeBooksDocs = await feedbackCodeBooksRef
+        .where("project", "==", project)
+        .get();
 
       for (let Doc of feedbackCodeBooksDocs.docs) {
         let data = Doc.data();
@@ -179,7 +181,7 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "Researcher",
+          title: data && data.title ? data.title : '',
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
@@ -188,7 +190,10 @@ const CodeFeedback = props => {
           approvedFeedbackCodeBooks.push(data.code);
         }
       }
-      setAllExperimentsCodes(allCodes);
+
+      const sortedAllCodes = orderBy(allCodes, ['coder', 'code'], ['asc', 'asc']);
+
+      setAllExperimentsCodes(sortedAllCodes);
       setApprovedCodes(approvedFeedbackCodeBooks);
 
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
@@ -483,6 +488,8 @@ const CodeFeedback = props => {
           ...codesApp[appIdx],
           checked: isChecked ? "◻" : "✅"
         };
+        const msg = !isChecked ? "Code approved" : "Code disapproved";
+        setSnackbarMessage(msg);
         setAllExperimentsCodes(codesApp);
       }
     }
