@@ -126,6 +126,7 @@ const MCQuestion = props => {
       code: newCode,
       coder: fullname,
       project: project,
+      title: "Participant",
       question: curQuestion,
       createdAt: firebase.firestore.Timestamp.fromDate(new Date())
     });
