@@ -231,33 +231,36 @@ const PassageRight = (props) => {
               );
             })}
         </>
-      ) : step === 9 ? (
+      ) : step === 9 && props.answeredPersonalTrait ? (
         <>
           <h2>Demographics!</h2>
           <p>
-            Please enter your demographic data on the left. We need this data to
-            better customize the results of our research for different
-            demographics.
+            Please enter your demographic data on the left. We need this data to better customize the results of our
+            research for different demographics.
           </p>
-          <p>
-            In our research publications, we will never use your name and all
-            our reports will be anonymized.
-          </p>
+          <p>In our research publications, we will never use your name and all our reports will be anonymized.</p>
           <p>Whenever you feel comfortable, click the "CONTINUE!" button.</p>
           {props.error ? (
             <div className="Error">Please enter your {props.error}!</div>
           ) : (
             <div id="StartTestContainer">
-              <Button
-                id="StartTestButton"
-                className="Button"
-                onClick={props.nextStep}
-                variant="contained"
-              >
+              <Button id="StartTestButton" className="Button" onClick={props.nextStep} variant="contained">
                 CONTINUE!
               </Button>
             </div>
           )}
+        </>
+      ) : step === 9 && !props.answeredPersonalTrait ? (
+        <>
+          <p>
+            This test measures key personality traits. Once you complete all items, click the "Next" after you answered
+            the test accordingly
+          </p>
+          <p>
+            Here are a number of characteristics that may or may not apply to you. For example, do you agree that you
+            are someone who likes to spend time with others? Please indicate the extent to which you agree or disagree
+            with each statement.
+          </p>
         </>
       ) : [10, 20].includes(step) ? (
         <>
