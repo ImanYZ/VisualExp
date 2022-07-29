@@ -310,6 +310,7 @@ const CodeFeedback = props => {
         approved: false,
         code: newCode,
         coder: fullname,
+        title: "Researcher",
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       });
 
