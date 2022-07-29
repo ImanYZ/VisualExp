@@ -21,6 +21,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Modal from '@mui/material/Modal';
 
+import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
@@ -93,7 +94,7 @@ const CodeFeedback = props => {
       headerName: "Approved/UnApproved",
       renderCell: cellValues => {
         return (
-          <GridCellToolTip isLink={false} actionCell={true} cellValues={cellValues} />
+          <GridCellToolTip isLink={false} toolTip={false} actionCell={true} cellValues={cellValues} />
         );
       }
     },
@@ -150,15 +151,12 @@ const CodeFeedback = props => {
     if (project) {
       let allCodes = [];
       let approvedFeedbackCodeBooks = [];
-      const experimentCodesDocs = await firebase.db
-        .collection("experimentCodes")
-        .where("project", "==", project)
-        .get();
-      const feedbackCodeBooksDocs = await firebase.db
-        .collection("feedbackCodeBooks")
-        .where("project", "==", project)
-        .get();
+      const experimentCodesRef = firebase.db.collection("experimentCodes")
+      const feedbackCodeBooksRef = firebase.db.collection("feedbackCodeBooks");
 
+      const experimentCodesDocs = await experimentCodesRef
+        .where("project", "==", project)
+        .get();
 
       for (let Doc of experimentCodesDocs.docs) {
         let data = Doc.data();
@@ -166,12 +164,16 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "Participant",
+          title: data && data.title ? data.title : '',
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
         allCodes.push(newCode);
       }
+
+      const feedbackCodeBooksDocs = await feedbackCodeBooksRef
+        .where("project", "==", project)
+        .get();
 
       for (let Doc of feedbackCodeBooksDocs.docs) {
         let data = Doc.data();
@@ -179,7 +181,7 @@ const CodeFeedback = props => {
           id: Doc.id,
           code: data.code,
           coder: data.coder,
-          title: "Researcher",
+          title: data && data.title ? data.title : '',
           question: data.question,
           checked: data.approved ? "✅" : "◻",
         };
@@ -188,7 +190,10 @@ const CodeFeedback = props => {
           approvedFeedbackCodeBooks.push(data.code);
         }
       }
-      setAllExperimentsCodes(allCodes);
+
+      const sortedAllCodes = orderBy(allCodes, ['coder', 'code'], ['asc', 'asc']);
+
+      setAllExperimentsCodes(sortedAllCodes);
       setApprovedCodes(approvedFeedbackCodeBooks);
 
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
@@ -483,6 +488,8 @@ const CodeFeedback = props => {
           ...codesApp[appIdx],
           checked: isChecked ? "◻" : "✅"
         };
+        const msg = !isChecked ? "Code approved" : "Code disapproved";
+        setSnackbarMessage(msg);
         setAllExperimentsCodes(codesApp);
       }
     }
@@ -623,37 +630,39 @@ const CodeFeedback = props => {
 
     const feedbackCodeBooksRed = firebase.db.collection("feedbackCodeBooks");
     const questionArray = [1, 2];
-    questionArray.map(async (x, index) => {
-      feedbackCodeBooksRed.add({
-        project,
-        approved: true,
-        code: updateCode,
-        coder: fullname,
-        title: "Researcher",
-        question: (index + 1),
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-      }).then((docRef) => {
-        const experimentCode = {
-          id: docRef.id,
+    try {
+      await questionArray.map(async (x, index) => {
+        const docRef = await feedbackCodeBooksRed.add({
+          project,
+          approved: true,
           code: updateCode,
           coder: fullname,
           title: "Researcher",
           question: (index + 1),
-          checked: "✅"
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+        if (docRef.id) {
+          const experimentCode = {
+            id: docRef.id,
+            code: updateCode,
+            coder: fullname,
+            title: "Researcher",
+            question: (index + 1),
+            checked: "✅"
+          }
+          experimentCodes.push(experimentCode);
         }
-        experimentCodes.push(experimentCode);
-        setAllExperimentsCodes(experimentCodes);
         if (index + 1 === questionArray.length) {
           setUpdateCode("");
           setAdminCodeData({});
           handleCloseAdminAddModal();
+          setAllExperimentsCodes(experimentCodes);
           setSnackbarMessage(`Code Add to both Questions!`);
         }
-      })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-        })
-    });
+      });
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
   }
 
   return (
@@ -728,8 +737,8 @@ const CodeFeedback = props => {
               "--List-item-paddingRight": "1rem"
             }}
           >
-            {approvedNewCodes.map(code => (
-              <ListItem key={code} disablePadding selected={selected[code]}>
+            {approvedNewCodes.map((code, index) => (
+              <ListItem key={index} disablePadding selected={selected[code]}>
                 <ListItemButton
                 >
                   <ListItemText id={`${code}`} primary={`${code}`} />
@@ -763,8 +772,8 @@ const CodeFeedback = props => {
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {approvedCodes.map(code => (
-                  <ListItem key={code} disablePadding selected={selected[code]}>
+                {approvedCodes.map((code, index) => (
+                  <ListItem key={index} disablePadding selected={selected[code]}>
                     <ListItemButton
                       value={code}
                       onClick={() => {
@@ -790,8 +799,8 @@ const CodeFeedback = props => {
                   "--List-item-paddingRight": "1rem"
                 }}
               >
-                {sentences.map(sentence => (
-                  <ListItem key={sentence} disablePadding>
+                {sentences.map((sentence, index) => (
+                  <ListItem key={index} disablePadding>
                     <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
                       <ListItemIcon>
                         <Checkbox
@@ -960,7 +969,7 @@ const CodeFeedback = props => {
               style={{ width: '90%' }}
               minRows={5}
               value={updateCode}
-              placeholder={"Update the code here."}
+              placeholder={"Add the code here."}
               onChange={(event) => setUpdateCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
