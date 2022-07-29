@@ -60,7 +60,7 @@ const CodeFeedback = props => {
   const [docId, setDocId] = useState("");
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState("");
-  const [allExperimentCodes, setAllExperimentsCodes] = useState([]);
+  const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [unApprovedNewCodes, setUnApprovedNewCodes] = useState([]);
   const [updateCode, setUpdateCode] = useState("");
@@ -94,7 +94,9 @@ const CodeFeedback = props => {
       headerName: "Approved/UnApproved",
       renderCell: cellValues => {
         return (
-          <GridCellToolTip isLink={false} toolTip={false} actionCell={true} cellValues={cellValues} />
+          <div style={{ width: "100%", textAlign: "center", cursor: "pointer" }}>
+            {cellValues.value}
+          </div>
         );
       }
     },
@@ -130,17 +132,29 @@ const CodeFeedback = props => {
       headerName: "Action",
       renderCell: cellValues => {
         return (
-          <IconButton
-            edge="end"
-            aria-label="edit"
-            onClick={() => {
-              setUpdateCode(cellValues.row.code);
-              setAdminCodeData(cellValues.row);
-              handleOpenAdminEditModal();
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <>
+            <IconButton
+              sx={{ mR: "10px" }}
+              edge="end"
+              aria-label="edit"
+              onClick={() => {
+                setUpdateCode(cellValues.row.code);
+                setAdminCodeData(cellValues.row);
+                handleOpenAdminEditModal();
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => {
+                setAdminCodeData(cellValues.row);
+                handleOpenDeleteModal();
+              }}>
+              <DeleteIcon />
+            </IconButton>
+          </>
         );
       }
     }
@@ -193,7 +207,7 @@ const CodeFeedback = props => {
 
       const sortedAllCodes = orderBy(allCodes, ['coder', 'code'], ['asc', 'asc']);
 
-      setAllExperimentsCodes(sortedAllCodes);
+      setAllExperimentCodes(sortedAllCodes);
       setApprovedCodes(approvedFeedbackCodeBooks);
 
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
@@ -490,7 +504,7 @@ const CodeFeedback = props => {
         };
         const msg = !isChecked ? "Code approved" : "Code disapproved";
         setSnackbarMessage(msg);
-        setAllExperimentsCodes(codesApp);
+        setAllExperimentCodes(codesApp);
       }
     }
   };
@@ -509,8 +523,33 @@ const CodeFeedback = props => {
         const updatedUnApprovedCode = unApprovedCode.filter(elem => elem !== selectedCode);
         setSnackbarMessage("code successfully deleted!");
         setUpdateCode("");
-        setSelectedCode("")
+        setSelectedCode("");
         setUnApprovedNewCodes(updatedUnApprovedCode);
+        handleCloseDeleteModal();
+      })
+      .catch(err => {
+        console.error(err);
+        setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+      });
+  }
+
+  const handleAdminDelete = async () => {
+    let experimentCodes = [...allExperimentCodes];
+    console.log('adminCodeData', adminCodeData);
+    await firebase.db
+      .collection("feedbackCodeBooks")
+      .where("code", "==", adminCodeData.code)
+      .where("project", "==", project)
+      .where("coder", "==", adminCodeData.coder)
+      .get()
+      .then(async (doc) => {
+        const [codeDoc] = doc.docs;
+        await codeDoc.ref.delete()
+        experimentCodes = experimentCodes.filter(elem => elem.id !== adminCodeData.id);
+        setSnackbarMessage("code successfully deleted!");
+        setUpdateCode("");
+        setSelectedCode("");
+        setAllExperimentCodes(experimentCodes);
         handleCloseDeleteModal();
       })
       .catch(err => {
@@ -577,13 +616,13 @@ const CodeFeedback = props => {
       const experimentCodes = [...allExperimentCodes];
 
       // check if the code already exists in approvedCode or unapprovedCode
-      const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
-      if (checkIfCodeExist) {
-        setSnackbarMessage("This code already exists, please try some other code");
+      const codes = experimentCodes.filter(elem => elem.code === updateCode);
+      if (codes.length >= 2) {
+        setSnackbarMessage("This code already exists 2 or more times, please try some other code");
         return;
       }
 
-      const index = experimentCodes.findIndex(elem => elem.code === adminCodeData.code);
+      const index = experimentCodes.findIndex(elem => elem.id === adminCodeData.id);
       if (index >= 0) {
         // update the document based on selected code
         firebase.db
@@ -608,7 +647,7 @@ const CodeFeedback = props => {
             setSnackbarMessage(`Code updated for ${updatedExperimentCode.coder}!`);
             setUpdateCode("");
             setAdminCodeData({});
-            setAllExperimentsCodes(experimentCodes);
+            setAllExperimentCodes(experimentCodes);
             handleCloseAdminEditModal();
           })
           .catch(err => {
@@ -621,15 +660,27 @@ const CodeFeedback = props => {
 
   const handleAdminAddNewCode = async () => {
     const experimentCodes = [...allExperimentCodes];
+    // iteration to add total number of questions for same code
+    let questionArray = [1, 2];
+
     // check if the code already exists in approvedCode or unapprovedCode
-    const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
-    if (checkIfCodeExist) {
-      setSnackbarMessage("This code already exists, please try some other code");
+    const checkIfItHasSameCode = experimentCodes.filter(elem => elem.code === updateCode);
+    if (checkIfItHasSameCode.length >= 2) {
+      setSnackbarMessage("This code already exists 2 or more times, please try some other code");
       return;
     }
+    if (checkIfItHasSameCode.length === 1) {
+      //if it exists it will iterate only once
+      questionArray = [1];
 
+    }
     const feedbackCodeBooksRed = firebase.db.collection("feedbackCodeBooks");
-    const questionArray = [1, 2];
+    const getQuestionNo = (index) => {
+      if (checkIfItHasSameCode.length === 1) {
+        return checkIfItHasSameCode[0].question === 1 ? 2 : 1;
+      }
+      return (index + 1);
+    }
     try {
       await questionArray.map(async (x, index) => {
         const docRef = await feedbackCodeBooksRed.add({
@@ -638,7 +689,7 @@ const CodeFeedback = props => {
           code: updateCode,
           coder: fullname,
           title: "Researcher",
-          question: (index + 1),
+          question: getQuestionNo(index),
           createdAt: firebase.firestore.Timestamp.fromDate(new Date())
         });
         if (docRef.id) {
@@ -647,7 +698,7 @@ const CodeFeedback = props => {
             code: updateCode,
             coder: fullname,
             title: "Researcher",
-            question: (index + 1),
+            question: getQuestionNo(index),
             checked: "✅"
           }
           experimentCodes.push(experimentCode);
@@ -656,8 +707,11 @@ const CodeFeedback = props => {
           setUpdateCode("");
           setAdminCodeData({});
           handleCloseAdminAddModal();
-          setAllExperimentsCodes(experimentCodes);
-          setSnackbarMessage(`Code Add to both Questions!`);
+          setAllExperimentCodes(experimentCodes);
+          const msg = checkIfItHasSameCode.length === 1 ?
+            `Code Added for Question ${getQuestionNo(index)}!` :
+            `Code Add to both Questions!`;
+          setSnackbarMessage(msg);
         }
       });
     } catch (error) {
@@ -707,7 +761,7 @@ const CodeFeedback = props => {
                         aria-label="delete"
                         onClick={() => {
                           setSelectedCode(code);
-                          handleOpenDeleteModal(code);
+                          handleOpenDeleteModal();
                         }}>
                         <DeleteIcon />
                       </IconButton>
@@ -899,10 +953,19 @@ const CodeFeedback = props => {
               onChange={(event) => setUpdateCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button className="Button" variant="contained" onClick={handleEdit}>
+              <Button
+                className="Button"
+                variant="contained"
+                onClick={handleEdit}>
                 Update
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseEditModal}>
+              <Button
+                variant="contained"
+                className="Button Red"
+                onClick={() => {
+                  setUpdateCode("");
+                  handleCloseEditModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -939,7 +1002,13 @@ const CodeFeedback = props => {
               <Button className="Button" variant="contained" onClick={handleAdminEdit}>
                 Update
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseAdminEditModal}>
+              <Button
+                variant="contained"
+                className="Button Red"
+                onClick={() => {
+                  setUpdateCode("");
+                  handleCloseAdminEditModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -973,10 +1042,20 @@ const CodeFeedback = props => {
               onChange={(event) => setUpdateCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button disabled={!updateCode} className="Button" variant="contained" onClick={handleAdminAddNewCode}>
+              <Button
+                disabled={!updateCode}
+                className="Button"
+                variant="contained"
+                onClick={handleAdminAddNewCode}>
                 Add
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseAdminAddModal}>
+              <Button
+                className="Button Red"
+                variant="contained"
+                onClick={() => {
+                  setUpdateCode("");
+                  handleCloseAdminAddModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -993,13 +1072,32 @@ const CodeFeedback = props => {
         <Box sx={{ ...modalStyle }}>
           <Typography variant="h6" margin-bottom="20px">
             Are you sure, you want to delete?
-            <br /> {selectedCode}
+            <br /> {selectedCode || adminCodeData.code}
           </Typography>
           <Box sx={{ textAlign: "center" }}>
-            <Button className="Button Red" variant="contained" onClick={handleDelete}>
+            <Button
+              variant="contained"
+              className="Button Red"
+              onClick={() => {
+                if (email === "oneweb@umich.edu") {
+                  handleAdminDelete();
+                } else {
+                  handleDelete();
+                }
+              }}>
               Delete
             </Button>
-            <Button className="Button" variant="contained" onClick={handleCloseDeleteModal}>
+            <Button
+              className="Button"
+              variant="contained"
+              onClick={() => {
+                if (email === "oneweb@umich.edu") {
+                  setAdminCodeData({});
+                } else {
+                  setSelectedCode("");
+                }
+                handleCloseDeleteModal();
+              }}>
               Cancel
             </Button>
           </Box>
