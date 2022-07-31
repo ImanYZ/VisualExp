@@ -16,6 +16,7 @@ const {
   addDoneFeildToRecallGrades,
   deleteIncompleteRecallGrades,
   restructureFeedBackCode,
+  deleteDamagedDocumentsOnFreeRecallGrades,
 } = require("./visualExp");
 
 const app = express();
