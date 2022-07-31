@@ -338,7 +338,7 @@ const PersonalInfo = props => {
                     </Box>
                 
                       <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
-                      <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />ﬁ
+                      <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
                       <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
                       <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
                       <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
