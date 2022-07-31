@@ -819,3 +819,81 @@ exports.restructureFeedBackCode = async (req, res) => {
 //   return res.status(200).json({ done: true });
 // };
 
+exports.deleteDamagedDocumentsOnFreeRecallGrades = async (req, res) => {
+  try {
+    let recallGradeDocsInitial = await db
+      .collection("recallGrades")
+      .orderBy("createdAt")
+      .limit(1)
+      .get();
+    let documentsNumber = 1;
+    let lastVisibleRecallGradesDoc =
+      recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
+    console.log("Starting");
+    while (lastVisibleRecallGradesDoc) {
+      recallGradeDocs = await db
+        .collection("recallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleRecallGradesDoc)
+        .limit(40000)
+        .get();
+      lastVisibleRecallGradesDoc =
+        recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
+      console.log(documentsNumber);
+      documentsNumber = documentsNumber + 40000;
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+         let recallGradeRef = db
+          .collection("recallGrades")
+          .doc(recallGradeDoc.id);
+        let recallGradeData = recallGradeDoc.data();
+        let recallUpdate = {};
+        if (recallGradeData.response === "recall1WeekreText") {
+          console.log(recallGradeData);
+          let userDoc = await db
+          .collection("users")
+          .doc(recallGradeData.user)
+          .get();
+          let userData = userDoc.data();
+          if(userData.pConditions[0].passage === recallGradeData.passage){
+            recallGradeData.response = userData.pConditions[0]["recall1WeekreText"];
+          }else{
+            recallGradeData.response = userData.pConditions[1]["recall1WeekreText"];
+          }
+          console.log(recallGradeData);
+          await batchUpdate(recallGradeRef, recallGradeData);
+        } else if(recallGradeData.response === "recall3DaysreText"){
+          let userDoc = await db
+          .collection("users")
+          .doc(recallGradeData.user)
+          .get();
+          let userData = userDoc.data();
+          if(userData.pConditions[0].passage === recallGradeData.passage){
+            recallGradeData.response = userData.pConditions[0]["recall3DaysreText"];
+          }else{
+            recallGradeData.response = userData.pConditions[1]["recall3DaysreText"];
+          }
+          console.log(recallGradeData);
+          await batchUpdate(recallGradeRef, recallGradeData);
+        }else if(recallGradeData.response === "recallreText"){
+          let userDoc = await db
+          .collection("users")
+          .doc(recallGradeData.user)
+          .get();
+          let userData = userDoc.data();
+          if(userData.pConditions[0].passage === recallGradeData.passage){
+            recallGradeData.response = userData.pConditions[0]["recallreText"];
+          }else{
+            recallGradeData.response = userData.pConditions[1]["recallreText"];
+          }
+          console.log(recallGradeData);
+          await batchUpdate(recallGradeRef, recallGradeData);
+        }
+      }
+    }
+    await commitBatch();
+    console.log("Done");
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
