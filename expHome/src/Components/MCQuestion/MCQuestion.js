@@ -50,7 +50,7 @@ const MCQuestion = props => {
       .where("project", "==", project)
       .where("question", "==", curQuestion)
       .get();
-    const codesHere = experimentCodeDocs.docs.map((doc) =>  doc.data().code);
+    const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
     setCodes(codesHere);
   };
 
@@ -80,8 +80,7 @@ const MCQuestion = props => {
   };
 
   const moveNext = () => {
-   
-    if (selectCodes || !([5, 19].includes(props.step))) {
+    if (selectCodes || ![5, 19].includes(props.step)) {
       const qsLeft = [];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
         if (!choices[qIdx]) {
@@ -197,7 +196,7 @@ const MCQuestion = props => {
               />
             ))}
           </RadioGroup>
-          {(props.explanations && props.explanations.length > 0 && !selectCodes) ?(
+          {props.explanations && props.explanations.length > 0 && !selectCodes ? (
             <>
               <h3>Why do you think so?</h3>
               <TextareaAutosize
@@ -209,7 +208,7 @@ const MCQuestion = props => {
                 value={explanation}
               />
             </>
-          ):null}
+          ) : null}
 
           {[5, 19].includes(props.step) && selectCodes ? (
             <div>
@@ -251,7 +250,9 @@ const MCQuestion = props => {
                   id="ExplanantionTextArea"
                   aria-label="Explanantion text box"
                   minRows={5}
-                  placeholder={"Please Enter your code here ?"}
+                  placeholder={
+                    "If what you are looking for does not exist among the options above, you can enter them here, only one per textbox."
+                  }
                   onChange={codeChange}
                   value={newCode}
                 />
