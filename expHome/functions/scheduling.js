@@ -249,7 +249,6 @@ exports.lifeLoggerScheduler = async context => {
 
 exports.scheduleLifeLog = async (req, res) => {
   try {
-    console.log({ body: req.body });
     const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
     if (authUser.email === "oneweb@umich.edu") {
       let start, end;
