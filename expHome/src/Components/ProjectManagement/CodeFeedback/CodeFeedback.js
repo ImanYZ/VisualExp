@@ -10,6 +10,8 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Sheet from "@mui/joy/Sheet";
+import Select from "@mui/material/Select";
+import OutlinedInput from '@mui/material/OutlinedInput';
 import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -60,10 +62,11 @@ const CodeFeedback = props => {
   const [docId, setDocId] = useState("");
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState("");
-  const [allExperimentCodes, setAllExperimentsCodes] = useState([]);
+  const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [unApprovedNewCodes, setUnApprovedNewCodes] = useState([]);
-  const [updateCode, setUpdateCode] = useState("");
+  const [code, setCode] = useState("");
+  const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
   // modal options
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -94,7 +97,9 @@ const CodeFeedback = props => {
       headerName: "Approved/UnApproved",
       renderCell: cellValues => {
         return (
-          <GridCellToolTip isLink={false} toolTip={false} actionCell={true} cellValues={cellValues} />
+          <div style={{ width: "100%", textAlign: "center", cursor: "pointer" }}>
+            {cellValues.value}
+          </div>
         );
       }
     },
@@ -130,17 +135,29 @@ const CodeFeedback = props => {
       headerName: "Action",
       renderCell: cellValues => {
         return (
-          <IconButton
-            edge="end"
-            aria-label="edit"
-            onClick={() => {
-              setUpdateCode(cellValues.row.code);
-              setAdminCodeData(cellValues.row);
-              handleOpenAdminEditModal();
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <>
+            <IconButton
+              sx={{ mR: "10px" }}
+              edge="end"
+              aria-label="edit"
+              onClick={() => {
+                setCode(cellValues.row.code);
+                setAdminCodeData(cellValues.row);
+                handleOpenAdminEditModal();
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => {
+                setAdminCodeData(cellValues.row);
+                handleOpenDeleteModal();
+              }}>
+              <DeleteIcon />
+            </IconButton>
+          </>
         );
       }
     }
@@ -151,25 +168,7 @@ const CodeFeedback = props => {
     if (project) {
       let allCodes = [];
       let approvedFeedbackCodeBooks = [];
-      const experimentCodesRef = firebase.db.collection("experimentCodes")
       const feedbackCodeBooksRef = firebase.db.collection("feedbackCodeBooks");
-
-      const experimentCodesDocs = await experimentCodesRef
-        .where("project", "==", project)
-        .get();
-
-      for (let Doc of experimentCodesDocs.docs) {
-        let data = Doc.data();
-        const newCode = {
-          id: Doc.id,
-          code: data.code,
-          coder: data.coder,
-          title: data && data.title ? data.title : '',
-          question: data.question,
-          checked: data.approved ? "✅" : "◻",
-        };
-        allCodes.push(newCode);
-      }
 
       const feedbackCodeBooksDocs = await feedbackCodeBooksRef
         .where("project", "==", project)
@@ -193,7 +192,7 @@ const CodeFeedback = props => {
 
       const sortedAllCodes = orderBy(allCodes, ['coder', 'code'], ['asc', 'asc']);
 
-      setAllExperimentsCodes(sortedAllCodes);
+      setAllExperimentCodes(sortedAllCodes);
       setApprovedCodes(approvedFeedbackCodeBooks);
 
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
@@ -311,9 +310,9 @@ const CodeFeedback = props => {
     if (!approvedCodes.includes(newCode) && newCode !== "") {
       codesRef.set({
         project,
-        approved: false,
         code: newCode,
         coder: fullname,
+        approved: false,
         title: "Researcher",
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       });
@@ -461,12 +460,6 @@ const CodeFeedback = props => {
 
   const handleCellClick = async clickedCell => {
     if (clickedCell.field === "checked") {
-      let collection;
-      if (clickedCell.row.title === "Participant") {
-        collection = "experimentCodes";
-      } else {
-        collection = "feedbackCodeBooks";
-      }
       let codesApp = [...allExperimentCodes];
       const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
       const isChecked = codesApp[appIdx][clickedCell.field] === "✅";
@@ -474,14 +467,14 @@ const CodeFeedback = props => {
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
         const id = clickedCell.id;
 
-        const codesAppDoc = await firebase.db.collection(collection).doc(id).get();
+        const codesAppDoc = await firebase.db.collection("feedbackCodeBooks").doc(id).get();
         const codesAppData = codesAppDoc.data();
 
         let codeUpdate = {
           ...codesAppData,
           approved: !isChecked
         };
-        let collectionRef = await firebase.db.collection(collection).doc(id);
+        let collectionRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
         await collectionRef.update(codeUpdate);
 
         codesApp[appIdx] = {
@@ -490,7 +483,7 @@ const CodeFeedback = props => {
         };
         const msg = !isChecked ? "Code approved" : "Code disapproved";
         setSnackbarMessage(msg);
-        setAllExperimentsCodes(codesApp);
+        setAllExperimentCodes(codesApp);
       }
     }
   };
@@ -508,9 +501,33 @@ const CodeFeedback = props => {
         await codeDoc.ref.delete()
         const updatedUnApprovedCode = unApprovedCode.filter(elem => elem !== selectedCode);
         setSnackbarMessage("code successfully deleted!");
-        setUpdateCode("");
-        setSelectedCode("")
+        setCode("");
+        setSelectedCode("");
         setUnApprovedNewCodes(updatedUnApprovedCode);
+        handleCloseDeleteModal();
+      })
+      .catch(err => {
+        console.error(err);
+        setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+      });
+  }
+
+  const handleAdminDelete = async () => {
+    let experimentCodes = [...allExperimentCodes];
+    await firebase.db
+      .collection("feedbackCodeBooks")
+      .where("code", "==", adminCodeData.code)
+      .where("project", "==", project)
+      .where("coder", "==", adminCodeData.coder)
+      .get()
+      .then(async (doc) => {
+        const [codeDoc] = doc.docs;
+        await codeDoc.ref.delete()
+        experimentCodes = experimentCodes.filter(elem => elem.id !== adminCodeData.id);
+        setSnackbarMessage("code successfully deleted!");
+        setCode("");
+        setSelectedCode("");
+        setAllExperimentCodes(experimentCodes);
         handleCloseDeleteModal();
       })
       .catch(err => {
@@ -528,8 +545,8 @@ const CodeFeedback = props => {
     const unApprovedCode = [...unApprovedNewCodes];
 
     // check if the code already exists in approvedCode or unapprovedCode
-    const checkIfApprovedCodeExist = approvedCode.some(elem => elem === updateCode);
-    const checkIfUnApprovedCodeExist = unApprovedCode.some(elem => elem === updateCode);
+    const checkIfApprovedCodeExist = approvedCode.some(elem => elem === code);
+    const checkIfUnApprovedCodeExist = unApprovedCode.some(elem => elem === code);
     if (checkIfApprovedCodeExist || checkIfUnApprovedCodeExist) {
       setSnackbarMessage("This code already exists, please try some other code");
       return;
@@ -549,11 +566,11 @@ const CodeFeedback = props => {
           const codeData = codeDoc.data();
           const codeUpdate = {
             ...codeData,
-            code: updateCode,
+            code: code,
           };
           codeDoc.ref.update(codeUpdate);
-          unApprovedCode[index] = updateCode;
-          setUpdateCode("");
+          unApprovedCode[index] = code;
+          setCode("");
           setSelectedCode("");
           setUnApprovedNewCodes(unApprovedCode);
           handleCloseEditModal();
@@ -568,26 +585,20 @@ const CodeFeedback = props => {
 
   const handleAdminEdit = async () => {
     if (adminCodeData?.code && adminCodeData?.title) {
-      let collection;
-      if (adminCodeData.title === "Participant") {
-        collection = "experimentCodes";
-      } else {
-        collection = "feedbackCodeBooks";
-      }
       const experimentCodes = [...allExperimentCodes];
 
       // check if the code already exists in approvedCode or unapprovedCode
-      const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
-      if (checkIfCodeExist) {
-        setSnackbarMessage("This code already exists, please try some other code");
+      const codes = experimentCodes.filter(elem => elem.code === code);
+      if (codes.length >= 2) {
+        setSnackbarMessage("This code already exists 2 or more times, please try some other code");
         return;
       }
 
-      const index = experimentCodes.findIndex(elem => elem.code === adminCodeData.code);
+      const index = experimentCodes.findIndex(elem => elem.id === adminCodeData.id);
       if (index >= 0) {
         // update the document based on selected code
         firebase.db
-          .collection(collection)
+          .collection("feedbackCodeBooks")
           .where("code", "==", adminCodeData.code)
           .where("project", "==", project)
           .where("coder", "==", adminCodeData.coder)
@@ -597,18 +608,18 @@ const CodeFeedback = props => {
             const codeData = codeDoc.data();
             const codeUpdate = {
               ...codeData,
-              code: updateCode,
+              code: code,
             };
             codeDoc.ref.update(codeUpdate);
             const updatedExperimentCode = {
               ...adminCodeData,
-              code: updateCode
+              code: code
             }
             experimentCodes[index] = updatedExperimentCode;
             setSnackbarMessage(`Code updated for ${updatedExperimentCode.coder}!`);
-            setUpdateCode("");
+            setCode("");
             setAdminCodeData({});
-            setAllExperimentsCodes(experimentCodes);
+            setAllExperimentCodes(experimentCodes);
             handleCloseAdminEditModal();
           })
           .catch(err => {
@@ -621,43 +632,59 @@ const CodeFeedback = props => {
 
   const handleAdminAddNewCode = async () => {
     const experimentCodes = [...allExperimentCodes];
+    // iteration to add total number of questions for same code
+    let questionArray = [1, 2];
+
     // check if the code already exists in approvedCode or unapprovedCode
-    const checkIfCodeExist = experimentCodes.some(elem => elem.code === updateCode);
-    if (checkIfCodeExist) {
-      setSnackbarMessage("This code already exists, please try some other code");
+    const checkIfItHasSameCode = experimentCodes.filter(elem => elem.code === code);
+    if (checkIfItHasSameCode.length >= 2) {
+      setSnackbarMessage("This code already exists 2 or more times, please try some other code");
       return;
     }
+    if (checkIfItHasSameCode.length === 1) {
+      //if it exists it will iterate only once
+      questionArray = [1];
 
-    const feedbackCodeBooksRed = firebase.db.collection("feedbackCodeBooks");
-    const questionArray = [1, 2];
+    }
+    const feedbackCodeBooksRef = firebase.db.collection("feedbackCodeBooks");
+    const getQuestionNo = (index) => {
+      if (checkIfItHasSameCode.length === 1) {
+        return checkIfItHasSameCode[0].question === 1 ? 2 : 1;
+      }
+      return (index + 1);
+    }
     try {
       await questionArray.map(async (x, index) => {
-        const docRef = await feedbackCodeBooksRed.add({
+        const docRef = await feedbackCodeBooksRef.add({
           project,
           approved: true,
-          code: updateCode,
+          code: code,
           coder: fullname,
-          title: "Researcher",
-          question: (index + 1),
+          title: feedbackCodeTitle,
+          question: getQuestionNo(index),
           createdAt: firebase.firestore.Timestamp.fromDate(new Date())
         });
         if (docRef.id) {
           const experimentCode = {
             id: docRef.id,
-            code: updateCode,
+            code: code,
             coder: fullname,
-            title: "Researcher",
-            question: (index + 1),
+            title: feedbackCodeTitle,
+            question: getQuestionNo(index),
             checked: "✅"
           }
           experimentCodes.push(experimentCode);
         }
         if (index + 1 === questionArray.length) {
-          setUpdateCode("");
+          setCode("");
+          setFeedbackCodeTitle("");
           setAdminCodeData({});
           handleCloseAdminAddModal();
-          setAllExperimentsCodes(experimentCodes);
-          setSnackbarMessage(`Code Add to both Questions!`);
+          setAllExperimentCodes(experimentCodes);
+          const msg = checkIfItHasSameCode.length === 1 ?
+            `Code Added for Question ${getQuestionNo(index)}!` :
+            `Code Add to both Questions!`;
+          setSnackbarMessage(msg);
         }
       });
     } catch (error) {
@@ -696,7 +723,7 @@ const CodeFeedback = props => {
                         edge="end"
                         aria-label="edit"
                         onClick={() => {
-                          setUpdateCode(code);
+                          setCode(code);
                           setSelectedCode(code);
                           handleOpenEditModal(code);
                         }}>
@@ -707,7 +734,7 @@ const CodeFeedback = props => {
                         aria-label="delete"
                         onClick={() => {
                           setSelectedCode(code);
-                          handleOpenDeleteModal(code);
+                          handleOpenDeleteModal();
                         }}>
                         <DeleteIcon />
                       </IconButton>
@@ -894,15 +921,24 @@ const CodeFeedback = props => {
             <TextareaAutosize
               style={{ width: '90%' }}
               minRows={5}
-              value={updateCode}
+              value={code}
               placeholder={"Update your code here."}
-              onChange={(event) => setUpdateCode(event.currentTarget.value)}
+              onChange={(event) => setCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button className="Button" variant="contained" onClick={handleEdit}>
+              <Button
+                className="Button"
+                variant="contained"
+                onClick={handleEdit}>
                 Update
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseEditModal}>
+              <Button
+                variant="contained"
+                className="Button Red"
+                onClick={() => {
+                  setCode("");
+                  handleCloseEditModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -931,15 +967,21 @@ const CodeFeedback = props => {
             <TextareaAutosize
               style={{ width: '90%' }}
               minRows={5}
-              value={updateCode}
+              value={code}
               placeholder={"Update the code here."}
-              onChange={(event) => setUpdateCode(event.currentTarget.value)}
+              onChange={(event) => setCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
               <Button className="Button" variant="contained" onClick={handleAdminEdit}>
                 Update
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseAdminEditModal}>
+              <Button
+                variant="contained"
+                className="Button Red"
+                onClick={() => {
+                  setCode("");
+                  handleCloseAdminEditModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -956,27 +998,53 @@ const CodeFeedback = props => {
         <Box sx={{
           ...modalStyle,
           width: '500px',
-          height: '250px',
+          height: '350px',
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between"
         }}>
-          <Typography variant="h6" margin-bottom="20px">
+          <Typography variant="h6">
             Your Code will be added for both questions
           </Typography>
           <Box>
             <TextareaAutosize
-              style={{ width: '90%' }}
+              style={{ width: '90%', marginBottom: '10px' }}
               minRows={5}
-              value={updateCode}
+              value={code}
               placeholder={"Add the code here."}
-              onChange={(event) => setUpdateCode(event.currentTarget.value)}
+              onChange={(event) => setCode(event.currentTarget.value)}
             />
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="h6" sx={{ mr: '10px' }}>
+                Add code for:
+              </Typography>
+              <Select
+                native
+                value={feedbackCodeTitle}
+                input={<OutlinedInput label="Title" id="demo-dialog-native" />}
+                onChange={(event) => setFeedbackCodeTitle(event.target.value || '')}
+              >
+                <option disabled value={""}>Select Title</option>
+                <option value={"Participant"}>Participant</option>
+                <option value={"Researcher"}>Researcher</option>
+              </Select>
+            </Box>
             <Box sx={{ textAlign: "center" }}>
-              <Button disabled={!updateCode} className="Button" variant="contained" onClick={handleAdminAddNewCode}>
+              <Button
+                disabled={!code || !feedbackCodeTitle}
+                className="Button"
+                variant="contained"
+                onClick={handleAdminAddNewCode}>
                 Add
               </Button>
-              <Button className="Button Red" variant="contained" onClick={handleCloseAdminAddModal}>
+              <Button
+                className="Button Red"
+                variant="contained"
+                onClick={() => {
+                  setCode("");
+                  setFeedbackCodeTitle("");
+                  handleCloseAdminAddModal();
+                }}>
                 Cancel
               </Button>
             </Box>
@@ -993,13 +1061,32 @@ const CodeFeedback = props => {
         <Box sx={{ ...modalStyle }}>
           <Typography variant="h6" margin-bottom="20px">
             Are you sure, you want to delete?
-            <br /> {selectedCode}
+            <br /> {selectedCode || adminCodeData.code}
           </Typography>
           <Box sx={{ textAlign: "center" }}>
-            <Button className="Button Red" variant="contained" onClick={handleDelete}>
+            <Button
+              variant="contained"
+              className="Button Red"
+              onClick={() => {
+                if (email === "oneweb@umich.edu") {
+                  handleAdminDelete();
+                } else {
+                  handleDelete();
+                }
+              }}>
               Delete
             </Button>
-            <Button className="Button" variant="contained" onClick={handleCloseDeleteModal}>
+            <Button
+              className="Button"
+              variant="contained"
+              onClick={() => {
+                if (email === "oneweb@umich.edu") {
+                  setAdminCodeData({});
+                } else {
+                  setSelectedCode("");
+                }
+                handleCloseDeleteModal();
+              }}>
               Cancel
             </Button>
           </Box>
