@@ -372,7 +372,7 @@ const App = () => {
               researchersNum: 0,
               session,
               user: fullname,
-              response: responseName
+              response: pCond[responseName]
             };
             for (let phras of passageData.phrases) {
               recallGradeData.phrase = phras;
