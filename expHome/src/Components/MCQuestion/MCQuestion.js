@@ -49,6 +49,7 @@ const MCQuestion = props => {
       .where("approved", "==", true)
       .where("project", "==", project)
       .where("question", "==", curQuestion)
+      .where("title", "==", "Participant")
       .get();
     const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
     setCodes(codesHere);
