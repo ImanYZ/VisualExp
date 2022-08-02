@@ -109,6 +109,11 @@ const postQuestions = [
     b: "Passage 2",
     c: "Both",
     d: "Neither"
+  },
+  {
+    stem: "Which type of question did you prefer to enter your feedback?",
+    a: "Open-ended free text",
+    b: "Choosing/entering the options",
   }
 ];
 
@@ -141,8 +146,11 @@ const App = () => {
   // const [toOptions, setToOptions] = useState([]);
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
-    { explanation: "", codes: [] }
+    { explanation: "", codes: [] },
+    {preferedFeedbackExplanation:"",choice:""}
   ]);
+
+
   const [birthDate, setBirthDate] = useState(null);
   const [major, setMajor] = useState({
     Major: "Information Sciences",
