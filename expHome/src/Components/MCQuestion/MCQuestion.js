@@ -16,6 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
+import Box from '@mui/material/Box';
 // import LiveHelp from "@mui/icons-material/LiveHelp";
 
 import { choicesState } from "../../store/ExperimentAtoms";
@@ -54,24 +55,30 @@ const MCQuestion = props => {
       .where("title", "==", "Participant")
       .get();
     const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
+    console.log("codesHere:::::::::",codesHere);
     setCodes(codesHere);
   };
 
   useEffect(() => {
     retrieveFeedbackcodes();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectCodes]);
 
   useEffect(() => {
     let qsLeft = 0;
-    let allAns = true;
-    for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
-      if (!choices[qIdx]&&(!choiceQuestion)) {
-        allAns = false;
-        qsLeft += 1;
-      }
-    }
+   
     setQuestionsLeft(qsLeft);
-    setAllAnswered(allAns);
+    if(![5, 19].includes(props.step)){
+      let allAns = true;
+      for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
+        if (!choices[qIdx]) {
+          allAns = false;
+          qsLeft += 1;
+        }
+      }
+      setAllAnswered(allAns);
+    }
+   
   }, [choices, choiceFeedbackQuestions,props.questions]);
 
   const choiceChange = event => {
@@ -178,11 +185,14 @@ const choiceFeedbackQuestion = (event) => {
   props.setExplanations(newExp);
   console.log(newExp);
   setAllAnswered(true);
+  console.log("choice feedback code")
  }
 
-  console.log(allAnswered);
+  console.log("allAnswerd::::::::",allAnswered);
   console.log(choiceQuestion);
   console.log(question.stem);
+  console.log("selectedCodes",selectCodes);
+  console.log(codes);
   return (
     <div
       style={
@@ -251,7 +261,7 @@ const choiceFeedbackQuestion = (event) => {
             </>
           ) : null}
 
-          {[5, 19].includes(props.step) && selectCodes && !choiceQuestion? (
+          {[5, 19].includes(props.step) && selectCodes ? (
             <div>
               <h3>Better Explain  Your Feedback:</h3>
 
@@ -298,12 +308,27 @@ const choiceFeedbackQuestion = (event) => {
                   value={newCode}
                 />
               </FormControl>
-      
+              <Box sx={{m:"10px 600px 0px 0px"}}>
+        {
+              ([5, 19].includes(props.step) && selectCodes) && (<Button
+               id="QuestionNextBtn"
+               onClick={addCode}
+               disabled={(!newCode || newCode === "")}
+               className={(!newCode || newCode === "") ? "Button Disabled" : "Button"}
+               variant="contained"
+             >
+               ADD YOUR Explanation
+             </Button>)
+          }
+          </Box>
            
             </div>  
           ) : null}
         </FormControl>
+       
         <div id="QuestionFooter">
+        
+          
           {selectCodes || ![5, 19].includes(props.step) ? (
             
             <Button
@@ -315,12 +340,13 @@ const choiceFeedbackQuestion = (event) => {
             >
               Next
             </Button>
+            
           ) : (
             !choiceQuestion && (<Button id="QuestionNextBtn" onClick={submit} disabled={false} className={"Button"} variant="contained">
               Submit
             </Button>)
           )}
-
+          
           <Button
             id="QuestionPreviousBtn"
             onClick={movePrevious} 
@@ -330,6 +356,8 @@ const choiceFeedbackQuestion = (event) => {
           >
             Previous
           </Button>
+        
+       
         </div>
       </Paper>
 
