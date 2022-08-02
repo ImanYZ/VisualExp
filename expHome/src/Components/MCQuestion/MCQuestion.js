@@ -45,7 +45,7 @@ const MCQuestion = props => {
 
   const retrieveFeedbackcodes = async () => {
     const experimentCodeDocs = await firebase.db
-      .collection("experimentCodes")
+      .collection("feedbackCodeBooks")
       .where("approved", "==", true)
       .where("project", "==", project)
       .where("question", "==", curQuestion)
@@ -115,11 +115,12 @@ const MCQuestion = props => {
   const codeChange = event => {
     setNewCode(event.currentTarget.value);
   };
+
   const addCode = async () => {
     const newCodes = [...codes];
     newCodes.push(newCode);
     setCodes(newCodes);
-    const experimentCodeRef = firebase.db.collection("experimentCodes").doc();
+    const experimentCodeRef = firebase.db.collection("feedbackCodeBooks").doc();
     experimentCodeRef.set({
       approved: false,
       code: newCode,
