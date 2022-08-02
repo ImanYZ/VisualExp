@@ -81,9 +81,15 @@
   margin-bottom: 70px;
   background-color: orange;
 }
-
+#AddCodeButton{
+  background-color: rgb(112, 187, 0);
+  float: right;
+}
+#AddCodeButton.Disabled,
 #QuestionNextBtn.Disabled,
 #QuestionPreviousBtn.Disabled,
 #QuestionSubmitBtn.Disabled {
   background-color: rgb(199, 199, 199);
 }
+
+
