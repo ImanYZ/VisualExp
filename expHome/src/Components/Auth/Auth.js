@@ -120,7 +120,7 @@ const Auth = props => {
             email: uEmail,
             firstname: fName,
             lastname: lName,
-            project: currentProject
+            project: userData.project
           };
           if (course) {
             userData.course = course;
@@ -614,7 +614,7 @@ const Auth = props => {
                   onChange={event => setResetPasswordEmail(event.target.value)}
                   value={resetPasswordEmail}
                   errorMessage={passwordResetError}
-                // autocomplete="off"
+                  // autocomplete="off"
                 />
                 <Button
                   id="ForgotPasswordEmailButton"
