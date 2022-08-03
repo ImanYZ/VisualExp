@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense,useCallback } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import axios from "axios";
@@ -32,7 +32,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-// import CSCObjLoader from "./CSCObjLoader";
+import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
@@ -406,6 +406,9 @@ const AddInstructor = props => {
   const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
   const [otherInstructorData, setOtherInstructorData] = useState({});
 
+
+
+  
   useEffect(() => {
     setSelectedRows([]);
     setValues(initialState);
@@ -414,8 +417,26 @@ const AddInstructor = props => {
     setLastname("");
     setEmail("");
     setExplanation("");
+    CSCObjLoader(CSCObj,setCSCObj,setAllCountries);
   }, [project]);
 
+
+  useEffect(() => {
+    const getCountries = async () => {
+      const defaultCountry= {
+        name: "Prefer not to say",
+        isoCode: "",
+        phonecode: "",
+        flag: "",
+        currency: "",
+        latitude: "",
+        longitude: ""
+      };
+      const { Country } = await import("country-state-city");
+      setAllCountries([...Country.getAllCountries(), defaultCountry]);
+    };
+    getCountries();
+  }, []);
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
