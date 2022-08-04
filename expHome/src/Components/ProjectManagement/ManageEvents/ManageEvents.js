@@ -398,10 +398,7 @@ const ManageEvents = props => {
         event.order = availabilities[availabilitiesIdx].order;
         let userDocs = await firebase.db.collection("users").where("email", "==", event.participant).get();
         if (userDocs.docs.length === 0) {
-          userDocs = await firebase.db
-            .collection("usersInstructorCoNoteSurvey")
-            .where("email", "==", event.participant)
-            .get();
+          userDocs = await firebase.db.collection("instructors").where("email", "==", event.participant).get();
         }
         if (userDocs.docs.length === 0) {
           userDocs = await firebase.db
@@ -484,7 +481,7 @@ const ManageEvents = props => {
       let recallSecondRatio = 0;
       let recallThirdRatio = 0;
       const userDocs = await firebase.db.collection("users").get();
-      const surveyInstructors = await firebase.db.collection("usersInstructorCoNoteSurvey").get();
+      const surveyInstructors = await firebase.db.collection("instructors").get();
       const surveyUsers = await firebase.db.collection("usersStudentCoNoteSurvey").get();
       for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...userDocs.docs]) {
         const userData = userDoc.data();
@@ -630,7 +627,7 @@ const ManageEvents = props => {
         // We need to first retrieve which project this user belongs to.
         let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
         if (!userDoc.exists) {
-          userDoc = await firebase.db.collection("usersInstructorCoNoteSurvey").doc(theRow.fullname).get();
+          userDoc = await firebase.db.collection("instructors").doc(theRow.fullname).get();
         }
         if (!userDoc.exists) {
           userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(theRow.fullname).get();
@@ -748,7 +745,7 @@ const ManageEvents = props => {
     let userDocs = await firebase.db.collection("users").where("email", "==", participant).get();
 
     if (userDocs.docs.length === 0) {
-      userDocs = await firebase.db.collection("usersInstructorCoNoteSurvey").where("email", "==", participant).get();
+      userDocs = await firebase.db.collection("instructors").where("email", "==", participant).get();
     }
 
     if (userDocs.docs.length === 0) {
@@ -756,7 +753,6 @@ const ManageEvents = props => {
     }
 
     if (userDocs.docs.length > 0) {
-      const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
       const userData = userDocs.docs[0].data();
       // If the user had previously completed all the three experiment sessions,
       // We just alert it and do nothing.
@@ -783,6 +779,8 @@ const ManageEvents = props => {
             .where("email", "==", participant)
             .where("order", "==", order)
             .get();
+
+          console.log("Schedule Docs = ", scheduleDocs.docs.length);
           // If it exists:
           if (scheduleDocs.docs.length > 0) {
             // 1) Get rid of the event "id" and "order" from the document.
@@ -791,13 +789,15 @@ const ManageEvents = props => {
               id: firebase.firestore.FieldValue.delete(),
               order: firebase.firestore.FieldValue.delete()
             });
+            console.log("Before Del");
             // 2) Delete the event from Google Calendar.
             responseObj = await axios.post("/deleteEvent", {
               eventId: events[eventIdx].id
             });
+            console.log("after Del");
             errorAlert(responseObj.data);
             // 3) Schedule the new session on Google Calendar.
-            responseObj = await axios.post("/scheduleSingleSession", {
+            console.log({
               email: participant,
               researcher: availableSessions[sessi.toLocaleString()][0],
               order,
@@ -805,6 +805,17 @@ const ManageEvents = props => {
               project: currentProject,
               sessionIndex: i
             });
+            responseObj = await axios.post(
+              "http://localhost:5001/visualexp-5d2c6/us-central1/api/scheduleSingleSession",
+              {
+                email: participant,
+                researcher: availableSessions[sessi.toLocaleString()][0],
+                order,
+                session: sessi,
+                project: currentProject,
+                sessionIndex: i
+              }
+            );
             errorAlert(responseObj.data);
             // Figure out whether the new session already exists in schedule
             // for this participant.

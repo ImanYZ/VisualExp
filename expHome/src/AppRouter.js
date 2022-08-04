@@ -16,6 +16,7 @@ import { secondSessionState, thirdSessionState } from "./store/ExperimentAtoms";
 import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
+import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import Home from "./Components/Home/Home";
@@ -39,6 +40,7 @@ import MonitorFeedBack from "./Components/Home/MonitorFeedBack";
 import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
+import WaitingForSessionStart from "./Components/WaitingForSessionStart";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -54,15 +56,18 @@ const AppRouter = props => {
 
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedFirstSession, setStartedFirstSession] = useState(false);
+  const [startedByResearcher, setStartedByResearcher] = useState(false);
 
   useEffect(() => {
     const areTheyDuringAnExperimentSession = async () => {
       const currentTime = new Date().getTime();
       const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email).get();
       let duringSession = false;
+      let onGoingScheduleDoc = null;
       if (scheduleDocs.docs.length > 0) {
         for (let scheduleDoc of scheduleDocs.docs) {
           const scheduleData = scheduleDoc.data();
+
           // Google Calendar ID
           if (scheduleData.id) {
             const session = scheduleData.session.toDate().getTime();
@@ -75,17 +80,40 @@ const AppRouter = props => {
               duringSession = true;
               if (scheduleData.order === "2nd") {
                 setSecondSession(true);
+                onGoingScheduleDoc = scheduleDoc;
               } else if (scheduleData.order === "3rd") {
                 setThirdSession(true);
+                onGoingScheduleDoc = scheduleDoc;
               }
             }
             if (currentTime >= session) {
               setStartedFirstSession(true);
+              onGoingScheduleDoc = scheduleDoc;
             }
           }
         }
       }
       setDuringAnExperiment(duringSession);
+
+      if (duringSession && onGoingScheduleDoc !== null) {
+        // if they are during a sessoion then check if the session has started by the researcher or not.
+        const onGoingScheduleData = onGoingScheduleDoc.data();
+        if (onGoingScheduleData.hasStarted) {
+          setStartedByResearcher(true);
+        } else {
+          // keep listening to the schedule until the researcher starts the session.
+          const unSubscribe = firebase.db
+            .collection("schedule")
+            .doc(onGoingScheduleDoc.id)
+            .onSnapshot(docSnapshot => {
+              const changedSchedule = docSnapshot.data();
+              if (changedSchedule.hasStarted) {
+                setStartedByResearcher(true);
+                unSubscribe();
+              }
+            });
+        }
+      }
     };
     const reloadIfNotLoadedToday = async () => {
       const userRef = firebase.db.collection("users").doc(fullname);
@@ -208,7 +236,13 @@ const AppRouter = props => {
         {fullname && email && emailVerified === "Verified" ? (
           <>
             {duringAnExperiment ? (
-              <Route path="*" element={<App />} />
+              <>
+                {startedByResearcher ? (
+                  <Route path="*" element={<App />} />
+                ) : (
+                  <Route path="*" element={<WaitingForSessionStart />} />
+                )}
+              </>
             ) : (
               <>
                 <Route path="Activities/Experiments" element={<Activities activityName="Experiments" />} />
@@ -245,6 +279,7 @@ const AppRouter = props => {
           </>
         ) : (
           <>
+            <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
             <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
             <Route path="*" element={<AuthConsent />} />

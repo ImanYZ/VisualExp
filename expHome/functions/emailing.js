@@ -712,7 +712,7 @@ const reschEventNotificationEmail = async (
         // (courseName ? "[" + courseName + "] " : "") +
         ("You " +
           (declined ? "declined our invitation to" : "missed") +
-          " the UX Research Experiment Session" +
+          " the session" +
           (declined ? " that will begin in " + hoursLeft : "") +
           "!"),
       html:
@@ -721,10 +721,10 @@ const reschEventNotificationEmail = async (
 ${
   "<p>You " +
   (declined ? "declined our invitation to" : "missed") +
-  " the UX Research Experiment Session" +
+  " the session" +
   (declined ? " that will begin in " + hoursLeft : "") +
-  "!</p><p>We deleted this session and the following sessions for you.</p>" +
-  "<p>Please reschedule your experiment sessions on <a href='https://visualexp1.web.app/' target='_blank'>our research website</a> ASAP.</p>" +
+  "!</p><p>We deleted your scheduled sessions.</p>" +
+  "<p>Please reschedule your sessions on <a href='https://1cademy.us/' target='_blank'>our website</a> ASAP.</p>" +
   "<p>Please reply to this email if you have any questions or experience any difficulties scheduling your sessions."
 }
 </p>
