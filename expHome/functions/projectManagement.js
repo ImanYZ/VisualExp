@@ -1612,6 +1612,20 @@ exports.remindAddingInstructorsAdministrators = async context => {
   }
 };
 
+const getUserDocsfromEmail = async email => {
+  let userDocs = await db.collection("users").where("email", "==", email.toLowerCase()).get();
+
+  if (userDocs.docs.length === 0) {
+    userDocs = await db.collection("instructors").where("email", "==", email.toLowerCase()).get();
+  }
+
+  if (userDocs.docs.length === 0) {
+    userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", email.toLowerCase()).get();
+  }
+
+  return userDocs;
+};
+
 // This is called in a pubsub every 4 hours.
 // Email reminders to researchers and participants to do the following:
 // For future Google Calendar events, to:
@@ -1695,21 +1709,7 @@ exports.remindCalendarInvitations = async context => {
             else if (attendee.email.toLowerCase() === participant.email) {
               // The only way to get the user data, like their firstname, which
               // sessions they have completed so far, ... is through "users"
-              let userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
-
-              if (userDocs.docs.length === 0) {
-                userDocs = await db
-                  .collection("usersInstructorCoNoteSurvey")
-                  .where("email", "==", attendee.email.toLowerCase())
-                  .get();
-              }
-
-              if (userDocs.docs.length === 0) {
-                userDocs = await db
-                  .collection("usersStudentCoNoteSurvey")
-                  .where("email", "==", attendee.email.toLowerCase())
-                  .get();
-              }
+              const userDocs = await getUserDocsfromEmail(attendee.email.toLowerCase());
 
               if (userDocs.docs.length > 0) {
                 const userData = userDocs.docs[0].data();
@@ -1747,7 +1747,7 @@ exports.remindCalendarInvitations = async context => {
                   // with the 1st session:
                   if (order === "1st" && !participant.firstDone) {
                     // Then, we delete all their sessions from Google Calendar and
-                    // schedule then, send them an email asking them to reschedule
+                    // schedule them, send them an email asking them to reschedule
                     // all their sessions.
                     setTimeout(() => {
                       reschEventNotificationEmail(
@@ -1837,6 +1837,9 @@ exports.remindCalendarInvitations = async context => {
     const pastEvs = await pastEvents(40);
     for (let ev of pastEvs) {
       const startTime = new Date(ev.start.dateTime);
+      // Because some people may spend more time in their sessions,
+      // we should consider the fact that while someone has not ended their session yet,
+      // this PubSub may be invoked. To prevent that we define the end time an hour after the actual end time of the session.
       const endTimeStamp = new Date(ev.end.dateTime).getTime() + 60 * 60 * 1000;
       const hoursLeft = (currentTime - startTime.getTime()) / (60 * 60 * 1000);
       if (
@@ -1857,7 +1860,8 @@ exports.remindCalendarInvitations = async context => {
             participant.responseStatus = attendee.responseStatus;
             // The only way to get the user data, like their firstname, which
             // sessions they have completed so far, ... is through "users"
-            const userDocs = await db.collection("users").where("email", "==", attendee.email.toLowerCase()).get();
+            const userDocs = await getUserDocsfromEmail(attendee.email.toLowerCase());
+
             if (userDocs.docs.length > 0) {
               const userData = userDocs.docs[0].data();
               participant.firstname = userData.firstname;
@@ -1881,7 +1885,15 @@ exports.remindCalendarInvitations = async context => {
               } else {
                 participant.thirdDone = false;
               }
-              if (order === "1st" && !participant.firstDone) {
+
+              // For project Annotating (survey) we will not have firstDone field in the participant
+              // So if they missed they attended the first session that that means
+              // the schedule object should have a hasStarted field
+
+              const participantAttendedFirstSession =
+                userData.project === "Annotating" ? schedule.hasStarted : participant.firstDone;
+
+              if (order === "1st" && !participantAttendedFirstSession) {
                 // Then, we delete all their sessions from Google Calendar and
                 // schedule then, send them an email asking them to reschedule
                 // all their sessions.

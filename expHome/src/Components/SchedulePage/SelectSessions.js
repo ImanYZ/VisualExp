@@ -114,7 +114,6 @@ const SelectSessions = props => {
 
         sessions.push(session);
       }
-
       if (hasAllSessions) {
         props.setSubmitable(true);
         props.setSelectedSession(sessions);
@@ -193,6 +192,7 @@ const SelectSessions = props => {
           newSche.push(newSess);
         }
       }
+
       props.setSchedule(newSche);
       setFirstRender(false);
     }

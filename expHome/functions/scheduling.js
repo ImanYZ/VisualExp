@@ -157,7 +157,10 @@ exports.pastEvents = async previousDays => {
 // Get all the events in the next specified number of days.
 exports.futureEvents = async nextDays => {
   try {
-    const start = new Date();
+    // sometimes a user has started the session earlier and the PubSub gets fired
+    // and if the user has not accepted the session, it is going to send them a reminder
+    // to prevent that we start an hour and a half from now.
+    const start = new Date(new Date().getTime() + 90 * 60 * 1000);
     let end = new Date();
     end = new Date(end.getTime() + nextDays * 24 * 60 * 60 * 1000);
     return await getEvents(start, end, "America/Detroit");
@@ -180,6 +183,50 @@ exports.todayPastEvents = async () => {
   } catch (err) {
     console.log({ err });
     return false;
+  }
+};
+
+exports.getOngoingResearcherEvent = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).send({ message: "Email id required" });
+    const fiveMinutes = 5 * 60 * 1000;
+    const now = new Date().getTime();
+    const start = new Date(now - fiveMinutes);
+    // get events for next 2 hours. then mannualy filter out the events that are not happening right now.
+    let end = new Date(now + 120 * 60 * 1000);
+
+    const events = await getEvents(start, end, "America/Detroit");
+
+    const filteredEvents = events.filter(event => {
+      const containsEmail = event.attendees.some(attendee => attendee.email === email.toLowerCase());
+      const isNowLessThanEnd = now < new Date(new Date(event.end.dateTime).getTime() - fiveMinutes);
+      return containsEmail && isNowLessThanEnd;
+    });
+    if (filteredEvents.length === 0) {
+      return res.status(404).send({ message: "No Event going on" });
+    }
+
+    const event = filteredEvents[0];
+
+    const schedule = await db.collection("schedule").where("id", "==", event.id).get();
+
+    if (schedule.docs.length === 0) {
+      return res.status(404).send({ message: "Schedule not found" });
+    }
+
+    const scheduleData = schedule.docs[0].data();
+    res.send({
+      event,
+      schedule: {
+        scheduleId: schedule.docs[0].id,
+        ...scheduleData,
+        session: scheduleData.session.toDate()
+      }
+    });
+  } catch (error) {
+    console.log("500", error);
+    return res.status(500).send({ message: "Something went wrong", error });
   }
 };
 
