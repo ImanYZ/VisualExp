@@ -81,11 +81,11 @@ const ResearcherPassage = () => {
   };
 
   const handlePassageConditionChange = event => {
-    debugger;
     const pCondition = event.target.value;
     setPConURL(passage1[`link${pCondition}`]);
     setPassageCondition(pCondition);
   };
+
   const handlePassageChange2 = event => {
     const userCondition = event.target.value;
     const allPassages = [...passages];
@@ -103,7 +103,6 @@ const ResearcherPassage = () => {
     setPassageCondition2(pCondition);
   };
 
-  console.log(passage2);
   return (
     <div style={{ userSelect: "none", background: "#e2e2e2" }}>
       <div style={{ display: "flex", height: "100%" }}>
