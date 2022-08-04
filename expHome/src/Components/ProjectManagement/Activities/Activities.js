@@ -65,10 +65,7 @@ const Activities = props => {
   useEffect(() => {
     const getOngoingResearcherEvent = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:5001/visualexp-5d2c6/us-central1/api/getOngoingResearcherEvent",
-          { email }
-        );
+        const response = await axios.post("/getOngoingResearcherEvent", { email });
         if (response.status === 200) {
           setOngoingEvent(response.data.event);
           setOnGoingSchedule(response.data.schedule);
