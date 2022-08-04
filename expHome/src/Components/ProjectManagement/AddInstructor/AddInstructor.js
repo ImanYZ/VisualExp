@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense,useCallback } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import axios from "axios";
@@ -420,23 +420,6 @@ const AddInstructor = props => {
     CSCObjLoader(CSCObj,setCSCObj,setAllCountries);
   }, [project]);
 
-
-  useEffect(() => {
-    const getCountries = async () => {
-      const defaultCountry= {
-        name: "Prefer not to say",
-        isoCode: "",
-        phonecode: "",
-        flag: "",
-        currency: "",
-        latitude: "",
-        longitude: ""
-      };
-      const { Country } = await import("country-state-city");
-      setAllCountries([...Country.getAllCountries(), defaultCountry]);
-    };
-    getCountries();
-  }, []);
   // Load the array of all the institutions located in the US or Canada to load
   // in the drop-down menu.
   useEffect(() => {
