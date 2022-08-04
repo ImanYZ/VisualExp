@@ -13,7 +13,6 @@ import Select from "@mui/material/Select";
 const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const [researchersConditions, setResearchersConditions] = useState([]);
   const [passages, setPassages] = useState([]);
   const [pConURL, setPConURL] = useState("");
   const [pConURL2, setPConURL2] = useState("");
@@ -28,43 +27,32 @@ const ResearcherPassage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     let passags = [];
-    let conditions = [];
-    let options = [];
-    console.log("fullname");
+    let titles = [];
     const userDoc = await firebase.db.collection("researchers").doc(fullname).get();
     const userData = userDoc.data();
     let userProjects = Object.keys(userData.projects);
     const passageDocs = await firebase.db.collection("passages").get();
-    for (let option of optionsConditions) {
-      for (let projec of userProjects) {
-        if (projec.includes(option) && !options.includes(option)) {
-          options.push(option);
-        }
-      }
-    }
-    setResearchersConditions(options);
 
     for (let passageDoc of passageDocs.docs) {
       const data = passageDoc.data();
       let passageProjects = Object.keys(data.projects);
-      for (let projec in userProjects) {
-        if (passageProjects.indexOf(projec)) {
+      if (passageProjects.length !== 0) {
+        if (passageProjects.find(element => userProjects.includes(element))) {
           passags.push({
             ...data
           });
-          conditions.push(data.title);
-          break;
+          titles.push(data.title);
         }
       }
     }
 
     setPassages(passags);
-    setUserCondition(conditions[0]);
-    setPassageCondition(options[0]);
-    setPConURL(passags[0][`link${options[0]}`]);
-    setUserCondition2(conditions[0]);
-    setPassageCondition2(options[0]);
-    setPConURL2(passags[0][`link${options[0]}`]);
+    setUserCondition(titles[0]);
+    setPassageCondition("H1");
+    setPConURL(passags[0]["linkH1"]);
+    setUserCondition2(titles[0]);
+    setPassageCondition2("H1");
+    setPConURL2(passags[0]["linkH1"]);
     setPassage2(passags[0]);
     setPassage1(passags[0]);
   }, [firebase, fullname]);
@@ -103,7 +91,6 @@ const ResearcherPassage = () => {
     setPassageCondition2(pCondition);
   };
 
-  console.log(passage2);
   return (
     <div style={{ userSelect: "none", background: "#e2e2e2" }}>
       <div style={{ display: "flex", height: "100%" }}>
@@ -124,7 +111,7 @@ const ResearcherPassage = () => {
                 Passage Condition
               </Typography>
               <Select id="demo-simple-select-helper" value={passageCondition} onChange={handlePassageConditionChange}>
-                {researchersConditions.map(option => {
+                {optionsConditions.map(option => {
                   return (
                     <MenuItem key={option} value={option}>
                       {option}
@@ -135,6 +122,9 @@ const ResearcherPassage = () => {
             </div>
           </div>
           <iframe id="PassageFrame" frameBorder="0" src={pConURL}></iframe>
+          <Typography variant="h5" gutterBottom component="div">
+            Questions and Answers
+          </Typography>
           {passage1 &&
             passage1?.questions?.length > 0 &&
             passage2.questions.map((question, index) => {
@@ -175,9 +165,11 @@ const ResearcherPassage = () => {
                 </Accordion>
               );
             })}
-          <Typography variant="h5" gutterBottom component="div">
-            Phrases
-          </Typography>
+          {passage1?.phrases?.length > 0 && (
+            <Typography variant="h5" gutterBottom component="div">
+              Phrases
+            </Typography>
+          )}
 
           <div>
             {passage1 &&
@@ -210,7 +202,7 @@ const ResearcherPassage = () => {
                 Passage Condition
               </Typography>
               <Select id="demo-simple-select-helper" value={passageCondition2} onChange={handlePassageConditionChange2}>
-                {researchersConditions.map(option => {
+                {optionsConditions.map(option => {
                   return <MenuItem value={option}>{option}</MenuItem>;
                 })}
               </Select>
@@ -218,7 +210,7 @@ const ResearcherPassage = () => {
           </div>
           <iframe id="PassageFrame" frameBorder="0" src={pConURL2}></iframe>
           <Typography variant="h5" gutterBottom component="div">
-            Question and Answer
+            Questions and Answers
           </Typography>
           {passage2 &&
             passage2?.questions?.length > 0 &&
@@ -260,9 +252,11 @@ const ResearcherPassage = () => {
                 </Accordion>
               );
             })}
-          <Typography variant="h5" gutterBottom component="div">
-            Phrases
-          </Typography>
+          {passage2?.phrases?.length > 0 && (
+            <Typography variant="h5" gutterBottom component="div">
+              Phrases
+            </Typography>
+          )}
 
           <div>
             {passage2 &&
