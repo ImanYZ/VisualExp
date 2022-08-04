@@ -805,17 +805,14 @@ const ManageEvents = props => {
               project: currentProject,
               sessionIndex: i
             });
-            responseObj = await axios.post(
-              "http://localhost:5001/visualexp-5d2c6/us-central1/api/scheduleSingleSession",
-              {
-                email: participant,
-                researcher: availableSessions[sessi.toLocaleString()][0],
-                order,
-                session: sessi,
-                project: currentProject,
-                sessionIndex: i
-              }
-            );
+            responseObj = await axios.post("/scheduleSingleSession", {
+              email: participant,
+              researcher: availableSessions[sessi.toLocaleString()][0],
+              order,
+              session: sessi,
+              project: currentProject,
+              sessionIndex: i
+            });
             errorAlert(responseObj.data);
             // Figure out whether the new session already exists in schedule
             // for this participant.
