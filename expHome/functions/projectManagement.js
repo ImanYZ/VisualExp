@@ -1492,7 +1492,7 @@ exports.assignExperimentSessionsPoints = async context => {
                   // this is temporary until the survey is over.
                   // as this survey will have only one session
                   if (project === "Annotating") {
-                    points = 15;
+                    points = 10;
                   }
 
                   try {
