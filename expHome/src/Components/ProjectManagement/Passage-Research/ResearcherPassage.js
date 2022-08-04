@@ -12,32 +12,62 @@ import Select from "@mui/material/Select";
 
 const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
+  const fullname = useRecoilValue(fullnameState);
+  const [researchersConditions, setResearchersConditions] = useState([]);
   const [passages, setPassages] = useState([]);
   const [pConURL, setPConURL] = useState("");
+  const [pConURL2, setPConURL2] = useState("");
   const [userCondition, setUserCondition] = React.useState({});
+  const [userCondition2, setUserCondition2] = React.useState({});
+  const [passage2, setPassage2] = useState({});
+  const [passage1, setPassage1] = useState({});
   const [passageCondition, setPassageCondition] = React.useState(0);
+  const [passageCondition2, setPassageCondition2] = React.useState(0);
+  const optionsConditions = ["H1", "H2", "K1", "K2", "L1", "L2"];
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    let passages = [];
+    let passags = [];
     let conditions = [];
+    let options = [];
+    console.log("fullname");
+    const userDoc = await firebase.db.collection("researchers").doc(fullname).get();
+    const userData = userDoc.data();
+    let userProjects = Object.keys(userData.projects);
     const passageDocs = await firebase.db.collection("passages").get();
+    for (let option of optionsConditions) {
+      for (let projec of userProjects) {
+        if (projec.includes(option) && !options.includes(option)) {
+          options.push(option);
+        }
+      }
+    }
+    setResearchersConditions(options);
 
     for (let passageDoc of passageDocs.docs) {
-      const data = await passageDoc.data();
-      passages.push({
-        ...data
-      });
-
-      conditions.push(data.title);
+      const data = passageDoc.data();
+      let passageProjects = Object.keys(data.projects);
+      for (let projec in userProjects) {
+        if (passageProjects.indexOf(projec)) {
+          passags.push({
+            ...data
+          });
+          conditions.push(data.title);
+          break;
+        }
+      }
     }
-    console.log(conditions);
-    setPassages(passages);
-    setUserCondition(conditions[0]);
-    setPassageCondition("H1");
-    setPConURL(passages[0]["linkH1"]);
-  }, []);
 
+    setPassages(passags);
+    setUserCondition(conditions[0]);
+    setPassageCondition(options[0]);
+    setPConURL(passags[0][`link${options[0]}`]);
+    setUserCondition2(conditions[0]);
+    setPassageCondition2(options[0]);
+    setPConURL2(passags[0][`link${options[0]}`]);
+    setPassage2(passags[0]);
+    setPassage1(passags[0]);
+  }, [firebase, fullname]);
 
   const handlePassageChange = event => {
     const userCondition = event.target.value;
@@ -47,20 +77,33 @@ const ResearcherPassage = () => {
     setPConURL(passage["linkH1"]);
     setUserCondition(userCondition);
     setPassageCondition("H1");
+    setPassage1(passage);
   };
 
   const handlePassageConditionChange = event => {
+    debugger;
     const pCondition = event.target.value;
+    setPConURL(passage1[`link${pCondition}`]);
+    setPassageCondition(pCondition);
+  };
+  const handlePassageChange2 = event => {
+    const userCondition = event.target.value;
     const allPassages = [...passages];
     const fIndex = allPassages.findIndex(i => i.title === userCondition);
     const passage = allPassages[fIndex];
-    setPConURL(passage[`link${pCondition}`]);
-    setPassageCondition(pCondition);
+    setPConURL2(passage["linkH1"]);
+    setUserCondition2(userCondition);
+    setPassageCondition2("H1");
+    setPassage2(passage);
   };
 
+  const handlePassageConditionChange2 = event => {
+    const pCondition = event.target.value;
+    setPConURL2(passage2[`link${pCondition}`]);
+    setPassageCondition2(pCondition);
+  };
 
-  console.log(passages);
-  console.log(userCondition);
+  console.log(passage2);
   return (
     <div style={{ userSelect: "none", background: "#e2e2e2" }}>
       <div style={{ display: "flex", height: "100%" }}>
@@ -81,118 +124,159 @@ const ResearcherPassage = () => {
                 Passage Condition
               </Typography>
               <Select id="demo-simple-select-helper" value={passageCondition} onChange={handlePassageConditionChange}>
-                <MenuItem value={"H1"}>H1</MenuItem>
-                <MenuItem value={"H2"}>H2</MenuItem>
-                <MenuItem value={"K1"}>K1</MenuItem>
-                <MenuItem value={"K2"}>K2</MenuItem>
-                <MenuItem value={"L1"}>L1</MenuItem>
-                <MenuItem value={"L2"}>L2</MenuItem>
+                {researchersConditions.map(option => {
+                  return (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  );
+                })}
               </Select>
             </div>
           </div>
           <iframe id="PassageFrame" frameBorder="0" src={pConURL}></iframe>
-        </div>
-        <div
-          style={{ width: "30%", margin: "15px 10px 10px 10px", height: "90vh", overflowX: "auto", overflowYy: "auto" }}
-        >
-          <Typography variant="h4" gutterBottom component="div">
-            All  Passages
-          </Typography>
-          {passages &&
-            passages?.length > 0 &&
-            passages?.map((doc, index) => {
+          {passage1 &&
+            passage1?.questions?.length > 0 &&
+            passage2.questions.map((question, index) => {
               return (
-                <Accordion square={false}>
+                <Accordion key={index}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
-                    <Typography variant="h6" gutterBottom component="div">
-                      {doc.condition} - {doc.title}
+                    <Typography variant="h6" component="div">
+                      {`${index + 1}. ${question.stem}`}
                     </Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    {/* Question and Answer Accordion */}
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography variant="h5" gutterBottom component="div">
-                          Question and Answer
+                    <ul>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.a}
                         </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {/* All Questions's Accordion */}
-                        {doc.questions.map((question, index) => {
-                          return (
-                            <Accordion key={index}>
-                              <AccordionSummary
-                                expandIcon={<ExpandMoreIcon />}
-                                aria-controls="panel1a-content"
-                                id="panel1a-header"
-                              >
-                                <Typography variant="h6" component="div">
-                                  {`${index + 1}. ${question.stem}`}
-                                </Typography>
-                              </AccordionSummary>
-                              <AccordionDetails>
-                                <ul>
-                                  <li>
-                                    <Typography variant="h6" component="div">
-                                      {question.a}
-                                    </Typography>
-                                  </li>
-                                  <li>
-                                    <Typography variant="h6" component="div">
-                                      {question.b}
-                                    </Typography>
-                                  </li>
-                                  <li>
-                                    <Typography variant="h6" component="div">
-                                      {question.c}
-                                    </Typography>
-                                  </li>
-                                  <li>
-                                    <Typography variant="h6" component="div">
-                                      {question.d}
-                                    </Typography>
-                                  </li>
-                                </ul>
-                                <Typography variant="h6" gutterBottom component="div" mb={2}>
-                                  Answer: <mark>{question[question.answer]}</mark>
-                                </Typography>
-                              </AccordionDetails>
-                            </Accordion>
-                          );
-                        })}
-                      </AccordionDetails>
-                    </Accordion>
-                    {/* Phrases Accordion */}
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography variant="h5" gutterBottom component="div">
-                          Phrases
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.b}
                         </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {doc.phrases?.map((phrase, index) => (
-                          <ul key={index}>
-                            <li>
-                              <Typography variant="h6" component="div">
-                                {phrase}
-                              </Typography>
-                            </li>
-                          </ul>
-                        ))}
-                      </AccordionDetails>
-                    </Accordion>
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.c}
+                        </Typography>
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.d}
+                        </Typography>
+                      </li>
+                    </ul>
+                    <Typography variant="h6" gutterBottom component="div" mb={2}>
+                      Answer: <mark>{question[question.answer]}</mark>
+                    </Typography>
                   </AccordionDetails>
                 </Accordion>
               );
             })}
+          <Typography variant="h5" gutterBottom component="div">
+            Phrases
+          </Typography>
+
+          <div>
+            {passage1 &&
+              passage1?.phrases?.length > 0 &&
+              passage1.phrases.map((phrase, index) => (
+                <ul key={index}>
+                  <li>
+                    <Typography variant="h6" component="div">
+                      {phrase}
+                    </Typography>
+                  </li>
+                </ul>
+              ))}
+          </div>
+        </div>
+        <div style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
+          <div style={{ display: "flex" }}>
+            <div style={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
+              <Typography variant="h6" component="div">
+                Passage
+              </Typography>
+              <Select id="demo-simple-select-helper" value={userCondition2} onChange={handlePassageChange2}>
+                {passages &&
+                  passages?.length > 0 &&
+                  passages?.map(doc => <MenuItem value={doc.title}>{doc.title}</MenuItem>)}
+              </Select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Typography variant="h6" component="div">
+                Passage Condition
+              </Typography>
+              <Select id="demo-simple-select-helper" value={passageCondition2} onChange={handlePassageConditionChange2}>
+                {researchersConditions.map(option => {
+                  return <MenuItem value={option}>{option}</MenuItem>;
+                })}
+              </Select>
+            </div>
+          </div>
+          <iframe id="PassageFrame" frameBorder="0" src={pConURL2}></iframe>
+          <Typography variant="h5" gutterBottom component="div">
+            Question and Answer
+          </Typography>
+          {passage2 &&
+            passage2?.questions?.length > 0 &&
+            passage2?.questions.map((question, index) => {
+              return (
+                <Accordion key={index}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                    <Typography variant="h6" component="div">
+                      {`${index + 1}. ${question.stem}`}
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <ul>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.a}
+                        </Typography>
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.b}
+                        </Typography>
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.c}
+                        </Typography>
+                      </li>
+                      <li>
+                        <Typography variant="h6" component="div">
+                          {question.d}
+                        </Typography>
+                      </li>
+                    </ul>
+                    <Typography variant="h6" gutterBottom component="div" mb={2}>
+                      Answer: <mark>{question[question.answer]}</mark>
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              );
+            })}
+          <Typography variant="h5" gutterBottom component="div">
+            Phrases
+          </Typography>
+
+          <div>
+            {passage2 &&
+              passage2?.phrases?.length > 0 &&
+              passage2.phrases.map((phrase, index) => (
+                <ul key={index}>
+                  <li>
+                    <Typography variant="h6" component="div">
+                      {phrase}
+                    </Typography>
+                  </li>
+                </ul>
+              ))}
+          </div>
         </div>
       </div>
     </div>
