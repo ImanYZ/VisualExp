@@ -141,7 +141,7 @@ const Auth = props => {
             email: uEmail,
             firstname: fName,
             lastname: lName,
-            project: currentProject
+            project: userData.project
           };
           if (course) {
             userData.course = course;
@@ -291,9 +291,6 @@ const Auth = props => {
       setNullPassage(nullPassage);
       setPhase(0);
       setStep(1);
-
-      console.log("User Ref = ", userRef, userData);
-
       await firebase.batchSet(userRef, userData, { merge: true });
       const userLogRef = firebase.db.collection("userLogs").doc();
       await firebase.batchSet(userLogRef, {
