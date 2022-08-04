@@ -127,7 +127,7 @@ const ResearcherPassage = () => {
           </Typography>
           {passage1 &&
             passage1?.questions?.length > 0 &&
-            passage2.questions.map((question, index) => {
+            passage1.questions.map((question, index) => {
               return (
                 <Accordion key={index}>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
