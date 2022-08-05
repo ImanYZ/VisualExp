@@ -1625,6 +1625,7 @@ const getUserDocsfromEmail = async email => {
 
   return userDocs;
 };
+exports.getUserDocsfromEmail = getUserDocsfromEmail;
 
 // This is called in a pubsub every 4 hours.
 // Email reminders to researchers and participants to do the following:

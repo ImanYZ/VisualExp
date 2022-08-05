@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { formatPoints } from "../../../../utils";
 import { firebaseState } from "../../../../store/AuthAtoms";
 import { useRecoilValue } from "recoil";
+import axios from "axios";
 
 export const LeaderBoard = ({
   fullname,
@@ -19,6 +20,7 @@ export const LeaderBoard = ({
   onGoingSchedule
 }) => {
   const [starting, setStarting] = useState(false);
+  const [sendingReminder, setSendingReminder] = useState(false);
 
   const firebase = useRecoilValue(firebaseState);
 
@@ -39,6 +41,23 @@ export const LeaderBoard = ({
       alert("Something went wrong while starting the session.");
     } finally {
       setStarting(false);
+    }
+  };
+
+  const sendEventNotificationEmail = async () => {
+    try {
+      setSendingReminder(true);
+      await axios.post("/sendOngoingSessionReminderEmail", {
+        email: onGoingSchedule.email,
+        hangoutLink: onGoingEvent.hangoutLink,
+        researcherName: fullname,
+        order: onGoingSchedule.order
+      });
+      alert("Event reminder notificatino sent.");
+    } catch (err) {
+      alert("Something went wrong while sending the reminder.");
+    } finally {
+      setSendingReminder(false);
     }
   };
 
@@ -104,7 +123,12 @@ export const LeaderBoard = ({
               <Typography variant="h4">{onGoingSchedule.email}</Typography>
 
               <div style={{ marginTop: "12px" }}>
-                <Button className={"Button Blue"} variant="contained">
+                <Button
+                  className={"Button Blue"}
+                  variant="contained"
+                  onClick={sendEventNotificationEmail}
+                  disabled={sendingReminder}
+                >
                   Remind Participant
                 </Button>
 
