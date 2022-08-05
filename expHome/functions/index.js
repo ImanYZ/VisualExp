@@ -34,7 +34,8 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations
+  sendPersonalInvitations,
+  sendOngoingSessionReminderEmail
 } = require("./emailing");
 const {
   schedule,
@@ -87,6 +88,7 @@ app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
 app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
+app.post("/sendOngoingSessionReminderEmail", sendOngoingSessionReminderEmail);
 
 // Schedule UX Research appointments
 app.post("/schedule", schedule);

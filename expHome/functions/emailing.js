@@ -8,6 +8,8 @@ const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require(".
 
 const { signatureHTML } = require("./emailSignature");
 
+const { getUserDocsfromEmail } = require("./projectManagement");
+
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
@@ -674,6 +676,49 @@ exports.sendEventNotificationEmail = (req, res) => {
         false
       );
     }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.sendOngoingSessionReminderEmail = async (req, res) => {
+  const { email, order = "1st", researcherName = "", hangoutLink = "" } = req.body;
+  if (!email) return res.send(400).send({ message: "Email is required" });
+
+  const userDocs = await getUserDocsfromEmail(email);
+  if (!userDocs) return res.send(400).send({ message: "Invalid Email passed" });
+  const userData = userDocs.docs[0].data();
+  const fullName = `${userData.firstname} ${userData.lastname}`;
+  try {
+    const mailOptions = {
+      from: "onecademy@umich.edu",
+      to: [email, "oneweb@umich.edu"],
+      subject: "[1Cademy] Your " + order + " Session is ongoing right now. please join the session",
+      html:
+        `<p>Hi ${fullName},</p>
+      <p></p>
+      ${
+        "<p>This is an auto-generated email to inform you that your session with " +
+        researcherName +
+        " has begun, but you've not joined the session yet!</p>" +
+        "Please join the session at <a href=" +
+        hangoutLink +
+        " target='_blank'>this link</a>.</p><p>"
+      }
+      </p>
+      <p></p>
+      <p>Best regards,</p>
+      ` + signatureHTML
+    };
+
+    return transporter.sendMail(mailOptions, (error, data) => {
+      if (error) {
+        return res.status(500).json({ error });
+      }
+
+      return res.status(200).json({ done: true });
+    });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
