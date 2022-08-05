@@ -59,6 +59,7 @@ const AppRouter = props => {
   const [startedByResearcher, setStartedByResearcher] = useState(false);
 
   useEffect(() => {
+    let schedulUnsubscribe;
     const areTheyDuringAnExperimentSession = async () => {
       const currentTime = new Date().getTime();
       const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email).get();
@@ -102,18 +103,24 @@ const AppRouter = props => {
           setStartedByResearcher(true);
         } else {
           // keep listening to the schedule until the researcher starts the session.
-          const unSubscribe = firebase.db
+          const schedulUnsubscribe = firebase.db
             .collection("schedule")
             .doc(onGoingScheduleDoc.id)
             .onSnapshot(docSnapshot => {
               const changedSchedule = docSnapshot.data();
-              if (changedSchedule.hasStarted) {
+              if (changedSchedule.hasStarted && changedSchedule.attended) {
                 setStartedByResearcher(true);
-                unSubscribe();
+                schedulUnsubscribe();
               }
             });
         }
       }
+
+      return () => {
+        if (schedulUnsubscribe) {
+          schedulUnsubscribe();
+        }
+      };
     };
     const reloadIfNotLoadedToday = async () => {
       const userRef = firebase.db.collection("users").doc(fullname);
