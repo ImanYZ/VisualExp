@@ -42,6 +42,22 @@ export const LeaderBoard = ({
     }
   };
 
+  const markAttended = async () => {
+    try {
+      const { scheduleId } = onGoingSchedule;
+      setStarting(true);
+      await firebase.db.collection("schedule").doc(scheduleId).update({ attended: true });
+      setOnGoingSchedule({
+        ...onGoingSchedule,
+        attended: true
+      });
+    } catch (err) {
+      alert("Something went wrong while marking the attendance.");
+    } finally {
+      setStarting(false);
+    }
+  };
+
   return (
     <div id="Leaderboard">
       <h2 id="InternsLeaderboardHeader">Interns Leaderboard:</h2>
@@ -92,15 +108,29 @@ export const LeaderBoard = ({
                   Remind Participant
                 </Button>
 
-                <Button
-                  className={"Button Green"}
-                  style={{ marginLeft: 5 }}
-                  variant="contained"
-                  onClick={startSession}
-                  disabled={starting || onGoingSchedule.hasStarted}
-                >
-                  {onGoingSchedule.hasStarted ? "Session Started" : "Start Session"}
-                </Button>
+                {!onGoingSchedule.hasStarted && (
+                  <Button
+                    className={"Button Green"}
+                    style={{ marginLeft: 5 }}
+                    variant="contained"
+                    onClick={startSession}
+                    disabled={starting || onGoingSchedule.hasStarted}
+                  >
+                    Start Session
+                  </Button>
+                )}
+
+                {onGoingSchedule.hasStarted && (
+                  <Button
+                    className={"Button Green"}
+                    style={{ marginLeft: 5 }}
+                    variant="contained"
+                    onClick={markAttended}
+                    disabled={starting || onGoingSchedule.attended}
+                  >
+                    Mark Attended
+                  </Button>
+                )}
               </div>
             </div>
           </Alert>
