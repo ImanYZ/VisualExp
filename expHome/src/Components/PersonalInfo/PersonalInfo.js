@@ -240,8 +240,8 @@ const PersonalInfo = props => {
                    
                    id="QuestionNextBtn"
                    onClick={handleNext}
-                   disabled={Object.keys(category).length !== 4}
-                   className={(Object.keys(category).length !== 4) ? "Button Disabled" : "Button"}
+                   disabled={Object.keys(category).length !== 44}
+                   className={(Object.keys(category).length !== 44) ? "Button Disabled" : "Button"}
                    variant="contained"
                  >
                    NEXT!
