@@ -128,11 +128,6 @@ const SchedulePage = props => {
       let userDoc = await firebase.db.collection("users").doc(fullname).get();
 
       if (!userDoc.exists) {
-        userDoc = await firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname).get();
-        isSurvey = true;
-      }
-
-      if (!userDoc.exists) {
         userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
         isSurvey = true;
       }
@@ -280,11 +275,6 @@ const SchedulePage = props => {
 
     const userRef = firebase.db.collection("users").doc(fullname);
     let userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      const userRef = firebase.db.collection("usersInstructorCoNoteSurvey").doc(fullname);
-      userDoc = await userRef.get();
-    }
 
     if (!userDoc.exists) {
       const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
