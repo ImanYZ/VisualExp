@@ -1439,7 +1439,7 @@ exports.assignExperimentSessionsPoints = async context => {
     const usersInfo = [];
     const usersDocs = await db.collection("users").get();
     const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
-    const surveyInstructors = await db.collection("usersInstructorCoNoteSurvey").get();
+    const surveyInstructors = await db.collection("instructors").get();
     for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...usersDocs.docs]) {
       const userData = userDoc.data();
       usersInfo.push({
