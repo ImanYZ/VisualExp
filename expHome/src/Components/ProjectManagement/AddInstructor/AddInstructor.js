@@ -32,7 +32,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-// import CSCObjLoader from "./CSCObjLoader";
+import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
@@ -406,6 +406,9 @@ const AddInstructor = props => {
   const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
   const [otherInstructorData, setOtherInstructorData] = useState({});
 
+
+
+  
   useEffect(() => {
     setSelectedRows([]);
     setValues(initialState);
@@ -414,6 +417,7 @@ const AddInstructor = props => {
     setLastname("");
     setEmail("");
     setExplanation("");
+    CSCObjLoader(CSCObj,setCSCObj,setAllCountries);
   }, [project]);
 
   // Load the array of all the institutions located in the US or Canada to load
@@ -853,6 +857,10 @@ const AddInstructor = props => {
       setInvalidInstructor("Please specify their position!");
     } else if (!values.interestedTopic) {
       setInvalidInstructor("Please enter their Topic of Interest!");
+    } else if (values.interestedTopic.split(" ").length > 8 || values.interestedTopic.split(",").length > 8) {
+      setInvalidInstructor(
+        "Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this instructor/school administrator."
+      );
     } else {
       setInvalidInstructor("");
     }
@@ -1262,9 +1270,19 @@ const AddInstructor = props => {
           {project === "Annotating" && (
             <div>
               <MuiTypography subtitle1="h2">
-                for the moment we need you to add the Intersted Topic for other Instructors previously added by
-                colleges.
+                For the moment we need you to add the Intersted Topic for other Instructors previously added by other
+                researcher. Please you're only allowed to enter an Intersted Topic that doesn't containe more than 7
+                words:
               </MuiTypography>
+              {(otherInterestedTopic.split(" ").length > 8 || otherInterestedTopic.split(",").length > 8) && (
+                <Alert className="VoteActivityAlert" severity="error">
+                  <h3>Reminder:</h3>
+                  <p>
+                    Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this
+                    instructor/school administrator.
+                  </p>
+                </Alert>
+              )}
               <Box sx={{ m: "10px 10px 10px 0", display: "flex" }}>
                 <TextField
                   sx={{ m: "10px", flex: "1 1 auto" }}
@@ -1280,7 +1298,11 @@ const AddInstructor = props => {
                   onClick={submitOtherInstructor}
                   className={"Button SubmitButton"}
                   variant="contained"
-                  disabled={!otherInstructorData?.email}
+                  disabled={
+                    !otherInstructorData?.email ||
+                    otherInterestedTopic.split(" ").length > 8 ||
+                    otherInterestedTopic.split(",").length > 8
+                  }
                 >
                   {"Update Instructor"}
                 </Button>
@@ -1430,7 +1452,7 @@ const AddInstructor = props => {
                 important topic that they teach or research at their institution.
               </p>
               <p>
-                Please only enter ONE TOPIC; i.e., a few words which indicate the most interesting to this
+                Please only enter ONE TOPIC; i.e., less than 7 words indicating the most interesting topic to this
                 instructor/school administrator.
               </p>
             </Alert>

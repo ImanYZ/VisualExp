@@ -139,7 +139,10 @@ const App = () => {
   // const [fromOptions, setFromOptions] = useState([]);
   // const [linkOptions, setLinkOptions] = useState([]);
   // const [toOptions, setToOptions] = useState([]);
-  const [explanations, setExplanations] = useState(["", ""]);
+  const [explanations, setExplanations] = useState([
+    { explanation: "", codes: [] },
+    { explanation: "", codes: [] }
+  ]);
   const [birthDate, setBirthDate] = useState(null);
   const [major, setMajor] = useState({
     Major: "Information Sciences",
@@ -149,10 +152,12 @@ const App = () => {
   const [language, setLanguage] = useState("English");
   const [gender, setGender] = useState("");
   const [ethnicity, setEthnicity] = useState([]);
+  const [personalityTraits, setPersonalityTraits]=useState({});
   const [genderOtherValue, setGenderOtherValue] = useState("");
   const [ethnicityOtherValue, setEthnicityOtherValue] = useState("");
   const [error, setError] = useState("");
   const [scores, setScores] = useState([]);
+  const [answeredPersonalTrait, setAnsweredPersonalTrait] = useState(false);
 
   const educationChange = event => {
     setEducation(event.target.value);
@@ -367,7 +372,7 @@ const App = () => {
               researchersNum: 0,
               session,
               user: fullname,
-              response: responseName
+              response: pCond[responseName]
             };
             for (let phras of passageData.phrases) {
               recallGradeData.phrase = phras;
@@ -583,6 +588,7 @@ const App = () => {
               birthDate,
               education,
               language,
+              personalityTraits,
               gender: gender === "Not listed (Please specify)" ? genderOtherValue : gender,
               ethnicity: ethnicityArray,
               major: major.Major,
@@ -719,7 +725,10 @@ const App = () => {
           },
           19
         );
-        setExplanations(["", ""]);
+        setExplanations([
+          { explanation: "", codes: [] },
+          { explanation: "", codes: [] }
+        ]);
         setTimer(30 * 60);
         break;
       case 19:
@@ -869,6 +878,7 @@ const App = () => {
             nextStep={nextStep}
             explanations={explanations}
             setExplanations={setExplanations}
+            step={step}
           />
         ) : [6, 8, 12, 15].includes(step) ? (
           // <ConceptMapping cMap={cMap} />
@@ -891,6 +901,9 @@ const App = () => {
             languageChange={languageChange}
             genderChange={genderChange}
             ethnicityChange={ethnicityChange}
+            setPersonalityTraits={setPersonalityTraits}
+            setAnsweredPersonalTrait={setAnsweredPersonalTrait}
+            answeredPersonalTrait={answeredPersonalTrait}
           />
         ) : null}
         {step === 1 ? (
@@ -915,6 +928,7 @@ const App = () => {
             nextStep={nextStep}
             error={error}
             scores={scores}
+            answeredPersonalTrait={answeredPersonalTrait}
           />
         )}
       </div>

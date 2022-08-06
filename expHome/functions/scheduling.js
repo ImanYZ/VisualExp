@@ -265,14 +265,14 @@ exports.deleteEvent = async (req, res) => {
 // Life Logging
 // ************
 
-exports.lifeLogger = async context => {
+exports.lifeLoggerScheduler = async context => {
   try {
     let end = new Date();
     const currentTime = end.getTime();
-    const anHourAgo = new Date(end.getTime() - 60 * 60 * 1000);
-    const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+    const anHourAgo = new Date(currentTime - 60 * 60 * 1000);
+    const start = new Date(currentTime - 24 * 60 * 60 * 1000);
     const allEvents = await getLifeLogEvents(start, end, "America/Detroit");
-    if (allEvents && allEvents.length > 0) {
+    if (allEvents) {
       let dark = 0,
         light = 0;
       const lifeLogDocs = await db.collection("lifeLog").get();
@@ -286,7 +286,7 @@ exports.lifeLogger = async context => {
         const startTime = new Date(ev.start.dateTime).getTime();
         const endTime = new Date(ev.end.dateTime).getTime();
         if (endTime <= currentTime && endTime >= anHourAgo && endTime > startTime) {
-          const minutes = Math.floor((endTime - startTime).getTime() / (60 * 1000));
+          const minutes = Math.floor(((endTime - startTime) * 2) / (60 * 1000));
           light += minutes;
         }
       }
@@ -301,7 +301,6 @@ exports.lifeLogger = async context => {
 
 exports.scheduleLifeLog = async (req, res) => {
   try {
-    console.log({ body: req.body });
     const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
     if (authUser.email === "oneweb@umich.edu") {
       let start, end;
