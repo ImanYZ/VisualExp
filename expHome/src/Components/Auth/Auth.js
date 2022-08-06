@@ -104,14 +104,6 @@ const Auth = props => {
     let userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
 
     if (userDocs.docs.length === 0) {
-      userDocs = await firebase.db.collection("usersInstructorCoNoteSurvey").where("email", "==", uEmail).get();
-      if (userDocs.docs.length > 0) {
-        isSurvey = true;
-        userCollection = "usersInstructorCoNoteSurvey";
-      }
-    }
-
-    if (userDocs.docs.length === 0) {
       userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
       if (userDocs.docs.length > 0) {
         isSurvey = true;

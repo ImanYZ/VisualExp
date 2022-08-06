@@ -6,7 +6,6 @@ import Grid from "@mui/material/Grid";
 
 import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
-import AuthInstructorCoNoteSurvey from "./AuthInstructorCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
 import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 
@@ -16,8 +15,6 @@ const AuthConsent = props => {
   let authComponent = <Auth {...props} />;
   if (props.project === "StudentCoNoteSurvey") {
     authComponent = <AuthStudentCoNoteSurvey />;
-  } else if (props.project === "InstructorCoNoteSurvey") {
-    authComponent = <AuthInstructorCoNoteSurvey />;
   }
 
   return (
