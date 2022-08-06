@@ -17,7 +17,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import { firebaseState, fullnameState, isAdminState } from "../../store/AuthAtoms";
+import { firebaseState, fullnameState, isAdminState, emailState } from "../../store/AuthAtoms";
 
 import { firebaseOneState, usernameState, emailOneState } from "../../store/OneCademyAtoms";
 
@@ -62,6 +62,7 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
 const RouterNav = props => {
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
+  const userEmail = useRecoilValue(emailState);
   const [username, setUsername] = useRecoilState(usernameState);
   const [email, setEmail] = useRecoilState(emailOneState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
@@ -101,6 +102,8 @@ const RouterNav = props => {
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
+  const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
+  const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -200,6 +203,16 @@ const RouterNav = props => {
                 setNegativeGradingPoints(theProject.negativeGradingPoints);
               } else {
                 setNegativeGradingPoints(0);
+              }
+              if (theProject.negativeCodingPoints) {
+                setNegativeCodesPionts(theProject.negativeCodingPoints);
+              } else {
+                setNegativeCodesPionts(0);
+              }
+              if (theProject.positiveCodingPoints) {
+                setPositiveCodesPoints(theProject.positiveCodingPoints);
+              } else {
+                setPositiveCodesPoints(0);
               }
             }
             if ("gradingNum" in theProject) {
@@ -939,18 +952,15 @@ const RouterNav = props => {
                           <div>
                             <div>You've earned {gradingPoints} total 🧠 free-recall grading points.</div>
                             <div>
-                              This means, {gradingPoints} times at least 3 other researchers have agreed with you on
-                              existance or non-existance of a specific phrase in a free-recall response.
+                              From that total, we've already excluded your negative {negativeGradingPoints} ❌ points.
                             </div>
                             <div>
-                              From that total 🧠 points, we've already excluded your negative {negativeGradingPoints} 🧟
-                              points.
-                            </div>
-                            <div>
-                              This means, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed on
-                              existance (non-existance) of a specific key phrase in a free-recall response by a
-                              participant, but you opposed their majority of votes. So, you got a 0.5 🧟 negative point
-                              for each of those cases.
+                              This means, 2 X {gradingPoints + negativeGradingPoints} times at least 3 other researchers
+                              have agreed with you on existance or non-existance of a specific phrase in a free-recall
+                              response. Also, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed
+                              with each other on existance (non-existance) of a specific key phrase in a free-recall
+                              response by a participant, BUT you opposed their majority of votes. So, you got a 0.5 ❌
+                              negative point for each of those cases.
                             </div>
                           </div>
                         }
@@ -960,10 +970,29 @@ const RouterNav = props => {
                           className={activePage === "FreeRecallGrading" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/FreeRecallGrading")}
                         >
-                          🧠 {gradingPoints} <br /> 🧟 {negativeGradingPoints}
+                          🧠 {gradingPoints} <br /> ❌ {negativeGradingPoints}
                         </Button>
                       </Tooltip>
                     ) : null}
+                    {userEmail === "oneweb@umich.edu" && (
+                      <Tooltip
+                        title={
+                          <div>
+                            You've earned {positiveCodesPoints} total 💬 coding participants responses and{" "}
+                            {negativeCodesPionts} ❌ negative point.
+                          </div>
+                        }
+                      >
+                        <Button
+                          id="CodeFeedback"
+                          className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
+                          onClick={event => navigate("/Activities/CodeFeedback")}
+                        >
+                          💬 {positiveCodesPoints}
+                          <br /> ❌ {negativeCodesPionts}
+                        </Button>
+                      </Tooltip>
+                    )}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">

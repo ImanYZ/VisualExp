@@ -22,8 +22,10 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import { LeaderBoard, ProjectPoints } from "./components";
 import { formatPoints } from "../../../utils";
+import ResearcherPassage from "../Passage-Research/ResearcherPassage";
 
 import favicon from "../../../assets/favicon.png";
 
@@ -40,7 +42,9 @@ const CommonPages = [
   { page: "Experiments", view: <ExperimentPoints /> },
   { page: "AddInstructor", view: <AddInstructor /> },
   { page: "1Cademy", view: <OneCademy /> },
-  { page: "FreeRecallGrading", view: <FreeRecallGrading /> }
+  { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
+  { page: "CodeFeedback", view: <CodeFeedback /> },
+  { page: "ResearcherPassage", view: <ResearcherPassage /> }
 ];
 
 const Activities = props => {
@@ -288,6 +292,7 @@ const Activities = props => {
 
   const showLeaderBoard = (() => {
     if (isAdmin) return ShowLeaderBoardForAdmin.indexOf(activePage) > -1;
+    if (props.hideLeaderBoard) return false;
     return true;
   })();
 
