@@ -245,24 +245,26 @@ const PersonalInfo = props => {
   console.log(Object.keys(category).length);
   return (
     <div>
-      <Box style={{margin:"10px 0px 100px 0px"}}>
-      <Button
-           
-           id="QuestionNextBtn"
-           onClick={handleNext}
-           disabled={Object.keys(category).length !== 44}
-           className={false ? "Button Disabled" : "Button"}
-           variant="contained"
-         >
-           NEXT!
-         </Button>
-      <h4  >I am someone who:</h4>
-        
-      </Box>
+
       
                      
       <Box style={{margin:"10px 10px 10px 10px",width:"900", overflow: "auto" }}>  
       {!props.answeredPersonalTrait && (
+        <>
+              <Box style={{margin:"10px 0px 100px 0px"}}>
+              <Button
+                   
+                   id="QuestionNextBtn"
+                   onClick={handleNext}
+                   disabled={Object.keys(category).length !== 44}
+                   className={false ? "Button Disabled" : "Button"}
+                   variant="contained"
+                 >
+                   NEXT!
+                 </Button> 
+              <h4  >I am someone who:</h4>
+                
+              </Box>
         <Box sx={{ height: "600px",width:"1000px", overflow: "auto" }}>
           <FormControl >
             <RadioGroup row >
@@ -531,6 +533,7 @@ const PersonalInfo = props => {
           </FormControl>
           <h3  style={{margin:"100px 10px 10px 10px"}}></h3>
         </Box>
+        </>
       )}</Box> 
 
       {props.answeredPersonalTrait && (
