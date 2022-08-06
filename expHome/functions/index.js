@@ -45,6 +45,7 @@ const {
   scheduleLifeLog,
   lifeLogger,
   getOngoingResearcherEvent,
+  lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
 const { card, image } = require("./misinformationExp");
