@@ -238,6 +238,7 @@ const LifeLogger = () => {
             <FormControlLabel value={25} control={<Radio />} label="25" />
             <FormControlLabel value={40} control={<Radio />} label="40" />
             <FormControlLabel value={55} control={<Radio />} label="55" />
+            <FormControlLabel value={60 * 7} control={<Radio />} label="60 x 7" />
           </RadioGroup>
           <FormGroup>
             <FormControlLabel
