@@ -14,7 +14,7 @@ const WaitingForSessionStart = () => {
       }}
     >
       <Typography align="center" variant="h3">
-        Please Wait! your researcher will start the session any moment.
+        Please Wait! The researcher will start the session soon.
       </Typography>
     </div>
   );

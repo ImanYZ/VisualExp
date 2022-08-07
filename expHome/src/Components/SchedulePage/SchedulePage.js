@@ -61,7 +61,7 @@ const sessionFormatter = (start, minutes) => {
   );
 };
 
-const formatSlotTime = (hourlyChunks = 2, slotCount = 0) => {
+const formatSlotTime = (hourlyChunks = 2, slotCount = 0, index) => {
   let str = "for ";
   let mins = 0,
     hours = 0;
@@ -352,8 +352,8 @@ const SchedulePage = props => {
             {i + 1}
             <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup> session
           </strong>{" "}
-          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter,` : null}
-          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i])}
+          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter after the first session,` : null}
+          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i], i)}
         </li>
       );
     }
@@ -376,8 +376,8 @@ const SchedulePage = props => {
                 {i + 1}
                 <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
                 {sessionFormatter(
-                  selectedSession[0],
-                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
+                  selectedSession[i],
+                  slotDuration * (projectSpecs?.sessionDuration?.[i] || AppConfig.defaultSessionDuration[i] || 1)
                 )}
               </li>
             );
