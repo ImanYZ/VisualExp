@@ -94,8 +94,8 @@ const PassageLeft = (props) => {
             step === 0
               ? "https://www.youtube.com/embed/uHKfrz65KSU?start=22&amp;autoplay=1"
               : step == 4
-              ? "https://www.youtube.com/embed/C6RUp21s6BQ?start=4&amp;autoplay=1"
-              : "https://www.youtube.com/embed/5ojcqpaO_Jo?autoplay=1"
+                ? "https://www.youtube.com/embed/C6RUp21s6BQ?start=4&amp;autoplay=1"
+                : "https://www.youtube.com/embed/5ojcqpaO_Jo?autoplay=1"
           }
           title="YouTube video player"
           frameBorder="0"
