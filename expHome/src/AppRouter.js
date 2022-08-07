@@ -99,7 +99,7 @@ const AppRouter = props => {
       if (duringSession && onGoingScheduleDoc !== null) {
         // if they are during a sessoion then check if the session has started by the researcher or not.
         const onGoingScheduleData = onGoingScheduleDoc.data();
-        if (onGoingScheduleData.hasStarted) {
+        if (onGoingScheduleData.hasStarted && onGoingScheduleData.attended) {
           setStartedByResearcher(true);
         } else {
           // keep listening to the schedule until the researcher starts the session.
@@ -256,7 +256,10 @@ const AppRouter = props => {
                 <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
                 <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
-                <Route path="Activities/ResearcherPassage" element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />} />
+                <Route
+                  path="Activities/ResearcherPassage"
+                  element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
+                />
                 <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
                 {email === "oneweb@umich.edu" && (
                   <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />

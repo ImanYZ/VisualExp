@@ -1892,7 +1892,7 @@ exports.remindCalendarInvitations = async context => {
               // the schedule object should have a hasStarted field
 
               const participantAttendedFirstSession =
-                userData.project === "Annotating" ? schedule.hasStarted : participant.firstDone;
+                userData.project === "Annotating" ? schedule.attended : participant.firstDone;
 
               if (order === "1st" && !participantAttendedFirstSession) {
                 // Then, we delete all their sessions from Google Calendar and
