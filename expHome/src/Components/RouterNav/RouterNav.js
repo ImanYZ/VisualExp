@@ -837,7 +837,7 @@ const RouterNav = props => {
                         ></LineDiagram>
                       ) : null}
                     </Box>
-                    {projectPoints.onePoints ? (
+                    {projectPoints.expPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -857,39 +857,41 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    <Tooltip
-                      title={
-                        <div>
+                    {projectPoints.onePoints ? (
+                      <Tooltip
+                        title={
                           <div>
-                            You've earned {oneCademyPoints + dayOneUpVotes} total 1Cademy points, including{" "}
-                            {oneCademyPoints} from others' votes and {dayOneUpVotes} points for casting 25 upvotes per
-                            day on others' proposals.
+                            <div>
+                              You've earned {oneCademyPoints + dayOneUpVotes} total 1Cademy points, including{" "}
+                              {oneCademyPoints} from others' votes and {dayOneUpVotes} points for casting 25 upvotes per
+                              day on others' proposals.
+                            </div>
+                            <div>You cast {proposalUpvotesToday} / 25 up-votes today on others' 1Cademy proposals.</div>
                           </div>
-                          <div>You cast {proposalUpvotesToday} / 25 up-votes today on others' 1Cademy proposals.</div>
-                        </div>
-                      }
-                    >
-                      <Button
-                        id="OneCademyPoints"
-                        className={activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"}
-                        onClick={event => navigate("/Activities/1Cademy")}
+                        }
                       >
-                        {username ? (
-                          <div>
-                            <img src={favicon} width="15.1" /> {oneCademyPoints + dayOneUpVotes}
-                            <br />✔ {oneCademyPoints}
-                            <br />
-                            <span>🌞 {proposalUpvotesToday} / 25</span>
-                          </div>
-                        ) : (
-                          <div>
-                            Click here to log <br />
-                            in to 1Cademy to <br />
-                            show your points.
-                          </div>
-                        )}
-                      </Button>
-                    </Tooltip>
+                        <Button
+                          id="OneCademyPoints"
+                          className={activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"}
+                          onClick={event => navigate("/Activities/1Cademy")}
+                        >
+                          {username ? (
+                            <div>
+                              <img src={favicon} width="15.1" /> {oneCademyPoints + dayOneUpVotes}
+                              <br />✔ {oneCademyPoints}
+                              <br />
+                              <span>🌞 {proposalUpvotesToday} / 25</span>
+                            </div>
+                          ) : (
+                            <div>
+                              Click here to log <br />
+                              in to 1Cademy to <br />
+                              show your points.
+                            </div>
+                          )}
+                        </Button>
+                      </Tooltip>
+                    ) : null}
                     {projectPoints.intellectualPoints ? (
                       <Tooltip
                         title={

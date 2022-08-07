@@ -1,5 +1,5 @@
 const AppConfig = {
-  defaultProject: "H2K2",
+  defaultProject: "H1L2",
   defaultSurveyProject: "Annotating",
   defaultNumberOfSessions: 3,
   defaultHourlyChunks: 2, // divider for hour used to determine timeslot size, 2 means 30mins, 4 means 15 mins.
