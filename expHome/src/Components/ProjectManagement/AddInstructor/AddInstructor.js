@@ -32,7 +32,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-// import CSCObjLoader from "./CSCObjLoader";
+import CSCObjLoader from "./CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
@@ -406,6 +406,9 @@ const AddInstructor = props => {
   const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
   const [otherInstructorData, setOtherInstructorData] = useState({});
 
+
+
+  
   useEffect(() => {
     setSelectedRows([]);
     setValues(initialState);
@@ -414,6 +417,7 @@ const AddInstructor = props => {
     setLastname("");
     setEmail("");
     setExplanation("");
+    CSCObjLoader(CSCObj,setCSCObj,setAllCountries);
   }, [project]);
 
   // Load the array of all the institutions located in the US or Canada to load
