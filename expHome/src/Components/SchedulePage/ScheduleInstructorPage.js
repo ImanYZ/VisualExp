@@ -339,7 +339,7 @@ const ScheduleInstructorPage = props => {
             {i + 1}
             <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup> session
           </strong>{" "}
-          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter after first session,` : null}
+          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter after the first session,` : null}
           {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i])}
         </li>
       );
