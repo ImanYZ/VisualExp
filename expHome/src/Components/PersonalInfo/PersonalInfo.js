@@ -13,6 +13,7 @@ import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
+import List from '@mui/material/List';
 
 import Done from "@mui/icons-material/Done";
 
@@ -225,51 +226,39 @@ const PersonalInfo = props => {
       Number(category[listOfItems[39]]) +
       Number(category[listOfItems[40]]) +
       Number(category[listOfItems[43]]);
-
-    console.log("extraversion", extraversion);
-    console.log("agreeableness", agreeableness);
-    console.log("conscientiousness", conscientiousness);
-    console.log("EmotionalStability", EmotionalStability);
-    console.log("openness", openness);
     props.setAnsweredPersonalTrait(true);
     props.setPersonalityTraits({"extraversion":extraversion,"agreeableness":agreeableness,"conscientiousness": conscientiousness,"EmotionalStability": EmotionalStability,"openness": openness});
   };
 
-  const choices = [
-    "Disagree Strongly",
-    "Disagree a little",
-    "Neither agree nor disagree",
-    "Agree a little",
-    "Agree strongly"
-  ];
-  console.log(Object.keys(category).length);
   return (
-    <div>
+    <div>        
+      <Box style={{margin:"10px 10px 10px 10px",width:"900", overflow: "auto" }}>  
       {!props.answeredPersonalTrait && (
-        <Paper sx={{ height: "900px", m: "1px 1px 1px 1px", overflow: "auto" }}>
-             <Button
-            style={{m:"20px 20px 20px 20px"}}
-            id="QuestionNextBtn"
-            onClick={handleNext}
-            disabled={Object.keys(category).length !== 44}
-            className={false ? "Button Disabled" : "Button"}
-            variant="contained"
-          >
-            NEXT!
-          </Button>
-          <Box sx={{ m: "40px 20px 20px 40px" }}>
-           
-            <p>I am someone who:</p>
-          </Box>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-              <Box style={{ margin: "10px 10px 10px 350px" }}>
+        <>
+              <Box style={{margin:"10px 0px 100px 0px"}}>
+              <Button
+                   
+                   id="QuestionNextBtn"
+                   onClick={handleNext}
+                   disabled={Object.keys(category).length !== 44}
+                   className={(Object.keys(category).length !== 44) ? "Button Disabled" : "Button"}
+                   variant="contained"
+                 >
+                   NEXT!
+                 </Button> 
+              <h4  >I am someone who:</h4>
+                
+              </Box>
+        <Box sx={{ height: "600px",width:"1000px", overflow: "auto" }}>
+          <FormControl >
+            <RadioGroup row >
+              <Box style={{ margin: "0px 0px 0px 220px" }}>
                 <FormControlLabel
                   style={{ marginInline: "40px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div >
                       Disagree <br />
                       Strongly
                     </div>
@@ -297,7 +286,7 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "59px" }}
+                  style={{ marginInline: "45px" }}
                   value=""
                   control={<></>}
                   label={
@@ -307,11 +296,11 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "0px" }}
+                  style={{ marginInline: "39px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div style={{ fontSize: 15 }}>
                       Agree <br />
                       strongly
                     </div>
@@ -320,9 +309,12 @@ const PersonalInfo = props => {
               </Box>
             </RadioGroup>
           </FormControl>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            {listOfItems0.map(name => (
-              <div>
+          <FormControl sx={{ m: "0px 0px 0px 0px" }}>
+            {listOfItems0.map((name, idx) => (
+              <>
+             <hr />
+              <List key={idx} style={{backgroundColor:"azure"}}>
+                 
                 {
                   <RadioGroup
                     row
@@ -333,7 +325,7 @@ const PersonalInfo = props => {
                     aria-labelledby="demo-row-radio-buttons-group-label1"
                     name="row-radio-buttons-group1"
                   >
-                     <Box style={{ marginLeft:"60px"  ,marginRight: "85px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
+                     <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
                       <div>{name}</div>
                     </Box>
                 
@@ -346,13 +338,107 @@ const PersonalInfo = props => {
                   </RadioGroup>
                   
                 }
-                 <hr id="QuestionHeaderSeparator" />
-              </div>
+              
+              </List>
+              </>
+            ))}
+          </FormControl>
+          <FormControl sx={{ m: "0px 0px 0px 0px" }}>
+            <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
+              <Box style={{ margin: "10px 10px 10px 200px" }}>
+                <FormControlLabel
+                  style={{ marginInline: "40px" }}
+                  value=""
+                  control={<></>}
+                  label={
+                    <div>
+                      Disagree <br />
+                      Strongly
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  style={{ marginInline: "40px" }}
+                  value=""
+                  control={<></>}
+                  label={
+                    <div>
+                      Disagree <br />a little
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  style={{ marginInline: "22px" }}
+                  value=""
+                  control={<></>}
+                  label={
+                    <div>
+                      Neither agree <br />
+                      anor disagree
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  style={{ marginInline: "40px" }}
+                  value=""
+                  control={<></>}
+                  label={
+                    <div>
+                      Agree <br />a little
+                    </div>
+                  }
+                />
+                <FormControlLabel
+                  style={{ marginInline: "60px" }}
+                  value=""
+                  control={<></>}
+                  label={
+                    <div>
+                      Agree <br />
+                      strongly
+                    </div>
+                  }
+                />
+              </Box>
+            </RadioGroup>
+          </FormControl>
+          <FormControl sx={{ m: "0px 0px 20px 5px" }}>
+            {listOfItems1.map((name,idx) => (
+               <>
+               <hr />
+                <List key={idx} style={{backgroundColor:"azure"}}>
+                   
+                  {
+                    <RadioGroup
+                      row
+                      onChange={e => {
+                        category[name] = e.target.value;
+                        setCategory(category);
+                      }}
+                      aria-labelledby="demo-row-radio-buttons-group-label1"
+                      name="row-radio-buttons-group1"
+                    >
+                       <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
+                        <div>{name}</div>
+                      </Box>
+                  
+                        <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
+                        <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
+                        <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
+                        <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
+                        <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
+                     
+                    </RadioGroup>
+                    
+                  }
+                
+                </List>
+                </>
             ))}
           </FormControl>
           <FormControl sx={{ m: "20px 20px 20px 20px" }}>
             <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-              <Box style={{ margin: "10px 10px 10px 350px" }}>
+              <Box style={{ margin: "10px 10px 10px 200px" }}>
                 <FormControlLabel
                   style={{ marginInline: "40px" }}
                   value=""
@@ -409,9 +495,12 @@ const PersonalInfo = props => {
               </Box>
             </RadioGroup>
           </FormControl>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            {listOfItems1.map(name => (
-              <div>
+          <FormControl sx={{ m: "0px 0px 200px 5px" }}>
+            {listOfItems2.map((name,idx) => (
+                <>
+             <hr />
+              <List key={idx} style={{backgroundColor:"azure"}}>
+                 
                 {
                   <RadioGroup
                     row
@@ -422,10 +511,10 @@ const PersonalInfo = props => {
                     aria-labelledby="demo-row-radio-buttons-group-label1"
                     name="row-radio-buttons-group1"
                   >
-                     <Box style={{ marginLeft:"60px"  ,marginRight: "85px" ,width:"200px",display: 'inline'}}>
+                     <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
                       <div>{name}</div>
                     </Box>
-                 
+                
                       <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
                       <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
                       <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
@@ -433,103 +522,17 @@ const PersonalInfo = props => {
                       <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
                    
                   </RadioGroup>
+                  
                 }
-                <hr id="QuestionHeaderSeparator" />
-              </div>
-            ))}
-          </FormControl>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-              <Box style={{ margin: "10px 10px 10px 350px" }}>
-                <FormControlLabel
-                  style={{ marginInline: "40px" }}
-                  value=""
-                  control={<></>}
-                  label={
-                    <div>
-                      Disagree <br />
-                      Strongly
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  style={{ marginInline: "40px" }}
-                  value=""
-                  control={<></>}
-                  label={
-                    <div>
-                      Disagree <br />a little
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  style={{ marginInline: "22px" }}
-                  value=""
-                  control={<></>}
-                  label={
-                    <div>
-                      Neither agree <br />
-                      anor disagree
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  style={{ marginInline: "40px" }}
-                  value=""
-                  control={<></>}
-                  label={
-                    <div>
-                      Agree <br />a little
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  style={{ marginInline: "40px" }}
-                  value=""
-                  control={<></>}
-                  label={
-                    <div>
-                      Agree <br />
-                      strongly
-                    </div>
-                  }
-                />
-              </Box>
-            </RadioGroup>
-          </FormControl>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            {listOfItems2.map(name => (
-              <div>
-                {
-                  <RadioGroup
-                    row
-                    onChange={e => {
-                      category[name] = e.target.value;
-                      setCategory(category);
-                    }}
-                    aria-labelledby="demo-row-radio-buttons-group-label1"
-                    name="row-radio-buttons-group1"
-                  >
-                   <Box style={{ marginLeft:"60px"  ,marginRight: "85px" ,width:"200px",display: 'inline'}}>
-                      <div>{name}</div>
-                    </Box>
-               
-                      <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
-                      <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
-                      <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
-                      <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
-                      <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
               
-                  </RadioGroup>
-                }
-                 <hr id="QuestionHeaderSeparator" />
-              </div>
+              </List>
+              </>
             ))}
           </FormControl>
-
-       
-        </Paper>
-      )}
+          <h3  style={{margin:"100px 10px 10px 10px"}}></h3>
+        </Box>
+        </>
+      )}</Box> 
 
       {props.answeredPersonalTrait && (
         <form noValidate autoComplete="off">
