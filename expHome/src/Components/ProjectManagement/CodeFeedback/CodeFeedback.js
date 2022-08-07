@@ -218,6 +218,7 @@ const CodeFeedback = props => {
       .collection("feedbackCodeBooks")
       .where("approved", "==", true)
       .where("project", "==", project)
+      .where("title", "==", "Researcher")
       .get();
     let approvedCodes = [];
     for (let codeBook of feedbackCodeBooksDocs.docs) {
@@ -285,6 +286,7 @@ const CodeFeedback = props => {
       .where("approved", "==", false)
       .where("project", "==", project)
       .where("coder", "==", fullname)
+      .where("title", "==", "Researcher")
       .get();
     const unApprovedData = feedbackCodeBooksDocs.docs.map(doc => doc.data().code);
     setUnApprovedNewCodes(unApprovedData);
@@ -560,6 +562,7 @@ const CodeFeedback = props => {
         .where("code", "==", selectedCode)
         .where("project", "==", project)
         .where("coder", "==", fullname)
+        .where("title", "==", "Researcher")
         .get()
         .then(async (doc) => {
           const [codeDoc] = doc.docs;
@@ -637,7 +640,7 @@ const CodeFeedback = props => {
 
     // check if the code already exists in approvedCode or unapprovedCode
     const checkIfItHasSameCode = experimentCodes.filter(elem => elem.code === code);
-    if (checkIfItHasSameCode.length >= 2) {
+    if (checkIfItHasSameCode.length >= 4) {
       setSnackbarMessage("This code already exists 2 or more times, please try some other code");
       return;
     }
