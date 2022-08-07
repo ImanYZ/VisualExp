@@ -957,12 +957,12 @@ const RouterNav = props => {
                               From that total, we've already excluded your negative {negativeGradingPoints} ❌ points.
                             </div>
                             <div>
-                              This means, {gradingPoints + negativeGradingPoints} times at least 3 other researchers
+                              This means, 2 X {gradingPoints + negativeGradingPoints} times at least 3 other researchers
                               have agreed with you on existance or non-existance of a specific phrase in a free-recall
-                              response. Also, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed on
-                              existance (non-existance) of a specific key phrase in a free-recall response by a
-                              participant, but you opposed their majority of votes. So, you got a 0.5 ❌ negative point
-                              for each of those cases.
+                              response. Also, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed
+                              with each other on existance (non-existance) of a specific key phrase in a free-recall
+                              response by a participant, BUT you opposed their majority of votes. So, you got a 0.5 ❌
+                              negative point for each of those cases.
                             </div>
                           </div>
                         }
