@@ -16,7 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import Box from '@mui/material/Box';
+import Box from "@mui/material/Box";
 // import LiveHelp from "@mui/icons-material/LiveHelp";
 
 import { choicesState } from "../../store/ExperimentAtoms";
@@ -38,13 +38,16 @@ const MCQuestion = props => {
   const [selectCodes, setSelectCodes] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [choiceQuestion, setChoiceQuestion] = useState(false);
-  const question = props.questions[props.currentQIdx];
   const choice = choices[props.currentQIdx];
-  const [choiceFeedbackQuestions,setChoiceFeedbackQuestions] = useState("");
+  const [choiceFeedbackQuestions, setChoiceFeedbackQuestions] = useState("");
   const curQuestion = props.currentQIdx + 1;
   const size = props.questions.length;
   const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
   const previousAvailable = props.currentQIdx !== 0;
+  const [orderOfQuestions, setOrderOfQuestions] = useState([
+    props.questions[Math.floor(Math.random() * props.questions.length)]
+  ]);
+  const postQuestion = props.questions[props.currentQIdx];
 
   const retrieveFeedbackcodes = async () => {
     const experimentCodeDocs = await firebase.db
@@ -55,31 +58,31 @@ const MCQuestion = props => {
       .where("title", "==", "Participant")
       .get();
     const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
-    console.log("codesHere:::::::::",codesHere);
+
     setCodes(codesHere);
   };
 
   useEffect(() => {
     retrieveFeedbackcodes();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectCodes]);
 
   useEffect(() => {
     let qsLeft = 0;
-   
+
     setQuestionsLeft(qsLeft);
-    if(![5, 19].includes(props.step)){
+    if (![5, 19].includes(props.step)) {
       let allAns = true;
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
-        if (!choices[qIdx]) {
+        if (!orderOfQuestions.includes(props.questions[qIdx])) {
           allAns = false;
           qsLeft += 1;
         }
       }
       setAllAnswered(allAns);
+      props.setOrderQuestions(orderOfQuestions);
     }
-   
-  }, [choices, choiceFeedbackQuestions,props.questions]);
+  }, [choices, choiceFeedbackQuestions, props.questions]);
 
   const choiceChange = event => {
     setChoices(oldChoices => {
@@ -90,31 +93,57 @@ const MCQuestion = props => {
   };
 
   const moveNext = () => {
-    if (selectCodes || !([5, 19].includes(props.step))) {
+    if (![5, 19].includes(props.step)) {
       const qsLeft = [];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
-        if (!choices[qIdx]) {
+        if (!orderOfQuestions.includes(props.questions[qIdx])) {
           qsLeft.push(qIdx);
         }
       }
       if (qsLeft.length > 0 && props.currentQIdx === props.questions.length - 1) {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
+        let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        while (orderOfQuestions.includes(props.questions[randomizeNumberOfQuestion])) {
+          randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        }
+        orderOfQuestions.push(props.questions[randomizeNumberOfQuestion]);
+        setOrderOfQuestions(orderOfQuestions);
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
       setSelectCodes(false);
       retrieveFeedbackcodes();
       setExplanation("");
 
-      if((props.currentQIdx === 1)&& [5, 19].includes(props.step)){
+      if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
         setChoiceQuestion(true);
       }
     } else {
-      setCodes([]);
-      retrieveFeedbackcodes();
-      setSelectCodes(true);
-    }
+      if (selectCodes) {
+        const qsLeft = [];
+        for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
+          if (!choices[qIdx]) {
+            qsLeft.push(qIdx);
+          }
+        }
+        if (qsLeft.length > 0 && props.currentQIdx === props.questions.length - 1) {
+          props.setCurrentQIdx(qsLeft[0]);
+        } else {
+          props.setCurrentQIdx(props.currentQIdx + 1);
+        }
+        setSelectCodes(false);
+        retrieveFeedbackcodes();
+        setExplanation("");
 
+        if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
+          setChoiceQuestion(true);
+        }
+      } else {
+        setCodes([]);
+        retrieveFeedbackcodes();
+        setSelectCodes(true);
+      }
+    }
   };
 
   const movePrevious = () => {
@@ -122,16 +151,16 @@ const MCQuestion = props => {
   };
 
   const explanationsChange = event => {
-   if(!choiceQuestion){ 
-    const newExp = [...props.explanations];
-    newExp[props.currentQIdx].explanation = event.target.value;
-    props.setExplanations(newExp);
-    setExplanation(event.target.value);
-  }else{
-    const newExp = [...props.explanations];
-    newExp[props.currentQIdx].preferedFeedbackExplanation = event.target.value;
-    props.setExplanations(newExp);
-    setExplanation(event.target.value);
+    if (!choiceQuestion) {
+      const newExp = [...props.explanations];
+      newExp[props.currentQIdx].explanation = event.target.value;
+      props.setExplanations(newExp);
+      setExplanation(event.target.value);
+    } else {
+      const newExp = [...props.explanations];
+      newExp[props.currentQIdx].preferedFeedbackExplanation = event.target.value;
+      props.setExplanations(newExp);
+      setExplanation(event.target.value);
     }
   };
 
@@ -172,27 +201,17 @@ const MCQuestion = props => {
     });
   };
 
-
-
   const submit = () => {
     moveNext();
   };
-const choiceFeedbackQuestion = (event) => { 
-  setChoiceFeedbackQuestions(event.target.value);
-  console.log(question);
-  const newExp = [...props.explanations];
-  newExp[props.currentQIdx].choice = question[event.target.value];
-  props.setExplanations(newExp);
-  console.log(newExp);
-  setAllAnswered(true);
-  console.log("choice feedback code")
- }
+  const choiceFeedbackQuestion = event => {
+    setChoiceFeedbackQuestions(event.target.value);
+    const newExp = [...props.explanations];
+    newExp[props.currentQIdx].choice = postQuestion[event.target.value];
+    props.setExplanations(newExp);
+    setAllAnswered(true);
+  };
 
-  console.log("allAnswerd::::::::",allAnswered);
-  console.log(choiceQuestion);
-  console.log(question.stem);
-  console.log("selectedCodes",selectCodes);
-  console.log(codes);
   return (
     <div
       style={
@@ -224,30 +243,40 @@ const choiceFeedbackQuestion = (event) => {
 
         <FormControl id="QuestionContent" component="fieldset">
           <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
-            {question.stem}
+            {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx].stem}
           </FormLabel>
-          { choiceQuestion?(<RadioGroup id="ChoiceGroup" aria-label="choice" name="choice" value={choiceFeedbackQuestions} onChange={choiceFeedbackQuestion}>
-            {["a", "b"].map(opt => (
-              <FormControlLabel
-                key={opt}
-                value={opt}
-                control={<Radio />}
-                label={question[opt]}
-                className="QuestionChoice"
-              />
-            ))}
-           </RadioGroup>):(<RadioGroup id="ChoiceGroup" aria-label="choice" name="choice" value={choice} onChange={choiceChange}>
-            {["a", "b", "c", "d"].map(opt => (
-              <FormControlLabel
-                key={opt}
-                value={opt}
-                control={<Radio />}
-                label={question[opt]}
-                className="QuestionChoice"
-              />
-            ))}
-          </RadioGroup>)}
-          {(props.explanations && props.explanations.length > 0 && !selectCodes) ?(
+          {choiceQuestion ? (
+            <RadioGroup
+              id="ChoiceGroup"
+              aria-label="choice"
+              name="choice"
+              value={choiceFeedbackQuestions}
+              onChange={choiceFeedbackQuestion}
+            >
+              {["a", "b"].map(opt => (
+                <FormControlLabel
+                  key={opt}
+                  value={opt}
+                  control={<Radio />}
+                  label={postQuestion[opt]}
+                  className="QuestionChoice"
+                />
+              ))}
+            </RadioGroup>
+          ) : (
+            <RadioGroup id="ChoiceGroup" aria-label="choice" name="choice" value={choice} onChange={choiceChange}>
+              {["a", "b", "c", "d"].map(opt => (
+                <FormControlLabel
+                  key={opt}
+                  value={opt}
+                  control={<Radio />}
+                  label={[5, 19].includes(props.step) ? postQuestion[opt] : orderOfQuestions[props.currentQIdx][opt]}
+                  className="QuestionChoice"
+                />
+              ))}
+            </RadioGroup>
+          )}
+          {props.explanations && props.explanations.length > 0 && !selectCodes ? (
             <>
               <h3>Why do you think so?</h3>
               <TextareaAutosize
@@ -263,7 +292,7 @@ const choiceFeedbackQuestion = (event) => {
 
           {[5, 19].includes(props.step) && selectCodes ? (
             <div>
-              <h3>Better Explain  Your Feedback:</h3>
+              <h3>Better Explain Your Feedback:</h3>
 
               <FormControl id="QuestionContent" component="fieldset">
                 <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
@@ -308,56 +337,51 @@ const choiceFeedbackQuestion = (event) => {
                   value={newCode}
                 />
               </FormControl>
-              <Box sx={{m:"10px 600px 0px 0px"}}>
-        {
-              ([5, 19].includes(props.step) && selectCodes) && (<Button
-               id="QuestionNextBtn"
-               onClick={addCode}
-               disabled={(!newCode || newCode === "")}
-               className={(!newCode || newCode === "") ? "Button Disabled" : "Button"}
-               variant="contained"
-             >
-               ADD YOUR Explanation
-             </Button>)
-          }
-          </Box>
-           
-            </div>  
+              <Box sx={{ m: "10px 600px 0px 0px" }}>
+                {[5, 19].includes(props.step) && selectCodes && (
+                  <Button
+                    id="QuestionNextBtn"
+                    onClick={addCode}
+                    disabled={!newCode || newCode === ""}
+                    className={!newCode || newCode === "" ? "Button Disabled" : "Button"}
+                    variant="contained"
+                  >
+                    ADD YOUR Explanation
+                  </Button>
+                )}
+              </Box>
+            </div>
           ) : null}
         </FormControl>
-       
+
         <div id="QuestionFooter">
-        
-          
           {selectCodes || ![5, 19].includes(props.step) ? (
-            
             <Button
               id="QuestionNextBtn"
               onClick={moveNext}
-              disabled={(!nextAvailable) || choiceQuestion}
-              className={((!nextAvailable) || choiceQuestion) ? "Button Disabled" : "Button"}
+              disabled={!nextAvailable || choiceQuestion}
+              className={!nextAvailable || choiceQuestion ? "Button Disabled" : "Button"}
               variant="contained"
             >
               Next
             </Button>
-            
           ) : (
-            !choiceQuestion && (<Button id="QuestionNextBtn" onClick={submit} disabled={false} className={"Button"} variant="contained">
-              Submit
-            </Button>)
+            !choiceQuestion && (
+              <Button id="QuestionNextBtn" onClick={submit} disabled={false} className={"Button"} variant="contained">
+                Submit
+              </Button>
+            )
           )}
-          
+
           <Button
             id="QuestionPreviousBtn"
-            onClick={movePrevious} 
+            onClick={movePrevious}
             disabled={!previousAvailable}
             className={!previousAvailable ? "Button Disabled" : "Button"}
             variant="contained"
           >
             Previous
           </Button>
-        
-       
         </div>
       </Paper>
 
@@ -368,14 +392,8 @@ const choiceFeedbackQuestion = (event) => {
         <Button
           id="QuestionSubmitBtn"
           onClick={props.nextStep}
-          disabled={
-          !allAnswered
-          }
-          className={
-            allAnswered
-              ? "Button"
-              : "Button Disabled"
-          }
+          disabled={!allAnswered}
+          className={allAnswered ? "Button" : "Button Disabled"}
           variant="contained"
         >
           Submit &amp; Continue!
