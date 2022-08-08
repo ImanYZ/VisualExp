@@ -131,12 +131,12 @@ const Activities = props => {
               expPoints = projectData.expPoints;
             }
             if (projectData.onePoints) {
-              totalPoints += projectData.onePoints;
-              onePoints += projectData.onePoints;
+              totalPoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.dayOneUpVotePoints) {
-              totalPoints += projectData.dayOneUpVotePoints;
-              onePoints += projectData.dayOneUpVotePoints;
+              totalPoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.points) {
               totalPoints += projectData.points;
