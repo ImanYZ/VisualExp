@@ -126,7 +126,7 @@ const ScheduleInstructorPage = props => {
       let userDoc = await firebase.db.collection("instructors").doc(instructorId).get();
 
       const userData = userDoc.data();
-      const project = userData.project;
+      const project = "Annotating";
       setEmail(userData.email);
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
