@@ -109,6 +109,11 @@ const postQuestions = [
     b: "Passage 2",
     c: "Both",
     d: "Neither"
+  },
+  {
+    stem: "Which type of question did you prefer to enter your feedback?",
+    a: "Open-ended free text",
+    b: "Choosing/entering the options"
   }
 ];
 
@@ -141,8 +146,10 @@ const App = () => {
   // const [toOptions, setToOptions] = useState([]);
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
-    { explanation: "", codes: [] }
+    { explanation: "", codes: [] },
+    { preferedFeedbackExplanation: "", choice: "" }
   ]);
+
   const [birthDate, setBirthDate] = useState(null);
   const [major, setMajor] = useState({
     Major: "Information Sciences",
@@ -152,12 +159,13 @@ const App = () => {
   const [language, setLanguage] = useState("English");
   const [gender, setGender] = useState("");
   const [ethnicity, setEthnicity] = useState([]);
-  const [personalityTraits, setPersonalityTraits]=useState({});
+  const [personalityTraits, setPersonalityTraits] = useState({});
   const [genderOtherValue, setGenderOtherValue] = useState("");
   const [ethnicityOtherValue, setEthnicityOtherValue] = useState("");
   const [error, setError] = useState("");
   const [scores, setScores] = useState([]);
   const [answeredPersonalTrait, setAnsweredPersonalTrait] = useState(false);
+  const [orderQuestions, setOrderQuestions] = useState([]);
 
   const educationChange = event => {
     setEducation(event.target.value);
@@ -235,14 +243,17 @@ const App = () => {
         }
       }
       let score = 0;
+      let originalChoicesOrder = [];
       for (let qIdx = 0; qIdx < questions.length; qIdx++) {
-        if (questions[qIdx].answer === choices[qIdx]) {
+        originalChoicesOrder.push(choices[orderQuestions.indexOf(questions[qIdx])]);
+        if (questions[qIdx].answer === choices[orderQuestions.indexOf(questions[qIdx])]) {
           score += 1;
         }
       }
+
       pConditions[phase] = {
         ...pConditions[phase],
-        [testName]: choices,
+        [testName]: originalChoicesOrder,
         [testName + "Score"]: score,
         [testName + "ScoreRatio"]: score / questions.length,
         [testName + "Ended"]: currentTime,
@@ -920,6 +931,7 @@ const App = () => {
             currentQIdx={currentQIdx}
             setCurrentQIdx={setCurrentQIdx}
             questions={questions}
+            setOrderQuestions={setOrderQuestions}
             reText={reText}
             minutes={minutes}
             seconds={seconds}
