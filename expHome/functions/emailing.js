@@ -8,7 +8,6 @@ const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require(".
 
 const { signatureHTML } = require("./emailSignature");
 
-const { getUserDocsfromEmail } = require("./projectManagement");
 
 require("dotenv").config();
 
@@ -460,20 +459,20 @@ const eventNotificationEmail = async (
         "[1Cademy] " +
         // (courseName ? "[" + courseName + "] " : "") +
         (weAreWaiting
-          ? "We Are Waiting for You in the UX Research Experiment Session!"
+          ? "We Are Waiting for You in the Session!"
           : declined
           ? "You Have Declined Your " +
             order +
-            " Session of the UX Research Experiment Which Will Begin in " +
+            " Session Which Will Begin in " +
             hoursLeft +
             "!"
-          : "Your UX Research Experiment Session Will Begin in " + hoursLeft + "!"),
+          : "Your Session Will Begin in " + hoursLeft + "!"),
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
       <p></p>
       ${
         weAreWaiting
-          ? "<p>Our UX researchers have been waiting for you in the UX research experiment session. " +
+          ? "<p>We have been waiting for you in the session. " +
             "Please join the session at <a href=" +
             hangoutLink +
             " target='_blank'>this link</a>.</p><p>" +
@@ -484,7 +483,7 @@ const eventNotificationEmail = async (
           : declined
           ? "<p>This is an auto-generated email to inform you that you have declined your " +
             order +
-            " session of the UX research experiment which will begin in " +
+            " session, which will begin in " +
             hoursLeft +
             "!</p>" +
             `<p>Please respond to this email with only one of the following options to proceed with:</p>
@@ -494,7 +493,7 @@ const eventNotificationEmail = async (
           </ul>
           <p>Note that because this is a 30-minute, ${order} session, our experiment protocol does not allow us to move it to another day. We can only reschedule it on the same day.</p>
           <p>Please reply to this email if you have any questions or concerns.</p>`
-          : "<p>This is an auto-generated email to inform you that your UX research experiment session will begin in " +
+          : "<p>This is an auto-generated email to inform you that your session will begin in " +
             hoursLeft +
             "," +
             " but you've not accepted our invitation on Google Calendar yet!</p>" +
@@ -557,7 +556,7 @@ exports.researcherEventNotificationEmail = async (email, fullname, participant, 
             <p>Instead, send an announcement to our Microsoft Teams research channel to look for another researcher to take the session on your behalf.</p>
             <p>Keep in mind that we are the one who invited the participant and we are not supposed to decline our own invitations.</p>
             <p>Let me know if you have any questions or concerns.</p>`
-          : "<p>This is an auto-generated email to inform you that your UX research experiment session with " +
+          : "<p>This is an auto-generated email to inform you that your session with " +
             participant +
             " will begin in " +
             hoursLeft +
@@ -599,11 +598,11 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
         // (courseName ? "[" + courseName + "] " : "") +
         "You Missed the " +
         order +
-        " UX Research Experiment Session Today!",
+        " Session Today!",
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
         <p></p>
-        <p>This is an auto-generated email to inform you that you missed your ${order} UX research experiment session!</p>
+        <p>This is an auto-generated email to inform you that you missed your ${order} session!</p>
         <p>Please respond to this email with only one of the following options to proceed with:</p>
         <ul>
           <li>Withdraw your application</li>
@@ -676,49 +675,6 @@ exports.sendEventNotificationEmail = (req, res) => {
         false
       );
     }
-  } catch (err) {
-    console.log({ err });
-    return res.status(500).json({ err });
-  }
-};
-
-exports.sendOngoingSessionReminderEmail = async (req, res) => {
-  const { email, order = "1st", researcherName = "", hangoutLink = "" } = req.body;
-  if (!email) return res.send(400).send({ message: "Email is required" });
-
-  const userDocs = await getUserDocsfromEmail(email);
-  if (!userDocs) return res.send(400).send({ message: "Invalid Email passed" });
-  const userData = userDocs.docs[0].data();
-  const fullName = `${userData.firstname} ${userData.lastname}`;
-  try {
-    const mailOptions = {
-      from: "onecademy@umich.edu",
-      to: [email, "oneweb@umich.edu"],
-      subject: "[1Cademy] Your " + order + " Session is ongoing right now. please join the session",
-      html:
-        `<p>Hi ${fullName},</p>
-      <p></p>
-      ${
-        "<p>This is an auto-generated email to inform you that your session with " +
-        researcherName +
-        " has begun, but you've not joined the session yet!</p>" +
-        "Please join the session at <a href=" +
-        hangoutLink +
-        " target='_blank'>this link</a>.</p><p>"
-      }
-      </p>
-      <p></p>
-      <p>Best regards,</p>
-      ` + signatureHTML
-    };
-
-    return transporter.sendMail(mailOptions, (error, data) => {
-      if (error) {
-        return res.status(500).json({ error });
-      }
-
-      return res.status(200).json({ done: true });
-    });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });

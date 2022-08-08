@@ -253,8 +253,7 @@ const PassageRight = (props) => {
       ) : step === 9 && !props.answeredPersonalTrait ? (
         <>
           <p>
-            This test measures key personality traits. Once you complete all items, click the "Next" after you answered
-            the test accordingly
+            This test measures key personality traits. Once you complete all items, click "Next".
           </p>
           <p>
             Here are a number of characteristics that may or may not apply to you. For example, do you agree that you

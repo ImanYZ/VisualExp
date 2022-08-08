@@ -1484,7 +1484,15 @@ exports.assignExperimentSessionsPoints = async context => {
                   .where("attendees", "==", attendees)
                   .where("sTime", "==", sTime)
                   .get();
-                if (expSessionDocs.docs.length === 0) {
+
+                // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
+                const schedule = await db.collection("schedule").where("id" ,"==" , pastEvent.id).get();
+                let didResearcherAttend = false;
+                if(schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
+                  didResearcherAttend = true
+                }
+
+                if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
                   let points = 7;
                   if (eTime.getTime() > sTime.getTime() + 40 * 60 * 1000) {
                     points = 16;
@@ -1643,7 +1651,7 @@ exports.remindCalendarInvitations = async context => {
       const researcherData = researcherDoc.data();
       let isActive = false;
       for (let proj in researcherData.projects) {
-        if (researcherData.projects[proj].active) {
+        if (researcherData.projects[proj].active && researcherData.projects[proj].scheduleSessions) {
           isActive = true;
         }
       }
