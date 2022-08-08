@@ -119,6 +119,12 @@ const ScheduleInstructorPage = props => {
   const [projectSpecs, setProjectSpecs] = useState({});
 
   useEffect(() => {
+    axios.post("/instructorYes", {
+      id: instructorId,
+    });
+  }, []);
+  
+  useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
