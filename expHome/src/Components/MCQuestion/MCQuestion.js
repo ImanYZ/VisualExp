@@ -47,6 +47,7 @@ const MCQuestion = props => {
   const [orderOfQuestions, setOrderOfQuestions] = useState([
     props.questions[Math.floor(Math.random() * props.questions.length)]
   ]);
+  const [random, setRandom] = useState(false);
   const postQuestion = props.questions[props.currentQIdx];
 
   const retrieveFeedbackcodes = async () => {
@@ -61,6 +62,13 @@ const MCQuestion = props => {
 
     setCodes(codesHere);
   };
+
+  useEffect(()=>{
+    if(props.currentQIdx===props.questions.length-1 ){
+      setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
+      props.setCurrentQIdx(0);
+    }
+  },[random])
 
   useEffect(() => {
     retrieveFeedbackcodes();
@@ -93,10 +101,12 @@ const MCQuestion = props => {
   };
 
   const moveNext = () => {
+  
     if (![5, 19].includes(props.step)) {
       const qsLeft = [];
+      let order = [...orderOfQuestions];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
-        if (!orderOfQuestions.includes(props.questions[qIdx])) {
+        if (!order.includes(props.questions[qIdx])) {
           qsLeft.push(qIdx);
         }
       }
@@ -104,11 +114,11 @@ const MCQuestion = props => {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
         let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-        while (orderOfQuestions.includes(props.questions[randomizeNumberOfQuestion])) {
+        while (order.includes(props.questions[randomizeNumberOfQuestion])) {
           randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
         }
-        orderOfQuestions.push(props.questions[randomizeNumberOfQuestion]);
-        setOrderOfQuestions(orderOfQuestions);
+        order.push(props.questions[randomizeNumberOfQuestion]);
+        setOrderOfQuestions(order);
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
       setSelectCodes(false);
@@ -201,9 +211,6 @@ const MCQuestion = props => {
     });
   };
 
-  const submit = () => {
-    moveNext();
-  };
   const choiceFeedbackQuestion = event => {
     setChoiceFeedbackQuestions(event.target.value);
     const newExp = [...props.explanations];
@@ -211,6 +218,11 @@ const MCQuestion = props => {
     props.setExplanations(newExp);
     setAllAnswered(true);
   };
+
+  const submitAndContinue = () => { 
+    props.nextStep();
+    setRandom(!random);
+   }
 
   return (
     <div
@@ -243,7 +255,7 @@ const MCQuestion = props => {
 
         <FormControl id="QuestionContent" component="fieldset">
           <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
-            {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx].stem}
+            {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx]?.stem}
           </FormLabel>
           {choiceQuestion ? (
             <RadioGroup
@@ -367,7 +379,7 @@ const MCQuestion = props => {
             </Button>
           ) : (
             !choiceQuestion && (
-              <Button id="QuestionNextBtn" onClick={submit} disabled={false} className={"Button"} variant="contained">
+              <Button id="QuestionNextBtn" onClick={moveNext} disabled={false} className={"Button"} variant="contained">
                 Submit
               </Button>
             )
@@ -391,7 +403,7 @@ const MCQuestion = props => {
         </p>
         <Button
           id="QuestionSubmitBtn"
-          onClick={props.nextStep}
+          onClick={submitAndContinue}
           disabled={!allAnswered}
           className={allAnswered ? "Button" : "Button Disabled"}
           variant="contained"
