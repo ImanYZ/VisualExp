@@ -8,7 +8,6 @@ const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require(".
 
 const { signatureHTML } = require("./emailSignature");
 
-
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
@@ -260,7 +259,9 @@ exports.inviteInstructors = async (req, res) => {
               <p></p>
               <p>If this is of interest to you, we'd be delighted to have a meeting with you. To schedule an appointment, please click one of the following links or directly reply to this email.</p>
               <ul>
-                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${instructorDoc.id}" target="_blank">Yes, I'd like to schedule.</a></li>
+                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
+                  instructorDoc.id
+                }" target="_blank">Yes, I'd like to schedule.</a></li>
                 <li><a href="https://1cademy.us/interestedFacultyLater/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
@@ -456,11 +457,7 @@ const eventNotificationEmail = async (
         (weAreWaiting
           ? "We Are Waiting for You in the Session!"
           : declined
-          ? "You Have Declined Your " +
-            order +
-            " Session Which Will Begin in " +
-            hoursLeft +
-            "!"
+          ? "You Have Declined Your " + order + " Session Which Will Begin in " + hoursLeft + "!"
           : "Your Session Will Begin in " + hoursLeft + "!"),
       html:
         `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
@@ -670,6 +667,7 @@ exports.sendEventNotificationEmail = (req, res) => {
         false
       );
     }
+    res.send({ message: "Email Sent" });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
