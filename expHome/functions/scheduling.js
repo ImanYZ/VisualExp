@@ -223,10 +223,11 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     const participantEmail = event.attendees.filter(
       attendee => attendee.email.toLowerCase() !== email.toLowerCase()
     )?.[0].email;
-    let userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
+
+    let userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
 
     if (userDocs.docs.length === 0) {
-      userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
+      userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
     }
 
     if (userDocs.docs.length === 0) {
