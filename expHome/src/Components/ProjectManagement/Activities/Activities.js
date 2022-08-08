@@ -20,7 +20,7 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
-import CodeFeedback from "../CodeFeedback/CodeFeedback"
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import { LeaderBoard, ProjectPoints } from "./components";
 import { formatPoints } from "../../../utils";
 import ResearcherPassage from "../Passage-Research/ResearcherPassage";
@@ -43,7 +43,7 @@ const CommonPages = [
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
-  { page: "ResearcherPassage", view: <ResearcherPassage /> },
+  { page: "ResearcherPassage", view: <ResearcherPassage /> }
 ];
 
 const Activities = props => {
@@ -111,12 +111,12 @@ const Activities = props => {
               expPoints = projectData.expPoints;
             }
             if (projectData.onePoints) {
-              totalPoints += projectData.onePoints;
-              onePoints += projectData.onePoints;
+              totalPoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.dayOneUpVotePoints) {
-              totalPoints += projectData.dayOneUpVotePoints;
-              onePoints += projectData.dayOneUpVotePoints;
+              totalPoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.points) {
               totalPoints += projectData.points;
