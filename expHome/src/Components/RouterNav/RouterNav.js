@@ -277,7 +277,6 @@ const RouterNav = props => {
             setUsername("");
           }
         } else {
-          localStorage.removeItem("StudentCoNoteSurvey");
           console.log("Signing out!");
           setUsername("");
         }
@@ -612,7 +611,6 @@ const RouterNav = props => {
   }, [notAResearcher, oneCademyPoints, oneCademyUpvotes, firebase, fullname, project]);
 
   const signOut = async event => {
-    localStorage.removeItem("StudentCoNoteSurvey");
     console.log("Signing out!");
     setEmail("");
     setUsername("");
