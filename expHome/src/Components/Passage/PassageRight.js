@@ -450,6 +450,7 @@ const PassageRight = (props) => {
               setCurrentQIdx={props.setCurrentQIdx}
               currentQIdx={props.currentQIdx}
               questions={props.questions}
+              setOrderQuestions={props.setOrderQuestions}
               nextStep={props.nextStep}
             />
           )}
