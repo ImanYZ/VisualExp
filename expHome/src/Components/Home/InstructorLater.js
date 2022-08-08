@@ -48,7 +48,7 @@ const InstructorLater = (props) => {
   return (
     <PagesNavbar thisPage="Interested, Later">
       <Typography variant="h3" gutterBottom marked="center" align="center">
-        Thank You for Your Interest in Our Communities!
+        Thank You for Your Interest in Joining 1Cademy!
       </Typography>
       <Paper style={{ padding: "10px 19px 10px 19px", textAlign: "center" }}>
         <h3>Please choose your preferred date for the reminder email:</h3>
