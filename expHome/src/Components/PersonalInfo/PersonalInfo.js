@@ -259,7 +259,7 @@ const PersonalInfo = props => {
           </Button>
           <Box sx={{ m: "40px 20px 20px 40px" }}>
            
-            <p>I am someone who:</p>
+            <h2>I am someone who:</h2>
           </Box>
           <FormControl sx={{ m: "20px 20px 20px 20px" }}>
             <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">

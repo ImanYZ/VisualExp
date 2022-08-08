@@ -47,11 +47,12 @@ export const LeaderBoard = ({
   const sendEventNotificationEmail = async () => {
     try {
       setSendingReminder(true);
-      await axios.post("/sendOngoingSessionReminderEmail", {
+      await axios.post("/sendEventNotificationEmail", {
         email: onGoingSchedule.email,
+        order: onGoingSchedule.order,
+        firstname: onGoingSchedule.firstname,
+        weAreWaiting: true,
         hangoutLink: onGoingEvent.hangoutLink,
-        researcherName: fullname,
-        order: onGoingSchedule.order
       });
       alert("Event reminder notificatino sent.");
     } catch (err) {

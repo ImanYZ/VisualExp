@@ -199,7 +199,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     const events = await getEvents(start, end, "America/Detroit");
 
     const filteredEvents = events.filter(event => {
-      const containsEmail = event.attendees.some(attendee => attendee.email === email.toLowerCase());
+      const containsEmail = event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
       const isNowLessThanEnd = now < new Date(new Date(event.end.dateTime).getTime() - fiveMinutes);
       return containsEmail && isNowLessThanEnd;
     });
@@ -216,12 +216,26 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     }
 
     const scheduleData = schedule.docs[0].data();
+   const participantEmail = event.attendees.filter(attendee => attendee.email.toLowerCase() !== email.toLowerCase())?.[0].email
+    let userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
+    }
+  
+    if (userDocs.docs.length === 0) {
+      userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", participantEmail.toLowerCase()).get();
+    }
+
+    const userData = userDocs.docs?.[0]?.data();
+
     res.send({
       event,
       schedule: {
         scheduleId: schedule.docs[0].id,
         ...scheduleData,
-        session: scheduleData.session.toDate()
+        session: scheduleData.session.toDate(),
+        firstname: userData?.firstname || ""
       }
     });
   } catch (error) {
