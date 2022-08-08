@@ -15,22 +15,26 @@ const { pad2Num } = require("./utils");
 const { toOrdinal } = require("number-to-words");
 
 const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs) => {
-  const summary = "[1Cademy] UX Research Experiment - " + order + " Session";
+  const isAnnotating = projectSpecs.numberOfSessions === 1;
+  const summary = isAnnotating ? "1Cademy Introduction" : "1Cademy UX Research Experiment - " + order + " Session";
   const description =
     "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +
     email.toLowerCase() +
-    " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p><P>This is your " +
-    order +
-    " session of the UX Research experiment.</p>" +
-    // projectSpecs.numberOfSessions === 3 just a temporary quick thing,
-    // a proper solution will be implemented for annotating project
-    (order === "1st" && projectSpecs.numberOfSessions === 3
-      ? "<p>We've also scheduled your 2nd session 3 days later, and 3rd session one week later.</p>"
-      : order === "2nd" && projectSpecs.numberOfSessions === 3
-      ? "<p>We've also scheduled your 3rd session 4 days later.</p>"
-      : "") +
-    "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
-    "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
+    " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p>" +
+    isAnnotating
+      ? ""
+      : "<p>This is your " +
+        order +
+        " session of the UX Research experiment.</p>" +
+        // projectSpecs.numberOfSessions === 3 just a temporary quick thing,
+        // a proper solution will be implemented for annotating project
+        (order === "1st" && projectSpecs.numberOfSessions === 3
+          ? "<p>We've also scheduled your 2nd session 3 days later, and 3rd session one week later.</p>"
+          : order === "2nd" && projectSpecs.numberOfSessions === 3
+          ? "<p>We've also scheduled your 3rd session 4 days later.</p>"
+          : "") +
+        "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
+        "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
   const colorId = order === "1st" ? "4" : "3";
   const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
   return eventCreated;
@@ -216,15 +220,20 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     }
 
     const scheduleData = schedule.docs[0].data();
-   const participantEmail = event.attendees.filter(attendee => attendee.email.toLowerCase() !== email.toLowerCase())?.[0].email
+    const participantEmail = event.attendees.filter(
+      attendee => attendee.email.toLowerCase() !== email.toLowerCase()
+    )?.[0].email;
     let userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
 
     if (userDocs.docs.length === 0) {
       userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
     }
-  
+
     if (userDocs.docs.length === 0) {
-      userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", participantEmail.toLowerCase()).get();
+      userDocs = await db
+        .collection("usersStudentCoNoteSurvey")
+        .where("email", "==", participantEmail.toLowerCase())
+        .get();
     }
 
     const userData = userDocs.docs?.[0]?.data();
