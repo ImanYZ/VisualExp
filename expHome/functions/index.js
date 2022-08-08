@@ -34,7 +34,7 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations
+  sendPersonalInvitations,
 } = require("./emailing");
 const {
   schedule,
@@ -42,6 +42,8 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
+  lifeLogger,
+  getOngoingResearcherEvent,
   lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
@@ -90,6 +92,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 app.post("/schedule", schedule);
 app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
+app.post("/getOngoingResearcherEvent", getOngoingResearcherEvent);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);

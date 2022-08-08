@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
-
+import axios from "axios";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
 
 import { firebaseState, emailState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
@@ -28,7 +30,6 @@ import ResearcherPassage from "../Passage-Research/ResearcherPassage";
 import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
-
 const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "FreeRecallGrading"];
 
 const AdminAccessPages = [
@@ -60,9 +61,28 @@ const Activities = props => {
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
+  const [onGoingEvent, setOngoingEvent] = useState(null);
+  const [onGoingSchedule, setOnGoingSchedule] = useState(null);
 
   const projectPoints = projectSpecs?.points || {};
 
+  useEffect(() => {
+    const getOngoingResearcherEvent = async () => {
+      try {
+        const response = await axios.post("/getOngoingResearcherEvent", { email });
+        if (response.status === 200) {
+          setOngoingEvent(response.data.event);
+          setOnGoingSchedule(response.data.schedule);
+        }
+      } catch (err) {
+        console.log("Failed to load getOngoingResearcherEvent", err);
+      }
+    };
+
+    if (firebase && email) {
+      getOngoingResearcherEvent();
+    }
+  }, [firebase, email]);
   useEffect(() => {
     if (props.activityName && activePage !== props.activityName) {
       setActivePage(props.activityName);
@@ -300,6 +320,9 @@ const Activities = props => {
             researchers={researchers}
             isResearcherCriteriaMet={isResearcherCriteriaMet}
             makeResearcherChipContent={makeResearcherChipContent}
+            onGoingEvent={onGoingEvent}
+            setOnGoingSchedule={setOnGoingSchedule}
+            onGoingSchedule={onGoingSchedule}
           />
         </div>
       )}

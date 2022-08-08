@@ -19,7 +19,7 @@ import {
   choicesState
 } from "../../store/ExperimentAtoms";
 
-import { projectSpecsState } from "../../store/ProjectAtoms";
+import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
@@ -29,13 +29,15 @@ import { isEmail, getFullname, shuffleArray } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
+import AppConfig from "../../AppConfig";
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [leading, setLeading] = useRecoilState(leadingState);
-  const currentProject = useRecoilValue(currentProjectState);
+  const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
+  const [project, setProject] = useRecoilState(projectState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [phase, setPhase] = useRecoilState(phaseState);
   const [step, setStep] = useRecoilState(stepState);
@@ -96,10 +98,22 @@ const Auth = props => {
     let userNotExists = false;
     let lName = lastname;
     let userData, userRef, fuName;
-    const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
+
+    let isSurvey = false;
+    let userCollection = "users";
+    let userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
+      if (userDocs.docs.length > 0) {
+        isSurvey = true;
+        userCollection = "usersStudentCoNoteSurvey";
+      }
+    }
+
     if (userDocs.docs.length > 0) {
       // Sign in and signed up:
-      userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
+      userRef = firebase.db.collection(userCollection).doc(userDocs.docs[0].id);
       userData = userDocs.docs[0].data();
       const fName = !userData.firstname ? firstname : userData.firstname;
       lName = !userData.lastname ? lastname : userData.lastname;
@@ -107,7 +121,6 @@ const Auth = props => {
         console.log({ fName, lName });
       }
       fuName = getFullname(fName, lName);
-      console.log("FULL NAME => ", fuName);
       if ("leading" in userData && userData.leading.length > 0) {
         setLeading(userData.leading);
       }
@@ -125,7 +138,10 @@ const Auth = props => {
           if (course) {
             userData.course = course;
           }
-        } else {
+          // because if the user signed up for the survey.
+          // the user document will not have these fields
+          // so there is no benefit of running this block
+        } else if (!isSurvey) {
           setPhase(userData.phase);
           setStep(userData.step);
           setPassage(userData.currentPCon.passage);
@@ -156,6 +172,13 @@ const Auth = props => {
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         });
       }
+      // when user is not a researcher update the project so that
+      // it loads the projectSpecs of the project that is assigned to a user.
+      if (userData && !researcherDoc.exists) {
+        const proj = userData.project || AppConfig.defaultProject;
+        setCurrentProject(proj);
+        setProject(proj);
+      }
     } else {
       userNotExists = true;
       // Only signed up:
@@ -180,7 +203,7 @@ const Auth = props => {
         }
       }
     }
-    if (userNotExists) {
+    if (userNotExists && !isSurvey) {
       const conditions = shuffleArray([...projectSpecs.conditions]); // ['H2', 'K2']
       // [{condition: "K2", passage: "xuNQUYbAEFfTD1PHuLGV"}, {condition: "H2", passage: "s1oo3G4n3jeE8fJQRs3g"}]
       // const minPassageNums = [10000, 10000]; // [166, 166]
@@ -206,8 +229,7 @@ const Auth = props => {
       ) {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
-      nullPassage = passagesDocs[passIdx].id;
-
+      nullPassage = passagesDocs[passIdx]?.id || "";
       let questions;
       for (let { condition, passage } of minPConditions) {
         // eslint-disable-next-line no-loop-func
@@ -251,13 +273,13 @@ const Auth = props => {
         phase: 0,
         step: 1,
         pConditions: minPConditions,
-        currentPCon: minPConditions[0],
+        currentPCon: minPConditions[0] || "",
         nullPassage,
         choices: initChoices,
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       };
-      setPassage(minPConditions[0].passage);
-      setCondition(minPConditions[0].condition);
+      setPassage(minPConditions[0]?.passage);
+      setCondition(minPConditions[0]?.condition);
       setNullPassage(nullPassage);
       setPhase(0);
       setStep(1);
@@ -298,7 +320,6 @@ const Auth = props => {
         }
       } else {
         // User is signed out
-        localStorage.removeItem("StudentCoNoteSurvey");
         console.log("Signing out!");
         setEmailVerified("NotSent");
         setFullname("");
