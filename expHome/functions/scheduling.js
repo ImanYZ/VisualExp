@@ -12,22 +12,29 @@ const {
 } = require("./GoogleCalendar");
 
 const { pad2Num } = require("./utils");
+const { toOrdinal } = require("number-to-words");
 
-const createExperimentEvent = async (email, researcher, order, start, end) => {
-  const summary = "[1Cademy] UX Research Experiment - " + order + " Session";
+const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs) => {
+  const isAnnotating = projectSpecs.numberOfSessions === 1;
+  const summary = isAnnotating ? "1Cademy Introduction" : "1Cademy UX Research Experiment - " + order + " Session";
   const description =
     "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +
     email.toLowerCase() +
-    " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p><P>This is your " +
-    order +
-    " session of the UX Research experiment.</p>" +
-    (order === "1st"
-      ? "<p>We've also scheduled your 2nd session 3 days later, and 3rd session one week later.</p>"
-      : order === "2nd"
-      ? "<p>We've also scheduled your 3rd session 4 days later.</p>"
-      : "") +
-    "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
-    "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
+    " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p>" +
+    isAnnotating
+      ? ""
+      : "<p>This is your " +
+        order +
+        " session of the UX Research experiment.</p>" +
+        // projectSpecs.numberOfSessions === 3 just a temporary quick thing,
+        // a proper solution will be implemented for annotating project
+        (order === "1st" && projectSpecs.numberOfSessions === 3
+          ? "<p>We've also scheduled your 2nd session 3 days later, and 3rd session one week later.</p>"
+          : order === "2nd" && projectSpecs.numberOfSessions === 3
+          ? "<p>We've also scheduled your 3rd session 4 days later.</p>"
+          : "") +
+        "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
+        "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
   const colorId = order === "1st" ? "4" : "3";
   const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
   return eventCreated;
@@ -36,37 +43,31 @@ const createExperimentEvent = async (email, researcher, order, start, end) => {
 // Schedule the 3 experiment sessions
 exports.schedule = async (req, res) => {
   try {
-    if (
-      "email" in req.body &&
-      "first" in req.body &&
-      "researcher1st" in req.body &&
-      "second" in req.body &&
-      "researcher2nd" in req.body &&
-      "third" in req.body &&
-      "researcher3rd" in req.body
-    ) {
+    if ("email" in req.body && "sessions" in req.body && "project" in req.body) {
       const events = [];
       const email = req.body.email;
-      const researcher1st = req.body.researcher1st;
-      const researcher2nd = req.body.researcher2nd;
-      const researcher3rd = req.body.researcher3rd;
-      let order = "1st";
-      let researcher = researcher1st;
-      let start = new Date(req.body.first);
-      let end = new Date(start.getTime() + 60 * 60000);
-      for (let session = 1; session < 4; session++) {
-        if (session === 2) {
-          order = "2nd";
-          researcher = researcher2nd;
-          start = new Date(req.body.second);
-          end = new Date(start.getTime() + 30 * 60000);
-        } else if (session === 3) {
-          order = "3rd";
-          researcher = researcher3rd;
-          start = new Date(req.body.third);
-          end = new Date(start.getTime() + 30 * 60000);
-        }
-        const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
+
+      const projectSpecs = await db.collection("projectSpecs").doc(req.body.project).get();
+      if (!projectSpecs.exists) {
+        throw new Error("Project Specs not found.");
+      }
+      const projectSpecsData = projectSpecs.data();
+      // 1 hour / 2 = 30 mins
+      const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
+
+      for (let i = 0; i < req.body.sessions.length; ++i) {
+        const sess = req.body.sessions[i];
+        const start = new Date(sess.startDate);
+        // adding slotDuration * number of slots for the session
+        const end = new Date(start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[i] || 2) * 60000);
+        const eventCreated = await createExperimentEvent(
+          email,
+          sess.researcher,
+          toOrdinal(i + 1),
+          start,
+          end,
+          projectSpecsData
+        );
         events.push(eventCreated);
       }
       return res.status(200).json({ events });
@@ -87,19 +88,27 @@ exports.scheduleSingleSession = async (req, res) => {
       req.body.researcher &&
       "order" in req.body &&
       req.body.order &&
-      "session" in req.body
+      "session" in req.body &&
+      "project" in req.body &&
+      "sessionIndex" in req.body
     ) {
       const email = req.body.email;
       const researcher = req.body.researcher;
       const order = req.body.order;
       const start = new Date(req.body.session);
-      let end;
-      if (order === "1st") {
-        end = new Date(start.getTime() + 60 * 60000);
-      } else if (order === "2nd" || order === "3rd") {
-        end = new Date(start.getTime() + 30 * 60000);
+
+      const projectSpecs = await db.collection("projectSpecs").doc(req.body.project).get();
+      if (!projectSpecs.exists) {
+        throw new Error("Project Specs not found.");
       }
-      const eventCreated = await createExperimentEvent(email, researcher, order, start, end);
+      const projectSpecsData = projectSpecs.data();
+      // 1 hour / 2 = 30 mins
+      const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
+
+      const end = new Date(
+        start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[req.body.sessionIndex] || 1) * 60000
+      );
+      const eventCreated = await createExperimentEvent(email, researcher, order, start, end, projectSpecsData);
       return res.status(200).json({ events: [eventCreated] });
     }
   } catch (err) {
@@ -152,7 +161,10 @@ exports.pastEvents = async previousDays => {
 // Get all the events in the next specified number of days.
 exports.futureEvents = async nextDays => {
   try {
-    const start = new Date();
+    // sometimes a user has started the session earlier and the PubSub gets fired
+    // and if the user has not accepted the session, it is going to send them a reminder
+    // to prevent that we start an hour and a half from now.
+    const start = new Date(new Date().getTime() + 90 * 60 * 1000);
     let end = new Date();
     end = new Date(end.getTime() + nextDays * 24 * 60 * 60 * 1000);
     return await getEvents(start, end, "America/Detroit");
@@ -175,6 +187,69 @@ exports.todayPastEvents = async () => {
   } catch (err) {
     console.log({ err });
     return false;
+  }
+};
+
+exports.getOngoingResearcherEvent = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).send({ message: "Email id required" });
+    const fiveMinutes = 5 * 60 * 1000;
+    const now = new Date().getTime();
+    const start = new Date(now - fiveMinutes);
+    // get events for next 2 hours. then mannualy filter out the events that are not happening right now.
+    let end = new Date(now + 120 * 60 * 1000);
+
+    const events = await getEvents(start, end, "America/Detroit");
+
+    const filteredEvents = events.filter(event => {
+      const containsEmail = event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
+      const isNowLessThanEnd = now < new Date(new Date(event.end.dateTime).getTime() - fiveMinutes);
+      return containsEmail && isNowLessThanEnd;
+    });
+    if (filteredEvents.length === 0) {
+      return res.status(404).send({ message: "No Event going on" });
+    }
+
+    const event = filteredEvents[0];
+
+    const schedule = await db.collection("schedule").where("id", "==", event.id).get();
+
+    if (schedule.docs.length === 0) {
+      return res.status(404).send({ message: "Schedule not found" });
+    }
+
+    const scheduleData = schedule.docs[0].data();
+    const participantEmail = event.attendees.filter(
+      attendee => attendee.email.toLowerCase() !== email.toLowerCase()
+    )?.[0].email;
+    let userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
+    }
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await db
+        .collection("usersStudentCoNoteSurvey")
+        .where("email", "==", participantEmail.toLowerCase())
+        .get();
+    }
+
+    const userData = userDocs.docs?.[0]?.data();
+
+    res.send({
+      event,
+      schedule: {
+        scheduleId: schedule.docs[0].id,
+        ...scheduleData,
+        session: scheduleData.session.toDate(),
+        firstname: userData?.firstname || ""
+      }
+    });
+  } catch (error) {
+    console.log("500", error);
+    return res.status(500).send({ message: "Something went wrong", error });
   }
 };
 

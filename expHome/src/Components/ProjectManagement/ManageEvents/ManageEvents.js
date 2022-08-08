@@ -20,19 +20,21 @@ import SelectSessions from "../../SchedulePage/SelectSessions";
 import "./ManageEvents.css";
 
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
+import AppConfig from "../../../AppConfig";
+import { toOrdinal } from "number-to-words";
 // import { firebaseOneState } from "../../../store/OneCademyAtoms";
 
 // Call this for sessions that the participant has not accepted the Google
 // Calendar invite yet, or should have been in the session but they have not
 // shown up yet.
-const sendEventNotificationEmail = (params) => async (event) => {
+const sendEventNotificationEmail = params => async event => {
   await axios.post("/sendEventNotificationEmail", params);
 };
 
 // Call this for only 1st sessions that the participant declined the Google
 // Calendar invite. In addition to emailing them the notification, it also
 // deletes all their sessions and asks them to reschedule.
-const rescheduleEventNotificationEmail = (params) => async (event) => {
+const rescheduleEventNotificationEmail = params => async event => {
   await axios.post("/rescheduleEventNotificationEmail", params);
 };
 
@@ -42,23 +44,23 @@ const expSessionsColumns = [
   {
     field: "participant", // email address
     headerName: "Participant",
-    width: 190,
+    width: 190
   },
   {
     field: "attendeesNum",
     headerName: "Att Num",
     type: "number",
     width: 70,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return cellValues.value + " T";
-    },
+    }
   },
   {
     field: "acceptedNum",
     headerName: "Acc Num",
     type: "number",
     width: 70,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       // If we're waiting for this participant, clicking this button
       // would email them a notification.
       return cellValues.row.weAreWaiting ? (
@@ -69,7 +71,7 @@ const expSessionsColumns = [
             firstname: cellValues.row.firstname,
             weAreWaiting: cellValues.row.weAreWaiting,
             hangoutLink: cellValues.row.hangoutLink,
-            courseName: cellValues.row.courseName,
+            courseName: cellValues.row.courseName
           })}
           className="Button Red NotificationBtn"
           variant="contained"
@@ -78,16 +80,14 @@ const expSessionsColumns = [
         </Button>
       ) : // If the participant has not accepted the Google Calendar
       // invite yet, clicking this button would email them a notification.
-      cellValues.row.notAccepted.length > 0 &&
-        cellValues.row.hoursLeft <= 19 &&
-        cellValues.row.hoursLeft > 0 ? (
+      cellValues.row.notAccepted.length > 0 && cellValues.row.hoursLeft <= 19 && cellValues.row.hoursLeft > 0 ? (
         <Button
           onClick={sendEventNotificationEmail({
             email: cellValues.row.participant,
             order: cellValues.row.order,
             firstname: cellValues.row.firstname,
             hoursLeft: cellValues.row.hoursLeft,
-            courseName: cellValues.row.courseName,
+            courseName: cellValues.row.courseName
           })}
           className="Button Green NotificationBtn"
           variant="contained"
@@ -97,30 +97,30 @@ const expSessionsColumns = [
       ) : (
         cellValues.value + " A"
       );
-    },
+    }
   },
   {
     field: "notAccepted",
     headerName: "Not Accepted",
     width: 280,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "attendees",
     headerName: "Attendees",
     width: 220,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "declinedNum",
     headerName: "Dec Num",
     type: "number",
     width: 70,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       // Only if this is a 1st session and the participant has declined
       // the Google Calendar ivite, clicking this button
       // would email them a notification and deletes all their sessions.
@@ -131,7 +131,7 @@ const expSessionsColumns = [
             email: cellValues.row.participant,
             firstname: cellValues.row.firstname,
             hoursLeft: cellValues.row.hoursLeft,
-            courseName: cellValues.row.courseName,
+            courseName: cellValues.row.courseName
           })}
           className="Button Red NotificationBtn"
           variant="contained"
@@ -141,21 +141,21 @@ const expSessionsColumns = [
       ) : (
         cellValues.value + " D"
       );
-    },
+    }
   },
   {
     field: "declined",
     headerName: "Declined",
     width: 220,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "id", // Event id comming from Google Calendar
     headerName: "Event Id",
-    width: 190,
-  },
+    width: 190
+  }
 ];
 
 const applicantsColumns = [
@@ -164,17 +164,17 @@ const applicantsColumns = [
     field: "user", // Their fullname
     headerName: "Applicant",
     width: 190,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "email",
     headerName: "Email",
     width: 190,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   // {
   //   field: "experiment",
@@ -190,36 +190,36 @@ const applicantsColumns = [
     headerName: "Tut Started",
     width: 130,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return cellValues.value ? "✅" : "";
-    },
+    }
   },
   {
     field: "tutorial", //They have completed the tutorial
     headerName: "Tutorial",
     width: 100,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return cellValues.value ? "✅" : "";
-    },
+    }
   },
   {
     field: "applicationsStarted",
     headerName: "Applications Started",
     width: 280,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "applications",
     headerName: "Applications",
     width: 280,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       const cellText =
         cellValues.value && cellValues.value.length > 0 ? (
           <ul>
-            {cellValues.value.map((communiVal) => {
+            {cellValues.value.map(communiVal => {
               return <li key={communiVal}>{communiVal}</li>;
             })}
           </ul>
@@ -232,41 +232,41 @@ const applicantsColumns = [
             style={{
               fontSize: 13,
               textOverflow: "ellipsis",
-              overflow: "hidden",
+              overflow: "hidden"
             }}
           >
             {cellText}
           </div>
         </Tooltip>
       );
-    },
+    }
   },
   {
     field: "withdrew",
     headerName: "Withdrew",
     width: 100,
     disableColumnMenu: true,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return cellValues.value ? "🚫" : "";
-    },
+    }
   },
   {
     field: "withdrawExp",
     headerName: "withdrawal Explanation",
     width: 280,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "reminder", // The last time the system sent them an automated reminder
     headerName: "Reminder",
     type: "dateTime",
-    width: 190,
-  },
+    width: 190
+  }
 ];
 
-const errorAlert = (data) => {
+const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
     console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
@@ -275,7 +275,7 @@ const errorAlert = (data) => {
 
 // This is an admin interface, only for Iman, to monitor and manage
 // experiment sessions and applicants' status in the application process.
-const ManageEvents = (props) => {
+const ManageEvents = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   // const firebaseOne = useRecoilValue(firebaseOneState);
@@ -309,16 +309,18 @@ const ManageEvents = (props) => {
   const [recall1stRatio, setRecall1stRatio] = useState(0);
   const [recall2ndRatio, setRecall2ndRatio] = useState(0);
   const [recall3rdRatio, setRecall3rdRatio] = useState(0);
+  const [allProjectSpecs, setAllProjectSpecs] = useState({});
+  const [currentProjectSpecs, setCurrentProjectSpecs] = useState({});
+  const [currentProject, setCurrentProject] = useState("");
+  const [selectedSession, setSelectedSession] = useState([]);
 
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
+
   useEffect(() => {
     const loadAvailabilities = async () => {
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .orderBy("id")
-        .get();
+      const scheduleDocs = await firebase.db.collection("schedule").orderBy("id").get();
       const sched = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         sched.push(scheduleDoc.data());
@@ -331,9 +333,25 @@ const ManageEvents = (props) => {
     }
   }, [firebase]);
 
+  // get all Project SPecs so that we don't have to that again and again.
+  useEffect(() => {
+    const loadProjectSpecs = async () => {
+      const specs = await firebase.db.collection("projectSpecs").get();
+      const specsObj = {};
+      specs.forEach(spec => {
+        specsObj[spec.id] = spec.data();
+      });
+      setAllProjectSpecs(specsObj);
+    };
+
+    if (firebase) {
+      loadProjectSpecs();
+    }
+  }, [firebase]);
+
   // Get events from Google Calendar based on relativeURL.
   // return the data for the states corresponding to each table.
-  const retrieveEvents = async (relativeURL) => {
+  const retrieveEvents = async relativeURL => {
     let responseObj = await axios.post(relativeURL, {});
     const allEvents = responseObj.data.events;
     const evs = [];
@@ -369,22 +387,25 @@ const ManageEvents = (props) => {
         hangoutLink: ev.hangoutLink,
         weAreWaiting,
         hoursLeft,
-        courseName: "",
+        courseName: ""
       };
       // If this event id is in one of the scheduled sessions (availabilities),
-      const availabilitiesIdx = availabilities.findIndex(
-        (sch) => sch.id === ev.id
-      );
+      const availabilitiesIdx = availabilities.findIndex(sch => sch.id === ev.id);
       if (availabilitiesIdx !== -1) {
         // Then, specify its participant email and the order of the
         // experiment session.
-        event.participant =
-          availabilities[availabilitiesIdx].email.toLowerCase();
+        event.participant = availabilities[availabilitiesIdx].email.toLowerCase();
         event.order = availabilities[availabilitiesIdx].order;
-        const userDocs = await firebase.db
-          .collection("users")
-          .where("email", "==", event.participant)
-          .get();
+        let userDocs = await firebase.db.collection("users").where("email", "==", event.participant).get();
+        if (userDocs.docs.length === 0) {
+          userDocs = await firebase.db.collection("instructors").where("email", "==", event.participant).get();
+        }
+        if (userDocs.docs.length === 0) {
+          userDocs = await firebase.db
+            .collection("usersStudentCoNoteSurvey")
+            .where("email", "==", event.participant)
+            .get();
+        }
         if (userDocs.docs.length > 0) {
           const userData = userDocs.docs[0].data();
           // then, assign their firstname, and courseName, if exists.
@@ -403,10 +424,7 @@ const ManageEvents = (props) => {
             event.acceptedNum += 1;
           } else {
             event.notAccepted.push(attendee.email.toLowerCase());
-            if (
-              attendee.responseStatus === "declined" ||
-              attendee.responseStatus === "tentative"
-            ) {
+            if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
               event.declined.push(attendee.email);
               event.declinedNum += 1;
             }
@@ -463,55 +481,37 @@ const ManageEvents = (props) => {
       let recallSecondRatio = 0;
       let recallThirdRatio = 0;
       const userDocs = await firebase.db.collection("users").get();
-      for (let userDoc of userDocs.docs) {
+      const surveyInstructors = await firebase.db.collection("instructors").get();
+      const surveyUsers = await firebase.db.collection("usersStudentCoNoteSurvey").get();
+      for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...userDocs.docs]) {
         const userData = userDoc.data();
-        if (
-          "createdAt" in userData &&
-          userData.createdAt.toDate() > new Date("1-14-2022")
-        ) {
+        if ("createdAt" in userData && userData.createdAt.toDate() > new Date("1-14-2022")) {
           registered += 1;
           if ("postQ2Choice" in userData) {
             completedFirst += 1;
-            if (
-              "pConditions" in userData &&
-              userData.pConditions.length === 2
-            ) {
-              recallFirst +=
-                userData.pConditions[0].recallScore +
-                userData.pConditions[1].recallScore;
-              recallFirstRatio +=
-                userData.pConditions[0].recallScoreRatio +
-                userData.pConditions[1].recallScoreRatio;
+            if ("pConditions" in userData && userData.pConditions.length === 2) {
+              recallFirst += userData.pConditions[0].recallScore + userData.pConditions[1].recallScore;
+              recallFirstRatio += userData.pConditions[0].recallScoreRatio + userData.pConditions[1].recallScoreRatio;
             }
           }
           if ("post3DaysQ2Choice" in userData) {
             completedSecond += 1;
-            if (
-              "pConditions" in userData &&
-              userData.pConditions.length === 2
-            ) {
-              recallSecond +=
-                userData.pConditions[0].recall3DaysScore +
-                userData.pConditions[1].recall3DaysScore;
+            if ("pConditions" in userData && userData.pConditions.length === 2) {
+              recallSecond += userData.pConditions[0].recall3DaysScore + userData.pConditions[1].recall3DaysScore;
               recallSecondRatio +=
-                userData.pConditions[0].recall3DaysScoreRatio +
-                userData.pConditions[1].recall3DaysScoreRatio;
+                userData.pConditions[0].recall3DaysScoreRatio + userData.pConditions[1].recall3DaysScoreRatio;
             }
           }
           if ("projectDone" in userData && userData.projectDone) {
             completedThird += 1;
-            if (
-              "pConditions" in userData &&
-              userData.pConditions.length === 2
-            ) {
+            if ("pConditions" in userData && userData.pConditions.length === 2) {
               recallThird += userData.pConditions[0].recall1WeekScore
                 ? userData.pConditions[0].recall1WeekScore
                 : 0 + userData.pConditions[1].recall1WeekScore
                 ? userData.pConditions[1].recall1WeekScore
                 : 0;
               recallThirdRatio +=
-                userData.pConditions[0].recall1WeekScoreRatio +
-                userData.pConditions[1].recall1WeekScoreRatio;
+                userData.pConditions[0].recall1WeekScoreRatio + userData.pConditions[1].recall1WeekScoreRatio;
             }
             const appl = {
               id: userDoc.id,
@@ -524,15 +524,9 @@ const ManageEvents = (props) => {
               applications: [],
               withdrew: "withdrew" in userData && userData.withdrew,
               withdrawExp: "withdrawExp" in userData && userData.withdrawExp,
-              reminder:
-                "reminder" in userData && userData.reminder
-                  ? userData.reminder.toDate()
-                  : null,
+              reminder: "reminder" in userData && userData.reminder ? userData.reminder.toDate() : null
             };
-            const tutorialDoc = await firebase.db
-              .collection("tutorial")
-              .doc(userDoc.id)
-              .get();
+            const tutorialDoc = await firebase.db.collection("tutorial").doc(userDoc.id).get();
             if (tutorialDoc.exists) {
               appl.tutStarted = true;
               const tutorialData = tutorialDoc.data();
@@ -549,11 +543,7 @@ const ManageEvents = (props) => {
                   if ("ended" in applicationData && applicationData.ended) {
                     submittedOne = true;
                     appl.applications.push(
-                      applicationData.communiId +
-                        ": " +
-                        applicationData.corrects +
-                        " - " +
-                        applicationData.wrongs
+                      applicationData.communiId + ": " + applicationData.corrects + " - " + applicationData.wrongs
                     );
                   }
                 }
@@ -627,139 +617,142 @@ const ManageEvents = (props) => {
 
   // Chooses a participant from the table to load their schedule
   // to be able to update one of their scheduled sessions.
-  const gridRowClick = async (clickedRow) => {
+  const gridRowClick = async clickedRow => {
     const theRow = clickedRow.row;
-    if (theRow.participant) {
-      const email = theRow.participant;
-      setParticipant(email);
-      setScheduleLoaded(false);
-      // We need to first retrieve which project this user belongs to.
-      const userDoc = await firebase.db
-        .collection("users")
-        .doc(theRow.fullname)
-        .get();
-      const userData = userDoc.data();
-      const project = userData.project;
-      // researchers = an object of fullnames as keys and the corresponding email addresses as values.
-      const researchers = {};
-      const researcherDocs = await firebase.db.collection("researchers").get();
-      for (let researcherDoc of researcherDocs.docs) {
-        const researcherData = researcherDoc.data();
-        // We only need the researchers who are active in the project that the user belongs to.
-        if (
-          "projects" in researcherData &&
-          project in researcherData.projects &&
-          researcherData.projects[project].active
-        ) {
-          researchers[researcherDoc.id] = researcherData.email;
+    try {
+      if (theRow.participant) {
+        const email = theRow.participant;
+        setParticipant(email);
+        setScheduleLoaded(false);
+        // We need to first retrieve which project this user belongs to.
+        let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
+        if (!userDoc.exists) {
+          userDoc = await firebase.db.collection("instructors").doc(theRow.fullname).get();
         }
-      }
-      // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
-      // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
-      // that may include 0 to many researchers who are available at that session.
-      const availSessions = {};
-      // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db
-        .collection("resSchedule")
-        .where("project", "==", project)
-        .get();
-      for (let resScheduleDoc of resScheduleDocs.docs) {
-        const resScheduleData = resScheduleDoc.data();
-        const resSession = resScheduleData.session.toDate();
-        const resSessionStr = resSession.toLocaleString();
-        // Only if the researcher is active in this project:
-        if (resScheduleData.fullname in researchers) {
-          // Add the available slots for the researcher's email.
-          if (resSessionStr in availSessions) {
-            availSessions[resSessionStr].push(
-              researchers[resScheduleData.fullname]
-            );
-          } else {
-            availSessions[resSessionStr] = [
-              researchers[resScheduleData.fullname],
-            ];
+        if (!userDoc.exists) {
+          userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(theRow.fullname).get();
+        }
+
+        const userData = userDoc.data();
+        const project = userData.project;
+        const projectSpecs = allProjectSpecs[project];
+        setCurrentProject(project);
+        setCurrentProjectSpecs(projectSpecs);
+        // researchers = an object of fullnames as keys and the corresponding email addresses as values.
+        const researchers = {};
+        const researcherDocs = await firebase.db.collection("researchers").get();
+        for (let researcherDoc of researcherDocs.docs) {
+          const researcherData = researcherDoc.data();
+          // We only need the researchers who are active in the project that the user belongs to.
+          if (
+            "projects" in researcherData &&
+            project in researcherData.projects &&
+            researcherData.projects[project].active
+          ) {
+            researchers[researcherDoc.id] = researcherData.email;
           }
         }
-      }
-      // We need to retrieve all the currently scheduled events to figure
-      // out which sessions are already taken and exclude them from availSessions.
-      // We don't need to retrieve the events from Google Calendar again,
-      // because we've already retrieved and saved them in `events` state.
-      for (let event of events) {
-        const startTime = new Date(event.start).toLocaleString();
-        const startMinus30Min = new Date(
-          event.start.getTime() - 30 * 60 * 1000
-        );
-        // If the event has some attendees and the start timestamp is a key in availSessions,
-        // we should remove all the attendees who are available researchers at this timestamp,
-        // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
-        // this participnat and the participant is rescheduling their sessions,
-        // OR 30 minutes before this session was the 1st session for this participant.
-        // This latter check is necessary to handle the exception where there is a second
-        // session staring 30 minutes after this session. We should not remove that second
-        // time slot, otherwise the system would not show this as an available slot and the
-        // participant would not be able to take this one-hour slot for their 1st session.
-        if (
-          event.attendees &&
-          event.attendees.length > 0 &&
-          startTime in availSessions &&
-          availSessions[startTime].length > 0 &&
-          !event.attendees.includes(email) &&
-          events.findIndex(
-            (eve) =>
-              eve.start.getTime() === startMinus30Min.getTime() &&
-              eve.order === "1st" &&
-              eve.attendees.includes(email)
-          ) === -1
-        ) {
-          // We should remove all the attendees who are available researchers at this timestamp:
-          for (let attendee of event.attendees) {
-            availSessions[startTime] = availSessions[startTime].filter(
-              (resea) => resea !== attendee
-            );
+        // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
+        // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
+        // that may include 0 to many researchers who are available at that session.
+        const availSessions = {};
+        // Retrieve all the researchers' avaialbilities in this project.
+        const resScheduleDocs = await firebase.db.collection("resSchedule").where("project", "==", project).get();
+        for (let resScheduleDoc of resScheduleDocs.docs) {
+          const resScheduleData = resScheduleDoc.data();
+          const resSession = resScheduleData.session.toDate();
+          const resSessionStr = resSession.toLocaleString();
+          // Only if the researcher is active in this project:
+          if (resScheduleData.fullname in researchers) {
+            // Add the available slots for the researcher's email.
+            if (resSessionStr in availSessions) {
+              availSessions[resSessionStr].push(researchers[resScheduleData.fullname]);
+            } else {
+              availSessions[resSessionStr] = [researchers[resScheduleData.fullname]];
+            }
           }
         }
-      }
-      setAvailableSessions(availSessions);
-      // Retrieve all the available time slots that the participant previously specified,
-      // just to start from. They are supposed to modify these.
-      const scheduleDocs = await firebase.db
-        .collection("schedule")
-        .where("email", "==", email.toLowerCase())
-        .get();
-      const sch = [];
-      // Define a copy of scheduleStart to find the earliest session for this participant.
-      let sStart = scheduleStart;
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        const session = scheduleData.session.toDate();
-        const sessionStr = session.toLocaleString();
-        sch.push(session);
-        if (session.getTime() < sStart.getTime()) {
-          sStart = session;
+        // We need to retrieve all the currently scheduled events to figure
+        // out which sessions are already taken and exclude them from availSessions.
+        // We don't need to retrieve the events from Google Calendar again,
+        // because we've already retrieved and saved them in `events` state.
+        const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
+        for (let event of events) {
+          const startTime = new Date(event.start).toLocaleString();
+          const startMinus30Min = new Date(event.start.getTime() - slotDuration * 60 * 1000);
+          // If the event has some attendees and the start timestamp is a key in availSessions,
+          // we should remove all the attendees who are available researchers at this timestamp,
+          // unless the researcher was previously assign to the 1st, 2nd, or 3rd session for
+          // this participnat and the participant is rescheduling their sessions,
+          // OR 30 minutes before this session was the 1st session for this participant.
+          // This latter check is necessary to handle the exception where there is a second
+          // session staring 30 minutes after this session. We should not remove that second
+          // time slot, otherwise the system would not show this as an available slot and the
+          // participant would not be able to take this one-hour slot for their 1st session.
+          if (
+            event.attendees &&
+            event.attendees.length > 0 &&
+            startTime in availSessions &&
+            availSessions[startTime].length > 0 &&
+            !event.attendees.includes(email) &&
+            events.findIndex(
+              eve =>
+                eve.start.getTime() === startMinus30Min.getTime() &&
+                eve.order === "1st" &&
+                eve.attendees.includes(email)
+            ) === -1
+          ) {
+            // We should remove all the attendees who are available researchers at this timestamp:
+            for (let attendee of event.attendees) {
+              availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee);
+            }
+          }
         }
+        setAvailableSessions(availSessions);
+        // Retrieve all the available time slots that the participant previously specified,
+        // just to start from. They are supposed to modify these.
+        const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
+        const sch = [];
+        // Define a copy of scheduleStart to find the earliest session for this participant.
+        let sStart = scheduleStart;
+        for (let scheduleDoc of scheduleDocs.docs) {
+          const scheduleData = scheduleDoc.data();
+          const session = scheduleData.session.toDate();
+          const sessionStr = session.toLocaleString();
+          sch.push(session);
+          if (session.getTime() < sStart.getTime()) {
+            sStart = session;
+          }
+        }
+        if (sch.length > 0) {
+          setSchedule(sch);
+          setScheduleStart(sStart);
+        }
+        setTimeout(() => {
+          setScheduleLoaded(true);
+        }, 400);
       }
-      if (sch.length > 0) {
-        setSchedule(sch);
-        setScheduleStart(sStart);
-      }
-      setTimeout(() => {
-        setScheduleLoaded(true);
-      }, 400);
+    } catch (err) {
+      console.log("Err => ", err);
     }
   };
 
   // Updates only one of the scheduled sessions for this participant.
-  const submitNewSessions = async (event) => {
+  const submitNewSessions = async event => {
     setIsSubmitting(true);
     // First, we get the user's data to make sure they had not previously
     // completed all the three experiment sessions.
-    const userDocs = await firebase.db
-      .collection("users")
-      .where("email", "==", participant)
-      .get();
+    let userDocs = await firebase.db.collection("users").where("email", "==", participant).get();
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("instructors").where("email", "==", participant).get();
+    }
+
+    if (userDocs.docs.length === 0) {
+      userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", participant).get();
+    }
+
     if (userDocs.docs.length > 0) {
-      const userRef = firebase.db.collection("users").doc(userDocs.docs[0].id);
       const userData = userDocs.docs[0].data();
       // If the user had previously completed all the three experiment sessions,
       // We just alert it and do nothing.
@@ -771,51 +764,54 @@ const ManageEvents = (props) => {
       let scheduleDocs, scheduleRef, responseObj;
       // We should check which of their scheduled sessions we'd like to change.
       // For each of the 1st, 2nd, and 3rd sessions:
-      for (let order of ["1st", "2nd", "3rd"]) {
+      for (let i = 0; i < selectedSession.length; ++i) {
         // sessi points to the state variable corresponding to the scheduled session.
-        let sessi = firstSession;
-        if (order === "2nd") {
-          sessi = secondSession;
-        } else if (order === "3rd") {
-          sessi = thirdSession;
-        }
+        const order = toOrdinal(i + 1);
+        let sessi = selectedSession[i];
         // Find the index of the event for the participant's corresponding session
-        const eventIdx = events.findIndex(
-          (eve) => eve.order === order && eve.participant === participant
-        );
+        const eventIdx = events.findIndex(eve => eve.order === order && eve.participant === participant);
         // If we found their 1st/2nd/3rd session, but its start time is different
         // from the new firstSession/secondSession/thirdSession:
-        if (
-          eventIdx !== -1 &&
-          events[eventIdx].start.getTime() !== sessi.getTime()
-        ) {
+        if (eventIdx !== -1 && events[eventIdx].start.getTime() !== sessi.getTime()) {
           // Find this session in schedule collection.
           scheduleDocs = await firebase.db
             .collection("schedule")
             .where("email", "==", participant)
             .where("order", "==", order)
             .get();
+
+          console.log("Schedule Docs = ", scheduleDocs.docs.length);
           // If it exists:
           if (scheduleDocs.docs.length > 0) {
             // 1) Get rid of the event "id" and "order" from the document.
-            scheduleRef = firebase.db
-              .collection("schedule")
-              .doc(scheduleDocs.docs[0].id);
+            scheduleRef = firebase.db.collection("schedule").doc(scheduleDocs.docs[0].id);
             await firebase.batchUpdate(scheduleRef, {
               id: firebase.firestore.FieldValue.delete(),
-              order: firebase.firestore.FieldValue.delete(),
+              order: firebase.firestore.FieldValue.delete()
             });
+            console.log("Before Del");
             // 2) Delete the event from Google Calendar.
             responseObj = await axios.post("/deleteEvent", {
-              eventId: events[eventIdx].id,
+              eventId: events[eventIdx].id
             });
+            console.log("after Del");
             errorAlert(responseObj.data);
             // 3) Schedule the new session on Google Calendar.
+            console.log({
+              email: participant,
+              researcher: availableSessions[sessi.toLocaleString()][0],
+              order,
+              session: sessi,
+              project: currentProject,
+              sessionIndex: i
+            });
             responseObj = await axios.post("/scheduleSingleSession", {
               email: participant,
               researcher: availableSessions[sessi.toLocaleString()][0],
               order,
               session: sessi,
+              project: currentProject,
+              sessionIndex: i
             });
             errorAlert(responseObj.data);
             // Figure out whether the new session already exists in schedule
@@ -827,12 +823,10 @@ const ManageEvents = (props) => {
               .get();
             // If it exists, update it with the new event id and order.
             if (scheduleDocs.docs.length > 0) {
-              scheduleRef = firebase.db
-                .collection("schedule")
-                .doc(scheduleDocs.docs[0].id);
+              scheduleRef = firebase.db.collection("schedule").doc(scheduleDocs.docs[0].id);
               await firebase.batchUpdate(scheduleRef, {
                 id: responseObj.data.events[0].data.id,
-                order,
+                order
               });
             } else {
               // Otherwise, create a new one.
@@ -841,7 +835,7 @@ const ManageEvents = (props) => {
                 email: participant,
                 session: firebase.firestore.Timestamp.fromDate(sessi),
                 id: responseObj.data.events[0].data.id,
-                order,
+                order
               });
             }
           }
@@ -989,22 +983,17 @@ const ManageEvents = (props) => {
         <p>
           {completed1st}
           {", "}
-          {Math.round(
-            (completed1st / totalRegistered + Number.EPSILON) * 100
-          )}{" "}
-          % Completed the 1st Session!
+          {Math.round((completed1st / totalRegistered + Number.EPSILON) * 100)} % Completed the 1st Session!
         </p>
         <p>
           {completed2nd}
           {", "}
-          {Math.round((completed2nd / completed1st + Number.EPSILON) * 100)} %
-          Completed the 2nd Session!
+          {Math.round((completed2nd / completed1st + Number.EPSILON) * 100)} % Completed the 2nd Session!
         </p>
         <p>
           {completed3rd}
           {", "}
-          {Math.round((completed3rd / completed1st + Number.EPSILON) * 100)} %
-          Completed the 3rd Session!
+          {Math.round((completed3rd / completed1st + Number.EPSILON) * 100)} % Completed the 3rd Session!
         </p>
         <p>{recall1st} Free recall score average in 1st session!</p>
         <p>{recall2nd} Free recall score average in 2nd session!</p>
@@ -1107,14 +1096,14 @@ const ManageEvents = (props) => {
               numDays={16}
               schedule={schedule}
               setSchedule={setSchedule}
+              selectedSession={selectedSession}
+              setSelectedSession={setSelectedSession}
               availableSessions={availableSessions}
-              firstSession={firstSession}
-              secondSession={secondSession}
-              thirdSession={thirdSession}
-              setFirstSession={setFirstSession}
-              setSecondSession={setSecondSession}
-              setThirdSession={setThirdSession}
               setSubmitable={setSubmitable}
+              numberOfSessions={currentProjectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+              hourlyChunks={currentProjectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+              sessionDuration={currentProjectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+              daysLater={currentProjectSpecs.daysLater || AppConfig.daysLater}
             />
           </div>
         )}
@@ -1122,11 +1111,7 @@ const ManageEvents = (props) => {
       <div id="SignBtnContainer">
         <Button
           onClick={submitNewSessions}
-          className={
-            submitable && !isSubmitting
-              ? "Button SubmitButton"
-              : "Button SubmitButton Disabled"
-          }
+          className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
           variant="contained"
           disabled={submitable && !isSubmitting ? null : true}
         >

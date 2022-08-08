@@ -171,6 +171,7 @@ class Firebase {
 axios.defaults.baseURL =
   // "http://localhost:5001/visualexp-a7d2c/us-central1/api/";
   // "https://us-central1-visualexp-a7d2c.cloudfunctions.net/api";
+  // "http://localhost:5001/visualexp-5d2c6/us-central1/api";
   "https://1cademy.us/api";
 
 export const firebase = new Firebase(firebaseConfig);
