@@ -195,7 +195,7 @@ const communityTitles = {
 // our experimental conditions and sends them personalized invitation
 // and reminder emails.
 // The algorithm is explained at emailing.drawio
-exports.inviteInstructors = async (req, res) => {
+exports.inviteInstructors = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
