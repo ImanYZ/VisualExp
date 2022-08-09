@@ -10,6 +10,26 @@ const { signatureHTML } = require("./emailSignature");
 
 require("dotenv").config();
 
+const getNameFormatted = async (email, firstname) => {
+  //if the instructor with this email exists then format according to the instructor's format
+  const instructorDocs = await db.collection("instructors").where("email", "==", email).get();
+  let isInstructor = instructorDocs.docs.length > 0;
+
+  let nameString = `<p>Hi ${capitalizeFirstLetter(firstname)},</p>`;
+  if (isInstructor) {
+    const instructorData = instructorDocs.docs[0].data();
+    nameString = `<p>Hello ${
+      instructorData.prefix +
+      ". " +
+      capitalizeFirstLetter(instructorData.firstname) +
+      " " +
+      capitalizeFirstLetter(instructorData.lastname)
+    },</p>`;
+  }
+
+  return nameString;
+};
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -95,13 +115,14 @@ exports.sendPersonalInvitations = async (req, res) => {
           const userDoc = await db.collection("users").doc(fullname).get();
           if (!userDoc.exists) {
             console.log({ firstname, lastname, from1Cademy });
+            const nameString = await getNameFormatted(email, firstname);
             const mailOptions = {
               from: process.env.EMAIL,
               to: email,
               subject: from1Cademy
                 ? "Help Improve 1Cademy by Participating in Our UX Research Study!"
                 : "Learn Which Knowledge Visualization Method is Better For You by Participating in Our UX Experiment!",
-              html: `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+              html: `${nameString}
                 <p></p>
                 ${
                   from1Cademy
@@ -447,6 +468,7 @@ const eventNotificationEmail = async (
   declined
 ) => {
   try {
+    const nameString = await getNameFormatted(email, firstname);
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -460,7 +482,7 @@ const eventNotificationEmail = async (
           ? "You Have Declined Your " + order + " Session Which Will Begin in " + hoursLeft + "!"
           : "Your Session Will Begin in " + hoursLeft + "!"),
       html:
-        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        `${nameString}
       <p></p>
       ${
         weAreWaiting
@@ -497,6 +519,7 @@ const eventNotificationEmail = async (
       <p>Best regards,</p>
       ` + signatureHTML
     };
+
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
         console.log({ error });
@@ -522,6 +545,7 @@ exports.eventNotificationEmail = eventNotificationEmail;
 // accept it or ask someone else to take it.
 exports.researcherEventNotificationEmail = async (email, fullname, participant, hoursLeft, order, declined) => {
   try {
+    const nameString = await getNameFormatted(email, fullname);
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -532,7 +556,7 @@ exports.researcherEventNotificationEmail = async (email, fullname, participant, 
           ? "You've Declined Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"
           : "Please Accept Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"),
       html:
-        `<p>Hi ${fullname},</p>
+        `${nameString}
       <p></p>
       ${
         declined
@@ -582,6 +606,7 @@ exports.researcherEventNotificationEmail = async (email, fullname, participant, 
 
 exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, order) => {
   try {
+    const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
@@ -592,7 +617,7 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
         order +
         " Session Today!",
       html:
-        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        `${nameString}
         <p></p>
         <p>This is an auto-generated email to inform you that you missed your ${order} session!</p>
         <p>Please respond to this email with only one of the following options to proceed with:</p>
@@ -698,6 +723,8 @@ const reschEventNotificationEmail = async (
         });
       }
     }
+
+    const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
@@ -710,7 +737,7 @@ const reschEventNotificationEmail = async (
           (declined ? " that will begin in " + hoursLeft : "") +
           "!"),
       html:
-        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        `${nameString}
 <p></p>
 ${
   "<p>You " +
@@ -768,12 +795,13 @@ exports.rescheduleEventNotificationEmail = (req, res) => {
 
 exports.emailCommunityLeader = async (email, firstname, communiId, applicants) => {
   try {
+    const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
       subject: `[1Cademy] You Have ${applicants.length} Complete Applications to Review in ${communiId}`,
       html:
-        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        `${nameString}
         <p></p>
         <p>This is an auto-generated email to inform you that you have ${
           applicants.length
@@ -849,13 +877,14 @@ exports.emailImanToInviteApplicants = async needInvite => {
 
 exports.emailApplicationStatus = async (email, firstname, fullname, reminders, subject, content, hyperlink) => {
   try {
+    const nameString = await getNameFormatted(email, firstname);
     const nWeek = nextWeek();
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
       subject,
       html:
-        `<p>Hi ${capitalizeFirstLetter(firstname)},</p>
+        `${nameString}
 <p></p>
 <p>This is an auto-generated email to inform you that you have ${content}.</p>
 <p>You can continue your 1Cademy application using 
@@ -885,14 +914,15 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
   }
 };
 
-exports.remindResearcherToSpecifyAvailability = (email, fullname, days) => {
+exports.remindResearcherToSpecifyAvailability = async (email, fullname, days) => {
   try {
+    const nameString = await getNameFormatted(email, fullname);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
       subject: "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
       html:
-        `<p>Hi ${fullname},</p>
+        `${nameString}
         <p></p>
         <p>This is an auto-generated email to remind you that you have not specified your availability for the next 16 days.</p>
         <p>We need to specify as much of our availability as possible, so that we get more participants who schedule only for the sessions that they can really attend.</p>
