@@ -145,7 +145,7 @@ const MCQuestion = props => {
         retrieveFeedbackcodes();
         setExplanation("");
 
-        if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
+        if (qsLeft.length === 1) {
           setChoiceQuestion(true);
         }
       } else {
