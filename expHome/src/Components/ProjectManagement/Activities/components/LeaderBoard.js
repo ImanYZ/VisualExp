@@ -52,9 +52,9 @@ export const LeaderBoard = ({
         order: onGoingSchedule.order,
         firstname: onGoingSchedule.firstname,
         weAreWaiting: true,
-        hangoutLink: onGoingEvent.hangoutLink,
+        hangoutLink: onGoingEvent.hangoutLink
       });
-      alert("Event reminder notificatino sent.");
+      alert("Event reminder notification sent.");
     } catch (err) {
       alert("Something went wrong while sending the reminder.");
     } finally {
