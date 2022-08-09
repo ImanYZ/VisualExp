@@ -34,7 +34,7 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations,
+  sendPersonalInvitations
 } = require("./emailing");
 const {
   schedule,
@@ -70,7 +70,6 @@ app.use((req, res, next) => {
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadContacts", loadContacts);
-app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
@@ -146,13 +145,13 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-// exports.updateTypesenseIndex = functions
-//   .runWith({
-//     memory: "1GB",
-//     timeoutSeconds: 520,
-//   })
-//   .pubsub.schedule("every 10 minutes")
-//   .onRun(updateTypesenseIndex);
+exports.inviteInstructors = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(inviteInstructors);
 
 // LifeLog:
 exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
