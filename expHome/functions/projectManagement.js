@@ -1401,7 +1401,7 @@ exports.assignExperimentSessionsPoints = async context => {
       const researcherData = researcherDoc.data();
       if ("projects" in researcherData) {
         for (let project in researcherData.projects) {
-          if (researcherData.projects[project].active) {
+          if (researcherData.projects[project].active && researcherData.projects[project].scheduleSessions) {
             const resScheduleDocs = await db
               .collection("resSchedule")
               .where("project", "==", project)
@@ -1486,10 +1486,10 @@ exports.assignExperimentSessionsPoints = async context => {
                   .get();
 
                 // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
-                const schedule = await db.collection("schedule").where("id" ,"==" , pastEvent.id).get();
+                const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
                 let didResearcherAttend = false;
-                if(schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
-                  didResearcherAttend = true
+                if (schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
+                  didResearcherAttend = true;
                 }
 
                 if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
@@ -1649,15 +1649,7 @@ exports.remindCalendarInvitations = async context => {
     const researcherDocs = await db.collection("researchers").get();
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
-      let isActive = false;
-      for (let proj in researcherData.projects) {
-        if (researcherData.projects[proj].active && researcherData.projects[proj].scheduleSessions) {
-          isActive = true;
-        }
-      }
-      if (isActive) {
-        researchers[researcherData.email.toLowerCase()] = researcherDoc.id;
-      }
+      researchers[researcherData.email.toLowerCase()] = researcherDoc.id;
     }
     // Retrieve all the scheduled sessions.
     // Having an id means the document is not just an availability, but there
