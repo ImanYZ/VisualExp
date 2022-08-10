@@ -39,7 +39,6 @@ const MCQuestion = props => {
   const [explanation, setExplanation] = useState("");
   const [choiceQuestion, setChoiceQuestion] = useState(false);
   const choice = choices[props.currentQIdx];
-  const [choiceFeedbackQuestions, setChoiceFeedbackQuestions] = useState("");
   const curQuestion = props.currentQIdx + 1;
   const size = props.questions.length;
   const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
@@ -89,8 +88,17 @@ const MCQuestion = props => {
       }
       setAllAnswered(allAns);
       props.setOrderQuestions(orderOfQuestions);
+    }else{
+      let allAns = true;
+      for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
+        if (!choices[qIdx]) {
+          allAns = false;
+          qsLeft += 1;
+        }
+      }
+      setAllAnswered(allAns);
     }
-  }, [choices, choiceFeedbackQuestions, props.questions]);
+  }, [choices, props.questions]);
 
   const choiceChange = event => {
     setChoices(oldChoices => {
@@ -98,6 +106,11 @@ const MCQuestion = props => {
       newChoices[props.currentQIdx] = event.target.value;
       return newChoices;
     });
+    if(choiceQuestion){
+    const newExp = [...props.explanations];
+    newExp[props.currentQIdx].choice = postQuestion[event.target.value];
+    props.setExplanations(newExp);
+    }
   };
 
   const moveNext = () => {
@@ -114,12 +127,12 @@ const MCQuestion = props => {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
         if(props.currentQIdx === order.length - 1){
-          let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-          while (order.includes(props.questions[randomizeNumberOfQuestion])) {
-            randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-          }
-          order.push(props.questions[randomizeNumberOfQuestion]);
-          setOrderOfQuestions(order);
+        let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        while (order.includes(props.questions[randomizeNumberOfQuestion])) {
+          randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        }
+        order.push(props.questions[randomizeNumberOfQuestion]);
+        setOrderOfQuestions(order);
         }
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
@@ -141,7 +154,7 @@ const MCQuestion = props => {
         retrieveFeedbackcodes();
         setExplanation("");
 
-        if (qsLeft.length === 1) {
+        if (props.currentQIdx >=1) {
           setChoiceQuestion(true);
         }
       } else {
@@ -154,6 +167,9 @@ const MCQuestion = props => {
 
   const movePrevious = () => {
     props.setCurrentQIdx(oldCurrentQIdx => oldCurrentQIdx - 1);
+    if ([5, 19].includes(props.step)){
+      setChoiceQuestion(false);
+    }
   };
 
   const explanationsChange = event => {
@@ -207,19 +223,11 @@ const MCQuestion = props => {
     });
   };
 
-  const choiceFeedbackQuestion = event => {
-    setChoiceFeedbackQuestions(event.target.value);
-    const newExp = [...props.explanations];
-    newExp[props.currentQIdx].choice = postQuestion[event.target.value];
-    props.setExplanations(newExp);
-    setAllAnswered(true);
-  };
 
   const submitAndContinue = () => { 
     props.nextStep();
     setRandom(!random);
-   }
-;
+   };
   return (
     <div
       style={
@@ -258,8 +266,8 @@ const MCQuestion = props => {
               id="ChoiceGroup"
               aria-label="choice"
               name="choice"
-              value={choiceFeedbackQuestions}
-              onChange={choiceFeedbackQuestion}
+              value={choice}
+              onChange={choiceChange}
             >
               {["a", "b"].map(opt => (
                 <FormControlLabel
@@ -363,23 +371,17 @@ const MCQuestion = props => {
         </FormControl>
 
         <div id="QuestionFooter">
-          {selectCodes || ![5, 19].includes(props.step) ? (
+
             <Button
               id="QuestionNextBtn"
               onClick={moveNext}
-              disabled={!nextAvailable || choiceQuestion}
-              className={!nextAvailable || choiceQuestion ? "Button Disabled" : "Button"}
+              disabled={!nextAvailable }
+              className={!nextAvailable ? "Button Disabled" : "Button"}
               variant="contained"
             >
-              Next
+                {(selectCodes || ![5, 19].includes(props.step))? "Next":"Submit"}
             </Button>
-          ) : (
-            !choiceQuestion && (
-              <Button id="QuestionNextBtn" onClick={moveNext} disabled={false} className={"Button"} variant="contained">
-                Submit
-              </Button>
-            )
-          )}
+ 
 
           <Button
             id="QuestionPreviousBtn"
