@@ -113,21 +113,17 @@ const MCQuestion = props => {
       if (qsLeft.length > 0 && props.currentQIdx === props.questions.length - 1) {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
-        let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-        while (order.includes(props.questions[randomizeNumberOfQuestion])) {
-          randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        if(props.currentQIdx === order.length - 1){
+          let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          while (order.includes(props.questions[randomizeNumberOfQuestion])) {
+            randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          }
+          order.push(props.questions[randomizeNumberOfQuestion]);
+          setOrderOfQuestions(order);
         }
-        order.push(props.questions[randomizeNumberOfQuestion]);
-        setOrderOfQuestions(order);
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
-      setSelectCodes(false);
-      retrieveFeedbackcodes();
-      setExplanation("");
 
-      if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
-        setChoiceQuestion(true);
-      }
     } else {
       if (selectCodes) {
         const qsLeft = [];
@@ -223,7 +219,7 @@ const MCQuestion = props => {
     props.nextStep();
     setRandom(!random);
    }
-
+;
   return (
     <div
       style={
