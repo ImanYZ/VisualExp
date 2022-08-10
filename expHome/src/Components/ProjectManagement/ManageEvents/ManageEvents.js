@@ -266,6 +266,70 @@ const applicantsColumns = [
   }
 ];
 
+const istructorsComumns = [
+  {
+    field: "instructor", // Their fullname
+    headerName: "Instructor",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "email",
+    headerName: "Email",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "reminders",
+    headerName: "number Of reminder",
+    type: "number",
+    width: 180,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "emailstatus",
+    headerName: "emailstatus",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+
+  {
+    field: "scheduled",
+    headerName: "Scheduled the Session",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+
+  {
+    field: "rescheduled",
+    headerName: "Rescheduled the Email",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "notIntersted",
+    headerName: "Not Intersted",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+
+  { field: "nextReminder", headerName: "Next Reminder", type: "dateTime", width: 190 }
+];
+
 const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
     console.log({ data });
@@ -313,10 +377,47 @@ const ManageEvents = props => {
   const [currentProjectSpecs, setCurrentProjectSpecs] = useState({});
   const [currentProject, setCurrentProject] = useState("");
   const [selectedSession, setSelectedSession] = useState([]);
-
+  const [invitesInstructors, setInvitesInstructors] = useState([]);
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
+
+  useEffect(() => {
+    const loadLoadInstructors = async () => {
+      const invitedInstructorsDocs = await firebase.db.collection("instructors").where("reminders", ">=", 1).get();
+      const invitedInstructors = [];
+      for (let instructorDoc of invitedInstructorsDocs.docs) {
+        const inst = {
+          instructor: instructorDoc.data().firstname + " " + instructorDoc.data().lastname,
+          email: instructorDoc.data().email,
+          reminders: instructorDoc.data().reminders,
+          nextReminder: instructorDoc.data().nextReminder.toDate(),
+          id: instructorDoc.id,
+          scheduled: instructorDoc.data().yes ? "✅ " : "NO RESPONSE",
+          emailstatus: instructorDoc.data().openedEmail ? "Opened" : "Not Opened",
+          rescheduled: instructorDoc.data().later ? "✅ " : "NO RESPONSE",
+          notIntersted: instructorDoc.data().NO ? "❌" : "NO RESPONSE"
+        };
+        invitedInstructors.push(inst);
+      }
+      setInvitesInstructors(invitedInstructors);
+      setAvailabilitiesLoaded(true);
+    };
+    if (firebase) {
+      loadLoadInstructors();
+    }
+  }, [firebase]);
+
+  useEffect(() => {
+    const invInstructors = [];
+    for (let instructor of invitesInstructors) {
+      const inst = {
+        instructor: instructor.fullname,
+        email: instructor.email
+      };
+      invInstructors.push(inst);
+    }
+  }, []);
 
   useEffect(() => {
     const loadAvailabilities = async () => {
@@ -326,7 +427,6 @@ const ManageEvents = props => {
         sched.push(scheduleDoc.data());
       }
       setAvailabilities(sched);
-      setAvailabilitiesLoaded(true);
     };
     if (firebase) {
       loadAvailabilities();
@@ -962,9 +1062,23 @@ const ManageEvents = props => {
     //   });
     // };
   }
-
+  console.log(invitesInstructors);
   return (
     <div style={{ height: "100vh", overflowY: "auto" }}>
+      <h3>Invited instructors : </h3>
+      <div className="dataGridTable">
+        <DataGrid
+          rows={invitesInstructors}
+          columns={istructorsComumns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          hideFooterSelectedRowCount
+          // loading={!ongoingEventsLoaded}
+          onRowClick={gridRowClick}
+        />
+      </div>
       <div className="dataGridTable">
         <DataGrid
           rows={ongoingEvents}
