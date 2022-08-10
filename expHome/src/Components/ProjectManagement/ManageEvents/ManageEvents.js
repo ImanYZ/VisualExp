@@ -396,7 +396,7 @@ const ManageEvents = props => {
           scheduled: instructorDoc.data().yes ? "✅ " : "NO RESPONSE",
           emailstatus: instructorDoc.data().openedEmail ? "Opened" : "Not Opened",
           rescheduled: instructorDoc.data().later ? "✅ " : "NO RESPONSE",
-          notIntersted: instructorDoc.data().NO ? "❌" : "NO RESPONSE"
+          notIntersted: instructorDoc.data().no ? "❌" : "NO RESPONSE"
         };
         invitedInstructors.push(inst);
       }
