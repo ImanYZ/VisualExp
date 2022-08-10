@@ -287,7 +287,7 @@ const istructorsComumns = [
     field: "reminders",
     headerName: "number Of reminder",
     type: "number",
-    width: 70,
+    width: 180,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
@@ -312,7 +312,7 @@ const istructorsComumns = [
 
   {
     field: "rescheduled",
-    headerName: "Rescheduled",
+    headerName: "Rescheduled the Email",
     width: 190,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -320,7 +320,7 @@ const istructorsComumns = [
   },
   {
     field: "notIntersted",
-    headerName: "NotIntersted",
+    headerName: "Not Intersted",
     width: 190,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -396,7 +396,7 @@ const ManageEvents = props => {
           scheduled: instructorDoc.data().yes ? "✅ " : "NO RESPONSE",
           emailstatus: instructorDoc.data().openedEmail ? "Opened" : "Not Opened",
           rescheduled: instructorDoc.data().later ? "✅ " : "NO RESPONSE",
-          notIntersted: instructorDoc.data().NO ? "❌" : ""
+          notIntersted: instructorDoc.data().NO ? "❌" : "NO RESPONSE"
         };
         invitedInstructors.push(inst);
       }
