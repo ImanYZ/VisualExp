@@ -61,9 +61,7 @@ const Activities = props => {
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
-  const [onGoingEvent, setOngoingEvent] = useState(null);
-  const [onGoingSchedule, setOnGoingSchedule] = useState(null);
-
+  const [onGoingEvents, setOnGoingEvents] = useState([]);
   const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
@@ -71,8 +69,7 @@ const Activities = props => {
       try {
         const response = await axios.post("/getOngoingResearcherEvent", { email });
         if (response.status === 200) {
-          setOngoingEvent(response.data.event);
-          setOnGoingSchedule(response.data.schedule);
+          setOnGoingEvents(response.data);
         }
       } catch (err) {
         console.log("Failed to load getOngoingResearcherEvent", err);
@@ -320,9 +317,8 @@ const Activities = props => {
             researchers={researchers}
             isResearcherCriteriaMet={isResearcherCriteriaMet}
             makeResearcherChipContent={makeResearcherChipContent}
-            onGoingEvent={onGoingEvent}
-            setOnGoingSchedule={setOnGoingSchedule}
-            onGoingSchedule={onGoingSchedule}
+            onGoingEvents={onGoingEvents}
+            setOnGoingEvents={setOnGoingEvents}
           />
         </div>
       )}

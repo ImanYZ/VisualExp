@@ -45,7 +45,7 @@
     "lodash": "^4.17.21",
     "lodash.orderby": "^4.6.0",
     "lottie-react": "^2.1.0",
-    "moment": "^2.29.1",
+    "moment": "^2.29.4",
     "number-to-words": "^1.2.4",
     "react": "^17.0.2",
     "react-animate-on-scroll": "^2.1.5",

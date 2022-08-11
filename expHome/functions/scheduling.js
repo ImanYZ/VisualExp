@@ -11,7 +11,7 @@ const {
   insertLifeLogEvent
 } = require("./GoogleCalendar");
 
-const { pad2Num } = require("./utils");
+const { pad2Num, capitalizeFirstLetter } = require("./utils");
 const { toOrdinal } = require("number-to-words");
 
 const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs) => {
@@ -194,60 +194,67 @@ exports.getOngoingResearcherEvent = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).send({ message: "Email id required" });
-    const fiveMinutes = 5 * 60 * 1000;
+    const twoHours = 120 * 60 * 1000;
     const now = new Date().getTime();
-    const start = new Date(now - fiveMinutes);
-    // get events for next 2 hours. then mannualy filter out the events that are not happening right now.
-    let end = new Date(now + 120 * 60 * 1000);
+    const start = new Date(now - twoHours);
+    // get events for next 10 hours.
+    let end = new Date(now + 600 * 60 * 1000);
 
     const events = await getEvents(start, end, "America/Detroit");
 
-    const filteredEvents = events.filter(event => {
-      const containsEmail = event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
-      const isNowLessThanEnd = now < new Date(new Date(event.end.dateTime).getTime() - fiveMinutes);
-      return containsEmail && isNowLessThanEnd;
+    const filteredEvents = (events || []).filter(event => {
+      return event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
     });
-    if (filteredEvents.length === 0) {
-      return res.status(404).send({ message: "No Event going on" });
-    }
 
-    const event = filteredEvents[0];
+    const responseData = [];
 
-    const schedule = await db.collection("schedule").where("id", "==", event.id).get();
+    for (let ev of filteredEvents) {
+      const schedule = await db.collection("schedule").where("id", "==", ev.id).get();
 
-    if (schedule.docs.length === 0) {
-      return res.status(404).send({ message: "Schedule not found" });
-    }
-
-    const scheduleData = schedule.docs[0].data();
-    const participantEmail = event.attendees.filter(
-      attendee => attendee.email.toLowerCase() !== email.toLowerCase()
-    )?.[0].email;
-
-    let userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
-
-    if (userDocs.docs.length === 0) {
-      userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
-    }
-
-    if (userDocs.docs.length === 0) {
-      userDocs = await db
-        .collection("usersStudentCoNoteSurvey")
-        .where("email", "==", participantEmail.toLowerCase())
-        .get();
-    }
-
-    const userData = userDocs.docs?.[0]?.data();
-
-    res.send({
-      event,
-      schedule: {
-        scheduleId: schedule.docs[0].id,
-        ...scheduleData,
-        session: scheduleData.session.toDate(),
-        firstname: userData?.firstname || ""
+      if (schedule.docs.length === 0) {
+        continue;
       }
-    });
+
+      const scheduleData = schedule.docs[0].data();
+      const participantEmail = scheduleData.email;
+
+      let userDocs = await db.collection("instructors").where("email", "==", participantEmail.toLowerCase()).get();
+
+      if (userDocs.docs.length === 0) {
+        userDocs = await db.collection("users").where("email", "==", participantEmail.toLowerCase()).get();
+      }
+
+      if (userDocs.docs.length === 0) {
+        userDocs = await db
+          .collection("usersStudentCoNoteSurvey")
+          .where("email", "==", participantEmail.toLowerCase())
+          .get();
+      }
+
+      const userData = userDocs.docs?.[0]?.data();
+
+      let userName = `${userData?.firstname} ${userData?.lastname}`;
+
+      if (userData.prefix) {
+        userName =
+          userData.prefix +
+          ". " +
+          capitalizeFirstLetter(userData.firstname) +
+          " " +
+          capitalizeFirstLetter(userData.lastname);
+      }
+      responseData.push({
+        event: ev,
+        schedule: {
+          scheduleId: schedule.docs[0].id,
+          ...scheduleData,
+          session: scheduleData.session.toDate(),
+          firstname: userName
+        }
+      });
+    }
+
+    res.send(responseData);
   } catch (error) {
     console.log("500", error);
     return res.status(500).send({ message: "Something went wrong", error });
