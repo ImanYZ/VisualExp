@@ -284,6 +284,14 @@ const istructorsComumns = [
     }
   },
   {
+    field: "interestedTopic",
+    headerName: "Interested Topic",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
     field: "reminders",
     headerName: "number Of reminder",
     type: "number",
@@ -384,19 +392,21 @@ const ManageEvents = props => {
 
   useEffect(() => {
     const loadLoadInstructors = async () => {
-      const invitedInstructorsDocs = await firebase.db.collection("instructors").where("reminders", ">=", 1).get();
+      const invitedInstructorsDocs = await firebase.db.collection("instructors").where("upVotes", ">=", 3).get();
       const invitedInstructors = [];
       for (let instructorDoc of invitedInstructorsDocs.docs) {
+        const instructorData = instructorDoc.data();
         const inst = {
-          instructor: instructorDoc.data().firstname + " " + instructorDoc.data().lastname,
-          email: instructorDoc.data().email,
-          reminders: instructorDoc.data().reminders,
-          nextReminder: instructorDoc.data().nextReminder.toDate(),
+          instructor: instructorData.firstname + " " + instructorData.lastname,
+          email: instructorData.email,
+          reminders: instructorData.reminders,
+          nextReminder: instructorData.nextReminder ? instructorData.nextReminder.toDate() : "",
           id: instructorDoc.id,
-          scheduled: instructorDoc.data().yes ? "✅ " : "NO RESPONSE",
-          emailstatus: instructorDoc.data().openedEmail ? "Opened" : "Not Opened",
-          rescheduled: instructorDoc.data().later ? "✅ " : "NO RESPONSE",
-          notIntersted: instructorDoc.data().no ? "❌" : "NO RESPONSE"
+          interestedTopic: instructorData.interestedTopic,
+          scheduled: instructorData.yes ? "✅ " : "NO RESPONSE",
+          emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",
+          rescheduled: instructorData.later ? "✅ " : "NO RESPONSE",
+          notIntersted: instructorData.no ? "❌" : "NO RESPONSE"
         };
         invitedInstructors.push(inst);
       }
@@ -407,17 +417,6 @@ const ManageEvents = props => {
       loadLoadInstructors();
     }
   }, [firebase]);
-
-  useEffect(() => {
-    const invInstructors = [];
-    for (let instructor of invitesInstructors) {
-      const inst = {
-        instructor: instructor.fullname,
-        email: instructor.email
-      };
-      invInstructors.push(inst);
-    }
-  }, []);
 
   useEffect(() => {
     const loadAvailabilities = async () => {
@@ -1062,7 +1061,7 @@ const ManageEvents = props => {
     //   });
     // };
   }
-  console.log(invitesInstructors);
+
   return (
     <div style={{ height: "100vh", overflowY: "auto" }}>
       <h3>Invited instructors : </h3>
