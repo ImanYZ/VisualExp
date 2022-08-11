@@ -35,6 +35,7 @@ const MCQuestion = props => {
   const [codes, setCodes] = useState([]);
   const [newCode, setNewCode] = useState("");
   const [codeChoice, setCodeChoice] = useState([]);
+  const [codeChoice1, setCodeChoice1] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [choiceQuestion, setChoiceQuestion] = useState(false);
@@ -42,6 +43,8 @@ const MCQuestion = props => {
   const curQuestion = props.currentQIdx + 1;
   const size = props.questions.length;
   const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
+  const allowNextForQC =
+    (codeChoice.length === 0 && props.currentQIdx === 0) || (codeChoice1.length === 0 && props.currentQIdx === 1);
   const previousAvailable = props.currentQIdx !== 0;
   const [orderOfQuestions, setOrderOfQuestions] = useState([
     props.questions[Math.floor(Math.random() * props.questions.length)]
@@ -107,14 +110,13 @@ const MCQuestion = props => {
       return newChoices;
     });
     if(choiceQuestion){
-    const newExp = [...props.explanations];
-    newExp[props.currentQIdx].choice = postQuestion[event.target.value];
-    props.setExplanations(newExp);
+      const newExp = [...props.explanations];
+      newExp[props.currentQIdx].choice = postQuestion[event.target.value];
+      props.setExplanations(newExp);
     }
   };
 
   const moveNext = () => {
-  
     if (![5, 19].includes(props.step)) {
       const qsLeft = [];
       let order = [...orderOfQuestions];
@@ -127,12 +129,12 @@ const MCQuestion = props => {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
         if(props.currentQIdx === order.length - 1){
-        let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-        while (order.includes(props.questions[randomizeNumberOfQuestion])) {
-          randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-        }
-        order.push(props.questions[randomizeNumberOfQuestion]);
-        setOrderOfQuestions(order);
+          let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          while (order.includes(props.questions[randomizeNumberOfQuestion])) {
+            randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          }
+          order.push(props.questions[randomizeNumberOfQuestion]);
+          setOrderOfQuestions(order);
         }
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
@@ -215,7 +217,11 @@ const MCQuestion = props => {
     } else {
       newChecked.splice(currentIndex, 1);
     }
-    setCodeChoice(newChecked);
+    if (props.currentQIdx === 0) {
+      setCodeChoice(newChecked);
+    } else {
+      setCodeChoice1(newChecked);
+    }
     props.setExplanations(oldExp => {
       const newExp = [...oldExp];
       newExp[props.currentQIdx].codes = newChecked;
@@ -223,11 +229,10 @@ const MCQuestion = props => {
     });
   };
 
-
-  const submitAndContinue = () => { 
+  const submitAndContinue = () => {
     props.nextStep();
     setRandom(!random);
-   };
+  };
   return (
     <div
       style={
@@ -262,13 +267,7 @@ const MCQuestion = props => {
             {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx]?.stem}
           </FormLabel>
           {choiceQuestion ? (
-            <RadioGroup
-              id="ChoiceGroup"
-              aria-label="choice"
-              name="choice"
-              value={choice}
-              onChange={choiceChange}
-            >
+            <RadioGroup id="ChoiceGroup" aria-label="choice" name="choice" value={choice} onChange={choiceChange}>
               {["a", "b"].map(opt => (
                 <FormControlLabel
                   key={opt}
@@ -330,7 +329,11 @@ const MCQuestion = props => {
                           <ListItemIcon>
                             <Checkbox
                               edge="start"
-                              checked={codeChoice.indexOf(value) !== -1}
+                              checked={
+                                props.currentQIdx === 0
+                                  ? codeChoice.indexOf(value) !== -1
+                                  : codeChoice1.indexOf(value) !== -1
+                              }
                               tabIndex={-1}
                               disableRipple
                               inputProps={{ "aria-labelledby": labelId }}
@@ -371,17 +374,27 @@ const MCQuestion = props => {
         </FormControl>
 
         <div id="QuestionFooter">
-
+          {![5, 19].includes(props.step) ? (
             <Button
               id="QuestionNextBtn"
               onClick={moveNext}
-              disabled={!nextAvailable }
+              disabled={!nextAvailable}
               className={!nextAvailable ? "Button Disabled" : "Button"}
               variant="contained"
             >
-                {(selectCodes || ![5, 19].includes(props.step))? "Next":"Submit"}
+              Next
             </Button>
- 
+          ) : (
+            <Button
+              id="QuestionNextBtn"
+              onClick={moveNext}
+              disabled={!nextAvailable || (allowNextForQC && selectCodes)}
+              className={!nextAvailable || (allowNextForQC && selectCodes) ? "Button Disabled" : "Button"}
+              variant="contained"
+            >
+              {selectCodes ? "Next" : "Submit"}
+            </Button>
+          )}
 
           <Button
             id="QuestionPreviousBtn"
