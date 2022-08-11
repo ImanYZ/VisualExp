@@ -548,7 +548,7 @@ exports.retrieveData = async (req, res) => {
         rowsData.push(row);
       }
     }
-    writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
@@ -610,7 +610,7 @@ exports.feedbackData = async (req, res) => {
       }
       rowsData.push(row);
     }
-    writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
@@ -624,7 +624,7 @@ exports.feedbackData = async (req, res) => {
 exports.recallData = async (req, res) => {
   try {
     const rowsData = [["id", "Key Phrase", "Response", "Score out of 4"]];
-    const recallGradesDocs = await db.collection("recallGrades").get();
+    const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
     for (let recallGradeDoc of recallGradesDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
       if (recallGradeData.grades.length >= 4) {
@@ -636,11 +636,14 @@ exports.recallData = async (req, res) => {
         for (let grade of recallGradeData.grades) {
           score += grade;
         }
+        if (score > 4) {
+          score = 4;
+        }
         row.push(score);
         rowsData.push(row);
       }
     }
-    writeToPath("datasets/recallData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/recallData.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Done!");
     });
   } catch (err) {
