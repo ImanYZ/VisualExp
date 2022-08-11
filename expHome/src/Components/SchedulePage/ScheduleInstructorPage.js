@@ -12,9 +12,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms";
-import { projectSpecsState } from "../../store/ProjectAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import { currentProjectState } from "../../store/ExperimentAtoms";
@@ -32,7 +31,6 @@ tomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDat
 
 const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
-    console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
   }
 };
@@ -61,7 +59,7 @@ const sessionFormatter = (start, minutes) => {
   );
 };
 
-const formatSlotTime = (hourlyChunks = 2, slotCount = 0, index) => {
+const formatSlotTime = (hourlyChunks = 2, slotCount = 0) => {
   let str = "for ";
   let mins = 0,
     hours = 0;
@@ -96,9 +94,11 @@ const formatSlotTime = (hourlyChunks = 2, slotCount = 0, index) => {
   return str;
 };
 
-const SchedulePage = props => {
+const ScheduleInstructorPage = props => {
+  const { instructorId } = useParams();
+
   const firebase = useRecoilValue(firebaseState);
-  const email = useRecoilValue(emailState);
+  const [email, setEmail] = useRecoilState(emailState);
   const fullname = useRecoilValue(fullnameState);
 
   const [availableSessions, setAvailableSessions] = useState({});
@@ -116,23 +116,26 @@ const SchedulePage = props => {
   const [globalProject, setGlobalProject] = useRecoilState(projectState);
   const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(currentProjectState);
   const navigate = useNavigate();
-  const projectSpecs = useRecoilValue(projectSpecsState);
+  const [projectSpecs, setProjectSpecs] = useState({});
 
+  useEffect(() => {
+    axios.post("/instructorYes", {
+      id: instructorId,
+    });
+  }, []);
+  
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
       let isSurvey = false;
-      // We need to first retrieve which project this user belongs to.
+      let userDoc = await firebase.db.collection("instructors").doc(instructorId).get();
 
-      let userDoc = await firebase.db.collection("users").doc(fullname).get();
-
-      if (!userDoc.exists) {
-        userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
-        isSurvey = true;
-      }
       const userData = userDoc.data();
-      const project = userData.project;
+      const project = "Annotating";
+      setEmail(userData.email);
+      const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
+      setProjectSpecs(projSp.data());
       if (isSurvey) {
         setGlobalProject(project);
         setGlobalCurrentProject(project);
@@ -141,10 +144,6 @@ const SchedulePage = props => {
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
       for (let researcherDoc of researcherDocs.docs) {
-        if (researcherDoc.id === userDoc.id) {
-          navigate("/Activities/Experiments");
-          return;
-        }
         const researcherData = researcherDoc.data();
         // We only need the researchers who are active in the project that the user belongs to.
         if (
@@ -190,7 +189,7 @@ const SchedulePage = props => {
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            event.attendees.findIndex(attendee => attendee.email === email) !== -1
+            event.attendees.findIndex(attendee => attendee.email === userData.email) !== -1
           ) {
             setParticipatedBefore(true);
             return;
@@ -252,10 +251,10 @@ const SchedulePage = props => {
         setScheduleLoaded(true);
       }, 400);
     };
-    if (fullname && isEmail(email)) {
+    if (firebase) {
       loadSchedule();
     }
-  }, [fullname, email]);
+  }, [firebase]);
 
   const confirmClickOpen = event => {
     setOpenConfirm(true);
@@ -273,13 +272,8 @@ const SchedulePage = props => {
   const submitData = async () => {
     setIsSubmitting(true);
 
-    const userRef = firebase.db.collection("users").doc(fullname);
+    const userRef = firebase.db.collection("instructors").doc(instructorId);
     let userDoc = await userRef.get();
-
-    if (!userDoc.exists) {
-      const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
-      userDoc = await userRef.get();
-    }
 
     let responseObj = null;
     if (userDoc.exists) {
@@ -311,7 +305,6 @@ const SchedulePage = props => {
             ]
         };
       });
-
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         sessions,
@@ -352,8 +345,8 @@ const SchedulePage = props => {
             {i + 1}
             <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup> session
           </strong>{" "}
-          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days later after the first session,` : null}
-          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i], i)}
+          {i > 0 ? `, ${projectSpecs.daysLater[i - 1]} days latter after the first session,` : null}
+          {" " + formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[i])}
         </li>
       );
     }
@@ -376,8 +369,8 @@ const SchedulePage = props => {
                 {i + 1}
                 <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
                 {sessionFormatter(
-                  selectedSession[i],
-                  slotDuration * (projectSpecs?.sessionDuration?.[i] || AppConfig.defaultSessionDuration[i] || 1)
+                  selectedSession[0],
+                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
                 )}
               </li>
             );
@@ -517,4 +510,4 @@ const SchedulePage = props => {
   );
 };
 
-export default SchedulePage;
+export default ScheduleInstructorPage;

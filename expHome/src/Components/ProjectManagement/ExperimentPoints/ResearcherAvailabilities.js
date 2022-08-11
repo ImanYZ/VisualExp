@@ -16,25 +16,20 @@ let end = 23 + tZoneDiff;
 
 const renderDateCell = (datetime, selected, refSetter) => {
   return (
-    <div
-      className={
-        selected ? "ScheduleCell SelectedCell" : "ScheduleCell UnselectedCell"
-      }
-      ref={refSetter}
-    >
+    <div className={selected ? "ScheduleCell SelectedCell" : "ScheduleCell UnselectedCell"} ref={refSetter}>
       {datetime.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false,
+        hour12: false
       })}
     </div>
   );
 };
 
-const ResearcherAvailabilities = (props) => {
+const ResearcherAvailabilities = props => {
   const [firstRender, setFirstRender] = useState(true);
 
-  const scheduleChange = (newSchedule) => {
+  const scheduleChange = newSchedule => {
     if (!firstRender || newSchedule.length > 0) {
       props.setSchedule(newSchedule);
       setFirstRender(false);
@@ -49,7 +44,7 @@ const ResearcherAvailabilities = (props) => {
       numDays={props.numDays}
       minTime={start}
       maxTime={end}
-      hourlyChunks={2}
+      hourlyChunks={props.hourlyChunks || 2}
       dateFormat="ddd MM/DD"
       timeFormat="hh:mma"
       onChange={scheduleChange}
