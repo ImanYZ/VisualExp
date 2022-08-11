@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Chip from "@mui/material/Chip";
 import Paper from "@mui/material/Paper";
 import Alert from "@mui/material/Alert";
@@ -8,6 +8,7 @@ import { formatPoints } from "../../../../utils";
 import { firebaseState } from "../../../../store/AuthAtoms";
 import { useRecoilValue } from "recoil";
 import axios from "axios";
+import moment from "moment";
 
 export const LeaderBoard = ({
   fullname,
@@ -15,28 +16,28 @@ export const LeaderBoard = ({
   researchers,
   isResearcherCriteriaMet,
   makeResearcherChipContent,
-  onGoingEvent,
-  setOnGoingSchedule,
-  onGoingSchedule
+  onGoingEvents,
+  setOnGoingEvents
 }) => {
   const [starting, setStarting] = useState(false);
   const [sendingReminder, setSendingReminder] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date().getTime());
 
   const firebase = useRecoilValue(firebaseState);
 
-  const startSession = async () => {
+  const startSession = async (ev, index) => {
     try {
-      const { scheduleId } = onGoingSchedule;
+      const { scheduleId } = ev.schedule;
       setStarting(true);
       await firebase.db.collection("schedule").doc(scheduleId).update({ hasStarted: true });
-      setOnGoingSchedule({
-        ...onGoingSchedule,
-        hasStarted: true
-      });
-      if (onGoingEvent.hangoutLink) {
+
+      if (ev.event.hangoutLink) {
         const open_link = window.open("", "_blank");
-        open_link.location = onGoingEvent.hangoutLink;
+        open_link.location = ev.event.hangoutLink;
       }
+      const evs = [...onGoingEvents];
+      evs[index] = { ...ev, schedule: { ...ev.schedule, hasStarted: true } };
+      setOnGoingEvents(evs);
     } catch (err) {
       alert("Something went wrong while starting the session.");
     } finally {
@@ -44,15 +45,15 @@ export const LeaderBoard = ({
     }
   };
 
-  const sendEventNotificationEmail = async () => {
+  const sendEventNotificationEmail = async ev => {
     try {
       setSendingReminder(true);
       await axios.post("/sendEventNotificationEmail", {
-        email: onGoingSchedule.email,
-        order: onGoingSchedule.order,
-        firstname: onGoingSchedule.firstname,
+        email: ev.schedule.email,
+        order: ev.schedule.order,
+        firstname: ev.schedule.firstname,
         weAreWaiting: true,
-        hangoutLink: onGoingEvent.hangoutLink
+        hangoutLink: ev.event.hangoutLink
       });
       alert("Event reminder notification sent.");
     } catch (err) {
@@ -62,15 +63,14 @@ export const LeaderBoard = ({
     }
   };
 
-  const markAttended = async () => {
+  const markAttended = async (ev, index) => {
     try {
-      const { scheduleId } = onGoingSchedule;
+      const { scheduleId } = ev.schedule;
       setStarting(true);
       await firebase.db.collection("schedule").doc(scheduleId).update({ attended: true });
-      setOnGoingSchedule({
-        ...onGoingSchedule,
-        attended: true
-      });
+      const evs = [...onGoingEvents];
+      evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
+      setOnGoingEvents(evs);
     } catch (err) {
       alert("Something went wrong while marking the attendance.");
     } finally {
@@ -116,51 +116,52 @@ export const LeaderBoard = ({
           );
         })}
       </Paper>
-      {onGoingEvent && onGoingSchedule && (
-        <div style={{ paddingBotton: "10px" }}>
-          <Alert severity="info">
-            <div style={{ width: "100%" }}>
-              <Typography>You have a session with</Typography>
-              <Typography variant="h4">{onGoingSchedule.email}</Typography>
+      {(onGoingEvents || []).map((ev, index) => {
+        const now = new Date().getTime();
+        const isHappening =
+          new Date(ev.event.start.dateTime).getTime() <= currentTime &&
+          new Date(ev.event.end.dateTime).getTime() >= currentTime;
 
-              <div style={{ marginTop: "12px" }}>
-                <Button
-                  className={"Button Blue"}
-                  variant="contained"
-                  onClick={sendEventNotificationEmail}
-                  disabled={sendingReminder}
-                >
-                  Remind Participant
-                </Button>
-
-                {!onGoingSchedule.hasStarted && (
-                  <Button
-                    className={"Button Green"}
-                    style={{ marginLeft: 5 }}
-                    variant="contained"
-                    onClick={startSession}
-                    disabled={starting || onGoingSchedule.hasStarted}
-                  >
-                    Start Session
-                  </Button>
+        const color = isHappening ? "success" : "primary";
+        return (
+          <div style={{ marginBottom: "5px" }}>
+            <Alert severity={color} key={ev.event.id}>
+              <Typography>
+                {ev.schedule.firstname} ({moment(ev.event.start.dateTime).format("LT")}
+                {" - "}
+                {moment(ev.event.end.dateTime).format("LT")})
+              </Typography>
+              <Typography variant="caption">{ev.schedule.email}</Typography>
+              <div>
+                <Chip
+                  label="Remind Participant"
+                  variant="outlined"
+                  color={color}
+                  style={{ margin: "5px" }}
+                  onClick={() => sendEventNotificationEmail(ev, index)}
+                />
+                {!ev?.schedule?.hasStarted && (
+                  <Chip
+                    label="Start Session"
+                    color={color}
+                    style={{ margin: "5px" }}
+                    onClick={() => startSession(ev, index)}
+                    disabled={starting}
+                  />
                 )}
-
-                {onGoingSchedule.hasStarted && (
-                  <Button
-                    className={"Button Green"}
-                    style={{ marginLeft: 5 }}
-                    variant="contained"
-                    onClick={markAttended}
-                    disabled={starting || onGoingSchedule.attended}
-                  >
-                    Mark Attended
-                  </Button>
+                {ev?.schedule?.hasStarted && (
+                  <Chip
+                    label="Mark Attended"
+                    color={color}
+                    style={{ margin: "5px" }}
+                    onClick={() => markAttended(ev, index)}
+                  />
                 )}
               </div>
-            </div>
-          </Alert>
-        </div>
-      )}
+            </Alert>
+          </div>
+        );
+      })}
     </div>
   );
 };
