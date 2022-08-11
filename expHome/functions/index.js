@@ -9,6 +9,7 @@ const {
   deleteUser,
   retrieveData,
   feedbackData,
+  recallData,
   loadContacts,
   reassignAllPConditionNums,
   applicationReminder
@@ -75,6 +76,7 @@ app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
+app.get("/recallData", recallData);
 app.post("/vote", voteEndpoint);
 app.post("/markPaid", markPaidEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
