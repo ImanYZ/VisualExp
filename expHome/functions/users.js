@@ -2,20 +2,9 @@ const fs = require("fs");
 const csv = require("fast-csv");
 require("dotenv").config();
 
-const {
-  admin,
-  db,
-  commitBatch,
-  batchSet,
-  batchUpdate,
-  batchDelete,
-} = require("./admin");
+const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
 const { getFullname } = require("./utils");
-const {
-  emailApplicationStatus,
-  emailCommunityLeader,
-  emailImanToInviteApplicants,
-} = require("./emailing");
+const { emailApplicationStatus, emailCommunityLeader, emailImanToInviteApplicants } = require("./emailing");
 
 exports.deleteUser = async (snap, context) => {
   // Get an object representing the document prior to deletion
@@ -25,7 +14,7 @@ exports.deleteUser = async (snap, context) => {
   const pConditions = userData.pConditions;
   for (let { passage, condition } of pConditions) {
     try {
-      await db.runTransaction(async (t) => {
+      await db.runTransaction(async t => {
         const conditionRef = db.collection("conditions").doc(condition);
         const conditionDoc = await t.get(conditionRef);
         const conditionData = conditionDoc.data();
@@ -38,9 +27,9 @@ exports.deleteUser = async (snap, context) => {
             ...passageData.projects,
             [project]: {
               ...passageData.projects[project],
-              [condition]: passageData.projects[project][condition] - 1,
-            },
-          },
+              [condition]: passageData.projects[project][condition] - 1
+            }
+          }
         });
       });
     } catch (e) {
@@ -54,7 +43,7 @@ exports.recalculateFreeRecall = async (req, res) => {
     const usersDocs = await db.collection("users").get();
     for (let userD of usersDocs.docs) {
       try {
-        await db.runTransaction(async (t) => {
+        await db.runTransaction(async t => {
           const userRef = db.collection("users").doc(userD.id);
           const userDoc = await t.get(userRef);
           const userData = userDoc.data();
@@ -62,9 +51,7 @@ exports.recalculateFreeRecall = async (req, res) => {
           for (let pCondIdx = 0; pCondIdx < pConditions.length; pCondIdx++) {
             const pCond = pConditions[pCondIdx];
             const reText = pCond.recallreText;
-            const recall3DaysreText = pCond.recall3DaysreText
-              ? pCond.recall3DaysreText
-              : "";
+            const recall3DaysreText = pCond.recall3DaysreText ? pCond.recall3DaysreText : "";
             const passage = pCond.passage;
             const passageRef = db.collection("passages").doc(passage);
             const passageDoc = await t.get(passageRef);
@@ -92,20 +79,17 @@ exports.recalculateFreeRecall = async (req, res) => {
               recallCosineSim: textCosineSimilarity(mainText, recalledText),
               recall3DaysScore: score3Days,
               recall3DaysScoreRatio: score3Days / keywordsText.length,
-              recall3DaysCosineSim: textCosineSimilarity(
-                mainText,
-                recalled3DaysText
-              ),
+              recall3DaysCosineSim: textCosineSimilarity(mainText, recalled3DaysText)
             };
           }
           t.update(userRef, {
-            pConditions,
+            pConditions
           });
           const userLogRef = db.collection("userLogs").doc();
           t.update(userLogRef, {
             pConditions,
             id: userRef.id,
-            updatedAt: admin.firestore.Timestamp.fromDate(new Date()),
+            updatedAt: admin.firestore.Timestamp.fromDate(new Date())
           });
         });
       } catch (e) {
@@ -137,9 +121,9 @@ exports.reassignAllPConditionNums = async (req, res) => {
             ...passageData.projects,
             [project]: {
               H2: 0,
-              K2: 0,
-            },
-          },
+              K2: 0
+            }
+          }
         });
       }
     }
@@ -162,7 +146,7 @@ exports.reassignAllPConditionNums = async (req, res) => {
             const conditionRef = db.collection("conditions").doc(condition);
             await conditionRef.update({ [project]: increment });
             try {
-              await db.runTransaction(async (t) => {
+              await db.runTransaction(async t => {
                 const passageRef = db.collection("passages").doc(passage);
                 const passageDoc = await t.get(passageRef);
                 const passageData = passageDoc.data();
@@ -172,10 +156,9 @@ exports.reassignAllPConditionNums = async (req, res) => {
                       ...passageData.projects,
                       [project]: {
                         ...passageData.projects[project],
-                        [condition]:
-                          passageData.projects[project][condition] + 1,
-                      },
-                    },
+                        [condition]: passageData.projects[project][condition] + 1
+                      }
+                    }
                   });
                 }
               });
@@ -198,7 +181,7 @@ exports.changeTo3Days = async (req, res) => {
     const userDocs = await db.collection("users").get();
     for (let userD of userDocs.docs) {
       try {
-        await db.runTransaction(async (t) => {
+        await db.runTransaction(async t => {
           const userRef = db.collection("users").doc(userD.id);
           const userDoc = await t.get(userRef);
           const userData = userDoc.data();
@@ -217,8 +200,7 @@ exports.changeTo3Days = async (req, res) => {
               delete pCondition.recall4DaysScore;
             }
             if ("recall4DaysScoreRatio" in pCondition) {
-              pCondition.recall3DaysScoreRatio =
-                pCondition.recall4DaysScoreRatio;
+              pCondition.recall3DaysScoreRatio = pCondition.recall4DaysScoreRatio;
               delete pCondition.recall4DaysScoreRatio;
             }
             if ("recall4DaysStart" in pCondition) {
@@ -294,11 +276,11 @@ exports.loadContacts = async (req, res) => {
     const ws = fs.createReadStream("datasets/Contacts.csv");
     csv
       .parseStream(ws, { headers: true })
-      .on("error", (error) => {
+      .on("error", error => {
         console.error(error);
         return res.status(500).json({ error });
       })
-      .on("data", async (row) => {
+      .on("data", async row => {
         console.log(row);
         const fullname = getFullname(row.firstname, row.lastname);
         const contactRef = db.collection("contacts").doc(fullname);
@@ -307,7 +289,7 @@ exports.loadContacts = async (req, res) => {
             firstname: row.firstname,
             lastname: row.lastname,
             email: row.email,
-            from1Cademy: row["1Cademy"] === "1",
+            from1Cademy: row["1Cademy"] === "1"
           });
         }
         rowIdx += 1;
@@ -432,8 +414,8 @@ exports.retrieveData = async (req, res) => {
         "post1WeekQsStart",
         "explanation1",
         "explanation3Days",
-        "explanation1Week",
-      ],
+        "explanation1Week"
+      ]
     ];
     usersDocs = await db.collection("users").get();
     let userIndex = 0;
@@ -492,19 +474,11 @@ exports.retrieveData = async (req, res) => {
         row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
         row.push("testTime" in pCond ? pCond.testTime : "");
         if (userData.post3DaysQsEnded) {
-          row.push(
-            pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : ""
-          );
+          row.push(pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : "");
           row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
-          row.push(
-            "recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : ""
-          );
-          row.push(
-            "recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : ""
-          );
-          row.push(
-            "recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : ""
-          );
+          row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
+          row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
+          row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
           row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
           row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
           for (let idx = 0; idx < 10; idx++) {
@@ -516,9 +490,7 @@ exports.retrieveData = async (req, res) => {
           }
           row.push(pCond.test3DaysEnded ? pCond.test3DaysEnded.toDate() : "");
           row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
-          row.push(
-            "test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : ""
-          );
+          row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
           row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
         } else {
           for (let idx = 0; idx < 21; idx++) {
@@ -526,19 +498,11 @@ exports.retrieveData = async (req, res) => {
           }
         }
         if (userData.post1WeekQsEnded) {
-          row.push(
-            pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : ""
-          );
+          row.push(pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : "");
           row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
-          row.push(
-            "recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : ""
-          );
-          row.push(
-            "recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : ""
-          );
-          row.push(
-            "recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : ""
-          );
+          row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
+          row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
+          row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
           row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
           row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
           for (let idx = 0; idx < 10; idx++) {
@@ -550,9 +514,7 @@ exports.retrieveData = async (req, res) => {
           }
           row.push(pCond.test1WeekEnded ? pCond.test1WeekEnded.toDate() : "");
           row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
-          row.push(
-            "test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : ""
-          );
+          row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
           row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
         } else {
           for (let idx = 0; idx < 21; idx++) {
@@ -563,59 +525,32 @@ exports.retrieveData = async (req, res) => {
         row.push(userData.postQsEnded ? userData.postQsEnded.toDate() : "");
         row.push(userData.postQsStart ? userData.postQsStart.toDate() : "");
         if (userData.post3DaysQsEnded) {
-          row.push(
-            pCIdx === 0
-              ? userData.post3DaysQ1Choice
-              : userData.post3DaysQ2Choice
-          );
-          row.push(
-            userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : ""
-          );
-          row.push(
-            userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : ""
-          );
+          row.push(pCIdx === 0 ? userData.post3DaysQ1Choice : userData.post3DaysQ2Choice);
+          row.push(userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : "");
+          row.push(userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : "");
         } else {
           for (let idx = 0; idx < 3; idx++) {
             row.push("");
           }
         }
         if (userData.post1WeekQsEnded) {
-          row.push(
-            pCIdx === 0
-              ? userData.post1WeekQ1Choice
-              : userData.post1WeekQ2Choice
-          );
-          row.push(
-            userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : ""
-          );
-          row.push(
-            userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : ""
-          );
+          row.push(pCIdx === 0 ? userData.post1WeekQ1Choice : userData.post1WeekQ2Choice);
+          row.push(userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : "");
+          row.push(userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : "");
         } else {
           for (let idx = 0; idx < 3; idx++) {
             row.push("");
           }
         }
-        row.push(
-          "explanations" in userData && userData.explanations[pCIdx]
-            ? userData.explanations[pCIdx]
-            : ""
-        );
-        row.push(
-          userData.explanations3Days ? userData.explanations3Days[pCIdx] : ""
-        );
-        row.push(
-          userData.explanations1Week ? userData.explanations1Week[pCIdx] : ""
-        );
+        row.push("explanations" in userData && userData.explanations[pCIdx] ? userData.explanations[pCIdx] : "");
+        row.push(userData.explanations3Days ? userData.explanations3Days[pCIdx] : "");
+        row.push(userData.explanations1Week ? userData.explanations1Week[pCIdx] : "");
         rowsData.push(row);
       }
     }
-    writeToPath("datasets/data.csv", rowsData, { headers: true }).on(
-      "finish",
-      () => {
-        console.log("done process data!");
-      }
-    );
+    csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("done process data!");
+    });
   } catch (err) {
     console.log({ err });
     return res.status(400).json({ err });
@@ -623,7 +558,7 @@ exports.retrieveData = async (req, res) => {
   return res.status(200).json({ done: false });
 };
 
-// Download the dataset in CSV
+// Download the feedback dataset in CSV
 exports.feedbackData = async (req, res) => {
   let rowsData, usersDocs, userData, row;
   try {
@@ -641,8 +576,8 @@ exports.feedbackData = async (req, res) => {
         "postQ1Choice-1Week",
         "explanation1-1Week",
         "postQ2Choice-1Week",
-        "explanation2-1Week",
-      ],
+        "explanation2-1Week"
+      ]
     ];
     usersDocs = await db.collection("users").get();
     for (let userDoc of usersDocs.docs) {
@@ -655,13 +590,9 @@ exports.feedbackData = async (req, res) => {
       row.push(userData.explanations[1]);
       if (userData.post3DaysQsEnded) {
         row.push(userData.post3DaysQ1Choice);
-        row.push(
-          userData.explanations3Days ? userData.explanations3Days[0] : ""
-        );
+        row.push(userData.explanations3Days ? userData.explanations3Days[0] : "");
         row.push(userData.post3DaysQ2Choice);
-        row.push(
-          userData.explanations3Days ? userData.explanations3Days[1] : ""
-        );
+        row.push(userData.explanations3Days ? userData.explanations3Days[1] : "");
       } else {
         for (let idx = 0; idx < 4; idx++) {
           row.push("");
@@ -669,13 +600,9 @@ exports.feedbackData = async (req, res) => {
       }
       if (userData.post1WeekQsEnded) {
         row.push(userData.post1WeekQ1Choice);
-        row.push(
-          userData.explanations1Week ? userData.explanations1Week[0] : ""
-        );
+        row.push(userData.explanations1Week ? userData.explanations1Week[0] : "");
         row.push(userData.post1WeekQ2Choice);
-        row.push(
-          userData.explanations1Week ? userData.explanations1Week[1] : ""
-        );
+        row.push(userData.explanations1Week ? userData.explanations1Week[1] : "");
       } else {
         for (let idx = 0; idx < 4; idx++) {
           row.push("");
@@ -683,12 +610,42 @@ exports.feedbackData = async (req, res) => {
       }
       rowsData.push(row);
     }
-    writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on(
-      "finish",
-      () => {
-        console.log("done process data!");
+    csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("done process data!");
+    });
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
+// Download the recall dataset in CSV
+exports.recallData = async (req, res) => {
+  try {
+    const rowsData = [["id", "Key Phrase", "Response", "Score out of 4"]];
+    const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
+    for (let recallGradeDoc of recallGradesDocs.docs) {
+      const recallGradeData = recallGradeDoc.data();
+      if (recallGradeData.grades.length >= 4) {
+        const row = [];
+        row.push(recallGradeDoc.id);
+        row.push(recallGradeData.phrase);
+        row.push(recallGradeData.response);
+        let score = 0;
+        for (let grade of recallGradeData.grades) {
+          score += grade;
+        }
+        if (score > 4) {
+          score = 4;
+        }
+        row.push(score);
+        rowsData.push(row);
       }
-    );
+    }
+    csv.writeToPath("datasets/recallData.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("Done!");
+    });
   } catch (err) {
     console.log({ err });
     return res.status(400).json({ err });
@@ -701,17 +658,14 @@ exports.feedbackData = async (req, res) => {
 // application and waiting for their response.
 // Email reminder emails to those applicatns who have completed the 3 experiment
 // sessions, but have not withdrawn or submitted any complete applications.
-exports.applicationReminder = async (context) => {
+exports.applicationReminder = async context => {
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     // Retrieve all the applicants who have completed the 3 experiment sessions.
-    const usersDocs = await db
-      .collection("users")
-      .where("projectDone", "==", true)
-      .get();
+    const usersDocs = await db.collection("users").where("projectDone", "==", true).get();
     // Array of information to be emailed to every applicant whose application
     // is incomplete.
     const reminders = [];
@@ -738,19 +692,15 @@ exports.applicationReminder = async (context) => {
           // accpeted or rejected it:
           if (!applicationData.accepted && !applicationData.rejected) {
             if (applicationData.communiId in needReview) {
-              needReview[applicationData.communiId].push(
-                applicationData.fullname
-              );
+              needReview[applicationData.communiId].push(applicationData.fullname);
             } else {
-              needReview[applicationData.communiId] = [
-                applicationData.fullname,
-              ];
+              needReview[applicationData.communiId] = [applicationData.fullname];
             }
           }
           if (applicationData.confirmed && !applicationData.invited) {
             needInvite.push({
               applicant: applicationData.fullname,
-              communiId: applicationData.communiId,
+              communiId: applicationData.communiId
             });
           }
         }
@@ -761,8 +711,7 @@ exports.applicationReminder = async (context) => {
           !userData.applicationSubmitted ||
           !("applicationsSubmitted" in userData) ||
           Object.keys(userData.applicationsSubmitted).length === 0) &&
-        (!("reminder" in userData) ||
-          userData.reminder.toDate() <= new Date()) &&
+        (!("reminder" in userData) || userData.reminder.toDate() <= new Date()) &&
         "createdAt" in userData &&
         userData.createdAt.toDate() > new Date("1-14-2022")
       ) {
@@ -779,10 +728,7 @@ exports.applicationReminder = async (context) => {
           //   const tutorialData = tutorialDoc.data();
           //   if ("ended" in tutorialData && tutorialData.ended) {
           let submittedOne = false;
-          const applicationDocs = await db
-            .collection("applications")
-            .where("fullname", "==", userDoc.id)
-            .get();
+          const applicationDocs = await db.collection("applications").where("fullname", "==", userDoc.id).get();
           for (let applicationDoc of applicationDocs.docs) {
             const applicationData = applicationDoc.data();
             if ("ended" in applicationData && applicationData.ended) {
@@ -798,7 +744,7 @@ exports.applicationReminder = async (context) => {
               subject: "Your 1Cademy Application is Incomplete!",
               content:
                 "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
-              hyperlink: "https://1cademy.us/home#JoinUsSection",
+              hyperlink: "https://1cademy.us/home#JoinUsSection"
             });
           }
           // } else {
@@ -832,10 +778,7 @@ exports.applicationReminder = async (context) => {
     // that they have not responded to yet.
     for (let communiId in needReview) {
       if (needReview[communiId].length > 0) {
-        const communityLeaderDocs = await db
-          .collection("users")
-          .where("leading", "array-contains", communiId)
-          .get();
+        const communityLeaderDocs = await db.collection("users").where("leading", "array-contains", communiId).get();
         for (let communityLeaderDoc of communityLeaderDocs.docs) {
           const communityLeaderData = communityLeaderDoc.data();
           // Because I am considered a leader in all communities.
