@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
-
+import axios from "axios";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
 
 import { firebaseState, emailState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
@@ -20,7 +22,7 @@ import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
-import CodeFeedback from "../CodeFeedback/CodeFeedback"
+import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import { LeaderBoard, ProjectPoints } from "./components";
 import { formatPoints } from "../../../utils";
 import ResearcherPassage from "../Passage-Research/ResearcherPassage";
@@ -28,7 +30,6 @@ import ResearcherPassage from "../Passage-Research/ResearcherPassage";
 import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
-
 const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "FreeRecallGrading"];
 
 const AdminAccessPages = [
@@ -43,7 +44,7 @@ const CommonPages = [
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
-  { page: "ResearcherPassage", view: <ResearcherPassage /> },
+  { page: "ResearcherPassage", view: <ResearcherPassage /> }
 ];
 
 const Activities = props => {
@@ -60,9 +61,25 @@ const Activities = props => {
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
-
+  const [onGoingEvents, setOnGoingEvents] = useState([]);
   const projectPoints = projectSpecs?.points || {};
 
+  useEffect(() => {
+    const getOngoingResearcherEvent = async () => {
+      try {
+        const response = await axios.post("/getOngoingResearcherEvent", { email });
+        if (response.status === 200) {
+          setOnGoingEvents(response.data);
+        }
+      } catch (err) {
+        console.log("Failed to load getOngoingResearcherEvent", err);
+      }
+    };
+
+    if (firebase && email) {
+      getOngoingResearcherEvent();
+    }
+  }, [firebase, email]);
   useEffect(() => {
     if (props.activityName && activePage !== props.activityName) {
       setActivePage(props.activityName);
@@ -111,12 +128,12 @@ const Activities = props => {
               expPoints = projectData.expPoints;
             }
             if (projectData.onePoints) {
-              totalPoints += projectData.onePoints;
-              onePoints += projectData.onePoints;
+              totalPoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.onePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.dayOneUpVotePoints) {
-              totalPoints += projectData.dayOneUpVotePoints;
-              onePoints += projectData.dayOneUpVotePoints;
+              totalPoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
+              onePoints += Math.round((projectData.dayOneUpVotePoints + Number.EPSILON) * 100) / 100;
             }
             if (projectData.points) {
               totalPoints += projectData.points;
@@ -300,6 +317,8 @@ const Activities = props => {
             researchers={researchers}
             isResearcherCriteriaMet={isResearcherCriteriaMet}
             makeResearcherChipContent={makeResearcherChipContent}
+            onGoingEvents={onGoingEvents}
+            setOnGoingEvents={setOnGoingEvents}
           />
         </div>
       )}

@@ -9,6 +9,7 @@ const {
   deleteUser,
   retrieveData,
   feedbackData,
+  recallData,
   loadContacts,
   reassignAllPConditionNums,
   applicationReminder
@@ -42,6 +43,8 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
+  lifeLogger,
+  getOngoingResearcherEvent,
   lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
@@ -68,12 +71,12 @@ app.use((req, res, next) => {
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadContacts", loadContacts);
-app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 // app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
+app.get("/recallData", recallData);
 app.post("/vote", voteEndpoint);
 app.post("/markPaid", markPaidEndpoint);
 app.post("/voteInstructor", voteInstructorEndpoint);
@@ -90,6 +93,7 @@ app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
 app.post("/schedule", schedule);
 app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
+app.post("/getOngoingResearcherEvent", getOngoingResearcherEvent);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
@@ -143,13 +147,13 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-// exports.updateTypesenseIndex = functions
-//   .runWith({
-//     memory: "1GB",
-//     timeoutSeconds: 520,
-//   })
-//   .pubsub.schedule("every 10 minutes")
-//   .onRun(updateTypesenseIndex);
+exports.inviteInstructors = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(inviteInstructors);
 
 // LifeLog:
 exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);

@@ -35,18 +35,21 @@ const MCQuestion = props => {
   const [codes, setCodes] = useState([]);
   const [newCode, setNewCode] = useState("");
   const [codeChoice, setCodeChoice] = useState([]);
+  const [codeChoice1, setCodeChoice1] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
   const [explanation, setExplanation] = useState("");
   const [choiceQuestion, setChoiceQuestion] = useState(false);
   const choice = choices[props.currentQIdx];
-  const [choiceFeedbackQuestions, setChoiceFeedbackQuestions] = useState("");
   const curQuestion = props.currentQIdx + 1;
   const size = props.questions.length;
   const nextAvailable = props.currentQIdx + 1 < props.questions.length || questionsLeft > 0;
+  const allowNextForQC =
+    (codeChoice.length === 0 && props.currentQIdx === 0) || (codeChoice1.length === 0 && props.currentQIdx === 1);
   const previousAvailable = props.currentQIdx !== 0;
   const [orderOfQuestions, setOrderOfQuestions] = useState([
     props.questions[Math.floor(Math.random() * props.questions.length)]
   ]);
+  const [random, setRandom] = useState(false);
   const postQuestion = props.questions[props.currentQIdx];
 
   const retrieveFeedbackcodes = async () => {
@@ -61,6 +64,13 @@ const MCQuestion = props => {
 
     setCodes(codesHere);
   };
+
+  useEffect(()=>{
+    if(props.currentQIdx===props.questions.length-1 ){
+      setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
+      props.setCurrentQIdx(0);
+    }
+  },[random])
 
   useEffect(() => {
     retrieveFeedbackcodes();
@@ -81,8 +91,17 @@ const MCQuestion = props => {
       }
       setAllAnswered(allAns);
       props.setOrderQuestions(orderOfQuestions);
+    }else{
+      let allAns = true;
+      for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
+        if (!choices[qIdx]) {
+          allAns = false;
+          qsLeft += 1;
+        }
+      }
+      setAllAnswered(allAns);
     }
-  }, [choices, choiceFeedbackQuestions, props.questions]);
+  }, [choices, props.questions]);
 
   const choiceChange = event => {
     setChoices(oldChoices => {
@@ -90,34 +109,36 @@ const MCQuestion = props => {
       newChoices[props.currentQIdx] = event.target.value;
       return newChoices;
     });
+    if(choiceQuestion){
+      const newExp = [...props.explanations];
+      newExp[props.currentQIdx].choice = postQuestion[event.target.value];
+      props.setExplanations(newExp);
+    }
   };
 
   const moveNext = () => {
     if (![5, 19].includes(props.step)) {
       const qsLeft = [];
+      let order = [...orderOfQuestions];
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
-        if (!orderOfQuestions.includes(props.questions[qIdx])) {
+        if (!order.includes(props.questions[qIdx])) {
           qsLeft.push(qIdx);
         }
       }
       if (qsLeft.length > 0 && props.currentQIdx === props.questions.length - 1) {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
-        let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
-        while (orderOfQuestions.includes(props.questions[randomizeNumberOfQuestion])) {
-          randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+        if(props.currentQIdx === order.length - 1){
+          let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          while (order.includes(props.questions[randomizeNumberOfQuestion])) {
+            randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
+          }
+          order.push(props.questions[randomizeNumberOfQuestion]);
+          setOrderOfQuestions(order);
         }
-        orderOfQuestions.push(props.questions[randomizeNumberOfQuestion]);
-        setOrderOfQuestions(orderOfQuestions);
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
-      setSelectCodes(false);
-      retrieveFeedbackcodes();
-      setExplanation("");
 
-      if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
-        setChoiceQuestion(true);
-      }
     } else {
       if (selectCodes) {
         const qsLeft = [];
@@ -135,7 +156,7 @@ const MCQuestion = props => {
         retrieveFeedbackcodes();
         setExplanation("");
 
-        if (props.currentQIdx === 1 && [5, 19].includes(props.step)) {
+        if (props.currentQIdx >=1) {
           setChoiceQuestion(true);
         }
       } else {
@@ -148,6 +169,9 @@ const MCQuestion = props => {
 
   const movePrevious = () => {
     props.setCurrentQIdx(oldCurrentQIdx => oldCurrentQIdx - 1);
+    if ([5, 19].includes(props.step)){
+      setChoiceQuestion(false);
+    }
   };
 
   const explanationsChange = event => {
@@ -193,7 +217,11 @@ const MCQuestion = props => {
     } else {
       newChecked.splice(currentIndex, 1);
     }
-    setCodeChoice(newChecked);
+    if (props.currentQIdx === 0) {
+      setCodeChoice(newChecked);
+    } else {
+      setCodeChoice1(newChecked);
+    }
     props.setExplanations(oldExp => {
       const newExp = [...oldExp];
       newExp[props.currentQIdx].codes = newChecked;
@@ -201,17 +229,10 @@ const MCQuestion = props => {
     });
   };
 
-  const submit = () => {
-    moveNext();
+  const submitAndContinue = () => {
+    props.nextStep();
+    setRandom(!random);
   };
-  const choiceFeedbackQuestion = event => {
-    setChoiceFeedbackQuestions(event.target.value);
-    const newExp = [...props.explanations];
-    newExp[props.currentQIdx].choice = postQuestion[event.target.value];
-    props.setExplanations(newExp);
-    setAllAnswered(true);
-  };
-
   return (
     <div
       style={
@@ -243,16 +264,10 @@ const MCQuestion = props => {
 
         <FormControl id="QuestionContent" component="fieldset">
           <FormLabel component="legend" style={{ whiteSpace: "pre-line" }}>
-            {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx].stem}
+            {[5, 19].includes(props.step) ? postQuestion.stem : orderOfQuestions[props.currentQIdx]?.stem}
           </FormLabel>
           {choiceQuestion ? (
-            <RadioGroup
-              id="ChoiceGroup"
-              aria-label="choice"
-              name="choice"
-              value={choiceFeedbackQuestions}
-              onChange={choiceFeedbackQuestion}
-            >
+            <RadioGroup id="ChoiceGroup" aria-label="choice" name="choice" value={choice} onChange={choiceChange}>
               {["a", "b"].map(opt => (
                 <FormControlLabel
                   key={opt}
@@ -314,7 +329,11 @@ const MCQuestion = props => {
                           <ListItemIcon>
                             <Checkbox
                               edge="start"
-                              checked={codeChoice.indexOf(value) !== -1}
+                              checked={
+                                props.currentQIdx === 0
+                                  ? codeChoice.indexOf(value) !== -1
+                                  : codeChoice1.indexOf(value) !== -1
+                              }
                               tabIndex={-1}
                               disableRipple
                               inputProps={{ "aria-labelledby": labelId }}
@@ -355,22 +374,26 @@ const MCQuestion = props => {
         </FormControl>
 
         <div id="QuestionFooter">
-          {selectCodes || ![5, 19].includes(props.step) ? (
+          {![5, 19].includes(props.step) ? (
             <Button
               id="QuestionNextBtn"
               onClick={moveNext}
-              disabled={!nextAvailable || choiceQuestion}
-              className={!nextAvailable || choiceQuestion ? "Button Disabled" : "Button"}
+              disabled={!nextAvailable}
+              className={!nextAvailable ? "Button Disabled" : "Button"}
               variant="contained"
             >
               Next
             </Button>
           ) : (
-            !choiceQuestion && (
-              <Button id="QuestionNextBtn" onClick={submit} disabled={false} className={"Button"} variant="contained">
-                Submit
-              </Button>
-            )
+            <Button
+              id="QuestionNextBtn"
+              onClick={moveNext}
+              disabled={!nextAvailable || (allowNextForQC && selectCodes)}
+              className={!nextAvailable || (allowNextForQC && selectCodes) ? "Button Disabled" : "Button"}
+              variant="contained"
+            >
+              {selectCodes ? "Next" : "Submit"}
+            </Button>
           )}
 
           <Button
@@ -391,7 +414,7 @@ const MCQuestion = props => {
         </p>
         <Button
           id="QuestionSubmitBtn"
-          onClick={props.nextStep}
+          onClick={submitAndContinue}
           disabled={!allAnswered}
           className={allAnswered ? "Button" : "Button Disabled"}
           variant="contained"

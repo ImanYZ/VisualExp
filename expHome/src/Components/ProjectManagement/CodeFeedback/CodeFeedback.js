@@ -104,6 +104,17 @@ const CodeFeedback = props => {
       }
     },
     {
+      field: "rejected",
+      headerName: "Reject",
+      renderCell: cellValues => {
+        return (
+          <div style={{ width: "100%", textAlign: "center", cursor: "pointer" }}>
+            {cellValues.value}
+          </div>
+        );
+      }
+    },
+    {
       field: "coder",
       headerName: "Coder",
       renderCell: cellValues => {
@@ -183,6 +194,7 @@ const CodeFeedback = props => {
           title: data && data.title ? data.title : '',
           question: data.question,
           checked: data.approved ? "✅" : "◻",
+          rejected:data.rejected ? "❌" :"◻",
         };
         allCodes.push(newCode);
         if (data.approved) {
@@ -315,6 +327,7 @@ const CodeFeedback = props => {
         code: newCode,
         coder: fullname,
         approved: false,
+        rejected:false,
         title: "Researcher",
         createdAt: firebase.firestore.Timestamp.fromDate(new Date())
       });
@@ -474,16 +487,48 @@ const CodeFeedback = props => {
 
         let codeUpdate = {
           ...codesAppData,
-          approved: !isChecked
+          approved: !isChecked,
+          rejected: isChecked
         };
         let collectionRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
         await collectionRef.update(codeUpdate);
 
         codesApp[appIdx] = {
           ...codesApp[appIdx],
-          checked: isChecked ? "◻" : "✅"
+          checked: isChecked ? "◻" : "✅",
+          rejected: isChecked ? "❌":"◻" 
         };
-        const msg = !isChecked ? "Code approved" : "Code disapproved";
+        const msg = !isChecked ? "Code approved" : "Code rejected";
+        setSnackbarMessage(msg);
+        setAllExperimentCodes(codesApp);
+      }
+    }
+    if (clickedCell.field === "rejected") {
+      let codesApp = [...allExperimentCodes];
+      const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
+      const isRejected = codesApp[appIdx][clickedCell.field] === "❌";
+
+      if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
+        const id = clickedCell.id;
+
+        const codesAppDoc = await firebase.db.collection("feedbackCodeBooks").doc(id).get();
+        const codesAppData = codesAppDoc.data();
+
+        let codeUpdate = {
+          ...codesAppData,
+          rejected: !isRejected,
+          checked: isRejected
+        };
+        let collectionRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
+        await collectionRef.update(codeUpdate);
+
+        codesApp[appIdx] = {
+          ...codesApp[appIdx],
+          rejected: isRejected ? "◻" : "❌",
+          checked: isRejected ?  "✅":"◻" 
+
+        };
+        const msg = !isRejected ? "Code rejected" : "Code approved";
         setSnackbarMessage(msg);
         setAllExperimentCodes(codesApp);
       }
