@@ -1018,7 +1018,9 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
   .get();
   const passageRef = db.collection("passages").doc(passage);
   const passageData = passageDoc.data();
-  let passageProjectUpdate = {...passageData.projects["H2K2"],"H2":(passageData.projects["H2K2"]["H2"]-passageNumberOfParticipant[passage]["H2"]),"K2":(passageData.projects["H2K2"]["K2"]-passageNumberOfParticipant[passage]["K2"])};
+  let passageProjectUpdate = {...passageData.projects["H2K2"],
+  "H2":(passageData.projects["H2K2"]["H2"]-passageNumberOfParticipant[passage]["H2"]),
+  "K2":(passageData.projects["H2K2"]["K2"]-passageNumberOfParticipant[passage]["K2"])};
   let passageUpdate = {
     ...passageData,
     projects:{
