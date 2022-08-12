@@ -1063,7 +1063,7 @@ const ManageEvents = props => {
   }
 
   return (
-    <div style={{ height: "100vh", overflowY: "auto" }}>
+    <div>
       <h3>Invited instructors : </h3>
       <div className="dataGridTable">
         <DataGrid
