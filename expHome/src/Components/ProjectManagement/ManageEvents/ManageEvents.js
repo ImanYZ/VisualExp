@@ -268,6 +268,20 @@ const applicantsColumns = [
 
 const istructorsComumns = [
   {
+    field: "interestedTopic",
+    headerName: "Interested Topic",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "votes",
+    headerName: "Up-votes - Down-votes",
+    width: 190,
+    type: "number"
+  },
+  {
     field: "instructor", // Their fullname
     headerName: "Instructor",
     width: 190,
@@ -284,21 +298,10 @@ const istructorsComumns = [
     }
   },
   {
-    field: "interestedTopic",
-    headerName: "Interested Topic",
-    width: 190,
-    renderCell: cellValues => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    }
-  },
-  {
     field: "reminders",
     headerName: "number Of reminder",
     type: "number",
-    width: 180,
-    renderCell: cellValues => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    }
+    width: 180
   },
   {
     field: "emailstatus",
@@ -402,6 +405,7 @@ const ManageEvents = props => {
           reminders: instructorData.reminders,
           nextReminder: instructorData.nextReminder ? instructorData.nextReminder.toDate() : "",
           id: instructorDoc.id,
+          votes: instructorData.upVotes - instructorData.downVotes,
           interestedTopic: instructorData.interestedTopic,
           scheduled: instructorData.yes ? "✅ " : "NO RESPONSE",
           emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",

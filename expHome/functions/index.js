@@ -65,7 +65,7 @@ app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
-// app.get("/retrieveData", retrieveData);
+app.get("/retrieveData", retrieveData);
 // app.get("/feedbackData", feedbackData);
 app.get("/recallData", recallData);
 app.post("/vote", voteEndpoint);
