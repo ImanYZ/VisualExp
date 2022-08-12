@@ -5,15 +5,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 
-const {
-  deleteUser,
-  retrieveData,
-  feedbackData,
-  recallData,
-  loadContacts,
-  reassignAllPConditionNums,
-  applicationReminder
-} = require("./users");
+const { deleteUser, retrieveData, feedbackData, recallData, applicationReminder } = require("./users");
 const {
   voteEndpoint,
   voteActivityReset,
@@ -43,7 +35,6 @@ const {
   allEvents,
   deleteEvent,
   scheduleLifeLog,
-  lifeLogger,
   getOngoingResearcherEvent,
   lifeLoggerScheduler,
   ongoingEvents
@@ -70,7 +61,7 @@ app.use((req, res, next) => {
 
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
-app.get("/loadContacts", loadContacts);
+app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
