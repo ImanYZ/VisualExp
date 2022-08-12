@@ -227,7 +227,7 @@ exports.inviteInstructors = async context => {
       const instructorData = instructorDoc.data();
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
-        instructorData.upVotes - instructorData.downVotes >= 3 &&
+        (instructorData?.upVotes || 0) - (instructorData?.downVotes || 0) >= 3 &&
         // We have not sent them any emails or less than 4 reminders
         (!instructorData.reminders || instructorData.reminders < 4) &&
         // Their next reminder is not scheduled yet, or it should have been sent before now.
