@@ -842,7 +842,7 @@ exports.deleteDamagedDocumentsOnFreeRecallGrades = async (req, res) => {
       console.log(documentsNumber);
       documentsNumber = documentsNumber + 40000;
       for (let recallGradeDoc of recallGradeDocs.docs) {
-         let recallGradeRef = db
+        let recallGradeRef = db
           .collection("recallGrades")
           .doc(recallGradeDoc.id);
         let recallGradeData = recallGradeDoc.data();
@@ -897,3 +897,330 @@ exports.deleteDamagedDocumentsOnFreeRecallGrades = async (req, res) => {
     return res.status(500).json({ err });
   }
 };
+
+
+exports.correctTheDataStructureForDamagedUsers = async (req,res) =>{
+  try{
+    let number = 0;
+    let usersDocs = await db
+    .collection("users")
+    .get();
+    for (let userDoc of usersDocs.docs) {
+      let userData = userDoc.data();
+
+    if(userData.pConditions){
+      if((userData.pConditions.passage ==="s1oo3G4n3jeE8fJQRs3g")){
+        number = number+1;
+        console.log(userData.project);
+        let pConditionsUpdate =[userData.pConditions];
+        let userUpdate = {
+            ...userData,
+            damagedDocument:true,
+            pConditions:pConditionsUpdate,
+          }
+        const recallGradeRef = db.collection("users").doc(userDoc.id);
+        // await batchUpdate(recallGradeRef, userUpdate);
+      }}
+    }
+    console.log(number);
+    // await commitBatch();
+  }catch(err){
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>{
+  try {
+    let damagedUsers=[];
+    let passagesUsers = {};
+    let damagedUsersDocs = await db
+    .collection("users")
+    .where("damagedDocument","==",true)
+    .get();
+    for(let userDoc of damagedUsersDocs.docs){
+      const userData = userDoc.data();
+      if(userData.explanations && userData.explanations1Week && userData.explanations3Days){
+        passagesUsers[userDoc.id] = [userData.pConditions[0].condition];
+      }
+      damagedUsers.push(userDoc.id);
+    }
+    console.log(damagedUsers);
+    let recallGradeDocsInitial = await db
+    .collection("recallGrades")
+    .orderBy("createdAt")
+    .limit(1)
+    .get();
+  let documentsNumber = 1;
+  let lastVisibleRecallGradesDoc =
+    recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
+  console.log("Starting");
+  while (lastVisibleRecallGradesDoc) {
+    recallGradeDocs = await db
+      .collection("recallGrades")
+      .orderBy("createdAt")
+      .startAfter(lastVisibleRecallGradesDoc)
+      .limit(40000)
+      .get();
+
+    console.log(documentsNumber);
+    documentsNumber = documentsNumber + 40000;
+    for (let recallGradeDoc of recallGradeDocs.docs) {
+      let recallGradeRef = db
+        .collection("recallGrades")
+        .doc(recallGradeDoc.id);
+      let recallGradeData = recallGradeDoc.data();
+      if (damagedUsers.includes(recallGradeData.user)) {
+        console.log(recallGradeDoc.id);
+
+        if(!(passagesUsers[recallGradeData.user].includes(recallGradeData.passage)) && Object.keys(passagesUsers).includes(recallGradeData.user)){
+          passagesUsers[recallGradeData.user].push(recallGradeData.passage);
+        }
+        // await batchDelete(recallGradeRef);
+      } 
+    }
+    lastVisibleRecallGradesDoc =
+    recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
+  }
+
+  let passageNumberOfParticipant = {};
+  for(let user of Object.keys(passagesUsers)){
+    for(let idx=0;idx<2;idx++){
+      if(!Object.keys(passageNumberOfParticipant).includes(passagesUsers[user][idx+1])){
+        passageNumberOfParticipant[passagesUsers[user][idx+1]]={"H2":0,"K2":0}
+      }
+    }
+  }
+
+  for(let user of Object.keys(passagesUsers)){
+    let condition;
+    let condition1=passagesUsers[user][0];
+    if(condition1 === "H2"){
+        condition = "K2";
+    }else{
+      condition = "H2";
+    }
+    for(let idx=0;idx<2;idx++){
+        let passage= passagesUsers[user][idx+1];
+        if(passage === "s1oo3G4n3jeE8fJQRs3g"){
+          passageNumberOfParticipant[passage][condition1] =passageNumberOfParticipant[passage][condition1]+1;
+        }else{
+          passageNumberOfParticipant[passage][condition] =passageNumberOfParticipant[passage][condition]+1;
+        }
+    }
+  }
+
+
+  for(let passage of Object.keys(passageNumberOfParticipant)){
+  let passageDoc = await db
+  .collection("passages")
+  .doc(passage)
+  .get();
+  const passageRef = db.collection("passages").doc(passage);
+  const passageData = passageDoc.data();
+  let passageProjectUpdate = {...passageData.projects["H2K2"],"H2":(passageData.projects["H2K2"]["H2"]-passageNumberOfParticipant[passage]["H2"]),"K2":(passageData.projects["H2K2"]["K2"]-passageNumberOfParticipant[passage]["K2"])};
+  let passageUpdate = {
+    ...passageData,
+    projects:{
+      ...passageData.projects,
+      "H2K2":passageProjectUpdate,
+    }
+  }
+  await batchUpdate(passageRef, passageUpdate);
+  }
+
+  // await commitBatch();
+  console.log("Done",Object.keys(passagesUsers).length);
+  return res.status(200).json({passagesUsers});
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+}
+
+["ANU ZAN"
+,"Aaditya Pillai"
+,"Aafia Alladin"
+,"Abhinav Anand"
+,"Abigail Post"
+,"Adeen Izzathullah"
+,"Adesewa Adebowale"
+,"Aidan Gauper"
+,"Ajinkya Bhanudas Dessai"
+,"Alexander Lee"
+,"Alexandra Gassel"
+,"Alexandra Liew"
+,"Alexis Ma"
+,"Alicia Lee"
+,"Alyssa McKinney"
+,"Amelia Henriques"
+,"Amelia Ostrow"
+,"Andrew Chen"
+,"Andrew Gu"
+,"Anh Dinh"
+,"Annalisse Thompson"
+,"Annie MacIntosh"
+,"Ardrian Sethra Tidwell"
+,"Arman Hemmat"
+,"Arthur Cho Ka Wai"
+,"Asia Luboyeski"
+,"Austin Zeng"
+,"Ayse Kamaci"
+,"Blythe Terry"
+,"Bronya Sandorffy"
+,"Candelas Distefano"
+,"Carson James Clark"
+,"Catherine Grillo"
+,"Catherine Kung"
+,"Chengtian Zhang"
+,"Chiara Casiglia"
+,"Christina Lin"
+,"Daniela Butkovic"
+,"Daniela Zubillaga"
+,"Danqi Li"
+,"David Lee"
+,"DeLante Blagburn"
+,"Delaney Riddering"
+,"Diksha Jothi"
+,"Divum Mittal"
+,"Dominique Sheldon"
+,"Dylan Brian McElroy"
+,"Eika Overton"
+,"Enna Castro"
+,"Erin Dickinson"
+,"Erin Utter"
+,"Esha Patel"
+,"Esha Raut"
+,"Esther Thielking"
+,"Evan Zane Hitsky"
+,"Everette Crudup"
+,"Gabrielle Calabrese"
+,"Govinda Lakshmanan"
+,"Grace Dwyer"
+,"Haley Felder"
+,"Haley Williams"
+,"Hanna Duncan"
+,"Hannah Pless"
+,"Hannah Ryniak"
+,"Haoran Zhang"
+,"Haoyuan Shi"
+,"Haozhen BO"
+,"Heather Bigeloq"
+,"HeeJoo Roh"
+,"Heidi Dargle"
+,"Hope Aspenleiter"
+,"Huijia Zheng"
+,"Hyerim Seo"
+,"Hyo Hong"
+,"Isabella Smith"
+,"Ivan Panergo"
+,"Jack Barron"
+,"Jahyun Koo"
+,"Jamile Munoz"
+,"Jasmine Wu"
+,"Jawairia aziz"
+,"Jeff Michael"
+,"Jenny Lee"
+,"Jenny Zhao"
+,"Jessica Bright"
+,"Jessica Cai"
+,"Jessica Savage"
+,"Jiejun Wang"
+,"Jingqi Zhu"
+,"Jingxian Zhou"
+,"Joel Andrew Garcia"
+,"John Paul O'Neill"
+,"Joseph Lutman"
+,"Joshua Butuyan"
+,"Julianna Nails"
+,"Justin McIntosh"
+,"Kaeli Fish"
+,"Katharine Collie"
+,"Katherine Wells"
+,"Keith Wu"
+,"Kelechi Eziri"
+,"Kevin Kwon"
+,"Kira Kunzman"
+,"Kyra Harris"
+,"Kyra finkelstein"
+,"Laura Garand"
+,"Leah O'Neill"
+,"Learned McLean Watson"
+,"Len Morelos-Zaragoza"
+,"Leo Pereira"
+,"Linge Yang"
+,"Liping Lin"
+,"Louai Massri"
+,"Lucy Sun"
+,"Maanasa Hanubal"
+,"Madeline Jacoby"
+,"Madison Teets"
+,"Manuela Monteiro Victorelli"
+,"Mara Lurie"
+,"Marina Alves"
+,"McKinzie Horoho"
+,"Melissa Ngai"
+,"Michelle Stern"
+,"Mingyu Li"
+,"Miranda Peak"
+,"Molly Guy"
+,"Molly Kraine"
+,"Mona Corinna Griesberg"
+,"NEHA PATEL"
+,"Natalie Fick"
+,"Natalie Sarmiento"
+,"Natasha Maria Treunen"
+,"Pooja Peravali"
+,"QIANWEN HU"
+,"Qi Zhou"
+,"Qingqing Yang"
+,"Qiuyuhong Lu"
+,"Qixuan Wei"
+,"Renee Kessler"
+,"Ricky Yu"
+,"Rima Jamaleddine"
+,"Ryan Green"
+,"Ryan Wilson"
+,"Sabria Jackson"
+,"Safah Bhatti"
+,"Samantha Wanamaker"
+,"Sara Skobac"
+,"Sarah Berland"
+,"Sarah Bost"
+,"Seungmin Baek"
+,"Shabana Gupta"
+,"Sharon Zhu"
+,"Shaw Qin"
+,"Shivani Lamba"
+,"Skyla Park"
+,"Sofia Diaz"
+,"Sofia Remelius"
+,"Sofia Thresher Ouenniche"
+,"Sophia Fanara"
+,"Sriamsha Dubbaka"
+,"Stephanie Sandoval"
+,"Tamanna Aujla"
+,"Tarun Prabhakar"
+,"Teuta Hoxha"
+,"Tewodros Taffese"
+,"Therese Streeter"
+,"Tiana Issa"
+,"Victoria Tran"
+,"Vy Nguyen"
+,"Winnifer Chen"
+,"Xinran Li"
+,"Xinyi Zhao"
+,"Yi Hung"
+,"Yicun Deng"
+,"Yifan Fang"
+,"Yirong Liang"
+,"Yiyang Guo"
+,"Zhuomin Chen"
+,"Ziyi Wang"
+,"Zoe Alarcon"
+,"Zoe Dunnum"
+,"jiarui chang"
+,"jingqiu Zhou"
+,"kelly bai"
+,"nirali asmani"
+,"ruohui xu"]
