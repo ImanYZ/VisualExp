@@ -938,6 +938,9 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
     .collection("users")
     .where("damagedDocument","==",true)
     .get();
+    //we go throught all the users damaged documets and we add object array element in the passagesUsers object 
+    //with the first element will be the condition of the passage "The Quiet Sideman"
+    
     for(let userDoc of damagedUsersDocs.docs){
       const userData = userDoc.data();
       if(userData.explanations && userData.explanations1Week && userData.explanations3Days){
@@ -945,7 +948,8 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
       }
       damagedUsers.push(userDoc.id);
     }
-    console.log(damagedUsers);
+
+//we get the first element of the recallGrades so we can go through all the recall grades documents
     let recallGradeDocsInitial = await db
     .collection("recallGrades")
     .orderBy("createdAt")
@@ -955,7 +959,9 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
   let lastVisibleRecallGradesDoc =
     recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
   console.log("Starting");
+  //we stay in the while loop as long as lastVisibleRecallGradesDoc is not undifined 
   while (lastVisibleRecallGradesDoc) {
+    //retreive 40000 document because that's the amount firebase can take without going on timeout 
     recallGradeDocs = await db
       .collection("recallGrades")
       .orderBy("createdAt")
@@ -965,11 +971,17 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
 
     console.log(documentsNumber);
     documentsNumber = documentsNumber + 40000;
+
+ 
+    //we go through the recallGrades documents and delete the documents associated with damagedUsers
     for (let recallGradeDoc of recallGradeDocs.docs) {
+
       let recallGradeRef = db
         .collection("recallGrades")
         .doc(recallGradeDoc.id);
+
       let recallGradeData = recallGradeDoc.data();
+      //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
       if (damagedUsers.includes(recallGradeData.user)) {
         console.log(recallGradeDoc.id);
 
@@ -983,6 +995,10 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>
     recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
   }
 
+
+//DONE WITH RECALLGRADES
+
+//---------start formating passages----------------//
   let passageNumberOfParticipant = {};
   for(let user of Object.keys(passagesUsers)){
     for(let idx=0;idx<2;idx++){
