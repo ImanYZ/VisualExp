@@ -155,7 +155,7 @@ exports.sendPersonalInvitations = async (req, res) => {
                 }"
                 width="420" height="37"><br></div></div></div>`
             };
-            transporter.sendMail(mailOptions, async (error, data) => {
+            return transporter.sendMail(mailOptions, async (error, data) => {
               if (error) {
                 console.log({ error });
                 return res.status(500).json({ error });
@@ -320,7 +320,7 @@ exports.inviteInstructors = async context => {
               }"
               width="420" height="37"><br></div></div></div>`
           };
-          transporter.sendMail(mailOptions, async (error, data) => {
+          return transporter.sendMail(mailOptions, async (error, data) => {
             if (error) {
               console.log({ error });
             } else {
