@@ -175,17 +175,10 @@ const MCQuestion = props => {
   };
 
   const explanationsChange = event => {
-    if (!choiceQuestion) {
       const newExp = [...props.explanations];
       newExp[props.currentQIdx].explanation = event.target.value;
       props.setExplanations(newExp);
       setExplanation(event.target.value);
-    } else {
-      const newExp = [...props.explanations];
-      newExp[props.currentQIdx].preferedFeedbackExplanation = event.target.value;
-      props.setExplanations(newExp);
-      setExplanation(event.target.value);
-    }
   };
 
   const codeChange = event => {
@@ -210,8 +203,15 @@ const MCQuestion = props => {
   };
 
   const choiceCodeChange = value => {
-    const currentIndex = codeChoice.indexOf(value);
-    const newChecked = [...codeChoice];
+    let currentIndex ;
+    let newChecked;
+    if (props.currentQIdx === 0) {
+      newChecked = [...codeChoice];
+      currentIndex = codeChoice.indexOf(value);
+    } else {
+      newChecked = [...codeChoice1];
+      currentIndex = codeChoice1.indexOf(value);
+    }
     if (currentIndex === -1) {
       newChecked.push(value);
     } else {
@@ -233,6 +233,8 @@ const MCQuestion = props => {
     props.nextStep();
     setRandom(!random);
   };
+  console.log(props.currentQIdx);
+  console.log(codeChoice1);
   return (
     <div
       style={
@@ -300,7 +302,7 @@ const MCQuestion = props => {
                 minRows={7}
                 placeholder={"Please Explain Why?"}
                 onChange={explanationsChange}
-                value={explanation}
+                value={props.explanations[props.currentQIdx].explanation}
               />
             </>
           ) : null}
