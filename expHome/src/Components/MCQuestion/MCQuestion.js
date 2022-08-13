@@ -37,7 +37,6 @@ const MCQuestion = props => {
   const [codeChoice, setCodeChoice] = useState([]);
   const [codeChoice1, setCodeChoice1] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
-  const [explanation, setExplanation] = useState("");
   const [choiceQuestion, setChoiceQuestion] = useState(false);
   const choice = choices[props.currentQIdx];
   const curQuestion = props.currentQIdx + 1;
@@ -56,7 +55,6 @@ const MCQuestion = props => {
     const experimentCodeDocs = await firebase.db
       .collection("feedbackCodeBooks")
       .where("approved", "==", true)
-      .where("project", "==", project)
       .where("question", "==", curQuestion)
       .where("title", "==", "Participant")
       .get();
@@ -65,12 +63,12 @@ const MCQuestion = props => {
     setCodes(codesHere);
   };
 
-  useEffect(()=>{
-    if(props.currentQIdx===props.questions.length-1 ){
+  useEffect(() => {
+    if (props.currentQIdx === props.questions.length - 1) {
       setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
       props.setCurrentQIdx(0);
     }
-  },[random])
+  }, [random]);
 
   useEffect(() => {
     retrieveFeedbackcodes();
@@ -91,7 +89,7 @@ const MCQuestion = props => {
       }
       setAllAnswered(allAns);
       props.setOrderQuestions(orderOfQuestions);
-    }else{
+    } else {
       let allAns = true;
       for (let qIdx = 0; qIdx < props.questions.length; qIdx++) {
         if (!choices[qIdx]) {
@@ -109,7 +107,7 @@ const MCQuestion = props => {
       newChoices[props.currentQIdx] = event.target.value;
       return newChoices;
     });
-    if(choiceQuestion){
+    if (choiceQuestion) {
       const newExp = [...props.explanations];
       newExp[props.currentQIdx].choice = postQuestion[event.target.value];
       props.setExplanations(newExp);
@@ -128,7 +126,7 @@ const MCQuestion = props => {
       if (qsLeft.length > 0 && props.currentQIdx === props.questions.length - 1) {
         props.setCurrentQIdx(qsLeft[0]);
       } else {
-        if(props.currentQIdx === order.length - 1){
+        if (props.currentQIdx === order.length - 1) {
           let randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
           while (order.includes(props.questions[randomizeNumberOfQuestion])) {
             randomizeNumberOfQuestion = Math.floor(Math.random() * props.questions.length);
@@ -138,7 +136,6 @@ const MCQuestion = props => {
         }
         props.setCurrentQIdx(props.currentQIdx + 1);
       }
-
     } else {
       if (selectCodes) {
         const qsLeft = [];
@@ -154,9 +151,9 @@ const MCQuestion = props => {
         }
         setSelectCodes(false);
         retrieveFeedbackcodes();
-        setExplanation("");
 
-        if (props.currentQIdx >=1) {
+
+        if (props.currentQIdx >= 1) {
           setChoiceQuestion(true);
         }
       } else {
@@ -169,16 +166,15 @@ const MCQuestion = props => {
 
   const movePrevious = () => {
     props.setCurrentQIdx(oldCurrentQIdx => oldCurrentQIdx - 1);
-    if ([5, 19].includes(props.step)){
+    if ([5, 19].includes(props.step)) {
       setChoiceQuestion(false);
     }
   };
 
   const explanationsChange = event => {
-      const newExp = [...props.explanations];
-      newExp[props.currentQIdx].explanation = event.target.value;
-      props.setExplanations(newExp);
-      setExplanation(event.target.value);
+    const newExp = [...props.explanations];
+    newExp[props.currentQIdx].explanation = event.target.value;
+    props.setExplanations(newExp);
   };
 
   const codeChange = event => {
@@ -203,7 +199,7 @@ const MCQuestion = props => {
   };
 
   const choiceCodeChange = value => {
-    let currentIndex ;
+    let currentIndex;
     let newChecked;
     if (props.currentQIdx === 0) {
       newChecked = [...codeChoice];
