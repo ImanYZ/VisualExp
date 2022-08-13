@@ -842,7 +842,7 @@ exports.deleteDamagedDocumentsOnFreeRecallGrades = async (req, res) => {
       console.log(documentsNumber);
       documentsNumber = documentsNumber + 40000;
       for (let recallGradeDoc of recallGradeDocs.docs) {
-         let recallGradeRef = db
+        let recallGradeRef = db
           .collection("recallGrades")
           .doc(recallGradeDoc.id);
         let recallGradeData = recallGradeDoc.data();
@@ -897,3 +897,161 @@ exports.deleteDamagedDocumentsOnFreeRecallGrades = async (req, res) => {
     return res.status(500).json({ err });
   }
 };
+
+
+exports.correctTheDataStructureForDamagedUsers = async (req,res) =>{
+  try{
+    let number = 0;
+    let usersDocs = await db
+    .collection("users")
+    .get();
+    for (let userDoc of usersDocs.docs) {
+      let userData = userDoc.data();
+
+    if(userData.pConditions){
+      if((userData.pConditions.passage ==="s1oo3G4n3jeE8fJQRs3g")){
+        number = number+1;
+        console.log(userData.project);
+        let pConditionsUpdate =[userData.pConditions];
+        let userUpdate = {
+            ...userData,
+            damagedDocument:true,
+            pConditions:pConditionsUpdate,
+          }
+        const recallGradeRef = db.collection("users").doc(userDoc.id);
+        // await batchUpdate(recallGradeRef, userUpdate);
+      }}
+    }
+    console.log(number);
+    // await commitBatch();
+  }catch(err){
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (req, res) =>{
+  try {
+    let damagedUsers=[];
+    let passagesUsers = {};
+    let damagedUsersDocs = await db
+    .collection("users")
+    .where("damagedDocument","==",true)
+    .get();
+    //we go throught all the users damaged documets and we add object array element in the passagesUsers object 
+    //with the first element will be the condition of the passage "The Quiet Sideman"
+    
+    for(let userDoc of damagedUsersDocs.docs){
+      const userData = userDoc.data();
+      if(userData.explanations && userData.explanations1Week && userData.explanations3Days){
+        passagesUsers[userDoc.id] = [userData.pConditions[0].condition];
+      }
+      damagedUsers.push(userDoc.id);
+    }
+
+//we get the first element of the recallGrades so we can go through all the recall grades documents
+    let recallGradeDocsInitial = await db
+    .collection("recallGrades")
+    .orderBy("createdAt")
+    .limit(1)
+    .get();
+  let documentsNumber = 1;
+  let lastVisibleRecallGradesDoc =
+    recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
+  console.log("Starting");
+  //we stay in the while loop as long as lastVisibleRecallGradesDoc is not undifined 
+  while (lastVisibleRecallGradesDoc) {
+    //retreive 40000 document because that's the amount firebase can take without going on timeout 
+    recallGradeDocs = await db
+      .collection("recallGrades")
+      .orderBy("createdAt")
+      .startAfter(lastVisibleRecallGradesDoc)
+      .limit(40000)
+      .get();
+
+    console.log(documentsNumber);
+    documentsNumber = documentsNumber + 40000;
+
+ 
+    //we go through the recallGrades documents and delete the documents associated with damagedUsers
+    for (let recallGradeDoc of recallGradeDocs.docs) {
+
+      let recallGradeRef = db
+        .collection("recallGrades")
+        .doc(recallGradeDoc.id);
+
+      let recallGradeData = recallGradeDoc.data();
+      //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
+      if (damagedUsers.includes(recallGradeData.user)) {
+        console.log(recallGradeDoc.id);
+
+        if(!(passagesUsers[recallGradeData.user].includes(recallGradeData.passage)) && Object.keys(passagesUsers).includes(recallGradeData.user)){
+          passagesUsers[recallGradeData.user].push(recallGradeData.passage);
+        }
+        // await batchDelete(recallGradeRef);
+      } 
+    }
+    lastVisibleRecallGradesDoc =
+    recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
+  }
+
+
+//DONE WITH RECALLGRADES
+
+//---------start formating passages----------------//
+  let passageNumberOfParticipant = {};
+  for(let user of Object.keys(passagesUsers)){
+    for(let idx=0;idx<2;idx++){
+      if(!Object.keys(passageNumberOfParticipant).includes(passagesUsers[user][idx+1])){
+        passageNumberOfParticipant[passagesUsers[user][idx+1]]={"H2":0,"K2":0}
+      }
+    }
+  }
+
+  for(let user of Object.keys(passagesUsers)){
+    let condition;
+    let condition1=passagesUsers[user][0];
+    if(condition1 === "H2"){
+        condition = "K2";
+    }else{
+      condition = "H2";
+    }
+    for(let idx=0;idx<2;idx++){
+        let passage= passagesUsers[user][idx+1];
+        if(passage === "s1oo3G4n3jeE8fJQRs3g"){
+          passageNumberOfParticipant[passage][condition1] =passageNumberOfParticipant[passage][condition1]+1;
+        }else{
+          passageNumberOfParticipant[passage][condition] =passageNumberOfParticipant[passage][condition]+1;
+        }
+    }
+  }
+
+
+  for(let passage of Object.keys(passageNumberOfParticipant)){
+  let passageDoc = await db
+  .collection("passages")
+  .doc(passage)
+  .get();
+  const passageRef = db.collection("passages").doc(passage);
+  const passageData = passageDoc.data();
+  let passageProjectUpdate = {...passageData.projects["H2K2"],
+  "H2":(passageData.projects["H2K2"]["H2"]-passageNumberOfParticipant[passage]["H2"]),
+  "K2":(passageData.projects["H2K2"]["K2"]-passageNumberOfParticipant[passage]["K2"])};
+  let passageUpdate = {
+    ...passageData,
+    projects:{
+      ...passageData.projects,
+      "H2K2":passageProjectUpdate,
+    }
+  }
+  await batchUpdate(passageRef, passageUpdate);
+  }
+
+  // await commitBatch();
+  console.log("Done",Object.keys(passagesUsers).length);
+  return res.status(200).json({passagesUsers});
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+}
