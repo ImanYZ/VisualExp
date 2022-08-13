@@ -4,7 +4,7 @@ const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
 
-const { getFullname, generateUID, nextWeek, capitalizeFirstLetter } = require("./utils");
+const { getFullname, generateUID, nextWeek, capitalizeFirstLetter, capitalizeSentence } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
 
@@ -266,7 +266,7 @@ exports.inviteInstructors = async context => {
             to: instructorData.email,
             subject: `A Large-scale Collaborative ${
               instructorData.GoogleScholar ? "Literature Review" : "Note-taking"
-            } Platform for ${instructorData.interestedTopic} Learning/Research`,
+            } Platform for ${capitalizeSentence(instructorData.interestedTopic)} Learning/Research`,
             html: `<p>Hello ${
               instructorData.prefix +
               ". " +
