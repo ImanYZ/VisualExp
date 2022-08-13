@@ -233,8 +233,6 @@ const MCQuestion = props => {
     props.nextStep();
     setRandom(!random);
   };
-  console.log(props.currentQIdx);
-  console.log(codeChoice1);
   return (
     <div
       style={
