@@ -19,7 +19,6 @@ const {
   deleteDamagedDocumentsOnFreeRecallGrades,
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
-  runit,
 } = require("./visualExp");
 
 const app = express();
