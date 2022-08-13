@@ -147,7 +147,7 @@ const App = () => {
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
     { explanation: "", codes: [] },
-    { preferedFeedbackExplanation: "", choice: "" }
+    { choice: "" ,explanation: ""}
   ]);
 
   const [birthDate, setBirthDate] = useState(null);
@@ -738,7 +738,8 @@ const App = () => {
         );
         setExplanations([
           { explanation: "", codes: [] },
-          { explanation: "", codes: [] }
+          { explanation: "", codes: [] },
+          { choice: "" ,explanation: ""}
         ]);
         setTimer(30 * 60);
         break;
