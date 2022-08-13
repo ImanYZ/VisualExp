@@ -3,10 +3,7 @@ const { admin, db } = require("./admin");
 // We're using fullname as id in some Firestore collections.
 // For these purposes, we need to escape some characters.
 const getFullname = (firstname, lastname) => {
-  return (firstname + " " + lastname)
-    .replace(".", "")
-    .replace("__", " ")
-    .replace("/", " ");
+  return (firstname + " " + lastname).replace(".", "").replace("__", " ").replace("/", " ");
 };
 
 const getActivityTimeStamps = (aDate, sTime, eTime) => {
@@ -40,7 +37,7 @@ const getIn30Minutes = (startTime, endTime) => {
   return timeSlots;
 };
 
-const strToBoolean = (str) => {
+const strToBoolean = str => {
   const str1 = str.toLowerCase();
   if (!str1 || str1 === "false" || str1 === "f") {
     return false;
@@ -56,20 +53,7 @@ const generateUID = () => {
       .substring(1);
   };
   //return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
-  return (
-    s4() +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    "-" +
-    s4() +
-    s4() +
-    s4()
-  );
+  return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
 };
 
 const datesAreOnSameDay = (first, second) =>
@@ -77,12 +61,12 @@ const datesAreOnSameDay = (first, second) =>
   first.getMonth() === second.getMonth() &&
   first.getDate() === second.getDate();
 
-const isToday = (theDate) => {
+const isToday = theDate => {
   const now = new Date();
   return datesAreOnSameDay(now, theDate);
 };
 
-const getDateString = (dateObj) => {
+const getDateString = dateObj => {
   const theDay = dateObj.getDate();
   const theMonth = dateObj.getMonth() + 1;
   return (
@@ -97,22 +81,28 @@ const getDateString = (dateObj) => {
 const nextWeek = () => {
   let nextWeek = new Date();
   nextWeek = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
-  nextWeek = new Date(
-    nextWeek.getFullYear(),
-    nextWeek.getMonth(),
-    nextWeek.getDate()
-  );
+  nextWeek = new Date(nextWeek.getFullYear(), nextWeek.getMonth(), nextWeek.getDate());
   return nextWeek;
 };
 
 // Removes leading and trailing whitespace from the string and capitalize its first character.
-const capitalizeFirstLetter = (string) => {
-  return (
-    string.trim().charAt(0).toUpperCase() + string.trim().slice(1).toLowerCase()
-  );
+const capitalizeFirstLetter = string => {
+  return string.trim().charAt(0).toUpperCase() + string.trim().slice(1).toLowerCase();
 };
 
-const pad2Num = (number) => {
+const capitalizeSentence = (string = "") => {
+  return string
+    .split(" ")
+    .map(letter => {
+      if (letter.length > 3) {
+        return capitalizeFirstLetter(letter);
+      }
+      return letter;
+    })
+    .join(" ");
+};
+
+const pad2Num = number => {
   return (number < 10 ? "0" : "") + number;
 };
 
@@ -127,5 +117,6 @@ module.exports = {
   getDateString,
   nextWeek,
   capitalizeFirstLetter,
-  pad2Num,
+  capitalizeSentence,
+  pad2Num
 };
