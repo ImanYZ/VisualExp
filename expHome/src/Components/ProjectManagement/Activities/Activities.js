@@ -120,6 +120,7 @@ const Activities = props => {
             let expPoints = 0;
             let onePoints = 0;
             let intellectualPoints = 0;
+            let intellectualVotingPoints = 0;
             let instructorsPoints = 0;
             let commentsPoints = 0;
             let gradingPoints = 0;
@@ -143,6 +144,10 @@ const Activities = props => {
               totalPoints += projectData.dayUpVotePoints;
               intellectualPoints += projectData.dayUpVotePoints;
             }
+            if (projectData.intellectualVotingPoints) {
+              totalPoints += projectData.intellectualVotingPoints;
+              intellectualVotingPoints += projectData.intellectualVotingPoints;
+            }
             if (projectData.instructors) {
               totalPoints += projectData.instructors;
               instructorsPoints += projectData.instructors;
@@ -162,6 +167,7 @@ const Activities = props => {
                 resears[reIdx].expPoints = expPoints;
                 resears[reIdx].onePoints = onePoints;
                 resears[reIdx].intellectualPoints = intellectualPoints;
+                resears[reIdx].intellectualVotingPoints = intellectualVotingPoints;
                 resears[reIdx].instructorsPoints = instructorsPoints;
                 resears[reIdx].commentsPoints = commentsPoints;
                 resears[reIdx].gradingPoints = gradingPoints;
@@ -176,6 +182,7 @@ const Activities = props => {
                 expPoints,
                 onePoints,
                 intellectualPoints,
+                intellectualVotingPoints,
                 instructorsPoints,
                 commentsPoints,
                 gradingPoints
@@ -207,9 +214,7 @@ const Activities = props => {
 
   const makeResearcherChipContent = resear => {
     const content = [];
-
     if (projectPoints.onePoints) {
-      console.log("projectPoints.onePoints");
       content.push(
         <>
           <img src={favicon} width="15.1" alt="1Cademy" />{" "}
@@ -221,7 +226,6 @@ const Activities = props => {
     }
 
     if (projectPoints.intellectualPoints) {
-      console.log("projectPoints.intellectualPoints");
       content.push(
         <span className={resear.intellectualPoints >= projectPoints.intellectualPoints ? "GreenText" : ""}>
           {"🎓 " + formatPoints(resear.intellectualPoints)}
@@ -229,8 +233,15 @@ const Activities = props => {
       );
     }
 
+    if (projectPoints.intellectualVotingPoints) {
+      content.push(
+        <span className={resear.intellectualVotingPoints >= projectPoints.intellectualVotingPoints ? "GreenText" : ""}>
+          {"🎓 ✅ " + formatPoints(resear.intellectualVotingPoints)}
+        </span>
+      );
+    }
+
     if (projectPoints.instructorsPoints) {
-      console.log("projectPoints.instructorsPoints");
       content.push(
         <span className={resear.instructorsPoints >= 100 ? "GreenText" : ""}>
           {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
@@ -261,8 +272,6 @@ const Activities = props => {
         </span>
       );
     }
-
-    console.log("makeResearcherChipContent", makeResearcherChipContent);
     return content.map((item, index) => {
       // if not last one append a " - "
       return content.length - 1 !== index ? (
@@ -302,7 +311,7 @@ const Activities = props => {
       {showLeaderBoard && (
         <div className="Columns40_60">
           <Alert severity="warning">
-            <ProjectPoints projectPoints={projectPoints} />
+            <ProjectPoints projectPoints={projectPoints} project={project} />
             <Button
               onClick={expandLeaderboard}
               className={expanded ? "Button Red" : "Button Green"}
