@@ -64,7 +64,8 @@ const AppRouter = props => {
       const currentTime = new Date().getTime();
       const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email).get();
       let duringSession = false;
-      let onGoingScheduleDoc = null;
+
+      let firtSessionDoc, secondSessionDoc, thirdSessionDoc;
       if (scheduleDocs.docs.length > 0) {
         for (let scheduleDoc of scheduleDocs.docs) {
           const scheduleData = scheduleDoc.data();
@@ -76,23 +77,31 @@ const AppRouter = props => {
             let maxTime = session + 60 * 60 * 1000;
             if (scheduleData.order === "1st") {
               maxTime = session + 90 * 60 * 1000;
+              firtSessionDoc = scheduleDoc;
             }
             if (currentTime >= minTime && currentTime <= maxTime) {
               duringSession = true;
               if (scheduleData.order === "2nd") {
                 setSecondSession(true);
-                onGoingScheduleDoc = scheduleDoc;
+                secondSessionDoc = scheduleDoc;
               } else if (scheduleData.order === "3rd") {
                 setThirdSession(true);
-                onGoingScheduleDoc = scheduleDoc;
+                thirdSessionDoc = scheduleDoc;
               }
             }
             if (currentTime >= session) {
               setStartedFirstSession(true);
-              onGoingScheduleDoc = scheduleDoc;
             }
           }
         }
+      }
+      let onGoingScheduleDoc = null;
+      if (thirdSessionDoc) {
+        onGoingScheduleDoc = thirdSessionDoc;
+      } else if (secondSessionDoc) {
+        onGoingScheduleDoc = secondSessionDoc;
+      } else {
+        onGoingScheduleDoc = firtSessionDoc;
       }
       setDuringAnExperiment(duringSession);
 

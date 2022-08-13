@@ -120,10 +120,10 @@ const ScheduleInstructorPage = props => {
 
   useEffect(() => {
     axios.post("/instructorYes", {
-      id: instructorId,
+      id: instructorId
     });
   }, []);
-  
+
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
@@ -308,7 +308,7 @@ const ScheduleInstructorPage = props => {
       responseObj = await axios.post("/schedule", {
         email: email.toLowerCase(),
         sessions,
-        project: userData.project
+        project: "Annotating"
       });
       errorAlert(responseObj.data);
 
