@@ -406,9 +406,6 @@ const AddInstructor = props => {
   const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
   const [otherInstructorData, setOtherInstructorData] = useState({});
 
-
-
-  
   useEffect(() => {
     setSelectedRows([]);
     setValues(initialState);
@@ -417,7 +414,7 @@ const AddInstructor = props => {
     setLastname("");
     setEmail("");
     setExplanation("");
-    CSCObjLoader(CSCObj,setCSCObj,setAllCountries);
+    CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
   }, [project]);
 
   // Load the array of all the institutions located in the US or Canada to load
@@ -1123,7 +1120,7 @@ const AddInstructor = props => {
             if (!updating) {
               // If they collect 7 instructors/school administrators' information
               // in a single day, we should giv them a point.
-              if (instructorsToday === 6 && dayInstructorsDocs.docs.length === 0) {
+              if (instructorsToday === 6 && dayInstructorsDocs.docs.length === 0 && project !== "H2L1") {
                 const dayInstructorRef = firebase.db.collection("dayInstructors").doc();
                 await dayInstructorRef.set({
                   project,
