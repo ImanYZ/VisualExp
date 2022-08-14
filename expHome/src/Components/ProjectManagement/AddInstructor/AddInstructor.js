@@ -421,7 +421,7 @@ const AddInstructor = props => {
     CSCObjLoader(CSCObj, setCSCObj, setAllCountries);
   }, [project]);
 
-  // Load the array of all the institutions located in the US or Canada to load
+  // Load the array of all the institutions located in the countries where English is the first language to load
   // in the drop-down menu.
   useEffect(() => {
     const loadInstitutions = async () => {
@@ -1546,8 +1546,8 @@ const AddInstructor = props => {
             <Alert className="VoteActivityAlert" severity="warning">
               <h2>Who to add:</h2>
               <p>
-                Enter a US-based college/university instructor/administrator's information that relate to our 1Cademy
-                communities:
+                Enter a college/university instructor/administrator's information, based in the countries where English
+                is the first language, which relates to our 1Cademy communities:
               </p>
               <ul>
                 {majors.map(maj => {
