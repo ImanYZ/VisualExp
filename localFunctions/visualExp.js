@@ -987,15 +987,16 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (
         //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
         if (damagedUsers.includes(recallGradeData.user)) {
           console.log(recallGradeDoc.id);
-
-          if (
-            !passagesUsers[recallGradeData.user].includes(
-              recallGradeData.passage
-            ) &&
-            recallGradeData.user in passagesUsers
-          ) {
-            passagesUsers[recallGradeData.user].push(recallGradeData.passage);
+          if (recallGradeData.user in passagesUsers) {
+            if (
+              !passagesUsers[recallGradeData.user].includes(
+                recallGradeData.passage
+              )
+            ) {
+              passagesUsers[recallGradeData.user].push(recallGradeData.passage);
+            }
           }
+
           await batchDelete(recallGradeRef);
         }
       }
@@ -1006,10 +1007,16 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (
     //DONE WITH RECALLGRADES
 
     //---------start formating passages----------------//
+    console.log("first");
     let passageNumberOfParticipant = {};
+
     for (let user in passagesUsers) {
+      console.log(user);
       for (let idx = 0; idx < 2; idx++) {
-        if (!passagesUsers[user][idx + 1] in passageNumberOfParticipant) {
+        if (
+          !(passagesUsers[user][idx + 1] in passageNumberOfParticipant) &&
+          passagesUsers[user][idx + 1]
+        ) {
           passageNumberOfParticipant[passagesUsers[user][idx + 1]] = {
             H2: 0,
             K2: 0,
@@ -1027,21 +1034,24 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (
         condition2 = "H2";
       }
       for (let idx = 0; idx < 2; idx++) {
-        let passage = passagesUsers[user][idx + 1];
-        if (passage === "s1oo3G4n3jeE8fJQRs3g") {
-          passageNumberOfParticipant[passage][condition1] =
-            passageNumberOfParticipant[passage][condition1] + 1;
-        } else {
-          passageNumberOfParticipant[passage][condition2] =
-            passageNumberOfParticipant[passage][condition2] + 1;
+        if (passagesUsers[user][idx + 1]) {
+          let passage = passagesUsers[user][idx + 1];
+          if (passage === "s1oo3G4n3jeE8fJQRs3g") {
+            passageNumberOfParticipant[passage][condition1] =
+              passageNumberOfParticipant[passage][condition1] + 1;
+          } else {
+            passageNumberOfParticipant[passage][condition2] =
+              passageNumberOfParticipant[passage][condition2] + 1;
+          }
         }
       }
     }
-
+    console.log({ passageNumberOfParticipant });
     for (let passage in passageNumberOfParticipant) {
       let passageDoc = await db.collection("passages").doc(passage).get();
       const passageRef = db.collection("passages").doc(passage);
       const passageData = passageDoc.data();
+      console.log(passage);
       let passageProjectUpdate = {
         ...passageData.projects["H2K2"],
         H2:
@@ -1053,17 +1063,17 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (
       };
       let passageUpdate = {
         ...passageData,
-        projects: {
+        "projects": {
           ...passageData.projects,
           H2K2: passageProjectUpdate,
         },
       };
+
       await batchUpdate(passageRef, passageUpdate);
     }
 
     await commitBatch();
     console.log("Done", Object.keys(passagesUsers).length);
-    return res.status(200).json({ passagesUsers });
   } catch (err) {
     console.log({ err });
     return res.status(500).json({ err });
