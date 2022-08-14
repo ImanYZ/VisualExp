@@ -2026,3 +2026,66 @@ exports.remindCalendarInvitations = async context => {
 //   }
 //   return null;
 // };
+
+exports.passagesNumberCorrection = async (req, res) => {
+  try {
+    let passageNumberOfParticipant = {};
+    let UsersDocs = await db.collection("users").get();
+    for (let userDoc of UsersDocs.docs) {
+      const userData = userDoc.data();
+      if (
+        userData.explanations &&
+        userData.explanations1Week &&
+        userData.explanations3Days &&
+        !userData.damagedDocument
+      ) {
+        for (let cond of userData.pConditions) {
+          if (passageNumberOfParticipant[cond.passage]) {
+            if (passageNumberOfParticipant[cond.passage][userData.project]) {
+              if (passageNumberOfParticipant[cond.passage][userData.project][cond.condition]) {
+                passageNumberOfParticipant[cond.passage][userData.project][cond.condition]++;
+              } else {
+                passageNumberOfParticipant[cond.passage] = {
+                  [userData.project]: {
+                    ...passageNumberOfParticipant[cond.passage][userData.project],
+                    [cond.condition]: 1
+                  }
+                };
+              }
+            } else {
+              passageNumberOfParticipant[cond.passage] = {
+                [userData.project]: {
+                  ...passageNumberOfParticipant[cond.passage][userData.project],
+                  [cond.condition]: 1
+                }
+              };
+            }
+          } else {
+            passageNumberOfParticipant[cond.passage] = {
+              [userData.project]: { [cond.condition]: 1 }
+            };
+          }
+        }
+      }
+    }
+    for (let passage in passageNumberOfParticipant) {
+      let passageDoc = await db.collection("passages").doc(passage).get();
+      const passageRef = db.collection("passages").doc(passage);
+      const passageData = passageDoc.data();
+      for (let project in passageNumberOfParticipant[passage]) {
+        let passageUpdate = {
+          ...passageData,
+          projects: {
+            ...passageData.projects,
+            [project]: passageNumberOfParticipant[passage][project]
+          }
+        };
+        await batchUpdate(passageRef, passageUpdate);
+      }
+    }
+    await commitBatch();
+    return res.status(200).json({ success: true, endpoint: "passagesNumberCorrection" });
+  } catch (err) {
+    return res.status(500).json({ err });
+  }
+};
