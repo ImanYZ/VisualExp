@@ -56,7 +56,6 @@ const MCQuestion = props => {
       .collection("feedbackCodeBooks")
       .where("approved", "==", true)
       .where("question", "==", curQuestion)
-      // .where("title", "==", "Participant")
       .get();
     const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
 
