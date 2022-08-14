@@ -37,7 +37,7 @@ export const ProjectPointThresholds = ({ projectPoints }) => {
           )}
           {projectPoints.dayInstructorUpVotes && (
             <li>
-              <strong>{projectPoints.dayInstructorUpVotes}</strong> 👨‍🏫 Voting instructor/administrator contact points
+              <strong>{projectPoints.dayInstructorUpVotes}</strong> 👨‍🏫 ✅ Voting instructor/administrator contact points
               and
             </li>
           )}
