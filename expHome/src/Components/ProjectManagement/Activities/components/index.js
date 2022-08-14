@@ -1,2 +1,2 @@
-export { ProjectPoints } from './ProjectPoints';
-export { LeaderBoard } from './LeaderBoard';
+export { ProjectPointThresholds } from "./ProjectPointThresholds";
+export { LeaderBoard } from "./LeaderBoard";

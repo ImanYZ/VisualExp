@@ -645,6 +645,9 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
       if (instructorDoc.exists && voterDoc.exists) {
         const voterData = voterDoc.data();
         const instructorData = instructorDoc.data();
+        const researcherRef = db.collection("researchers").doc(instructorData.fullname);
+        const researcherDoc = await t.get(researcherRef);
+        const researcherData = researcherDoc.data();
         const voteQuery = db
           .collection("instructorVotes")
           .where("instructor", "==", instructor)
@@ -731,6 +734,30 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           updatedAt: currentTime,
           id: voterRef.id
         });
+        const projectSpecsDoc = await db.collection("projectSpecs").doc(instructorData.project).get();
+        const projectPoints = projectSpecsDoc.data().points;
+        if ("instructorVotingPoints" in projectPoints) {
+          let instructors = 0;
+          if (researcherData.projects[instructorData.project].instructors) {
+            instructors = researcherData.projects[instructorData.project].instructors;
+          }
+          const researcherProjectUpdates = {
+            projects: {
+              ...researcherData.projects,
+              [instructorData.project]: {
+                ...researcherData.projects[instructorData.project],
+                instructors: instructors + upVoteVal / 10
+              }
+            }
+          };
+          t.update(researcherRef, researcherProjectUpdates);
+          const researcherLogRef = db.collection("researcherLogs").doc();
+          t.set(researcherLogRef, {
+            ...researcherProjectUpdates,
+            updatedAt: currentTime,
+            id: researcherRef.id
+          });
+        }
         let instructorUpVotes = 0;
         if (instructorData.upVotes) {
           instructorUpVotes = instructorData.upVotes;
