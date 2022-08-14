@@ -16,7 +16,8 @@ const {
   remindCalendarInvitations,
   // updateNotTakenSessions,
   bulkGradeFreeRecall,
-  markPaidEndpoint
+  markPaidEndpoint,
+  passagesNumberCalculate
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -145,6 +146,14 @@ exports.inviteInstructors = functions
   })
   .pubsub.schedule("every 25 hours")
   .onRun(inviteInstructors);
+
+exports.passagesNumberCalculate = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(passagesNumberCalculate);
 
 // LifeLog:
 exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
