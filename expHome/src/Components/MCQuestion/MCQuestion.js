@@ -55,6 +55,7 @@ const MCQuestion = props => {
     const experimentCodeDocs = await firebase.db
       .collection("feedbackCodeBooks")
       .where("approved", "==", true)
+      .where("title","==","Participant")
       .where("question", "==", curQuestion)
       .get();
     const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
