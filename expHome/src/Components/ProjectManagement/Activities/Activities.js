@@ -23,7 +23,7 @@ import AddInstructor from "../AddInstructor/AddInstructor";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 import CodeFeedback from "../CodeFeedback/CodeFeedback";
-import { LeaderBoard, ProjectPoints } from "./components";
+import { LeaderBoard, ProjectPointThresholds } from "./components";
 import { formatPoints } from "../../../utils";
 import ResearcherPassage from "../Passage-Research/ResearcherPassage";
 
@@ -54,15 +54,15 @@ const Activities = props => {
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
   const projects = useRecoilValue(projectsState);
-  const projectSpecs = useRecoilValue(projectSpecsState);
   const [activePage, setActivePage] = useRecoilState(activePageState);
   const notAResearcher = useRecoilValue(notAResearcherState);
+  const projectSpecs = useRecoilValue(projectSpecsState);
+  const projectPoints = projectSpecs?.points || {};
 
   const [researchers, setResearchers] = useState([]);
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [onGoingEvents, setOnGoingEvents] = useState([]);
-  const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
     const getOngoingResearcherEvent = async () => {
@@ -120,8 +120,9 @@ const Activities = props => {
             let expPoints = 0;
             let onePoints = 0;
             let intellectualPoints = 0;
-            let intellectualVotingPoints = 0;
+            let dayUpVotePoints = 0;
             let instructorsPoints = 0;
+            let dayInstructorUpVotes = 0;
             let commentsPoints = 0;
             let gradingPoints = 0;
             if (projectData.expPoints) {
@@ -142,11 +143,11 @@ const Activities = props => {
             }
             if (projectData.dayUpVotePoints) {
               totalPoints += projectData.dayUpVotePoints;
-              intellectualPoints += projectData.dayUpVotePoints;
-            }
-            if (projectData.intellectualVotingPoints) {
-              totalPoints += projectData.intellectualVotingPoints;
-              intellectualVotingPoints += projectData.intellectualVotingPoints;
+              if (projectPoints.dayUpVotePoints) {
+                dayUpVotePoints += projectData.dayUpVotePoints;
+              } else {
+                intellectualPoints += projectData.dayUpVotePoints;
+              }
             }
             if (projectData.instructors) {
               totalPoints += projectData.instructors;
@@ -154,7 +155,11 @@ const Activities = props => {
             }
             if (projectData.dayInstructorUpVotes) {
               totalPoints += projectData.dayInstructorUpVotes;
-              instructorsPoints += projectData.dayInstructorUpVotes;
+              if (projectPoints.dayInstructorUpVotes) {
+                dayInstructorUpVotes += projectData.dayInstructorUpVotes;
+              } else {
+                instructorsPoints += projectData.dayInstructorUpVotes;
+              }
             }
             if (projectData.gradingPoints) {
               totalPoints += projectData.gradingPoints;
@@ -167,8 +172,9 @@ const Activities = props => {
                 resears[reIdx].expPoints = expPoints;
                 resears[reIdx].onePoints = onePoints;
                 resears[reIdx].intellectualPoints = intellectualPoints;
-                resears[reIdx].intellectualVotingPoints = intellectualVotingPoints;
+                resears[reIdx].dayUpVotePoints = dayUpVotePoints;
                 resears[reIdx].instructorsPoints = instructorsPoints;
+                resears[reIdx].dayInstructorUpVotes = dayInstructorUpVotes;
                 resears[reIdx].commentsPoints = commentsPoints;
                 resears[reIdx].gradingPoints = gradingPoints;
                 foundResear = true;
@@ -182,8 +188,9 @@ const Activities = props => {
                 expPoints,
                 onePoints,
                 intellectualPoints,
-                intellectualVotingPoints,
+                dayUpVotePoints,
                 instructorsPoints,
+                dayInstructorUpVotes,
                 commentsPoints,
                 gradingPoints
               });
@@ -233,18 +240,26 @@ const Activities = props => {
       );
     }
 
-    if (projectPoints.intellectualVotingPoints) {
+    if (projectPoints.dayUpVotePoints) {
       content.push(
-        <span className={resear.intellectualVotingPoints >= projectPoints.intellectualVotingPoints ? "GreenText" : ""}>
-          {"🎓 ✅ " + formatPoints(resear.intellectualVotingPoints)}
+        <span className={resear.dayUpVotePoints >= projectPoints.dayUpVotePoints ? "GreenText" : ""}>
+          {"🎓 ✅ " + formatPoints(resear.dayUpVotePoints)}
         </span>
       );
     }
 
     if (projectPoints.instructorsPoints) {
       content.push(
-        <span className={resear.instructorsPoints >= 100 ? "GreenText" : ""}>
+        <span className={resear.instructorsPoints >= projectPoints.instructorsPoints ? "GreenText" : ""}>
           {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
+        </span>
+      );
+    }
+
+    if (projectPoints.dayInstructorUpVotes) {
+      content.push(
+        <span className={resear.dayInstructorUpVotes >= projectPoints.dayInstructorUpVotes ? "GreenText" : ""}>
+          {"👨‍🏫 ✅ " + formatPoints(resear.dayInstructorUpVotes)}
         </span>
       );
     }
@@ -257,6 +272,14 @@ const Activities = props => {
       );
     }
 
+    if (projectPoints.gradingPoints) {
+      content.push(
+        <span className={resear.gradingPoints >= projectPoints.gradingPoints ? "GreenText" : ""}>
+          {"🧠 " + formatPoints(resear.gradingPoints)}
+        </span>
+      );
+    }
+
     if (projectPoints.commentsPoints) {
       content.push(
         <span className={resear.commentsPoints >= projectPoints.commentsPoints ? "GreenText" : ""}>
@@ -265,13 +288,6 @@ const Activities = props => {
       );
     }
 
-    if (projectPoints.gradingPoints) {
-      content.push(
-        <span className={resear.gradingPoints >= projectPoints.gradingPoints ? "GreenText" : ""}>
-          {"🧠 " + formatPoints(resear.gradingPoints)}
-        </span>
-      );
-    }
     return content.map((item, index) => {
       // if not last one append a " - "
       return content.length - 1 !== index ? (
@@ -311,7 +327,7 @@ const Activities = props => {
       {showLeaderBoard && (
         <div className="Columns40_60">
           <Alert severity="warning">
-            <ProjectPoints projectPoints={projectPoints} project={project} />
+            <ProjectPointThresholds projectPoints={projectPoints} />
             <Button
               onClick={expandLeaderboard}
               className={expanded ? "Button Red" : "Button Green"}

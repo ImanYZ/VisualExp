@@ -924,18 +924,32 @@ const RouterNav = props => {
                     {projectPoints.instructorsPoints ? (
                       <Tooltip
                         title={
-                          <div>
+                          projectPoints.dayInstructorUpVotes ? (
                             <div>
-                              You've earned {instructorPoints + dayInstructorUpVotes} total points, including{" "}
-                              {instructorPoints} points for collecting instructors/administrators' contact info and{" "}
-                              {dayInstructorUpVotes} points for casting 25 up-voting per day on other's collected data.
+                              <div>
+                                You've earned {instructorPoints} instructor points from others' votes and{" "}
+                                {dayInstructorUpVotes} points for casting 16 upvotes per day on others' collected data.
+                              </div>
+                              <div>
+                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected
+                                instructors/administrators' data.
+                              </div>
                             </div>
-                            <div>You collected {instructorsToday} / 7 instructors/administrators' info today.</div>
+                          ) : (
                             <div>
-                              You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected
-                              instructors/administrators' data.
+                              <div>
+                                You've earned {instructorPoints + dayInstructorUpVotes} total points, including{" "}
+                                {instructorPoints} points for collecting instructors/administrators' contact info and{" "}
+                                {dayInstructorUpVotes} points for casting 16 up-voting per day on other's collected
+                                data.
+                              </div>
+                              <div>You collected {instructorsToday} / 7 instructors/administrators' info today.</div>
+                              <div>
+                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected
+                                instructors/administrators' data.
+                              </div>
                             </div>
-                          </div>
+                          )
                         }
                       >
                         <Button
@@ -943,8 +957,15 @@ const RouterNav = props => {
                           className={activePage === "AddInstructor" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/AddInstructor")}
                         >
-                          👨‍🏫 {instructorPoints + dayInstructorUpVotes} <br /> 🌞 {instructorsToday} / 7
-                          <br /> ✅ {upvotedInstructorsToday} / 16
+                          👨‍🏫{" "}
+                          {projectPoints.dayInstructorUpVotes
+                            ? instructorPoints
+                            : instructorPoints + dayInstructorUpVotes}{" "}
+                          <br />{" "}
+                          {projectPoints.dayInstructorUpVotes
+                            ? "✔ " + dayInstructorUpVotes
+                            : "🌞 " + instructorsToday + " / 7"}
+                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {upvotedInstructorsToday} / 16
                         </Button>
                       </Tooltip>
                     ) : null}
