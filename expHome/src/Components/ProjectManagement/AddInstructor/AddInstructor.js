@@ -25,6 +25,7 @@ import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
 import {
   projectState,
+  projectSpecsState,
   instructorsState,
   othersInstructorsState,
   instructorsTodayState,
@@ -342,6 +343,9 @@ const AddInstructor = props => {
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
+  const projectSpecs = useRecoilValue(projectSpecsState);
+  const projectPoints = projectSpecs?.points || {};
+
   // The instructors/school administrators added by this authenticated
   // researcher
   const [instructors, setInstructors] = useRecoilState(instructorsState);
@@ -1120,7 +1124,11 @@ const AddInstructor = props => {
             if (!updating) {
               // If they collect 7 instructors/school administrators' information
               // in a single day, we should giv them a point.
-              if (instructorsToday === 6 && dayInstructorsDocs.docs.length === 0 && project !== "H2L1") {
+              if (
+                instructorsToday === 6 &&
+                dayInstructorsDocs.docs.length === 0 &&
+                "instructorVotingPoints" in projectPoints
+              ) {
                 const dayInstructorRef = firebase.db.collection("dayInstructors").doc();
                 await dayInstructorRef.set({
                   project,
