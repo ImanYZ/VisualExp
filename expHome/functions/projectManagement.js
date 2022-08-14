@@ -861,6 +861,233 @@ exports.voteInstructorReset = async (req, res) => {
   }
 };
 
+const voteAdministratorFn = async (voter, administrator, vote, comment) => {
+  try {
+    const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+    await db.runTransaction(async t => {
+      const voterRef = db.collection("researchers").doc(voter);
+      const voterDoc = await t.get(voterRef);
+      const administratorRef = db.collection("administrators").doc(administrator);
+      const administratorDoc = await t.get(administratorRef);
+      if (administratorDoc.exists && voterDoc.exists) {
+        const voterData = voterDoc.data();
+        const administratorData = administratorDoc.data();
+        const researcherRef = db.collection("researchers").doc(administratorData.fullname);
+        const researcherDoc = await t.get(researcherRef);
+        const researcherData = researcherDoc.data();
+        const voteQuery = db
+          .collection("administratorVotes")
+          .where("administrator", "==", administrator)
+          .where("voter", "==", voter)
+          .limit(1);
+        const voteDocs = await t.get(voteQuery);
+        let upVote = false;
+        let downVote = false;
+        let newUpVote = vote === "upVote";
+        let newDownVote = vote === "downVote";
+        let voteRef, voteData, newVoteData;
+        if (voteDocs.docs.length > 0) {
+          voteRef = db.collection("administratorVotes").doc(voteDocs.docs[0].id);
+          voteData = voteDocs.docs[0].data();
+          ({ upVote, downVote } = voteData);
+          if (newUpVote) {
+            newUpVote = !upVote;
+            newDownVote = false;
+          } else if (newDownVote) {
+            newUpVote = false;
+            newDownVote = !downVote;
+          }
+          newVoteData = {
+            upVote: newUpVote,
+            downVote: newDownVote,
+            updatedAt: currentTime
+          };
+          if (comment) {
+            newVoteData.comment = comment;
+          }
+          t.update(voteRef, newVoteData);
+        } else {
+          voteRef = db.collection("administratorVotes").doc();
+          newVoteData = {
+            fullname: administratorData.fullname,
+            administrator,
+            project: administratorData.project,
+            upVote: newUpVote,
+            downVote: newDownVote,
+            voter,
+            createdAt: currentTime
+          };
+          if (comment) {
+            newVoteData.comment = comment;
+          }
+          t.set(voteRef, newVoteData);
+        }
+        const voteLogRef = db.collection("administratorVoteLogs").doc();
+        t.set(voteLogRef, {
+          ...newVoteData,
+          id: voteRef.id
+        });
+        let upVoteVal = 0;
+        let downVoteVal = 0;
+        if (vote === "upVote") {
+          upVoteVal = upVote ? -1 : 1;
+          downVoteVal = downVote ? -1 : 0;
+        } else if (vote === "downVote") {
+          upVoteVal = upVote ? -1 : 0;
+          downVoteVal = downVote ? -1 : 1;
+        }
+        let upVotes = 0;
+        if (voterData.projects[administratorData.project].administratorUpVotes) {
+          upVotes = voterData.projects[administratorData.project].administratorUpVotes;
+        }
+        let downVotes = 0;
+        if (voterData.projects[administratorData.project].administratorDownVotes) {
+          downVotes = voterData.projects[administratorData.project].administratorDownVotes;
+        }
+        const voterProjectUpdates = {
+          projects: {
+            ...voterData.projects,
+            [administratorData.project]: {
+              ...voterData.projects[administratorData.project],
+              administratorUpVotes: upVotes + upVoteVal,
+              administratorDownVotes: downVotes + downVoteVal
+            }
+          }
+        };
+        t.update(voterRef, voterProjectUpdates);
+        const voterLogRef = db.collection("researcherLogs").doc();
+        t.set(voterLogRef, {
+          ...voterProjectUpdates,
+          updatedAt: currentTime,
+          id: voterRef.id
+        });
+        const projectSpecsDoc = await db.collection("projectSpecs").doc(administratorData.project).get();
+        const projectPoints = projectSpecsDoc.data().points;
+        if ("administratorVotingPoints" in projectPoints) {
+          let administrators = 0;
+          if (researcherData.projects[administratorData.project].administrators) {
+            administrators = researcherData.projects[administratorData.project].administrators;
+          }
+          const researcherProjectUpdates = {
+            projects: {
+              ...researcherData.projects,
+              [administratorData.project]: {
+                ...researcherData.projects[administratorData.project],
+                administrators: administrators + upVoteVal / 10
+              }
+            }
+          };
+          t.update(researcherRef, researcherProjectUpdates);
+          const researcherLogRef = db.collection("researcherLogs").doc();
+          t.set(researcherLogRef, {
+            ...researcherProjectUpdates,
+            updatedAt: currentTime,
+            id: researcherRef.id
+          });
+        }
+        let administratorUpVotes = 0;
+        if (administratorData.upVotes) {
+          administratorUpVotes = administratorData.upVotes;
+        }
+        let administratorDownVotes = 0;
+        if (administratorData.downVotes) {
+          administratorDownVotes = administratorData.downVotes;
+        }
+        const administratorUpdates = {
+          upVotes: administratorUpVotes + upVoteVal,
+          downVotes: administratorDownVotes + downVoteVal
+        };
+        if (comment) {
+          if (!("comments" in administratorData)) {
+            administratorUpdates.comments = [comment];
+          } else if (voteData && voteData.comment !== comment) {
+            administratorUpdates.comments = administratorData.comments.filter(comm => comm !== voteData.comment);
+            administratorUpdates.comments.push(comment);
+          }
+        }
+        t.update(administratorRef, administratorUpdates);
+        const administratorLogRef = db.collection("administratorLogs").doc();
+        t.set(administratorLogRef, {
+          id: administratorRef.id,
+          updatedAt: currentTime,
+          ...administratorUpdates
+        });
+      }
+    });
+  } catch (e) {
+    console.log("Transaction failure:", e);
+  }
+};
+
+exports.voteAdministratorEndpoint = async (req, res) => {
+  try {
+    const administrator = req.body.administrator;
+    const vote = req.body.vote;
+    const comment = req.body.comment;
+    if (administrator && vote) {
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
+      if (userDocs.docs.length > 0) {
+        await voteAdministratorFn(userDocs.docs[0].id, administrator, vote, comment);
+      }
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ errMsg: err.message });
+  }
+};
+
+exports.voteAdministratorReset = async (req, res) => {
+  try {
+    const administrator = req.body.administrator;
+    if (administrator) {
+      const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
+      const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
+      if (userDocs.docs.length > 0) {
+        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        await db.runTransaction(async t => {
+          const administratorRef = db.collection("administrators").doc(administrator);
+          const administratorDoc = await t.get(administratorRef);
+          if (administratorDoc.exists) {
+            const voteQuery = db.collection("administratorVotes").where("administrator", "==", administrator);
+            const voteDocs = await t.get(voteQuery);
+            for (let voteDoc of voteDocs.docs) {
+              const voteRef = db.collection("administratorVotes").doc(voteDoc.id);
+              const newVoteData = {
+                upVote: false,
+                downVote: false,
+                updatedAt: currentTime
+              };
+              t.update(voteRef, newVoteData);
+              const voteLogRef = db.collection("administratorVoteLogs").doc();
+              t.set(voteLogRef, {
+                ...newVoteData,
+                id: voteRef.id
+              });
+            }
+            const administratorUpdates = {
+              upVotes: 0,
+              downVotes: 0
+            };
+            t.update(administratorRef, administratorUpdates);
+            const administratorLogRef = db.collection("administratorLogs").doc();
+            t.set(administratorLogRef, {
+              id: administratorRef.id,
+              updatedAt: currentTime,
+              ...administratorUpdates
+            });
+          }
+        });
+      }
+    }
+    return res.status(200).json({});
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ errMsg: err.message });
+  }
+};
+
 // exports.addInstructorsNums = async (req, res) => {
 //   try {
 //     const instructorsNums = {};
@@ -2043,19 +2270,13 @@ exports.passagesNumberCorrection = async (req, res) => {
           if (passageNumberOfParticipant[cond.passage]) {
             if (passageNumberOfParticipant[cond.passage][userData.project]) {
               if (passageNumberOfParticipant[cond.passage][userData.project][cond.condition]) {
-                passageNumberOfParticipant[cond.passage][userData.project][cond.condition]++;
+                passageNumberOfParticipant[cond.passage][userData.project][cond.condition] += 1;
               } else {
-                passageNumberOfParticipant[cond.passage][userData.project] = {
-                  ...passageNumberOfParticipant[cond.passage][userData.project],
-                  [cond.condition]: 1
-              };
+                passageNumberOfParticipant[cond.passage][userData.project][cond.condition] = 1;
               }
             } else {
-              passageNumberOfParticipant[cond.passage] = {
-                [userData.project]: {
-                  ...passageNumberOfParticipant[cond.passage][userData.project],
-                  [cond.condition]: 1
-                }
+              passageNumberOfParticipant[cond.passage][userData.project] = {
+                [cond.condition]: 1
               };
             }
           } else {
@@ -2067,12 +2288,11 @@ exports.passagesNumberCorrection = async (req, res) => {
       }
     }
     for (let passage in passageNumberOfParticipant) {
-      let passageDoc = await db.collection("passages").doc(passage).get();
       const passageRef = db.collection("passages").doc(passage);
+      const passageDoc = await passageRef.get();
       const passageData = passageDoc.data();
       for (let project in passageNumberOfParticipant[passage]) {
         let passageUpdate = {
-          ...passageData,
           projects: {
             ...passageData.projects,
             [project]: passageNumberOfParticipant[passage][project]

@@ -17,7 +17,7 @@ const {
   // updateNotTakenSessions,
   bulkGradeFreeRecall,
   markPaidEndpoint,
-  passagesNumberCalculate
+  passagesNumberCorrection
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -67,6 +67,7 @@ app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 app.get("/retrieveData", retrieveData);
+app.get("/passagesNumberCorrection", passagesNumberCorrection);
 // app.get("/feedbackData", feedbackData);
 app.get("/recallData", recallData);
 app.post("/vote", voteEndpoint);
@@ -147,13 +148,13 @@ exports.inviteInstructors = functions
   .pubsub.schedule("every 25 hours")
   .onRun(inviteInstructors);
 
-exports.passagesNumberCalculate = functions
+exports.passagesNumberCorrection = functions
   .runWith({
     memory: "1GB",
     timeoutSeconds: 520
   })
   .pubsub.schedule("every 25 hours")
-  .onRun(passagesNumberCalculate);
+  .onRun(passagesNumberCorrection);
 
 // LifeLog:
 exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
