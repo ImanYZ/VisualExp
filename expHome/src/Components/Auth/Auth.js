@@ -211,11 +211,22 @@ const Auth = props => {
 
       // passages that contains the current project
       let passagesDocs = passagesResult.docs.filter(p => currentProject in p.data()?.projects);
-      // randomize Array order
-      passagesDocs = shuffleArray(passagesDocs);
+
       const minPConditions = [];
-      conditions.forEach((con, i) => {
-        minPConditions.push({ condition: con, passage: passagesDocs[i].id });
+      const assigned = {};
+
+      conditions.forEach(con => {
+        // sort the passages in ascending order according to the current pcondition
+        const sortedPassages = [...passagesDocs].sort((a, b) => {
+          return (a.data().projects?.[currentProject]?.[con] || 0) - (b.data().projects?.[currentProject]?.[con] || 0);
+        });
+        for (let p of sortedPassages) {
+          if (!assigned[p.id]) {
+            minPConditions.push({ condition: con, passage: p.id });
+            assigned[p.id] = true;
+            break;
+          }
+        }
       });
 
       // setting up a null passage that is not in minPConditions.

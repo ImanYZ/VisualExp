@@ -372,7 +372,7 @@ const SchedulePage = props => {
         <ul>
           {selectedSession.map((session, i) => {
             return (
-              <li>
+              <li key={session}>
                 {i + 1}
                 <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
                 {sessionFormatter(
