@@ -20,6 +20,7 @@ import ExpenseReports from "../IntellectualPoints/ExpenseReports";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
+import AddAdministrator from "../AddAdministrator/AddAdministrator";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 import CodeFeedback from "../CodeFeedback/CodeFeedback";
@@ -30,7 +31,7 @@ import ResearcherPassage from "../Passage-Research/ResearcherPassage";
 import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
-const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "FreeRecallGrading"];
+const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "AddAdministrator", "FreeRecallGrading"];
 
 const AdminAccessPages = [
   { page: "Intellectual", view: <ExpenseReports /> },
@@ -41,6 +42,7 @@ const CommonPages = [
   { page: "Intellectual", view: <IntellectualPoints /> },
   { page: "Experiments", view: <ExperimentPoints /> },
   { page: "AddInstructor", view: <AddInstructor /> },
+  { page: "AddAdministrator", view: <AddAdministrator /> },
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
@@ -123,6 +125,8 @@ const Activities = props => {
             let dayUpVotePoints = 0;
             let instructorsPoints = 0;
             let dayInstructorUpVotes = 0;
+            let administratorsPoints = 0;
+            let dayAdministratorUpVotes = 0;
             let commentsPoints = 0;
             let gradingPoints = 0;
             if (projectData.expPoints) {
@@ -161,6 +165,18 @@ const Activities = props => {
                 instructorsPoints += projectData.dayInstructorUpVotes;
               }
             }
+            if (projectData.administrators) {
+              totalPoints += projectData.administrators;
+              administratorsPoints += projectData.administrators;
+            }
+            if (projectData.dayAdministratorUpVotes) {
+              totalPoints += projectData.dayAdministratorUpVotes;
+              if (projectPoints.dayAdministratorUpVotes) {
+                dayAdministratorUpVotes += projectData.dayAdministratorUpVotes;
+              } else {
+                administratorsPoints += projectData.dayAdministratorUpVotes;
+              }
+            }
             if (projectData.gradingPoints) {
               totalPoints += projectData.gradingPoints;
               gradingPoints += projectData.gradingPoints;
@@ -175,6 +191,8 @@ const Activities = props => {
                 resears[reIdx].dayUpVotePoints = dayUpVotePoints;
                 resears[reIdx].instructorsPoints = instructorsPoints;
                 resears[reIdx].dayInstructorUpVotes = dayInstructorUpVotes;
+                resears[reIdx].administratorsPoints = administratorsPoints;
+                resears[reIdx].dayAdministratorUpVotes = dayAdministratorUpVotes;
                 resears[reIdx].commentsPoints = commentsPoints;
                 resears[reIdx].gradingPoints = gradingPoints;
                 foundResear = true;
@@ -191,6 +209,8 @@ const Activities = props => {
                 dayUpVotePoints,
                 instructorsPoints,
                 dayInstructorUpVotes,
+                administratorsPoints,
+                dayAdministratorUpVotes,
                 commentsPoints,
                 gradingPoints
               });
@@ -260,6 +280,22 @@ const Activities = props => {
       content.push(
         <span className={resear.dayInstructorUpVotes >= projectPoints.dayInstructorUpVotes ? "GreenText" : ""}>
           {"👨‍🏫 ✅ " + formatPoints(resear.dayInstructorUpVotes)}
+        </span>
+      );
+    }
+
+    if (projectPoints.administratorsPoints) {
+      content.push(
+        <span className={resear.administratorsPoints >= projectPoints.administratorsPoints ? "GreenText" : ""}>
+          {"💼 " + formatPoints(resear.administratorsPoints)}
+        </span>
+      );
+    }
+
+    if (projectPoints.dayAdministratorUpVotes) {
+      content.push(
+        <span className={resear.dayAdministratorUpVotes >= projectPoints.dayAdministratorUpVotes ? "GreenText" : ""}>
+          {"💼 ✅ " + formatPoints(resear.dayAdministratorUpVotes)}
         </span>
       );
     }
