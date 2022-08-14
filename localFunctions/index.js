@@ -19,7 +19,6 @@ const {
   deleteDamagedDocumentsOnFreeRecallGrades,
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
-  passagesNumberCorrection,
 } = require("./visualExp");
 
 const app = express();
@@ -42,11 +41,19 @@ app.get("/deleteDuplicatesWithNoVotes", deleteDuplicatesWithNoVotes);
 app.get("/deleteDuplicatesWithVotes", deleteDuplicatesWithVotes);
 app.get("/addDoneFeildToRecallGrades", addDoneFeildToRecallGrades);
 app.get("/deleteIncompleteRecallGrades", deleteIncompleteRecallGrades);
-app.get("/restructureFeedBackCode",restructureFeedBackCode);
-app.get("/deleteDamagedDocumentsOnFreeRecallGrades",deleteDamagedDocumentsOnFreeRecallGrades);
-app.get("/correctTheDataStructureForDamagedUsers",correctTheDataStructureForDamagedUsers);
-app.get("/deleteDamageDocumentForAffectedUsersInRecallGrades",deleteDamageDocumentForAffectedUsersInRecallGrades);
-app.get("/passagesNumberCorrection",passagesNumberCorrection);
+app.get("/restructureFeedBackCode", restructureFeedBackCode);
+app.get(
+  "/deleteDamagedDocumentsOnFreeRecallGrades",
+  deleteDamagedDocumentsOnFreeRecallGrades
+);
+app.get(
+  "/correctTheDataStructureForDamagedUsers",
+  correctTheDataStructureForDamagedUsers
+);
+app.get(
+  "/deleteDamageDocumentForAffectedUsersInRecallGrades",
+  deleteDamageDocumentForAffectedUsersInRecallGrades
+);
 
 const port = 8080;
 app.listen(port, () => {
