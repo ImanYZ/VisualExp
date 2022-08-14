@@ -2045,17 +2045,17 @@ exports.passagesNumberCorrection = async (req, res) => {
               if (passageNumberOfParticipant[cond.passage][userData.project][cond.condition]) {
                 passageNumberOfParticipant[cond.passage][userData.project][cond.condition]++;
               } else {
-                passageNumberOfParticipant[cond.passage] = {
-                  [userData.project]: {
-                    ...passageNumberOfParticipant[cond.passage][userData.project],
-                    [cond.condition]: 1
-                  }
-                };
-              }
-            } else {
-              passageNumberOfParticipant[cond.passage][userData.project] = {
+                passageNumberOfParticipant[cond.passage][userData.project] = {
                   ...passageNumberOfParticipant[cond.passage][userData.project],
                   [cond.condition]: 1
+              };
+              }
+            } else {
+              passageNumberOfParticipant[cond.passage] = {
+                [userData.project]: {
+                  ...passageNumberOfParticipant[cond.passage][userData.project],
+                  [cond.condition]: 1
+                }
               };
             }
           } else {
