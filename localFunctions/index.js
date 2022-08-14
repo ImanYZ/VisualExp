@@ -19,6 +19,7 @@ const {
   deleteDamagedDocumentsOnFreeRecallGrades,
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
+  passagesNumberCorrection,
 } = require("./visualExp");
 
 const app = express();
@@ -45,6 +46,7 @@ app.get("/restructureFeedBackCode",restructureFeedBackCode);
 app.get("/deleteDamagedDocumentsOnFreeRecallGrades",deleteDamagedDocumentsOnFreeRecallGrades);
 app.get("/correctTheDataStructureForDamagedUsers",correctTheDataStructureForDamagedUsers);
 app.get("/deleteDamageDocumentForAffectedUsersInRecallGrades",deleteDamageDocumentForAffectedUsersInRecallGrades);
+app.get("/passagesNumberCorrection",passagesNumberCorrection);
 
 const port = 8080;
 app.listen(port, () => {
