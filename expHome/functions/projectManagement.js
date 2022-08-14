@@ -2053,11 +2053,9 @@ exports.passagesNumberCorrection = async (req, res) => {
                 };
               }
             } else {
-              passageNumberOfParticipant[cond.passage] = {
-                [userData.project]: {
+              passageNumberOfParticipant[cond.passage][userData.project] = {
                   ...passageNumberOfParticipant[cond.passage][userData.project],
                   [cond.condition]: 1
-                }
               };
             }
           } else {
