@@ -33,7 +33,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-import CSCObjLoader from "./CSCObjLoader";
+import CSCObjLoader from "../../CountryStateCity/CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 

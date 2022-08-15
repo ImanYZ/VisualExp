@@ -783,7 +783,7 @@ const AddAdministrator = props => {
   const howToAddressChange = event => {
     let hName = event.target.value;
     hName = hName.replace(/[0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;\.:[\]]/gi, "");
-    setLastname(hName);
+    setHowToAddress(hName);
   };
 
   const emailChange = event => {
