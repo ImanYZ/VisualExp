@@ -684,7 +684,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           newVoteData = {
             fullname: instructorData.fullname,
             instructor,
-            project: instructorData.project,
+            project: voterData.project,
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
@@ -710,18 +710,18 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           downVoteVal = downVote ? -1 : 1;
         }
         let upVotes = 0;
-        if (voterData.projects[instructorData.project].instructorUpVotes) {
-          upVotes = voterData.projects[instructorData.project].instructorUpVotes;
+        if (voterData.projects[voterData.project].instructorUpVotes) {
+          upVotes = voterData.projects[voterData.project].instructorUpVotes;
         }
         let downVotes = 0;
-        if (voterData.projects[instructorData.project].instructorDownVotes) {
-          downVotes = voterData.projects[instructorData.project].instructorDownVotes;
+        if (voterData.projects[voterData.project].instructorDownVotes) {
+          downVotes = voterData.projects[voterData.project].instructorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
             ...voterData.projects,
-            [instructorData.project]: {
-              ...voterData.projects[instructorData.project],
+            [voterData.project]: {
+              ...voterData.projects[voterData.project],
               instructorUpVotes: upVotes + upVoteVal,
               instructorDownVotes: downVotes + downVoteVal
             }
@@ -734,18 +734,18 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           updatedAt: currentTime,
           id: voterRef.id
         });
-        const projectSpecsDoc = await db.collection("projectSpecs").doc(instructorData.project).get();
+        const projectSpecsDoc = await db.collection("projectSpecs").doc(researcherData.project).get();
         const projectPoints = projectSpecsDoc.data().points;
-        if ("instructorVotingPoints" in projectPoints) {
+        if ("dayInstructorUpVotes" in projectPoints) {
           let instructors = 0;
-          if (researcherData.projects[instructorData.project].instructors) {
-            instructors = researcherData.projects[instructorData.project].instructors;
+          if (researcherData.projects[researcherData.project].instructors) {
+            instructors = researcherData.projects[researcherData.project].instructors;
           }
           const researcherProjectUpdates = {
             projects: {
               ...researcherData.projects,
-              [instructorData.project]: {
-                ...researcherData.projects[instructorData.project],
+              [researcherData.project]: {
+                ...researcherData.projects[researcherData.project],
                 instructors: instructors + upVoteVal / 10
               }
             }
@@ -911,7 +911,7 @@ const voteAdministratorFn = async (voter, administrator, vote, comment) => {
           newVoteData = {
             fullname: administratorData.fullname,
             administrator,
-            project: administratorData.project,
+            project: voterData.project,
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
@@ -937,18 +937,18 @@ const voteAdministratorFn = async (voter, administrator, vote, comment) => {
           downVoteVal = downVote ? -1 : 1;
         }
         let upVotes = 0;
-        if (voterData.projects[administratorData.project].administratorUpVotes) {
-          upVotes = voterData.projects[administratorData.project].administratorUpVotes;
+        if (voterData.projects[voterData.project].administratorUpVotes) {
+          upVotes = voterData.projects[voterData.project].administratorUpVotes;
         }
         let downVotes = 0;
-        if (voterData.projects[administratorData.project].administratorDownVotes) {
-          downVotes = voterData.projects[administratorData.project].administratorDownVotes;
+        if (voterData.projects[voterData.project].administratorDownVotes) {
+          downVotes = voterData.projects[voterData.project].administratorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
             ...voterData.projects,
-            [administratorData.project]: {
-              ...voterData.projects[administratorData.project],
+            [voterData.project]: {
+              ...voterData.projects[voterData.project],
               administratorUpVotes: upVotes + upVoteVal,
               administratorDownVotes: downVotes + downVoteVal
             }
@@ -961,18 +961,18 @@ const voteAdministratorFn = async (voter, administrator, vote, comment) => {
           updatedAt: currentTime,
           id: voterRef.id
         });
-        const projectSpecsDoc = await db.collection("projectSpecs").doc(administratorData.project).get();
+        const projectSpecsDoc = await db.collection("projectSpecs").doc(researcherData.project).get();
         const projectPoints = projectSpecsDoc.data().points;
-        if ("administratorVotingPoints" in projectPoints) {
+        if ("dayAdministratorUpVotes" in projectPoints) {
           let administrators = 0;
-          if (researcherData.projects[administratorData.project].administrators) {
-            administrators = researcherData.projects[administratorData.project].administrators;
+          if (researcherData.projects[researcherData.project].administrators) {
+            administrators = researcherData.projects[researcherData.project].administrators;
           }
           const researcherProjectUpdates = {
             projects: {
               ...researcherData.projects,
-              [administratorData.project]: {
-                ...researcherData.projects[administratorData.project],
+              [researcherData.project]: {
+                ...researcherData.projects[researcherData.project],
                 administrators: administrators + upVoteVal / 10
               }
             }
