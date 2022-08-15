@@ -764,7 +764,8 @@ const AddAdministrator = props => {
         await axios.post("/voteAdministrator", {
           administrator: administratorId,
           vote: voteType,
-          comment
+          comment,
+          voterProject: project
         });
         setSnackbarMessage("You successfully voted for others' administrator!");
         setOtherVoting(false);
