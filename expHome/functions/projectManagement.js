@@ -644,6 +644,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
       const instructorDoc = await t.get(instructorRef);
       if (instructorDoc.exists && voterDoc.exists) {
         const voterData = voterDoc.data();
+        console.log(voterData);
         const instructorData = instructorDoc.data();
         const researcherRef = db.collection("researchers").doc(instructorData.fullname);
         const researcherDoc = await t.get(researcherRef);
@@ -684,7 +685,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           newVoteData = {
             fullname: instructorData.fullname,
             instructor,
-            project: voterData.project,
+            project: instructorData.project,
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
@@ -693,6 +694,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           if (comment) {
             newVoteData.comment = comment;
           }
+          console.log({newVoteData});
           t.set(voteRef, newVoteData);
         }
         const voteLogRef = db.collection("instructorVoteLogs").doc();
@@ -710,18 +712,18 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           downVoteVal = downVote ? -1 : 1;
         }
         let upVotes = 0;
-        if (voterData.projects[voterData.project].instructorUpVotes) {
+        if (voterData.projects[instructorData.project].instructorUpVotes) {
           upVotes = voterData.projects[voterData.project].instructorUpVotes;
         }
         let downVotes = 0;
-        if (voterData.projects[voterData.project].instructorDownVotes) {
-          downVotes = voterData.projects[voterData.project].instructorDownVotes;
+        if (voterData.projects[instructorData.project].instructorDownVotes) {
+          downVotes = voterData.projects[instructorData.project].instructorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
             ...voterData.projects,
-            [voterData.project]: {
-              ...voterData.projects[voterData.project],
+            [instructorData.project]: {
+              ...voterData.projects[instructorData.project],
               instructorUpVotes: upVotes + upVoteVal,
               instructorDownVotes: downVotes + downVoteVal
             }
@@ -801,6 +803,7 @@ exports.voteInstructorEndpoint = async (req, res) => {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
+        console.log("documentPath",userDocs.docs[0].id,instructor,vote,comment)
         await voteInstructorFn(userDocs.docs[0].id, instructor, vote, comment);
       }
     }
