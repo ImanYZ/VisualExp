@@ -43,7 +43,7 @@ import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
 import "./AddInstructor.css";
 
-const CountryStateCity = React.lazy(() => import("./CountryStateCity/CountryStateCity"));
+const CountryStateCity = React.lazy(() => import("../../CountryStateCity/CountryStateCity"));
 
 const prefixes = [
   "1st Lt",
@@ -74,8 +74,6 @@ const prefixes = [
   "Sister"
 ];
 
-const occupations = ["Instructor", "Administrator"];
-
 // From https://www.act.org/content/act/en/research/reports/act-publications/college-choice-report-class-of-2013/college-majors-and-occupational-choices/college-majors-and-occupational-choices.html
 // Later on, add other majors.
 // const majors = [
@@ -97,7 +95,6 @@ const initialState = {
   stateInfo: "Michigan;MI;US",
   city: "Ann Arbor",
   major: "",
-  occupation: "Instructor",
   position: "",
   prefix: "Prof",
   webURL: "",
@@ -188,14 +185,6 @@ let instructorsColumns = [
   {
     field: "interestedTopic",
     headerName: "Topic of Interest",
-    width: 130,
-    renderCell: cellValues => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    }
-  },
-  {
-    field: "occupation",
-    headerName: "Occupation",
     width: 130,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -1028,7 +1017,6 @@ const AddInstructor = props => {
         stateInfo: theRow.stateInfo,
         city: theRow.city,
         major: theRow.major,
-        occupation: theRow.occupation,
         position: theRow.position,
         prefix: theRow.prefix,
         webURL: theRow.webURL,
@@ -1343,9 +1331,7 @@ const AddInstructor = props => {
                 otherInstructor.email}
             </p>
             <p>
-              {otherInstructor.occupation +
-                "/" +
-                otherInstructor.position +
+              {otherInstructor.position +
                 " in 1Cademy Community: " +
                 otherInstructor.major +
                 ", from " +
@@ -1639,25 +1625,6 @@ const AddInstructor = props => {
               value={email}
               onKeyPress={onKeyPress}
             />
-            <FormControl className="Select">
-              <InputLabel id="OccupationSelectLabel">Occupation:</InputLabel>
-              <Select
-                labelId="OccupationSelectLabel"
-                id="OccupationSelect"
-                value={values.occupation}
-                label="Occupation"
-                name="occupation"
-                onChange={handleChange}
-              >
-                {occupations.map(pref => {
-                  return (
-                    <MenuItem key={pref} value={pref}>
-                      {pref}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
             <TextField
               className="TextField"
               label="position"

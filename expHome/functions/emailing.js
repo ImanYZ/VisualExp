@@ -11,12 +11,25 @@ const { signatureHTML } = require("./emailSignature");
 require("dotenv").config();
 
 const getNameFormatted = async (email, firstname) => {
-  //if the instructor with this email exists then format according to the instructor's format
+  // If the instructor with this email exists then format according to the instructor's format
   const instructorDocs = await db.collection("instructors").where("email", "==", email).get();
   let isInstructor = instructorDocs.docs.length > 0;
 
+  // If the administrator with this email exists then format according to the administrator's format
+  const administratorDocs = await db.collection("administrators").where("email", "==", email).get();
+  let isAdministrator = administratorDocs.docs.length > 0;
+
   let nameString = `<p>Hi ${capitalizeFirstLetter(firstname)},</p>`;
-  if (isInstructor) {
+  if (isAdministrator) {
+    const administratorData = administratorDocs.docs[0].data();
+    nameString = `<p>Hello ${
+      administratorData.prefix +
+      ". " +
+      capitalizeFirstLetter(administratorData.firstname) +
+      " " +
+      capitalizeFirstLetter(administratorData.lastname)
+    },</p>`;
+  } else if (isInstructor) {
     const instructorData = instructorDocs.docs[0].data();
     nameString = `<p>Hello ${
       instructorData.prefix +
@@ -92,6 +105,23 @@ const emailOpenedInstructor = async instructorId => {
 // 2) Return the UMSI logo as a response stream.
 exports.loadImageProfessor = (req, res) => {
   emailOpenedInstructor(req.params.instructorId);
+  loadUmichLogo(res);
+};
+
+// When an administrator opens their email, we should log it in administrators collection.
+const emailOpenedAdministrator = async administratorId => {
+  const contactRef = db.collection("administrators").doc(administratorId);
+  await contactRef.update({
+    openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
+    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+  });
+};
+
+// When an administrator opens their email, we should:
+// 1) Log it in administrators collection
+// 2) Return the UMSI logo as a response stream.
+exports.loadImageAdministrator = (req, res) => {
+  emailOpenedAdministrator(req.params.administratorId);
   loadUmichLogo(res);
 };
 
@@ -211,6 +241,97 @@ const communityTitles = {
 };
 
 // This should be called by a pubsub scheduler every 25 hours.
+// It reads all the documents from the administrators collection.
+// For each of them that meet the criteria, randomizes them into one of
+// our experimental conditions and sends them personalized invitation
+// and reminder emails.
+// The algorithm is explained at emailing.drawio
+exports.inviteAdministrators = async context => {
+  try {
+    // We don't want to send many emails at once, because it may drive Gmail crazy.
+    // waitTime keeps increasing for every email that should be sent and in a setTimeout
+    // postpones sending the next email until the next waitTime.
+    let waitTime = 0;
+    const administratorDocs = await db.collection("administrators").get();
+    for (let administratorDoc of administratorDocs.docs) {
+      const administratorData = administratorDoc.data();
+      if (
+        // Only those administrators whose information is verified by at least 3 other researchers.
+        (administratorData?.upVotes || 0) - (administratorData?.downVotes || 0) >= 3 &&
+        // We have not sent them any emails or less than 4 reminders
+        (!administratorData.reminders || administratorData.reminders < 4) &&
+        // Their next reminder is not scheduled yet, or it should have been sent before now.
+        (!administratorData.nextReminder || administratorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
+        // They have not already clicked any of the options in their email.
+        !administratorData.yes &&
+        !administratorData.no &&
+        !administratorData.alreadyTalked &&
+        administratorData.howToAddress
+      ) {
+        // We don't want to send many emails at once, because it may drive Gmail crazy.
+        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
+        // postpones sending the next email until the next waitTime.
+        setTimeout(async () => {
+          const mailOptions = {
+            from: process.env.EMAIL,
+            to: administratorData.email,
+            subject: `Offering Student Internships for Large-scale Collaborative Learning/Research`,
+            html: `<p>Hello ${capitalizeFirstLetter(administratorData.howToAddress)},</p>
+              <p></p>
+              <p>We are a research group at the University of Michigan, School of Information. We would like to invite your students to join our online research communities and collaborate with us on research literature review on topics of their interest.</p>
+              <p></p>
+              <p>We have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.us/home" target="_blank">on this page</a>). So far, out of more than 10,000 students who applied, 1,490 talented students from 144 schools have joined 1Cademy to collaboratively summarize, visualize, and present books and research papers. You can check out our existing research communities <a href="https://1cademy.us/home#CommunitiesSection" target="_blank">on this page</a> and search through <a href="https://node.1cademy.us" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students. We also have community leadership opportunities for qualified students to lead our existing communities or establish new research communities.</p>
+              <p></p>
+              <p>We would like to ask if you can kindly inform your students about our online research opportunities, so they can apply through <a href="https://1cademy.us/home" target="_blank">the 1Cademy homepage</a>.</p>
+              <p>Reply to this email if you have any questions or concerns.</p>
+              <p></p>
+              <p>Best regards,</p>
+              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://ci3.googleusercontent.com/mail-sig/AIorK4w7H_RAY7i2tZlCbQFzUtOTVBnQeAR7ux4pYFodxivEpW9gcO9n3PRiYVBWSYjiTNpx5Kaw9C4" data-os="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Behavioral Economics &amp; Social Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare<div><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare</div><div><b><a href="https://1cademy.us/community/Educational_Organizational_Psychology" target="_blank">Organization/Educational Psychology</a> - </b>Desiree Mayrie Comer</div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Sarah Licht, Viktoria Roshchin<br></div><b><a href="https://youtu.be/73Uk2Nsgbgg" target="_blank"></a></b><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b></div><div><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a>- Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div><div><a href="https://1cademy.us/community/Financial_Technology" target="_blank"><b>Financial Technology</b></a>- Xinrong Yao</div></div><div><div><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Rishabh Verma<br></div></div><a href="https://1cademy.us/community/Graph_Neural_Network" target="_blank"><b>Graph Neural Networks</b></a>- Tian Yan</div></div></div><div><div><a href="https://1cademy.us/community/Computer_Vision" target="_blank"><b>Computer Vision</b></a>- Adam Nik<br></div><b></b></div><div><a href="https://1cademy.us/community/Responsible_AI" target="_blank"><b>Responsible AI</b></a>- Lanjing Ye<br></div><div><b>R&amp;D</b> - Iman YeckehZaare<br></div><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
+              <img src="https://1cademy.us/api/loadImage/administrator/${
+                // For tracking when they open their email.
+                // Note that the email clients that cache emails like those on iPad or Outlook open the content
+                // of the emails without the user's knowlege, so those would be false positives for us.
+                administratorDoc.id + "/" + generateUID()
+              }"
+              width="420" height="37"><br></div></div></div>`
+          };
+          return transporter.sendMail(mailOptions, async (error, data) => {
+            if (error) {
+              console.log({ error });
+            } else {
+              // // minCondNum === -1 signals that we had previously assigned a condition to
+              // // the administrator and we do not need to assign any experimental conditions again.
+              // if (minCondNum !== -1) {
+              //   // If the email is successfully sent:
+              //   // 1) Update the num value in the corresponding administratorConditions document;
+              //   const administratorConditionRef = db.collection("administratorConditions").doc(minCondition);
+              //   await administratorConditionRef.update({
+              //     num: admin.firestore.FieldValue.increment(1)
+              //   });
+              // }
+              // 2) Update the corresponding administrator document.
+              const administratorRef = db.collection("administrators").doc(administratorDoc.id);
+              await administratorRef.update({
+                // condition: minCondition,
+                emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
+                reminders: admin.firestore.FieldValue.increment(1),
+                // The next reminder should be sent one week later.
+                nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
+                updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+              });
+            }
+          });
+        }, waitTime);
+        // Increase waitTime by a random integer between 1 to 4 seconds.
+        waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+      }
+    }
+  } catch (err) {
+    console.log({ err });
+  }
+};
+
+// This should be called by a pubsub scheduler every 25 hours.
 // It reads all the documents from the instructors collection.
 // For each of them that meet the criteria, randomizes them into one of
 // our experimental conditions and sends them personalized invitation
@@ -277,21 +398,19 @@ exports.inviteInstructors = async context => {
               <p></p>
               ${
                 instructorData.GoogleScholar
-                  ? "A comprehensive literature review is essential for research, but it is time-consuming. What if we can crowd-source it through talented students who are eager to engage in research?"
+                  ? "<p>A comprehensive literature review is essential for research, but it is time-consuming. What if we can crowd-source it through talented students who are eager to engage in research?</p>"
                   : "<p>We all want our students to master and retain knowledge from their courses. Note-taking in general, and increasingly collaborative note-taking, can play vital roles in deepening students' learning and retention.</p>"
               }
               <p></p>
-              <p>We are a research group at the University of Michigan, School of Information, who have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.us/home" target="_blank">on this page</a>). So far, out of more than 10,000 students who applied, 1,490 talented students from 144 schools in the US have joined 1Cademy to collaboratively summarize, visualize, and present books and research papers. Through 13 years of research, we have incorporated a set of norms and guidelines in 1Cademy, which improve collaborative ${
-                instructorData.GoogleScholar ? "literature review" : "note-taking"
-              } through summarization, visualization, peer-review, and peer improvement. You can ${
-              instructorData.GoogleScholar
-                ? 'check out our existing research communities <a href="https://1cademy.us/home#CommunitiesSection" target="_blank">on this page</a> and '
-                : ""
-            }search through <a href="https://node.1cademy.us" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students.</p>
+              <p>We are a research group at the University of Michigan, School of Information, who have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.us/home" target="_blank">on this page</a>). So far, out of more than 10,000 students who applied, 1,490 talented students from 144 schools have joined 1Cademy to collaboratively summarize, visualize, and present books and research papers. You can ${
+                instructorData.GoogleScholar
+                  ? 'check out <a href="https://1cademy.us/home#CommunitiesSection" target="_blank">our existing research communities and their accomplishments</a> and '
+                  : ""
+              }search through <a href="https://node.1cademy.us" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students.</p>
               ${
                 instructorData.GoogleScholar
-                  ? "<p>We would like to work with you to run a 1Cademy community around your research, and invite talented students from different schools to join your community."
-                  : "We would like to provide you and your students with 1Cademy and work with you to implement the features that can specifically help your course or research team."
+                  ? "<p>We would like to work with you to run a 1Cademy community around your research, and invite talented students from different schools to join your community.</p>"
+                  : "<p>We would like to provide you and your students with 1Cademy and work with you to implement the features that can specifically help your course or research team.</p>"
               }
               <p></p>
               <p>If this is of interest to you, we'd be delighted to have a meeting with you. To schedule an appointment, please click one of the following links or directly reply to this email.</p>
