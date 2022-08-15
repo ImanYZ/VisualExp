@@ -634,7 +634,7 @@ exports.deleteActivity = async (req, res) => {
   }
 };
 
-const voteInstructorFn = async (voter, instructor, vote, comment) => {
+const voteInstructorFn = async (voter, instructor, vote, comment, voterProject) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
     await db.runTransaction(async t => {
@@ -684,7 +684,7 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           newVoteData = {
             fullname: instructorData.fullname,
             instructor,
-            project: instructorData.project,
+            project: voterProject,
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
@@ -710,18 +710,18 @@ const voteInstructorFn = async (voter, instructor, vote, comment) => {
           downVoteVal = downVote ? -1 : 1;
         }
         let upVotes = 0;
-        if (voterData.projects[instructorData.project].instructorUpVotes) {
-          upVotes = voterData.projects[instructorData.project].instructorUpVotes;
+        if (voterData.projects[voterProject].instructorUpVotes) {
+          upVotes = voterData.projects[voterProject].instructorUpVotes;
         }
         let downVotes = 0;
-        if (voterData.projects[instructorData.project].instructorDownVotes) {
-          downVotes = voterData.projects[instructorData.project].instructorDownVotes;
+        if (voterData.projects[voterProject].instructorDownVotes) {
+          downVotes = voterData.projects[voterProject].instructorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
             ...voterData.projects,
-            [instructorData.project]: {
-              ...voterData.projects[instructorData.project],
+            [voterProject]: {
+              ...voterData.projects[voterProject],
               instructorUpVotes: upVotes + upVoteVal,
               instructorDownVotes: downVotes + downVoteVal
             }
@@ -804,11 +804,12 @@ exports.voteInstructorEndpoint = async (req, res) => {
     const instructor = req.body.instructor;
     const vote = req.body.vote;
     const comment = req.body.comment || "";
-    if (instructor && vote) {
+    const voterProject = req.body.voterProject;
+    if (instructor && vote && voterProject) {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
-        await voteInstructorFn(userDocs.docs[0].id, instructor, vote, comment);
+        await voteInstructorFn(userDocs.docs[0].id, instructor, vote, comment, voterProject);
       }
     }
     return res.status(200).json({});
@@ -868,7 +869,7 @@ exports.voteInstructorReset = async (req, res) => {
   }
 };
 
-const voteAdministratorFn = async (voter, administrator, vote, comment) => {
+const voteAdministratorFn = async (voter, administrator, vote, comment, voterProject) => {
   try {
     const currentTime = admin.firestore.Timestamp.fromDate(new Date());
     await db.runTransaction(async t => {
@@ -918,7 +919,7 @@ const voteAdministratorFn = async (voter, administrator, vote, comment) => {
           newVoteData = {
             fullname: administratorData.fullname,
             administrator,
-            project: administratorData.project,
+            project: voterProject,
             upVote: newUpVote,
             downVote: newDownVote,
             voter,
@@ -944,18 +945,18 @@ const voteAdministratorFn = async (voter, administrator, vote, comment) => {
           downVoteVal = downVote ? -1 : 1;
         }
         let upVotes = 0;
-        if (voterData.projects[administratorData.project].administratorUpVotes) {
-          upVotes = voterData.projects[administratorData.project].administratorUpVotes;
+        if (voterData.projects[voterProject].administratorUpVotes) {
+          upVotes = voterData.projects[voterProject].administratorUpVotes;
         }
         let downVotes = 0;
-        if (voterData.projects[administratorData.project].administratorDownVotes) {
-          downVotes = voterData.projects[administratorData.project].administratorDownVotes;
+        if (voterData.projects[voterProject].administratorDownVotes) {
+          downVotes = voterData.projects[voterProject].administratorDownVotes;
         }
         const voterProjectUpdates = {
           projects: {
             ...voterData.projects,
-            [administratorData.project]: {
-              ...voterData.projects[administratorData.project],
+            [voterProject]: {
+              ...voterData.projects[voterProject],
               administratorUpVotes: upVotes + upVoteVal,
               administratorDownVotes: downVotes + downVoteVal
             }
@@ -1031,11 +1032,12 @@ exports.voteAdministratorEndpoint = async (req, res) => {
     const administrator = req.body.administrator;
     const vote = req.body.vote;
     const comment = req.body.comment;
-    if (administrator && vote) {
+    const voterProject = req.body.voterProject;
+    if (administrator && vote && voterProject) {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
-        await voteAdministratorFn(userDocs.docs[0].id, administrator, vote, comment);
+        await voteAdministratorFn(userDocs.docs[0].id, administrator, vote, comment, voterProject);
       }
     }
     return res.status(200).json({});
