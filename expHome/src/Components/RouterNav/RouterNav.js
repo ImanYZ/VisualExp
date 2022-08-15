@@ -269,8 +269,8 @@ const RouterNav = props => {
         });
         setAdministratorsNum(oAdminNums => {
           const oldAdminNums = { ...oAdminNums };
-          for (let researcher in AdminNums) {
-            oldAdminNums[researcher] = { num: AdminNums[researcher] };
+          for (let researcher in adminNums) {
+            oldAdminNums[researcher] = { num: adminNums[researcher] };
           }
           const maxInstruNum = Math.max(...Object.values(oldAdminNums).map(({ num }) => num));
           for (let researcher in oldAdminNums) {
