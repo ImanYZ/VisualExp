@@ -33,7 +33,7 @@ import {
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
-import CSCObjLoader from "./CSCObjLoader";
+import CSCObjLoader from "../../CountryStateCity/CSCObjLoader";
 import GridCellToolTip from "../../GridCellToolTip";
 import communities from "../../Home/modules/views/communitiesOrder";
 
@@ -43,7 +43,7 @@ import GoogleScholarIcon from "../../../assets/GoogleScholarIcon.svg";
 
 import "./AddInstructor.css";
 
-const CountryStateCity = React.lazy(() => import("./CountryStateCity/CountryStateCity"));
+const CountryStateCity = React.lazy(() => import("../../CountryStateCity/CountryStateCity"));
 
 const prefixes = [
   "1st Lt",
@@ -74,8 +74,6 @@ const prefixes = [
   "Sister"
 ];
 
-const occupations = ["Instructor", "Administrator"];
-
 // From https://www.act.org/content/act/en/research/reports/act-publications/college-choice-report-class-of-2013/college-majors-and-occupational-choices/college-majors-and-occupational-choices.html
 // Later on, add other majors.
 // const majors = [
@@ -97,7 +95,6 @@ const initialState = {
   stateInfo: "Michigan;MI;US",
   city: "Ann Arbor",
   major: "",
-  occupation: "Instructor",
   position: "",
   prefix: "Prof",
   webURL: "",
@@ -188,14 +185,6 @@ let instructorsColumns = [
   {
     field: "interestedTopic",
     headerName: "Topic of Interest",
-    width: 130,
-    renderCell: cellValues => {
-      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    }
-  },
-  {
-    field: "occupation",
-    headerName: "Occupation",
     width: 130,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -428,7 +417,7 @@ const AddInstructor = props => {
       if (institutions.length === 0) {
         const institutionsObj = await import("../../../assets/edited_universities.json");
         let institutionsList = institutionsObj.default
-          .filter(l => ["United States", "Canada"].includes(l.country))
+          // .filter(l => ["United States", "Canada"].includes(l.country))
           .map(l => l.name);
         institutionsList = [...new Set(institutionsList)];
         setInstitutions(institutionsList);
@@ -901,7 +890,8 @@ const AddInstructor = props => {
           await firebase.idToken();
           await axios.post("/voteInstructor", {
             instructor: clickedCell.id,
-            vote: clickedCell.field
+            vote: clickedCell.field,
+            voterProject: project
           });
           setComment("");
           setSnackbarMessage("You successfully voted for others' instructor/administrator!");
@@ -924,8 +914,10 @@ const AddInstructor = props => {
         await axios.post("/voteInstructor", {
           instructor: instructorId,
           vote: voteType,
+          voterProject: project,
           comment
         });
+        setComment("");
         setSnackbarMessage("You successfully voted for others' instructor/administrator!");
         setOtherVoting(false);
       }
@@ -1028,7 +1020,6 @@ const AddInstructor = props => {
         stateInfo: theRow.stateInfo,
         city: theRow.city,
         major: theRow.major,
-        occupation: theRow.occupation,
         position: theRow.position,
         prefix: theRow.prefix,
         webURL: theRow.webURL,
@@ -1127,7 +1118,7 @@ const AddInstructor = props => {
               if (
                 instructorsToday === 6 &&
                 dayInstructorsDocs.docs.length === 0 &&
-                "instructorVotingPoints" in projectPoints
+                "dayInstructorUpVotes" in projectPoints
               ) {
                 const dayInstructorRef = firebase.db.collection("dayInstructors").doc();
                 await dayInstructorRef.set({
@@ -1343,9 +1334,7 @@ const AddInstructor = props => {
                 otherInstructor.email}
             </p>
             <p>
-              {otherInstructor.occupation +
-                "/" +
-                otherInstructor.position +
+              {otherInstructor.position +
                 " in 1Cademy Community: " +
                 otherInstructor.major +
                 ", from " +
@@ -1554,21 +1543,25 @@ const AddInstructor = props => {
                   return <li key={maj}>{maj}</li>;
                 })}
               </ul>
-              <h2>Earning points:</h2>
-              <ul>
-                <li>
-                  <strong>Only 1 point per day:</strong> to earn the point of each day, you need to add 7 instructors'
-                  contact information.
-                </li>
-                <li>
-                  <strong>No partial points:</strong> if you add fewer than 7 instructors on a day, you'll not earn any
-                  partial points.
-                </li>
-                <li>
-                  <strong>No extra points:</strong> if you add more than 7 instructors on a day, you'll not earn any
-                  extra points.
-                </li>
-              </ul>
+              {"dayInstructorUpVotes" in projectPoints ? null : (
+                <>
+                  <h2>Earning points:</h2>
+                  <ul>
+                    <li>
+                      <strong>Only 1 point per day:</strong> to earn the point of each day, you need to add 7
+                      instructors' contact information.
+                    </li>
+                    <li>
+                      <strong>No partial points:</strong> if you add fewer than 7 instructors on a day, you'll not earn
+                      any partial points.
+                    </li>
+                    <li>
+                      <strong>No extra points:</strong> if you add more than 7 instructors on a day, you'll not earn any
+                      extra points.
+                    </li>
+                  </ul>
+                </>
+              )}
             </Alert>
             <TextField
               className="TextField"
@@ -1639,25 +1632,6 @@ const AddInstructor = props => {
               value={email}
               onKeyPress={onKeyPress}
             />
-            <FormControl className="Select">
-              <InputLabel id="OccupationSelectLabel">Occupation:</InputLabel>
-              <Select
-                labelId="OccupationSelectLabel"
-                id="OccupationSelect"
-                value={values.occupation}
-                label="Occupation"
-                name="occupation"
-                onChange={handleChange}
-              >
-                {occupations.map(pref => {
-                  return (
-                    <MenuItem key={pref} value={pref}>
-                      {pref}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
             <TextField
               className="TextField"
               label="position"

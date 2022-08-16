@@ -29,7 +29,9 @@ import {
   notAResearcherState,
   upVotedTodayState,
   instructorsTodayState,
-  upvotedInstructorsTodayState
+  upvotedInstructorsTodayState,
+  administratorsTodayState,
+  upvotedAdministratorsTodayState
 } from "../../store/ProjectAtoms";
 
 import LineDiagram from "./LineDiagram";
@@ -52,7 +54,10 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
     return (key === uname ? "You've posted" : "Posted") + ` ${obj[key].num} proposals.`;
   }
   if (type === "instructors") {
-    return (key === uname ? "You've added" : "Added") + ` ${obj[key].num} instructors/school administrators.`;
+    return (key === uname ? "You've added" : "Added") + ` ${obj[key].num} instructors.`;
+  }
+  if (type === "administrators") {
+    return (key === uname ? "You've added" : "Added") + ` ${obj[key].num} administrators.`;
   }
   if (type === "grading") {
     return (key === uname ? "You've graded" : "Graded") + ` ${obj[key].num} free-recall responses.`;
@@ -76,6 +81,8 @@ const RouterNav = props => {
   const [upVotedToday, setUpVotedToday] = useRecoilState(upVotedTodayState);
   const [instructorsToday, setInstructorsToday] = useRecoilState(instructorsTodayState);
   const [upvotedInstructorsToday, setUpvotedInstructorsToday] = useRecoilState(upvotedInstructorsTodayState);
+  const [administratorsToday, setAdministratorsToday] = useRecoilState(administratorsTodayState);
+  const [upvotedAdministratorsToday, setUpvotedAdministratorsToday] = useRecoilState(upvotedAdministratorsTodayState);
 
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -88,6 +95,9 @@ const RouterNav = props => {
   const [instructorPoints, setInstructorPoints] = useState(0);
   const [instructorsNum, setInstructorsNum] = useState({});
   const [dayInstructorUpVotes, setDayInstructorUpVotes] = useState(0);
+  const [administratorPoints, setAdministratorPoints] = useState(0);
+  const [administratorsNum, setAdministratorsNum] = useState({});
+  const [dayAdministratorUpVotes, setDayAdministratorUpVotes] = useState(0);
   const [proposalsChanges, setProposalsChanges] = useState([]);
   const [proposals, setProposals] = useState({});
   const [othersProposals, setOthersProposals] = useState({});
@@ -160,7 +170,8 @@ const RouterNav = props => {
       const researcherQuery = firebase.db.collection("researchers");
       const researcherSnapshot = researcherQuery.onSnapshot(snapshot => {
         const graNums = {};
-        const instraNums = {};
+        const instruNums = {};
+        const adminNums = {};
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
@@ -194,6 +205,16 @@ const RouterNav = props => {
               } else {
                 setDayInstructorUpVotes(0);
               }
+              if (theProject.administrators) {
+                setAdministratorPoints(theProject.administrators);
+              } else {
+                setAdministratorPoints(0);
+              }
+              if (theProject.dayAdministratorUpVotes) {
+                setDayAdministratorUpVotes(theProject.dayAdministratorUpVotes);
+              } else {
+                setDayAdministratorUpVotes(0);
+              }
               if (theProject.gradingPoints) {
                 setGradingPoints(theProject.gradingPoints);
               } else {
@@ -219,7 +240,10 @@ const RouterNav = props => {
               graNums[change.doc.id] = theProject.gradingNum;
             }
             if ("instructorsNum" in theProject) {
-              instraNums[change.doc.id] = theProject.instructorsNum;
+              instruNums[change.doc.id] = theProject.instructorsNum;
+            }
+            if ("administratorsNum" in theProject) {
+              adminNums[change.doc.id] = theProject.administratorsNum;
             }
           }
         }
@@ -234,17 +258,29 @@ const RouterNav = props => {
           }
           return oldGraNums;
         });
-        setInstructorsNum(oInstraNums => {
-          const oldInstraNums = { ...oInstraNums };
-          for (let researcher in instraNums) {
-            oldInstraNums[researcher] = { num: instraNums[researcher] };
+        setInstructorsNum(oInstruNums => {
+          const oldInstruNums = { ...oInstruNums };
+          for (let researcher in instruNums) {
+            oldInstruNums[researcher] = { num: instruNums[researcher] };
           }
-          const maxInstraNum = Math.max(...Object.values(oldInstraNums).map(({ num }) => num));
-          for (let researcher in oldInstraNums) {
-            oldInstraNums[researcher].percent =
-              Math.round(((oldInstraNums[researcher].num * 100.0) / maxInstraNum) * 100) / 100;
+          const maxInstruNum = Math.max(...Object.values(oldInstruNums).map(({ num }) => num));
+          for (let researcher in oldInstruNums) {
+            oldInstruNums[researcher].percent =
+              Math.round(((oldInstruNums[researcher].num * 100.0) / maxInstruNum) * 100) / 100;
           }
-          return oldInstraNums;
+          return oldInstruNums;
+        });
+        setAdministratorsNum(oAdminNums => {
+          const oldAdminNums = { ...oAdminNums };
+          for (let researcher in adminNums) {
+            oldAdminNums[researcher] = { num: adminNums[researcher] };
+          }
+          const maxInstruNum = Math.max(...Object.values(oldAdminNums).map(({ num }) => num));
+          for (let researcher in oldAdminNums) {
+            oldAdminNums[researcher].percent =
+              Math.round(((oldAdminNums[researcher].num * 100.0) / maxInstruNum) * 100) / 100;
+          }
+          return oldAdminNums;
         });
       });
       return () => {
@@ -254,6 +290,9 @@ const RouterNav = props => {
         setInstructorPoints(0);
         setInstructorsNum({});
         setDayInstructorUpVotes(0);
+        setAdministratorPoints(0);
+        setAdministratorsNum({});
+        setDayAdministratorUpVotes(0);
         setGradingPoints(0);
         setGradingNums({});
         setNegativeGradingPoints(0);
@@ -622,12 +661,16 @@ const RouterNav = props => {
     setUpVotedToday(0);
     setInstructorsToday(0);
     setUpvotedInstructorsToday(0);
+    setInstructorPoints(0);
+    setDayInstructorUpVotes(0);
+    setAdministratorsToday(0);
+    setUpvotedAdministratorsToday(0);
+    setAdministratorPoints(0);
+    setDayAdministratorUpVotes(0);
     setProposalUpvotesToday(0);
     setUpVotedDays(0);
     setIntellectualPoints(0);
     setExpPoints(0);
-    setInstructorPoints(0);
-    setDayInstructorUpVotes(0);
     setProposalsChanges([]);
     setProposals({});
     setOthersProposals([]);
@@ -789,9 +832,15 @@ const RouterNav = props => {
                         </Tooltip>
                       ) : null}
 
-                      {projectPoints.instructorsPoints ? (
+                      {projectPoints.administratorsPoints ? (
                         <Tooltip
-                          title={`You've collected ${instructorsNum[username]} instructors/school administrators' information. Note that your score is determined based on the # of times your collected information was approved by two other researchers, not this number.`}
+                          title={`You've collected ${administratorsNum[username]} school administrators' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
+                        >
+                          <Box># of 💼:</Box>
+                        </Tooltip>
+                      ) : projectPoints.instructorsPoints ? (
+                        <Tooltip
+                          title={`You've collected ${instructorsNum[username]} instructors' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
                         >
                           <Box># of 👨‍🏫:</Box>
                         </Tooltip>
@@ -821,7 +870,13 @@ const RouterNav = props => {
                         ></LineDiagram>
                       ) : null}
 
-                      {projectPoints.instructorsPoints ? (
+                      {projectPoints.administratorsPoints ? (
+                        <LineDiagram
+                          obj={administratorsNum}
+                          username={fullname}
+                          lineDiagramTooltip={lineDiagramTooltip("administrators")}
+                        ></LineDiagram>
+                      ) : projectPoints.instructorsPoints ? (
                         <LineDiagram
                           obj={instructorsNum}
                           username={fullname}
@@ -931,22 +986,22 @@ const RouterNav = props => {
                                 {dayInstructorUpVotes} points for casting 16 upvotes per day on others' collected data.
                               </div>
                               <div>
-                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected
-                                instructors/administrators' data.
+                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected instructors'
+                                data.
                               </div>
                             </div>
                           ) : (
                             <div>
                               <div>
                                 You've earned {instructorPoints + dayInstructorUpVotes} total points, including{" "}
-                                {instructorPoints} points for collecting instructors/administrators' contact info and{" "}
+                                {instructorPoints} points for collecting instructors' contact info and{" "}
                                 {dayInstructorUpVotes} points for casting 16 up-voting per day on other's collected
                                 data.
                               </div>
-                              <div>You collected {instructorsToday} / 7 instructors/administrators' info today.</div>
+                              <div>You collected {instructorsToday} / 7 instructors' info today.</div>
                               <div>
-                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected
-                                instructors/administrators' data.
+                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected instructors'
+                                data.
                               </div>
                             </div>
                           )
@@ -966,6 +1021,55 @@ const RouterNav = props => {
                             ? "✔ " + dayInstructorUpVotes
                             : "🌞 " + instructorsToday + " / 7"}
                           <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {upvotedInstructorsToday} / 16
+                        </Button>
+                      </Tooltip>
+                    ) : null}
+                    {projectPoints.administratorsPoints ? (
+                      <Tooltip
+                        title={
+                          projectPoints.dayAdministratorUpVotes ? (
+                            <div>
+                              <div>
+                                You've earned {administratorPoints} administrator points from others' votes and{" "}
+                                {dayAdministratorUpVotes} points for casting 16 upvotes per day on others' collected
+                                data.
+                              </div>
+                              <div>
+                                You cast {upvotedAdministratorsToday} / 16 up-votes today on others' collected
+                                administrators' data.
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div>
+                                You've earned {administratorPoints + dayAdministratorUpVotes} total points, including{" "}
+                                {administratorPoints} points for collecting administrators' contact info and{" "}
+                                {dayAdministratorUpVotes} points for casting 16 up-voting per day on other's collected
+                                data.
+                              </div>
+                              <div>You collected {administratorsToday} / 7 administrators' info today.</div>
+                              <div>
+                                You cast {upvotedAdministratorsToday} / 16 up-votes today on others' collected
+                                administrators' data.
+                              </div>
+                            </div>
+                          )
+                        }
+                      >
+                        <Button
+                          id="AdministratorPoints"
+                          className={activePage === "AddAdministrator" ? "ActiveNavLink" : "NavLink"}
+                          onClick={event => navigate("/Activities/AddAdministrator")}
+                        >
+                          💼{" "}
+                          {projectPoints.dayAdministratorUpVotes
+                            ? administratorPoints
+                            : administratorPoints + dayAdministratorUpVotes}{" "}
+                          <br />{" "}
+                          {projectPoints.dayAdministratorUpVotes
+                            ? "✔ " + dayAdministratorUpVotes
+                            : "🌞 " + administratorsToday + " / 7"}
+                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"} {upvotedInstructorsToday} / 16
                         </Button>
                       </Tooltip>
                     ) : null}
