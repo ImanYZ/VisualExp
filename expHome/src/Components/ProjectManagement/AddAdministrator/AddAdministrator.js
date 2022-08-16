@@ -706,8 +706,8 @@ const AddAdministrator = props => {
       setInvalidAdministrator("Please specify their state!");
     } else if (!values.city) {
       setInvalidAdministrator("Please specify their city!");
-    } else if (!values.position) {
-      setInvalidAdministrator("Please specify their position!");
+      // } else if (!values.position) {
+      //   setInvalidAdministrator("Please specify their position!");
     } else {
       setInvalidAdministrator("");
     }
@@ -942,7 +942,7 @@ const AddAdministrator = props => {
               if (
                 administratorsToday === 6 &&
                 dayAdministratorsDocs.docs.length === 0 &&
-                "administratorVotingPoints" in projectPoints
+                "dayAdministratorUpVotes" in projectPoints
               ) {
                 const dayAdministratorRef = firebase.db.collection("dayAdministrators").doc();
                 await dayAdministratorRef.set({
@@ -1205,21 +1205,25 @@ const AddAdministrator = props => {
                 Enter a college/university administrator's information, based in the countries where English is the
                 first language.
               </p>
-              <h2>Earning points:</h2>
-              <ul>
-                <li>
-                  <strong>Only 1 point per day:</strong> to earn the point of each day, you need to add 7
-                  administrators' contact information.
-                </li>
-                <li>
-                  <strong>No partial points:</strong> if you add fewer than 7 administrators on a day, you'll not earn
-                  any partial points.
-                </li>
-                <li>
-                  <strong>No extra points:</strong> if you add more than 7 administrators on a day, you'll not earn any
-                  extra points.
-                </li>
-              </ul>
+              {"dayAdministratorUpVotes" in projectPoints ? null : (
+                <>
+                  <h2>Earning points:</h2>
+                  <ul>
+                    <li>
+                      <strong>Only 1 point per day:</strong> to earn the point of each day, you need to add 7
+                      administrators' contact information.
+                    </li>
+                    <li>
+                      <strong>No partial points:</strong> if you add fewer than 7 administrators on a day, you'll not
+                      earn any partial points.
+                    </li>
+                    <li>
+                      <strong>No extra points:</strong> if you add more than 7 administrators on a day, you'll not earn
+                      any extra points.
+                    </li>
+                  </ul>
+                </>
+              )}
             </Alert>
             <TextField
               className="TextField"

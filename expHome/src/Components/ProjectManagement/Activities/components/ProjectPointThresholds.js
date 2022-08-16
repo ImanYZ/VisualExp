@@ -41,12 +41,12 @@ export const ProjectPointThresholds = ({ projectPoints }) => {
           )}
           {projectPoints.administratorsPoints && (
             <li>
-              <strong>{projectPoints.administratorsPoints}</strong> 👨‍🏫 Collecting administrator contact points and
+              <strong>{projectPoints.administratorsPoints}</strong> 💼 Collecting administrator contact points and
             </li>
           )}
           {projectPoints.dayAdministratorUpVotes && (
             <li>
-              <strong>{projectPoints.dayAdministratorUpVotes}</strong> 👨‍🏫 ✅ Voting administrator contact points and
+              <strong>{projectPoints.dayAdministratorUpVotes}</strong> 💼 ✅ Voting administrator contact points and
             </li>
           )}
           {projectPoints.commentsPoints && (
