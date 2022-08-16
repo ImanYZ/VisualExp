@@ -644,7 +644,6 @@ const voteInstructorFn = async (voter, instructor, vote, comment, voterProject) 
       const instructorDoc = await t.get(instructorRef);
       if (instructorDoc.exists && voterDoc.exists) {
         const voterData = voterDoc.data();
-        console.log(voterData);
         const instructorData = instructorDoc.data();
         const researcherRef = db.collection("researchers").doc(instructorData.fullname);
         const researcherDoc = await t.get(researcherRef);
