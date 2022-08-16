@@ -914,8 +914,10 @@ const AddInstructor = props => {
         await axios.post("/voteInstructor", {
           instructor: instructorId,
           vote: voteType,
+          voterProject: project,
           comment
         });
+        setComment("");
         setSnackbarMessage("You successfully voted for others' instructor/administrator!");
         setOtherVoting(false);
       }
