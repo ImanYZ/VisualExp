@@ -263,19 +263,19 @@ const Auth = props => {
           if (!questions) {
             questions = passageData.questions;
           }
-          let passageCondNum = 0;
-          if (passageData.projects[currentProject] && passageData.projects[currentProject][condition]) {
-            passageCondNum = passageData.projects[currentProject][condition];
-          }
-          t.update(passageRef, {
-            projects: {
-              ...passageData.projects,
-              [currentProject]: {
-                ...passageData.projects[currentProject],
-                [condition]: passageCondNum + 1
-              }
-            }
-          });
+          // let passageCondNum = 0;
+          // if (passageData.projects[currentProject] && passageData.projects[currentProject][condition]) {
+          //   passageCondNum = passageData.projects[currentProject][condition];
+          // }
+          // t.update(passageRef, {
+          //   projects: {
+          //     ...passageData.projects,
+          //     [currentProject]: {
+          //       ...passageData.projects[currentProject],
+          //       [condition]: passageCondNum + 1
+          //     }
+          //   }
+          // });
         });
       }
       const initChoices = new Array(10).fill("");
