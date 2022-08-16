@@ -12,6 +12,8 @@ const {
   deleteActivity,
   voteInstructorEndpoint,
   voteInstructorReset,
+  voteAdministratorEndpoint,
+  voteAdministratorReset,
   assignExperimentSessionsPoints,
   remindCalendarInvitations,
   // updateNotTakenSessions,
@@ -24,6 +26,7 @@ const {
   loadImageProfessor,
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
+  inviteAdministrators,
   inviteInstructors,
   instructorYes,
   instructorNo,
@@ -62,6 +65,7 @@ app.use((req, res, next) => {
 
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
+app.get("/inviteAdministrators", inviteAdministrators);
 app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
@@ -72,6 +76,8 @@ app.get("/passagesNumberCorrection", passagesNumberCorrection);
 app.get("/recallData", recallData);
 app.post("/vote", voteEndpoint);
 app.post("/markPaid", markPaidEndpoint);
+app.post("/voteAdministrator", voteAdministratorEndpoint);
+app.post("/voteAdministratorReset", voteAdministratorReset);
 app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
