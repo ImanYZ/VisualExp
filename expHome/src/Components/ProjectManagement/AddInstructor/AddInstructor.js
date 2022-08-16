@@ -890,7 +890,8 @@ const AddInstructor = props => {
           await firebase.idToken();
           await axios.post("/voteInstructor", {
             instructor: clickedCell.id,
-            vote: clickedCell.field
+            vote: clickedCell.field,
+            voterProject: project
           });
           setComment("");
           setSnackbarMessage("You successfully voted for others' instructor/administrator!");
