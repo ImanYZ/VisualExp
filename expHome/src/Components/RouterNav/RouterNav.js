@@ -56,6 +56,9 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
   if (type === "instructors") {
     return (key === uname ? "You've added" : "Added") + ` ${obj[key].num} instructors.`;
   }
+  if (type === "administrators") {
+    return (key === uname ? "You've added" : "Added") + ` ${obj[key].num} administrators.`;
+  }
   if (type === "grading") {
     return (key === uname ? "You've graded" : "Graded") + ` ${obj[key].num} free-recall responses.`;
   }
