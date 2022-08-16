@@ -276,7 +276,10 @@ exports.inviteAdministrators = async context => {
             from: process.env.EMAIL,
             to: administratorData.email,
             subject: `Offering Student Internships for Large-scale Collaborative Learning/Research`,
-            html: `<p>Hello ${capitalizeFirstLetter(administratorData.howToAddress)},</p>
+            html: `<p>Hello ${(administratorData.howToAddress || "")
+              .split(" ")
+              .map(s => capitalizeFirstLetter(s))
+              .join(" ")},</p>
               <p></p>
               <p>We are a research group at the University of Michigan, School of Information. We would like to invite your students to join our online research communities and collaborate with us on research literature review on topics of their interest.</p>
               <p></p>
