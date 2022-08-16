@@ -2302,8 +2302,10 @@ exports.passagesNumberCorrection = async (req, res) => {
       }
     }
     await commitBatch();
+    console.log({ success: true, endpoint: "passagesNumberCorrection" });
     return res.status(200).json({ success: true, endpoint: "passagesNumberCorrection" });
   } catch (err) {
+    console.log({ err });
     return res.status(500).json({ err });
   }
 };
