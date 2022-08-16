@@ -2263,7 +2263,7 @@ exports.remindCalendarInvitations = async context => {
 //   return null;
 // };
 
-exports.passagesNumberCorrection = async (req, res) => {
+exports.passagesNumberCorrection = async context => {
   try {
     let passageNumberOfParticipant = {};
     let UsersDocs = await db.collection("users").get();
@@ -2312,9 +2312,9 @@ exports.passagesNumberCorrection = async (req, res) => {
     }
     await commitBatch();
     console.log({ success: true, endpoint: "passagesNumberCorrection" });
-    return res.status(200).json({ success: true, endpoint: "passagesNumberCorrection" });
+    return null;
   } catch (err) {
     console.log({ err });
-    return res.status(500).json({ err });
+    return null;
   }
 };
