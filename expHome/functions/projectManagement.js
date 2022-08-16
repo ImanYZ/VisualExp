@@ -693,7 +693,6 @@ const voteInstructorFn = async (voter, instructor, vote, comment, voterProject) 
           if (comment) {
             newVoteData.comment = comment;
           }
-          console.log({newVoteData});
           t.set(voteRef, newVoteData);
         }
         const voteLogRef = db.collection("instructorVoteLogs").doc();
