@@ -316,7 +316,7 @@ const AddAdministrator = props => {
       if (institutions.length === 0) {
         const institutionsObj = await import("../../../assets/edited_universities.json");
         let institutionsList = institutionsObj.default
-          .filter(l => ["United States", "Canada"].includes(l.country))
+          // .filter(l => ["United States", "Canada"].includes(l.country))
           .map(l => l.name);
         institutionsList = [...new Set(institutionsList)];
         setInstitutions(institutionsList);
