@@ -893,6 +893,7 @@ const AddInstructor = props => {
             vote: clickedCell.field,
             voterProject: project
           });
+          setComment("");
           setSnackbarMessage("You successfully voted for others' instructor/administrator!");
         }
       } catch (err) {
