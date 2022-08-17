@@ -24,6 +24,7 @@ const {
 const {
   loadImageIndividual,
   loadImageProfessor,
+  loadImageAdministrator,
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
   inviteAdministrators,
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
 
 app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
+app.get("/loadImage/administrator/:administratorId/:randNum", loadImageAdministrator);
 app.get("/inviteAdministrators", inviteAdministrators);
 app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
@@ -153,6 +155,14 @@ exports.inviteInstructors = functions
   })
   .pubsub.schedule("every 25 hours")
   .onRun(inviteInstructors);
+
+exports.inviteAdministrators = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions
   .runWith({
