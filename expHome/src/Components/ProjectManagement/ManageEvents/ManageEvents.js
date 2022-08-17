@@ -266,7 +266,7 @@ const applicantsColumns = [
   }
 ];
 
-const istructorsComumns = [
+const istructorsColumns = [
   {
     field: "interestedTopic",
     headerName: "Interested Topic",
@@ -341,6 +341,62 @@ const istructorsComumns = [
   { field: "nextReminder", headerName: "Next Reminder", type: "dateTime", width: 190 }
 ];
 
+const adminstratorsColumns = [
+  {
+    field: "votes",
+    headerName: "Up-votes - Down-votes",
+    width: 190,
+    type: "number"
+  },
+  {
+    field: "howToAddress", // Their fullname
+    headerName: "How To Address",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "position", // Their fullname
+    headerName: "position",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "institution", // Their fullname
+    headerName: "institution",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "email",
+    headerName: "Email",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "reminders",
+    headerName: "number Of reminder",
+    type: "number",
+    width: 180
+  },
+  {
+    field: "emailstatus",
+    headerName: "emailstatus",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  { field: "nextReminder", headerName: "Next Reminder", type: "dateTime", width: 190 }
+];
+
 const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
     console.log({ data });
@@ -389,6 +445,7 @@ const ManageEvents = props => {
   const [currentProject, setCurrentProject] = useState("");
   const [selectedSession, setSelectedSession] = useState([]);
   const [invitesInstructors, setInvitesInstructors] = useState([]);
+  const [invitesAdminstartors, setInvitesAdminstartors] = useState([]);
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
@@ -396,13 +453,30 @@ const ManageEvents = props => {
   useEffect(() => {
     const loadLoadInstructors = async () => {
       const invitedInstructorsDocs = await firebase.db.collection("instructors").where("upVotes", ">=", 3).get();
+      const invitedAdministratorsDocs = await firebase.db.collection("administrators").where("upVotes", ">=", 3).get();
       const invitedInstructors = [];
+      const invitedAdministrators = [];
+      for (let adminstratorDoc of invitedAdministratorsDocs.docs) {
+        const administratorData = adminstratorDoc.data();
+        const admin = {
+          howToAddress: administratorData.howToAddress,
+          email: administratorData.email,
+          position: administratorData.position,
+          institution: administratorData.institution,
+          reminders: administratorData.reminders ? administratorData.reminders : 0,
+          nextReminder: administratorData.nextReminder ? administratorData.nextReminder.toDate() : "",
+          id: adminstratorDoc.id,
+          votes: administratorData.upVotes - administratorData.downVotes,
+          emailstatus: administratorData.openedEmail ? "Opened" : "Not Opened"
+        };
+        invitedAdministrators.push(admin);
+      }
       for (let instructorDoc of invitedInstructorsDocs.docs) {
         const instructorData = instructorDoc.data();
         const inst = {
           instructor: instructorData.firstname + " " + instructorData.lastname,
           email: instructorData.email,
-          reminders: instructorData.reminders,
+          reminders: instructorData.reminders ? instructorData.reminders : 0,
           nextReminder: instructorData.nextReminder ? instructorData.nextReminder.toDate() : "",
           id: instructorDoc.id,
           votes: instructorData.upVotes - instructorData.downVotes,
@@ -414,6 +488,7 @@ const ManageEvents = props => {
         };
         invitedInstructors.push(inst);
       }
+      setInvitesAdminstartors(invitedAdministrators);
       setInvitesInstructors(invitedInstructors);
       setAvailabilitiesLoaded(true);
     };
@@ -1072,14 +1147,24 @@ const ManageEvents = props => {
       <div className="dataGridTable">
         <DataGrid
           rows={invitesInstructors}
-          columns={istructorsComumns}
+          columns={istructorsColumns}
           pageSize={10}
           rowsPerPageOptions={[10]}
           autoPageSize
           autoHeight
-          hideFooterSelectedRowCount
           // loading={!ongoingEventsLoaded}
-          onRowClick={gridRowClick}
+        />
+      </div>
+      <h3>Invited adminstrators : </h3>
+      <div className="dataGridTable">
+        <DataGrid
+          rows={invitesAdminstartors}
+          columns={adminstratorsColumns}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
+          autoPageSize
+          autoHeight
+          // loading={!ongoingEventsLoaded}
         />
       </div>
       <div className="dataGridTable">
