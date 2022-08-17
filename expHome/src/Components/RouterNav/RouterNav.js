@@ -1069,7 +1069,7 @@ const RouterNav = props => {
                           {projectPoints.dayAdministratorUpVotes
                             ? "✔ " + dayAdministratorUpVotes
                             : "🌞 " + administratorsToday + " / 7"}
-                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"} {upvotedInstructorsToday} / 16
+                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"} {upvotedAdministratorsToday} / 16
                         </Button>
                       </Tooltip>
                     ) : null}
