@@ -1108,7 +1108,7 @@ const AddAdministrator = props => {
             />
             <Box sx={{ textAlign: "center" }}>To submit your comment, click one of the vote buttons!</Box>
             <div id="VoteOtherFooter">
-              <Tooltip title="Skip" placement="top">
+              <Tooltip title="Down-vote" placement="top">
                 <Button
                   id="VoteOtherDownVoteBtn"
                   onClick={voteOtherAdministrator(otherAdministrator.id, "downVote")}
