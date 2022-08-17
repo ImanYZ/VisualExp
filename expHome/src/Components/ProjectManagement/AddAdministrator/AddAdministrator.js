@@ -1186,14 +1186,15 @@ const AddAdministrator = props => {
           <Box>
             <Alert className="VoteActivityAlert" severity="success">
               <h2>How to Address:</h2>
-              <p>
-                We need this field to include it in the first line of the email after the word "Hello," e.g., "Hello
-                Office of Career Development at the University of Michigan, School of Information," or "Hello John Doe,"
-              </p>
+              <p>We need this field to include it in the first line of the email after the word "Hello,"</p>
               <ul>
-                <li>If the email address belongs to a specific person, please add the fullname of that persion.</li>
                 <li>
-                  If the email address belongs to an office/department, please add the name of that office/department.
+                  If the email address belongs to a specific person, please add the fullname of that persion; e.g.,
+                  "Hello John Doe,"
+                </li>
+                <li>
+                  If the email address belongs to an office/department, please add the name of that office/department;
+                  e.g., "Hello Office of Career Development at the University of Michigan, School of Information,"
                 </li>
               </ul>
             </Alert>
