@@ -741,7 +741,8 @@ const AddAdministrator = props => {
           await firebase.idToken();
           await axios.post("/voteAdministrator", {
             administrator: clickedCell.id,
-            vote: clickedCell.field
+            vote: clickedCell.field,
+            voterProject: project
           });
           setComment("");
           setSnackbarMessage("You successfully voted for others' administrator!");
