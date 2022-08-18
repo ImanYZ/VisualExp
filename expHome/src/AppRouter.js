@@ -36,7 +36,6 @@ import CommunityApplications from "./Components/Home/CommunityApplications";
 import InstructorYes from "./Components/Home/InstructorYes";
 import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
-import AdministratorYes from "./Components/Home/AdministratorYes";
 import AdministratorNo from "./Components/Home/AdministratorNo";
 import AdministratorLater from "./Components/Home/AdministratorLater";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
@@ -252,6 +251,8 @@ const AppRouter = props => {
       ))}
       <Route path={"/notInterestedFaculty/:instructorId"} element={<InstructorNo />} />
       <Route path={"/interestedFacultyLater/:instructorId"} element={<InstructorLater />} />
+      <Route path={"/notInterestedAdministrator/:administratorId"} element={<AdministratorNo />} />
+      <Route path={"/interestedAdministratorLater/:administratorId"} element={<AdministratorLater />} />
       <Route path="/*" element={<RouterNav duringAnExperiment={duringAnExperiment} />}>
         {fullname && email && emailVerified === "Verified" ? (
           <>

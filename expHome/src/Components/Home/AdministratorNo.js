@@ -8,12 +8,12 @@ import Paper from "@mui/material/Paper";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
-const InstructorNo = props => {
-  const { instructorId } = useParams();
+const AdministratorNo = props => {
+  const { administratorId } = useParams();
 
   useEffect(() => {
-    axios.post("/InstructorNo", {
-      id: instructorId
+    axios.post("/AdministratorNo", {
+      id: administratorId
     });
   }, []);
 
@@ -31,4 +31,4 @@ const InstructorNo = props => {
   );
 };
 
-export default InstructorNo;
+export default AdministratorNo;
