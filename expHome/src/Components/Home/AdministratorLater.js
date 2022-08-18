@@ -18,21 +18,21 @@ let nextWeek = new Date();
 nextWeek = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
 nextWeek = new Date(nextWeek.getFullYear(), nextWeek.getMonth(), nextWeek.getDate());
 
-const InstructorLater = props => {
+const AdministratorLater = props => {
   const [reminder, setReminder] = useState(nextWeek);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const { instructorId } = useParams();
+  const { administratorId } = useParams();
 
   useEffect(() => {
-    axios.post("/InstructorLater", {
-      id: instructorId
+    axios.post("/AdministratorLater", {
+      id: administratorId
     });
   }, []);
 
   const changeDate = async newValue => {
-    await axios.post("/InstructorLater", {
-      id: instructorId,
+    await axios.post("/AdministratorLater", {
+      id: administratorId,
       reminder: newValue
     });
     setReminder(newValue);
@@ -57,4 +57,4 @@ const InstructorLater = props => {
   );
 };
 
-export default InstructorLater;
+export default AdministratorLater;
