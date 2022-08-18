@@ -17,6 +17,7 @@ import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
+import ScheduleAdministratorPage from "./Components/SchedulePage/ScheduleAdministratorPage";
 import AuthConsent from "./Components/Auth/AuthConsent";
 import Activities from "./Components/ProjectManagement/Activities/Activities";
 import Home from "./Components/Home/Home";
@@ -35,6 +36,9 @@ import CommunityApplications from "./Components/Home/CommunityApplications";
 import InstructorYes from "./Components/Home/InstructorYes";
 import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
+import AdministratorYes from "./Components/Home/AdministratorYes";
+import AdministratorNo from "./Components/Home/AdministratorNo";
+import AdministratorLater from "./Components/Home/AdministratorLater";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
 
 import { isToday } from "./utils/DateFunctions";
@@ -304,6 +308,7 @@ const AppRouter = props => {
         ) : (
           <>
             <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
+            <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
             <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
             <Route path="*" element={<AuthConsent />} />

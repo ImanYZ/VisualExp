@@ -94,8 +94,8 @@ const formatSlotTime = (hourlyChunks = 2, slotCount = 0) => {
   return str;
 };
 
-const ScheduleInstructorPage = props => {
-  const { instructorId } = useParams();
+const ScheduleAdministratorPage = props => {
+  const { administratorId } = useParams();
 
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
@@ -119,8 +119,8 @@ const ScheduleInstructorPage = props => {
   const [projectSpecs, setProjectSpecs] = useState({});
 
   useEffect(() => {
-    axios.post("/instructorYes", {
-      id: instructorId
+    axios.post("/administratorYes", {
+      id: administratorId
     });
   }, []);
 
@@ -129,7 +129,7 @@ const ScheduleInstructorPage = props => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
       let isSurvey = false;
-      let userDoc = await firebase.db.collection("instructors").doc(instructorId).get();
+      let userDoc = await firebase.db.collection("administrators").doc(administratorId).get();
 
       const userData = userDoc.data();
       const project = "Annotating";
@@ -272,7 +272,7 @@ const ScheduleInstructorPage = props => {
   const submitData = async () => {
     setIsSubmitting(true);
 
-    const userRef = firebase.db.collection("instructors").doc(instructorId);
+    const userRef = firebase.db.collection("administrators").doc(administratorId);
     let userDoc = await userRef.get();
 
     let responseObj = null;
@@ -511,4 +511,4 @@ const ScheduleInstructorPage = props => {
   );
 };
 
-export default ScheduleInstructorPage;
+export default ScheduleAdministratorPage;

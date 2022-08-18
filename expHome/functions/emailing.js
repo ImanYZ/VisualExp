@@ -263,6 +263,7 @@ exports.inviteAdministrators = async context => {
         // Their next reminder is not scheduled yet, or it should have been sent before now.
         (!administratorData.nextReminder || administratorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
         // They have not already clicked any of the options in their email.
+        !administratorData.invitedStudents &&
         !administratorData.yes &&
         !administratorData.no &&
         !administratorData.alreadyTalked &&
@@ -290,7 +291,21 @@ exports.inviteAdministrators = async context => {
                   ? "Considering the success we've had with the previous interns who joined our communities from your school, we would like to invite more of your students to join our communities. "
                   : ""
               }We would like to ask if you can kindly inform your students about our online research opportunities, so they can apply through <a href="https://1cademy.us/home" target="_blank">the 1Cademy homepage</a>.</p>
+              <p>We would be delighted to have a meeting with you to further discuss our program. Please let us know which action you would like to take:</p>
               <p>Reply to this email if you have any questions or concerns.</p>
+              <ul>
+                <li><a href="https://1cademy.us/ScheduleAdministratorSurvey/${
+                  instructorDoc.id
+                }" target="_blank">Yes, I'd like to schedule.</a></li>
+                <li><a href="https://1cademy.us/interestedFacultyLater/${
+                  // These are all sending requests to the client side.
+                  instructorDoc.id
+                }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
+                <li><a href="https://1cademy.us/notInterestedFaculty/${
+                  // These are all sending requests to the client side.
+                  instructorDoc.id
+                }" target="_blank">No, do not contact me again.</a></li>
+              </ul>
               <p></p>
               <p>Best regards,</p>
               <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><span style="font-family: Arial, Helvetica, sans-serif; font-style: normal; font-weight: normal; letter-spacing: normal; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; word-spacing: 0px; text-decoration: none; color: rgb(102, 102, 102); --darkreader-inline-color: #a8a095;" data-darkreader-inline-color=""><img src="https://ci3.googleusercontent.com/mail-sig/AIorK4w7H_RAY7i2tZlCbQFzUtOTVBnQeAR7ux4pYFodxivEpW9gcO9n3PRiYVBWSYjiTNpx5Kaw9C4" data-os="https://drive.google.com/uc?id=1WH0cEF5s8kMl8BnIDEWBI2wdgr0Ea01O&amp;export=download" width="87" height="96"></span> Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Behavioral Economics &amp; Social Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare<div><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare</div><div><b><a href="https://1cademy.us/community/Educational_Organizational_Psychology" target="_blank">Organization/Educational Psychology</a> - </b>Desiree Mayrie Comer</div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown, Sarah Licht, Viktoria Roshchin<br></div><b><a href="https://youtu.be/73Uk2Nsgbgg" target="_blank"></a></b><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b></div><div><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a>- Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div><div><a href="https://1cademy.us/community/Financial_Technology" target="_blank"><b>Financial Technology</b></a>- Xinrong Yao</div></div><div><div><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Rishabh Verma<br></div></div><a href="https://1cademy.us/community/Graph_Neural_Network" target="_blank"><b>Graph Neural Networks</b></a>- Tian Yan</div></div></div><div><div><a href="https://1cademy.us/community/Computer_Vision" target="_blank"><b>Computer Vision</b></a>- Adam Nik<br></div><b></b></div><div><a href="https://1cademy.us/community/Responsible_AI" target="_blank"><b>Responsible AI</b></a>- Lanjing Ye<br></div><div><b>R&amp;D</b> - Iman YeckehZaare<br></div><div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/playlists" target="_blank">YouTube Channel</a></div><div>
@@ -335,6 +350,95 @@ exports.inviteAdministrators = async context => {
     }
   } catch (err) {
     console.log({ err });
+  }
+};
+
+// Logs that the administrator clicked Yes in their email.
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
+exports.administratorYes = async (req, res) => {
+  try {
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const administratorId = req.body.id;
+      const administratorDoc = db.collection("administrators").doc(administratorId);
+      await administratorDoc.update({
+        yes: true,
+        no: false,
+        later: false,
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+// Logs that the administrator clicked No in their email.
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
+exports.administratorNo = async (req, res) => {
+  try {
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const administratorId = req.body.id;
+      const administratorDoc = db.collection("administrators").doc(administratorId);
+      await administratorDoc.update({
+        no: true,
+        yes: false,
+        later: false,
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+      });
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+// Logs the administrator's preferred date for their reminder email.
+// We should not do this directly in the front-end because in Firebase.rules we have defined:
+// allow write: if request.auth != null
+// && request.resource.data.fullname == request.auth.token.name;
+exports.administratorLater = async (req, res) => {
+  try {
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id) {
+      const administratorId = req.body.id;
+      const administratorDoc = db.collection("administrators").doc(administratorId);
+
+      // In addition to setting later = true, we should also set yes = true so that if
+      // they previously declined and then changed their mind, we still send them a reminder
+      // email one week later, or at the reminder date that they spedcified.
+
+      // If reminder exists, its value would be the date that the administrator wants to
+      // receive a reminder email.
+      if ("reminder" in req.body) {
+        const reminder = new Date(req.body.reminder);
+        await administratorDoc.update({
+          later: true,
+          no: false,
+          yes: false,
+          reminder: admin.firestore.Timestamp.fromDate(reminder),
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        });
+      } else {
+        // If reminder does not exist, we should still log that the administrator
+        // clicked the remind me later link in their email.
+        await administratorDoc.update({
+          later: true,
+          no: false,
+          yes: false,
+          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        });
+      }
+    }
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
   }
 };
 
