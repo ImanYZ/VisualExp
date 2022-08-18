@@ -28,6 +28,9 @@ const {
   sendEventNotificationEmail,
   rescheduleEventNotificationEmail,
   inviteAdministrators,
+  administratorYes,
+  administratorNo,
+  administratorLater,
   inviteInstructors,
   instructorYes,
   instructorNo,
@@ -68,6 +71,9 @@ app.get("/loadImage/individual/:contactId/:randNum", loadImageIndividual);
 app.get("/loadImage/professor/:instructorId/:randNum", loadImageProfessor);
 app.get("/loadImage/administrator/:administratorId/:randNum", loadImageAdministrator);
 app.get("/inviteAdministrators", inviteAdministrators);
+app.post("/administratorYes", administratorYes);
+app.post("/administratorLater", administratorLater);
+app.post("/administratorNo", administratorNo);
 app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
