@@ -20,6 +20,7 @@ import { projectState } from "../../store/ProjectAtoms";
 import { currentProjectState } from "../../store/ExperimentAtoms";
 
 import SelectSessions from "./SelectSessions";
+import sessionFormatter from "./sessionFormatter";
 
 import { isEmail } from "../../utils";
 
@@ -35,30 +36,6 @@ const errorAlert = data => {
     console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
   }
-};
-
-const sessionFormatter = (start, minutes) => {
-  return (
-    " session: " +
-    start.toLocaleDateString(navigator.language, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    }) +
-    ", " +
-    start.toLocaleTimeString(navigator.language, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    }) +
-    " - " +
-    new Date(start.getTime() + minutes * 60000).toLocaleTimeString(navigator.language, {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    })
-  );
 };
 
 const formatSlotTime = (hourlyChunks = 2, slotCount = 0, index) => {
@@ -366,18 +343,22 @@ const SchedulePage = props => {
       <>
         <div>
           Press "Confirm" if you'd like to schedule the following{" "}
-          {`${toWords(selectedSession.length)} ${selectedSession.length > 1 ? "sessions" : "session"}`}, or press
-          "Cancel" to revise your sessions.
+          {selectedSession.length > 1 ? toWords(selectedSession.length) + " sessions" : "session"}, or press "Cancel" to
+          revise your {selectedSession.length > 1 ? "sessions" : "session"}:
         </div>
         <ul>
           {selectedSession.map((session, i) => {
             return (
-              <li key={session}>
-                {i + 1}
-                <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
+              <li>
+                {selectedSession.length > 1 && (
+                  <>
+                    {i + 1}
+                    <sup>{toOrdinal(i + 1).replace(/[0-9]/g, "")}</sup>
+                  </>
+                )}
                 {sessionFormatter(
-                  selectedSession[i],
-                  slotDuration * (projectSpecs?.sessionDuration?.[i] || AppConfig.defaultSessionDuration[i] || 1)
+                  selectedSession[0],
+                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
                 )}
               </li>
             );
