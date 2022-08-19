@@ -263,12 +263,12 @@ exports.inviteAdministrators = async context => {
         // Their next reminder is not scheduled yet, or it should have been sent before now.
         (!administratorData.nextReminder || administratorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
         // They have not already clicked any of the options in their email.
-        !administratorData.invitedStudents &&
         !administratorData.yes &&
         !administratorData.no &&
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
-        administratorData.howToAddress
+        administratorData.howToAddress &&
+        administratorData.email === "onecademy@umich.edu"
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -426,7 +426,7 @@ exports.administratorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          reminder: admin.firestore.Timestamp.fromDate(reminder),
+          nextReminder: admin.firestore.Timestamp.fromDate(reminder),
           updatedAt: admin.firestore.Timestamp.fromDate(new Date())
         });
       } else {
@@ -439,6 +439,7 @@ exports.administratorLater = async (req, res) => {
           updatedAt: admin.firestore.Timestamp.fromDate(new Date())
         });
       }
+      return res.status(200).json({ done: true });
     }
   } catch (err) {
     console.log({ err });
@@ -534,7 +535,7 @@ exports.inviteInstructors = async context => {
               <ul>
                 <li><a href="https://1cademy.us/inviteStudents/instructors/${
                   instructorDoc.id
-                }" target="_blank">I'd like to invite students to apply.</a></li>
+                }" target="_blank">I'd like to invite my students to apply to 1Cademy research communities.</a></li>
                 <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
                   instructorDoc.id
                 }" target="_blank">I'd like to schedule a meeting with you.</a></li>
@@ -664,7 +665,7 @@ exports.instructorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          reminder: admin.firestore.Timestamp.fromDate(reminder),
+          nextReminder: admin.firestore.Timestamp.fromDate(reminder),
           updatedAt: admin.firestore.Timestamp.fromDate(new Date())
         });
       } else {
@@ -692,9 +693,6 @@ exports.trackStudentInvite = async (req, res) => {
       const collection = req.body.collection;
       const instructorDoc = db.collection(collection).doc(instructorId);
       await instructorDoc.update({
-        yes: false,
-        no: false,
-        later: false,
         inviteStudents: true,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date())
       });
