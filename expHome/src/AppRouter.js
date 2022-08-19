@@ -38,6 +38,7 @@ import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
 import AdministratorNo from "./Components/Home/AdministratorNo";
 import AdministratorLater from "./Components/Home/AdministratorLater";
+import InviteStudents from "./Components/Home/InviteStudents";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
 
 import { isToday } from "./utils/DateFunctions";
@@ -232,6 +233,7 @@ const AppRouter = props => {
       )}
 
       <Route path="/communities/" element={<Communities />} />
+      <Route path="/InviteStudents/:collection/:instructorId" element={<InviteStudents />} />
       {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
           <Route path={"/community/" + communi.id} element={<Communities commIdx={idx} />} />
