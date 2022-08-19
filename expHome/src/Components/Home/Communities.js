@@ -60,17 +60,13 @@ const Communities = props => {
   const [communities, setCommunities] = useState(allCommunities);
 
   useEffect(() => {
-    if (props.commId !== undefined) {
+    if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunities(oldCommunities => {
-        const commIdx = oldCommunities.findIndex(communi => communi.id === props.commId);
-        if (commIdx !== -1) {
-          return [oldCommunities[commIdx], ...oldCommunities.filter(communi => communi.id !== props.commId)];
-        }
-        return oldCommunities;
+        return [oldCommunities[props.commIdx], ...oldCommunities.filter(communi => communi.id !== props.commIdx)];
       });
       setExpanded(0);
     }
-  }, [props.commId]);
+  }, [props.commIdx]);
 
   useEffect(() => {
     if (firebase) {
