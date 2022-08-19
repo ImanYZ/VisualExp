@@ -35,7 +35,8 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations
+  sendPersonalInvitations,
+  trackStudentInvite
 } = require("./emailing");
 const {
   schedule,
@@ -78,6 +79,7 @@ app.get("/inviteInstructors", inviteInstructors);
 app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
+app.post("/trackStudentInvite", trackStudentInvite);
 app.get("/retrieveData", retrieveData);
 app.get("/passagesNumberCorrection", passagesNumberCorrection);
 // app.get("/feedbackData", feedbackData);

@@ -33,7 +33,7 @@ import communitiesOrder from "./Components/Home/modules/views/communitiesOrder";
 import PaperTest from "./Components/Home/PaperTest";
 import ReminderDate from "./Components/Home/ReminderDate";
 import CommunityApplications from "./Components/Home/CommunityApplications";
-import InstructorYes from "./Components/Home/InstructorYes";
+import InviteStudents from "./Components/Home/InviteStudents";
 import InstructorNo from "./Components/Home/InstructorNo";
 import InstructorLater from "./Components/Home/InstructorLater";
 import AdministratorNo from "./Components/Home/AdministratorNo";
@@ -235,12 +235,7 @@ const AppRouter = props => {
       {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
           <Route path={"/community/" + communi.id} element={<Communities commIdx={idx} />} />
-          <Route
-            path={"/interestedFaculty/" + communi.id + "/:condition/:instructorId"}
-            element={
-              <InstructorYes community={communitiesOrder[idx].title} leader={communitiesOrder[idx].leaders[0].name} />
-            }
-          />
+
           {fullname && emailVerified === "Verified" && (
             <Route
               path={"/paperTest/" + communi.id}
@@ -249,6 +244,7 @@ const AppRouter = props => {
           )}
         </React.Fragment>
       ))}
+      <Route path={"/inviteStudents/:collection/:instructorId"} element={<InviteStudents />} />
       <Route path={"/notInterestedFaculty/:instructorId"} element={<InstructorNo />} />
       <Route path={"/interestedFacultyLater/:instructorId"} element={<InstructorLater />} />
       <Route path={"/notInterestedAdministrator/:administratorId"} element={<AdministratorNo />} />
