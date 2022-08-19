@@ -928,7 +928,6 @@ const AddAdministrator = props => {
               transaction.update(administratorRef, administratorData);
               gotUpdated = true;
             } else {
-              administratorData.researcher = fullname;
               administratorData.createdAt = currentTime;
               transaction.set(administratorRef, administratorData);
             }

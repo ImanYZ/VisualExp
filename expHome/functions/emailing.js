@@ -267,8 +267,7 @@ exports.inviteAdministrators = async context => {
         !administratorData.no &&
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
-        administratorData.howToAddress &&
-        administratorData.email === "onecademy@umich.edu"
+        administratorData.howToAddress
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -295,18 +294,18 @@ exports.inviteAdministrators = async context => {
               <p>We would be delighted to have a meeting with you to further discuss our program. Please let us know which action you would like to take:</p>
               <ul>
                 <li><a href="https://1cademy.us/inviteStudents/administrators/${
-                  administratorData.id
+                  administratorDoc.id
                 }" target="_blank">I'd like to invite students to apply.</a></li>
                 <li><a href="https://1cademy.us/ScheduleAdministratorSurvey/${
-                  administratorData.id
+                  administratorDoc.id
                 }" target="_blank">I'd like to schedule a meeting with you.</a></li>
                 <li><a href="https://1cademy.us/interestedAdministratorLater/${
                   // These are all sending requests to the client side.
-                  administratorData.id
+                  administratorDoc.id
                 }" target="_blank">Send me a reminder in a few weeks.</a></li>
                 <li><a href="https://1cademy.us/notInterestedAdministrator/${
                   // These are all sending requests to the client side.
-                  administratorData.id
+                  administratorDoc.id
                 }" target="_blank">Do not contact me again.</a></li>
               </ul>
               <p>Reply to this email if you have any questions or concerns.</p>

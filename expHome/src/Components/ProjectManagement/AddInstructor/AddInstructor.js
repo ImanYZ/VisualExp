@@ -1103,7 +1103,6 @@ const AddInstructor = props => {
               transaction.update(instructorRef, instructorData);
               gotUpdated = true;
             } else {
-              instructorData.researcher = fullname;
               instructorData.createdAt = currentTime;
               transaction.set(instructorRef, instructorData);
             }
