@@ -754,8 +754,25 @@ exports.feedbackData = async (req, res) => {
 
 // Download the recall dataset in CSV
 exports.recallData = async (req, res) => {
+  console.log("I'm here!");
   try {
-    const rowsData = [["id", "Key Phrase", "Response", "Score out of 4"]];
+    const rowsData = [
+      [
+        "id",
+        "Key Phrase",
+        "Response",
+        "Question ID",
+        "Score out of 4",
+        "Researcher 1",
+        "Grade 1",
+        "Researcher 2",
+        "Grade 2",
+        "Researcher 3",
+        "Grade 3",
+        "Researcher 4",
+        "Grade 4"
+      ]
+    ];
     const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
     for (let recallGradeDoc of recallGradesDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
@@ -764,8 +781,12 @@ exports.recallData = async (req, res) => {
         row.push(recallGradeDoc.id);
         row.push(recallGradeData.phrase);
         row.push(recallGradeData.response);
+        row.push(recallGradeData.passage);
         let score = 0;
-        for (let grade of recallGradeData.grades) {
+        for (let gradeIdx = 0; gradeIdx < recallGradeData.grades.length; gradeIdx++) {
+          row.push(recallGradeData.researchers[gradeIdx]);
+          const grade = recallGradeData.grades[gradeIdx];
+          row.push(grade);
           score += grade;
         }
         if (score > 4) {
