@@ -311,7 +311,6 @@ const istructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
-
   {
     field: "scheduled",
     headerName: "Scheduled the Session",
@@ -337,7 +336,6 @@ const istructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
-
   { field: "nextReminder", headerName: "Next Reminder", type: "dateTime", width: 190 }
 ];
 
@@ -389,6 +387,31 @@ const adminstratorsColumns = [
   {
     field: "emailstatus",
     headerName: "emailstatus",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "scheduled",
+    headerName: "Scheduled the Session",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+
+  {
+    field: "rescheduled",
+    headerName: "Rescheduled the Email",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
+  {
+    field: "notIntersted",
+    headerName: "Not Intersted",
     width: 190,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
@@ -467,7 +490,10 @@ const ManageEvents = props => {
           nextReminder: administratorData.nextReminder ? administratorData.nextReminder.toDate() : "",
           id: adminstratorDoc.id,
           votes: administratorData.upVotes - administratorData.downVotes,
-          emailstatus: administratorData.openedEmail ? "Opened" : "Not Opened"
+          scheduled: administratorData.yes ? "✅ " : "NO RESPONSE",
+          emailstatus: administratorData.openedEmail ? "Opened" : "Not Opened",
+          rescheduled: administratorData.later ? "✅ " : "NO RESPONSE",
+          notIntersted: administratorData.no ? "❌" : "NO RESPONSE"
         };
         invitedAdministrators.push(admin);
       }
