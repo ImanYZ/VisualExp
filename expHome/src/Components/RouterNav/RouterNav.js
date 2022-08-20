@@ -196,7 +196,7 @@ const RouterNav = props => {
                 setExpPoints(0);
               }
               if (theProject.instructors) {
-                setInstructorPoints(theProject.instructors);
+                setInstructorPoints(Number.parseFloat(theProject.instructors).toFixed(1));
               } else {
                 setInstructorPoints(0);
               }
@@ -206,7 +206,7 @@ const RouterNav = props => {
                 setDayInstructorUpVotes(0);
               }
               if (theProject.administrators) {
-                setAdministratorPoints(theProject.administrators);
+                setAdministratorPoints(Number.parseFloat(theProject.administrators).toFixed(1));
               } else {
                 setAdministratorPoints(0);
               }
