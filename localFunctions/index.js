@@ -19,6 +19,7 @@ const {
   deleteDamagedDocumentsOnFreeRecallGrades,
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
+  makeCorrectionToPhrasesinRecallGrades,
 } = require("./visualExp");
 
 const app = express();
@@ -53,6 +54,10 @@ app.get(
 app.get(
   "/deleteDamageDocumentForAffectedUsersInRecallGrades",
   deleteDamageDocumentForAffectedUsersInRecallGrades
+);
+app.get(
+  "/makeCorrectionToPhrasesinRecallGrades",
+  makeCorrectionToPhrasesinRecallGrades
 );
 
 const port = 8080;
