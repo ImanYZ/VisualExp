@@ -218,7 +218,7 @@ const ResearcherPassage = () => {
   };
 
   const addNewPhrase = async () => {
-    let users = new Set();
+    let responses = new Set();
     const passageDoc = await firebase.db.collection("passages").where("title", "==", chosenPassage).get();
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
@@ -232,7 +232,7 @@ const ResearcherPassage = () => {
       for (let recallDoc of recallGradesDoc.docs) {
         const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
         const recallData = recallDoc.data();
-        if (!users.has(recallData.user)) {
+        if (!responses.has(recallData.response)) {
           const newRecallGrade = {
             ...recallData,
             done: false,
@@ -242,7 +242,7 @@ const ResearcherPassage = () => {
             grades: []
           };
           t.set(recallRef, newRecallGrade);
-          users.add(recallData.user);
+          responses.add(recallData.response);
         }
       }
     });
