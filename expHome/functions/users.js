@@ -754,7 +754,6 @@ exports.feedbackData = async (req, res) => {
 
 // Download the recall dataset in CSV
 exports.recallData = async (req, res) => {
-  console.log("I'm here!");
   try {
     const rowsData = [
       [
@@ -762,7 +761,6 @@ exports.recallData = async (req, res) => {
         "Key Phrase",
         "Response",
         "Question ID",
-        "Score out of 4",
         "Researcher 1",
         "Grade 1",
         "Researcher 2",
@@ -770,9 +768,18 @@ exports.recallData = async (req, res) => {
         "Researcher 3",
         "Grade 3",
         "Researcher 4",
-        "Grade 4"
+        "Grade 4",
+        "Score out of 4"
       ]
     ];
+    const passages = {};
+    const passagesDocs = await db.collection("passages").get();
+    for (let passageDoc of passagesDocs.docs) {
+      const passageData = passageDoc.data();
+      passages[passageData.title] = passageData.phrases?.length || 0;
+    }
+    console.log(passages);
+    const researchers = {};
     const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
     for (let recallGradeDoc of recallGradesDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
@@ -784,9 +791,15 @@ exports.recallData = async (req, res) => {
         row.push(recallGradeData.passage);
         let score = 0;
         for (let gradeIdx = 0; gradeIdx < recallGradeData.grades.length; gradeIdx++) {
-          row.push(recallGradeData.researchers[gradeIdx]);
+          const researcher = recallGradeData.researchers[gradeIdx];
+          row.push(researcher);
+          if (researcher in researchers) {
+            researchers[researcher] += 1;
+          } else {
+            researchers[researcher] = 1;
+          }
           const grade = recallGradeData.grades[gradeIdx];
-          row.push(grade);
+          row.push(grade ? 1 : 0);
           score += grade;
         }
         if (score > 4) {
@@ -797,7 +810,7 @@ exports.recallData = async (req, res) => {
       }
     }
     csv.writeToPath("datasets/recallData.csv", rowsData, { headers: true }).on("finish", () => {
-      console.log("Done!");
+      console.log({ researchers });
     });
   } catch (err) {
     console.log({ err });
