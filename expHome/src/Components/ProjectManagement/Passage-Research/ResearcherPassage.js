@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState,emailState } from "../../../store/AuthAtoms";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -9,7 +9,28 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import Box from "@mui/material/Box";
+import Modal from '@mui/material/Modal';
+import Button from "@mui/material/Button";
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Alert from '@mui/material/Alert';
 
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  pt: 2,
+  px: 4,
+  pb: 3,
+};
 const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -22,49 +43,83 @@ const ResearcherPassage = () => {
   const [passage1, setPassage1] = useState({});
   const [passageCondition, setPassageCondition] = React.useState(0);
   const [passageCondition2, setPassageCondition2] = React.useState(0);
+  const [openEditModal, setOpenEditModal] = useState(false);
   const optionsConditions = ["H1", "H2", "K1", "K2", "L1", "L2"];
+  const [newPhrase,setNewPhrase]=useState("");
+  const [selectedPhrase, setSelectedPhrase] = useState("");
+  const [passagTitle, setPassagTitle] = useState("");
+  const handleOpenEditModal = () => setOpenEditModal(true);
+  const handleCloseEditModal = () => setOpenEditModal(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const handleOpenDeleteModal = () => setOpenDeleteModal(true);
+  const handleCloseDeleteModal = () => setOpenDeleteModal(false);
+  const [passagesChanges,setPassagesChanges] = useState([]);
+  const [passagesLoaded, setPassagesLoaded] = useState(false);
+  const [numberRecorded,setNumberRecorded] =useState(0);
+  const email = useRecoilValue(emailState);
+
+  useEffect(() => {
+    if (firebase) {
+      const passagesQuery = firebase.db.collection("passages");
+
+      const passagesSnapshot = passagesQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        setPassagesChanges(oldPassagessChanges => {
+          return [...oldPassagessChanges, ...docChanges];
+        });
+        setPassagesLoaded(true);
+      });
+      return () => {
+        setPassagesChanges([]);
+        passagesSnapshot();
+      };
+    }
+  }, [firebase,passagesLoaded]);
+
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
+  if(passagesLoaded)
+  {  const tempPassagesChanges = [...passagesChanges];
+    setPassagesChanges([]);
     let passags = [];
     let titles = [];
     const userDoc = await firebase.db.collection("researchers").doc(fullname).get();
     const userData = userDoc.data();
     let userProjects = Object.keys(userData.projects);
-    const passageDocs = await firebase.db.collection("passages").get();
 
-    for (let passageDoc of passageDocs.docs) {
-      const data = passageDoc.data();
-      let passageProjects = Object.keys(data.projects);
+    for (let change of tempPassagesChanges) {
+      const pasageData = change.doc.data();;
+      let passageProjects = Object.keys(pasageData.projects);
       if (passageProjects.length !== 0) {
         if (passageProjects.find(element => userProjects.includes(element))) {
           passags.push({
-            ...data
+            ...pasageData
           });
-          titles.push(data.title);
+          titles.push(pasageData.title);
         }
       }
     }
 
     setPassages(passags);
     setUserCondition(titles[0]);
-    setPassageCondition("H1");
-    setPConURL(passags[0]["linkH1"]);
+    setPassageCondition("H2");
+    setPConURL(passags[0]["linkH2"]);
     setUserCondition2(titles[0]);
-    setPassageCondition2("H1");
-    setPConURL2(passags[0]["linkH1"]);
+    setPassageCondition2("K2");
+    setPConURL2(passags[0]["linkK2"]);
     setPassage2(passags[0]);
-    setPassage1(passags[0]);
-  }, [firebase, fullname]);
+    setPassage1(passags[0]);}
+  }, [firebase, fullname,passagesLoaded]);
 
   const handlePassageChange = event => {
     const userCondition = event.target.value;
     const allPassages = [...passages];
     const fIndex = allPassages.findIndex(i => i.title === userCondition);
     const passage = allPassages[fIndex];
-    setPConURL(passage["linkH1"]);
+    setPConURL(passage["linkH2"]);
     setUserCondition(userCondition);
-    setPassageCondition("H1");
+    setPassageCondition("H2");
     setPassage1(passage);
   };
 
@@ -79,9 +134,9 @@ const ResearcherPassage = () => {
     const allPassages = [...passages];
     const fIndex = allPassages.findIndex(i => i.title === userCondition);
     const passage = allPassages[fIndex];
-    setPConURL2(passage["linkH1"]);
+    setPConURL2(passage["linkK2"]);
     setUserCondition2(userCondition);
-    setPassageCondition2("H1");
+    setPassageCondition2("K2");
     setPassage2(passage);
   };
 
@@ -91,7 +146,152 @@ const ResearcherPassage = () => {
     setPassageCondition2(pCondition);
   };
 
+  const correctionToRecallGrades = async (event) => { 
+    const passageDoc = await firebase.db.collection("passages").where("title","==",passagTitle).get();
+    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+    const passageUpdate = passageDoc.docs[0].data();
+    passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
+    passageRef.update(passageUpdate);
+    const recallGradesDoc =await  firebase.db.collection("recallGrades")
+    .where("passage","==",passageDoc.docs[0].id)
+    .where("phrase","==",selectedPhrase).get();
+  await firebase.db.runTransaction(async t => {
+      for(let recallDoc of recallGradesDoc.docs){
+        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+      const recallUpdate= {
+        phrase:newPhrase,
+      }
+      t.update(recallRef, recallUpdate);
+      }
+    })
+  handleCloseEditModal();
+  setPassagesLoaded(false);
+  }
+
+  const deleteRecallGrades = async (event) =>{
+    const passageDoc = await firebase.db.collection("passages").where("title","==",passagTitle).get();
+    let allowDelete = true;
+    let numberRecord = 0;
+    const recallGradesDoc = await firebase.db.collection("recallGrades")
+    .where("passage","==",passageDoc.docs[0].id)
+    .where("phrase","==",selectedPhrase).get();
+    if(numberRecorded ===0){  
+      for(let recallDoc of recallGradesDoc.docs){
+        const recallData = recallDoc.data();
+        if(recallData.researchersNum!==0){
+          allowDelete=false;
+
+          numberRecord =numberRecord+1;
+        }
+      }
+      setNumberRecorded(numberRecord);
+      }
+  const oldPhrase = selectedPhrase;
+  const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+  const passageUpdate = passageDoc.docs[0].data();
+  if(allowDelete){
+    setNumberRecorded(0);
+    passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase),1);
+    passageRef.update(passageUpdate);
+  await firebase.db.runTransaction(async t => {
+      for(let recallDoc of recallGradesDoc.docs){
+      const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+      t.delete(recallRef);
+      }
+    })
+    setPassagesLoaded(false);
+    handleCloseDeleteModal();
+  }
+  }
+
+
   return (
+  <>
+    <Modal
+        open={openEditModal}
+        onClose={handleCloseEditModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{
+          ...modalStyle,
+          width: '500px',
+          height: '250px',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between"
+        }}>
+          <Typography variant="h6" margin-bottom="20px">
+
+            Update the phrase below:
+          </Typography>
+          <Box>
+            <TextareaAutosize
+              style={{ width: '90%' }}
+              minRows={5}
+              value={newPhrase}
+              placeholder={"Update the Phrase here."}
+              onChange={(event) => setNewPhrase(event.currentTarget.value)}
+            />
+            <Box sx={{ textAlign: "center" }}>
+              <Button
+                className="Button"
+                variant="contained"
+                onClick={correctionToRecallGrades}>
+                Update
+              </Button>
+              <Button
+                variant="contained"
+                className="Button Red"
+                onClick={() => {
+                  setNewPhrase("");
+                  handleCloseEditModal();
+                }}>
+                Cancel
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+
+
+      <Modal
+        open={openDeleteModal}
+        onClose={handleCloseDeleteModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{ ...modalStyle }}>
+          <Alert  severity={(numberRecorded !==0)?"error":"warning"}>
+            Are you sure, you want to delete phrase ?
+            <br/>
+          { (numberRecorded !==0 )&& `there are ${numberRecorded} already graded records for this phrase.`}
+            <br /> 
+          </Alert>
+          <Box sx={{ textAlign: "center" }}>
+            <Button
+              variant="contained"
+              className="Button Red"
+              onClick={() => {
+                deleteRecallGrades()
+              }}>
+              Delete
+            </Button>
+            <Button
+              className="Button"
+              variant="contained"
+              onClick={() => {
+      
+                  setSelectedPhrase("");
+                  setNumberRecorded(0);
+                handleCloseDeleteModal();
+              }}>
+              Cancel
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
     <div style={{ userSelect: "none", background: "#e2e2e2" }}>
       <div style={{ display: "flex", height: "100%" }}>
         <div style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
@@ -166,12 +366,14 @@ const ResearcherPassage = () => {
               );
             })}
           {passage1?.phrases?.length > 0 && (
+            <>
             <Typography variant="h5" gutterBottom component="div">
               Phrases
             </Typography>
-          )}
-
-          <div>
+        </>
+          
+      )}
+        <div>
             {passage1 &&
               passage1?.phrases?.length > 0 &&
               passage1.phrases.map((phrase, index) => (
@@ -180,6 +382,30 @@ const ResearcherPassage = () => {
                     <Typography variant="h6" component="div">
                       {phrase}
                     </Typography>
+                  {email === "oneweb@umich.edu" && ( 
+                    <>
+                    <IconButton
+                        edge="end"
+                        aria-label="edit"
+                        onClick={() => {
+                          setPassagTitle(passage1.title);
+                          setNewPhrase(phrase);
+                          setSelectedPhrase(phrase);
+                          handleOpenEditModal(phrase);
+                        }}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => {
+                          setPassagTitle(passage1.title);
+                          setSelectedPhrase(phrase);
+                          handleOpenDeleteModal();
+                        }}>
+                        <DeleteIcon />
+                      </IconButton>
+                      </>)}
                   </li>
                 </ul>
               ))}
@@ -267,6 +493,30 @@ const ResearcherPassage = () => {
                     <Typography variant="h6" component="div">
                       {phrase}
                     </Typography>
+                    {email === "oneweb@umich.edu" &&(
+                      <>
+                    <IconButton
+                        edge="end"
+                        aria-label="edit"
+                        onClick={() => {
+                          setPassagTitle(passage2.title);
+                          setNewPhrase(phrase);
+                          setSelectedPhrase(phrase);
+                          handleOpenEditModal(phrase);
+                        }}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => {
+                          setPassagTitle(passage2.title);
+                          setSelectedPhrase(phrase);
+                          handleOpenDeleteModal();
+                        }}>
+                        <DeleteIcon />
+                      </IconButton>
+                      </>)}
                   </li>
                 </ul>
               ))}
@@ -274,6 +524,7 @@ const ResearcherPassage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
