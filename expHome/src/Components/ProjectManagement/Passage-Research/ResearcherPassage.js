@@ -20,7 +20,8 @@ import Alert from "@mui/material/Alert";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
+import { batchDelete, batchSet, batchUpdate, commitBatch } from "../../../../functions/admin";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -160,21 +161,20 @@ const ResearcherPassage = () => {
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-    passageRef.update(passageUpdate);
+    await batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
       .where("phrase", "==", selectedPhrase)
       .get();
-    await firebase.db.runTransaction(async t => {
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        const recallUpdate = {
-          phrase: newPhrase
-        };
-        t.update(recallRef, recallUpdate);
-      }
-    });
+    for (let recallDoc of recallGradesDoc.docs) {
+      const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+      const recallUpdate = {
+        phrase: newPhrase
+      };
+      await batchUpdate(recallRef, recallUpdate);
+    }
+    await commitBatch();
     handleCloseEditModal();
     setPassagesLoaded(false);
   };
@@ -205,13 +205,12 @@ const ResearcherPassage = () => {
     if (allowDelete) {
       setNumberRecorded(0);
       passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
-      passageRef.update(passageUpdate);
-      await firebase.db.runTransaction(async t => {
-        for (let recallDoc of recallGradesDoc.docs) {
-          const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-          t.delete(recallRef);
-        }
-      });
+      await batchUpdate(passageRef, passageUpdate);
+      for (let recallDoc of recallGradesDoc.docs) {
+        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+        await batchDelete(recallRef);
+      }
+      await commitBatch();
       setPassagesLoaded(false);
       handleCloseDeleteModal();
     }
@@ -223,29 +222,28 @@ const ResearcherPassage = () => {
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases.push(newPhraseAdded);
-    passageRef.update(passageUpdate);
+    await batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
       .get();
-    await firebase.db.runTransaction(async t => {
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        const recallData = recallDoc.data();
-        if (!responses.has(recallData.response)) {
-          const newRecallGrade = {
-            ...recallData,
-            done: false,
-            phrase: newPhraseAdded,
-            researchers: [],
-            researchersNum: 0,
-            grades: []
-          };
-          t.set(recallRef, newRecallGrade);
-          responses.add(recallData.response);
-        }
+    for (let recallDoc of recallGradesDoc.docs) {
+      const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+      const recallData = recallDoc.data();
+      if (!responses.has(recallData.response)) {
+        const newRecallGrade = {
+          ...recallData,
+          done: false,
+          phrase: newPhraseAdded,
+          researchers: [],
+          researchersNum: 0,
+          grades: []
+        };
+        await batchSet(recallRef, newRecallGrade);
+        responses.add(recallData.response);
       }
-    });
+    }
+    await commitBatch();
     handleCloseAddPhraseModal();
     setSubmtingNewPhrase(false);
   };
@@ -487,14 +485,16 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "oneweb@umich.edu" && (<Button
-                  onClick={() => {
-                    handleOpenddPhraseModal();
-                    setChosenPassage(passage1.title);
-                  }}
-                >
-                <AddIcon /> add New Phrase
-                </Button>)}
+                {email === "oneweb@umich.edu" && (
+                  <Button
+                    onClick={() => {
+                      handleOpenddPhraseModal();
+                      setChosenPassage(passage1.title);
+                    }}
+                  >
+                    <AddIcon /> add New Phrase
+                  </Button>
+                )}
               </>
             )}
             <div>
@@ -615,18 +615,20 @@ const ResearcherPassage = () => {
               })}
             {passage2?.phrases?.length > 0 && (
               <>
-              <Typography variant="h5" gutterBottom component="div">
-                Phrases
-              </Typography>
+                <Typography variant="h5" gutterBottom component="div">
+                  Phrases
+                </Typography>
 
-              {email === "oneweb@umich.edu" && (<Button
-                onClick={() => {
-                handleOpenddPhraseModal();
-                setChosenPassage(passage2.title);
-                }}
-              >
-              <AddIcon /> add New Phrase
-              </Button>)}
+                {email === "oneweb@umich.edu" && (
+                  <Button
+                    onClick={() => {
+                      handleOpenddPhraseModal();
+                      setChosenPassage(passage2.title);
+                    }}
+                  >
+                    <AddIcon /> add New Phrase
+                  </Button>
+                )}
               </>
             )}
 
