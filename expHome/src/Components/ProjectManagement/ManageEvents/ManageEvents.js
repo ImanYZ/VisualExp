@@ -319,7 +319,14 @@ const istructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
-
+  {
+    field: "inviteStudents",
+    headerName: "Invited Students",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
   {
     field: "rescheduled",
     headerName: "Rescheduled the Email",
@@ -400,7 +407,14 @@ const adminstratorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
-
+  {
+    field: "inviteStudents",
+    headerName: "Invited Students",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
   {
     field: "rescheduled",
     headerName: "Rescheduled the Email",
@@ -491,6 +505,7 @@ const ManageEvents = props => {
           id: adminstratorDoc.id,
           votes: administratorData.upVotes - administratorData.downVotes,
           scheduled: administratorData.yes ? "✅ " : "NO RESPONSE",
+          inviteStudents: administratorData.inviteStudents ? "✅ " : "NO RESPONSE",
           emailstatus: administratorData.openedEmail ? "Opened" : "Not Opened",
           rescheduled: administratorData.later ? "✅ " : "NO RESPONSE",
           notIntersted: administratorData.no ? "❌" : "NO RESPONSE"
@@ -508,6 +523,7 @@ const ManageEvents = props => {
           votes: instructorData.upVotes - instructorData.downVotes,
           interestedTopic: instructorData.interestedTopic,
           scheduled: instructorData.yes ? "✅ " : "NO RESPONSE",
+          inviteStudents: instructorData.inviteStudents ? "✅ " : "NO RESPONSE",
           emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",
           rescheduled: instructorData.later ? "✅ " : "NO RESPONSE",
           notIntersted: instructorData.no ? "❌" : "NO RESPONSE"
