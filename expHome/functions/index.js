@@ -50,7 +50,8 @@ const {
 } = require("./scheduling");
 const { card, image } = require("./misinformationExp");
 
-process.env.TZ = "America/Detroit";
+const EST_TIMEZONE = "America/Detroit";
+process.env.TZ = EST_TIMEZONE;
 
 const express = require("express");
 
@@ -161,7 +162,8 @@ exports.inviteInstructors = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 4 minutes")
+  .pubsub.schedule("0 9,13 * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(inviteInstructors);
 
 exports.inviteAdministrators = functions
@@ -169,7 +171,8 @@ exports.inviteAdministrators = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("0 9,13 * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions
