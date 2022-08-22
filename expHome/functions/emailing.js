@@ -464,7 +464,7 @@ exports.inviteInstructors = async context => {
     console.log("Instructors count = ", instructorDocs.docs.length);
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
-      if (instructorData.email === "usamashzd99@gmail.com" || instructorData === "onecademy@umich.edu") {
+      if (instructorData.email === "usamashzd99@gmail.com" || instructorData.email === "onecademy@umich.edu") {
         console.log({ nextReminder: instructorData.nextReminder.toDate(), now: new Date() });
       }
 
