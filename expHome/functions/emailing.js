@@ -474,8 +474,9 @@ exports.inviteInstructors = async context => {
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
         !instructorData.inviteStudents &&
-        (instructorData.email === "usamashzd99@gmail.com" || instructorData === "onecademy@umich.edu")
+        (instructorData.email === "usamashzd99@gmail.com" || instructorData.email === "onecademy@umich.edu")
       ) {
+        console.log("Condition Passed");
         // let minCondition,
         //   minCondNum = -1;
         // if (instructorData.condition) {
@@ -500,6 +501,7 @@ exports.inviteInstructors = async context => {
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
         // postpones sending the next email until the next waitTime.
         setTimeout(async () => {
+          console.log("sending email");
           const mailOptions = {
             from: process.env.EMAIL,
             to: instructorData.email,
