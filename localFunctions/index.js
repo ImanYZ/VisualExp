@@ -20,6 +20,7 @@ const {
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
   makeCorrectionToPhrasesinRecallGrades,
+  createRecallGradesForNewUser,
 } = require("./visualExp");
 
 const app = express();
@@ -59,6 +60,7 @@ app.get(
   "/makeCorrectionToPhrasesinRecallGrades",
   makeCorrectionToPhrasesinRecallGrades
 );
+app.get("/createRecallGradesForNewUser",createRecallGradesForNewUser);
 
 const port = 8080;
 app.listen(port, () => {
