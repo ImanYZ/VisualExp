@@ -20,7 +20,19 @@ const InviteStudents = props => {
     });
   }, []);
 
+  const trackCopyEvent = async () => {
+    try {
+      axios.post("/trackStudentEmailTemplateCopy", {
+        id: instructorId,
+        collection
+      });
+    } catch (err) {
+      //
+    }
+  };
+
   const onStudentsEmailContentCopy = event => {
+    trackCopyEvent();
     window.getSelection().removeAllRanges();
 
     const range = document.createRange();
