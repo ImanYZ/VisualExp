@@ -21,7 +21,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
 import AddIcon from "@mui/icons-material/Add";
-import { batchDelete, batchSet, batchUpdate, commitBatch } from "../../../../functions/admin";
+import { batchDelete, batchSet, batchUpdate, commitBatch } from "../../firebase/firebase";
 const modalStyle = {
   position: "absolute",
   top: "50%",

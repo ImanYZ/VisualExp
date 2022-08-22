@@ -473,7 +473,8 @@ exports.inviteInstructors = async context => {
         !instructorData.no &&
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
-        !instructorData.inviteStudents
+        !instructorData.inviteStudents &&
+        (instructorData.email === "usamashzd99@gmail.com" || instructorData === "onecademy@umich.edu")
       ) {
         // let minCondition,
         //   minCondNum = -1;
