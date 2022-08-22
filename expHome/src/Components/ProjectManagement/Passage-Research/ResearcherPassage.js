@@ -173,7 +173,7 @@ const ResearcherPassage = () => {
       };
       await firebase.batchUpdate(recallRef, recallUpdate);
     }
-    await commitBatch();
+    await firebase.commitBatch();
     handleCloseEditModal();
     setPassagesLoaded(false);
   };
@@ -209,7 +209,7 @@ const ResearcherPassage = () => {
         const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
         await firebase.batchDelete(recallRef);
       }
-      await commitBatch();
+      await firebase.commitBatch();
       setPassagesLoaded(false);
       handleCloseDeleteModal();
     }
@@ -242,7 +242,7 @@ const ResearcherPassage = () => {
         responses.add(recallData.response);
       }
     }
-    await commitBatch();
+    await firebase.commitBatch();
     handleCloseAddPhraseModal();
     setSubmtingNewPhrase(false);
   };
