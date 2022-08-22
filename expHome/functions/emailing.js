@@ -461,6 +461,10 @@ exports.inviteInstructors = async context => {
     const instructorDocs = await db.collection("instructors").get();
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
+      if (instructorData.email === "usamashzd99@gmail.com" || instructorData === "onecademy@umich.edu") {
+        console.log({ nextReminder: instructorData.nextReminder.toDate(), now: new Date() });
+      }
+
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
         (instructorData?.upVotes || 0) - (instructorData?.downVotes || 0) >= 3 &&
