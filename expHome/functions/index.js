@@ -161,7 +161,7 @@ exports.inviteInstructors = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("every 4 minutes")
   .onRun(inviteInstructors);
 
 exports.inviteAdministrators = functions
