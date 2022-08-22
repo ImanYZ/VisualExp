@@ -1212,14 +1212,14 @@ for(let userDoc of userDocs.docs){
           researchersNum: 0,
           session,
           createdAt: userData.lastLoad,
-          user:"yash khouli",
+          user:userDoc.id,
           response: pCond[responseName]
         };
         for (let phras of passageData.phrases) {
           recallGradeData.phrase = phras;
-          console.log(recallGradeData);
+
           const recallGradeRef = db.collection("recallGradesH1L2").doc();
-          console.log(recallGradeRef);
+   
           await batchSet(recallGradeRef, recallGradeData);
         }
       }
