@@ -75,7 +75,7 @@ const FreeRecallGrading = props => {
       // costly to rename.
       const firstFve = [];
       let collName = "recallGrades";
-      if (project !== "H2K2") {
+      if (project !== "H2K2" && project !== "AutoGrading") {
         collName += project;
       }
       const recallGradeDocs = await firebase.db
