@@ -194,7 +194,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       // Because there will be multiple places to update this researcher data,
       // we should accumulate all the updates for this researcher to commit them
       // at the end of the transaction.
-      const currentResearcherRef = await db.collection("researchers").doc(`${fullname}`);
+      const currentResearcherRef = db.collection("researchers").doc(`${fullname}`);
       const currentResearcherDoc = await t.get(currentResearcherRef);
       const currentResearcherData = currentResearcherDoc.data();
       const currentResearcherUpdates = currentResearcherData.projects[project];
@@ -236,7 +236,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           .where("phrase", "==", phraseGrade.phrase);
         const recallGradeDocs = await t.get(recallGradeQuery);
         console.log("Getting data from recallGrade Doc Id", `${recallGradeDocs.docs[0].id}`);
-        const recallGradeRef = await db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
+        const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
         const recallGradeData = recallGradeDocs.docs[0].data();
         if (!recallGradeData.researchers.includes(fullname)) {
           const recallGradeUpdates = {};
@@ -392,7 +392,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
 
       // write all the transactions for other researcher's data
       for (let researcherId of Object.keys(otherResearchersData)) {
-        const researcherRef = await db.collection("researchers").doc(`${researcherId}`);
+        const researcherRef = db.collection("researchers").doc(`${researcherId}`);
         transactionWrites.push({
           type: "update",
           refObj: researcherRef,
