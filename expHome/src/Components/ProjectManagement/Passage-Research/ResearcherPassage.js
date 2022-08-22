@@ -21,7 +21,6 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
 import AddIcon from "@mui/icons-material/Add";
-import { batchDelete, batchSet, batchUpdate, commitBatch } from "../../firebase/firebase";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -161,7 +160,7 @@ const ResearcherPassage = () => {
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-    await batchUpdate(passageRef, passageUpdate);
+    await firebase.batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
@@ -172,7 +171,7 @@ const ResearcherPassage = () => {
       const recallUpdate = {
         phrase: newPhrase
       };
-      await batchUpdate(recallRef, recallUpdate);
+      await firebase.batchUpdate(recallRef, recallUpdate);
     }
     await commitBatch();
     handleCloseEditModal();
@@ -205,10 +204,10 @@ const ResearcherPassage = () => {
     if (allowDelete) {
       setNumberRecorded(0);
       passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
-      await batchUpdate(passageRef, passageUpdate);
+      await firebase.batchUpdate(passageRef, passageUpdate);
       for (let recallDoc of recallGradesDoc.docs) {
         const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        await batchDelete(recallRef);
+        await firebase.batchDelete(recallRef);
       }
       await commitBatch();
       setPassagesLoaded(false);
@@ -222,7 +221,7 @@ const ResearcherPassage = () => {
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases.push(newPhraseAdded);
-    await batchUpdate(passageRef, passageUpdate);
+    await firebase.batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
@@ -239,7 +238,7 @@ const ResearcherPassage = () => {
           researchersNum: 0,
           grades: []
         };
-        await batchSet(recallRef, newRecallGrade);
+        await firebase.batchSet(recallRef, newRecallGrade);
         responses.add(recallData.response);
       }
     }
