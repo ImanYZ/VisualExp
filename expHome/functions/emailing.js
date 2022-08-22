@@ -453,12 +453,15 @@ exports.administratorLater = async (req, res) => {
 // and reminder emails.
 // The algorithm is explained at emailing.drawio
 exports.inviteInstructors = async context => {
+  console.log("Function Starts ******");
   try {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     const instructorDocs = await db.collection("instructors").get();
+
+    console.log("Instructors count = ", instructorDocs.docs.length);
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
       if (
