@@ -175,7 +175,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     "condition" in req.body &&
     "session" in req.body &&
     "phraseNum" in req.body &&
-    "response" in req.body
+    "response" in req.body&&
+    "voterProject" in req.body
   ) {
     const phrasesWithGrades = req.body.phrasesWithGrades || [];
     const fullname = req.body.fullname;
@@ -186,6 +187,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     const passageIdx = req.body.passageIdx;
     const session = req.body.session;
     const phraseNum = req.body.phraseNum;
+    const voterProject= req.body.voterProject;
     db.runTransaction(async t => {
       // Accumulate all the transaction writes in an array to commit all of them
       // after all the reads to abide by the Firestore transaction law
@@ -197,7 +199,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const currentResearcherRef = db.collection("researchers").doc(`${fullname}`);
       const currentResearcherDoc = await t.get(currentResearcherRef);
       const currentResearcherData = currentResearcherDoc.data();
-      const currentResearcherUpdates = currentResearcherData.projects[project];
+      const currentResearcherUpdates = currentResearcherData.projects[voterProject];
       // The very first update we need to apply is to increment the number of
       // times they have graded a free-recall response.
       currentResearcherUpdates.gradingNum = currentResearcherUpdates.gradingNum
