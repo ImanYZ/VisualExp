@@ -241,9 +241,17 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians"
 };
 
-const isTimeToSendEmail = (city = "") => {
-  const cityDetails = cityTimezones.lookupViaCity(city);
-  const timezone = cityDetails?.[0]?.timezone;
+const isTimeToSendEmail = (city = "", state = "", country = "") => {
+  state = state.split(";")[1] || "";
+  country = country.split(";")[1] || "";
+
+  const cityDetails = (cityTimezones.lookupViaCity(city) || []).find(detail => {
+    return (
+      detail.state_ansi.toLowerCase() === state.toLowerCase() || detail.iso2.toLowerCase() === country.toLowerCase()
+    );
+  });
+
+  const timezone = cityDetails?.timezone;
   if (timezone) {
     let hour = moment().tz(timezone).hour();
     if (hour === 7 || hour === 13) {
@@ -281,7 +289,7 @@ exports.inviteAdministrators = async context => {
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
         administratorData.howToAddress &&
-        isTimeToSendEmail(administratorData.city)
+        isTimeToSendEmail(administratorData.city, administratorData.stateInfo, administratorData.country)
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -490,7 +498,7 @@ exports.inviteInstructors = async context => {
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
         !instructorData.inviteStudents &&
-        isTimeToSendEmail(instructorData.city)
+        isTimeToSendEmail(instructorData.city, instructorData.stateInfo, instructorData.country)
       ) {
         // let minCondition,
         //   minCondNum = -1;
