@@ -374,9 +374,9 @@ const ScheduleAdministratorPage = props => {
           <Alert severity="warning">
             <ul id="WarningPoints">
               <li>
-                Please choose a 45-minute time slot based on your availability <strong>in your timezone</strong> for
+                Please choose a 30-minute time slot based on your availability <strong>in your timezone</strong> for
                 scheduling the meeting with us. The following table includes all our availabilities in 15-minute time
-                slots. So, please choose three consecutive slots.
+                slots. So, please choose two consecutive slots.
               </li>
               <li>
                 As soon as you meet the criteria, the SCHEDULE button will be enabled and the time slots with ✅ will
