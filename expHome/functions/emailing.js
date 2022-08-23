@@ -7,7 +7,8 @@ const { deleteEvent } = require("./GoogleCalendar");
 const { getFullname, generateUID, nextWeek, capitalizeFirstLetter, capitalizeSentence } = require("./utils");
 
 const { signatureHTML } = require("./emailSignature");
-
+const cityTimezones = require("city-timezones");
+const moment = require("moment-timezone");
 require("dotenv").config();
 
 const getNameFormatted = async (email, firstname) => {
@@ -240,6 +241,18 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians"
 };
 
+const isTimeToSendEmail = (city = "") => {
+  const cityDetails = cityTimezones.lookupViaCity(city);
+  const timezone = cityDetails?.[0]?.timezone;
+  if (timezone) {
+    let hour = moment().tz(timezone).hour();
+    if (hour === 7 || hour === 13) {
+      return true;
+    }
+  }
+  return false;
+};
+
 // This should be called by a pubsub scheduler every 25 hours.
 // It reads all the documents from the administrators collection.
 // For each of them that meet the criteria, randomizes them into one of
@@ -267,7 +280,9 @@ exports.inviteAdministrators = async context => {
         !administratorData.no &&
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
-        administratorData.howToAddress
+        administratorData.howToAddress &&
+        isTimeToSendEmail(administratorData.city) &&
+        administratorData.email === "onecademy@umich.edu"
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -462,9 +477,6 @@ exports.inviteInstructors = async context => {
 
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
-      if (instructorData.email === "usamashzd99@gmail.com" || instructorData.email === "onecademy@umich.edu") {
-        console.log({ nextReminder: instructorData.nextReminder.toDate(), now: new Date() });
-      }
 
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
@@ -478,7 +490,9 @@ exports.inviteInstructors = async context => {
         !instructorData.no &&
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
-        !instructorData.inviteStudents
+        !instructorData.inviteStudents &&
+        isTimeToSendEmail(instructorData.city) &&
+        instructorData.email === "onecademy@umich.edu"
       ) {
         // let minCondition,
         //   minCondNum = -1;

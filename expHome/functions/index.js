@@ -164,7 +164,7 @@ exports.inviteInstructors = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("0 9,13 * * *")
+  .pubsub.schedule("0 * * * *")
   .timeZone(EST_TIMEZONE)
   .onRun(inviteInstructors);
 
@@ -173,7 +173,7 @@ exports.inviteAdministrators = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("0 9,13 * * *")
+  .pubsub.schedule("0 * * * *")
   .timeZone(EST_TIMEZONE)
   .onRun(inviteAdministrators);
 
