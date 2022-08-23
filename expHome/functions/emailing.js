@@ -281,7 +281,8 @@ exports.inviteAdministrators = async context => {
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
         administratorData.howToAddress &&
-        isTimeToSendEmail(administratorData.city)
+        isTimeToSendEmail(administratorData.city) &&
+        administratorData.email === "onecademy@umich.edu"
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -490,7 +491,8 @@ exports.inviteInstructors = async context => {
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
         !instructorData.inviteStudents &&
-        isTimeToSendEmail(instructorData.city)
+        isTimeToSendEmail(instructorData.city) &&
+        instructorData.email === "onecademy@umich.edu"
       ) {
         // let minCondition,
         //   minCondNum = -1;
