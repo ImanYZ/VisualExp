@@ -36,7 +36,8 @@ const {
   instructorNo,
   instructorLater,
   sendPersonalInvitations,
-  trackStudentInvite
+  trackStudentInvite,
+  trackStudentEmailTemplateCopy
 } = require("./emailing");
 const {
   schedule,
@@ -50,7 +51,8 @@ const {
 } = require("./scheduling");
 const { card, image } = require("./misinformationExp");
 
-process.env.TZ = "America/Detroit";
+const EST_TIMEZONE = "America/Detroit";
+process.env.TZ = EST_TIMEZONE;
 
 const express = require("express");
 
@@ -80,6 +82,7 @@ app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 app.post("/trackStudentInvite", trackStudentInvite);
+app.post("/trackStudentEmailTemplateCopy", trackStudentEmailTemplateCopy);
 app.get("/retrieveData", retrieveData);
 app.get("/passagesNumberCorrection", passagesNumberCorrection);
 // app.get("/feedbackData", feedbackData);
@@ -161,7 +164,8 @@ exports.inviteInstructors = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("0 9,13 * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(inviteInstructors);
 
 exports.inviteAdministrators = functions
@@ -169,7 +173,8 @@ exports.inviteAdministrators = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("0 9,13 * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions

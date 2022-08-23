@@ -20,7 +20,8 @@ import Alert from "@mui/material/Alert";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -38,6 +39,7 @@ const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const [passages, setPassages] = useState([]);
+  const [titles, setTitles] = useState([]);
   const [pConURL, setPConURL] = useState("");
   const [pConURL2, setPConURL2] = useState("");
   const [userCondition, setUserCondition] = React.useState({});
@@ -60,11 +62,15 @@ const ResearcherPassage = () => {
   const handleOpenddPhraseModal = () => setOpenAddPhraseModal(true);
   const [passagesChanges, setPassagesChanges] = useState([]);
   const [passagesLoaded, setPassagesLoaded] = useState(false);
+  const [passagesLoadedUse, setPassagesLoadedUse] = useState(false);
   const [numberRecorded, setNumberRecorded] = useState(0);
   const [newPhraseAdded, setNewPhraseAdded] = useState();
   const [chosenPassage, setChosenPassage] = useState();
   const [openAddPhraseModal, setOpenAddPhraseModal] = useState(false);
   const [submtingNewPhrase, setSubmtingNewPhrase] = useState(false);
+  const [updatingPhrase, setUpdatingPhrase] = useState(false);
+  const [deletingPhrase, setDeletingPhrase] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(true);
   const email = useRecoilValue(emailState);
 
   useEffect(() => {
@@ -76,7 +82,7 @@ const ResearcherPassage = () => {
         setPassagesChanges(oldPassagessChanges => {
           return [...oldPassagessChanges, ...docChanges];
         });
-        setPassagesLoaded(true);
+        setPassagesLoadedUse(true);
       });
       return () => {
         setPassagesChanges([]);
@@ -87,11 +93,11 @@ const ResearcherPassage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    if (passagesLoaded) {
+    let passags = passages;
+    if (passagesLoadedUse) {
       const tempPassagesChanges = [...passagesChanges];
       setPassagesChanges([]);
-      let passags = [];
-      let titles = [];
+      let titls = titles;
       const userDoc = await firebase.db.collection("researchers").doc(fullname).get();
       const userData = userDoc.data();
       let userProjects = Object.keys(userData.projects);
@@ -101,25 +107,39 @@ const ResearcherPassage = () => {
         let passageProjects = Object.keys(pasageData.projects);
         if (passageProjects.length !== 0) {
           if (passageProjects.find(element => userProjects.includes(element))) {
-            passags.push({
-              ...pasageData
-            });
-            titles.push(pasageData.title);
+            if (change.type === "modified") {
+              passags[titls.indexOf(pasageData.title)] = { ...pasageData };
+            } else {
+              passags.push({
+                ...pasageData
+              });
+              titls.push(pasageData.title);
+            }
           }
         }
       }
 
       setPassages(passags);
-      setUserCondition(titles[0]);
-      setPassageCondition("H2");
-      setPConURL(passags[0]["linkH2"]);
-      setUserCondition2(titles[0]);
-      setPassageCondition2("K2");
-      setPConURL2(passags[0]["linkK2"]);
-      setPassage2(passags[0]);
-      setPassage1(passags[0]);
+      if (firstLoad) {
+        setTitles(titls);
+        setUserCondition(titles[0]);
+        setPassageCondition("H2");
+        setPConURL(passags[0]["linkH2"]);
+        setUserCondition2(titles[0]);
+        setPassageCondition2("K2");
+        setPConURL2(passags[0]["linkK2"]);
+        setPassage2(passags[0]);
+        setPassage1(passags[0]);
+        setFirstLoad(false);
+      } else {
+        const index1 = titles.indexOf(passage1.title);
+        const index2 = titles.indexOf(passage2.title);
+        setPassage2(passags[index1]);
+        setPassage1(passags[index2]);
+      }
+      setPassagesLoadedUse(false);
     }
-  }, [firebase, fullname, passagesLoaded]);
+  }, [firebase, fullname, passagesLoadedUse]);
 
   const handlePassageChange = event => {
     const userCondition = event.target.value;
@@ -155,31 +175,44 @@ const ResearcherPassage = () => {
     setPassageCondition2(pCondition);
   };
 
-  const correctionToRecallGrades = async event => {
+  const hundleUpdatePhrase = async event => {
     const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-    passageRef.update(passageUpdate);
+    await firebase.batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
       .where("phrase", "==", selectedPhrase)
       .get();
-    await firebase.db.runTransaction(async t => {
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        const recallUpdate = {
-          phrase: newPhrase
-        };
-        t.update(recallRef, recallUpdate);
-      }
-    });
+    const recallGradesDocH1L2 = await firebase.db
+      .collection("recallGradesH1L2")
+      .where("passage", "==", passageDoc.docs[0].id)
+      .where("phrase", "==", selectedPhrase)
+      .get();
+
+    for (let recallDoc of recallGradesDoc.docs) {
+      const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+      const recallUpdate = {
+        phrase: newPhrase
+      };
+      await firebase.batchUpdate(recallRef, recallUpdate);
+    }
+    for (let recallDoc of recallGradesDocH1L2.docs) {
+      const recallRef = firebase.db.collection("recallGradesH1L2").doc(recallDoc.id);
+      const recallUpdate = {
+        phrase: newPhrase
+      };
+      await firebase.batchUpdate(recallRef, recallUpdate);
+    }
+    await firebase.commitBatch();
     handleCloseEditModal();
     setPassagesLoaded(false);
+    setUpdatingPhrase(false);
   };
 
-  const deleteRecallGrades = async event => {
+  const handleDeletePhrase = async event => {
     const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
     let allowDelete = true;
     let numberRecord = 0;
@@ -188,15 +221,28 @@ const ResearcherPassage = () => {
       .where("passage", "==", passageDoc.docs[0].id)
       .where("phrase", "==", selectedPhrase)
       .get();
+    const recallGradesDocH1L2 = await firebase.db
+      .collection("recallGradesH1L2")
+      .where("passage", "==", passageDoc.docs[0].id)
+      .where("phrase", "==", selectedPhrase)
+      .get();
+
     if (numberRecorded === 0) {
       for (let recallDoc of recallGradesDoc.docs) {
         const recallData = recallDoc.data();
         if (recallData.researchersNum !== 0) {
           allowDelete = false;
-
           numberRecord = numberRecord + 1;
         }
       }
+      for (let recallDoc of recallGradesDocH1L2.docs) {
+        const recallData = recallDoc.data();
+        if (recallData.researchersNum !== 0) {
+          allowDelete = false;
+          numberRecord = numberRecord + 1;
+        }
+      }
+
       setNumberRecorded(numberRecord);
     }
     const oldPhrase = selectedPhrase;
@@ -205,49 +251,76 @@ const ResearcherPassage = () => {
     if (allowDelete) {
       setNumberRecorded(0);
       passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
-      passageRef.update(passageUpdate);
-      await firebase.db.runTransaction(async t => {
-        for (let recallDoc of recallGradesDoc.docs) {
-          const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-          t.delete(recallRef);
-        }
-      });
+      await firebase.batchUpdate(passageRef, passageUpdate);
+      for (let recallDoc of recallGradesDoc.docs) {
+        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
+        await firebase.batchDelete(recallRef);
+      }
+      for (let recallDoc of recallGradesDocH1L2.docs) {
+        const recallRef = firebase.db.collection("recallGradesH1L2").doc(recallDoc.id);
+        await firebase.batchDelete(recallRef);
+      }
+      await firebase.commitBatch();
       setPassagesLoaded(false);
       handleCloseDeleteModal();
     }
+    setDeletingPhrase(false);
   };
 
-  const addNewPhrase = async () => {
+  const handleAddNewPhrase = async () => {
+
+    
     let responses = new Set();
     const passageDoc = await firebase.db.collection("passages").where("title", "==", chosenPassage).get();
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases.push(newPhraseAdded);
-    passageRef.update(passageUpdate);
+    await firebase.batchUpdate(passageRef, passageUpdate);
     const recallGradesDoc = await firebase.db
       .collection("recallGrades")
       .where("passage", "==", passageDoc.docs[0].id)
       .get();
-    await firebase.db.runTransaction(async t => {
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        const recallData = recallDoc.data();
-        if (!responses.has(recallData.response)) {
-          const newRecallGrade = {
-            ...recallData,
-            done: false,
-            phrase: newPhraseAdded,
-            researchers: [],
-            researchersNum: 0,
-            grades: []
-          };
-          t.set(recallRef, newRecallGrade);
-          responses.add(recallData.response);
-        }
+    const recallGradesDocH1L2 = await firebase.db
+      .collection("recallGradesH1L2")
+      .where("passage", "==", passageDoc.docs[0].id)
+      .get();
+    for (let recallDoc of recallGradesDoc.docs) {
+      const recallRef = firebase.db.collection("recallGrades").doc();
+      const recallData = recallDoc.data();
+      if (!responses.has(recallData.response)) {
+        const newRecallGrade = {
+          ...recallData,
+          done: false,
+          phrase: newPhraseAdded,
+          researchers: [],
+          researchersNum: 0,
+          grades: []
+        };
+        await firebase.batchSet(recallRef, newRecallGrade);
+        responses.add(recallData.response);
       }
-    });
+    }
+    for (let recallDoc of recallGradesDocH1L2.docs) {
+      const recallRef = firebase.db.collection("recallGradesH1L2").doc();
+      const recallData = recallDoc.data();
+      if (!responses.has(recallData.response)) {
+        const newRecallGrade = {
+          ...recallData,
+          done: false,
+          phrase: newPhraseAdded,
+          researchers: [],
+          researchersNum: 0,
+          grades: []
+        };
+        await firebase.batchSet(recallRef, newRecallGrade);
+        responses.add(recallData.response);
+      }
+    }
+    await firebase.commitBatch();
     handleCloseAddPhraseModal();
+    setPassagesLoaded(false);
     setSubmtingNewPhrase(false);
+    setNewPhraseAdded("");
   };
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
@@ -279,15 +352,24 @@ const ResearcherPassage = () => {
               onChange={event => setNewPhrase(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button className="Button" variant="contained" onClick={correctionToRecallGrades}>
+              <LoadingButton
+                loading={updatingPhrase}
+                className="Button"
+                variant="contained"
+                onClick={() => {
+                  hundleUpdatePhrase();
+                  setUpdatingPhrase(true);
+                }}
+              >
                 Update
-              </Button>
+              </LoadingButton>
               <Button
                 variant="contained"
                 className="Button Red"
                 onClick={() => {
                   setNewPhrase("");
                   handleCloseEditModal();
+                  setUpdatingPhrase(false);
                 }}
               >
                 Cancel
@@ -311,15 +393,17 @@ const ResearcherPassage = () => {
             <br />
           </Alert>
           <Box sx={{ textAlign: "center" }}>
-            <Button
+            <LoadingButton
+              loading={deletingPhrase}
               variant="contained"
               className="Button Red"
               onClick={() => {
-                deleteRecallGrades();
+                handleDeletePhrase();
+                setDeletingPhrase(true);
               }}
             >
               Delete
-            </Button>
+            </LoadingButton>
             <Button
               className="Button"
               variant="contained"
@@ -327,6 +411,7 @@ const ResearcherPassage = () => {
                 setSelectedPhrase("");
                 setNumberRecorded(0);
                 handleCloseDeleteModal();
+                setDeletingPhrase(false);
               }}
             >
               Cancel
@@ -381,7 +466,7 @@ const ResearcherPassage = () => {
                 variant="contained"
                 loading={submtingNewPhrase}
                 onClick={() => {
-                  addNewPhrase();
+                  handleAddNewPhrase();
                   setSubmtingNewPhrase(true);
                 }}
               >
@@ -487,14 +572,16 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "oneweb@umich.edu" && (<Button
-                  onClick={() => {
-                    handleOpenddPhraseModal();
-                    setChosenPassage(passage1.title);
-                  }}
-                >
-                <AddIcon /> add New Phrase
-                </Button>)}
+                {email === "oneweb@umich.edu" && (
+                  <Button
+                    onClick={() => {
+                      handleOpenddPhraseModal();
+                      setChosenPassage(passage1.title);
+                    }}
+                  >
+                    <AddIcon /> add New Phrase
+                  </Button>
+                )}
               </>
             )}
             <div>
@@ -503,9 +590,8 @@ const ResearcherPassage = () => {
                 passage1.phrases.map((phrase, index) => (
                   <ul key={index}>
                     <li>
-                      <Typography variant="h6" component="div">
-                        {phrase}
-                      </Typography>
+                      <div> {phrase}</div>
+
                       {email === "oneweb@umich.edu" && (
                         <>
                           <IconButton
@@ -615,18 +701,20 @@ const ResearcherPassage = () => {
               })}
             {passage2?.phrases?.length > 0 && (
               <>
-              <Typography variant="h5" gutterBottom component="div">
-                Phrases
-              </Typography>
+                <Typography variant="h5" gutterBottom component="div">
+                  Phrases
+                </Typography>
 
-              {email === "oneweb@umich.edu" && (<Button
-                onClick={() => {
-                handleOpenddPhraseModal();
-                setChosenPassage(passage2.title);
-                }}
-              >
-              <AddIcon /> add New Phrase
-              </Button>)}
+                {email === "oneweb@umich.edu" && (
+                  <Button
+                    onClick={() => {
+                      handleOpenddPhraseModal();
+                      setChosenPassage(passage2.title);
+                    }}
+                  >
+                    <AddIcon /> add New Phrase
+                  </Button>
+                )}
               </>
             )}
 
@@ -636,9 +724,7 @@ const ResearcherPassage = () => {
                 passage2.phrases.map((phrase, index) => (
                   <ul key={index}>
                     <li>
-                      <Typography variant="h6" component="div">
-                        {phrase}
-                      </Typography>
+                      <div>{phrase}</div>
                       {email === "oneweb@umich.edu" && (
                         <>
                           <IconButton
