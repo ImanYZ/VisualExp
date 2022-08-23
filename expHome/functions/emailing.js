@@ -459,6 +459,7 @@ exports.inviteInstructors = async context => {
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     const instructorDocs = await db.collection("instructors").get();
+
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
       if (
@@ -693,6 +694,25 @@ exports.trackStudentInvite = async (req, res) => {
       const instructorDoc = db.collection(collection).doc(instructorId);
       await instructorDoc.update({
         inviteStudents: true,
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+      });
+    }
+    res.send("OK");
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.trackStudentEmailTemplateCopy = async (req, res) => {
+  try {
+    // This is a post request and we should retrieve the data from req.body
+    if ("id" in req.body && req.body.id && "collection" in req.body && req.body.collection) {
+      const instructorId = req.body.id;
+      const collection = req.body.collection;
+      const instructorDoc = db.collection(collection).doc(instructorId);
+      await instructorDoc.update({
+        copiedStudentsEmail: true,
         updatedAt: admin.firestore.Timestamp.fromDate(new Date())
       });
     }
