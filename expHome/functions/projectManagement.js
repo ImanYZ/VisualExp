@@ -1726,7 +1726,12 @@ exports.assignExperimentSessionsPoints = async context => {
             if (rIdx !== -1) {
               researcherObjs.push(researchersInfo[rIdx]);
             }
-            const uIdx = usersInfo.findIndex(user => user.email.toLowerCase() === attendee.email.toLowerCase());
+            const uIdx = usersInfo.findIndex(user => {
+              return (
+                user.email.toLowerCase() === attendee.email.toLowerCase() &&
+                !researcherObjs.some(r => r.email.toLowerCase() === attendee.email.toLowerCase())
+              );
+            });
             if (uIdx !== -1) {
               userObj = usersInfo[uIdx];
             }
@@ -1746,6 +1751,7 @@ exports.assignExperimentSessionsPoints = async context => {
                   .collection("expSessions")
                   .where("attendees", "==", attendees)
                   .where("sTime", "==", sTime)
+                  .where("project", "==", project)
                   .get();
 
                 // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
