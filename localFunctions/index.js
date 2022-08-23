@@ -20,6 +20,7 @@ const {
   correctTheDataStructureForDamagedUsers,
   deleteDamageDocumentForAffectedUsersInRecallGrades,
   makeCorrectionToPhrasesinRecallGrades,
+  createRecallGradesForNewUserH1L2,
 } = require("./visualExp");
 
 const app = express();
@@ -60,6 +61,7 @@ app.get(
   makeCorrectionToPhrasesinRecallGrades
 );
 
+app.get("/createRecallGradesForNewUserH1L2", createRecallGradesForNewUserH1L2);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
