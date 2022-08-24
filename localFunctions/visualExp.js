@@ -1079,32 +1079,36 @@ exports.deleteDamageDocumentForAffectedUsersInRecallGrades = async (
   }
 };
 
-
 exports.makeCorrectionToPhrasesinRecallGrades = async (req, res) => {
   try {
     const changedPhrases = new Set();
-    const corespondingPhrases={
-      'Barn owl locate prey like predators that hunt on the ground':'Barn owl locates prey similarly to predators that hunt on the ground',
-      'The face structure of barn owls consists of purpose of troughs':'The face structure of barn owls contains two troughs',
-      'Barn owls have acuity and sensitivity to differences in loudness through information interpretation and impulse transmission':'Barn owls must organize and interpret sound information',
-      'Barn owl must locate prey quickly and precisely':'Barn owl must locate prey precisely',
-     };
-    const deletRecallGradePhrases =[ 
-      'The decision stands teach visitors about habitat loss and conservation efforts',
+    const corespondingPhrases = {
+      "Barn owl locate prey like predators that hunt on the ground":
+        "Barn owl locates prey similarly to predators that hunt on the ground",
+      "The face structure of barn owls consists of purpose of troughs":
+        "The face structure of barn owls contains two troughs",
+      "Barn owls have acuity and sensitivity to differences in loudness through information interpretation and impulse transmission":
+        "Barn owls must organize and interpret sound information",
+      "Barn owl must locate prey quickly and precisely":
+        "Barn owl must locate prey precisely",
+    };
+    const deletRecallGradePhrases = [
+      "The decision stands teach visitors about habitat loss and conservation efforts",
       "The decision stands teach visitors what it's like to weight economic decisions against the need to preserve panda habitats",
       "The decision stands are Wang's favorite part of the exhibit because the experience helps visitors understand that the problem is a wider socio-economic one",
-      "The decision stands are Wang's favorite part of the exhibit because the experience helps visitors understand that the problem cannot be solved by biologists alone"]
-    const passagesDocs = await db
-    .collection("passages")
-    .get();
+      "The decision stands are Wang's favorite part of the exhibit because the experience helps visitors understand that the problem cannot be solved by biologists alone",
+    ];
+    const passagesDocs = await db.collection("passages").get();
     const passages = {};
-    for(let doc of passagesDocs.docs){
+    for (let doc of passagesDocs.docs) {
       const passageData = doc.data();
-      passages[doc.id] = passageData
-      if("H2K2" in passageData.projects && doc.id !=="s1oo3G4n3jeE8fJQRs3g"){
-        if(passageData.phrases){for(let phrase of passageData.phrases){
-          changedPhrases.add(phrase);
-        }}
+      passages[doc.id] = passageData;
+      if ("H2K2" in passageData.projects && doc.id !== "s1oo3G4n3jeE8fJQRs3g") {
+        if (passageData.phrases) {
+          for (let phrase of passageData.phrases) {
+            changedPhrases.add(phrase);
+          }
+        }
       }
     }
     let recallGradeDocsInitial = await db
@@ -1117,10 +1121,8 @@ exports.makeCorrectionToPhrasesinRecallGrades = async (req, res) => {
       recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
     console.log("Starting");
     const uniquePhrases = new Set();
-    const recallGradesToDelete=new Set();
+    const recallGradesToDelete = new Set();
 
-
-    
     while (lastVisibleRecallGradesDoc) {
       recallGradeDocs = await db
         .collection("recallGrades")
@@ -1138,33 +1140,35 @@ exports.makeCorrectionToPhrasesinRecallGrades = async (req, res) => {
           .doc(recallGradeDoc.id);
 
         const recallGradeData = recallGradeDoc.data();
-    
+
         changedPhrases.delete(recallGradeData.phrase);
-        if(! "H2K2" in passages[recallGradeData.passage].projects){
-          recallGradesToDelete.add(recallGradeDoc.id)
+        if (!"H2K2" in passages[recallGradeData.passage].projects) {
+          recallGradesToDelete.add(recallGradeDoc.id);
         }
-        if(!passages[recallGradeData.passage].phrases.includes(recallGradeData.phrase)){
-          if(deletRecallGradePhrases.includes(recallGradeData.phrase)){
+        if (
+          !passages[recallGradeData.passage].phrases.includes(
+            recallGradeData.phrase
+          )
+        ) {
+          if (deletRecallGradePhrases.includes(recallGradeData.phrase)) {
             // await batchDelete(recallGradeRef)
-          }else{
-        const recallUpdate = {
-          phrase:corespondingPhrases[recallGradeData.phrase]
-        };
-          // await batchUpdate(recallGradeRef,recallUpdate);
+          } else {
+            const recallUpdate = {
+              phrase: corespondingPhrases[recallGradeData.phrase],
+            };
+            // await batchUpdate(recallGradeRef,recallUpdate);
           }
 
-          if(!uniquePhrases.has(recallGradeData.phrase)){
+          if (!uniquePhrases.has(recallGradeData.phrase)) {
             uniquePhrases.add(recallGradeData.phrase);
           }
           // console.log({recallphrase:recallGradeData.phrase,passageId:recallGradeData.passage});
         }
-      
       }
-
     }
-    console.log({changedPhrases})
-    console.log({recallGradesToDelete})
-    console.log({uniquePhrases})
+    console.log({ changedPhrases });
+    console.log({ recallGradesToDelete });
+    console.log({ uniquePhrases });
     // await commitBatch();
     console.log("Done");
   } catch (err) {
@@ -1173,61 +1177,63 @@ exports.makeCorrectionToPhrasesinRecallGrades = async (req, res) => {
   }
 };
 
+exports.createRecallGradesForNewUserH1L2 = async (req, res) => {
+  try {
+    const userDocs = await db
+      .collection("users")
+      .where("project", "==", "H1L2")
+      .get();
 
-exports.createRecallGradesForNewUserH1L2 = async(req,res)=>{
-try {
-  const userDocs = await db
-  .collection("users")
-  .where("project","==","H1L2")
-  .get();
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
 
-for(let userDoc of userDocs.docs){
-  const userData = userDoc.data();
-  console.log("userData");
-  let allResponsesReady = true;
-  for (let pCond of userData.pConditions) {
-    if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
-      allResponsesReady = false;
-    }
-  }
-  if (allResponsesReady) {
-    for (let pCond of userData.pConditions) {
-      passageDoc = await db.collection("passages").doc(pCond.passage).get();
-      passageData = passageDoc.data();
-      for (let session of ["1st", "2nd", "3rd"]) {
-        let responseName = "recallreText";
-        if (session === "2nd") {
-          responseName = "recall3DaysreText";
-        } else if (session === "3rd") {
-          responseName = "recall1WeekreText";
+      let allResponsesReady = true;
+      for (let pCond of userData.pConditions) {
+        if (
+          !("recallreText" in pCond) ||
+          !("recall3DaysreText" in pCond) ||
+          !("recall1WeekreText" in pCond)
+        ) {
+          allResponsesReady = false;
         }
-        const recallGradeData = {
-          done: false,
-          condition: pCond.condition,
-          createdAt: userData.lastLoad,
-          passage: pCond.passage,
-          project: userData.project,
-          grades: [],
-          researchers: [],
-          researchersNum: 0,
-          session,
-          createdAt: userData.lastLoad,
-          user:userDoc.id,
-          response: pCond[responseName]
-        };
-        for (let phras of passageData.phrases) {
-          recallGradeData.phrase = phras;
+      }
+      if (allResponsesReady) {
+        for (let pCond of userData.pConditions) {
+          passageDoc = await db.collection("passages").doc(pCond.passage).get();
+          passageData = passageDoc.data();
+          for (let session of ["1st", "2nd", "3rd"]) {
+            let responseName = "recallreText";
+            if (session === "2nd") {
+              responseName = "recall3DaysreText";
+            } else if (session === "3rd") {
+              responseName = "recall1WeekreText";
+            }
+            for (let phras of passageData.phrases) {
+              const recallGradeData = {
+                done: false,
+                condition: pCond.condition,
+                createdAt: userData.lastLoad ? userData.lastLoad : new Date(),
+                passage: pCond.passage,
+                project: userData.project,
+                grades: [],
+                researchers: [],
+                researchersNum: 0,
+                session,
+                user: userDoc.id,
+                phrase: phras,
+                response: pCond[responseName],
+              };
 
-          const recallGradeRef = db.collection("recallGradesH1L2").doc();
-   
-          await batchSet(recallGradeRef, recallGradeData);
+              const recallGradeRef = db.collection("recallGradesH1L2").doc();
+              await batchSet(recallGradeRef, recallGradeData);
+            }
+          }
         }
       }
     }
+    await commitBatch();
+    console.log("done");
+  } catch (error) {
+    console.log(error);
   }
-}
-  await commitBatch();
-} catch (error) {
-  console.log(error)
-}
-}
+};
