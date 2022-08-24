@@ -942,7 +942,7 @@ const AddAdministrator = props => {
               if (
                 administratorsToday === 6 &&
                 dayAdministratorsDocs.docs.length === 0 &&
-                "dayAdministratorUpVotes" in projectPoints
+                !("dayAdministratorUpVotes" in projectPoints)
               ) {
                 const dayAdministratorRef = firebase.db.collection("dayAdministrators").doc();
                 await dayAdministratorRef.set({
