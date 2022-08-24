@@ -1117,7 +1117,7 @@ const AddInstructor = props => {
               if (
                 instructorsToday === 6 &&
                 dayInstructorsDocs.docs.length === 0 &&
-                "dayInstructorUpVotes" in projectPoints
+                !("dayInstructorUpVotes" in projectPoints)
               ) {
                 const dayInstructorRef = firebase.db.collection("dayInstructors").doc();
                 await dayInstructorRef.set({
