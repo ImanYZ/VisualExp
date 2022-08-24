@@ -136,6 +136,11 @@ const FreeRecallGrading = props => {
     }
 
     const firstBatch = [];
+    const lastVisibleRecallGradesData = lastVisibleRecallGradesDoc.data();
+
+    if (lastVisibleRecallGradesData.user !== fullname && !lastVisibleRecallGradesData.researchers.includes(fullname)) {
+      firstBatch.push({ data: lastVisibleRecallGradesData, grade: false });
+    }
     for (let recallGradeDoc of recallGradeDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
 
