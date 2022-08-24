@@ -175,7 +175,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     "condition" in req.body &&
     "session" in req.body &&
     "phraseNum" in req.body &&
-    "response" in req.body
+    "response" in req.body &&
+    "voterProject" in req.body
   ) {
     const phrasesWithGrades = req.body.phrasesWithGrades || [];
     const fullname = req.body.fullname;
@@ -186,6 +187,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     const passageIdx = req.body.passageIdx;
     const session = req.body.session;
     const phraseNum = req.body.phraseNum;
+    const voterProject = req.body.voterProject;
     db.runTransaction(async t => {
       // Accumulate all the transaction writes in an array to commit all of them
       // after all the reads to abide by the Firestore transaction law
@@ -197,7 +199,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const currentResearcherRef = db.collection("researchers").doc(`${fullname}`);
       const currentResearcherDoc = await t.get(currentResearcherRef);
       const currentResearcherData = currentResearcherDoc.data();
-      const currentResearcherUpdates = currentResearcherData.projects[project];
+      const currentResearcherUpdates = currentResearcherData.projects[voterProject];
       // The very first update we need to apply is to increment the number of
       // times they have graded a free-recall response.
       currentResearcherUpdates.gradingNum = currentResearcherUpdates.gradingNum
@@ -222,22 +224,36 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const userUpdates = userData;
 
       // researcher references
+      const researchersDocs = await db
+      .collection("researchers")
+      .get();
       const otherResearchersData = {};
+      for(let resDoc of researchersDocs.docs){
+        otherResearchersData[resDoc.id] = {data:resDoc.data()};
+      }
 
+      //getting data from recallGrades
+      const recallGradeQuery = db
+        .collection(collName)
+        .where("user", "==", user)
+        .where("session", "==", session)
+        .where("condition", "==", condition)
+        .where("passage", "==", passageId);
+      const recallGradeDocs = await t.get(recallGradeQuery);
+      const recallGradesData = {};
+      for (let recallDoc of recallGradeDocs.docs) {
+        const recallData = recallDoc.data();
+        recallGradesData[recallData.phrase] = {id:recallDoc.id,...recallData}
+      }
       // phraseGrade loop
+
       for (let phraseGrade of phrasesWithGrades) {
         console.log("phrase & grade::::", phraseGrade);
-        const recallGradeQuery = db
-          .collection(collName)
-          .where("user", "==", user)
-          .where("session", "==", session)
-          .where("condition", "==", condition)
-          .where("passage", "==", passageId)
-          .where("phrase", "==", phraseGrade.phrase);
-        const recallGradeDocs = await t.get(recallGradeQuery);
-        console.log("Getting data from recallGrade Doc Id", `${recallGradeDocs.docs[0].id}`);
-        const recallGradeRef = db.collection(collName).doc(`${recallGradeDocs.docs[0].id}`);
-        const recallGradeData = recallGradeDocs.docs[0].data();
+        const recallGradeData = recallGradesData[phraseGrade.phrase];
+        console.log("Getting data from recallGrade Doc Id", `${recallGradeData.id}`);
+        const recallGradeRef = db.collection(collName).doc(`${recallGradeData.id}`);
+
+
         if (!recallGradeData.researchers.includes(fullname)) {
           const recallGradeUpdates = {};
           // Only if all the 4 researchers (this one and 3 others) have graded
@@ -300,21 +316,14 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               // a point to each of the researchers who unanimously
               // identified/notIdentified this phrase in this free recall response.
               for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-                if (!otherResearchersData[recallGradeData.researchers[fResearcherIdx]]) {
-                  console.log("NEW RESEARCHER ADDED::::", recallGradeData.researchers[fResearcherIdx]);
-                  const researcherRef = db
-                    .collection("researchers")
-                    .doc(`${recallGradeData.researchers[fResearcherIdx]}`);
-                  const researcherDoc = await t.get(researcherRef);
-                  const researcherData = researcherDoc.data();
-                  otherResearchersData[recallGradeData.researchers[fResearcherIdx]] = researcherData;
-                }
+             
+                  otherResearchersData[recallGradeData.researchers[fResearcherIdx]].isOther = true;
+                
 
                 // fetch all the researcher projects and
                 // check if it has in payload or not.
                 const researcherObj = otherResearchersData[recallGradeData.researchers[fResearcherIdx]];
-                const researcherProjects = Object.keys(researcherObj.projects);
-                const researcherHasProjectFromPayloadProject = researcherProjects.includes(project);
+                const researcherHasProjectFromPayloadProject = project in researcherObj.projects;
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
                   (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
@@ -346,7 +355,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                       : 0.5;
                   }
                 }
-                otherResearchersData[recallGradeData.researchers[fResearcherIdx]] = researcherObj;
               }
               // If the authenticated researcher has graded the same as the majority
               // of grades:
@@ -378,7 +386,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
             type: "update",
             refObj: recallGradeRef,
             updateObj: {
-              ...recallGradeUpdates,
               done: recallGradeData.researchersNum >= 3,
               researchers: [...recallGradeData.researchers, fullname],
               grades: [...recallGradeData.grades, phraseGrade.grade],
@@ -391,13 +398,15 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       // for phrase grades loop ends above
 
       // write all the transactions for other researcher's data
-      for (let researcherId of Object.keys(otherResearchersData)) {
-        const researcherRef = db.collection("researchers").doc(`${researcherId}`);
-        transactionWrites.push({
-          type: "update",
-          refObj: researcherRef,
-          updateObj: otherResearchersData[researcherId]
-        });
+      for (let researcherId in otherResearchersData) {
+        if(otherResearchersData[researcherId].isOther){
+          const researcherRef = db.collection("researchers").doc(`${researcherId}`);
+          transactionWrites.push({
+            type: "update",
+            refObj: researcherRef,
+            updateObj: otherResearchersData[researcherId]
+          });
+        }
       }
 
       // write user transactions
@@ -421,6 +430,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
 
       // After accumulating all the updates for the authenticated researcher,
       // now we can update their document's.
+
       for (let transactionWrite of transactionWrites) {
         if (transactionWrite.type === "update") {
           t.update(transactionWrite.refObj, transactionWrite.updateObj);
