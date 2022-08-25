@@ -147,7 +147,7 @@ const App = () => {
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
     { explanation: "", codes: [] },
-    { choice: "" ,explanation: ""}
+    { choice: "", explanation: "" }
   ]);
 
   const [birthDate, setBirthDate] = useState(null);
@@ -493,13 +493,17 @@ const App = () => {
         setTimer(15 * 60);
         break;
       case 3:
+        // if a pCondition do not have "testScore" field, that means
+        // the participant has not gone through that paragraph.
+        const pendingPCon = pConditions.find(pCon => !("testScore" in pCon));
+
         userUpdates = {};
-        if (phase === 0) {
+        if (pendingPCon) {
           userUpdates = {
             phase: 1,
             currentPCon: {
-              passage: pConditions[1].passage,
-              condition: pConditions[1].condition
+              passage: pendingPCon.passage,
+              condition: pendingPCon.condition
             }
           };
           newStep = 0;
@@ -507,10 +511,10 @@ const App = () => {
           newStep = 4;
         }
         await submitAnswers(currentTime, 15 * 60 - timer, userRef, userData, userUpdates, newStep);
-        if (phase === 0) {
+        if (pendingPCon) {
           setPhase(1);
-          setPassage(pConditions[1].passage);
-          setCondition(pConditions[1].condition);
+          setPassage(pendingPCon.passage);
+          setCondition(pendingPCon.condition);
         }
         setTimer(15 * 60);
         break;
@@ -739,7 +743,7 @@ const App = () => {
         setExplanations([
           { explanation: "", codes: [] },
           { explanation: "", codes: [] },
-          { choice: "" ,explanation: ""}
+          { choice: "", explanation: "" }
         ]);
         setTimer(30 * 60);
         break;
