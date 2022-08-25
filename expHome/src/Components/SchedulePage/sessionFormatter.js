@@ -1,5 +1,6 @@
 const sessionFormatter = (start, minutes) => {
   return (
+    " " +
     start.toLocaleDateString(navigator.language, {
       weekday: "long",
       year: "numeric",
