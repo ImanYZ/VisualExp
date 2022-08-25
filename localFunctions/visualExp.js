@@ -1237,3 +1237,268 @@ exports.createRecallGradesForNewUserH1L2 = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.deleteTheKeyPhrasesForPassage = async (req, res) => {
+  try {
+    const newPhrases = [
+      "The passage is about trap-jaw ants",
+      "They are a group of Central and South American ants",
+      "They have a speedy bite",
+      "They bites are the fastest on the planet",
+      "They can jump with their jaw",
+      "Jumping with jaw is a newly discovered defense",
+      "They nest in leaf litter",
+      "They feed on well-armored and elusive prey, including other species of ants",
+      "They stalk prey",
+      "They hold their mandibles wide apart, often at 180 degrees",
+      "Mandibles cocked open by a latch mechanism",
+      "Jaw snaps shut after minute trigger hairs in mandible come in contact with something",
+      "Jaws snap shut at up to 145 miles per hour",
+      "No passerby can outrace that astoundingly high speed of the jaws",
+      "Jaws have enough force to crack open the armor of most prey",
+      "They store energy in their jaws",
+      "Energy release from strong but slow muscles is the key for the jaw’s speed",
+      "Archers use bowstring to throw arrows faster than throwing the arrow like a javelin",
+      "The energy stored in their jaws are similar to an archer drawing their bow",
+      "Sheila N. Patek is a biomechanist at the University of California, Berkeley",
+      "Joseph E. Baio is a biomechanist at the University of California, Berkeley",
+      "Sheila N. Patek and Joseph E. Baio are experts in the biomechanics of energy storage",
+      "Brian L. Fisher of the California Academy of Sciences in San Francisco is an ant expert",
+      "Andrew V. Suarez of the University of Illinois at Urbana-Champaign is an ant expert",
+      "They are known as Odontomachus bauri",
+      "Catching them is like grabbing for popping hot popcorn",
+      "Painful sting goes with their trap-jaw bite",
+      "They propel themselves many times their body length",
+      "They jump when biologists or smaller intruders approach them",
+      "Secret of their self-propulsion is the well-executed “firing” of their mandibles",
+      "Researchers made high-speed video to discover the secret of their self propulsion",
+      "Their mandibles started to decelerate before they meet",
+      "Deceleration of mandibles possibly help to avoid self-inflicted damage",
+      "They have two distinct modes of aerial locomotion",
+      "In escape jump, an ant orients its head and jaws perpendicular to the ground",
+      "In escape jump, they slam their face straight down",
+      "In escape jump, mandibles are released with a force 400 times the ant’s body weight",
+      "Escape jump launches the insect ten or more body lengths nearly straight into the air",
+      "Escape jump is fast and unpredictable",
+      "Escape jump help the insect evade threats",
+      "Escape jump helps ant to sow confusion",
+      "Escape jump helps the ant get to a new vantage point to relaunch an attack",
+      "Bouncer-defense jump is done when an intruder enters their nest",
+      "Bouncer-defense jump is more common than escape jump",
+      "For bouncer-defense jump ants bangs its jaws against the intruder ",
+      "Banging jaws against intruder triggers the trap-jaw and propels the interloper",
+      "Bouncer-defense jump propels the interloper (if small enough) in one direction",
+      "Bouncer-defense jump propels the ant in other direction",
+      "Bouncer defense jump often sends the ant an inch off the ground",
+      "Bouncer defense jump often sends the ant nearly a foot away",
+      "Gangs of defending ants team up to send hostile strangers out of the nest",
+      "Their evolution is intriguing",
+      "They evolved to use already useful system of chewing up prey for propulsion",
+      "Bouncer-defense jump could have arisen out of attempts to bite intruders",
+      "The bouncer-defense jump is horizontal",
+      "High, escape jump must have arisen from a different, perhaps accidental kind of behavior",
+      "Several lineages use tactic of storing energy in their jaws to penetrate well-defended prey",
+    ];
+
+    const passagesToDelete = ["xuNQUYbAEFfTD1PHuLGV"];
+
+    for (passage of passagesToDelete) {
+      console.log(passage);
+      const passageRef = await db.collection("passages").doc(passage);
+      if (passage === "xuNQUYbAEFfTD1PHuLGV") {
+        passageUpdate = {
+          phrases: newPhrases,
+        };
+      } else {
+        passageUpdate = {
+          phrases: [],
+        };
+      }
+
+      await batchUpdate(passageRef, passageUpdate);
+    }
+    //Delete documents for recall Grades project H2K2
+
+    let recallGradeDocsInitial = await db
+      .collection("recallGrades")
+      .orderBy("createdAt")
+      .limit(1)
+      .get();
+    let documentsNumber = 1;
+    let lastVisibleRecallGradesDoc =
+      recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
+    const lastVisibleRecallGradesData = lastVisibleRecallGradesDoc.data();
+    const lastVisibleRecallGradeRef = db
+      .collection("recallGrades")
+      .doc(lastVisibleRecallGradesDoc.id);
+    if (passagesToDelete.includes(lastVisibleRecallGradesData.passage)) {
+      console.log(lastVisibleRecallGradesDoc.id);
+      await batchDelete(lastVisibleRecallGradeRef);
+    }
+    //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
+    console.log("StartingH2K2");
+    //we stay in the while loop as long as lastVisibleRecallGradesDoc is not undifined
+    while (lastVisibleRecallGradesDoc) {
+      //retreive 40000 document because that's the amount firebase can take without going on timeout
+      recallGradeDocs = await db
+        .collection("recallGrades")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleRecallGradesDoc)
+        .limit(40000)
+        .get();
+
+      console.log(documentsNumber);
+      documentsNumber = documentsNumber + 40000;
+      //we go through the recallGrades documents and delete the documents associated with damagedUsers
+      for (let recallGradeDoc of recallGradeDocs.docs) {
+        const recallGradeRef = db
+          .collection("recallGrades")
+          .doc(recallGradeDoc.id);
+
+        let recallGradeData = recallGradeDoc.data();
+        //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
+        if (passagesToDelete.includes(recallGradeData.passage)) {
+          console.log(recallGradeDoc.id);
+          await batchDelete(recallGradeRef);
+        }
+      }
+      lastVisibleRecallGradesDoc =
+        recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
+    }
+
+    //Delete documents for recall Grades project H1L2
+
+    let recallGradeH1L2DocsInitial = await db
+      .collection("recallGradesH1L2")
+      .orderBy("createdAt")
+      .limit(1)
+      .get();
+
+    let lastVisibleRecallGradesH1L2Doc =
+      recallGradeH1L2DocsInitial.docs[
+        recallGradeH1L2DocsInitial.docs.length - 1
+      ];
+
+    const lastVisibleRecallGradesH1L2Data =
+      lastVisibleRecallGradesH1L2Doc.data();
+    const lastVisibleRecallGradeH1L2Ref = db
+      .collection("recallGradesH1L2")
+      .doc(lastVisibleRecallGradesH1L2Doc.id);
+    if (passagesToDelete.includes(lastVisibleRecallGradesH1L2Data.passage)) {
+      console.log(lastVisibleRecallGradesH1L2Doc.id);
+      await batchDelete(lastVisibleRecallGradeH1L2Ref);
+    }
+    console.log("StartingH1L2");
+    //we stay in the while loop as long as lastVisibleRecallGradesDoc is not undifined
+    while (lastVisibleRecallGradesH1L2Doc) {
+      //retreive 40000 document because that's the amount firebase can take without going on timeout
+      recallGradeDocsH1L2 = await db
+        .collection("recallGradesH1L2")
+        .orderBy("createdAt")
+        .startAfter(lastVisibleRecallGradesH1L2Doc)
+        .limit(40000)
+        .get();
+
+      console.log(documentsNumber);
+      documentsNumber = documentsNumber + 40000;
+
+      //we go through the recallGrades documents and delete the documents associated with damagedUsers
+      for (let recallGradH1L2Doc of recallGradeDocsH1L2.docs) {
+        console.log(recallGradH1L2Doc.id);
+        let recallGradeH1L2Ref = db
+          .collection("recallGradesH1L2")
+          .doc(recallGradH1L2Doc.id);
+
+        let recallGradeH1L2Data = recallGradH1L2Doc.data();
+        //if the document belong to a damaged user we delete the ducement and add the passage id to passagesUsers
+        if (passagesToDelete.includes(recallGradeH1L2Data.passage)) {
+          console.log(recallGradH1L2Doc.id);
+          await batchDelete(recallGradeH1L2Ref);
+        }
+      }
+      lastVisibleRecallGradesH1L2Doc =
+        recallGradeDocsH1L2.docs[recallGradeDocsH1L2.docs.length - 1];
+    }
+
+    await commitBatch();
+    console.log("Done");
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
+  }
+};
+
+exports.recreateNewRecallGradesDocuments = async () => {
+  try {
+    const userDocs = await db.collection("users").get();
+
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
+
+      let allResponsesReady = true;
+      if (userData.pConditions) {
+        for (let pCond of userData.pConditions) {
+          if (
+            !("recallreText" in pCond) ||
+            !("recall3DaysreText" in pCond) ||
+            !("recall1WeekreText" in pCond)
+          ) {
+            allResponsesReady = false;
+          }
+        }
+        if (allResponsesReady) {
+          for (let pCond of userData.pConditions) {
+            if (pCond.passage === "xuNQUYbAEFfTD1PHuLGV") {
+              passageDoc = await db
+                .collection("passages")
+                .doc(pCond.passage)
+                .get();
+              passageData = passageDoc.data();
+              for (let session of ["1st", "2nd", "3rd"]) {
+                let responseName = "recallreText";
+                if (session === "2nd") {
+                  responseName = "recall3DaysreText";
+                } else if (session === "3rd") {
+                  responseName = "recall1WeekreText";
+                }
+
+                for (let phras of passageData.phrases) {
+                  const recallGradeData = {
+                    done: false,
+                    condition: pCond.condition,
+                    createdAt: userData.lastLoad
+                      ? userData.lastLoad
+                      : new Date(),
+                    passage: pCond.passage,
+                    project: userData.project,
+                    grades: [],
+                    researchers: [],
+                    researchersNum: 0,
+                    session,
+                    user: userDoc.id,
+                    phrase: phras,
+                    response: pCond[responseName],
+                  };
+                  if (userData.project === "H2K2") {
+                    const recallGradeRef = db.collection("recallGrades").doc();
+                    await batchSet(recallGradeRef, recallGradeData);
+                    
+                  } else if (userData.project === "H1L2") {
+                    const recallGradeRef = db
+                      .collection("recallGradesH1L2")
+                      .doc();
+                    await batchSet(recallGradeRef, recallGradeData);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    await commitBatch();
+    console.log("Done");
+  } catch (error) {
+    console.log(error);
+  }
+};
