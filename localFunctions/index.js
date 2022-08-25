@@ -21,6 +21,8 @@ const {
   deleteDamageDocumentForAffectedUsersInRecallGrades,
   makeCorrectionToPhrasesinRecallGrades,
   createRecallGradesForNewUserH1L2,
+  deleteTheKeyPhrasesForPassage,
+  recreateNewRecallGradesDocuments
 } = require("./visualExp");
 
 const app = express();
@@ -62,6 +64,9 @@ app.get(
 );
 
 app.get("/createRecallGradesForNewUserH1L2", createRecallGradesForNewUserH1L2);
+
+app.get("/deleteTheKeyPhrasesForPassage",deleteTheKeyPhrasesForPassage);
+app.get("/recreateNewRecallGradesDocuments",recreateNewRecallGradesDocuments);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
