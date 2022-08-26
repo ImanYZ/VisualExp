@@ -245,7 +245,7 @@ const App = () => {
       let score = 0;
       let originalChoicesOrder = [];
       for (let qIdx = 0; qIdx < questions.length; qIdx++) {
-        originalChoicesOrder.push(choices[orderQuestions.indexOf(questions[qIdx])]);
+        originalChoicesOrder.push(choices[orderQuestions.indexOf(questions[qIdx])] || "");
         if (questions[qIdx].answer === choices[orderQuestions.indexOf(questions[qIdx])]) {
           score += 1;
         }
