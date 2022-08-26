@@ -357,8 +357,8 @@ const SchedulePage = props => {
                   </>
                 )}
                 {sessionFormatter(
-                  selectedSession[0],
-                  slotDuration * (projectSpecs?.sessionDuration?.[0] || AppConfig.defaultSessionDuration[0])
+                  selectedSession[i],
+                  slotDuration * (projectSpecs?.sessionDuration?.[i] || AppConfig.defaultSessionDuration[i])
                 )}
               </li>
             );
