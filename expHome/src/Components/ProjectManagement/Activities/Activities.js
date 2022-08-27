@@ -268,15 +268,26 @@ const Activities = props => {
       );
     }
 
-    if (projectPoints.instructorsPoints) {
+    if (projectPoints.instructorsPoints && !projectPoints.dayInstructorUpVotes) {
       content.push(
-        <span className={resear.instructorsPoints >= projectPoints.instructorsPoints ? "GreenText" : ""}>
-          {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
+        <span
+          className={
+            resear.dayInstructorUpVotes + resear.instructorsPoints >= projectPoints.instructorsPoints ? "GreenText" : ""
+          }
+        >
+          {"👨‍🏫 " + formatPoints(resear.dayInstructorUpVotes + resear.instructorsPoints)}
         </span>
       );
     }
 
     if (projectPoints.dayInstructorUpVotes) {
+      if (projectPoints.instructorsPoints) {
+        content.push(
+          <span className={resear.instructorsPoints >= projectPoints.instructorsPoints ? "GreenText" : ""}>
+            {"👨‍🏫 " + formatPoints(resear.instructorsPoints)}
+          </span>
+        );
+      }
       content.push(
         <span className={resear.dayInstructorUpVotes >= projectPoints.dayInstructorUpVotes ? "GreenText" : ""}>
           {"👨‍🏫 ✅ " + formatPoints(resear.dayInstructorUpVotes)}
