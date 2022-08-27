@@ -1241,71 +1241,92 @@ exports.createRecallGradesForNewUserH1L2 = async (req, res) => {
 exports.deleteTheKeyPhrasesForPassage = async (req, res) => {
   try {
     const newPhrases = [
-      "The passage is about trap-jaw ants",
-      "They are a group of Central and South American ants",
-      "They have a speedy bite",
-      "They bites are the fastest on the planet",
-      "They can jump with their jaw",
-      "Jumping with jaw is a newly discovered defense",
-      "They nest in leaf litter",
-      "They feed on well-armored and elusive prey, including other species of ants",
-      "They stalk prey",
-      "They hold their mandibles wide apart, often at 180 degrees",
-      "Mandibles cocked open by a latch mechanism",
-      "Jaw snaps shut after minute trigger hairs in mandible come in contact with something",
-      "Jaws snap shut at up to 145 miles per hour",
-      "No passerby can outrace that astoundingly high speed of the jaws",
-      "Jaws have enough force to crack open the armor of most prey",
-      "They store energy in their jaws",
-      "Energy release from strong but slow muscles is the key for the jaw’s speed",
-      "Archers use bowstring to throw arrows faster than throwing the arrow like a javelin",
-      "The energy stored in their jaws are similar to an archer drawing their bow",
-      "Sheila N. Patek is a biomechanist at the University of California, Berkeley",
-      "Joseph E. Baio is a biomechanist at the University of California, Berkeley",
-      "Sheila N. Patek and Joseph E. Baio are experts in the biomechanics of energy storage",
-      "Brian L. Fisher of the California Academy of Sciences in San Francisco is an ant expert",
-      "Andrew V. Suarez of the University of Illinois at Urbana-Champaign is an ant expert",
-      "They are known as Odontomachus bauri",
-      "Catching them is like grabbing for popping hot popcorn",
-      "Painful sting goes with their trap-jaw bite",
-      "They propel themselves many times their body length",
-      "They jump when biologists or smaller intruders approach them",
-      "Secret of their self-propulsion is the well-executed “firing” of their mandibles",
-      "Researchers made high-speed video to discover the secret of their self propulsion",
-      "Their mandibles started to decelerate before they meet",
-      "Deceleration of mandibles possibly help to avoid self-inflicted damage",
-      "They have two distinct modes of aerial locomotion",
-      "In escape jump, an ant orients its head and jaws perpendicular to the ground",
-      "In escape jump, they slam their face straight down",
-      "In escape jump, mandibles are released with a force 400 times the ant’s body weight",
-      "Escape jump launches the insect ten or more body lengths nearly straight into the air",
-      "Escape jump is fast and unpredictable",
-      "Escape jump help the insect evade threats",
-      "Escape jump helps ant to sow confusion",
-      "Escape jump helps the ant get to a new vantage point to relaunch an attack",
-      "Bouncer-defense jump is done when an intruder enters their nest",
-      "Bouncer-defense jump is more common than escape jump",
-      "For bouncer-defense jump ants bangs its jaws against the intruder ",
-      "Banging jaws against intruder triggers the trap-jaw and propels the interloper",
-      "Bouncer-defense jump propels the interloper (if small enough) in one direction",
-      "Bouncer-defense jump propels the ant in other direction",
-      "Bouncer defense jump often sends the ant an inch off the ground",
-      "Bouncer defense jump often sends the ant nearly a foot away",
-      "Gangs of defending ants team up to send hostile strangers out of the nest",
-      "Their evolution is intriguing",
-      "They evolved to use already useful system of chewing up prey for propulsion",
-      "Bouncer-defense jump could have arisen out of attempts to bite intruders",
-      "The bouncer-defense jump is horizontal",
-      "High, escape jump must have arisen from a different, perhaps accidental kind of behavior",
-      "Several lineages use tactic of storing energy in their jaws to penetrate well-defended prey",
+      `Berry was a recording-session musician`,
+      `Berry was a tenor saxophonist`,
+      `Berry worked as a musician for 8 years`,
+      `Berry briefly joined Count Basie's orchestra`,
+      `Stood in for one of the Basie band's two tenor giants`,
+      `Berry took a lead solo in Count Basie's orchestra`,
+      `Berry took a lead solo on"Oh, Lady, Be Good"`,
+      `"Oh, Lady, Be Good" is a 1924 Gershwin song`,
+      `Basie had played "Oh, Lady, Be Good"  for years`,
+      `The solo lasted 28 seconds`,
+      `The solo was on February 4, 1939`,
+      `The solo was the musical personification of mind and body`,
+      `The solo was like mind and body working together in divine musical tandem`,
+      `When you hear the solo for the first time, you wonder why you have not heard of Berry`,
+      `There is a lack of recognition regarding Berry`,
+      `Many hard-core jazz buffs don't know about Berry`,
+      `Berry was a solid session player`,
+      `Berry has shown up on recordings with Basie, Bessie Smith, Fletcher Henderson, and Billie Holliday`,
+      `He did not cut many sessions himself as a leader`,
+      `When he soloed, he worked within the recording constraints of the era and the swing genre`,
+      `The swing genre's constraints were fast-moving 78s with solos often lasting for 32 beats`,
+      `The people who loved Berry were other tenor players`,
+      `Berry was tagged "musician's musician"`,
+      `The tag "musician's musician" was dreaded`,
+      `Berry's displayed great musical dexterity`,
+      `Berry's musical dexterity would be envied by future horn men`,
+      `Berry faced the lot of other horn players`,
+      `Horn players had to work hard until something memorable burst through`,
+      `The listening public had prejudices and expectations`,
+      `There was an accepted wisdom of what is and isn't art`,
+      `Swing music was fodder for dance parties`,
+      `Swing music was thought not to be worthy of study`,
+      `Berry's geniality might explain his failure to become well-known`,
+      `It wasn't in Berry's nature to call attention to himself`,
+      `It wasn't in Berry's nature to call attention to his playing`,
+      `Berry was born in 1908`,
+      `He was born into the Black middle class`,
+      `He was born in Wheeling, West Virginia`,
+      `He was laid-back and affable`,
+      `He attended West Virginia State in Charleston`,
+      `He switched from alto sax to tenor in college`,
+      `He was willing to fit in`,
+      `He participated in dance bands`,
+      `He refused to put his interests above those of the band`,
+      `He frequently played ensemble passages rather than taking a healthy allotment of solo breaks`,
+      `College provided a training ground for Berry`,
+      `He teamed up with amateur outfits at college`,
+      `He played not to show off`,
+      `He tried to bring out the positive attributes in any given situation`,
+      `The Calloway ensemble played ragged, out-of-tune before Berry's first solo`,
+      `The other players no longer languidly blow through their charts`,
+      `The other players immediately surge up behind him`,
+      `The shenanigans resume once Berry finishes his solo`,
+      `Berry made his way to New York`,
+      `In New York, Berry was in demand`,
+      `Great jazz orchestras of the swing era were headed by musical directors/arrangers`,
+      `Duke Ellington was preeminent`,
+      `These musical directors/arrangers drew acclaim`,
+      `Sidemen were musical traveling salesmen`,
+      `Sidemen played others' pieces`,
+      `With Fletcher Henderson, Berry was able to become more than a typical sideman`,
+      `Fletcher Henderson wrote in keys that were rare for jazz orchestras`,
+      `Henderson's music was an ideal match to Berry`,
+      `Berry had an introspective approach to his instrument`,
+      `Berry sounds like he is being swallowed by his sax`,
+      `"Blues in C Sharp Minor" is odd, haunting, and ultimately relaxing`,
+      `A Berry solo in "Blues in C Sharp Minor" is slightly off mike`,
+      `The off mike solo gives the unnerving impression Berry has been playing unnoticed for some time`,
+      `Cab Calloway let Berry perform "A Ghost of a Chance" in June 1940`,
+      `"A Ghost of a Chance" is the sole recording to feature Berry from start to finish`,
+      `"A Ghost of a Chance" was Berry's "Body and Soul"`,
+      `"A Ghost of a Chance" is a response to Coleman Hawkin's famous recording ("Body and Soul")`,
+      `"A Ghost of a Chance" is not meant to be a rival of Hawkin's recording ("Body and Soul")`,
+      `"A Ghost of a Chance" is the other half of a dialogue to Hawkin's recording ("Body and Soul")`,
+      `"A Ghost of a Chance's" rubato lines are spartan to begin with`,
+      `"A Ghost of a Chance" may be Berry's one and only instance of indulgence on a record`,
+      `"A Ghost of a Chance" is a cathedral of a solo`,
+      `If sunlight could pass through "A Ghost of a Chance" it would funnel it out in the broadest spectrum of colors`,
     ];
 
-    const passagesToDelete = ["xuNQUYbAEFfTD1PHuLGV"];
+    const passagesToDelete = ["s1oo3G4n3jeE8fJQRs3g"];
 
     for (passage of passagesToDelete) {
       console.log(passage);
-      const passageRef = await db.collection("passages").doc(passage);
-      if (passage === "xuNQUYbAEFfTD1PHuLGV") {
+      const passageRef = db.collection("passages").doc(passage);
+      if (passage === "s1oo3G4n3jeE8fJQRs3g") {
         passageUpdate = {
           phrases: newPhrases,
         };
@@ -1448,7 +1469,7 @@ exports.recreateNewRecallGradesDocuments = async () => {
         }
         if (allResponsesReady) {
           for (let pCond of userData.pConditions) {
-            if (pCond.passage === "xuNQUYbAEFfTD1PHuLGV") {
+            if (pCond.passage === "s1oo3G4n3jeE8fJQRs3g") {
               passageDoc = await db
                 .collection("passages")
                 .doc(pCond.passage)
@@ -1482,7 +1503,6 @@ exports.recreateNewRecallGradesDocuments = async () => {
                   if (userData.project === "H2K2") {
                     const recallGradeRef = db.collection("recallGrades").doc();
                     await batchSet(recallGradeRef, recallGradeData);
-                    
                   } else if (userData.project === "H1L2") {
                     const recallGradeRef = db
                       .collection("recallGradesH1L2")
