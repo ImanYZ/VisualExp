@@ -428,7 +428,7 @@ exports.retrieveData = async (req, res) => {
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
       console.log({ userId: userDoc.id });
-      if (Array.isArray(userData.pConditions)) {
+      if (Array.isArray(userData.pConditions) && userData.pConditions.length === 2) {
         corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
