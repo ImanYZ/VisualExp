@@ -308,7 +308,7 @@ exports.retrieveData = async (req, res) => {
   try {
     rowsData = [
       [
-        "fullname",
+        // "fullname",
         "userIndex",
         "birthDate",
         "cond2Start",
@@ -316,7 +316,7 @@ exports.retrieveData = async (req, res) => {
         "demoQsEnded",
         "demoQsStart",
         "education",
-        "email",
+        // "email",
         "ethnicity",
         "gender",
         "language",
@@ -432,7 +432,7 @@ exports.retrieveData = async (req, res) => {
         corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
-          row.push(userDoc.id);
+          // row.push(userDoc.id);
           userIndex += 1;
           row.push(userIndex);
           row.push(userData.birthDate ? userData.birthDate.toDate() : "");
@@ -441,7 +441,7 @@ exports.retrieveData = async (req, res) => {
           row.push(userData.demoQsEnded ? userData.demoQsEnded.toDate() : "");
           row.push(userData.demoQsStart ? userData.demoQsStart.toDate() : "");
           row.push(userData.education ? userData.education : "");
-          row.push(userData.email ? userData.email : "");
+          // row.push(userData.email ? userData.email : "");
           row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
           row.push(userData.gender ? userData.gender : "");
           row.push(userData.language ? userData.language : "");
