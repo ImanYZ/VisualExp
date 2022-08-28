@@ -303,6 +303,7 @@ exports.loadContacts = async (req, res) => {
 
 // Download the dataset in CSV
 exports.retrieveData = async (req, res) => {
+  console.log("retrieveData");
   let rowsData, usersDocs, userData, row, pCond;
   try {
     rowsData = [
@@ -347,6 +348,7 @@ exports.retrieveData = async (req, res) => {
         "recallStart",
         "recallTime",
         "recallreText",
+        "recallreGrade",
         "test0",
         "test1",
         "test2",
@@ -368,6 +370,7 @@ exports.retrieveData = async (req, res) => {
         "recall3DaysStart",
         "recall3DaysTime",
         "recall3DaysreText",
+        "recall3DaysreGrade",
         "test3Days0",
         "test3Days1",
         "test3Days2",
@@ -389,6 +392,7 @@ exports.retrieveData = async (req, res) => {
         "recall1WeekStart",
         "recall1WeekTime",
         "recall1WeekreText",
+        "recall1WeekreGrade",
         "test1Week0",
         "test1Week1",
         "test1Week2",
@@ -423,6 +427,7 @@ exports.retrieveData = async (req, res) => {
       wrongs = 0;
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
+      console.log({ userId: userDoc.id });
       if (Array.isArray(userData.pConditions)) {
         corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
@@ -466,6 +471,7 @@ exports.retrieveData = async (req, res) => {
           row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
+          row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.test && idx < pCond.test.length) {
               row.push(pCond.test[idx]);
@@ -485,6 +491,7 @@ exports.retrieveData = async (req, res) => {
             row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
             row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
             row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
+            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test3Days && idx < pCond.test3Days.length) {
                 row.push(pCond.test3Days[idx]);
@@ -509,6 +516,7 @@ exports.retrieveData = async (req, res) => {
             row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
             row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
             row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
+            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test1Week && idx < pCond.test1Week.length) {
                 row.push(pCond.test1Week[idx]);
@@ -552,131 +560,131 @@ exports.retrieveData = async (req, res) => {
           rowsData.push(row);
         }
       } else if (userData.pConditions) {
-        wrongs + 1;
-        row = [];
-        row.push(userDoc.id);
-        userIndex += 1;
-        row.push(userIndex);
-        row.push(userData.birthDate ? userData.birthDate.toDate() : "");
-        row.push(userData.cond2Start ? userData.cond2Start.toDate() : "");
-        row.push(userData.createdAt ? userData.createdAt.toDate() : "");
-        row.push(userData.demoQsEnded ? userData.demoQsEnded.toDate() : "");
-        row.push(userData.demoQsStart ? userData.demoQsStart.toDate() : "");
-        row.push(userData.education ? userData.education : "");
-        row.push(userData.email ? userData.email : "");
-        row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
-        row.push(userData.gender ? userData.gender : "");
-        row.push(userData.language ? userData.language : "");
-        row.push(userData.major ? userData.major : "");
-        row.push(userData.nullPassage);
-        row.push(0);
-        pCond = userData.pConditions;
-        row.push(pCond.condition);
-        row.push(pCond.passage);
-        for (let idx = 0; idx < 10; idx++) {
-          if (pCond.pretest && idx < pCond.pretest.length) {
-            row.push(pCond.pretest[idx]);
-          } else {
-            row.push("");
-          }
-        }
-        row.push(pCond.pretestEnded ? pCond.pretestEnded.toDate() : "");
-        row.push("pretestScore" in pCond ? pCond.pretestScore : "");
-        row.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
-        row.push("pretestTime" in pCond ? pCond.pretestTime : "");
-        row.push("previewEnded" in pCond ? pCond.previewEnded.toDate() : "");
-        row.push("previewTime" in pCond ? pCond.previewTime : "");
-        row.push("recallEnded" in pCond ? pCond.recallEnded.toDate() : "");
-        row.push("recallScore" in pCond ? pCond.recallScore : "");
-        row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
-        row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
-        row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
-        row.push("recallTime" in pCond ? pCond.recallTime : "");
-        row.push("recallreText" in pCond ? pCond.recallreText : "");
-        for (let idx = 0; idx < 10; idx++) {
-          if (pCond.test && idx < pCond.test.length) {
-            row.push(pCond.test[idx]);
-          } else {
-            row.push("");
-          }
-        }
-        row.push("testEnded" in pCond ? pCond.testEnded.toDate() : "");
-        row.push("testScore" in pCond ? pCond.testScore : "");
-        row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
-        row.push("testTime" in pCond ? pCond.testTime : "");
-        if (userData.post3DaysQsEnded) {
-          row.push(pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : "");
-          row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
-          row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
-          row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
-          row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
-          row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
-          row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-          for (let idx = 0; idx < 10; idx++) {
-            if (pCond.test3Days && idx < pCond.test3Days.length) {
-              row.push(pCond.test3Days[idx]);
-            } else {
-              row.push("");
-            }
-          }
-          row.push(pCond.test3DaysEnded ? pCond.test3DaysEnded.toDate() : "");
-          row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
-          row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
-          row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
-        } else {
-          for (let idx = 0; idx < 21; idx++) {
-            row.push("");
-          }
-        }
-        if (userData.post1WeekQsEnded) {
-          row.push(pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : "");
-          row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
-          row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
-          row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
-          row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
-          row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
-          row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-          for (let idx = 0; idx < 10; idx++) {
-            if (pCond.test1Week && idx < pCond.test1Week.length) {
-              row.push(pCond.test1Week[idx]);
-            } else {
-              row.push("");
-            }
-          }
-          row.push(pCond.test1WeekEnded ? pCond.test1WeekEnded.toDate() : "");
-          row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
-          row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
-          row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
-        } else {
-          for (let idx = 0; idx < 21; idx++) {
-            row.push("");
-          }
-        }
-        row.push(userData.postQ1Choice);
-        row.push(userData.postQsEnded ? userData.postQsEnded.toDate() : "");
-        row.push(userData.postQsStart ? userData.postQsStart.toDate() : "");
-        if (userData.post3DaysQsEnded) {
-          row.push(userData.post3DaysQ1Choice);
-          row.push(userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : "");
-          row.push(userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : "");
-        } else {
-          for (let idx = 0; idx < 3; idx++) {
-            row.push("");
-          }
-        }
-        if (userData.post1WeekQsEnded) {
-          row.push(userData.post1WeekQ1Choice);
-          row.push(userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : "");
-          row.push(userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : "");
-        } else {
-          for (let idx = 0; idx < 3; idx++) {
-            row.push("");
-          }
-        }
-        row.push("explanations" in userData && userData.explanations ? userData.explanations : "");
-        row.push(userData.explanations3Days ? userData.explanations3Days : "");
-        row.push(userData.explanations1Week ? userData.explanations1Week : "");
-        rowsData.push(row);
+        wrongs += 1;
+        // row = [];
+        // row.push(userDoc.id);
+        // userIndex += 1;
+        // row.push(userIndex);
+        // row.push(userData.birthDate ? userData.birthDate.toDate() : "");
+        // row.push(userData.cond2Start ? userData.cond2Start.toDate() : "");
+        // row.push(userData.createdAt ? userData.createdAt.toDate() : "");
+        // row.push(userData.demoQsEnded ? userData.demoQsEnded.toDate() : "");
+        // row.push(userData.demoQsStart ? userData.demoQsStart.toDate() : "");
+        // row.push(userData.education ? userData.education : "");
+        // row.push(userData.email ? userData.email : "");
+        // row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
+        // row.push(userData.gender ? userData.gender : "");
+        // row.push(userData.language ? userData.language : "");
+        // row.push(userData.major ? userData.major : "");
+        // row.push(userData.nullPassage);
+        // row.push(0);
+        // pCond = userData.pConditions;
+        // row.push(pCond.condition);
+        // row.push(pCond.passage);
+        // for (let idx = 0; idx < 10; idx++) {
+        //   if (pCond.pretest && idx < pCond.pretest.length) {
+        //     row.push(pCond.pretest[idx]);
+        //   } else {
+        //     row.push("");
+        //   }
+        // }
+        // row.push(pCond.pretestEnded ? pCond.pretestEnded.toDate() : "");
+        // row.push("pretestScore" in pCond ? pCond.pretestScore : "");
+        // row.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
+        // row.push("pretestTime" in pCond ? pCond.pretestTime : "");
+        // row.push("previewEnded" in pCond ? pCond.previewEnded.toDate() : "");
+        // row.push("previewTime" in pCond ? pCond.previewTime : "");
+        // row.push("recallEnded" in pCond ? pCond.recallEnded.toDate() : "");
+        // row.push("recallScore" in pCond ? pCond.recallScore : "");
+        // row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
+        // row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
+        // row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
+        // row.push("recallTime" in pCond ? pCond.recallTime : "");
+        // row.push("recallreText" in pCond ? pCond.recallreText : "");
+        // for (let idx = 0; idx < 10; idx++) {
+        //   if (pCond.test && idx < pCond.test.length) {
+        //     row.push(pCond.test[idx]);
+        //   } else {
+        //     row.push("");
+        //   }
+        // }
+        // row.push("testEnded" in pCond ? pCond.testEnded.toDate() : "");
+        // row.push("testScore" in pCond ? pCond.testScore : "");
+        // row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
+        // row.push("testTime" in pCond ? pCond.testTime : "");
+        // if (userData.post3DaysQsEnded) {
+        //   row.push(pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : "");
+        //   row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
+        //   row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
+        //   row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
+        //   row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
+        //   row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
+        //   row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
+        //   for (let idx = 0; idx < 10; idx++) {
+        //     if (pCond.test3Days && idx < pCond.test3Days.length) {
+        //       row.push(pCond.test3Days[idx]);
+        //     } else {
+        //       row.push("");
+        //     }
+        //   }
+        //   row.push(pCond.test3DaysEnded ? pCond.test3DaysEnded.toDate() : "");
+        //   row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
+        //   row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
+        //   row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
+        // } else {
+        //   for (let idx = 0; idx < 21; idx++) {
+        //     row.push("");
+        //   }
+        // }
+        // if (userData.post1WeekQsEnded) {
+        //   row.push(pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : "");
+        //   row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
+        //   row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
+        //   row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
+        //   row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
+        //   row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
+        //   row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
+        //   for (let idx = 0; idx < 10; idx++) {
+        //     if (pCond.test1Week && idx < pCond.test1Week.length) {
+        //       row.push(pCond.test1Week[idx]);
+        //     } else {
+        //       row.push("");
+        //     }
+        //   }
+        //   row.push(pCond.test1WeekEnded ? pCond.test1WeekEnded.toDate() : "");
+        //   row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
+        //   row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
+        //   row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
+        // } else {
+        //   for (let idx = 0; idx < 21; idx++) {
+        //     row.push("");
+        //   }
+        // }
+        // row.push(userData.postQ1Choice);
+        // row.push(userData.postQsEnded ? userData.postQsEnded.toDate() : "");
+        // row.push(userData.postQsStart ? userData.postQsStart.toDate() : "");
+        // if (userData.post3DaysQsEnded) {
+        //   row.push(userData.post3DaysQ1Choice);
+        //   row.push(userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : "");
+        //   row.push(userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : "");
+        // } else {
+        //   for (let idx = 0; idx < 3; idx++) {
+        //     row.push("");
+        //   }
+        // }
+        // if (userData.post1WeekQsEnded) {
+        //   row.push(userData.post1WeekQ1Choice);
+        //   row.push(userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : "");
+        //   row.push(userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : "");
+        // } else {
+        //   for (let idx = 0; idx < 3; idx++) {
+        //     row.push("");
+        //   }
+        // }
+        // row.push("explanations" in userData && userData.explanations ? userData.explanations : "");
+        // row.push(userData.explanations3Days ? userData.explanations3Days : "");
+        // row.push(userData.explanations1Week ? userData.explanations1Week : "");
+        // rowsData.push(row);
       }
     }
     console.log({ corrects, wrongs });
