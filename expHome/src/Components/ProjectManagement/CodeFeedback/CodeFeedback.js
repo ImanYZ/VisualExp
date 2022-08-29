@@ -199,7 +199,6 @@ const CodeFeedback = props => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    debugger;
     if (codeBooksLoaded) {
       const allCodes = [...allExperimentCodes];
       const tempPassagesChanges = [...codeBooksChanges];
