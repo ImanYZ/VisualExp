@@ -21,7 +21,12 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
 import AddIcon from "@mui/icons-material/Add";
-
+import Checkbox from "@mui/material/Checkbox";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -93,6 +98,7 @@ const ResearcherPassage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
+    debugger
     let passags = passages;
     if (passagesLoadedUse) {
       const tempPassagesChanges = [...passagesChanges];
@@ -134,8 +140,8 @@ const ResearcherPassage = () => {
       } else {
         const index1 = titles.indexOf(passage1.title);
         const index2 = titles.indexOf(passage2.title);
-        setPassage2(passags[index1]);
-        setPassage1(passags[index2]);
+        setPassage1(passags[index1]);
+        setPassage2(passags[index2]);
       }
       setPassagesLoadedUse(false);
     }
@@ -268,8 +274,6 @@ const ResearcherPassage = () => {
   };
 
   const handleAddNewPhrase = async () => {
-
-    
     let responses = new Set();
     const passageDoc = await firebase.db.collection("passages").where("title", "==", chosenPassage).get();
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
@@ -322,6 +326,18 @@ const ResearcherPassage = () => {
     setSubmtingNewPhrase(false);
     setNewPhraseAdded("");
   };
+
+  const handleTypeOfQuestion = async (type,title,questionIndex) => {
+    const passageDoc = await firebase.db.collection("passages").where("title", "==", title).get();
+    const passageUpdate = passageDoc.docs[0].data();
+    passageUpdate.questions[questionIndex] = {
+      ...passageUpdate.questions[questionIndex],
+      type
+    };
+    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+    passageRef.update(passageUpdate);
+  };
+
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal
@@ -545,23 +561,36 @@ const ResearcherPassage = () => {
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            {question.b}
+                            b.{question.b}
                           </Typography>
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            {question.c}
+                            b.{question.c}
                           </Typography>
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            {question.d}
+                            d.{question.d}
                           </Typography>
                         </li>
                       </ul>
                       <Typography variant="h6" gutterBottom component="div" mb={2}>
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
+                      {email === "oneweb@umich.edu" && (
+                      <List>
+                        {["Inference", "memory"].map(type => (
+                          <ListItem  disablePadding>
+                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage1.title,index)}} dense>
+                              <ListItemIcon>
+                                <Checkbox edge="start" checked={question.type === type} disableRipple />
+                              </ListItemIcon>
+                              <ListItemText id={type} primary={`${type}`}/>
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>)}
                     </AccordionDetails>
                   </Accordion>
                 );
@@ -695,6 +724,19 @@ const ResearcherPassage = () => {
                       <Typography variant="h6" gutterBottom component="div" mb={2}>
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
+
+                      {email === "oneweb@umich.edu" &&(<List>
+                        {["Inference", "memory"].map(type => (
+                          <ListItem  disablePadding>
+                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage1.title,index)}} dense>
+                              <ListItemIcon>
+                                <Checkbox edge="start" checked={question.type === type} disableRipple />
+                              </ListItemIcon>
+                              <ListItemText id={type} primary={`${type}`}/>
+                            </ListItemButton>
+                          </ListItem>
+                        ))}
+                      </List>)}
                     </AccordionDetails>
                   </Accordion>
                 );
