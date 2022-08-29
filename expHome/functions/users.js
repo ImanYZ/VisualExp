@@ -468,7 +468,8 @@ exports.retrieveData = async (req, res) => {
       wrongs = 0;
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
-      console.log({ userId: userDoc.id });
+      userIndex += 1;
+      console.log({ userIndex });
       if (
         Array.isArray(userData.pConditions) &&
         userData.pConditions.length === 2 &&
@@ -483,7 +484,6 @@ exports.retrieveData = async (req, res) => {
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
           // row.push(userDoc.id);
-          userIndex += 1;
           row.push(userIndex);
           row.push(userData.birthDate ? userData.birthDate.toDate() : "");
           row.push(userData.cond2Start ? userData.cond2Start.toDate() : "");
