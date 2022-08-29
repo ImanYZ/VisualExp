@@ -71,6 +71,7 @@ const CodeFeedback = props => {
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [unApprovedNewCodes, setUnApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
+  const [chosenCondition, setChosenCondition] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
   // modal options
@@ -303,6 +304,9 @@ const CodeFeedback = props => {
     const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
+      if ("choice" in feedbackData) {
+        setChosenCondition(feedbackData.choice);
+      }
       const lengthSentence = feedbackData.explanation.split(".").length;
       let response;
       if (lengthSentence > 1) {
@@ -864,9 +868,24 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-      <Typography variant="h6" margin-bottom="20px" sx={{ margin: "19px 5px 70px 19px" }}>
-        For each different code, please choose which response(s) contains the code:
-      </Typography>
+      <Alert severity="warning">
+        <h2>The participant chose {chosenCondition}.</h2>
+        <ol>
+          <li>
+            Read the participant's qualitative response that we've divided into sentences and listed in the right box
+            below.
+          </li>
+          <li>Click and read every single code from the codebook listed in the left box below.</li>
+          <li>
+            If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
+            sentence in the right box.
+          </li>
+          <li>
+            For every code, if you check any of the sentences, it also check-marks the code indicating that the code was
+            mentioned by the participant due to the sentence that you checked.
+          </li>
+        </ol>
+      </Alert>
       <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
         <Box
           sx={{
@@ -878,6 +897,7 @@ const CodeFeedback = props => {
         >
           <Box>
             <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+              <h2>The Codebook</h2>
               <List
                 sx={{
                   paddingBlock: 1,
@@ -913,9 +933,9 @@ const CodeFeedback = props => {
             </Sheet>
 
             <Alert severity="success" className="VoteActivityAlert">
-                If the code you're looking for does not exist in the list above, add it below :
-                <br />
-              </Alert>
+              If the code you're looking for does not exist in the list above, add it below :
+              <br />
+            </Alert>
 
             <TextareaAutosize
               style={{ width: "80%", alignItems: "center" }}
@@ -937,6 +957,7 @@ const CodeFeedback = props => {
           </Box>
           <Box>
             <Sheet variant="outlined">
+              <h2>Participant's response in sentences</h2>
               <List
                 sx={{
                   paddingBlock: 1,
@@ -965,7 +986,7 @@ const CodeFeedback = props => {
               </List>
             </Sheet>
           </Box>
-          <Box >
+          <Box>
             <Button
               variant="contained"
               style={{ margin: "19px 500px 10px 580px" }}
@@ -979,9 +1000,7 @@ const CodeFeedback = props => {
             </Button>
           </Box>
         </Box>
-        <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}>
-        
-        </Box>
+        <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
       </Paper>
 
       {email === "oneweb@umich.edu" && (
