@@ -596,7 +596,7 @@ const ResearcherPassage = () => {
                       <Typography variant="h6" gutterBottom component="div" mb={2}>
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
-                      {email === "ouhrac@gmail.com" && (
+                      {email === "oneweb@umich.edu" && (
                         <List>
                           {["Inference", "memory"].map(type => (
                             <ListItem disablePadding>
@@ -625,7 +625,7 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "ouhrac@gmail.com" && (
+                {email === "oneweb@umich.edu" && (
                   <Button
                     onClick={() => {
                       handleOpenddPhraseModal();
@@ -645,7 +645,7 @@ const ResearcherPassage = () => {
                     <li>
                       <div> {phrase}</div>
 
-                      {email === "ouhrac@gmail.com" && (
+                      {email === "oneweb@umich.edu" && (
                         <div>
                           <IconButton
                             edge="end"
@@ -770,7 +770,7 @@ const ResearcherPassage = () => {
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
 
-                      {email === "ouhrac@gmail.com" && (
+                      {email === "oneweb@umich.edu" && (
                         <List>
                           {["Inference", "memory"].map(type => (
                             <ListItem disablePadding>
@@ -799,7 +799,7 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "ouhrac@gmail.com" && (
+                {email === "oneweb@umich.edu" && (
                   <Button
                     onClick={() => {
                       handleOpenddPhraseModal();
@@ -819,7 +819,7 @@ const ResearcherPassage = () => {
                   <ul key={index}>
                     <li>
                       <div>{phrase}</div>
-                      {email === "ouhrac@gmail.com" && (
+                      {email === "oneweb@umich.edu" && (
                         <>
                           <IconButton
                             edge="end"
