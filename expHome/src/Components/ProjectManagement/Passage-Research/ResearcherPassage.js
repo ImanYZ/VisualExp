@@ -98,7 +98,6 @@ const ResearcherPassage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    debugger
     let passags = passages;
     if (passagesLoadedUse) {
       const tempPassagesChanges = [...passagesChanges];
@@ -257,6 +256,9 @@ const ResearcherPassage = () => {
     if (allowDelete) {
       setNumberRecorded(0);
       passageUpdate.phrases.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
+      if (passageUpdate.phrasesTypes) {
+        passageUpdate.phrasesTypes.splice(passageUpdate.phrases.indexOf(oldPhrase), 1);
+      }
       await firebase.batchUpdate(passageRef, passageUpdate);
       for (let recallDoc of recallGradesDoc.docs) {
         const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
@@ -327,13 +329,29 @@ const ResearcherPassage = () => {
     setNewPhraseAdded("");
   };
 
-  const handleTypeOfQuestion = async (type,title,questionIndex) => {
+  const handleTypeOfQuestion = async (type, title, questionIndex) => {
     const passageDoc = await firebase.db.collection("passages").where("title", "==", title).get();
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.questions[questionIndex] = {
       ...passageUpdate.questions[questionIndex],
       type
     };
+    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+    passageRef.update(passageUpdate);
+  };
+
+  const handleTypeOfPhrase = async (type, title, phraseIndex) => {
+    const passageDoc = await firebase.db.collection("passages").where("title", "==", title).get();
+    let passageUpdate = passageDoc.docs[0].data();
+    const initPhrasesTypes = new Array(passageUpdate.phrases.length).fill("");
+    if (!passageUpdate.phrasesTypes) {
+      passageUpdate = {
+        ...passageUpdate,
+        phrasesTypes: initPhrasesTypes
+      };
+    }
+    passageUpdate.phrasesTypes[phraseIndex] = type;
+
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     passageRef.update(passageUpdate);
   };
@@ -553,7 +571,7 @@ const ResearcherPassage = () => {
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <ul>
+                      <ol id="sortable" type="a" start="1">
                         <li>
                           <Typography variant="h6" component="div">
                             {question.a}
@@ -561,36 +579,42 @@ const ResearcherPassage = () => {
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            b.{question.b}
+                            {question.b}
                           </Typography>
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            b.{question.c}
+                            {question.c}
                           </Typography>
                         </li>
                         <li>
                           <Typography variant="h6" component="div">
-                            d.{question.d}
+                            {question.d}
                           </Typography>
                         </li>
-                      </ul>
+                      </ol>
                       <Typography variant="h6" gutterBottom component="div" mb={2}>
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
-                      {email === "oneweb@umich.edu" && (
-                      <List>
-                        {["Inference", "memory"].map(type => (
-                          <ListItem  disablePadding>
-                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage1.title,index)}} dense>
-                              <ListItemIcon>
-                                <Checkbox edge="start" checked={question.type === type} disableRipple />
-                              </ListItemIcon>
-                              <ListItemText id={type} primary={`${type}`}/>
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>)}
+                      {email === "ouhrac@gmail.com" && (
+                        <List>
+                          {["Inference", "memory"].map(type => (
+                            <ListItem disablePadding>
+                              <ListItemButton
+                                onClick={() => {
+                                  handleTypeOfQuestion(type, passage1.title, index);
+                                }}
+                                dense
+                              >
+                                <ListItemIcon>
+                                  <Checkbox edge="start" checked={question.type === type} disableRipple />
+                                </ListItemIcon>
+                                <ListItemText id={type} primary={`${type}`} />
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
                     </AccordionDetails>
                   </Accordion>
                 );
@@ -601,7 +625,7 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "oneweb@umich.edu" && (
+                {email === "ouhrac@gmail.com" && (
                   <Button
                     onClick={() => {
                       handleOpenddPhraseModal();
@@ -621,8 +645,8 @@ const ResearcherPassage = () => {
                     <li>
                       <div> {phrase}</div>
 
-                      {email === "oneweb@umich.edu" && (
-                        <>
+                      {email === "ouhrac@gmail.com" && (
+                        <div>
                           <IconButton
                             edge="end"
                             aria-label="edit"
@@ -646,7 +670,28 @@ const ResearcherPassage = () => {
                           >
                             <DeleteIcon />
                           </IconButton>
-                        </>
+                          <List>
+                            {["Inference", "memory"].map(type => (
+                              <ListItem disablePadding>
+                                <ListItemButton
+                                  onClick={() => {
+                                    handleTypeOfPhrase(type, passage1.title, index);
+                                  }}
+                                  dense
+                                >
+                                  <ListItemIcon>
+                                    <Checkbox
+                                      edge="start"
+                                      checked={passage1.phrasesTypes && passage1?.phrasesTypes[index] === type}
+                                      disableRipple
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText id={type} primary={`${type}`} />
+                                </ListItemButton>
+                              </ListItem>
+                            ))}
+                          </List>
+                        </div>
                       )}
                     </li>
                   </ul>
@@ -725,18 +770,25 @@ const ResearcherPassage = () => {
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
 
-                      {email === "oneweb@umich.edu" &&(<List>
-                        {["Inference", "memory"].map(type => (
-                          <ListItem  disablePadding>
-                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage2.title,index)}} dense>
-                              <ListItemIcon>
-                                <Checkbox edge="start" checked={question.type === type} disableRipple />
-                              </ListItemIcon>
-                              <ListItemText id={type} primary={`${type}`}/>
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>)}
+                      {email === "ouhrac@gmail.com" && (
+                        <List>
+                          {["Inference", "memory"].map(type => (
+                            <ListItem disablePadding>
+                              <ListItemButton
+                                onClick={() => {
+                                  handleTypeOfQuestion(type, passage2.title, index);
+                                }}
+                                dense
+                              >
+                                <ListItemIcon>
+                                  <Checkbox edge="start" checked={question.type === type} disableRipple />
+                                </ListItemIcon>
+                                <ListItemText id={type} primary={`${type}`} />
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
+                      )}
                     </AccordionDetails>
                   </Accordion>
                 );
@@ -747,7 +799,7 @@ const ResearcherPassage = () => {
                   Phrases
                 </Typography>
 
-                {email === "oneweb@umich.edu" && (
+                {email === "ouhrac@gmail.com" && (
                   <Button
                     onClick={() => {
                       handleOpenddPhraseModal();
@@ -767,7 +819,7 @@ const ResearcherPassage = () => {
                   <ul key={index}>
                     <li>
                       <div>{phrase}</div>
-                      {email === "oneweb@umich.edu" && (
+                      {email === "ouhrac@gmail.com" && (
                         <>
                           <IconButton
                             edge="end"
@@ -792,6 +844,28 @@ const ResearcherPassage = () => {
                           >
                             <DeleteIcon />
                           </IconButton>
+
+                          <List>
+                            {["Inference", "memory"].map(type => (
+                              <ListItem disablePadding>
+                                <ListItemButton
+                                  onClick={() => {
+                                    handleTypeOfPhrase(type, passage2.title, index);
+                                  }}
+                                  dense
+                                >
+                                  <ListItemIcon>
+                                    <Checkbox
+                                      edge="start"
+                                      checked={passage2.phrasesTypes && passage2?.phrasesTypes[index] === type}
+                                      disableRipple
+                                    />
+                                  </ListItemIcon>
+                                  <ListItemText id={type} primary={`${type}`} />
+                                </ListItemButton>
+                              </ListItem>
+                            ))}
+                          </List>
                         </>
                       )}
                     </li>
