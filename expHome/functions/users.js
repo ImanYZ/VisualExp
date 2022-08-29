@@ -424,35 +424,42 @@ exports.retrieveData = async (req, res) => {
     const recallGrades = {};
     const recallGradesDocs = await db
       .collection("recallGrades")
-      .where("researchers", "array-contains", "Tirdad Barghi")
+      .where("researchers", "array-contains-any", [
+        "Shaobo Liang",
+        "Benjamin Brown",
+        "Ember Shan",
+        "Ziyi Wang",
+        "Jeffery Phonn",
+        "Jessica Cai",
+        "Iman YeckehZaare",
+        "Amelia Henriques",
+        "Tirdad Barghi"
+      ])
       .get();
     for (let recallGradeDoc of recallGradesDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
-      const recallGradeResearcherIdx = recallGradeData.researchers.findIndex(resear => resear === "Tirdad Barghi");
-      if (recallGradeResearcherIdx !== -1) {
-        if (recallGradeData.user in recallGrades) {
-          if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
-            if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
-              recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
-                recallGradeData.grades[recallGradeResearcherIdx]
-              );
-            } else {
-              recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
-                recallGradeData.grades[recallGradeResearcherIdx]
-              ];
-            }
+      if (recallGradeData.user in recallGrades) {
+        if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
+          if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
+            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
+              recallGradeData.grades
+            );
           } else {
-            recallGrades[recallGradeData.user][recallGradeData.passage] = {
-              [recallGradeData.session]: [recallGradeData.grades[recallGradeResearcherIdx]]
-            };
+            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
+              recallGradeData.grades
+            ];
           }
         } else {
-          recallGrades[recallGradeData.user] = {
-            [recallGradeData.passage]: {
-              [recallGradeData.session]: [recallGradeData.grades[recallGradeResearcherIdx]]
-            }
+          recallGrades[recallGradeData.user][recallGradeData.passage] = {
+            [recallGradeData.session]: [recallGradeData.grades]
           };
         }
+      } else {
+        recallGrades[recallGradeData.user] = {
+          [recallGradeData.passage]: {
+            [recallGradeData.session]: [recallGradeData.grades]
+          }
+        };
       }
     }
     usersDocs = await db.collection("users").get();
@@ -514,7 +521,11 @@ exports.retrieveData = async (req, res) => {
             "1st" in recallGrades[userDoc.id][pCond.passage]
           ) {
             for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["1st"]) {
-              recallreGrade += recallGradePhrase;
+              itemScore = 0;
+              for (let grade of recallGradePhrase) {
+                itemScore += grade;
+              }
+              recallreGrade += itemScore / recallGradePhrase.length;
               isGraded = true;
             }
           }
@@ -547,7 +558,11 @@ exports.retrieveData = async (req, res) => {
               "2nd" in recallGrades[userDoc.id][pCond.passage]
             ) {
               for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
-                recallreGrade += recallGradePhrase;
+                itemScore = 0;
+                for (let grade of recallGradePhrase) {
+                  itemScore += grade;
+                }
+                recallreGrade += itemScore / recallGradePhrase.length;
                 isGraded = true;
               }
             }
@@ -585,7 +600,11 @@ exports.retrieveData = async (req, res) => {
               "3rd" in recallGrades[userDoc.id][pCond.passage]
             ) {
               for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
-                recallreGrade += recallGradePhrase;
+                itemScore = 0;
+                for (let grade of recallGradePhrase) {
+                  itemScore += grade;
+                }
+                recallreGrade += itemScore / recallGradePhrase.length;
                 isGraded = true;
               }
             }
