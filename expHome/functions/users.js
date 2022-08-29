@@ -474,11 +474,7 @@ exports.retrieveData = async (req, res) => {
         Array.isArray(userData.pConditions) &&
         userData.pConditions.length === 2 &&
         "recallScore" in userData.pConditions[0] &&
-        "recallScore" in userData.pConditions[1] &&
-        "recall3DaysScore" in userData.pConditions[0] &&
-        "recall3DaysScore" in userData.pConditions[1] &&
-        "recall1WeekScore" in userData.pConditions[0] &&
-        "recall1WeekScore" in userData.pConditions[1]
+        "recallScore" in userData.pConditions[1]
       ) {
         corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
@@ -590,7 +586,7 @@ exports.retrieveData = async (req, res) => {
             row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
             row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
           } else {
-            for (let idx = 0; idx < 21; idx++) {
+            for (let idx = 0; idx < 22; idx++) {
               row.push("");
             }
           }
@@ -633,7 +629,7 @@ exports.retrieveData = async (req, res) => {
             row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
             row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
           } else {
-            for (let idx = 0; idx < 21; idx++) {
+            for (let idx = 0; idx < 22; idx++) {
               row.push("");
             }
           }
