@@ -471,7 +471,28 @@ exports.retrieveData = async (req, res) => {
           row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
-          row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
+          const recallGradesDocs = await db
+            .collection("recallGrades")
+            .where("user", "==", userDoc.id)
+            .where("done", "==", true)
+            .where("passage", "==", pCond.passage)
+            .where("session", "==", "1st")
+            .get();
+          let itemScore = 0;
+          let isGraded = false;
+          let recallreGrade = 0;
+          for (let recallGradeDoc of recallGradesDocs.docs) {
+            const recallGradeData = recallGradeDoc.data();
+            itemScore = 0;
+            for (let grade of recallGradeData.grades) {
+              itemScore += grade;
+            }
+            if (itemScore >= 3) {
+              recallreGrade += 1;
+            }
+            isGraded = true;
+          }
+          row.push(isGraded ? recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.test && idx < pCond.test.length) {
               row.push(pCond.test[idx]);
@@ -491,7 +512,28 @@ exports.retrieveData = async (req, res) => {
             row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
             row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
             row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
+            const recallGradesDocs = await db
+              .collection("recallGrades")
+              .where("user", "==", userDoc.id)
+              .where("done", "==", true)
+              .where("passage", "==", pCond.passage)
+              .where("session", "==", "2nd")
+              .get();
+            itemScore = 0;
+            isGraded = false;
+            recallreGrade = 0;
+            for (let recallGradeDoc of recallGradesDocs.docs) {
+              const recallGradeData = recallGradeDoc.data();
+              itemScore = 0;
+              for (let grade of recallGradeData.grades) {
+                itemScore += grade;
+              }
+              if (itemScore >= 3) {
+                recallreGrade += 1;
+              }
+              isGraded = true;
+            }
+            row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test3Days && idx < pCond.test3Days.length) {
                 row.push(pCond.test3Days[idx]);
@@ -516,7 +558,28 @@ exports.retrieveData = async (req, res) => {
             row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
             row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
             row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
+            const recallGradesDocs = await db
+              .collection("recallGrades")
+              .where("user", "==", userDoc.id)
+              .where("done", "==", true)
+              .where("passage", "==", pCond.passage)
+              .where("session", "==", "3rd")
+              .get();
+            itemScore = 0;
+            isGraded = false;
+            recallreGrade = 0;
+            for (let recallGradeDoc of recallGradesDocs.docs) {
+              const recallGradeData = recallGradeDoc.data();
+              itemScore = 0;
+              for (let grade of recallGradeData.grades) {
+                itemScore += grade;
+              }
+              if (itemScore >= 3) {
+                recallreGrade += 1;
+              }
+              isGraded = true;
+            }
+            row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test1Week && idx < pCond.test1Week.length) {
                 row.push(pCond.test1Week[idx]);
