@@ -421,6 +421,34 @@ exports.retrieveData = async (req, res) => {
         "explanation1Week"
       ]
     ];
+    const recallGrades = {};
+    const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
+    for (let recallGradeDoc of recallGradesDocs.docs) {
+      const recallGradeData = recallGradeDoc.data();
+      if (recallGradeData.user in recallGrades) {
+        if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
+          if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
+            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
+              recallGradeData.grades
+            );
+          } else {
+            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
+              recallGradeData.grades
+            ];
+          }
+        } else {
+          recallGrades[recallGradeData.user][recallGradeData.passage] = {
+            [recallGradeData.session]: [recallGradeData.grades]
+          };
+        }
+      } else {
+        recallGrades[recallGradeData.user] = {
+          [recallGradeData.passage]: {
+            [recallGradeData.session]: [recallGradeData.grades]
+          }
+        };
+      }
+    }
     usersDocs = await db.collection("users").get();
     let userIndex = 0,
       corrects = 0,
@@ -471,26 +499,24 @@ exports.retrieveData = async (req, res) => {
           row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
-          const recallGradesDocs = await db
-            .collection("recallGrades")
-            .where("user", "==", userDoc.id)
-            .where("done", "==", true)
-            .where("passage", "==", pCond.passage)
-            .where("session", "==", "1st")
-            .get();
           let itemScore = 0;
           let isGraded = false;
           let recallreGrade = 0;
-          for (let recallGradeDoc of recallGradesDocs.docs) {
-            const recallGradeData = recallGradeDoc.data();
-            itemScore = 0;
-            for (let grade of recallGradeData.grades) {
-              itemScore += grade;
+          if (
+            userDoc.id in recallGrades &&
+            pCond.passage in recallGrades[userDoc.id] &&
+            "1st" in recallGrades[userDoc.id][pCond.passage]
+          ) {
+            for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["1st"]) {
+              itemScore = 0;
+              for (let grade of recallGradePhrase) {
+                itemScore += grade;
+              }
+              if (itemScore >= 3) {
+                recallreGrade += 1;
+              }
+              isGraded = true;
             }
-            if (itemScore >= 3) {
-              recallreGrade += 1;
-            }
-            isGraded = true;
           }
           row.push(isGraded ? recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
@@ -512,26 +538,24 @@ exports.retrieveData = async (req, res) => {
             row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
             row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
             row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-            const recallGradesDocs = await db
-              .collection("recallGrades")
-              .where("user", "==", userDoc.id)
-              .where("done", "==", true)
-              .where("passage", "==", pCond.passage)
-              .where("session", "==", "2nd")
-              .get();
             itemScore = 0;
             isGraded = false;
             recallreGrade = 0;
-            for (let recallGradeDoc of recallGradesDocs.docs) {
-              const recallGradeData = recallGradeDoc.data();
-              itemScore = 0;
-              for (let grade of recallGradeData.grades) {
-                itemScore += grade;
+            if (
+              userDoc.id in recallGrades &&
+              pCond.passage in recallGrades[userDoc.id] &&
+              "2nd" in recallGrades[userDoc.id][pCond.passage]
+            ) {
+              for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
+                itemScore = 0;
+                for (let grade of recallGradePhrase) {
+                  itemScore += grade;
+                }
+                if (itemScore >= 3) {
+                  recallreGrade += 1;
+                }
+                isGraded = true;
               }
-              if (itemScore >= 3) {
-                recallreGrade += 1;
-              }
-              isGraded = true;
             }
             row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
@@ -558,26 +582,24 @@ exports.retrieveData = async (req, res) => {
             row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
             row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
             row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-            const recallGradesDocs = await db
-              .collection("recallGrades")
-              .where("user", "==", userDoc.id)
-              .where("done", "==", true)
-              .where("passage", "==", pCond.passage)
-              .where("session", "==", "3rd")
-              .get();
             itemScore = 0;
             isGraded = false;
             recallreGrade = 0;
-            for (let recallGradeDoc of recallGradesDocs.docs) {
-              const recallGradeData = recallGradeDoc.data();
-              itemScore = 0;
-              for (let grade of recallGradeData.grades) {
-                itemScore += grade;
+            if (
+              userDoc.id in recallGrades &&
+              pCond.passage in recallGrades[userDoc.id] &&
+              "3rd" in recallGrades[userDoc.id][pCond.passage]
+            ) {
+              for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
+                itemScore = 0;
+                for (let grade of recallGradePhrase) {
+                  itemScore += grade;
+                }
+                if (itemScore >= 3) {
+                  recallreGrade += 1;
+                }
+                isGraded = true;
               }
-              if (itemScore >= 3) {
-                recallreGrade += 1;
-              }
-              isGraded = true;
             }
             row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
