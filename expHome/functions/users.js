@@ -422,31 +422,37 @@ exports.retrieveData = async (req, res) => {
       ]
     ];
     const recallGrades = {};
-    const recallGradesDocs = await db.collection("recallGrades").where("done", "==", true).get();
+    const recallGradesDocs = await db
+      .collection("recallGrades")
+      .where("researchers", "array-contains", "Tirdad Barghi")
+      .get();
     for (let recallGradeDoc of recallGradesDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
-      if (recallGradeData.user in recallGrades) {
-        if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
-          if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
-            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
-              recallGradeData.grades
-            );
+      const recallGradeResearcherIdx = recallGradeData.researchers.findIndex(resear => resear === "Tirdad Barghi");
+      if (recallGradeResearcherIdx !== -1) {
+        if (recallGradeData.user in recallGrades) {
+          if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
+            if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
+              recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
+                recallGradeData.grades[recallGradeResearcherIdx]
+              );
+            } else {
+              recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
+                recallGradeData.grades[recallGradeResearcherIdx]
+              ];
+            }
           } else {
-            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
-              recallGradeData.grades
-            ];
+            recallGrades[recallGradeData.user][recallGradeData.passage] = {
+              [recallGradeData.session]: [recallGradeData.grades[recallGradeResearcherIdx]]
+            };
           }
         } else {
-          recallGrades[recallGradeData.user][recallGradeData.passage] = {
-            [recallGradeData.session]: [recallGradeData.grades]
+          recallGrades[recallGradeData.user] = {
+            [recallGradeData.passage]: {
+              [recallGradeData.session]: [recallGradeData.grades[recallGradeResearcherIdx]]
+            }
           };
         }
-      } else {
-        recallGrades[recallGradeData.user] = {
-          [recallGradeData.passage]: {
-            [recallGradeData.session]: [recallGradeData.grades]
-          }
-        };
       }
     }
     usersDocs = await db.collection("users").get();
@@ -508,13 +514,7 @@ exports.retrieveData = async (req, res) => {
             "1st" in recallGrades[userDoc.id][pCond.passage]
           ) {
             for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["1st"]) {
-              itemScore = 0;
-              for (let grade of recallGradePhrase) {
-                itemScore += grade;
-              }
-              if (itemScore >= 3) {
-                recallreGrade += 1;
-              }
+              recallreGrade += recallGradePhrase;
               isGraded = true;
             }
           }
@@ -547,13 +547,7 @@ exports.retrieveData = async (req, res) => {
               "2nd" in recallGrades[userDoc.id][pCond.passage]
             ) {
               for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
-                itemScore = 0;
-                for (let grade of recallGradePhrase) {
-                  itemScore += grade;
-                }
-                if (itemScore >= 3) {
-                  recallreGrade += 1;
-                }
+                recallreGrade += recallGradePhrase;
                 isGraded = true;
               }
             }
@@ -591,13 +585,7 @@ exports.retrieveData = async (req, res) => {
               "3rd" in recallGrades[userDoc.id][pCond.passage]
             ) {
               for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
-                itemScore = 0;
-                for (let grade of recallGradePhrase) {
-                  itemScore += grade;
-                }
-                if (itemScore >= 3) {
-                  recallreGrade += 1;
-                }
+                recallreGrade += recallGradePhrase;
                 isGraded = true;
               }
             }
@@ -771,6 +759,9 @@ exports.retrieveData = async (req, res) => {
         // row.push(userData.explanations1Week ? userData.explanations1Week : "");
         // rowsData.push(row);
       }
+    }
+    for (let recallGradeUser in recallGrades) {
+      console.log(recallGradeUser);
     }
     console.log({ corrects, wrongs });
     csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
