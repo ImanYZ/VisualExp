@@ -421,47 +421,47 @@ exports.retrieveData = async (req, res) => {
         "explanation1Week"
       ]
     ];
-    const recallGrades = {};
-    const recallGradesDocs = await db
-      .collection("recallGrades")
-      .where("researchers", "array-contains-any", [
-        "Shaobo Liang",
-        "Benjamin Brown",
-        "Ember Shan",
-        "Ziyi Wang",
-        "Jeffery Phonn",
-        "Jessica Cai",
-        "Iman YeckehZaare",
-        "Amelia Henriques",
-        "Tirdad Barghi"
-      ])
-      .get();
-    for (let recallGradeDoc of recallGradesDocs.docs) {
-      const recallGradeData = recallGradeDoc.data();
-      if (recallGradeData.user in recallGrades) {
-        if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
-          if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
-            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
-              recallGradeData.grades
-            );
-          } else {
-            recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
-              recallGradeData.grades
-            ];
-          }
-        } else {
-          recallGrades[recallGradeData.user][recallGradeData.passage] = {
-            [recallGradeData.session]: [recallGradeData.grades]
-          };
-        }
-      } else {
-        recallGrades[recallGradeData.user] = {
-          [recallGradeData.passage]: {
-            [recallGradeData.session]: [recallGradeData.grades]
-          }
-        };
-      }
-    }
+    // const recallGrades = {};
+    // const recallGradesDocs = await db
+    //   .collection("recallGrades")
+    //   .where("researchers", "array-contains-any", [
+    //     "Shaobo Liang",
+    //     "Benjamin Brown",
+    //     "Ember Shan",
+    //     "Ziyi Wang",
+    //     "Jeffery Phonn",
+    //     "Jessica Cai",
+    //     "Iman YeckehZaare",
+    //     "Amelia Henriques",
+    //     "Tirdad Barghi"
+    //   ])
+    //   .get();
+    // for (let recallGradeDoc of recallGradesDocs.docs) {
+    //   const recallGradeData = recallGradeDoc.data();
+    //   if (recallGradeData.user in recallGrades) {
+    //     if (recallGradeData.passage in recallGrades[recallGradeData.user]) {
+    //       if (recallGradeData.session in recallGrades[recallGradeData.user][recallGradeData.passage]) {
+    //         recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session].push(
+    //           recallGradeData.grades
+    //         );
+    //       } else {
+    //         recallGrades[recallGradeData.user][recallGradeData.passage][recallGradeData.session] = [
+    //           recallGradeData.grades
+    //         ];
+    //       }
+    //     } else {
+    //       recallGrades[recallGradeData.user][recallGradeData.passage] = {
+    //         [recallGradeData.session]: [recallGradeData.grades]
+    //       };
+    //     }
+    //   } else {
+    //     recallGrades[recallGradeData.user] = {
+    //       [recallGradeData.passage]: {
+    //         [recallGradeData.session]: [recallGradeData.grades]
+    //       }
+    //     };
+    //   }
+    // }
     usersDocs = await db.collection("users").get();
     let userIndex = 0,
       corrects = 0,
@@ -469,7 +469,16 @@ exports.retrieveData = async (req, res) => {
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
       console.log({ userId: userDoc.id });
-      if (Array.isArray(userData.pConditions) && userData.pConditions.length === 2) {
+      if (
+        Array.isArray(userData.pConditions) &&
+        userData.pConditions.length === 2 &&
+        "recallScore" in userData.pConditions[0] &&
+        "recallScore" in userData.pConditions[1] &&
+        "recall3DaysScore" in userData.pConditions[0] &&
+        "recall3DaysScore" in userData.pConditions[1] &&
+        "recall1WeekScore" in userData.pConditions[0] &&
+        "recall1WeekScore" in userData.pConditions[1]
+      ) {
         corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
@@ -512,24 +521,25 @@ exports.retrieveData = async (req, res) => {
           row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
-          let itemScore = 0;
-          let isGraded = false;
-          let recallreGrade = 0;
-          if (
-            userDoc.id in recallGrades &&
-            pCond.passage in recallGrades[userDoc.id] &&
-            "1st" in recallGrades[userDoc.id][pCond.passage]
-          ) {
-            for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["1st"]) {
-              itemScore = 0;
-              for (let grade of recallGradePhrase) {
-                itemScore += grade;
-              }
-              recallreGrade += itemScore / recallGradePhrase.length;
-              isGraded = true;
-            }
-          }
-          row.push(isGraded ? recallreGrade : "");
+          row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
+          // let itemScore = 0;
+          // let isGraded = false;
+          // let recallreGrade = 0;
+          // if (
+          //   userDoc.id in recallGrades &&
+          //   pCond.passage in recallGrades[userDoc.id] &&
+          //   "1st" in recallGrades[userDoc.id][pCond.passage]
+          // ) {
+          //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["1st"]) {
+          //     itemScore = 0;
+          //     for (let grade of recallGradePhrase) {
+          //       itemScore += grade;
+          //     }
+          //     recallreGrade += itemScore / recallGradePhrase.length;
+          //     isGraded = true;
+          //   }
+          // }
+          // row.push(isGraded ? recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.test && idx < pCond.test.length) {
               row.push(pCond.test[idx]);
@@ -549,24 +559,25 @@ exports.retrieveData = async (req, res) => {
             row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
             row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
             row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-            itemScore = 0;
-            isGraded = false;
-            recallreGrade = 0;
-            if (
-              userDoc.id in recallGrades &&
-              pCond.passage in recallGrades[userDoc.id] &&
-              "2nd" in recallGrades[userDoc.id][pCond.passage]
-            ) {
-              for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
-                itemScore = 0;
-                for (let grade of recallGradePhrase) {
-                  itemScore += grade;
-                }
-                recallreGrade += itemScore / recallGradePhrase.length;
-                isGraded = true;
-              }
-            }
-            row.push(isGraded ? recallreGrade : "");
+            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
+            // itemScore = 0;
+            // isGraded = false;
+            // recallreGrade = 0;
+            // if (
+            //   userDoc.id in recallGrades &&
+            //   pCond.passage in recallGrades[userDoc.id] &&
+            //   "2nd" in recallGrades[userDoc.id][pCond.passage]
+            // ) {
+            //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
+            //     itemScore = 0;
+            //     for (let grade of recallGradePhrase) {
+            //       itemScore += grade;
+            //     }
+            //     recallreGrade += itemScore / recallGradePhrase.length;
+            //     isGraded = true;
+            //   }
+            // }
+            // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test3Days && idx < pCond.test3Days.length) {
                 row.push(pCond.test3Days[idx]);
@@ -591,24 +602,25 @@ exports.retrieveData = async (req, res) => {
             row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
             row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
             row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-            itemScore = 0;
-            isGraded = false;
-            recallreGrade = 0;
-            if (
-              userDoc.id in recallGrades &&
-              pCond.passage in recallGrades[userDoc.id] &&
-              "3rd" in recallGrades[userDoc.id][pCond.passage]
-            ) {
-              for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
-                itemScore = 0;
-                for (let grade of recallGradePhrase) {
-                  itemScore += grade;
-                }
-                recallreGrade += itemScore / recallGradePhrase.length;
-                isGraded = true;
-              }
-            }
-            row.push(isGraded ? recallreGrade : "");
+            row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
+            // itemScore = 0;
+            // isGraded = false;
+            // recallreGrade = 0;
+            // if (
+            //   userDoc.id in recallGrades &&
+            //   pCond.passage in recallGrades[userDoc.id] &&
+            //   "3rd" in recallGrades[userDoc.id][pCond.passage]
+            // ) {
+            //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
+            //     itemScore = 0;
+            //     for (let grade of recallGradePhrase) {
+            //       itemScore += grade;
+            //     }
+            //     recallreGrade += itemScore / recallGradePhrase.length;
+            //     isGraded = true;
+            //   }
+            // }
+            // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test1Week && idx < pCond.test1Week.length) {
                 row.push(pCond.test1Week[idx]);
