@@ -791,9 +791,9 @@ exports.retrieveData = async (req, res) => {
         // rowsData.push(row);
       }
     }
-    for (let recallGradeUser in recallGrades) {
-      console.log(recallGradeUser);
-    }
+    // for (let recallGradeUser in recallGrades) {
+    //   console.log(recallGradeUser);
+    // }
     console.log({ corrects, wrongs });
     csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
