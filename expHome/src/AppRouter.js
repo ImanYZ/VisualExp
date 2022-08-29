@@ -272,9 +272,7 @@ const AppRouter = props => {
                   element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
                 />
                 <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
-                {email === "oneweb@umich.edu" && (
-                  <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
-                )}
+                <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
                 <Route
                   path="LifeLog"
                   element={
