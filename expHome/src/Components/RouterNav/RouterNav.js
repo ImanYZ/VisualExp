@@ -1101,7 +1101,7 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {userEmail === "oneweb@umich.edu" && (
+                    {projectPoints.commentsPoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -1119,7 +1119,7 @@ const RouterNav = props => {
                           <br /> ❌ {negativeCodesPionts}
                         </Button>
                       </Tooltip>
-                    )}
+                    ):null}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
