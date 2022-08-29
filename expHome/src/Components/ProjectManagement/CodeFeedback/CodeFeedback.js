@@ -434,7 +434,7 @@ const CodeFeedback = props => {
   // here we go through all the codes and check the ones
   // that the voter have chosen and append them to his name in the feedbackCode collection
   const handleSubmit = async () => {
-    // try {
+    try {
     await firebase.db.runTransaction(async t => {
       setSubmitting(true);
       let recievePoints = [];
@@ -523,11 +523,11 @@ const CodeFeedback = props => {
       setSubmitting(false);
     });
 
-    // } catch (err) {
-    //   setSubmitting(false);
-    //   console.error({ err });
-    //   setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
-    // }
+    } catch (err) {
+      setSubmitting(false);
+      console.error({ err });
+      setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
+    }
   };
 
   const handleCellClick = async clickedCell => {
