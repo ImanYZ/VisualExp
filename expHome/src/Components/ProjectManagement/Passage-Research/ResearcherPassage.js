@@ -728,7 +728,7 @@ const ResearcherPassage = () => {
                       {email === "oneweb@umich.edu" &&(<List>
                         {["Inference", "memory"].map(type => (
                           <ListItem  disablePadding>
-                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage1.title,index)}} dense>
+                            <ListItemButton  onClick={()=>{handleTypeOfQuestion(type,passage2.title,index)}} dense>
                               <ListItemIcon>
                                 <Checkbox edge="start" checked={question.type === type} disableRipple />
                               </ListItemIcon>
