@@ -586,7 +586,7 @@ exports.retrieveData = async (req, res) => {
             row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
             row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
           } else {
-            for (let idx = 0; idx < 21; idx++) {
+            for (let idx = 0; idx < 22; idx++) {
               row.push("");
             }
           }
@@ -629,7 +629,7 @@ exports.retrieveData = async (req, res) => {
             row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
             row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
           } else {
-            for (let idx = 0; idx < 21; idx++) {
+            for (let idx = 0; idx < 22; idx++) {
               row.push("");
             }
           }
