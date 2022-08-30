@@ -473,22 +473,29 @@ exports.retrieveData = async (req, res) => {
     //   }
     // }
     const passages = {};
+    const passagesH2K2 = [];
     const passageDocs = await db.collection("passages").get();
     for (let passageDoc of passageDocs.docs) {
-      passages[passageDoc.id] = passageDoc.data();
+      const passageData = passageDoc.data();
+      passages[passageDoc.id] = passageData;
+      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
+        passagesH2K2.push(passageDoc.id);
+      }
     }
     usersDocs = await db.collection("users").where("project", "==", "H2K2").get();
     let userIndex = 0;
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
-      userIndex += 1;
-      console.log({ userIndex });
       if (
         Array.isArray(userData.pConditions) &&
         userData.pConditions.length === 2 &&
         "recallScore" in userData.pConditions[0] &&
-        "recallScore" in userData.pConditions[1]
+        "recallScore" in userData.pConditions[1] &&
+        passagesH2K2.includes(userData.pConditions[0].passage) &&
+        passagesH2K2.includes(userData.pConditions[1].passage)
       ) {
+        userIndex += 1;
+        console.log({ userIndex });
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
           // row.push(userDoc.id);
@@ -504,14 +511,15 @@ exports.retrieveData = async (req, res) => {
           row.push(userData.gender ? userData.gender : "");
           row.push(userData.language ? userData.language : "");
           row.push(userData.major ? userData.major : "");
-          row.push(userData.nullPassage);
+          row.push(passages[userData.nullPassage].title);
           row.push(pCIdx);
           pCond = userData.pConditions[pCIdx];
           row.push(pCond.condition);
-          row.push(pCond.passage);
+          row.push(passages[pCond.passage].title);
+          const questions = passages[pCond.passage].questions;
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.pretest && idx < pCond.pretest.length) {
-              row.push(pCond.pretest[idx]);
+              row.push(pCond.pretest[idx] === questions[idx]);
             } else {
               row.push("");
             }
@@ -549,9 +557,11 @@ exports.retrieveData = async (req, res) => {
           // }
           // row.push(isGraded ? recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
-            if (pCond.test && idx < pCond.test.length) {
-              row.push(pCond.test[idx]);
+            if (pCond.test && idx < questions.length) {
+              row.push(pCond.test[idx] === questions[idx]);
+              row.push(questions[idx].type);
             } else {
+              row.push("");
               row.push("");
             }
           }
@@ -588,7 +598,7 @@ exports.retrieveData = async (req, res) => {
             // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test3Days && idx < pCond.test3Days.length) {
-                row.push(pCond.test3Days[idx]);
+                row.push(pCond.test3Days[idx] === questions[idx]);
               } else {
                 row.push("");
               }
@@ -631,7 +641,7 @@ exports.retrieveData = async (req, res) => {
             // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test1Week && idx < pCond.test1Week.length) {
-                row.push(pCond.test1Week[idx]);
+                row.push(pCond.test1Week[idx] === questions[idx]);
               } else {
                 row.push("");
               }
