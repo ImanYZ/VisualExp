@@ -3,7 +3,7 @@ const csv = require("fast-csv");
 require("dotenv").config();
 
 const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
-const { getFullname } = require("./utils");
+const { getFullname, getDateString } = require("./utils");
 const { emailApplicationStatus, emailCommunityLeader, emailImanToInviteApplicants } = require("./emailing");
 
 exports.deleteUser = async (snap, context) => {
@@ -322,7 +322,7 @@ exports.retrieveData = async (req, res) => {
         "language",
         "major",
         "nullPassage",
-        "Phase",
+        "phase",
         "condition",
         "passage",
         "pretest0",
@@ -349,20 +349,30 @@ exports.retrieveData = async (req, res) => {
         "recallTime",
         "recallreText",
         "recallreGrade",
-        "test0",
-        "test1",
-        "test2",
-        "test3",
-        "test4",
-        "test5",
-        "test6",
-        "test7",
-        "test8",
-        "test9",
-        "testEnded",
-        "testScore",
-        "testScoreRatio",
-        "testTime",
+        "recognition0",
+        "question0Type",
+        "recognition1",
+        "question1Type",
+        "recognition2",
+        "question2Type",
+        "recognition3",
+        "question3Type",
+        "recognition4",
+        "question4Type",
+        "recognition5",
+        "question5Type",
+        "recognition6",
+        "question6Type",
+        "recognition7",
+        "question7Type",
+        "recognition8",
+        "question8Type",
+        "recognition9",
+        "question9Type",
+        "recognitionEnded",
+        "recognitionScore",
+        "recognitionScoreRatio",
+        "recognitionTime",
         "recall3DaysEnded",
         "recall3DaysScore",
         "recall3DaysScoreRatio",
@@ -371,20 +381,20 @@ exports.retrieveData = async (req, res) => {
         "recall3DaysTime",
         "recall3DaysreText",
         "recall3DaysreGrade",
-        "test3Days0",
-        "test3Days1",
-        "test3Days2",
-        "test3Days3",
-        "test3Days4",
-        "test3Days5",
-        "test3Days6",
-        "test3Days7",
-        "test3Days8",
-        "test3Days9",
-        "test3DaysEnded",
-        "test3DaysScore",
-        "test3DaysScoreRatio",
-        "test3DaysTime",
+        "recognition3Days0",
+        "recognition3Days1",
+        "recognition3Days2",
+        "recognition3Days3",
+        "recognition3Days4",
+        "recognition3Days5",
+        "recognition3Days6",
+        "recognition3Days7",
+        "recognition3Days8",
+        "recognition3Days9",
+        "recognition3DaysEnded",
+        "recognition3DaysScore",
+        "recognition3DaysScoreRatio",
+        "recognition3DaysTime",
         "recall1WeekEnded",
         "recall1WeekScore",
         "recall1WeekScoreRatio",
@@ -393,20 +403,20 @@ exports.retrieveData = async (req, res) => {
         "recall1WeekTime",
         "recall1WeekreText",
         "recall1WeekreGrade",
-        "test1Week0",
-        "test1Week1",
-        "test1Week2",
-        "test1Week3",
-        "test1Week4",
-        "test1Week5",
-        "test1Week6",
-        "test1Week7",
-        "test1Week8",
-        "test1Week9",
-        "test1WeekEnded",
-        "test1WeekScore",
-        "test1WeekScoreRatio",
-        "test1WeekTime",
+        "recognition1Week0",
+        "recognition1Week1",
+        "recognition1Week2",
+        "recognition1Week3",
+        "recognition1Week4",
+        "recognition1Week5",
+        "recognition1Week6",
+        "recognition1Week7",
+        "recognition1Week8",
+        "recognition1Week9",
+        "recognition1WeekEnded",
+        "recognition1WeekScore",
+        "recognition1WeekScoreRatio",
+        "recognition1WeekTime",
         "postQChoice",
         "postQsEnded",
         "postQsStart",
@@ -462,10 +472,13 @@ exports.retrieveData = async (req, res) => {
     //     };
     //   }
     // }
-    usersDocs = await db.collection("users").get();
-    let userIndex = 0,
-      corrects = 0,
-      wrongs = 0;
+    const passages = {};
+    const passageDocs = await db.collection("passages").get();
+    for (let passageDoc of passageDocs.docs) {
+      passages[passageDoc.id] = passageDoc.data();
+    }
+    usersDocs = await db.collection("users").where("project", "==", "H2K2").get();
+    let userIndex = 0;
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
       userIndex += 1;
@@ -476,16 +489,15 @@ exports.retrieveData = async (req, res) => {
         "recallScore" in userData.pConditions[0] &&
         "recallScore" in userData.pConditions[1]
       ) {
-        corrects += 1;
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           row = [];
           // row.push(userDoc.id);
           row.push(userIndex);
-          row.push(userData.birthDate ? userData.birthDate.toDate() : "");
-          row.push(userData.cond2Start ? userData.cond2Start.toDate() : "");
-          row.push(userData.createdAt ? userData.createdAt.toDate() : "");
-          row.push(userData.demoQsEnded ? userData.demoQsEnded.toDate() : "");
-          row.push(userData.demoQsStart ? userData.demoQsStart.toDate() : "");
+          row.push(userData.birthDate ? getDateString(userData.birthDate.toDate()) : "");
+          row.push(userData.cond2Start ? getDateString(userData.cond2Start.toDate()) : "");
+          row.push(userData.createdAt ? getDateString(userData.createdAt.toDate()) : "");
+          row.push(userData.demoQsEnded ? getDateString(userData.demoQsEnded.toDate()) : "");
+          row.push(userData.demoQsStart ? getDateString(userData.demoQsStart.toDate()) : "");
           row.push(userData.education ? userData.education : "");
           // row.push(userData.email ? userData.email : "");
           row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
@@ -504,17 +516,17 @@ exports.retrieveData = async (req, res) => {
               row.push("");
             }
           }
-          row.push(pCond.pretestEnded ? pCond.pretestEnded.toDate() : "");
+          row.push(pCond.pretestEnded ? getDateString(pCond.pretestEnded.toDate()) : "");
           row.push("pretestScore" in pCond ? pCond.pretestScore : "");
           row.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
           row.push("pretestTime" in pCond ? pCond.pretestTime : "");
-          row.push("previewEnded" in pCond ? pCond.previewEnded.toDate() : "");
+          row.push("previewEnded" in pCond ? getDateString(pCond.previewEnded.toDate()) : "");
           row.push("previewTime" in pCond ? pCond.previewTime : "");
-          row.push("recallEnded" in pCond ? pCond.recallEnded.toDate() : "");
+          row.push("recallEnded" in pCond ? getDateString(pCond.recallEnded.toDate()) : "");
           row.push("recallScore" in pCond ? pCond.recallScore : "");
           row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
           row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
-          row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
+          row.push("recallStart" in pCond ? getDateString(pCond.recallStart.toDate()) : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
           row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
@@ -543,16 +555,16 @@ exports.retrieveData = async (req, res) => {
               row.push("");
             }
           }
-          row.push("testEnded" in pCond ? pCond.testEnded.toDate() : "");
+          row.push("testEnded" in pCond ? getDateString(pCond.testEnded.toDate()) : "");
           row.push("testScore" in pCond ? pCond.testScore : "");
           row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
           row.push("testTime" in pCond ? pCond.testTime : "");
           if (userData.post3DaysQsEnded) {
-            row.push(pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : "");
+            row.push(pCond.recall3DaysEnded ? getDateString(pCond.recall3DaysEnded.toDate()) : "");
             row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
             row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
             row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
-            row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
+            row.push("recall3DaysStart" in pCond ? getDateString(pCond.recall3DaysStart.toDate()) : "");
             row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
             row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
             row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
@@ -581,7 +593,7 @@ exports.retrieveData = async (req, res) => {
                 row.push("");
               }
             }
-            row.push(pCond.test3DaysEnded ? pCond.test3DaysEnded.toDate() : "");
+            row.push(pCond.test3DaysEnded ? getDateString(pCond.test3DaysEnded.toDate()) : "");
             row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
             row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
             row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
@@ -591,11 +603,11 @@ exports.retrieveData = async (req, res) => {
             }
           }
           if (userData.post1WeekQsEnded) {
-            row.push(pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : "");
+            row.push(pCond.recall1WeekEnded ? getDateString(pCond.recall1WeekEnded.toDate()) : "");
             row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
             row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
             row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
-            row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
+            row.push("recall1WeekStart" in pCond ? getDateString(pCond.recall1WeekStart.toDate()) : "");
             row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
             row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
             row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
@@ -624,7 +636,7 @@ exports.retrieveData = async (req, res) => {
                 row.push("");
               }
             }
-            row.push(pCond.test1WeekEnded ? pCond.test1WeekEnded.toDate() : "");
+            row.push(pCond.test1WeekEnded ? getDateString(pCond.test1WeekEnded.toDate()) : "");
             row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
             row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
             row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
@@ -634,12 +646,12 @@ exports.retrieveData = async (req, res) => {
             }
           }
           row.push(pCIdx === 0 ? userData.postQ1Choice : userData.postQ2Choice);
-          row.push(userData.postQsEnded ? userData.postQsEnded.toDate() : "");
-          row.push(userData.postQsStart ? userData.postQsStart.toDate() : "");
+          row.push(userData.postQsEnded ? getDateString(userData.postQsEnded.toDate()) : "");
+          row.push(userData.postQsStart ? getDateString(userData.postQsStart.toDate()) : "");
           if (userData.post3DaysQsEnded) {
             row.push(pCIdx === 0 ? userData.post3DaysQ1Choice : userData.post3DaysQ2Choice);
-            row.push(userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : "");
-            row.push(userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : "");
+            row.push(userData.post3DaysQsEnded ? getDateString(userData.post3DaysQsEnded.toDate()) : "");
+            row.push(userData.post3DaysQsStart ? getDateString(userData.post3DaysQsStart.toDate()) : "");
           } else {
             for (let idx = 0; idx < 3; idx++) {
               row.push("");
@@ -647,8 +659,8 @@ exports.retrieveData = async (req, res) => {
           }
           if (userData.post1WeekQsEnded) {
             row.push(pCIdx === 0 ? userData.post1WeekQ1Choice : userData.post1WeekQ2Choice);
-            row.push(userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : "");
-            row.push(userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : "");
+            row.push(userData.post1WeekQsEnded ? getDateString(userData.post1WeekQsEnded.toDate()) : "");
+            row.push(userData.post1WeekQsStart ? getDateString(userData.post1WeekQsStart.toDate()) : "");
           } else {
             for (let idx = 0; idx < 3; idx++) {
               row.push("");
@@ -659,140 +671,13 @@ exports.retrieveData = async (req, res) => {
           row.push(userData.explanations1Week ? userData.explanations1Week[pCIdx] : "");
           rowsData.push(row);
         }
-      } else if (userData.pConditions) {
-        wrongs += 1;
-        // row = [];
-        // row.push(userDoc.id);
-        // userIndex += 1;
-        // row.push(userIndex);
-        // row.push(userData.birthDate ? userData.birthDate.toDate() : "");
-        // row.push(userData.cond2Start ? userData.cond2Start.toDate() : "");
-        // row.push(userData.createdAt ? userData.createdAt.toDate() : "");
-        // row.push(userData.demoQsEnded ? userData.demoQsEnded.toDate() : "");
-        // row.push(userData.demoQsStart ? userData.demoQsStart.toDate() : "");
-        // row.push(userData.education ? userData.education : "");
-        // row.push(userData.email ? userData.email : "");
-        // row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
-        // row.push(userData.gender ? userData.gender : "");
-        // row.push(userData.language ? userData.language : "");
-        // row.push(userData.major ? userData.major : "");
-        // row.push(userData.nullPassage);
-        // row.push(0);
-        // pCond = userData.pConditions;
-        // row.push(pCond.condition);
-        // row.push(pCond.passage);
-        // for (let idx = 0; idx < 10; idx++) {
-        //   if (pCond.pretest && idx < pCond.pretest.length) {
-        //     row.push(pCond.pretest[idx]);
-        //   } else {
-        //     row.push("");
-        //   }
-        // }
-        // row.push(pCond.pretestEnded ? pCond.pretestEnded.toDate() : "");
-        // row.push("pretestScore" in pCond ? pCond.pretestScore : "");
-        // row.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
-        // row.push("pretestTime" in pCond ? pCond.pretestTime : "");
-        // row.push("previewEnded" in pCond ? pCond.previewEnded.toDate() : "");
-        // row.push("previewTime" in pCond ? pCond.previewTime : "");
-        // row.push("recallEnded" in pCond ? pCond.recallEnded.toDate() : "");
-        // row.push("recallScore" in pCond ? pCond.recallScore : "");
-        // row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
-        // row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
-        // row.push("recallStart" in pCond ? pCond.recallStart.toDate() : "");
-        // row.push("recallTime" in pCond ? pCond.recallTime : "");
-        // row.push("recallreText" in pCond ? pCond.recallreText : "");
-        // for (let idx = 0; idx < 10; idx++) {
-        //   if (pCond.test && idx < pCond.test.length) {
-        //     row.push(pCond.test[idx]);
-        //   } else {
-        //     row.push("");
-        //   }
-        // }
-        // row.push("testEnded" in pCond ? pCond.testEnded.toDate() : "");
-        // row.push("testScore" in pCond ? pCond.testScore : "");
-        // row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
-        // row.push("testTime" in pCond ? pCond.testTime : "");
-        // if (userData.post3DaysQsEnded) {
-        //   row.push(pCond.recall3DaysEnded ? pCond.recall3DaysEnded.toDate() : "");
-        //   row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
-        //   row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
-        //   row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
-        //   row.push("recall3DaysStart" in pCond ? pCond.recall3DaysStart.toDate() : "");
-        //   row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
-        //   row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-        //   for (let idx = 0; idx < 10; idx++) {
-        //     if (pCond.test3Days && idx < pCond.test3Days.length) {
-        //       row.push(pCond.test3Days[idx]);
-        //     } else {
-        //       row.push("");
-        //     }
-        //   }
-        //   row.push(pCond.test3DaysEnded ? pCond.test3DaysEnded.toDate() : "");
-        //   row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
-        //   row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
-        //   row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
-        // } else {
-        //   for (let idx = 0; idx < 21; idx++) {
-        //     row.push("");
-        //   }
-        // }
-        // if (userData.post1WeekQsEnded) {
-        //   row.push(pCond.recall1WeekEnded ? pCond.recall1WeekEnded.toDate() : "");
-        //   row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
-        //   row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
-        //   row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
-        //   row.push("recall1WeekStart" in pCond ? pCond.recall1WeekStart.toDate() : "");
-        //   row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
-        //   row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-        //   for (let idx = 0; idx < 10; idx++) {
-        //     if (pCond.test1Week && idx < pCond.test1Week.length) {
-        //       row.push(pCond.test1Week[idx]);
-        //     } else {
-        //       row.push("");
-        //     }
-        //   }
-        //   row.push(pCond.test1WeekEnded ? pCond.test1WeekEnded.toDate() : "");
-        //   row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
-        //   row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
-        //   row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
-        // } else {
-        //   for (let idx = 0; idx < 21; idx++) {
-        //     row.push("");
-        //   }
-        // }
-        // row.push(userData.postQ1Choice);
-        // row.push(userData.postQsEnded ? userData.postQsEnded.toDate() : "");
-        // row.push(userData.postQsStart ? userData.postQsStart.toDate() : "");
-        // if (userData.post3DaysQsEnded) {
-        //   row.push(userData.post3DaysQ1Choice);
-        //   row.push(userData.post3DaysQsEnded ? userData.post3DaysQsEnded.toDate() : "");
-        //   row.push(userData.post3DaysQsStart ? userData.post3DaysQsStart.toDate() : "");
-        // } else {
-        //   for (let idx = 0; idx < 3; idx++) {
-        //     row.push("");
-        //   }
-        // }
-        // if (userData.post1WeekQsEnded) {
-        //   row.push(userData.post1WeekQ1Choice);
-        //   row.push(userData.post1WeekQsEnded ? userData.post1WeekQsEnded.toDate() : "");
-        //   row.push(userData.post1WeekQsStart ? userData.post1WeekQsStart.toDate() : "");
-        // } else {
-        //   for (let idx = 0; idx < 3; idx++) {
-        //     row.push("");
-        //   }
-        // }
-        // row.push("explanations" in userData && userData.explanations ? userData.explanations : "");
-        // row.push(userData.explanations3Days ? userData.explanations3Days : "");
-        // row.push(userData.explanations1Week ? userData.explanations1Week : "");
-        // rowsData.push(row);
       }
     }
     // for (let recallGradeUser in recallGrades) {
     //   console.log(recallGradeUser);
     // }
-    console.log({ corrects, wrongs });
     csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
-      console.log("done process data!");
+      console.log("Created the CSV file!");
     });
   } catch (err) {
     console.log({ err });
