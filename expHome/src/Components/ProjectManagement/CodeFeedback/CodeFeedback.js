@@ -30,7 +30,6 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { width } from "@mui/system";
 
 const modalStyle = {
   position: "absolute",
@@ -195,7 +194,7 @@ const CodeFeedback = props => {
         passagesSnapshot();
       };
     }
-  }, [firebase, loadNewCodes]);
+  }, [firebase, loadNewCodes, retrieveNext]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
@@ -232,8 +231,6 @@ const CodeFeedback = props => {
             }
           }
         } else if (change.type === "added") {
-          console.log(id);
-          console.log(change.doc.id);
           const newCode = {
             id: change.doc.id,
             code: data.code,
@@ -259,7 +256,6 @@ const CodeFeedback = props => {
                 approvedFeedbackCodeBooks.splice(approvedFeedbackCodeBooks.indexOf({ id: change.doc.id, ...data }), 1);
               }
             }
-            console.log("approvedFeedbackCodeBooks:::::test", approvedFeedbackCodeBooks.includes(data));
           }
 
           const findCode = allCodes.find(code => code.id === id);
@@ -295,12 +291,27 @@ const CodeFeedback = props => {
       setSelected(codesSelecting);
       setCodeBooksLoaded(false);
     }
-  }, [codeBooksLoaded]);
+  }, [codeBooksLoaded, retrieveNext]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     let foundResponse = false;
+    const quotesSelectedForCode = {};
+    for (let codeData of approvedCodes) {
+      quotesSelectedForCode[codeData.code] = [];
+    }
+    setQuotesSelectedForCodes(quotesSelectedForCode);
+
     const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
+    const feedbackCodeBooksDocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
+    const newSet = new Set();
+    for (let feedbackCodeBooksDoc of feedbackCodeBooksDocs.docs) {
+      const data = feedbackCodeBooksDoc.data();
+      if (!newSet.has(data.code)) {
+        newSet.add(data.code);
+      }
+    }
+
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
       if ("choice" in feedbackData) {
@@ -313,14 +324,16 @@ const CodeFeedback = props => {
       } else {
         response = feedbackData.explanation.split(".");
       }
-      setDocId(feedbackDoc.id);
+
       //we check if the authenticated reserchers have aleardy casted his vote
       //if so we get all his recorded past choices
       if (feedbackData.coders.includes(fullname)) {
         const myCodes = Object.keys(feedbackData.codersChoices[fullname]);
-        if (myCodes.length !== approvedCodes.length) {
+
+        if (myCodes.length !== newSet.size) {
           const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
           setApprovedNewCodes(newCodes);
+          setDocId(feedbackDoc.id);
           setSentences(response);
           foundResponse = true;
           for (let code of myCodes) {
@@ -344,6 +357,7 @@ const CodeFeedback = props => {
           }
         }
         if (allowOtherResearchersToVote) {
+          setDocId(feedbackDoc.id);
           setSentences(response);
           foundResponse = true;
         }
@@ -517,7 +531,7 @@ const CodeFeedback = props => {
           t.update(researcherRef, researcherUpdates);
         }
         const feedbackCodesRef = await firebase.db.collection("feedbackCode").doc(docId);
-        console.log("feedbackCodeUpdate:::::::::::::::", feedbackCodeUpdate);
+
         t.update(feedbackCodesRef, feedbackCodeUpdate);
         setRetrieveNext(oldValue => oldValue + 1);
         setSnackbarMessage("Your evaluation was submitted successfully.");
@@ -532,14 +546,12 @@ const CodeFeedback = props => {
 
   const handleCellClick = async clickedCell => {
     if (clickedCell.field === "approved") {
-      console.log("approved");
       let codesApp = [...allExperimentCodes];
       const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
       const isApproved = codesApp[appIdx][clickedCell.field] === "✅";
 
       if (appIdx >= 0 && codesApp[appIdx][clickedCell.field] !== "O") {
         const id = clickedCell.id;
-        console.log(id);
         const codesAppDoc = await firebase.db.collection("feedbackCodeBooks").doc(id).get();
         const codesAppData = codesAppDoc.data();
         let codeUpdate;
@@ -562,7 +574,6 @@ const CodeFeedback = props => {
       }
     }
     if (clickedCell.field === "rejected") {
-      console.log("rejected");
       let codesApp = [...allExperimentCodes];
       const appIdx = codesApp.findIndex(acti => acti.id === clickedCell.id);
       const isRejected = codesApp[appIdx][clickedCell.field] === "❌";
@@ -640,7 +651,6 @@ const CodeFeedback = props => {
 
     if (unApprovedCode.includes(selectedCode)) {
       // update the document based on selected code
-      console.log("update");
       const selectedCodeRef = firebase.db.collection("feedbackCodeBooks").doc(selectedCode.id);
       const codeUpdate = {
         code: code
@@ -797,11 +807,6 @@ const CodeFeedback = props => {
     setLoadNewCodes(true);
   };
 
-  console.log("/////////:::::::::::", openDeleteModalAdmin);
-  console.log(":::::::::::::::::::::openDeleteModal:::::::::::::::", openDeleteModal);
-  console.log("approvedCodes data", approvedCodes);
-
-  console.log("quotesSelectedForCodes::::::::::::::::>", quotesSelectedForCodes);
   return (
     <>
       {unApprovedNewCodes.length > 0 && (
@@ -915,14 +920,11 @@ const CodeFeedback = props => {
                         handleSelectedCode(codeData.code);
                       }}
                     >
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          checked={
-                            quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0
-                          }
-                        />
-                      </ListItemIcon>
+                      {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
+                        <Checkbox checked={true} color="success" />
+                      ) : (
+                        <Checkbox checked={false} />
+                      )}
 
                       <ListItemText primary={`${codeData.code}`} />
                     </ListItemButton>
