@@ -304,9 +304,9 @@ exports.loadContacts = async (req, res) => {
 // Download the dataset in CSV
 exports.retrieveData = async (req, res) => {
   console.log("retrieveData");
-  let rowsData, usersDocs, userData, row, pCond;
+  let usersDocs, userData, row, pCond, rowLong;
   try {
-    rowsData = [
+    const rowsData = [
       [
         // "fullname",
         "userIndex",
@@ -325,16 +325,6 @@ exports.retrieveData = async (req, res) => {
         "phase",
         "condition",
         "passage",
-        "pretest0",
-        "pretest1",
-        "pretest2",
-        "pretest3",
-        "pretest4",
-        "pretest5",
-        "pretest6",
-        "pretest7",
-        "pretest8",
-        "pretest9",
         "pretestEnded",
         "pretestScore",
         "pretestScoreRatio",
@@ -349,26 +339,6 @@ exports.retrieveData = async (req, res) => {
         "recallTime",
         "recallreText",
         "recallreGrade",
-        "recognition0",
-        "question0Type",
-        "recognition1",
-        "question1Type",
-        "recognition2",
-        "question2Type",
-        "recognition3",
-        "question3Type",
-        "recognition4",
-        "question4Type",
-        "recognition5",
-        "question5Type",
-        "recognition6",
-        "question6Type",
-        "recognition7",
-        "question7Type",
-        "recognition8",
-        "question8Type",
-        "recognition9",
-        "question9Type",
         "recognitionEnded",
         "recognitionScore",
         "recognitionScoreRatio",
@@ -381,16 +351,6 @@ exports.retrieveData = async (req, res) => {
         "recall3DaysTime",
         "recall3DaysreText",
         "recall3DaysreGrade",
-        "recognition3Days0",
-        "recognition3Days1",
-        "recognition3Days2",
-        "recognition3Days3",
-        "recognition3Days4",
-        "recognition3Days5",
-        "recognition3Days6",
-        "recognition3Days7",
-        "recognition3Days8",
-        "recognition3Days9",
         "recognition3DaysEnded",
         "recognition3DaysScore",
         "recognition3DaysScoreRatio",
@@ -403,16 +363,6 @@ exports.retrieveData = async (req, res) => {
         "recall1WeekTime",
         "recall1WeekreText",
         "recall1WeekreGrade",
-        "recognition1Week0",
-        "recognition1Week1",
-        "recognition1Week2",
-        "recognition1Week3",
-        "recognition1Week4",
-        "recognition1Week5",
-        "recognition1Week6",
-        "recognition1Week7",
-        "recognition1Week8",
-        "recognition1Week9",
         "recognition1WeekEnded",
         "recognition1WeekScore",
         "recognition1WeekScoreRatio",
@@ -429,6 +379,32 @@ exports.retrieveData = async (req, res) => {
         "explanation1",
         "explanation3Days",
         "explanation1Week"
+      ]
+    ];
+    const rowsLongData = [
+      [
+        // "fullname",
+        "userIndex",
+        "birthDate",
+        "cond2Start",
+        "createdAt",
+        "demoQsEnded",
+        "demoQsStart",
+        "education",
+        // "email",
+        "ethnicity",
+        "gender",
+        "language",
+        "major",
+        "nullPassage",
+        "phase",
+        "condition",
+        "passage",
+        "session",
+        "question",
+        "questionType",
+        "pretest",
+        "recognition"
       ]
     ];
     // const recallGrades = {};
@@ -517,12 +493,28 @@ exports.retrieveData = async (req, res) => {
           row.push(pCond.condition);
           row.push(passages[pCond.passage].title);
           const questions = passages[pCond.passage].questions;
-          for (let idx = 0; idx < 10; idx++) {
-            if (pCond.pretest && idx < pCond.pretest.length) {
-              row.push(pCond.pretest[idx] === questions[idx] ? 1 : 0);
-            } else {
-              row.push("");
-            }
+          for (let idx = 0; idx < questions.length; idx++) {
+            rowLong = [...row];
+            rowLong.push("1st");
+            rowLong.push(pCond.passage + "Q" + idx);
+            rowLong.push(questions[idx].type);
+            rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+            rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
+            rowsLongData.push(rowLong);
+            rowLong = [...row];
+            rowLong.push("2nd");
+            rowLong.push(pCond.passage + "Q" + idx);
+            rowLong.push(questions[idx].type);
+            rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+            rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
+            rowsLongData.push(rowLong);
+            rowLong = [...row];
+            rowLong.push("3rd");
+            rowLong.push(pCond.passage + "Q" + idx);
+            rowLong.push(questions[idx].type);
+            rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+            rowLong.push(questions[idx] && pCond.test1Week[idx] === questions[idx].answer ? 1 : 0);
+            rowsLongData.push(rowLong);
           }
           row.push(pCond.pretestEnded ? getDateString(pCond.pretestEnded.toDate()) : "");
           row.push("pretestScore" in pCond ? pCond.pretestScore : "");
@@ -556,15 +548,6 @@ exports.retrieveData = async (req, res) => {
           //   }
           // }
           // row.push(isGraded ? recallreGrade : "");
-          for (let idx = 0; idx < 10; idx++) {
-            if (pCond.test && idx < questions.length) {
-              row.push(pCond.test[idx] === questions[idx] ? 1 : 0);
-              row.push(questions[idx].type);
-            } else {
-              row.push("");
-              row.push("");
-            }
-          }
           row.push("testEnded" in pCond ? getDateString(pCond.testEnded.toDate()) : "");
           row.push("testScore" in pCond ? pCond.testScore : "");
           row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
@@ -596,19 +579,12 @@ exports.retrieveData = async (req, res) => {
             //   }
             // }
             // row.push(isGraded ? recallreGrade : "");
-            for (let idx = 0; idx < 10; idx++) {
-              if (pCond.test3Days && idx < pCond.test3Days.length) {
-                row.push(pCond.test3Days[idx] === questions[idx] ? 1 : 0);
-              } else {
-                row.push("");
-              }
-            }
             row.push(pCond.test3DaysEnded ? getDateString(pCond.test3DaysEnded.toDate()) : "");
             row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
             row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
             row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
           } else {
-            for (let idx = 0; idx < 22; idx++) {
+            for (let idx = 0; idx < 12; idx++) {
               row.push("");
             }
           }
@@ -639,19 +615,12 @@ exports.retrieveData = async (req, res) => {
             //   }
             // }
             // row.push(isGraded ? recallreGrade : "");
-            for (let idx = 0; idx < 10; idx++) {
-              if (pCond.test1Week && idx < pCond.test1Week.length) {
-                row.push(pCond.test1Week[idx] === questions[idx] ? 1 : 0);
-              } else {
-                row.push("");
-              }
-            }
             row.push(pCond.test1WeekEnded ? getDateString(pCond.test1WeekEnded.toDate()) : "");
             row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
             row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
             row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
           } else {
-            for (let idx = 0; idx < 22; idx++) {
+            for (let idx = 0; idx < 12; idx++) {
               row.push("");
             }
           }
@@ -688,6 +657,9 @@ exports.retrieveData = async (req, res) => {
     // }
     csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Created the CSV file!");
+    });
+    csv.writeToPath("datasets/dataLong.csv", rowsLongData, { headers: true }).on("finish", () => {
+      console.log("Created the Long CSV file!");
     });
   } catch (err) {
     console.log({ err });
