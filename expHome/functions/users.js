@@ -519,7 +519,7 @@ exports.retrieveData = async (req, res) => {
           const questions = passages[pCond.passage].questions;
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.pretest && idx < pCond.pretest.length) {
-              row.push(pCond.pretest[idx] === questions[idx]);
+              row.push(pCond.pretest[idx] === questions[idx] ? 1 : 0);
             } else {
               row.push("");
             }
@@ -558,7 +558,7 @@ exports.retrieveData = async (req, res) => {
           // row.push(isGraded ? recallreGrade : "");
           for (let idx = 0; idx < 10; idx++) {
             if (pCond.test && idx < questions.length) {
-              row.push(pCond.test[idx] === questions[idx]);
+              row.push(pCond.test[idx] === questions[idx] ? 1 : 0);
               row.push(questions[idx].type);
             } else {
               row.push("");
@@ -598,7 +598,7 @@ exports.retrieveData = async (req, res) => {
             // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test3Days && idx < pCond.test3Days.length) {
-                row.push(pCond.test3Days[idx] === questions[idx]);
+                row.push(pCond.test3Days[idx] === questions[idx] ? 1 : 0);
               } else {
                 row.push("");
               }
@@ -641,7 +641,7 @@ exports.retrieveData = async (req, res) => {
             // row.push(isGraded ? recallreGrade : "");
             for (let idx = 0; idx < 10; idx++) {
               if (pCond.test1Week && idx < pCond.test1Week.length) {
-                row.push(pCond.test1Week[idx] === questions[idx]);
+                row.push(pCond.test1Week[idx] === questions[idx] ? 1 : 0);
               } else {
                 row.push("");
               }
