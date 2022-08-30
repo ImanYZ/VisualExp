@@ -888,6 +888,13 @@ const CodeFeedback = props => {
             For every code, if you check any of the sentences, it also check-marks the code indicating that the code was
             mentioned by the participant due to the sentence that you checked.
           </li>
+          <li>Select all the sentences that apply to the code you have selected.</li>
+          <li>
+            After going through all the codes, if you found an important point in the participant's feedback that is not
+            mentioned in any of the codes in the codebook, then you can manually add a new concise code that summarizes
+            the important point in the box on the bottom left. Clicking the add button will add this new code to the
+            codebook.
+          </li>
         </ol>
       </Alert>
       <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
