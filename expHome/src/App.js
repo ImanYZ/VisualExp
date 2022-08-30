@@ -493,20 +493,27 @@ const App = () => {
         setTimer(15 * 60);
         break;
       case 3:
-        // if a pCondition do not have "testScore" field, that means
+        // if a pCondition do not have "testScore" field,
+        // and it's condition is not equal to the current condition that means
         // the participant has not gone through that paragraph.
-        const pendingPCon = pConditions.find(pCon => !("testScore" in pCon));
+        const pendingPConIndex = pConditions.findIndex(pCon => !("testScore" in pCon) && pCon.condition !== condition);
+
+        const pendingPCon = pConditions[pendingPConIndex];
 
         userUpdates = {};
         if (pendingPCon) {
           userUpdates = {
-            phase: 1,
+            phase: pendingPConIndex === -1 ? 1 : pendingPConIndex,
             currentPCon: {
               passage: pendingPCon.passage,
               condition: pendingPCon.condition
             }
           };
-          newStep = 0;
+          if (pendingPConIndex === -1) {
+            newStep = 4;
+          } else {
+            newStep = 0;
+          }
         } else {
           newStep = 4;
         }
