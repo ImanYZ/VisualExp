@@ -512,11 +512,28 @@ const CodeFeedback = props => {
           }
         }
 
-        for (let res of recieveNegativePoints) {
+        const tWriteOperations = [];
+        for (let res of feedbackCodeUpdate.coders) {
           const researcherRef = firebase.db.collection("researchers").doc(res);
 
           const researcherData = (await t.get(researcherRef)).data();
+          let negativeCodingPoints = 0;
+          let positiveCodingPoints = 0;
+          recievePositivePoints.forEach(coder => {
+            if (coder === res) {
+              positiveCodingPoints += 0.04;
+            }
+          });
+          recieveNegativePoints.forEach(coder => {
+            if (coder === res) {
+              negativeCodingPoints += 0.04;
+            }
+          });
 
+       
+          positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2))
+          negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2))
+     
           const researcherUpdates = {
             projects: {
               ...researcherData.projects,
@@ -525,33 +542,30 @@ const CodeFeedback = props => {
               }
             }
           };
-          if ("negativeCodingPoints" in researcherUpdates.projects[project]) {
-            researcherUpdates.projects[project].negativeCodingPoints += 0.04;
-          } else {
-            researcherUpdates.projects[project].negativeCodingPoints = 0.04;
+
+          let calulatedProject = project;
+          if (!(project in researcherData.projects)) {
+            calulatedProject = Object.keys(researcherData.projects)[0];
           }
-          t.update(researcherRef, researcherUpdates);
-        }
-
-        for (let res of recievePositivePoints) {
-          const researcherRef = firebase.db.collection("researchers").doc(res);
-          const researcherData = (await t.get(researcherRef)).data();
-
-          const researcherUpdates = {
-            projects: {
-              [project]: {
-                ...researcherData.projects[project]
-              }
+          if (researcherUpdates.projects[calulatedProject]) {
+            if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+              researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
+            } else {
+              researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
             }
-          };
-          if ("positiveCodingPoints" in researcherUpdates.projects[project]) {
-            researcherUpdates.projects[project].positiveCodingPoints += 0.04;
-          } else {
-            researcherUpdates.projects[project].positiveCodingPoints = 0.04;
+            if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+              researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
+            } else {
+              researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
+            }
+
+            tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
           }
-          t.update(researcherRef, researcherUpdates);
         }
-        t.update(feedbackCodesRef, feedbackCodeUpdate);
+        tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
+        for (let operation of tWriteOperations) {
+          t.update(operation.docRef, operation.data);
+        }
         setRetrieveNext(oldValue => oldValue + 1);
         setSnackbarMessage("Your evaluation was submitted successfully.");
         setSubmitting(false);
