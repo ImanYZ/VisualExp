@@ -452,14 +452,13 @@ const CodeFeedback = props => {
     try {
       await firebase.db.runTransaction(async t => {
         setSubmitting(true);
-        let recievePoints = [];
+        let recievePositivePoints = [];
         let recieveNegativePoints = [];
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docId).get();
         const feedbackCodeData = feedbackCodesDoc.data();
         let researcherVotes = quotesSelectedForCodes;
         let codesVotes = {};
         approvedCodes.forEach(codeData => {
-          // researcherVotes[codeData.code] = quotesSelectedForCodes[codeData.code];
           if (quotesSelectedForCodes[codeData.code].length !== 0 ) {
             if(feedbackCodeData.codesVotes[codeData.code]){
               const voters = feedbackCodeData.codesVotes[codeData.code];
@@ -481,15 +480,15 @@ const CodeFeedback = props => {
           codesVotes,
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         };
-        const keys = Object.keys(feedbackCodeData.codesVotes);
+
         if (feedbackCodeData.coders.length === 3) {
-          for (let key of keys) {
-            if (feedbackCodeData.codesVotes[key].length >= 3) {
-              for (let researcher of feedbackCodeData.codesVotes[key]) {
-                recievePoints.push(researcher);
+          for (let code in feedbackCodeData.codesVotes) {
+            if (feedbackCodeData.codesVotes[code].length >= 3) {
+              for (let researcher of feedbackCodeData.codesVotes[code]) {
+                recievePositivePoints.push(researcher);
               }
             } else {
-              for (let researcher of feedbackCodeData.codesVotes[key]) {
+              for (let researcher of feedbackCodeData.codesVotes[code]) {
                 recieveNegativePoints.push(researcher);
               }
             }
@@ -497,8 +496,9 @@ const CodeFeedback = props => {
         }
 
         for (let res of recieveNegativePoints) {
-          const researcherRef = await firebase.db.collection("researchers").doc(res);
-          const researcherData = researcherRef.get().data();
+          const researcherRef = firebase.db.collection("researchers").doc(res);
+
+          const researcherData = (await researcherRef.get()).data();
 
           const researcherUpdates = {
             projects: {
@@ -516,9 +516,9 @@ const CodeFeedback = props => {
           t.update(researcherRef, researcherUpdates);
         }
 
-        for (let res of recievePoints) {
-          const researcherRef = await firebase.db.collection("researchers").doc(res);
-          const researcherData = researcherRef.get().data();
+        for (let res of recievePositivePoints) {
+          const researcherRef = firebase.db.collection("researchers").doc(res);
+          const researcherData = (await researcherRef.get()).data();
 
           const researcherUpdates = {
             projects: {
@@ -534,7 +534,7 @@ const CodeFeedback = props => {
           }
           t.update(researcherRef, researcherUpdates);
         }
-        const feedbackCodesRef = await firebase.db.collection("feedbackCode").doc(docId);
+        const feedbackCodesRef = firebase.db.collection("feedbackCode").doc(docId);
 
         t.update(feedbackCodesRef, feedbackCodeUpdate);
         setRetrieveNext(oldValue => oldValue + 1);
