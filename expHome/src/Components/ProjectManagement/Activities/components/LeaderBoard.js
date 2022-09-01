@@ -107,7 +107,7 @@ export const LeaderBoard = ({
                 color={isResearcherCriteriaMet(resear) ? "success" : "error"}
                 label={
                   <span className="ChipContent">
-                    {(resear.id === fullname || fullname === "oneweb@umich.edu") && fullname + " - "}
+                    {(resear.id === fullname || fullname === "Iman YeckehZaare") && resear.id + " - "}
                     {expanded ? makeResearcherChipContent(resear) : formatPoints(resear.totalPoints)}
                   </span>
                 }
