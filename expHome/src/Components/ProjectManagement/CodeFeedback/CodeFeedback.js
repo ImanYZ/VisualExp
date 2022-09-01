@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
@@ -52,7 +52,7 @@ const CodeFeedback = props => {
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [approvedCodes, setApprovedCodes] = useState([]);
+
   const [retrieveNext, setRetrieveNext] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -68,7 +68,6 @@ const CodeFeedback = props => {
   const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
-  const [unApprovedNewCodes, setUnApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
@@ -184,9 +183,7 @@ const CodeFeedback = props => {
 
       const passagesSnapshot = CodeBooksQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setCodeBooksChanges(oldPassagessChanges => {
-          return [...oldPassagessChanges, ...docChanges];
-        });
+        setCodeBooksChanges([...docChanges]);
         setCodeBooksLoaded(true);
       });
       return () => {
@@ -194,181 +191,167 @@ const CodeFeedback = props => {
         passagesSnapshot();
       };
     }
-  }, [firebase, loadNewCodes, retrieveNext]);
+  }, [firebase]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (codeBooksLoaded) {
+  useEffect(() => {
+    const func = async () => {
       const allCodes = [...allExperimentCodes];
-      const tempPassagesChanges = [...codeBooksChanges];
-      setCodeBooksChanges([]);
-      const approvedFeedbackCodeBooks = [...approvedCodes];
-      const unApprovedCodes = [...unApprovedNewCodes];
-      for (let change of tempPassagesChanges) {
+
+      for (let change of codeBooksChanges) {
         const data = change.doc.data();
         const id = change.doc.id;
-        if (change.type === "modified") {
-          const findCode = allCodes.find(code => code.id === id);
-          allCodes[allCodes.indexOf(findCode)] = {
-            id: change.doc.id,
-            code: data.code,
-            coder: data.coder,
-            addedBy: data.addedBy,
-            title: data && data.title ? data.title : "",
-            question: data.question,
-            approved: data.approved ? "✅" : "◻",
-            rejected: data.rejected ? "❌" : "◻"
-          };
-          if (data.approved) {
-            approvedFeedbackCodeBooks[approvedFeedbackCodeBooks.indexOf(findCode)] = data;
-          } else {
-            if (data.coder === fullname) {
-              const findCodeUnapproved = unApprovedCodes.find(codeData => codeData.id === change.doc.id);
-              unApprovedCodes[unApprovedCodes.indexOf(findCodeUnapproved)] = {
-                ...unApprovedCodes[unApprovedCodes.indexOf(findCodeUnapproved)],
-                code: data.code
-              };
-            }
-          }
-        } else if (change.type === "added") {
-          const newCode = {
-            id: change.doc.id,
-            code: data.code,
-            coder: data.coder,
-            addedBy: data.addedBy,
-            title: data && data.title ? data.title : "",
-            question: data.question,
-            approved: data.approved ? "✅" : "◻",
-            rejected: data.rejected ? "❌" : "◻"
-          };
 
-          if (data.approved) {
-            if (!approvedFeedbackCodeBooks.some(dataCode => dataCode.code === data.code)) {
-              approvedFeedbackCodeBooks.push({ id: change.doc.id, ...data });
-              if (unApprovedCodes.some(code => code.id === change.doc.id)) {
-                unApprovedCodes.splice(unApprovedCodes.indexOf({ id: change.doc.id, ...data }), 1);
-              }
-            }
-          } else {
-            if (data.coder === fullname && !unApprovedCodes.some(code => code.id === change.doc.id)) {
-              unApprovedCodes.push({ id: change.doc.id, ...data });
-              if (approvedFeedbackCodeBooks.some(code => code.id === change.doc.id)) {
-                approvedFeedbackCodeBooks.splice(approvedFeedbackCodeBooks.indexOf({ id: change.doc.id, ...data }), 1);
-              }
-            }
+        if (change.type === "added") {
+          const obj = { id, ...data };
+          allCodes.push(obj);
+        } else if (change.type === "modified") {
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
           }
-
-          const findCode = allCodes.find(code => code.id === id);
-          if (!allCodes.includes(findCode)) {
-            allCodes.push(newCode);
-          }
-        } else if (change.type === "removed") {
-          const findCode = allCodes.find(code => code.id === id);
-          if (allCodes.includes(findCode)) {
-            allCodes.splice(allCodes.indexOf(findCode), 1);
-          }
-          if (approvedFeedbackCodeBooks.some(code => code.id === change.doc.id)) {
-            approvedFeedbackCodeBooks.splice(approvedFeedbackCodeBooks.indexOf({ id: change.doc.id, ...data }), 1);
-          }
-          if (unApprovedCodes.some(code => code.id === change.doc.id)) {
-            unApprovedCodes.splice(unApprovedCodes.indexOf({ id: change.doc.id, ...data }), 1);
+        } else if (change.type === "remove") {
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes.splice(existingIndex, 1);
           }
         }
       }
-      setApprovedCodes(approvedFeedbackCodeBooks);
-      setUnApprovedNewCodes(unApprovedCodes);
-      const sortedAllCodes = orderBy(allCodes, ["coder", "code"], ["asc", "asc"]);
+      setAllExperimentCodes(allCodes);
+    };
 
-      setAllExperimentCodes(sortedAllCodes);
+    if (codeBooksChanges.length > 0) {
+      func();
+    }
+  }, [codeBooksChanges]);
 
+  const approvedCodes = useMemo(() => {
+    const codeMap = {};
+    const filtered = allExperimentCodes.filter(c => {
+      let exist = codeMap[c.code] || false;
+      codeMap[c.code] = true;
+      return c.approved && !exist;
+    });
+
+    return filtered.sort((a, b) => a.code - b.code);
+  }, [allExperimentCodes]);
+
+  useEffect(() => {
+    if (approvedCodes.length > 0) {
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
       let codesSelecting = {};
-      for (let codeData of approvedFeedbackCodeBooks) {
+      for (let codeData of approvedCodes) {
         quotesSelectedForCode[codeData.code] = [];
         codesSelecting[codeData.code] = false;
       }
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelected(codesSelecting);
-      setCodeBooksLoaded(false);
     }
-  }, [codeBooksLoaded, retrieveNext]);
+  }, [approvedCodes, retrieveNext]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    let foundResponse = false;
-    const quotesSelectedForCode = {};
-    for (let codeData of approvedCodes) {
-      quotesSelectedForCode[codeData.code] = [];
-    }
-    setQuotesSelectedForCodes(quotesSelectedForCode);
+  const adminCodes = useMemo(() => {
+    const mapped = allExperimentCodes.map(c => {
+      return {
+        id: c.id,
+        code: c.code,
+        coder: c.coder,
+        addedBy: c.addedBy,
+        title: c?.title || "",
+        question: c.question,
+        approved: c.approved ? "✅" : "◻",
+        rejected: c.rejected ? "❌" : "◻"
+      };
+    });
 
-    const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
-    const feedbackCodeBooksDocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
-    const newSet = new Set();
-    for (let feedbackCodeBooksDoc of feedbackCodeBooksDocs.docs) {
-      const data = feedbackCodeBooksDoc.data();
-      if (!newSet.has(data.code)) {
-        newSet.add(data.code);
-      }
-    }
+    return orderBy(mapped, ["coder", "code"], ["asc", "asc"]);
+  }, [allExperimentCodes]);
 
-    for (let feedbackDoc of feedbackCodesDocs.docs) {
-      const feedbackData = feedbackDoc.data();
-      if ("choice" in feedbackData) {
-        setChosenCondition(feedbackData.choice);
-      }
-      const lengthSentence = feedbackData.explanation.split(".").length;
-      let response;
-      if (lengthSentence > 1) {
-        response = feedbackData.explanation.split(".", lengthSentence - 1);
-      } else {
-        response = feedbackData.explanation.split(".");
-      }
+  const unApprovedCodes = useMemo(() => {
+    return allExperimentCodes.filter(c => {
+      return c?.coder === fullname && !c.approved;
+    });
+  }, [allExperimentCodes]);
 
-      //we check if the authenticated reserchers have aleardy casted his vote
-      //if so we get all his recorded past choices
-      if (feedbackData.coders.includes(fullname)) {
-        const myCodes = Object.keys(feedbackData.codersChoices[fullname]);
+  useEffect(() => {
+    const func = async () => {
+      let foundResponse = false;
+      const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
 
-        if (myCodes.length !== newSet.size) {
-          const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-          setApprovedNewCodes(newCodes);
-          setDocId(feedbackDoc.id);
-          setSentences(response);
-          foundResponse = true;
-          for (let code of myCodes) {
-            quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
-          }
-          for (let code of newCodes) {
-            quotesSelectedForCodes[code] = [];
-          }
-          setQuotesSelectedForCodes(quotesSelectedForCodes);
+      for (let feedbackDoc of feedbackCodesDocs.docs) {
+        const feedbackData = feedbackDoc.data();
+        if ("choice" in feedbackData) {
+          setChosenCondition(feedbackData.choice);
         }
-        // if the authenticated researcher didn't vote on this  explanation yet
-        // we check if all the others coders who previously casted their vote that they checked
-        //the new code added ,so that way we would know if we can show this explanation or not
-      } else {
-        setApprovedNewCodes([]);
-        let allowOtherResearchersToVote = true;
-        for (let coder of feedbackData.coders) {
-          const myCodes = Object.keys(feedbackData.codersChoices[coder]);
-          if (myCodes.length !== approvedCodes.length) {
-            allowOtherResearchersToVote = false;
+        const lengthSentence = feedbackData.explanation.split(".").length;
+        let response;
+        if (lengthSentence > 1) {
+          response = feedbackData.explanation.split(".", lengthSentence - 1);
+        } else {
+          response = feedbackData.explanation.split(".");
+        }
+
+        //we check if the authenticated reserchers have aleardy casted his vote
+        //if so we get all his recorded past choices
+        if (feedbackData.coders.includes(fullname)) {
+          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+          const approvedCodesStrings = approvedCodes
+            .map(data => {
+              return data.code;
+            })
+            .sort();
+
+          // if the string representations of these arrays ar enot same that means they have been changed.
+          if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+            const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+            setApprovedNewCodes(newCodes);
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            foundResponse = true;
+            for (let code of myCodes) {
+              quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
+            }
+            for (let code of newCodes) {
+              quotesSelectedForCodes[code] = [];
+            }
+            setQuotesSelectedForCodes(quotesSelectedForCodes);
+          }
+          // if the authenticated researcher didn't vote on this  explanation yet
+          // we check if all the others coders who previously casted their vote that they checked
+          //the new code added ,so that way we would know if we can show this explanation or not
+        } else {
+          setApprovedNewCodes([]);
+          let allowOtherResearchersToVote = true;
+          for (let coder of feedbackData.coders) {
+            const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
+            const approvedCodesStrings = approvedCodes
+              .map(data => {
+                return data.code;
+              })
+              .sort();
+
+            if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+              allowOtherResearchersToVote = false;
+            }
+          }
+          if (allowOtherResearchersToVote) {
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            foundResponse = true;
           }
         }
-        if (allowOtherResearchersToVote) {
-          setDocId(feedbackDoc.id);
-          setSentences(response);
-          foundResponse = true;
+
+        setSubmitting(false);
+
+        if (foundResponse) {
+          break;
         }
       }
+    };
 
-      setSubmitting(false);
-
-      if (foundResponse) {
-        break;
-      }
-    }
+    func();
   }, [firebase, retrieveNext, project, codeBooksLoaded]);
 
   // add new code to the database
@@ -530,10 +513,9 @@ const CodeFeedback = props => {
             }
           });
 
-       
-          positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2))
-          negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2))
-     
+          positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
+          negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
+
           const researcherUpdates = {
             projects: {
               ...researcherData.projects,
@@ -672,7 +654,7 @@ const CodeFeedback = props => {
   // to approved list.
   const handleEdit = async () => {
     const approvedCode = [...approvedCodes];
-    const unApprovedCode = [...unApprovedNewCodes];
+    const unApprovedCode = [...unApprovedCodes];
 
     // check if the code already exists in approvedCode or unapprovedCode
     const checkIfApprovedCodeExist = approvedCode.some(elem => elem.code === code);
@@ -707,39 +689,58 @@ const CodeFeedback = props => {
         return;
       }
 
-      const index = experimentCodes.findIndex(elem => elem.id === adminCodeData.id);
-      if (index >= 0) {
-        // update the document based on selected code
-        firebase.db
-          .collection("feedbackCodeBooks")
-          .where("code", "==", adminCodeData.code)
-          .where("project", "==", project)
-          .where("coder", "==", adminCodeData.coder)
-          .get()
-          .then(async doc => {
-            const [codeDoc] = doc.docs;
-            const codeData = codeDoc.data();
-            const codeUpdate = {
-              ...codeData,
-              code: code
-            };
-            codeDoc.ref.update(codeUpdate);
-            const updatedExperimentCode = {
-              ...adminCodeData,
-              code: code
-            };
-            experimentCodes[index] = updatedExperimentCode;
-            setSnackbarMessage(`Code updated for ${updatedExperimentCode.coder}!`);
-            setCode("");
-            setAdminCodeData({});
-            // setAllExperimentCodes(experimentCodes);
-            handleCloseAdminEditModal();
-          })
-          .catch(err => {
-            console.error(err);
-            setSnackbarMessage("There is some error while updating your code, please try after some time!");
-          });
-      }
+      // update the document based on selected code
+      const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+      const updatefeedbackCodeBooksDoc = await firebase.db
+        .collection("feedbackCodeBooks")
+        .where("code", "==", adminCodeData.code)
+        .get();
+
+      firebase.db.runTransaction(async t => {
+        for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
+          const codeData = feedbackCodeDoc.data();
+          const codeUpdate = {
+            ...codeData,
+            code: code
+          };
+          t.update(feedbackCodeDoc.ref, codeUpdate);
+        }
+
+        // update the codeVots
+        for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+          const data = feedbackCodeDoc.data();
+          let updateCheck = false;
+
+          for (let codeKey in data?.codesVotes) {
+            if (codeKey === adminCodeData.code) {
+              updateCheck = true;
+              data.codesVotes[code] = data.codesVotes[codeKey];
+              delete data.codesVotes[codeKey];
+            }
+          }
+
+          //update the codersChoices
+          for (let researcherKey in data?.codersChoices) {
+            for (let codeKey in data?.codersChoices[researcherKey]) {
+              if (codeKey === adminCodeData.code) {
+                updateCheck = true;
+                data.codersChoices[researcherKey][code] = data?.codersChoices[researcherKey][codeKey];
+                delete data?.codersChoices[researcherKey][codeKey];
+              }
+            }
+          }
+
+          if (updateCheck) {
+            t.update(feedbackCodeDoc.ref, data);
+          }
+        }
+      });
+
+      setSnackbarMessage(`Code updated !`);
+      setCode("");
+      setAdminCodeData({});
+      // setAllExperimentCodes(experimentCodes);
+      handleCloseAdminEditModal();
     }
   };
 
@@ -842,7 +843,7 @@ const CodeFeedback = props => {
 
   return (
     <>
-      {unApprovedNewCodes.length > 0 && (
+      {unApprovedCodes.length > 0 && (
         <div>
           <Alert severity="success" className="VoteActivityAlert">
             <strong>You've suggesed this codes ,you can update or delete the codes :</strong>
@@ -854,7 +855,7 @@ const CodeFeedback = props => {
                 width: "auto"
               }}
             >
-              {unApprovedNewCodes.map(codeData => (
+              {unApprovedCodes.map(codeData => (
                 <ListItem key={codeData.id} disablePadding>
                   <Box sx={{ display: "inline", mr: "19px" }}>
                     <IconButton
@@ -1044,14 +1045,14 @@ const CodeFeedback = props => {
         <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
       </Paper>
 
-      {email === "oneweb@umich.edu" && (
+      {
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
               Add New Code
             </Button>
             <DataGrid
-              rows={allExperimentCodes}
+              rows={adminCodes}
               columns={codesColumn}
               pageSize={10}
               rowsPerPageOptions={[10]}
@@ -1063,7 +1064,7 @@ const CodeFeedback = props => {
             />
           </Paper>
         </Box>
-      )}
+      }
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       {/* Edit Code Researcher Modal */}
       <Modal
