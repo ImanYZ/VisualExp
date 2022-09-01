@@ -456,14 +456,18 @@ const CodeFeedback = props => {
         let recieveNegativePoints = [];
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docId).get();
         const feedbackCodeData = feedbackCodesDoc.data();
-        let researcherVotes = {};
+        let researcherVotes = quotesSelectedForCodes;
         let codesVotes = {};
         approvedCodes.forEach(codeData => {
-          researcherVotes[codeData.code] = quotesSelectedForCodes[codeData.code];
-          if (quotesSelectedForCodes[codeData.code].length !== 0) {
-            codesVotes[codeData.code] = [fullname];
-          } else {
-            codesVotes[codeData.code] = [];
+          // researcherVotes[codeData.code] = quotesSelectedForCodes[codeData.code];
+          if (quotesSelectedForCodes[codeData.code].length !== 0 ) {
+            if(feedbackCodeData.codesVotes[codeData.code]){
+              const voters = feedbackCodeData.codesVotes[codeData.code];
+              voters.push(fullname);
+              codesVotes[codeData.code] = voters;
+            }else{
+              codesVotes[codeData.code] = [fullname];
+            }
           }
         });
         let feedbackCodeUpdate = {
