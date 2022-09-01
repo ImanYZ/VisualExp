@@ -456,7 +456,6 @@ const CodeFeedback = props => {
         let recieveNegativePoints = [];
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docId).get();
         const feedbackCodeData = feedbackCodesDoc.data();
-        let researcherVotes = quotesSelectedForCodes;
         let codesVotes = {};
         approvedCodes.forEach(codeData => {
           if (quotesSelectedForCodes[codeData.code].length !== 0 ) {
@@ -472,7 +471,7 @@ const CodeFeedback = props => {
         let feedbackCodeUpdate = {
           codersChoices: {
             ...feedbackCodeData.codersChoices,
-            [fullname]: researcherVotes
+            [fullname]: quotesSelectedForCodes
           },
           coders: feedbackCodeData.coders.includes(fullname)
             ? feedbackCodeData.coders
