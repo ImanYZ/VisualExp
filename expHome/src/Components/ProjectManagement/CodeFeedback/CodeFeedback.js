@@ -454,18 +454,21 @@ const CodeFeedback = props => {
         setSubmitting(true);
         let recievePositivePoints = [];
         let recieveNegativePoints = [];
-        const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docId).get();
+        const feedbackCodesRef = firebase.db.collection("feedbackCode").doc(docId);
+        const feedbackCodesDoc = await t.get(feedbackCodesRef);
         const feedbackCodeData = feedbackCodesDoc.data();
         let codesVotes = {};
         approvedCodes.forEach(codeData => {
-          if (quotesSelectedForCodes[codeData.code].length !== 0 ) {
-            if(feedbackCodeData.codesVotes[codeData.code]){
+          if (quotesSelectedForCodes[codeData.code].length !== 0) {
+            if (feedbackCodeData.codesVotes[codeData.code]) {
               const voters = feedbackCodeData.codesVotes[codeData.code];
               voters.push(fullname);
               codesVotes[codeData.code] = voters;
-            }else{
+            } else {
               codesVotes[codeData.code] = [fullname];
             }
+          } else {
+            codesVotes[codeData.code] = [];
           }
         });
         let feedbackCodeUpdate = {
@@ -480,15 +483,30 @@ const CodeFeedback = props => {
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         };
 
-        if (feedbackCodeData.coders.length === 3) {
-          for (let code in feedbackCodeData.codesVotes) {
-            if (feedbackCodeData.codesVotes[code].length >= 3) {
-              for (let researcher of feedbackCodeData.codesVotes[code]) {
+        if (feedbackCodeUpdate.coders.length === 4) {
+          for (let code in feedbackCodeUpdate.codesVotes) {
+            if (feedbackCodeUpdate.codesVotes[code].length >= 3) {
+              for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
                 recievePositivePoints.push(researcher);
               }
-            } else {
-              for (let researcher of feedbackCodeData.codesVotes[code]) {
-                recieveNegativePoints.push(researcher);
+              if (feedbackCodeUpdate.codesVotes[code].length === 3) {
+                for (let otherCoder of feedbackCodeUpdate.coders) {
+                  if (!feedbackCodeUpdate.codesVotes[code].includes(otherCoder)) {
+                    recieveNegativePoints.push(otherCoder);
+                  }
+                }
+              }
+            } else if (feedbackCodeUpdate.codesVotes[code].length === 1) {
+              const theCoder = feedbackCodeUpdate.codesVotes[code][0];
+              recieveNegativePoints.push(theCoder);
+              for (let otherCoder of feedbackCodeUpdate.coders) {
+                if (otherCoder !== theCoder) {
+                  recievePositivePoints.push(otherCoder);
+                }
+              }
+            } else if (feedbackCodeUpdate.codesVotes[code].length === 0) {
+              for (let otherCoder of feedbackCodeUpdate.coders) {
+                recievePositivePoints.push(otherCoder);
               }
             }
           }
@@ -497,7 +515,7 @@ const CodeFeedback = props => {
         for (let res of recieveNegativePoints) {
           const researcherRef = firebase.db.collection("researchers").doc(res);
 
-          const researcherData = (await researcherRef.get()).data();
+          const researcherData = (await t.get(researcherRef)).data();
 
           const researcherUpdates = {
             projects: {
@@ -508,16 +526,16 @@ const CodeFeedback = props => {
             }
           };
           if ("negativeCodingPoints" in researcherUpdates.projects[project]) {
-            researcherUpdates.projects[project].negativeCodingPoints += 0.25;
+            researcherUpdates.projects[project].negativeCodingPoints += 0.04;
           } else {
-            researcherUpdates.projects[project].negativeCodingPoints = 0.25;
+            researcherUpdates.projects[project].negativeCodingPoints = 0.04;
           }
           t.update(researcherRef, researcherUpdates);
         }
 
         for (let res of recievePositivePoints) {
           const researcherRef = firebase.db.collection("researchers").doc(res);
-          const researcherData = (await researcherRef.get()).data();
+          const researcherData = (await t.get(researcherRef)).data();
 
           const researcherUpdates = {
             projects: {
@@ -527,14 +545,12 @@ const CodeFeedback = props => {
             }
           };
           if ("positiveCodingPoints" in researcherUpdates.projects[project]) {
-            researcherUpdates.projects[project].positiveCodingPoints += 0.25;
+            researcherUpdates.projects[project].positiveCodingPoints += 0.04;
           } else {
-            researcherUpdates.projects[project].positiveCodingPoints = 0.25;
+            researcherUpdates.projects[project].positiveCodingPoints = 0.04;
           }
           t.update(researcherRef, researcherUpdates);
         }
-        const feedbackCodesRef = firebase.db.collection("feedbackCode").doc(docId);
-
         t.update(feedbackCodesRef, feedbackCodeUpdate);
         setRetrieveNext(oldValue => oldValue + 1);
         setSnackbarMessage("Your evaluation was submitted successfully.");
