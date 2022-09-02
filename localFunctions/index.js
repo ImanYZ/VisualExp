@@ -22,7 +22,8 @@ const {
   makeCorrectionToPhrasesinRecallGrades,
   createRecallGradesForNewUserH1L2,
   deleteTheKeyPhrasesForPassage,
-  recreateNewRecallGradesDocuments
+  recreateNewRecallGradesDocuments,
+  addNexDataToFeedbackCode
 } = require("./visualExp");
 
 const app = express();
@@ -67,6 +68,7 @@ app.get("/createRecallGradesForNewUserH1L2", createRecallGradesForNewUserH1L2);
 
 app.get("/deleteTheKeyPhrasesForPassage",deleteTheKeyPhrasesForPassage);
 app.get("/recreateNewRecallGradesDocuments",recreateNewRecallGradesDocuments);
+app.get("/addNexDataToFeedbackCode",addNexDataToFeedbackCode);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
