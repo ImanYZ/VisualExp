@@ -278,7 +278,11 @@ const CodeFeedback = props => {
   useEffect(() => {
     const func = async () => {
       let foundResponse = false;
-      const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
+      const feedbackCodesDocs = await firebase.db
+        .collection("feedbackCode")
+        .where("project", "==", project)
+        .where("approved", "==", false)
+        .get();
 
       for (let feedbackDoc of feedbackCodesDocs.docs) {
         const feedbackData = feedbackDoc.data();
@@ -296,15 +300,20 @@ const CodeFeedback = props => {
         //we check if the authenticated reserchers have aleardy casted his vote
         //if so we get all his recorded past choices
         if (feedbackData.coders.includes(fullname)) {
+          let voteAgain = false;
           const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
           const approvedCodesStrings = approvedCodes
             .map(data => {
               return data.code;
             })
             .sort();
-
+          for (let approvedCode of approvedCodesStrings) {
+            if (!myCodes.includes(approvedCode)) {
+              voteAgain = true;
+            }
+          }
           // if the string representations of these arrays ar enot same that means they have been changed.
-          if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+          if (voteAgain) {
             const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
             setApprovedNewCodes(newCodes);
             setDocId(feedbackDoc.id);
@@ -321,7 +330,7 @@ const CodeFeedback = props => {
           // if the authenticated researcher didn't vote on this  explanation yet
           // we check if all the others coders who previously casted their vote that they checked
           //the new code added ,so that way we would know if we can show this explanation or not
-        } else {
+        } else if (!feedbackData.coders.includes(fullname)) {
           setApprovedNewCodes([]);
           let allowOtherResearchersToVote = true;
           for (let coder of feedbackData.coders) {
@@ -441,6 +450,7 @@ const CodeFeedback = props => {
         const feedbackCodesDoc = await t.get(feedbackCodesRef);
         const feedbackCodeData = feedbackCodesDoc.data();
         let codesVotes = {};
+
         approvedCodes.forEach(codeData => {
           if (quotesSelectedForCodes[codeData.code].length !== 0) {
             if (feedbackCodeData.codesVotes[codeData.code]) {
@@ -465,8 +475,9 @@ const CodeFeedback = props => {
           codesVotes,
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         };
-
+        const tWriteOperations = [];
         if (feedbackCodeUpdate.coders.length === 4) {
+          feedbackCodeUpdate.approved = true;
           for (let code in feedbackCodeUpdate.codesVotes) {
             if (feedbackCodeUpdate.codesVotes[code].length >= 3) {
               for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
@@ -493,57 +504,56 @@ const CodeFeedback = props => {
               }
             }
           }
-        }
+          for (let res of feedbackCodeUpdate.coders) {
+            const researcherRef = firebase.db.collection("researchers").doc(res);
 
-        const tWriteOperations = [];
-        for (let res of feedbackCodeUpdate.coders) {
-          const researcherRef = firebase.db.collection("researchers").doc(res);
-
-          const researcherData = (await t.get(researcherRef)).data();
-          let negativeCodingPoints = 0;
-          let positiveCodingPoints = 0;
-          recievePositivePoints.forEach(coder => {
-            if (coder === res) {
-              positiveCodingPoints += 0.04;
-            }
-          });
-          recieveNegativePoints.forEach(coder => {
-            if (coder === res) {
-              negativeCodingPoints += 0.04;
-            }
-          });
-
-          positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
-          negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
-
-          const researcherUpdates = {
-            projects: {
-              ...researcherData.projects,
-              [project]: {
-                ...researcherData.projects[project]
+            const researcherData = (await t.get(researcherRef)).data();
+            let negativeCodingPoints = 0;
+            let positiveCodingPoints = 0;
+            recievePositivePoints.forEach(coder => {
+              if (coder === res) {
+                positiveCodingPoints += 0.04;
               }
-            }
-          };
+            });
+            recieveNegativePoints.forEach(coder => {
+              if (coder === res) {
+                negativeCodingPoints += 0.04;
+              }
+            });
 
-          let calulatedProject = project;
-          if (!(project in researcherData.projects)) {
-            calulatedProject = Object.keys(researcherData.projects)[0];
-          }
-          if (researcherUpdates.projects[calulatedProject]) {
-            if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-              researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
-            } else {
-              researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
-            }
-            if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-              researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
-            } else {
-              researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
-            }
+            positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
+            negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
 
-            tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
+            const researcherUpdates = {
+              projects: {
+                ...researcherData.projects,
+                [project]: {
+                  ...researcherData.projects[project]
+                }
+              }
+            };
+
+            let calulatedProject = project;
+            if (!(project in researcherData.projects)) {
+              calulatedProject = Object.keys(researcherData.projects)[0];
+            }
+            if (researcherUpdates.projects[calulatedProject]) {
+              if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
+              }
+              if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
+              }
+
+              tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
+            }
           }
         }
+
         tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
         for (let operation of tWriteOperations) {
           t.update(operation.docRef, operation.data);
@@ -840,7 +850,8 @@ const CodeFeedback = props => {
     }
     setLoadNewCodes(true);
   };
-
+  console.log("quotesSelectedForCodes ::::::::::::::::::::::::::::::::::::::::::::::::", quotesSelectedForCodes);
+  console.log(docId);
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -906,146 +917,150 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-      <Alert severity="warning">
-        <h2>The participant chose {chosenCondition}.</h2>
-        <ol>
-          <li>
-            Read the participant's qualitative response that we've divided into sentences and listed in the right box
-            below.
-          </li>
-          <li>Click and read every single code from the codebook listed in the left box below.</li>
-          <li>
-            If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
-            sentence in the right box.
-          </li>
-          <li>
-            For every code, if you check any of the sentences, it also check-marks the code indicating that the code was
-            mentioned by the participant due to the sentence that you checked.
-          </li>
-          <li>Select all the sentences that apply to the code you have selected.</li>
-          <li>
-            After going through all the codes, if you found an important point in the participant's feedback that is not
-            mentioned in any of the codes in the codebook, then you can manually add a new concise code that summarizes
-            the important point in the box on the bottom left. Clicking the add button will add this new code to the
-            codebook.
-          </li>
-        </ol>
-      </Alert>
-      <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 0
-          }}
-        >
-          <Box>
-            <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-              <h2>The Codebook</h2>
-              <List
-                sx={{
-                  paddingBlock: 1,
-                  maxWidth: 500,
-                  height: 500,
-                  "--List-decorator-width": "48px",
-                  "--List-item-paddingLeft": "1.5rem",
-                  "--List-item-paddingRight": "1rem"
-                }}
-              >
-                {approvedCodes.map(codeData => (
-                  <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
-                    <ListItemButton
-                      value={codeData.code}
-                      onClick={() => {
-                        handleSelectedCode(codeData.code);
-                      }}
-                    >
-                      {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
-                        <Checkbox checked={true} color="success" />
-                      ) : (
-                        <Checkbox checked={false} />
-                      )}
+    {sentences.length !== 0 && (
+        <Alert severity="warning">
+          <h2>The participant chose {chosenCondition}.</h2>
+          <ol>
+            <li>
+              Read the participant's qualitative response that we've divided into sentences and listed in the right box
+              below.
+            </li>
+            <li>Click and read every single code from the codebook listed in the left box below.</li>
+            <li>
+              If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
+              sentence in the right box.
+            </li>
+            <li>
+              For every code, if you check any of the sentences, it also check-marks the code indicating that the code
+              was mentioned by the participant due to the sentence that you checked.
+            </li>
+            <li>Select all the sentences that apply to the code you have selected.</li>
+            <li>
+              After going through all the codes, if you found an important point in the participant's feedback that is
+              not mentioned in any of the codes in the codebook, then you can manually add a new concise code that
+              summarizes the important point in the box on the bottom left. Clicking the add button will add this new
+              code to the codebook.
+            </li>
+          </ol>
+        </Alert>
+      )}
+      {sentences.length !== 0 && (
+        <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 0
+            }}
+          >
+            <Box>
+              <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                <h2>The Codebook</h2>
+                <List
+                  sx={{
+                    paddingBlock: 1,
+                    maxWidth: 500,
+                    height: 500,
+                    "--List-decorator-width": "48px",
+                    "--List-item-paddingLeft": "1.5rem",
+                    "--List-item-paddingRight": "1rem"
+                  }}
+                >
+                  {approvedCodes.map(codeData => (
+                    <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
+                      <ListItemButton
+                        value={codeData.code}
+                        onClick={() => {
+                          handleSelectedCode(codeData.code);
+                        }}
+                      >
+                        {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
+                          <Checkbox checked={true} color="success" />
+                        ) : (
+                          <Checkbox checked={false} />
+                        )}
 
-                      <ListItemText primary={`${codeData.code}`} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Sheet>
+                        <ListItemText primary={`${codeData.code}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Sheet>
 
-            <Alert severity="success" className="VoteActivityAlert">
-              If the code you're looking for does not exist in the list above, add it below :
-              <br />
-            </Alert>
+              <Alert severity="success" className="VoteActivityAlert">
+                If the code you're looking for does not exist in the list above, add it below :
+                <br />
+              </Alert>
 
-            <TextareaAutosize
-              style={{ width: "80%", alignItems: "center" }}
-              minRows={7}
-              placeholder={"Add your code here."}
-              onChange={event => setNewCode(event.currentTarget.value)}
-              value={newCode}
-            />
+              <TextareaAutosize
+                style={{ width: "80%", alignItems: "center" }}
+                minRows={7}
+                placeholder={"Add your code here."}
+                onChange={event => setNewCode(event.currentTarget.value)}
+                value={newCode}
+              />
+              <Box>
+                <Button
+                  variant="contained"
+                  style={{ margin: "5px 5px 5px 5ox" }}
+                  onClick={handleAddNewCode}
+                  disabled={(!newCode || newCode === "") && !creating}
+                >
+                  {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+                </Button>
+              </Box>
+            </Box>
+            <Box>
+              <Sheet variant="outlined">
+                <h2>Participant's response in sentences</h2>
+                <List
+                  sx={{
+                    paddingBlock: 1,
+                    width: 700,
+                    height: 500,
+                    "--List-decorator-width": "48px",
+                    "--List-item-paddingLeft": "1.5rem",
+                    "--List-item-paddingRight": "1rem"
+                  }}
+                >
+                  {sentences.map((sentence, index) => (
+                    <ListItem key={index} disablePadding>
+                      <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
+                            tabIndex={-1}
+                            disableRipple
+                          />
+                        </ListItemIcon>
+                        <ListItemText id={sentence} primary={`${sentence}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Sheet>
+            </Box>
             <Box>
               <Button
                 variant="contained"
-                style={{ margin: "5px 5px 5px 5ox" }}
-                onClick={handleAddNewCode}
-                disabled={(!newCode || newCode === "") && !creating}
+                style={{ margin: "19px 500px 10px 580px" }}
+                onClick={handleSubmit}
+                color="success"
+                size="large"
+                disabled={submitting}
+                className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
               >
-                {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+                {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
               </Button>
             </Box>
           </Box>
-          <Box>
-            <Sheet variant="outlined">
-              <h2>Participant's response in sentences</h2>
-              <List
-                sx={{
-                  paddingBlock: 1,
-                  width: 700,
-                  height: 500,
-                  "--List-decorator-width": "48px",
-                  "--List-item-paddingLeft": "1.5rem",
-                  "--List-item-paddingRight": "1rem"
-                }}
-              >
-                {sentences.map((sentence, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
-                          tabIndex={-1}
-                          disableRipple
-                        />
-                      </ListItemIcon>
-                      <ListItemText id={sentence} primary={`${sentence}`} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Sheet>
-          </Box>
-          <Box>
-            <Button
-              variant="contained"
-              style={{ margin: "19px 500px 10px 580px" }}
-              onClick={handleSubmit}
-              color="success"
-              size="large"
-              disabled={submitting}
-              className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-            >
-              {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
-            </Button>
-          </Box>
-        </Box>
-        <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
-      </Paper>
+          <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
+        </Paper>
+      )}
 
-      {
+      { email ==="oneweb@umich.edu" &&
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
