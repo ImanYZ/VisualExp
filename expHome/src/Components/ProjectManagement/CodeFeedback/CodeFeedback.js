@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
@@ -30,6 +30,7 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import arrayToChunks from "../../../utils/arrayToChunks";
 
 const modalStyle = {
   position: "absolute",
@@ -52,7 +53,7 @@ const CodeFeedback = props => {
   const project = useRecoilValue(projectState);
   const [newCode, setNewCode] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [approvedCodes, setApprovedCodes] = useState([]);
+
   const [retrieveNext, setRetrieveNext] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -64,11 +65,12 @@ const CodeFeedback = props => {
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
   const [loadNewCodes, setLoadNewCodes] = useState(false);
+  const [submittingUpdate, setSubmittingUpdate] = useState(false);
+  const [submittingDelete, setSubmittingDelete] = useState(false)
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
-  const [unApprovedNewCodes, setUnApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
@@ -184,9 +186,7 @@ const CodeFeedback = props => {
 
       const passagesSnapshot = CodeBooksQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setCodeBooksChanges(oldPassagessChanges => {
-          return [...oldPassagessChanges, ...docChanges];
-        });
+        setCodeBooksChanges([...docChanges]);
         setCodeBooksLoaded(true);
       });
       return () => {
@@ -194,181 +194,176 @@ const CodeFeedback = props => {
         passagesSnapshot();
       };
     }
-  }, [firebase, loadNewCodes, retrieveNext]);
+  }, [firebase]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (codeBooksLoaded) {
+  useEffect(() => {
+    const func = async () => {
       const allCodes = [...allExperimentCodes];
-      const tempPassagesChanges = [...codeBooksChanges];
-      setCodeBooksChanges([]);
-      const approvedFeedbackCodeBooks = [...approvedCodes];
-      const unApprovedCodes = [...unApprovedNewCodes];
-      for (let change of tempPassagesChanges) {
+
+      for (let change of codeBooksChanges) {
         const data = change.doc.data();
         const id = change.doc.id;
-        if (change.type === "modified") {
-          const findCode = allCodes.find(code => code.id === id);
-          allCodes[allCodes.indexOf(findCode)] = {
-            id: change.doc.id,
-            code: data.code,
-            coder: data.coder,
-            addedBy: data.addedBy,
-            title: data && data.title ? data.title : "",
-            question: data.question,
-            approved: data.approved ? "✅" : "◻",
-            rejected: data.rejected ? "❌" : "◻"
-          };
-          if (data.approved) {
-            approvedFeedbackCodeBooks[approvedFeedbackCodeBooks.indexOf(findCode)] = data;
-          } else {
-            if (data.coder === fullname) {
-              const findCodeUnapproved = unApprovedCodes.find(codeData => codeData.id === change.doc.id);
-              unApprovedCodes[unApprovedCodes.indexOf(findCodeUnapproved)] = {
-                ...unApprovedCodes[unApprovedCodes.indexOf(findCodeUnapproved)],
-                code: data.code
-              };
-            }
-          }
-        } else if (change.type === "added") {
-          const newCode = {
-            id: change.doc.id,
-            code: data.code,
-            coder: data.coder,
-            addedBy: data.addedBy,
-            title: data && data.title ? data.title : "",
-            question: data.question,
-            approved: data.approved ? "✅" : "◻",
-            rejected: data.rejected ? "❌" : "◻"
-          };
 
-          if (data.approved) {
-            if (!approvedFeedbackCodeBooks.some(dataCode => dataCode.code === data.code)) {
-              approvedFeedbackCodeBooks.push({ id: change.doc.id, ...data });
-              if (unApprovedCodes.some(code => code.id === change.doc.id)) {
-                unApprovedCodes.splice(unApprovedCodes.indexOf({ id: change.doc.id, ...data }), 1);
-              }
-            }
-          } else {
-            if (data.coder === fullname && !unApprovedCodes.some(code => code.id === change.doc.id)) {
-              unApprovedCodes.push({ id: change.doc.id, ...data });
-              if (approvedFeedbackCodeBooks.some(code => code.id === change.doc.id)) {
-                approvedFeedbackCodeBooks.splice(approvedFeedbackCodeBooks.indexOf({ id: change.doc.id, ...data }), 1);
-              }
-            }
-          }
-
-          const findCode = allCodes.find(code => code.id === id);
-          if (!allCodes.includes(findCode)) {
-            allCodes.push(newCode);
+        if (change.type === "added") {
+          const obj = { id, ...data };
+          allCodes.push(obj);
+        } else if (change.type === "modified") {
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
           }
         } else if (change.type === "removed") {
-          const findCode = allCodes.find(code => code.id === id);
-          if (allCodes.includes(findCode)) {
-            allCodes.splice(allCodes.indexOf(findCode), 1);
-          }
-          if (approvedFeedbackCodeBooks.some(code => code.id === change.doc.id)) {
-            approvedFeedbackCodeBooks.splice(approvedFeedbackCodeBooks.indexOf({ id: change.doc.id, ...data }), 1);
-          }
-          if (unApprovedCodes.some(code => code.id === change.doc.id)) {
-            unApprovedCodes.splice(unApprovedCodes.indexOf({ id: change.doc.id, ...data }), 1);
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes.splice(existingIndex, 1);
           }
         }
       }
-      setApprovedCodes(approvedFeedbackCodeBooks);
-      setUnApprovedNewCodes(unApprovedCodes);
-      const sortedAllCodes = orderBy(allCodes, ["coder", "code"], ["asc", "asc"]);
+      setAllExperimentCodes(allCodes);
+    };
 
-      setAllExperimentCodes(sortedAllCodes);
+    if (codeBooksChanges.length > 0) {
+      func();
+    }
+  }, [codeBooksChanges]);
 
+  const approvedCodes = useMemo(() => {
+    const codeMap = {};
+    const filtered = allExperimentCodes.filter(c => {
+      let exist = codeMap[c.code] || false;
+      codeMap[c.code] = true;
+      return c.approved && !exist;
+    });
+
+    return filtered.sort((a, b) => a.code - b.code);
+  }, [allExperimentCodes]);
+
+  useEffect(() => {
+    if (approvedCodes.length > 0) {
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
       let codesSelecting = {};
-      for (let codeData of approvedFeedbackCodeBooks) {
+      for (let codeData of approvedCodes) {
         quotesSelectedForCode[codeData.code] = [];
         codesSelecting[codeData.code] = false;
       }
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelected(codesSelecting);
-      setCodeBooksLoaded(false);
     }
-  }, [codeBooksLoaded, retrieveNext]);
+  }, [approvedCodes, retrieveNext]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    let foundResponse = false;
-    const quotesSelectedForCode = {};
-    for (let codeData of approvedCodes) {
-      quotesSelectedForCode[codeData.code] = [];
-    }
-    setQuotesSelectedForCodes(quotesSelectedForCode);
+  const adminCodes = useMemo(() => {
+    const mapped = allExperimentCodes.map(c => {
+      return {
+        id: c.id,
+        code: c.code,
+        coder: c.coder,
+        addedBy: c.addedBy,
+        title: c?.title || "",
+        question: c.question,
+        approved: c.approved ? "✅" : "◻",
+        rejected: c.rejected ? "❌" : "◻"
+      };
+    });
 
-    const feedbackCodesDocs = await firebase.db.collection("feedbackCode").where("approved", "==", false).get();
-    const feedbackCodeBooksDocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
-    const newSet = new Set();
-    for (let feedbackCodeBooksDoc of feedbackCodeBooksDocs.docs) {
-      const data = feedbackCodeBooksDoc.data();
-      if (!newSet.has(data.code)) {
-        newSet.add(data.code);
-      }
-    }
+    return orderBy(mapped, ["coder", "code"], ["asc", "asc"]);
+  }, [allExperimentCodes]);
 
-    for (let feedbackDoc of feedbackCodesDocs.docs) {
-      const feedbackData = feedbackDoc.data();
-      if ("choice" in feedbackData) {
-        setChosenCondition(feedbackData.choice);
-      }
-      const lengthSentence = feedbackData.explanation.split(".").length;
-      let response;
-      if (lengthSentence > 1) {
-        response = feedbackData.explanation.split(".", lengthSentence - 1);
-      } else {
-        response = feedbackData.explanation.split(".");
-      }
+  const unApprovedCodes = useMemo(() => {
+    return allExperimentCodes.filter(c => {
+      return c?.coder === fullname && !c.approved;
+    });
+  }, [allExperimentCodes]);
 
-      //we check if the authenticated reserchers have aleardy casted his vote
-      //if so we get all his recorded past choices
-      if (feedbackData.coders.includes(fullname)) {
-        const myCodes = Object.keys(feedbackData.codersChoices[fullname]);
+  useEffect(() => {
+    const func = async () => {
+      let foundResponse = false;
+      const feedbackCodesDocs = await firebase.db
+        .collection("feedbackCode")
+        .where("project", "==", project)
+        .where("approved", "==", false)
+        .get();
 
-        if (myCodes.length !== newSet.size) {
-          const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-          setApprovedNewCodes(newCodes);
-          setDocId(feedbackDoc.id);
-          setSentences(response);
-          foundResponse = true;
-          for (let code of myCodes) {
-            quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
-          }
-          for (let code of newCodes) {
-            quotesSelectedForCodes[code] = [];
-          }
-          setQuotesSelectedForCodes(quotesSelectedForCodes);
+      for (let feedbackDoc of feedbackCodesDocs.docs) {
+        const feedbackData = feedbackDoc.data();
+        if ("choice" in feedbackData) {
+          setChosenCondition(feedbackData.choice);
         }
-        // if the authenticated researcher didn't vote on this  explanation yet
-        // we check if all the others coders who previously casted their vote that they checked
-        //the new code added ,so that way we would know if we can show this explanation or not
-      } else {
-        setApprovedNewCodes([]);
-        let allowOtherResearchersToVote = true;
-        for (let coder of feedbackData.coders) {
-          const myCodes = Object.keys(feedbackData.codersChoices[coder]);
-          if (myCodes.length !== approvedCodes.length) {
-            allowOtherResearchersToVote = false;
+        const lengthSentence = feedbackData.explanation.split(".").length;
+        let response;
+        if (lengthSentence > 1) {
+          response = feedbackData.explanation.split(".", lengthSentence - 1);
+        } else {
+          response = feedbackData.explanation.split(".");
+        }
+
+        //we check if the authenticated reserchers have aleardy casted his vote
+        //if so we get all his recorded past choices
+        if (feedbackData.coders.includes(fullname)) {
+          let voteAgain = false;
+          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+          const approvedCodesStrings = approvedCodes
+            .map(data => {
+              return data.code;
+            })
+            .sort();
+          for (let approvedCode of approvedCodesStrings) {
+            if (!myCodes.includes(approvedCode)) {
+              voteAgain = true;
+            }
+          }
+          // if the string representations of these arrays ar enot same that means they have been changed.
+          if (voteAgain) {
+            const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+            setApprovedNewCodes(newCodes);
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            foundResponse = true;
+            for (let code of myCodes) {
+              quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
+            }
+            for (let code of newCodes) {
+              quotesSelectedForCodes[code] = [];
+            }
+            setQuotesSelectedForCodes(quotesSelectedForCodes);
+          }
+          // if the authenticated researcher didn't vote on this  explanation yet
+          // we check if all the others coders who previously casted their vote that they checked
+          //the new code added ,so that way we would know if we can show this explanation or not
+        } else if (!feedbackData.coders.includes(fullname)) {
+          setApprovedNewCodes([]);
+          let allowOtherResearchersToVote = true;
+          for (let coder of feedbackData.coders) {
+            const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
+            const approvedCodesStrings = approvedCodes
+              .map(data => {
+                return data.code;
+              })
+              .sort();
+
+            if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+              allowOtherResearchersToVote = false;
+            }
+          }
+          if (allowOtherResearchersToVote) {
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            foundResponse = true;
           }
         }
-        if (allowOtherResearchersToVote) {
-          setDocId(feedbackDoc.id);
-          setSentences(response);
-          foundResponse = true;
+
+        setSubmitting(false);
+
+        if (foundResponse) {
+          break;
         }
       }
+    };
 
-      setSubmitting(false);
-
-      if (foundResponse) {
-        break;
-      }
-    }
+    func();
   }, [firebase, retrieveNext, project, codeBooksLoaded]);
 
   // add new code to the database
@@ -458,6 +453,7 @@ const CodeFeedback = props => {
         const feedbackCodesDoc = await t.get(feedbackCodesRef);
         const feedbackCodeData = feedbackCodesDoc.data();
         let codesVotes = {};
+
         approvedCodes.forEach(codeData => {
           if (quotesSelectedForCodes[codeData.code].length !== 0) {
             if (feedbackCodeData.codesVotes[codeData.code]) {
@@ -482,8 +478,9 @@ const CodeFeedback = props => {
           codesVotes,
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         };
-
+        const tWriteOperations = [];
         if (feedbackCodeUpdate.coders.length === 4) {
+          feedbackCodeUpdate.approved = true;
           for (let code in feedbackCodeUpdate.codesVotes) {
             if (feedbackCodeUpdate.codesVotes[code].length >= 3) {
               for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
@@ -510,58 +507,56 @@ const CodeFeedback = props => {
               }
             }
           }
-        }
+          for (let res of feedbackCodeUpdate.coders) {
+            const researcherRef = firebase.db.collection("researchers").doc(res);
 
-        const tWriteOperations = [];
-        for (let res of feedbackCodeUpdate.coders) {
-          const researcherRef = firebase.db.collection("researchers").doc(res);
-
-          const researcherData = (await t.get(researcherRef)).data();
-          let negativeCodingPoints = 0;
-          let positiveCodingPoints = 0;
-          recievePositivePoints.forEach(coder => {
-            if (coder === res) {
-              positiveCodingPoints += 0.04;
-            }
-          });
-          recieveNegativePoints.forEach(coder => {
-            if (coder === res) {
-              negativeCodingPoints += 0.04;
-            }
-          });
-
-       
-          positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2))
-          negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2))
-     
-          const researcherUpdates = {
-            projects: {
-              ...researcherData.projects,
-              [project]: {
-                ...researcherData.projects[project]
+            const researcherData = (await t.get(researcherRef)).data();
+            let negativeCodingPoints = 0;
+            let positiveCodingPoints = 0;
+            recievePositivePoints.forEach(coder => {
+              if (coder === res) {
+                positiveCodingPoints += 0.04;
               }
-            }
-          };
+            });
+            recieveNegativePoints.forEach(coder => {
+              if (coder === res) {
+                negativeCodingPoints += 0.04;
+              }
+            });
 
-          let calulatedProject = project;
-          if (!(project in researcherData.projects)) {
-            calulatedProject = Object.keys(researcherData.projects)[0];
-          }
-          if (researcherUpdates.projects[calulatedProject]) {
-            if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-              researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
-            } else {
-              researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
-            }
-            if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-              researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
-            } else {
-              researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
-            }
+            positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
+            negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
 
-            tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
+            const researcherUpdates = {
+              projects: {
+                ...researcherData.projects,
+                [project]: {
+                  ...researcherData.projects[project]
+                }
+              }
+            };
+
+            let calulatedProject = project;
+            if (!(project in researcherData.projects)) {
+              calulatedProject = Object.keys(researcherData.projects)[0];
+            }
+            if (researcherUpdates.projects[calulatedProject]) {
+              if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
+              }
+              if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
+              }
+
+              tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
+            }
           }
         }
+
         tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
         for (let operation of tWriteOperations) {
           t.update(operation.docRef, operation.data);
@@ -652,27 +647,13 @@ const CodeFeedback = props => {
     }
   };
 
-  const handleAdminDelete = async () => {
-    try {
-      const selectedCodeRef = await firebase.db.collection("feedbackCodeBooks").doc(adminCodeData.id);
-      await selectedCodeRef.delete();
-      setSnackbarMessage("code successfully deleted!");
-      setCode("");
-      setAdminCodeData({});
-      handleCloseDeleteModalAdmin();
-    } catch (err) {
-      console.error(err);
-      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
-    }
-  };
-
   // function to edit selected codes from the list until
   // it gets approved by the admin
   // upon approval, the code will move from unapproved
   // to approved list.
   const handleEdit = async () => {
     const approvedCode = [...approvedCodes];
-    const unApprovedCode = [...unApprovedNewCodes];
+    const unApprovedCode = [...unApprovedCodes];
 
     // check if the code already exists in approvedCode or unapprovedCode
     const checkIfApprovedCodeExist = approvedCode.some(elem => elem.code === code);
@@ -696,50 +677,171 @@ const CodeFeedback = props => {
     }
   };
 
-  const handleAdminEdit = async () => {
-    if (adminCodeData?.code && adminCodeData?.title) {
-      const experimentCodes = [...allExperimentCodes];
+  const handleAdminDelete = async () => {
+    try {
+      setSubmittingDelete(true)
+      // update the document based on selected code
+      const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+      const updatefeedbackCodeBooksDoc = await firebase.db
+        .collection("feedbackCodeBooks")
+        .where("code", "==", adminCodeData.code)
+        .get();
+      const tWriteOperations = [];
 
-      // check if the code already exists in approvedCode or unapprovedCode
-      const codes = experimentCodes.filter(elem => elem.code === code);
-      if (codes.length >= 2) {
-        setSnackbarMessage("This code already exists 2 or more times, please try some other code");
-        return;
+      for (let feedbackCodebookDoc of updatefeedbackCodeBooksDoc.docs) {
+        tWriteOperations.push({
+          docRef: feedbackCodebookDoc.ref,
+          operation: "delete"
+        });
       }
 
-      const index = experimentCodes.findIndex(elem => elem.id === adminCodeData.id);
-      if (index >= 0) {
+      // update the codeVots
+      for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+        const data = feedbackCodeDoc.data();
+        let updateCheck = false;
+
+        for (let codeKey in data?.codesVotes) {
+          if (codeKey === adminCodeData.code) {
+            updateCheck = true;
+            delete data.codesVotes[codeKey];
+          }
+        }
+
+        //update the codersChoices
+        for (let researcherKey in data?.codersChoices) {
+          for (let codeKey in data?.codersChoices[researcherKey]) {
+            if (codeKey === adminCodeData.code) {
+              updateCheck = true;
+              delete data?.codersChoices[researcherKey][codeKey];
+            }
+          }
+        }
+
+        if (updateCheck) {
+          tWriteOperations.push({
+            docRef: feedbackCodeDoc.ref,
+            data: data,
+            operation: "update"
+          });
+        }
+      }
+
+      const chunked = arrayToChunks(tWriteOperations);
+
+      for (let chunk of chunked) {
+        await firebase.db.runTransaction(async t => {
+          for (let op of chunk) {
+            switch (op.operation) {
+              case "update":
+                await t.update(op.docRef, op.data);
+                break;
+
+              case "delete":
+                await t.delete(op.docRef);
+                break;
+            }
+          }
+        });
+      }
+
+      setSnackbarMessage("code successfully deleted!");
+      setCode("");
+      setAdminCodeData({});
+      handleCloseDeleteModalAdmin();
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+    } finally {
+      setSubmittingDelete(false)
+    }
+  };
+
+  const handleAdminEdit = async () => {
+    try {
+      setSubmittingUpdate(true);
+      if (adminCodeData?.code && adminCodeData?.title) {
+        const experimentCodes = [...allExperimentCodes];
+
+        // check if the code already exists in approvedCode or unapprovedCode
+        const codes = experimentCodes.filter(elem => elem.code === code);
+        if (codes.length >= 2) {
+          setSnackbarMessage("This code already exists 2 or more times, please try some other code");
+          return;
+        }
+
         // update the document based on selected code
-        firebase.db
+        const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+        const updatefeedbackCodeBooksDoc = await firebase.db
           .collection("feedbackCodeBooks")
           .where("code", "==", adminCodeData.code)
-          .where("project", "==", project)
-          .where("coder", "==", adminCodeData.coder)
-          .get()
-          .then(async doc => {
-            const [codeDoc] = doc.docs;
-            const codeData = codeDoc.data();
-            const codeUpdate = {
-              ...codeData,
-              code: code
-            };
-            codeDoc.ref.update(codeUpdate);
-            const updatedExperimentCode = {
-              ...adminCodeData,
-              code: code
-            };
-            experimentCodes[index] = updatedExperimentCode;
-            setSnackbarMessage(`Code updated for ${updatedExperimentCode.coder}!`);
-            setCode("");
-            setAdminCodeData({});
-            // setAllExperimentCodes(experimentCodes);
-            handleCloseAdminEditModal();
-          })
-          .catch(err => {
-            console.error(err);
-            setSnackbarMessage("There is some error while updating your code, please try after some time!");
+          .get();
+
+        const tWriteOperations = [];
+
+        for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
+          const codeData = feedbackCodeDoc.data();
+          const codeUpdate = {
+            ...codeData,
+            code: code
+          };
+
+          tWriteOperations.push({
+            docRef: feedbackCodeDoc.ref,
+            data: codeUpdate
           });
+        }
+
+        // update the codeVots
+        for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+          const data = feedbackCodeDoc.data();
+          let updateCheck = false;
+
+          for (let codeKey in data?.codesVotes) {
+            if (codeKey === adminCodeData.code) {
+              updateCheck = true;
+              data.codesVotes[code] = data.codesVotes[codeKey];
+              delete data.codesVotes[codeKey];
+            }
+          }
+
+          //update the codersChoices
+          for (let researcherKey in data?.codersChoices) {
+            for (let codeKey in data?.codersChoices[researcherKey]) {
+              if (codeKey === adminCodeData.code) {
+                updateCheck = true;
+                data.codersChoices[researcherKey][code] = data?.codersChoices[researcherKey][codeKey];
+                delete data?.codersChoices[researcherKey][codeKey];
+              }
+            }
+          }
+
+          if (updateCheck) {
+            tWriteOperations.push({
+              docRef: feedbackCodeDoc.ref,
+              data
+            });
+          }
+        }
+
+        const chunked = arrayToChunks(tWriteOperations);
+
+        for (let chunk of chunked) {
+          await firebase.db.runTransaction(async t => {
+            for (let operation of chunk) {
+              await t.update(operation.docRef, operation.data);
+            }
+          });
+        }
+
+        setSnackbarMessage(`Code updated !`);
+        setCode("");
+        setAdminCodeData({});
+        handleCloseAdminEditModal();
       }
+    } catch (err) {
+      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+    } finally {
+      setSubmittingUpdate(false);
     }
   };
 
@@ -839,10 +941,9 @@ const CodeFeedback = props => {
     }
     setLoadNewCodes(true);
   };
-
   return (
     <>
-      {unApprovedNewCodes.length > 0 && (
+      {unApprovedCodes.length > 0 && (
         <div>
           <Alert severity="success" className="VoteActivityAlert">
             <strong>You've suggesed this codes ,you can update or delete the codes :</strong>
@@ -854,7 +955,7 @@ const CodeFeedback = props => {
                 width: "auto"
               }}
             >
-              {unApprovedNewCodes.map(codeData => (
+              {unApprovedCodes.map(codeData => (
                 <ListItem key={codeData.id} disablePadding>
                   <Box sx={{ display: "inline", mr: "19px" }}>
                     <IconButton
@@ -905,153 +1006,157 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-      <Alert severity="warning">
-        <h2>The participant chose {chosenCondition}.</h2>
-        <ol>
-          <li>
-            Read the participant's qualitative response that we've divided into sentences and listed in the right box
-            below.
-          </li>
-          <li>Click and read every single code from the codebook listed in the left box below.</li>
-          <li>
-            If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
-            sentence in the right box.
-          </li>
-          <li>
-            For every code, if you check any of the sentences, it also check-marks the code indicating that the code was
-            mentioned by the participant due to the sentence that you checked.
-          </li>
-          <li>Select all the sentences that apply to the code you have selected.</li>
-          <li>
-            After going through all the codes, if you found an important point in the participant's feedback that is not
-            mentioned in any of the codes in the codebook, then you can manually add a new concise code that summarizes
-            the important point in the box on the bottom left. Clicking the add button will add this new code to the
-            codebook.
-          </li>
-        </ol>
-      </Alert>
-      <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 0
-          }}
-        >
-          <Box>
-            <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-              <h2>The Codebook</h2>
-              <List
-                sx={{
-                  paddingBlock: 1,
-                  maxWidth: 500,
-                  height: 500,
-                  "--List-decorator-width": "48px",
-                  "--List-item-paddingLeft": "1.5rem",
-                  "--List-item-paddingRight": "1rem"
-                }}
-              >
-                {approvedCodes.map(codeData => (
-                  <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
-                    <ListItemButton
-                      value={codeData.code}
-                      onClick={() => {
-                        handleSelectedCode(codeData.code);
-                      }}
-                    >
-                      {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
-                        <Checkbox checked={true} color="success" />
-                      ) : (
-                        <Checkbox checked={false} />
-                      )}
+      {sentences.length !== 0 && (
+        <Alert severity="warning">
+          <h2>The participant chose {chosenCondition}.</h2>
+          <ol>
+            <li>
+              Read the participant's qualitative response that we've divided into sentences and listed in the right box
+              below.
+            </li>
+            <li>Click and read every single code from the codebook listed in the left box below.</li>
+            <li>
+              If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
+              sentence in the right box.
+            </li>
+            <li>
+              For every code, if you check any of the sentences, it also check-marks the code indicating that the code
+              was mentioned by the participant due to the sentence that you checked.
+            </li>
+            <li>Select all the sentences that apply to the code you have selected.</li>
+            <li>
+              After going through all the codes, if you found an important point in the participant's feedback that is
+              not mentioned in any of the codes in the codebook, then you can manually add a new concise code that
+              summarizes the important point in the box on the bottom left. Clicking the add button will add this new
+              code to the codebook.
+            </li>
+          </ol>
+        </Alert>
+      )}
+      {sentences.length !== 0 && (
+        <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              gap: 0
+            }}
+          >
+            <Box>
+              <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                <h2>The Codebook</h2>
+                <List
+                  sx={{
+                    paddingBlock: 1,
+                    maxWidth: 500,
+                    height: 500,
+                    "--List-decorator-width": "48px",
+                    "--List-item-paddingLeft": "1.5rem",
+                    "--List-item-paddingRight": "1rem"
+                  }}
+                >
+                  {approvedCodes.map(codeData => (
+                    <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
+                      <ListItemButton
+                        value={codeData.code}
+                        onClick={() => {
+                          handleSelectedCode(codeData.code);
+                        }}
+                      >
+                        {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
+                          <Checkbox checked={true} color="success" />
+                        ) : (
+                          <Checkbox checked={false} />
+                        )}
 
-                      <ListItemText primary={`${codeData.code}`} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Sheet>
+                        <ListItemText primary={`${codeData.code}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Sheet>
 
-            <Alert severity="success" className="VoteActivityAlert">
-              If the code you're looking for does not exist in the list above, add it below :
-              <br />
-            </Alert>
+              <Alert severity="success" className="VoteActivityAlert">
+                If the code you're looking for does not exist in the list above, add it below :
+                <br />
+              </Alert>
 
-            <TextareaAutosize
-              style={{ width: "80%", alignItems: "center" }}
-              minRows={7}
-              placeholder={"Add your code here."}
-              onChange={event => setNewCode(event.currentTarget.value)}
-              value={newCode}
-            />
+              <TextareaAutosize
+                style={{ width: "80%", alignItems: "center" }}
+                minRows={7}
+                placeholder={"Add your code here."}
+                onChange={event => setNewCode(event.currentTarget.value)}
+                value={newCode}
+              />
+              <Box>
+                <Button
+                  variant="contained"
+                  style={{ margin: "5px 5px 5px 5ox" }}
+                  onClick={handleAddNewCode}
+                  disabled={(!newCode || newCode === "") && !creating}
+                >
+                  {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+                </Button>
+              </Box>
+            </Box>
+            <Box>
+              <Sheet variant="outlined">
+                <h2>Participant's response in sentences</h2>
+                <List
+                  sx={{
+                    paddingBlock: 1,
+                    width: 700,
+                    height: 500,
+                    "--List-decorator-width": "48px",
+                    "--List-item-paddingLeft": "1.5rem",
+                    "--List-item-paddingRight": "1rem"
+                  }}
+                >
+                  {sentences.map((sentence, index) => (
+                    <ListItem key={index} disablePadding>
+                      <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
+                        <ListItemIcon>
+                          <Checkbox
+                            edge="start"
+                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
+                            tabIndex={-1}
+                            disableRipple
+                          />
+                        </ListItemIcon>
+                        <ListItemText id={sentence} primary={`${sentence}`} />
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </Sheet>
+            </Box>
             <Box>
               <Button
                 variant="contained"
-                style={{ margin: "5px 5px 5px 5ox" }}
-                onClick={handleAddNewCode}
-                disabled={(!newCode || newCode === "") && !creating}
+                style={{ margin: "19px 500px 10px 580px" }}
+                onClick={handleSubmit}
+                color="success"
+                size="large"
+                disabled={submitting}
+                className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
               >
-                {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+                {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
               </Button>
             </Box>
           </Box>
-          <Box>
-            <Sheet variant="outlined">
-              <h2>Participant's response in sentences</h2>
-              <List
-                sx={{
-                  paddingBlock: 1,
-                  width: 700,
-                  height: 500,
-                  "--List-decorator-width": "48px",
-                  "--List-item-paddingLeft": "1.5rem",
-                  "--List-item-paddingRight": "1rem"
-                }}
-              >
-                {sentences.map((sentence, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
-                          tabIndex={-1}
-                          disableRipple
-                        />
-                      </ListItemIcon>
-                      <ListItemText id={sentence} primary={`${sentence}`} />
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </Sheet>
-          </Box>
-          <Box>
-            <Button
-              variant="contained"
-              style={{ margin: "19px 500px 10px 580px" }}
-              onClick={handleSubmit}
-              color="success"
-              size="large"
-              disabled={submitting}
-              className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-            >
-              {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
-            </Button>
-          </Box>
-        </Box>
-        <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
-      </Paper>
+          <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
+        </Paper>
+      )}
 
-      {email === "oneweb@umich.edu" && (
+      { email ==="oneweb@umich.edu" &&
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
               Add New Code
             </Button>
             <DataGrid
-              rows={allExperimentCodes}
+              rows={adminCodes}
               columns={codesColumn}
               pageSize={10}
               rowsPerPageOptions={[10]}
@@ -1063,7 +1168,7 @@ const CodeFeedback = props => {
             />
           </Paper>
         </Box>
-      )}
+      }
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       {/* Edit Code Researcher Modal */}
       <Modal
@@ -1177,7 +1282,7 @@ const CodeFeedback = props => {
               onChange={event => setCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button className="Button" variant="contained" onClick={handleAdminEdit}>
+              <Button className="Button" variant="contained" disabled={submittingUpdate} onClick={handleAdminEdit}>
                 Update
               </Button>
               <Button
@@ -1280,6 +1385,7 @@ const CodeFeedback = props => {
             <Button
               variant="contained"
               className="Button Red"
+              disabled ={submittingDelete}
               onClick={() => {
                 handleAdminDelete();
               }}
