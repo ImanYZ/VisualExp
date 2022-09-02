@@ -407,7 +407,7 @@ const App = () => {
         }
         for (let explan of ["explanations", "explanations3Days", "explanations1Week"]) {
           for (let index of [0, 1]) {
-            if (userData[explan][index] !== "") {
+            if (userData[explan] && userData[explan][index] !== "") {
               let choice;
               let session;
               let response;
