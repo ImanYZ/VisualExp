@@ -30,6 +30,7 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import arrayToChunks from "../../../utils/arrayToChunks";
 
 const modalStyle = {
   position: "absolute",
@@ -64,6 +65,8 @@ const CodeFeedback = props => {
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
   const [loadNewCodes, setLoadNewCodes] = useState(false);
+  const [submittingUpdate, setSubmittingUpdate] = useState(false);
+  const [submittingDelete, setSubmittingDelete] = useState(false)
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
@@ -211,7 +214,7 @@ const CodeFeedback = props => {
           if (existingIndex !== -1) {
             allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
           }
-        } else if (change.type === "remove") {
+        } else if (change.type === "removed") {
           const existingIndex = allCodes.findIndex(c => {
             return c.id === id;
           });
@@ -644,7 +647,6 @@ const CodeFeedback = props => {
     }
   };
 
-
   // function to edit selected codes from the list until
   // it gets approved by the admin
   // upon approval, the code will move from unapproved
@@ -677,45 +679,70 @@ const CodeFeedback = props => {
 
   const handleAdminDelete = async () => {
     try {
-       // update the document based on selected code
-       const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
-       const updatefeedbackCodeBooksDoc = await firebase.db
-         .collection("feedbackCodeBooks")
-         .where("code", "==", adminCodeData.code)
-         .get();
+      setSubmittingDelete(true)
+      // update the document based on selected code
+      const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+      const updatefeedbackCodeBooksDoc = await firebase.db
+        .collection("feedbackCodeBooks")
+        .where("code", "==", adminCodeData.code)
+        .get();
+      const tWriteOperations = [];
 
-      await firebase.db.runTransaction(async t => {
-        for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
-          t.delete(feedbackCodeDoc.ref);
+      for (let feedbackCodebookDoc of updatefeedbackCodeBooksDoc.docs) {
+        tWriteOperations.push({
+          docRef: feedbackCodebookDoc.ref,
+          operation: "delete"
+        });
+      }
+
+      // update the codeVots
+      for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+        const data = feedbackCodeDoc.data();
+        let updateCheck = false;
+
+        for (let codeKey in data?.codesVotes) {
+          if (codeKey === adminCodeData.code) {
+            updateCheck = true;
+            delete data.codesVotes[codeKey];
+          }
         }
 
-        // update the codeVots
-        for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
-          const data = feedbackCodeDoc.data();
-          let updateCheck = false;
-
-          for (let codeKey in data?.codesVotes) {
+        //update the codersChoices
+        for (let researcherKey in data?.codersChoices) {
+          for (let codeKey in data?.codersChoices[researcherKey]) {
             if (codeKey === adminCodeData.code) {
               updateCheck = true;
-              delete data.codesVotes[codeKey];
+              delete data?.codersChoices[researcherKey][codeKey];
             }
-          }
-
-          //update the codersChoices
-          for (let researcherKey in data?.codersChoices) {
-            for (let codeKey in data?.codersChoices[researcherKey]) {
-              if (codeKey === adminCodeData.code) {
-                updateCheck = true;
-                delete data?.codersChoices[researcherKey][codeKey];
-              }
-            }
-          }
-
-          if (updateCheck) {
-            t.update(feedbackCodeDoc.ref, data);
           }
         }
-      });
+
+        if (updateCheck) {
+          tWriteOperations.push({
+            docRef: feedbackCodeDoc.ref,
+            data: data,
+            operation: "update"
+          });
+        }
+      }
+
+      const chunked = arrayToChunks(tWriteOperations);
+
+      for (let chunk of chunked) {
+        await firebase.db.runTransaction(async t => {
+          for (let op of chunk) {
+            switch (op.operation) {
+              case "update":
+                await t.update(op.docRef, op.data);
+                break;
+
+              case "delete":
+                await t.delete(op.docRef);
+                break;
+            }
+          }
+        });
+      }
 
       setSnackbarMessage("code successfully deleted!");
       setCode("");
@@ -724,37 +751,44 @@ const CodeFeedback = props => {
     } catch (err) {
       console.error(err);
       setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+    } finally {
+      setSubmittingDelete(false)
     }
   };
 
-
-
   const handleAdminEdit = async () => {
-    if (adminCodeData?.code && adminCodeData?.title) {
-      const experimentCodes = [...allExperimentCodes];
+    try {
+      setSubmittingUpdate(true);
+      if (adminCodeData?.code && adminCodeData?.title) {
+        const experimentCodes = [...allExperimentCodes];
 
-      // check if the code already exists in approvedCode or unapprovedCode
-      const codes = experimentCodes.filter(elem => elem.code === code);
-      if (codes.length >= 2) {
-        setSnackbarMessage("This code already exists 2 or more times, please try some other code");
-        return;
-      }
+        // check if the code already exists in approvedCode or unapprovedCode
+        const codes = experimentCodes.filter(elem => elem.code === code);
+        if (codes.length >= 2) {
+          setSnackbarMessage("This code already exists 2 or more times, please try some other code");
+          return;
+        }
 
-      // update the document based on selected code
-      const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
-      const updatefeedbackCodeBooksDoc = await firebase.db
-        .collection("feedbackCodeBooks")
-        .where("code", "==", adminCodeData.code)
-        .get();
+        // update the document based on selected code
+        const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+        const updatefeedbackCodeBooksDoc = await firebase.db
+          .collection("feedbackCodeBooks")
+          .where("code", "==", adminCodeData.code)
+          .get();
 
-      await firebase.db.runTransaction(async t => {
+        const tWriteOperations = [];
+
         for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
           const codeData = feedbackCodeDoc.data();
           const codeUpdate = {
             ...codeData,
             code: code
           };
-          t.update(feedbackCodeDoc.ref, codeUpdate);
+
+          tWriteOperations.push({
+            docRef: feedbackCodeDoc.ref,
+            data: codeUpdate
+          });
         }
 
         // update the codeVots
@@ -782,16 +816,32 @@ const CodeFeedback = props => {
           }
 
           if (updateCheck) {
-            t.update(feedbackCodeDoc.ref, data);
+            tWriteOperations.push({
+              docRef: feedbackCodeDoc.ref,
+              data
+            });
           }
         }
-      });
 
-      setSnackbarMessage(`Code updated !`);
-      setCode("");
-      setAdminCodeData({});
-      // setAllExperimentCodes(experimentCodes);
-      handleCloseAdminEditModal();
+        const chunked = arrayToChunks(tWriteOperations);
+
+        for (let chunk of chunked) {
+          await firebase.db.runTransaction(async t => {
+            for (let operation of chunk) {
+              await t.update(operation.docRef, operation.data);
+            }
+          });
+        }
+
+        setSnackbarMessage(`Code updated !`);
+        setCode("");
+        setAdminCodeData({});
+        handleCloseAdminEditModal();
+      }
+    } catch (err) {
+      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+    } finally {
+      setSubmittingUpdate(false);
     }
   };
 
@@ -891,8 +941,6 @@ const CodeFeedback = props => {
     }
     setLoadNewCodes(true);
   };
-  console.log("quotesSelectedForCodes ::::::::::::::::::::::::::::::::::::::::::::::::", quotesSelectedForCodes);
-  console.log(docId);
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -958,7 +1006,7 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-    {sentences.length !== 0 && (
+      {sentences.length !== 0 && (
         <Alert severity="warning">
           <h2>The participant chose {chosenCondition}.</h2>
           <ol>
@@ -1234,7 +1282,7 @@ const CodeFeedback = props => {
               onChange={event => setCode(event.currentTarget.value)}
             />
             <Box sx={{ textAlign: "center" }}>
-              <Button className="Button" variant="contained" onClick={handleAdminEdit}>
+              <Button className="Button" variant="contained" disabled={submittingUpdate} onClick={handleAdminEdit}>
                 Update
               </Button>
               <Button
@@ -1337,6 +1385,7 @@ const CodeFeedback = props => {
             <Button
               variant="contained"
               className="Button Red"
+              disabled ={submittingDelete}
               onClick={() => {
                 handleAdminDelete();
               }}
