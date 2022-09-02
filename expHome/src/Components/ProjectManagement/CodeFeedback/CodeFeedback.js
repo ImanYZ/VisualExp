@@ -294,7 +294,11 @@ const CodeFeedback = props => {
           setChosenCondition(feedbackData.choice);
           const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
           const userData = userDoc.data();
-          setChosenPassage(userData.pConditions[feedbackData.expIdx].passage);
+          const passageDoc = await firebase.db
+            .collection("passages")
+            .doc(userData.pConditions[feedbackData.expIdx].passage)
+            .get();
+          setChosenPassage(passageDoc.data().title);
         }
         const lengthSentence = feedbackData.explanation.split(".").length;
         let response;
