@@ -392,6 +392,73 @@ const App = () => {
             }
           }
         }
+        const feedbackCodeBooksdocs = await firebase.db
+          .collection("feedbackCodeBooks")
+          .where("approved", "==", true)
+          .get();
+        const approvedCodes = new Set();
+        let codesVotes = {};
+        for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
+          const data = feedbackCodeBooksDoc.data();
+          if (!approvedCodes.has(data.code)) {
+            codesVotes[data.code] = [];
+            approvedCodes.add(data.code);
+          }
+        }
+        for (let explan of ["explanations", "explanations3Days", "explanations1Week"]) {
+          for (let index of [0, 1]) {
+            if (userData[explan][index] !== "") {
+              let choice;
+              let session;
+              let response;
+              if (explan === "explanations") {
+                session = "1st";
+                if (index === 0) {
+                  choice = "postQ1Choice";
+                } else {
+                  choice = "postQ2Choice";
+                }
+              } else if (explan === "explanations3Days") {
+                session = "2nd";
+                if (index === 0) {
+                  choice = "post3DaysQ1Choice";
+                } else {
+                  choice = "post3DaysQ2Choice";
+                }
+              } else if (explan === "explanations1Week") {
+                session = "3rd";
+                if (index === 0) {
+                  choice = "post1WeekQ1Choice";
+                } else {
+                  choice = "post1WeekQ2Choice";
+                }
+              }
+              if (userData[explan][index].explanation) {
+                response = userData[explan][index].explanation;
+              } else {
+                response = userData[explan][index];
+              }
+              const newFeedbackDdoc = {
+                approved: false,
+                codersChoices: {},
+                coders: [],
+                choice: userData[choice],
+                project: userData.project,
+                fullname: userData.fullname,
+                session: session,
+                explanation: response,
+                createdAt: new Date(),
+                expIdx: index,
+                codesVotes,
+                updatedAt: new Date()
+              };
+              const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
+
+              await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
+            }
+          }
+        }
+
         await firebase.commitBatch();
       }
     }

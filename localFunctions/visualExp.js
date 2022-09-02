@@ -702,7 +702,10 @@ exports.restructureFeedBackCode = async (req, res) => {
     const feedBack = {};
     console.log("starting");
     let feedbackCodesDocs = await db.collection("feedbackCodes").get();
-    let feedbackCodeBooksdocs = await db.collection("feedbackCodeBooks").get();
+    let feedbackCodeBooksdocs = await db
+      .collection("feedbackCodeBooks")
+      .where("approved", "==", true)
+      .get();
 
     for (let feedbackCodesDoc of feedbackCodesDocs.docs) {
       const fData = feedbackCodesDoc.data();
@@ -713,7 +716,9 @@ exports.restructureFeedBackCode = async (req, res) => {
         let codesVotes = {};
         for (let doc of feedbackCodeBooksdocs.docs) {
           const data = doc.data();
-          codesVotes[data.code] = [];
+          if (data.approved && codesVotes[data.code]) {
+            codesVotes[data.code] = [];
+          }
         }
         // codesVotes[fData.code] = [fData.coder];
         console.log(codesVotes);
@@ -1496,5 +1501,124 @@ exports.recreateNewRecallGradesDocuments = async () => {
     console.log("Done");
   } catch (error) {
     console.log(error);
+  }
+};
+
+exports.addNexDataToFeedbackCode = async (req, res) => {
+  try {
+    const feedBack = {};
+    console.log("starting");
+    const userDocs = await db.collection("users").get();
+    const feedbackCodeBooksdocs = await db
+      .collection("feedbackCodeBooks")
+      .where("approved", "==", true)
+      .get();
+
+    const previouslyAdded = new Set();
+    const feedbackCodedocs = await db.collection("feedbackCode").get();
+
+    for (let feeedbackDoc of feedbackCodedocs.docs) {
+      const data = feeedbackDoc.data();
+      if (!previouslyAdded.has(data.fullname)) {
+        previouslyAdded.add(data.fullname);
+      }
+    }
+    const approvedCodes = new Set();
+    let codesVotes = {};
+    for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
+      const data = feedbackCodeBooksDoc.data();
+      if (!approvedCodes.has(data.code)) {
+        codesVotes[data.code] = [];
+
+        approvedCodes.add(data.code);
+      }
+    }
+
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
+
+      let allResponsesReady = false;
+      if (userData.pConditions) {
+        for (let pCond of userData.pConditions) {
+          if (
+            "recallreText" in pCond &&
+            "recall3DaysreText" in pCond &&
+            "recall1WeekreText" in pCond &&
+            !previouslyAdded.has(userDoc.id)
+          ) {
+            allResponsesReady = true;
+          }
+        }
+      }
+      if (allResponsesReady) {
+        for (let explan of [
+          "explanations",
+          "explanations3Days",
+          "explanations1Week",
+        ]) {
+          for (let index of [0, 1]) {
+            console.log(userDoc.id);
+            if (userData[explan] && userData[explan][index] !== "") {
+              let choice;
+              let session;
+              let response;
+              if (explan === "explanations") {
+                session = "1st";
+                if (index === 0) {
+                  choice = "postQ1Choice";
+                } else {
+                  choice = "postQ2Choice";
+                }
+              } else if (explan === "explanations3Days") {
+                session = "2nd";
+                if (index === 0) {
+                  choice = "post3DaysQ1Choice";
+                } else {
+                  choice = "post3DaysQ2Choice";
+                }
+              } else if (explan === "explanations1Week") {
+                session = "3rd";
+                if (index === 0) {
+                  choice = "post1WeekQ1Choice";
+                } else {
+                  choice = "post1WeekQ2Choice";
+                }
+              }
+              if (userData[explan][index].explanation) {
+                response = userData[explan][index].explanation;
+              }else{
+                response = userData[explan][index];
+              }
+              const newFeedbackDdoc = {
+                approved: false,
+                codersChoices: {},
+                coders: [],
+                choice: userData[choice],
+                project: userData.project,
+                fullname: userDoc.id,
+                session: session,
+                explanation: response,
+                createdAt: new Date(),
+                expIdx: index,
+                codesVotes,
+                updatedAt: new Date(),
+              };
+              const feedbackCodeRef = db.collection("feedbackCode").doc();
+
+              await batchSet(feedbackCodeRef, newFeedbackDdoc);
+            }
+          }
+        }
+      }
+    }
+
+    console.log("*********************");
+    console.log("Started to commit!");
+    console.log("*********************");
+    await commitBatch();
+    console.log("Done.");
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
   }
 };
