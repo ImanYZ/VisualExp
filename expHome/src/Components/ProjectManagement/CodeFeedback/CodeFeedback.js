@@ -66,13 +66,14 @@ const CodeFeedback = props => {
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
   const [loadNewCodes, setLoadNewCodes] = useState(false);
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
-  const [submittingDelete, setSubmittingDelete] = useState(false)
+  const [submittingDelete, setSubmittingDelete] = useState(false);
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
+  const [chosenPassage, setChosenPassage] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
   // modal options
@@ -291,6 +292,9 @@ const CodeFeedback = props => {
         const feedbackData = feedbackDoc.data();
         if ("choice" in feedbackData) {
           setChosenCondition(feedbackData.choice);
+          const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+          const userData = userDoc.data();
+          setChosenPassage(userData.pConditions[feedbackData.expIdx].passage);
         }
         const lengthSentence = feedbackData.explanation.split(".").length;
         let response;
@@ -679,7 +683,7 @@ const CodeFeedback = props => {
 
   const handleAdminDelete = async () => {
     try {
-      setSubmittingDelete(true)
+      setSubmittingDelete(true);
       // update the document based on selected code
       const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
       const updatefeedbackCodeBooksDoc = await firebase.db
@@ -752,7 +756,7 @@ const CodeFeedback = props => {
       console.error(err);
       setSnackbarMessage("There is some error while deleting your code, please try after some time!");
     } finally {
-      setSubmittingDelete(false)
+      setSubmittingDelete(false);
     }
   };
 
@@ -941,6 +945,31 @@ const CodeFeedback = props => {
     }
     setLoadNewCodes(true);
   };
+
+  const saveQuote = quote => async event => {
+    const quoteDocs = await firebase.db.collection("quotes").where("quote", "==", quote).get();
+    if (quoteDocs.docs.length > 0) {
+      let quoteData = quoteDocs.docs[0].data();
+      if (!quoteData.researchers.includes(fullname)) {
+        await firebase.db.runTransaction(async t => {
+          const quoteRef = firebase.db.collection("quotes").doc(quoteDocs.docs[0].id);
+          const quoteDoc = await t.get(quoteRef);
+          quoteData = quoteDoc.data();
+          if (!quoteData.researchers.includes(fullname)) {
+            t.update(quoteRef, { researchers: [...quoteData.researchers, fullname], updatedAt: new Date() });
+          }
+        });
+      }
+    } else {
+      const quoteRef = firebase.db.collection("quotes").doc();
+      await quoteRef.set({
+        researchers: [fullname],
+        quote,
+        createdAt: new Date()
+      });
+    }
+  };
+
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1008,7 +1037,9 @@ const CodeFeedback = props => {
       )}
       {sentences.length !== 0 && (
         <Alert severity="warning">
-          <h2>The participant chose {chosenCondition}.</h2>
+          <h2>
+            The participant chose {chosenCondition} / passage {chosenPassage}.
+          </h2>
           <ol>
             <li>
               Read the participant's qualitative response that we've divided into sentences and listed in the right box
@@ -1078,7 +1109,7 @@ const CodeFeedback = props => {
               </Sheet>
 
               <Alert severity="success" className="VoteActivityAlert">
-                If the code you're looking for does not exist in the list above, add it below :
+                If the code you're looking for does not exist in the list above, add it below:
                 <br />
               </Alert>
 
@@ -1126,6 +1157,9 @@ const CodeFeedback = props => {
                         </ListItemIcon>
                         <ListItemText id={sentence} primary={`${sentence}`} />
                       </ListItemButton>
+                      <Button onClick={saveQuote(sentence)} variant="contained">
+                        Save as Quote
+                      </Button>
                     </ListItem>
                   ))}
                 </List>
@@ -1149,7 +1183,7 @@ const CodeFeedback = props => {
         </Paper>
       )}
 
-      { email ==="oneweb@umich.edu" &&
+      {email === "oneweb@umich.edu" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
@@ -1168,7 +1202,7 @@ const CodeFeedback = props => {
             />
           </Paper>
         </Box>
-      }
+      )}
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       {/* Edit Code Researcher Modal */}
       <Modal
@@ -1385,7 +1419,7 @@ const CodeFeedback = props => {
             <Button
               variant="contained"
               className="Button Red"
-              disabled ={submittingDelete}
+              disabled={submittingDelete}
               onClick={() => {
                 handleAdminDelete();
               }}
