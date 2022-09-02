@@ -644,19 +644,6 @@ const CodeFeedback = props => {
     }
   };
 
-  const handleAdminDelete = async () => {
-    try {
-      const selectedCodeRef = await firebase.db.collection("feedbackCodeBooks").doc(adminCodeData.id);
-      await selectedCodeRef.delete();
-      setSnackbarMessage("code successfully deleted!");
-      setCode("");
-      setAdminCodeData({});
-      handleCloseDeleteModalAdmin();
-    } catch (err) {
-      console.error(err);
-      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
-    }
-  };
 
   // function to edit selected codes from the list until
   // it gets approved by the admin
@@ -688,6 +675,60 @@ const CodeFeedback = props => {
     }
   };
 
+  const handleAdminDelete = async () => {
+    try {
+       // update the document based on selected code
+       const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
+       const updatefeedbackCodeBooksDoc = await firebase.db
+         .collection("feedbackCodeBooks")
+         .where("code", "==", adminCodeData.code)
+         .get();
+
+      await firebase.db.runTransaction(async t => {
+        for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
+          t.delete(feedbackCodeDoc.ref);
+        }
+
+        // update the codeVots
+        for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+          const data = feedbackCodeDoc.data();
+          let updateCheck = false;
+
+          for (let codeKey in data?.codesVotes) {
+            if (codeKey === adminCodeData.code) {
+              updateCheck = true;
+              delete data.codesVotes[codeKey];
+            }
+          }
+
+          //update the codersChoices
+          for (let researcherKey in data?.codersChoices) {
+            for (let codeKey in data?.codersChoices[researcherKey]) {
+              if (codeKey === adminCodeData.code) {
+                updateCheck = true;
+                delete data?.codersChoices[researcherKey][codeKey];
+              }
+            }
+          }
+
+          if (updateCheck) {
+            t.update(feedbackCodeDoc.ref, data);
+          }
+        }
+      });
+
+      setSnackbarMessage("code successfully deleted!");
+      setCode("");
+      setAdminCodeData({});
+      handleCloseDeleteModalAdmin();
+    } catch (err) {
+      console.error(err);
+      setSnackbarMessage("There is some error while deleting your code, please try after some time!");
+    }
+  };
+
+
+
   const handleAdminEdit = async () => {
     if (adminCodeData?.code && adminCodeData?.title) {
       const experimentCodes = [...allExperimentCodes];
@@ -706,7 +747,7 @@ const CodeFeedback = props => {
         .where("code", "==", adminCodeData.code)
         .get();
 
-      firebase.db.runTransaction(async t => {
+      await firebase.db.runTransaction(async t => {
         for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
           const codeData = feedbackCodeDoc.data();
           const codeUpdate = {
