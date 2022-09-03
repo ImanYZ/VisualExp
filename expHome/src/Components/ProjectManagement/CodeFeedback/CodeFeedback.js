@@ -1134,6 +1134,15 @@ const CodeFeedback = props => {
               summarizes the important point in the box on the bottom left. Clicking the add button will add this new
               code to the codebook.
             </li>
+            <li>
+              For every code that you select, please click the switch next to it, to specify which experimental
+              condition the participant has mentioned this code about.
+            </li>
+            <li>
+              In the final paper, we need to quote some of the sentences from the users' feedback. If you find any
+              sentence that seems very supportive of each of the codes that you select and you think it's valuable
+              enough to be quoted in the final paper, please click the "Save as Quote" button next it.
+            </li>
           </ol>
         </Alert>
       )}
