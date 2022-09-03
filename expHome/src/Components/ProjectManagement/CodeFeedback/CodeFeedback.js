@@ -31,7 +31,7 @@ import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import arrayToChunks from "../../../utils/arrayToChunks";
-
+import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -76,7 +76,7 @@ const CodeFeedback = props => {
   const [docId, setDocId] = useState("");
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
-  const [loadNewCodes, setLoadNewCodes] = useState(false);
+  const [enableSaveQuote, setEnableSaveQuote] = useState(true);
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
   const [submittingDelete, setSubmittingDelete] = useState(false);
   // const isAdmin = useRecoilValue(isAdminState);
@@ -974,30 +974,40 @@ const CodeFeedback = props => {
       const msg = `Code Add to both Questions!`;
       setSnackbarMessage(msg);
     }
-    setLoadNewCodes(true);
   };
 
   const saveQuote = quote => async event => {
-    const quoteDocs = await firebase.db.collection("quotes").where("quote", "==", quote).get();
-    if (quoteDocs.docs.length > 0) {
-      let quoteData = quoteDocs.docs[0].data();
-      if (!quoteData.researchers.includes(fullname)) {
-        await firebase.db.runTransaction(async t => {
-          const quoteRef = firebase.db.collection("quotes").doc(quoteDocs.docs[0].id);
-          const quoteDoc = await t.get(quoteRef);
-          quoteData = quoteDoc.data();
-          if (!quoteData.researchers.includes(fullname)) {
-            t.update(quoteRef, { researchers: [...quoteData.researchers, fullname], updatedAt: new Date() });
-          }
+    try {
+      setEnableSaveQuote(false);
+      const quoteDocs = await firebase.db.collection("quotes").where("quote", "==", quote).get();
+      if (quoteDocs.docs.length > 0) {
+        let quoteData = quoteDocs.docs[0].data();
+        if (!quoteData.researchers.includes(fullname)) {
+          await firebase.db.runTransaction(async t => {
+            const quoteRef = firebase.db.collection("quotes").doc(quoteDocs.docs[0].id);
+            const quoteDoc = await t.get(quoteRef);
+            quoteData = quoteDoc.data();
+            if (!quoteData.researchers.includes(fullname)) {
+              t.update(quoteRef, { researchers: [...quoteData.researchers, fullname], updatedAt: new Date() });
+            }
+          });
+        }
+      } else {
+        const quoteRef = firebase.db.collection("quotes").doc();
+        await quoteRef.set({
+          researchers: [fullname],
+          quote,
+          createdAt: new Date()
         });
       }
-    } else {
-      const quoteRef = firebase.db.collection("quotes").doc();
-      await quoteRef.set({
-        researchers: [fullname],
-        quote,
-        createdAt: new Date()
-      });
+
+      setSnackbarMessage(`Quote Saved successfully !`);
+    } catch (error) {
+      console.log(error);
+
+      setSnackbarMessage("There is some error while saving the Quote ,please try after some time!");
+    } finally {
+      setEnableSaveQuote(true);
     }
   };
 
@@ -1165,7 +1175,7 @@ const CodeFeedback = props => {
             </Box>
             <Box>
               <Sheet variant="outlined">
-                <h2>Participant's response in sentences</h2>
+                <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
                 <List
                   sx={{
                     paddingBlock: 1,
@@ -1180,17 +1190,24 @@ const CodeFeedback = props => {
                     <ListItem key={index} disablePadding>
                       <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
                         <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={selecte ? quotesSelectedForCodes[selecte].indexOf(sentence) !== -1 : false}
-                            tabIndex={-1}
-                            disableRipple
-                          />
+                          {quotesSelectedForCodes[selecte] && quotesSelectedForCodes[selecte].includes(sentence) ? (
+                            <Checkbox checked={true} />
+                          ) : (
+                            <Checkbox checked={false} />
+                          )}
                         </ListItemIcon>
                         <ListItemText id={sentence} primary={`${sentence}`} />
                       </ListItemButton>
-                      <Button onClick={saveQuote(sentence)} variant="contained">
-                        Save as Quote
+
+                      <Button
+                        mode="outlined"
+                        uppercase={false}
+                        disabled={!enableSaveQuote}
+                       
+                        onClick={saveQuote(sentence)}
+                        variant="contained"
+                      >
+                        Save As A Quote
                       </Button>
                     </ListItem>
                   ))}
