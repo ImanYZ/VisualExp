@@ -16,7 +16,7 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
-
+import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 
@@ -31,7 +31,6 @@ import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import arrayToChunks from "../../../utils/arrayToChunks";
-import LibraryAddCheckIcon from "@mui/icons-material/LibraryAddCheck";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -99,6 +98,8 @@ const CodeFeedback = props => {
   const [openAdminEditModal, setOpenEditAdminModal] = useState(false);
   const [openAdminAddModal, setOpenAddAdminModal] = useState(false);
 
+  const [switchState, setSwitchState] = useState({});
+  const [choiceConditions, setChoiceConditions] = useState({});
   const handleOpenEditModal = () => setOpenEditModal(true);
   const handleCloseEditModal = () => setOpenEditModal(false);
   const handleOpenAdminEditModal = () => setOpenEditAdminModal(true);
@@ -260,12 +261,18 @@ const CodeFeedback = props => {
 
   useEffect(() => {
     if (approvedCodes.length > 0) {
+      const _choiceConditions = {};
+      const _switchState = {};
       let quotesSelectedForCode = { ...quotesSelectedForCodes };
       let codesSelecting = {};
       for (let codeData of approvedCodes) {
         quotesSelectedForCode[codeData.code] = [];
         codesSelecting[codeData.code] = false;
+        _choiceConditions[codeData.code] = project === "H2K2" ? "H2" : "H1";
+        _switchState[codeData.code] = false;
       }
+      setSwitchState(_switchState);
+      setChoiceConditions(_choiceConditions);
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelected(codesSelecting);
     }
@@ -510,6 +517,10 @@ const CodeFeedback = props => {
           codersChoices: {
             ...feedbackCodeData.codersChoices,
             [fullname]: quotesSelectedForCodes
+          },
+          codersChoiceConditions: {
+            ...feedbackCodeData.codersChoiceConditions,
+            [fullname]: choiceConditions
           },
           coders: feedbackCodeData.coders.includes(fullname)
             ? feedbackCodeData.coders
@@ -1015,6 +1026,21 @@ const CodeFeedback = props => {
     }
   };
 
+  const changeChoices = (event, codeChoice) => {
+    const _switchState = { ...switchState };
+    const _choiceConditions = { ...choiceConditions };
+    _switchState[codeChoice] = event.target.checked;
+    _choiceConditions[codeChoice] = event.target.checked
+      ? project === "H2K2"
+        ? "K2"
+        : "L2"
+      : project === "H2K2"
+      ? "H2"
+      : "H1";
+    setChoiceConditions(_choiceConditions);
+    setSwitchState(_switchState);
+  };
+
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1130,8 +1156,7 @@ const CodeFeedback = props => {
                     maxWidth: 500,
                     height: 500,
                     "--List-decorator-width": "48px",
-                    "--List-item-paddingLeft": "1.5rem",
-                    "--List-item-paddingRight": "1rem"
+                    "--List-item-paddingLeft": "1.5rem"
                   }}
                 >
                   {approvedCodes.map(codeData => (
@@ -1148,8 +1173,16 @@ const CodeFeedback = props => {
                           <Checkbox checked={false} />
                         )}
 
-                        <ListItemText primary={`${codeData.code}`} />
+                        <Box sx={{ display: "inline" }}>{codeData.code}</Box>
                       </ListItemButton>
+
+                      {project === "H2K2" ? "H2" : "H1"}
+                      <Switch
+                        checked={switchState[codeData.code]}
+                        onChange={event => changeChoices(event, codeData.code)}
+                        color="secondary"
+                      />
+                      {project === "H2K2" ? "K2" : "L2"}
                     </ListItem>
                   ))}
                 </List>
