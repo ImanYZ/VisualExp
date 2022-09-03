@@ -84,6 +84,7 @@ const CodeFeedback = props => {
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
+  const [conditionsOrder, setConditionsOrder] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
   const [chosenPassage, setChosenPassage] = useState("");
   const [otherCondition, setOtherCondition] = useState("");
@@ -311,6 +312,9 @@ const CodeFeedback = props => {
           passagesInH2K2.includes(userData.pConditions[0].passage) &&
           passagesInH2K2.includes(userData.pConditions[1].passage)
         ) {
+          setConditionsOrder(
+            "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
+          );
           setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
           const chosenPassageDoc = await firebase.db
             .collection("passages")
@@ -1078,6 +1082,7 @@ const CodeFeedback = props => {
       )}
       {sentences.length !== 0 && (
         <Alert severity="warning">
+          <h2>{conditionsOrder}</h2>
           <h2>
             The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
             {otherPassage}.
@@ -1203,7 +1208,6 @@ const CodeFeedback = props => {
                         mode="outlined"
                         uppercase={false}
                         disabled={!enableSaveQuote}
-                       
                         onClick={saveQuote(sentence)}
                         variant="contained"
                       >
