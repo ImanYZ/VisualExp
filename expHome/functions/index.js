@@ -49,7 +49,7 @@ const {
   lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
-const { card, image } = require("./misinformationExp");
+const { assignNodeContributorsInstitutionsStats, updateInstitutions } = require("./knowledge");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -113,8 +113,8 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 // Knowledge endpoints
 
 // Misinformation Experiment
-app.get("/card", card);
-app.get("/image*", image);
+// app.get("/card", card);
+// app.get("/image*", image);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ api: true });
@@ -159,23 +159,23 @@ exports.applicationReminder = functions
   .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
-exports.inviteInstructors = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("0 * * * *")
-  .timeZone(EST_TIMEZONE)
-  .onRun(inviteInstructors);
+// exports.inviteInstructors = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520
+//   })
+//   .pubsub.schedule("0 * * * *")
+//   .timeZone(EST_TIMEZONE)
+//   .onRun(inviteInstructors);
 
-exports.inviteAdministrators = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("0 * * * *")
-  .timeZone(EST_TIMEZONE)
-  .onRun(inviteAdministrators);
+// exports.inviteAdministrators = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520
+//   })
+//   .pubsub.schedule("0 * * * *")
+//   .timeZone(EST_TIMEZONE)
+//   .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions
   .runWith({
@@ -185,5 +185,22 @@ exports.passagesNumberCorrection = functions
   .pubsub.schedule("every 25 hours")
   .onRun(passagesNumberCorrection);
 
+// Knowledge
+exports.assignNodeContributorsInstitutionsStats = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(assignNodeContributorsInstitutionsStats);
+
+exports.updateInstitutions = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(updateInstitutions);
+
 // LifeLog:
-exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
+// exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
