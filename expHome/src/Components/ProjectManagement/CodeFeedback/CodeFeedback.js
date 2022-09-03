@@ -74,6 +74,8 @@ const CodeFeedback = props => {
   const [code, setCode] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
   const [chosenPassage, setChosenPassage] = useState("");
+  const [otherCondition, setOtherCondition] = useState("");
+  const [otherPassage, setOtherPassage] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
   // modal options
@@ -294,11 +296,18 @@ const CodeFeedback = props => {
           setChosenCondition(feedbackData.choice);
           const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
           const userData = userDoc.data();
-          const passageDoc = await firebase.db
+          const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
+          setOtherCondition(userData.pConditions[otherConditionIdx].condition);
+          const chosenPassageDoc = await firebase.db
             .collection("passages")
             .doc(userData.pConditions[feedbackData.expIdx].passage)
             .get();
-          setChosenPassage(passageDoc.data().title);
+          setChosenPassage(chosenPassageDoc.data().title);
+          const otherPassageDoc = await firebase.db
+            .collection("passages")
+            .doc(userData.pConditions[otherConditionIdx].passage)
+            .get();
+          setOtherPassage(otherPassageDoc.data().title);
         }
         const lengthSentence = feedbackData.explanation.split(".").length;
         let response;
@@ -1042,7 +1051,8 @@ const CodeFeedback = props => {
       {sentences.length !== 0 && (
         <Alert severity="warning">
           <h2>
-            The participant chose {chosenCondition} / passage {chosenPassage}.
+            The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
+            {otherPassage}.
           </h2>
           <ol>
             <li>
