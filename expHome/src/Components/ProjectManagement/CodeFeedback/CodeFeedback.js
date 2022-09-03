@@ -296,18 +296,20 @@ const CodeFeedback = props => {
           setChosenCondition(feedbackData.choice);
           const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
           const userData = userDoc.data();
-          const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
-          setOtherCondition(userData.pConditions[otherConditionIdx].condition);
           const chosenPassageDoc = await firebase.db
             .collection("passages")
             .doc(userData.pConditions[feedbackData.expIdx].passage)
             .get();
           setChosenPassage(chosenPassageDoc.data().title);
-          const otherPassageDoc = await firebase.db
-            .collection("passages")
-            .doc(userData.pConditions[otherConditionIdx].passage)
-            .get();
-          setOtherPassage(otherPassageDoc.data().title);
+          if (userData.pConditions.length > 1) {
+            const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
+            setOtherCondition(userData.pConditions[otherConditionIdx].condition);
+            const otherPassageDoc = await firebase.db
+              .collection("passages")
+              .doc(userData.pConditions[otherConditionIdx].passage)
+              .get();
+            setOtherPassage(otherPassageDoc.data().title);
+          }
         }
         const lengthSentence = feedbackData.explanation.split(".").length;
         let response;
