@@ -46,6 +46,18 @@ const modalStyle = {
   pb: 3
 };
 
+const passagesInH2K2 = [
+  "zlS4Gh2AXaLZV7HM2oXd",
+  "lmGQvzSit4LBTj1Zptot",
+  "97D6P4unPYqzkpVeUY2c",
+  "zbcUNl5593vOeChp1G8O",
+  "UowdqbVHYMJ9Hhh5zNY3",
+  "qOO4Yn9oyUthKaifSIl1",
+  "6rc4k1su3txN6ZK4CJ0h",
+  "xuNQUYbAEFfTD1PHuLGV",
+  "s1oo3G4n3jeE8fJQRs3g"
+];
+
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -292,10 +304,14 @@ const CodeFeedback = props => {
 
       for (let feedbackDoc of feedbackCodesDocs.docs) {
         const feedbackData = feedbackDoc.data();
-        if ("choice" in feedbackData) {
-          setChosenCondition(feedbackData.choice);
-          const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
-          const userData = userDoc.data();
+        const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+        const userData = userDoc.data();
+        if (
+          userData.pConditions.length > 1 &&
+          passagesInH2K2.includes(userData.pConditions[0].passage) &&
+          passagesInH2K2.includes(userData.pConditions[1].passage)
+        ) {
+          setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
           const chosenPassageDoc = await firebase.db
             .collection("passages")
             .doc(userData.pConditions[feedbackData.expIdx].passage)
@@ -310,67 +326,67 @@ const CodeFeedback = props => {
               .get();
             setOtherPassage(otherPassageDoc.data().title);
           }
-        }
-        const lengthSentence = feedbackData.explanation.split(".").length;
-        let response;
-        if (lengthSentence > 1) {
-          response = feedbackData.explanation.split(".", lengthSentence - 1);
-        } else {
-          response = feedbackData.explanation.split(".");
-        }
+          const lengthSentence = feedbackData.explanation.split(".").length;
+          let response;
+          if (lengthSentence > 1) {
+            response = feedbackData.explanation.split(".", lengthSentence - 1);
+          } else {
+            response = feedbackData.explanation.split(".");
+          }
 
-        //we check if the authenticated reserchers have aleardy casted his vote
-        //if so we get all his recorded past choices
-        if (feedbackData.coders.includes(fullname)) {
-          let voteAgain = false;
-          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
-          const approvedCodesStrings = approvedCodes
-            .map(data => {
-              return data.code;
-            })
-            .sort();
-          for (let approvedCode of approvedCodesStrings) {
-            if (!myCodes.includes(approvedCode)) {
-              voteAgain = true;
-            }
-          }
-          // if the string representations of these arrays ar enot same that means they have been changed.
-          if (voteAgain) {
-            const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-            setApprovedNewCodes(newCodes);
-            setDocId(feedbackDoc.id);
-            setSentences(response);
-            foundResponse = true;
-            for (let code of myCodes) {
-              quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
-            }
-            for (let code of newCodes) {
-              quotesSelectedForCodes[code] = [];
-            }
-            setQuotesSelectedForCodes(quotesSelectedForCodes);
-          }
-          // if the authenticated researcher didn't vote on this  explanation yet
-          // we check if all the others coders who previously casted their vote that they checked
-          //the new code added ,so that way we would know if we can show this explanation or not
-        } else if (!feedbackData.coders.includes(fullname)) {
-          setApprovedNewCodes([]);
-          let allowOtherResearchersToVote = true;
-          for (let coder of feedbackData.coders) {
-            const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
+          //we check if the authenticated reserchers have aleardy casted his vote
+          //if so we get all his recorded past choices
+          if (feedbackData.coders.includes(fullname)) {
+            let voteAgain = false;
+            const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
             const approvedCodesStrings = approvedCodes
               .map(data => {
                 return data.code;
               })
               .sort();
-
-            if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
-              allowOtherResearchersToVote = false;
+            for (let approvedCode of approvedCodesStrings) {
+              if (!myCodes.includes(approvedCode)) {
+                voteAgain = true;
+              }
             }
-          }
-          if (allowOtherResearchersToVote) {
-            setDocId(feedbackDoc.id);
-            setSentences(response);
-            foundResponse = true;
+            // if the string representations of these arrays ar enot same that means they have been changed.
+            if (voteAgain) {
+              const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+              setApprovedNewCodes(newCodes);
+              setDocId(feedbackDoc.id);
+              setSentences(response);
+              foundResponse = true;
+              for (let code of myCodes) {
+                quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
+              }
+              for (let code of newCodes) {
+                quotesSelectedForCodes[code] = [];
+              }
+              setQuotesSelectedForCodes(quotesSelectedForCodes);
+            }
+            // if the authenticated researcher didn't vote on this  explanation yet
+            // we check if all the others coders who previously casted their vote that they checked
+            //the new code added ,so that way we would know if we can show this explanation or not
+          } else if (!feedbackData.coders.includes(fullname)) {
+            setApprovedNewCodes([]);
+            let allowOtherResearchersToVote = true;
+            for (let coder of feedbackData.coders) {
+              const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
+              const approvedCodesStrings = approvedCodes
+                .map(data => {
+                  return data.code;
+                })
+                .sort();
+
+              if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+                allowOtherResearchersToVote = false;
+              }
+            }
+            if (allowOtherResearchersToVote) {
+              setDocId(feedbackDoc.id);
+              setSentences(response);
+              foundResponse = true;
+            }
           }
         }
 
