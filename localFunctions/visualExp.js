@@ -1625,17 +1625,17 @@ exports.addNexDataToFeedbackCode = async (req, res) => {
 
 exports.fixActivityProject = async (req, res) => {
   try {
-    const researchers = await db.collecion('researchers').get();
+    const researchers = await db.collection('researchers').get();
 
     for (let researcher of researchers.docs) {
       const researcherId = researcher.id;
 
       const researhcerData = researcher.data();
-      const researcherProjects = Object.keys(researhcerData.projects);
-
+      const researcherProjects = Object.keys(researhcerData?.projects || {});
+      console.log(researcherId, researcherProjects);
       const allActivities = await db
-        .collection()
-        .where('fullname', '==', researcherId);
+        .collection("activities")
+        .where('fullname', '==', researcherId).get();
 
       for (let activity of allActivities.docs) {
         const activityData = activity.data();
@@ -1646,11 +1646,13 @@ exports.fixActivityProject = async (req, res) => {
           researcherProjects.includes('H1L2')
         ) {
           activityData.project = 'H1L2';
+          
           await batchUpdate(activity.ref, activityData);
         }
       }
-      await commitBatch();
     }
+    await commitBatch();
+    console.log("Done")
     res.send('Success');
   } catch (err) {
     console.log(err);
