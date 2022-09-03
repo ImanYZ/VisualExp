@@ -487,14 +487,14 @@ const CodeFeedback = props => {
           updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
         };
         const tWriteOperations = [];
-        if (feedbackCodeUpdate.coders.length === 4) {
+        if (feedbackCodeUpdate.coders.length === 3) {
           feedbackCodeUpdate.approved = true;
           for (let code in feedbackCodeUpdate.codesVotes) {
-            if (feedbackCodeUpdate.codesVotes[code].length >= 3) {
+            if (feedbackCodeUpdate.codesVotes[code].length >= 2) {
               for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
                 recievePositivePoints.push(researcher);
               }
-              if (feedbackCodeUpdate.codesVotes[code].length === 3) {
+              if (feedbackCodeUpdate.codesVotes[code].length === 2) {
                 for (let otherCoder of feedbackCodeUpdate.coders) {
                   if (!feedbackCodeUpdate.codesVotes[code].includes(otherCoder)) {
                     recieveNegativePoints.push(otherCoder);
