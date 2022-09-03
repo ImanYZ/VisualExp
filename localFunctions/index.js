@@ -1,10 +1,10 @@
-const express = require("express");
+const express = require('express');
 
 const {
   downloadNodes,
   fixInstitutionInUsers,
   identifyDuplicateInstitutionDomains,
-} = require("./knowledge");
+} = require('./knowledge');
 
 const {
   addRecallGradesColl,
@@ -23,53 +23,55 @@ const {
   createRecallGradesForNewUserH1L2,
   deleteTheKeyPhrasesForPassage,
   recreateNewRecallGradesDocuments,
-  addNexDataToFeedbackCode
-} = require("./visualExp");
+  addNexDataToFeedbackCode,
+  fixActivityProject,
+} = require('./visualExp');
 
 const app = express();
 
-app.get("/", (req, res) => {
-  console.log("Hello world received a request.");
+app.get('/fixActivityProject', fixActivityProject);
+app.get('/', (req, res) => {
+  console.log('Hello world received a request.');
   res.send(`Hello World!\n`);
 });
-app.get("/addRecallGradesColl", addRecallGradesColl);
-app.get("/checkRepeatedRecallGrades", checkRepeatedRecallGrades);
-app.get("/downloadNodes", downloadNodes);
-app.get("/fixInstitutionInUsers", fixInstitutionInUsers);
+app.get('/addRecallGradesColl', addRecallGradesColl);
+app.get('/checkRepeatedRecallGrades', checkRepeatedRecallGrades);
+app.get('/downloadNodes', downloadNodes);
+app.get('/fixInstitutionInUsers', fixInstitutionInUsers);
 app.get(
-  "/identifyDuplicateInstitutionDomains",
+  '/identifyDuplicateInstitutionDomains',
   identifyDuplicateInstitutionDomains
 );
-app.get("/restructureProjectSpecs", restructureProjectSpecs);
-app.get("/moveResearchersPoints", moveResearchersPoints);
-app.get("/deleteDuplicatesWithNoVotes", deleteDuplicatesWithNoVotes);
-app.get("/deleteDuplicatesWithVotes", deleteDuplicatesWithVotes);
-app.get("/addDoneFeildToRecallGrades", addDoneFeildToRecallGrades);
-app.get("/deleteIncompleteRecallGrades", deleteIncompleteRecallGrades);
-app.get("/restructureFeedBackCode", restructureFeedBackCode);
+app.get('/restructureProjectSpecs', restructureProjectSpecs);
+app.get('/moveResearchersPoints', moveResearchersPoints);
+app.get('/deleteDuplicatesWithNoVotes', deleteDuplicatesWithNoVotes);
+app.get('/deleteDuplicatesWithVotes', deleteDuplicatesWithVotes);
+app.get('/addDoneFeildToRecallGrades', addDoneFeildToRecallGrades);
+app.get('/deleteIncompleteRecallGrades', deleteIncompleteRecallGrades);
+app.get('/restructureFeedBackCode', restructureFeedBackCode);
 app.get(
-  "/deleteDamagedDocumentsOnFreeRecallGrades",
+  '/deleteDamagedDocumentsOnFreeRecallGrades',
   deleteDamagedDocumentsOnFreeRecallGrades
 );
 app.get(
-  "/correctTheDataStructureForDamagedUsers",
+  '/correctTheDataStructureForDamagedUsers',
   correctTheDataStructureForDamagedUsers
 );
 app.get(
-  "/deleteDamageDocumentForAffectedUsersInRecallGrades",
+  '/deleteDamageDocumentForAffectedUsersInRecallGrades',
   deleteDamageDocumentForAffectedUsersInRecallGrades
 );
 app.get(
-  "/makeCorrectionToPhrasesinRecallGrades",
+  '/makeCorrectionToPhrasesinRecallGrades',
   makeCorrectionToPhrasesinRecallGrades
 );
 
-app.get("/createRecallGradesForNewUserH1L2", createRecallGradesForNewUserH1L2);
+app.get('/createRecallGradesForNewUserH1L2', createRecallGradesForNewUserH1L2);
 
-app.get("/deleteTheKeyPhrasesForPassage",deleteTheKeyPhrasesForPassage);
-app.get("/recreateNewRecallGradesDocuments",recreateNewRecallGradesDocuments);
-app.get("/addNexDataToFeedbackCode",addNexDataToFeedbackCode);
+app.get('/deleteTheKeyPhrasesForPassage', deleteTheKeyPhrasesForPassage);
+app.get('/recreateNewRecallGradesDocuments', recreateNewRecallGradesDocuments);
+app.get('/addNexDataToFeedbackCode', addNexDataToFeedbackCode);
 const port = 8080;
 app.listen(port, () => {
-  console.log("1Cademy local Express server for one-time functions!", port);
+  console.log('1Cademy local Express server for one-time functions!', port);
 });
