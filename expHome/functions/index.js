@@ -19,7 +19,8 @@ const {
   // updateNotTakenSessions,
   bulkGradeFreeRecall,
   markPaidEndpoint,
-  passagesNumberCorrection
+  passagesNumberCorrection,
+  handleSubmitFeebackCode
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -96,6 +97,8 @@ app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
+app.post("/handleSubmitFeebackCode", handleSubmitFeebackCode);
+
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);

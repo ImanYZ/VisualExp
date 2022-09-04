@@ -3,6 +3,7 @@ import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
 
+import axios from "axios";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -322,12 +323,10 @@ const CodeFeedback = props => {
           setConditionsOrder(
             "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
           );
-          setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
           const chosenPassageDoc = await firebase.db
             .collection("passages")
             .doc(userData.pConditions[feedbackData.expIdx].passage)
             .get();
-          setChosenPassage(chosenPassageDoc.data().title);
           if (userData.pConditions.length > 1) {
             const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
             setOtherCondition(userData.pConditions[otherConditionIdx].condition);
@@ -366,6 +365,8 @@ const CodeFeedback = props => {
               setApprovedNewCodes(newCodes);
               setDocId(feedbackDoc.id);
               setSentences(response);
+              setChosenPassage(chosenPassageDoc.data().title);
+              setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
               foundResponse = true;
               for (let code of myCodes) {
                 quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
@@ -491,130 +492,22 @@ const CodeFeedback = props => {
   // that the voter have chosen and append them to his name in the feedbackCode collection
   const handleSubmit = async () => {
     try {
-      await firebase.db.runTransaction(async t => {
-        setSubmitting(true);
-        let recievePositivePoints = [];
-        let recieveNegativePoints = [];
-        const feedbackCodesRef = firebase.db.collection("feedbackCode").doc(docId);
-        const feedbackCodesDoc = await t.get(feedbackCodesRef);
-        const feedbackCodeData = feedbackCodesDoc.data();
-        let codesVotes = {};
-
-        approvedCodes.forEach(codeData => {
-          if (quotesSelectedForCodes[codeData.code].length !== 0) {
-            if (feedbackCodeData.codesVotes[codeData.code]) {
-              const voters = feedbackCodeData.codesVotes[codeData.code];
-              voters.push(fullname);
-              codesVotes[codeData.code] = voters;
-            } else {
-              codesVotes[codeData.code] = [fullname];
-            }
-          } else {
-            codesVotes[codeData.code] = [];
-          }
-        });
-        let feedbackCodeUpdate = {
-          codersChoices: {
-            ...feedbackCodeData.codersChoices,
-            [fullname]: quotesSelectedForCodes
-          },
-          codersChoiceConditions: {
-            ...feedbackCodeData.codersChoiceConditions,
-            [fullname]: choiceConditions
-          },
-          coders: feedbackCodeData.coders.includes(fullname)
-            ? feedbackCodeData.coders
-            : [...feedbackCodeData.coders, fullname],
-          codesVotes,
-          updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-        };
-        const tWriteOperations = [];
-        if (feedbackCodeUpdate.coders.length === 3) {
-          feedbackCodeUpdate.approved = true;
-          for (let code in feedbackCodeUpdate.codesVotes) {
-            if (feedbackCodeUpdate.codesVotes[code].length >= 2) {
-              for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
-                recievePositivePoints.push(researcher);
-              }
-              if (feedbackCodeUpdate.codesVotes[code].length === 2) {
-                for (let otherCoder of feedbackCodeUpdate.coders) {
-                  if (!feedbackCodeUpdate.codesVotes[code].includes(otherCoder)) {
-                    recieveNegativePoints.push(otherCoder);
-                  }
-                }
-              }
-            } else if (feedbackCodeUpdate.codesVotes[code].length === 1) {
-              const theCoder = feedbackCodeUpdate.codesVotes[code][0];
-              recieveNegativePoints.push(theCoder);
-              for (let otherCoder of feedbackCodeUpdate.coders) {
-                if (otherCoder !== theCoder) {
-                  recievePositivePoints.push(otherCoder);
-                }
-              }
-            } else if (feedbackCodeUpdate.codesVotes[code].length === 0) {
-              for (let otherCoder of feedbackCodeUpdate.coders) {
-                recievePositivePoints.push(otherCoder);
-              }
-            }
-          }
-          for (let res of feedbackCodeUpdate.coders) {
-            const researcherRef = firebase.db.collection("researchers").doc(res);
-
-            const researcherData = (await t.get(researcherRef)).data();
-            let negativeCodingPoints = 0;
-            let positiveCodingPoints = 0;
-            recievePositivePoints.forEach(coder => {
-              if (coder === res) {
-                positiveCodingPoints += 0.04;
-              }
-            });
-            recieveNegativePoints.forEach(coder => {
-              if (coder === res) {
-                negativeCodingPoints += 0.04;
-              }
-            });
-
-            positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
-            negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
-
-            const researcherUpdates = {
-              projects: {
-                ...researcherData.projects,
-                [project]: {
-                  ...researcherData.projects[project]
-                }
-              }
-            };
-
-            let calulatedProject = project;
-            if (!(project in researcherData.projects)) {
-              calulatedProject = Object.keys(researcherData.projects)[0];
-            }
-            if (researcherUpdates.projects[calulatedProject]) {
-              if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-                researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
-              } else {
-                researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
-              }
-              if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-                researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
-              } else {
-                researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
-              }
-
-              tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
-            }
-          }
-        }
-
-        tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
-        for (let operation of tWriteOperations) {
-          t.update(operation.docRef, operation.data);
-        }
-        setRetrieveNext(oldValue => oldValue + 1);
-        setSnackbarMessage("Your evaluation was submitted successfully.");
-        setSubmitting(false);
+      setSubmitting(true);
+      await firebase.idToken();
+      await axios.post("/handleSubmitFeebackCode", {
+        fullname,
+        docId,
+        quotesSelectedForCodes,
+        choiceConditions,
+        approvedCodes,
+        project
       });
+      setRetrieveNext(oldValue => oldValue + 1);
+      setSentences("");
+      setChosenPassage("");
+      setChosenCondition("");
+      setSnackbarMessage("Your evaluation was submitted successfully.");
+      setSubmitting(false);
     } catch (err) {
       setSubmitting(false);
       console.error({ err });
@@ -781,13 +674,14 @@ const CodeFeedback = props => {
       for (let chunk of chunked) {
         await firebase.db.runTransaction(async t => {
           for (let op of chunk) {
+            // eslint-disable-next-line default-case
             switch (op.operation) {
               case "update":
-                await t.update(op.docRef, op.data);
+                t.update(op.docRef, op.data);
                 break;
 
               case "delete":
-                await t.delete(op.docRef);
+                t.delete(op.docRef);
                 break;
             }
           }
