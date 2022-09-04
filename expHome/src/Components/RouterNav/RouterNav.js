@@ -1042,7 +1042,7 @@ const RouterNav = props => {
                           ) : (
                             <div>
                               <div>
-                                You've earned {administratorPoints + dayAdministratorUpVotes} total points, including{" "}
+                                You've earned {Number(administratorPoints) + Number(dayAdministratorUpVotes)} total points, including{" "}
                                 {administratorPoints} points for collecting administrators' contact info and{" "}
                                 {dayAdministratorUpVotes} points for casting 16 up-voting per day on other's collected
                                 data.
@@ -1064,7 +1064,7 @@ const RouterNav = props => {
                           💼{" "}
                           {projectPoints.dayAdministratorUpVotes
                             ? administratorPoints
-                            : administratorPoints + dayAdministratorUpVotes}{" "}
+                            : Number(administratorPoints) + Number(dayAdministratorUpVotes)}{" "}
                           <br />{" "}
                           {projectPoints.dayAdministratorUpVotes
                             ? "✔ " + dayAdministratorUpVotes
@@ -1082,7 +1082,7 @@ const RouterNav = props => {
                               From that total, we've already excluded your negative {negativeGradingPoints} ❌ points.
                             </div>
                             <div>
-                              This means, 2 X {gradingPoints + negativeGradingPoints} times at least 3 other researchers
+                              This means, 2 X {Number(gradingPoints) + Number(negativeGradingPoints)} times at least 3 other researchers
                               have agreed with you on existance or non-existance of a specific phrase in a free-recall
                               response. Also, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed
                               with each other on existance (non-existance) of a specific key phrase in a free-recall
