@@ -224,12 +224,10 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const userUpdates = userData;
 
       // researcher references
-      const researchersDocs = await db
-      .collection("researchers")
-      .get();
+      const researchersDocs = await db.collection("researchers").get();
       const otherResearchersData = {};
-      for(let resDoc of researchersDocs.docs){
-        otherResearchersData[resDoc.id] = {data:resDoc.data()};
+      for (let resDoc of researchersDocs.docs) {
+        otherResearchersData[resDoc.id] = { data: resDoc.data() };
       }
 
       //getting data from recallGrades
@@ -243,7 +241,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       const recallGradesData = {};
       for (let recallDoc of recallGradeDocs.docs) {
         const recallData = recallDoc.data();
-        recallGradesData[recallData.phrase] = {id:recallDoc.id,...recallData}
+        recallGradesData[recallData.phrase] = { id: recallDoc.id, ...recallData };
       }
       // phraseGrade loop
 
@@ -252,7 +250,6 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         const recallGradeData = recallGradesData[phraseGrade.phrase];
         console.log("Getting data from recallGrade Doc Id", `${recallGradeData.id}`);
         const recallGradeRef = db.collection(collName).doc(`${recallGradeData.id}`);
-
 
         if (!recallGradeData.researchers.includes(fullname)) {
           const recallGradeUpdates = {};
@@ -316,9 +313,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
               // a point to each of the researchers who unanimously
               // identified/notIdentified this phrase in this free recall response.
               for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-             
-                  otherResearchersData[recallGradeData.researchers[fResearcherIdx]].isOther = true;
-                
+                otherResearchersData[recallGradeData.researchers[fResearcherIdx]].isOther = true;
 
                 // fetch all the researcher projects and
                 // check if it has in payload or not.
@@ -399,7 +394,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
 
       // write all the transactions for other researcher's data
       for (let researcherId in otherResearchersData) {
-        if(otherResearchersData[researcherId].isOther){
+        if (otherResearchersData[researcherId].isOther) {
           const researcherRef = db.collection("researchers").doc(`${researcherId}`);
           transactionWrites.push({
             type: "update",
@@ -2332,5 +2327,151 @@ exports.passagesNumberCorrection = async context => {
   } catch (err) {
     console.log({ err });
     return null;
+  }
+};
+
+exports.handleSubmitFeebackCode = async (req, res) => {
+  try {
+    if (
+      "fullname" in req.body &&
+      "docId" in req.body &&
+      "quotesSelectedForCodes" in req.body &&
+      "choiceConditions" in req.body &&
+      "approvedCodes" in req.body &&
+      "project" in req.body
+    ) {
+      const fullname = req.body.fullname;
+      const docId = req.body.docId;
+      const quotesSelectedForCodes = req.body.quotesSelectedForCodes;
+      const choiceConditions = req.body.choiceConditions;
+      const approvedCodes = req.body.approvedCodes;
+      const project = req.body.project;
+      await db.runTransaction(async t => {
+        let recievePositivePoints = [];
+        let recieveNegativePoints = [];
+        const feedbackCodesRef = db.collection("feedbackCode").doc(docId);
+        const feedbackCodesDoc = await t.get(feedbackCodesRef);
+        const feedbackCodeData = feedbackCodesDoc.data();
+        let codesVotes = {};
+
+        approvedCodes.forEach(codeData => {
+          if (quotesSelectedForCodes[codeData.code].length !== 0) {
+            if (feedbackCodeData.codesVotes[codeData.code]) {
+              const voters = feedbackCodeData.codesVotes[codeData.code];
+              voters.push(fullname);
+              codesVotes[codeData.code] = voters;
+            } else {
+              codesVotes[codeData.code] = [fullname];
+            }
+          } else {
+            codesVotes[codeData.code] = [];
+          }
+        });
+        let feedbackCodeUpdate = {
+          codersChoices: {
+            ...feedbackCodeData.codersChoices,
+            [fullname]: quotesSelectedForCodes
+          },
+          codersChoiceConditions: {
+            ...feedbackCodeData.codersChoiceConditions,
+            [fullname]: choiceConditions
+          },
+          coders: feedbackCodeData.coders.includes(fullname)
+            ? feedbackCodeData.coders
+            : [...feedbackCodeData.coders, fullname],
+          codesVotes,
+          updatedAt: new Date()
+        };
+        const tWriteOperations = [];
+        if (feedbackCodeUpdate.coders.length === 3) {
+          feedbackCodeUpdate.approved = true;
+          for (let code in feedbackCodeUpdate.codesVotes) {
+            if (feedbackCodeUpdate.codesVotes[code].length >= 2) {
+              for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
+                recievePositivePoints.push(researcher);
+              }
+              if (feedbackCodeUpdate.codesVotes[code].length === 2) {
+                for (let otherCoder of feedbackCodeUpdate.coders) {
+                  if (!feedbackCodeUpdate.codesVotes[code].includes(otherCoder)) {
+                    recieveNegativePoints.push(otherCoder);
+                  }
+                }
+              }
+            } else if (feedbackCodeUpdate.codesVotes[code].length === 1) {
+              const theCoder = feedbackCodeUpdate.codesVotes[code][0];
+              recieveNegativePoints.push(theCoder);
+              for (let otherCoder of feedbackCodeUpdate.coders) {
+                if (otherCoder !== theCoder) {
+                  recievePositivePoints.push(otherCoder);
+                }
+              }
+            } else if (feedbackCodeUpdate.codesVotes[code].length === 0) {
+              for (let otherCoder of feedbackCodeUpdate.coders) {
+                recievePositivePoints.push(otherCoder);
+              }
+            }
+          }
+          for (let res of feedbackCodeUpdate.coders) {
+            const researcherRef = db.collection("researchers").doc(res);
+
+            const researcherData = (await t.get(researcherRef)).data();
+            let negativeCodingPoints = 0;
+            let positiveCodingPoints = 0;
+            recievePositivePoints.forEach(coder => {
+              if (coder === res) {
+                positiveCodingPoints += 0.04;
+              }
+            });
+            recieveNegativePoints.forEach(coder => {
+              if (coder === res) {
+                negativeCodingPoints += 0.04;
+              }
+            });
+
+            positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
+            negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
+
+            const researcherUpdates = {
+              projects: {
+                ...researcherData.projects,
+                [project]: {
+                  ...researcherData.projects[project]
+                }
+              }
+            };
+
+            let calulatedProject = project;
+            if (!(project in researcherData.projects)) {
+              calulatedProject = Object.keys(researcherData.projects)[0];
+            }
+            if (researcherUpdates.projects[calulatedProject]) {
+              if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
+              }
+              if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
+              } else {
+                researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
+              }
+              tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
+            }
+          }
+        }
+
+        tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
+
+        for (let operation of tWriteOperations) {
+          t.update(operation.docRef, operation.data);
+        }
+      });
+      return res
+        .status(200)
+        .json({ success: true, endpoint: "FeedBack upload", successData: req.body.quotesSelectedForCodes });
+    }
+  } catch (err) {
+    console.error({ err });
+    return res.status(500).json({ errMsg: err.message, success: false });
   }
 };
