@@ -993,7 +993,7 @@ const RouterNav = props => {
                           ) : (
                             <div>
                               <div>
-                                You've earned {instructorPoints + dayInstructorUpVotes} total points, including{" "}
+                                You've earned {Number(instructorPoints) + Number(dayInstructorUpVotes)} total points, including{" "}
                                 {instructorPoints} points for collecting instructors' contact info and{" "}
                                 {dayInstructorUpVotes} points for casting 16 up-voting per day on other's collected
                                 data.
@@ -1015,7 +1015,7 @@ const RouterNav = props => {
                           👨‍🏫{" "}
                           {projectPoints.dayInstructorUpVotes
                             ? instructorPoints
-                            : instructorPoints + dayInstructorUpVotes}{" "}
+                            : Number(instructorPoints) + Number(dayInstructorUpVotes)}{" "}
                           <br />{" "}
                           {projectPoints.dayInstructorUpVotes
                             ? "✔ " + dayInstructorUpVotes
