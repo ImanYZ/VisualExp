@@ -20,6 +20,7 @@ import Alert from "@mui/material/Alert";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -76,7 +77,7 @@ const CodeFeedback = props => {
   const [docId, setDocId] = useState("");
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
-  const [enableSaveQuote, setEnableSaveQuote] = useState(true);
+  const [enableSaveQuote, setEnableSaveQuote] = useState(new Array(100).fill(true));
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
   const [submittingDelete, setSubmittingDelete] = useState(false);
   // const isAdmin = useRecoilValue(isAdminState);
@@ -907,7 +908,9 @@ const CodeFeedback = props => {
 
   const saveQuote = quote => async event => {
     try {
-      setEnableSaveQuote(false);
+      const _enableSaveQuote = [...enableSaveQuote];
+      _enableSaveQuote[sentences.indexOf(quote)] = false;
+      setEnableSaveQuote(_enableSaveQuote);
       const quoteDocs = await firebase.db.collection("quotes").where("quote", "==", quote).get();
       if (quoteDocs.docs.length > 0) {
         let quoteData = quoteDocs.docs[0].data();
@@ -936,7 +939,9 @@ const CodeFeedback = props => {
 
       setSnackbarMessage("There is some error while saving the Quote ,please try after some time!");
     } finally {
-      setEnableSaveQuote(true);
+      const _enableSaveQuote = [...enableSaveQuote];
+      _enableSaveQuote[sentences.indexOf(quote)] = true;
+      setEnableSaveQuote(_enableSaveQuote);
     }
   };
 
@@ -1020,182 +1025,189 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-      {sentences.length !== 0 && (
-        <Alert severity="warning">
-          <h2>{conditionsOrder}</h2>
+      {sentences.length !== 0 ? (
+        <>
+          <Alert severity="warning">
+            <h2>{conditionsOrder}</h2>
 
-          {chosenCondition === "both" ? (
-            <h2>
-              The participant chose both conditions for passage {chosenPassage} and passage {otherPassage}.
-            </h2>
-          ) : (
-            <h2>
-              The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
-              {otherPassage}.
-            </h2>
-          )}
-          <ol>
-            <li>
-              Read the participant's qualitative response that we've divided into sentences and listed in the right box
-              below.
-            </li>
-            <li>Click and read every single code from the codebook listed in the left box below.</li>
-            <li>
-              If you see any sentence in the right box that indicates the clicked code in the left box, check-mark that
-              sentence in the right box.
-            </li>
-            <li>
-              For every code, if you check any of the sentences, it also check-marks the code indicating that the code
-              was mentioned by the participant due to the sentence that you checked.
-            </li>
-            <li>Select all the sentences that apply to the code you have selected.</li>
-            <li>
-              After going through all the codes, if you found an important point in the participant's feedback that is
-              not mentioned in any of the codes in the codebook, then you can manually add a new concise code that
-              summarizes the important point in the box on the bottom left. Clicking the add button will add this new
-              code to the codebook.
-            </li>
-            <li>
-              For every code that you select, please click the switch next to it, to specify which experimental
-              condition the participant has mentioned this code about.
-            </li>
-            <li>
-              In the final paper, we need to quote some of the sentences from the users' feedback. If you find any
-              sentence that seems very supportive of each of the codes that you select and you think it's valuable
-              enough to be quoted in the final paper, please click the "Save as Quote" button next it.
-            </li>
-          </ol>
-        </Alert>
-      )}
-      {sentences.length !== 0 && (
-        <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: 0
-            }}
-          >
-            <Box>
-              <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-                <h2>The Codebook</h2>
-                <List
-                  sx={{
-                    paddingBlock: 1,
-                    maxWidth: 500,
-                    height: 500,
-                    "--List-decorator-width": "48px",
-                    "--List-item-paddingLeft": "1.5rem"
-                  }}
-                >
-                  {approvedCodes.map(codeData => (
-                    <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
-                      <ListItemButton
-                        value={codeData.code}
-                        onClick={() => {
-                          handleSelectedCode(codeData.code);
-                        }}
-                      >
-                        {quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0 ? (
-                          <Checkbox checked={true} color="success" />
-                        ) : (
-                          <Checkbox checked={false} />
-                        )}
+            {chosenCondition === "both" ? (
+              <h2>
+                The participant chose both conditions for passage {chosenPassage} and passage {otherPassage}.
+              </h2>
+            ) : (
+              <h2>
+                The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
+                {otherPassage}.
+              </h2>
+            )}
+            <ol>
+              <li>
+                Read the participant's qualitative response that we've divided into sentences and listed in the right
+                box below.
+              </li>
+              <li>Click and read every single code from the codebook listed in the left box below.</li>
+              <li>
+                If you see any sentence in the right box that indicates the clicked code in the left box, check-mark
+                that sentence in the right box.
+              </li>
+              <li>
+                For every code, if you check any of the sentences, it also check-marks the code indicating that the code
+                was mentioned by the participant due to the sentence that you checked.
+              </li>
+              <li>Select all the sentences that apply to the code you have selected.</li>
+              <li>
+                After going through all the codes, if you found an important point in the participant's feedback that is
+                not mentioned in any of the codes in the codebook, then you can manually add a new concise code that
+                summarizes the important point in the box on the bottom left. Clicking the add button will add this new
+                code to the codebook.
+              </li>
+              <li>
+                For every code that you select, please click the switch next to it, to specify which experimental
+                condition the participant has mentioned this code about.
+              </li>
+              <li>
+                In the final paper, we need to quote some of the sentences from the users' feedback. If you find any
+                sentence that seems very supportive of each of the codes that you select and you think it's valuable
+                enough to be quoted in the final paper, please click the "Save as Quote" button next it.
+              </li>
+            </ol>
+          </Alert>
 
-                        <Box sx={{ display: "inline" }}>{codeData.code}</Box>
-                      </ListItemButton>
-
-                      {project === "H2K2" ? "H2" : "H1"}
-                      <Switch
-                        checked={switchState[codeData.code]}
-                        onChange={event => changeChoices(event, codeData.code)}
-                        color="secondary"
-                      />
-                      {project === "H2K2" ? "K2" : "L2"}
-                    </ListItem>
-                  ))}
-                </List>
-              </Sheet>
-
-              <Alert severity="success" className="VoteActivityAlert">
-                If the code you're looking for does not exist in the list above, add it below:
-                <br />
-              </Alert>
-
-              <TextareaAutosize
-                style={{ width: "80%", alignItems: "center" }}
-                minRows={7}
-                placeholder={"Add your code here."}
-                onChange={event => setNewCode(event.currentTarget.value)}
-                value={newCode}
-              />
+          <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: 0
+              }}
+            >
               <Box>
-                <Button
-                  variant="contained"
-                  style={{ margin: "5px 5px 5px 5ox" }}
-                  onClick={handleAddNewCode}
-                  disabled={(!newCode || newCode === "") && !creating}
-                >
-                  {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
-                </Button>
-              </Box>
-            </Box>
-            <Box>
-              <Sheet variant="outlined">
-                <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
-                <List
-                  sx={{
-                    paddingBlock: 1,
-                    width: 700,
-                    height: 500,
-                    "--List-decorator-width": "48px",
-                    "--List-item-paddingLeft": "1.5rem",
-                    "--List-item-paddingRight": "1rem"
-                  }}
-                >
-                  {sentences.map((sentence, index) => (
-                    <ListItem key={index} disablePadding>
-                      <ListItemButton role={undefined} onClick={handleQuotesSelected(sentence)} dense>
-                        <ListItemIcon>
-                          {quotesSelectedForCodes[selecte] && quotesSelectedForCodes[selecte].includes(sentence) ? (
-                            <Checkbox checked={true} />
+                <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                  <h2>The Codebook</h2>
+                  <List
+                    sx={{
+                      paddingBlock: 1,
+                      maxWidth: 500,
+                      height: 500,
+                      "--List-decorator-width": "48px",
+                      "--List-item-paddingLeft": "1.5rem"
+                    }}
+                  >
+                    {approvedCodes.map(codeData => (
+                      <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
+                        <ListItemButton
+                          value={codeData.code}
+                          onClick={() => {
+                            handleSelectedCode(codeData.code);
+                          }}
+                        >
+                          {quotesSelectedForCodes[codeData.code] &&
+                          quotesSelectedForCodes[codeData.code].length !== 0 ? (
+                            <Checkbox checked={true} color="success" />
                           ) : (
                             <Checkbox checked={false} />
                           )}
-                        </ListItemIcon>
-                        <ListItemText id={sentence} primary={`${sentence}`} />
-                      </ListItemButton>
 
-                      <Button
-                        mode="outlined"
-                        disabled={!enableSaveQuote}
-                        onClick={saveQuote(sentence)}
-                        variant="contained"
-                      >
-                        Save As A Quote
-                      </Button>
-                    </ListItem>
-                  ))}
-                </List>
-              </Sheet>
+                          <Box sx={{ display: "inline" }}>{codeData.code}</Box>
+                        </ListItemButton>
+
+                        {project === "H2K2" ? "H2" : "H1"}
+                        <Switch
+                          checked={switchState[codeData.code]}
+                          onChange={event => changeChoices(event, codeData.code)}
+                          color="secondary"
+                        />
+                        {project === "H2K2" ? "K2" : "L2"}
+                      </ListItem>
+                    ))}
+                  </List>
+                </Sheet>
+
+                <Alert severity="success" className="VoteActivityAlert">
+                  If the code you're looking for does not exist in the list above, add it below:
+                  <br />
+                </Alert>
+
+                <TextareaAutosize
+                  style={{ width: "80%", alignItems: "center" }}
+                  minRows={7}
+                  placeholder={"Add your code here."}
+                  onChange={event => setNewCode(event.currentTarget.value)}
+                  value={newCode}
+                />
+                <Box>
+                  <Button
+                    variant="contained"
+                    style={{ margin: "5px 5px 5px 5ox" }}
+                    onClick={handleAddNewCode}
+                    disabled={(!newCode || newCode === "") && !creating}
+                  >
+                    {creating ? <CircularProgress color="warning" size="16px" /> : "Create"}
+                  </Button>
+                </Box>
+              </Box>
+              <Box>
+                <Sheet variant="outlined">
+                  <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
+                  <List
+                    sx={{
+                      paddingBlock: 1,
+                      width: 800,
+                      height: 500
+                    }}
+                  >
+                    {sentences.map((sentence, index) => (
+                      <ListItem key={index} disablePadding>
+                        <ListItemButton
+                          role={undefined}
+                          style={{ width: 500}}
+                          onClick={handleQuotesSelected(sentence)}
+                          dense
+                        >
+                          <ListItemIcon>
+                            {quotesSelectedForCodes[selecte] && quotesSelectedForCodes[selecte].includes(sentence) ? (
+                              <Checkbox checked={true} />
+                            ) : (
+                              <Checkbox checked={false} />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText id={sentence} primary={`${sentence}`} />
+                        </ListItemButton>
+
+                        <Button
+                          mode="outlined"
+                          disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
+                          onClick={saveQuote(sentence)}
+                          variant="contained"
+                        >
+                          <BookmarkIcon />
+                          Save As A Quote
+                        </Button>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Sheet>
+              </Box>
+              <Box>
+                <Button
+                  variant="contained"
+                  style={{ margin: "19px 500px 10px 580px" }}
+                  onClick={handleSubmit}
+                  color="success"
+                  size="large"
+                  disabled={submitting}
+                  className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+                >
+                  {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
+                </Button>
+              </Box>
             </Box>
-            <Box>
-              <Button
-                variant="contained"
-                style={{ margin: "19px 500px 10px 580px" }}
-                onClick={handleSubmit}
-                color="success"
-                size="large"
-                disabled={submitting}
-                className={!submitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-              >
-                {submitting ? <CircularProgress color="warning" size="16px" /> : "Submit"}
-              </Button>
-            </Box>
-          </Box>
-          <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
-        </Paper>
+            <Box style={{ width: 600, margin: "60px 50px 100px 500px" }}></Box>
+          </Paper>
+        </>
+      ) : (
+        <CircularProgress color="warning" sx={{ margin: "300px 600px 500px 580px" }} size="100px" />
       )}
 
       {email === "oneweb@umich.edu" && (
