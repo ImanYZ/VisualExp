@@ -85,7 +85,7 @@ const CodeFeedback = props => {
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
-  const [conditionsOrder, setConditionsOrder] = useState("");
+  const [conditionsOrder, setConditionsOrder] = useState([]);
   const [chosenCondition, setChosenCondition] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
@@ -358,15 +358,17 @@ const CodeFeedback = props => {
               quotesSelectedForCode[code] = [];
             }
             setQuotesSelectedForCodes(quotesSelectedForCode);
-            let cOrders =
-              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition;
+            const cOrders = [
+              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition
+            ];
             if (userData.pConditions.length > 1) {
               const secondPassageDoc = await firebase.db
                 .collection("passages")
                 .doc(userData.pConditions[1].passage)
                 .get();
-              cOrders +=
-                "\n2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition;
+              cOrders.push(
+                "2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition
+              );
             }
             setConditionsOrder(cOrders);
 
@@ -394,15 +396,17 @@ const CodeFeedback = props => {
             setDocId(feedbackDoc.id);
             setSentences(response);
             setChosenCondition(feedbackData.choice);
-            let cOrders =
-              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition;
+            const cOrders = [
+              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition
+            ];
             if (userData.pConditions.length > 1) {
               const secondPassageDoc = await firebase.db
                 .collection("passages")
                 .doc(userData.pConditions[1].passage)
                 .get();
-              cOrders +=
-                "\n2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition;
+              cOrders.push(
+                "2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition
+              );
             }
             setConditionsOrder(cOrders);
             foundResponse = true;
@@ -1017,7 +1021,13 @@ const CodeFeedback = props => {
       {sentences.length !== 0 ? (
         <>
           <Alert severity="warning">
-            <h2>{conditionsOrder}</h2>
+            <h2>
+              <ul>
+                {conditionsOrder.map((cOrder, idx) => {
+                  return <li key={"cOrder" + idx}>{cOrder}</li>;
+                })}
+              </ul>
+            </h2>
 
             <h2>
               The participant chose {chosenCondition} condition
