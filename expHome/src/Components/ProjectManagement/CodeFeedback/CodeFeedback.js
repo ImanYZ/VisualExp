@@ -358,17 +358,13 @@ const CodeFeedback = props => {
               quotesSelectedForCode[code] = [];
             }
             setQuotesSelectedForCodes(quotesSelectedForCode);
-            const cOrders = [
-              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition
-            ];
+            const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
             if (userData.pConditions.length > 1) {
               const secondPassageDoc = await firebase.db
                 .collection("passages")
                 .doc(userData.pConditions[1].passage)
                 .get();
-              cOrders.push(
-                "2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition
-              );
+              cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
             }
             setConditionsOrder(cOrders);
 
@@ -396,17 +392,13 @@ const CodeFeedback = props => {
             setDocId(feedbackDoc.id);
             setSentences(response);
             setChosenCondition(feedbackData.choice);
-            const cOrders = [
-              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition
-            ];
+            const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
             if (userData.pConditions.length > 1) {
               const secondPassageDoc = await firebase.db
                 .collection("passages")
                 .doc(userData.pConditions[1].passage)
                 .get();
-              cOrders.push(
-                "2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition
-              );
+              cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
             }
             setConditionsOrder(cOrders);
             foundResponse = true;
@@ -1029,10 +1021,7 @@ const CodeFeedback = props => {
               </ul>
             </h2>
 
-            <h2>
-              The participant chose {chosenCondition} condition
-              {["Both", "Neither"].includes(chosenCondition) ? "s" : ""}.
-            </h2>
+            <h2>The participant chose {chosenCondition}.</h2>
             <ol>
               <li>
                 Read the participant's qualitative response that we've divided into sentences and listed in the right
