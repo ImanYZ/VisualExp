@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
@@ -264,7 +264,7 @@ const CodeFeedback = props => {
     if (approvedCodes.length > 0) {
       const _choiceConditions = {};
       const _switchState = {};
-      let quotesSelectedForCode = { ...quotesSelectedForCodes };
+      let quotesSelectedForCode = {};
       let codesSelecting = {};
       for (let codeData of approvedCodes) {
         quotesSelectedForCode[codeData.code] = [];
@@ -302,124 +302,144 @@ const CodeFeedback = props => {
     });
   }, [allExperimentCodes]);
 
-  useEffect(() => {
-    const func = async () => {
-      let foundResponse = false;
-      const feedbackCodesDocs = await firebase.db
-        .collection("feedbackCode")
-        .where("project", "==", project)
-        .where("approved", "==", false)
-        .get();
+  const retriveNextResponse = useCallback(async () => {
+    const feedbackCodesDocs = await firebase.db
+      .collection("feedbackCode")
+      .where("project", "==", project)
+      .where("approved", "==", false)
+      .get();
+    let foundResponse = false;
+    for (let feedbackDoc of feedbackCodesDocs.docs) {
+      const feedbackData = feedbackDoc.data();
+      const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+      const userData = userDoc.data();
+      if (
+        userData.pConditions.length > 1 &&
+        passagesInH2K2.includes(userData.pConditions[0].passage) &&
+        passagesInH2K2.includes(userData.pConditions[1].passage)
+      ) {
+        const chosenPassageDoc = await firebase.db
+          .collection("passages")
+          .doc(userData.pConditions[feedbackData.expIdx].passage)
+          .get();
 
-      for (let feedbackDoc of feedbackCodesDocs.docs) {
-        const feedbackData = feedbackDoc.data();
-        const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
-        const userData = userDoc.data();
-        if (
-          userData.pConditions.length > 1 &&
-          passagesInH2K2.includes(userData.pConditions[0].passage) &&
-          passagesInH2K2.includes(userData.pConditions[1].passage)
-        ) {
-          setConditionsOrder(
-            "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
-          );
-          const chosenPassageDoc = await firebase.db
-            .collection("passages")
-            .doc(userData.pConditions[feedbackData.expIdx].passage)
-            .get();
-          if (userData.pConditions.length > 1) {
-            const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
-            setOtherCondition(userData.pConditions[otherConditionIdx].condition);
-            const otherPassageDoc = await firebase.db
-              .collection("passages")
-              .doc(userData.pConditions[otherConditionIdx].passage)
-              .get();
-            setOtherPassage(otherPassageDoc.data().title);
-          }
-          const lengthSentence = feedbackData.explanation.split(".").length;
-          let response;
-          if (lengthSentence > 1) {
-            response = feedbackData.explanation.split(".", lengthSentence - 1);
-          } else {
-            response = feedbackData.explanation.split(".");
+        const lengthSentence = feedbackData.explanation.split(".").length;
+        let response;
+        if (lengthSentence > 1) {
+          response = feedbackData.explanation.split(".", lengthSentence - 1);
+        } else {
+          response = feedbackData.explanation.split(".");
+        }
+
+        //we check if the authenticated reserchers have aleardy casted his vote
+        //if so we get all his recorded past choices
+        if (feedbackData.coders.includes(fullname)) {
+          let voteAgain = false;
+          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+          const approvedCodesStrings = approvedCodes
+            .map(data => {
+              return data.code;
+            })
+            .sort();
+          // if the string representations of these arrays ar enot same that means they have been changed.
+          for (let approvedCode of approvedCodesStrings) {
+            if (!myCodes.includes(approvedCode)) {
+              voteAgain = true;
+            }
           }
 
-          //we check if the authenticated reserchers have aleardy casted his vote
-          //if so we get all his recorded past choices
-          if (feedbackData.coders.includes(fullname)) {
-            let voteAgain = false;
-            const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+          if (voteAgain) {
+            const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+            setApprovedNewCodes(newCodes);
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            setChosenPassage(chosenPassageDoc.data().title);
+            setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
+
+            const quotesSelectedForCode = { ...quotesSelectedForCodes };
+            for (let code of myCodes) {
+              quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
+            }
+            for (let code of newCodes) {
+              quotesSelectedForCode[code] = [];
+            }
+            setQuotesSelectedForCodes(quotesSelectedForCode);
+            setConditionsOrder(
+              "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
+            );
+            if (userData.pConditions.length > 1) {
+              const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
+              setOtherCondition(userData.pConditions[otherConditionIdx].condition);
+              const otherPassageDoc = await firebase.db
+                .collection("passages")
+                .doc(userData.pConditions[otherConditionIdx].passage)
+                .get();
+              setOtherPassage(otherPassageDoc.data().title);
+            }
+
+            foundResponse = true;
+          }
+          // if the authenticated researcher didn't vote on this  explanation yet
+          // we check if all the others coders who previously casted their vote that they checked
+          //the new code added ,so that way we would know if we can show this explanation or not
+        } else if (!feedbackData.coders.includes(fullname)) {
+          setApprovedNewCodes([]);
+          let allowOtherResearchersToVote = true;
+          for (let coder of feedbackData.coders) {
+            const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
             const approvedCodesStrings = approvedCodes
               .map(data => {
                 return data.code;
               })
               .sort();
-            for (let approvedCode of approvedCodesStrings) {
-              if (!myCodes.includes(approvedCode)) {
-                voteAgain = true;
-              }
-            }
-            // if the string representations of these arrays ar enot same that means they have been changed.
-            if (voteAgain) {
-              const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-              setApprovedNewCodes(newCodes);
-              setDocId(feedbackDoc.id);
-              setSentences(response);
-              setChosenPassage(chosenPassageDoc.data().title);
-              setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
-              foundResponse = true;
-              for (let code of myCodes) {
-                quotesSelectedForCodes[code] = feedbackData.codersChoices[fullname][code];
-              }
-              for (let code of newCodes) {
-                quotesSelectedForCodes[code] = [];
-              }
-              setQuotesSelectedForCodes(quotesSelectedForCodes);
-            }
-            // if the authenticated researcher didn't vote on this  explanation yet
-            // we check if all the others coders who previously casted their vote that they checked
-            //the new code added ,so that way we would know if we can show this explanation or not
-          } else if (!feedbackData.coders.includes(fullname)) {
-            setApprovedNewCodes([]);
-            let allowOtherResearchersToVote = true;
-            for (let coder of feedbackData.coders) {
-              const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
-              const approvedCodesStrings = approvedCodes
-                .map(data => {
-                  return data.code;
-                })
-                .sort();
 
-              if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
-                allowOtherResearchersToVote = false;
-              }
-            }
-            if (allowOtherResearchersToVote) {
-              setDocId(feedbackDoc.id);
-              setSentences(response);
-              foundResponse = true;
+            if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
+              allowOtherResearchersToVote = false;
             }
           }
-        }
-
-        setSubmitting(false);
-
-        if (foundResponse) {
-          break;
+          if (allowOtherResearchersToVote) {
+            setDocId(feedbackDoc.id);
+            setSentences(response);
+            setChosenPassage(chosenPassageDoc.data().title);
+            setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
+            setConditionsOrder(
+              "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
+            );
+            if (userData.pConditions.length > 1) {
+              const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
+              setOtherCondition(userData.pConditions[otherConditionIdx].condition);
+              const otherPassageDoc = await firebase.db
+                .collection("passages")
+                .doc(userData.pConditions[otherConditionIdx].passage)
+                .get();
+              setOtherPassage(otherPassageDoc.data().title);
+            }
+            foundResponse = true;
+          }
         }
       }
-    };
 
-    func();
-  }, [firebase, retrieveNext, project, codeBooksLoaded]);
+      if (foundResponse) {
+        break;
+      }
+      setSubmitting(false);
+    }
+  }, [retrieveNext, project]);
+
+  useEffect(() => {
+    retriveNextResponse();
+    return () => {
+      return;
+    };
+  }, [retrieveNext]);
 
   // add new code to the database
   const handleAddNewCode = async () => {
     setCreating(true);
 
-    const researcherRef = await firebase.db.collection("researchers").doc(fullname);
+    const researcherRef = firebase.db.collection("researchers").doc(fullname);
     const researcherGet = await researcherRef.get();
-    const researcherData = await researcherGet.data();
+    const researcherData = researcherGet.data();
 
     const researcherUpdates = {
       projects: {
@@ -950,7 +970,7 @@ const CodeFeedback = props => {
               }}
             >
               {unApprovedCodes.map(codeData => (
-                <ListItem key={codeData.id} disablePadding>
+                <ListItem key={codeData.id}>
                   <Box sx={{ display: "inline", mr: "19px" }}>
                     <IconButton
                       edge="end"
@@ -992,7 +1012,7 @@ const CodeFeedback = props => {
             added, please add your choice(s) for these codes and feel free to change your votes:
             <List>
               {approvedNewCodes.map(codeData => (
-                <div key={codeData.id} disablePadding selected={selected[codeData.code]}>
+                <div key={codeData.id} selected={selected[codeData.code]}>
                   <strong>{codeData.code}</strong>
                 </div>
               ))}
@@ -1003,10 +1023,17 @@ const CodeFeedback = props => {
       {sentences.length !== 0 && (
         <Alert severity="warning">
           <h2>{conditionsOrder}</h2>
-          <h2>
-            The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
-            {otherPassage}.
-          </h2>
+
+          {chosenCondition === "both" ? (
+            <h2>
+              The participant chose both conditions for passage {chosenPassage} and passage {otherPassage}.
+            </h2>
+          ) : (
+            <h2>
+              The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
+              {otherPassage}.
+            </h2>
+          )}
           <ol>
             <li>
               Read the participant's qualitative response that we've divided into sentences and listed in the right box
@@ -1142,7 +1169,6 @@ const CodeFeedback = props => {
 
                       <Button
                         mode="outlined"
-                        uppercase={false}
                         disabled={!enableSaveQuote}
                         onClick={saveQuote(sentence)}
                         variant="contained"
