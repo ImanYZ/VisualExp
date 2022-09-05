@@ -87,9 +87,6 @@ const CodeFeedback = props => {
   const [code, setCode] = useState("");
   const [conditionsOrder, setConditionsOrder] = useState("");
   const [chosenCondition, setChosenCondition] = useState("");
-  const [chosenPassage, setChosenPassage] = useState("");
-  const [otherCondition, setOtherCondition] = useState("");
-  const [otherPassage, setOtherPassage] = useState("");
   const [feedbackCodeTitle, setFeedbackCodeTitle] = useState("");
   const [adminCodeData, setAdminCodeData] = useState({});
   // modal options
@@ -312,6 +309,7 @@ const CodeFeedback = props => {
     let foundResponse = false;
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
+      setChosenCondition(feedbackData.choice);
       const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
       const userData = userDoc.data();
       if (
@@ -319,10 +317,7 @@ const CodeFeedback = props => {
         passagesInH2K2.includes(userData.pConditions[0].passage) &&
         passagesInH2K2.includes(userData.pConditions[1].passage)
       ) {
-        const chosenPassageDoc = await firebase.db
-          .collection("passages")
-          .doc(userData.pConditions[feedbackData.expIdx].passage)
-          .get();
+        const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
 
         const lengthSentence = feedbackData.explanation.split(".").length;
         let response;
@@ -354,8 +349,6 @@ const CodeFeedback = props => {
             setApprovedNewCodes(newCodes);
             setDocId(feedbackDoc.id);
             setSentences(response);
-            setChosenPassage(chosenPassageDoc.data().title);
-            setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
 
             const quotesSelectedForCode = { ...quotesSelectedForCodes };
             for (let code of myCodes) {
@@ -365,18 +358,17 @@ const CodeFeedback = props => {
               quotesSelectedForCode[code] = [];
             }
             setQuotesSelectedForCodes(quotesSelectedForCode);
-            setConditionsOrder(
-              "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
-            );
+            let cOrders =
+              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition;
             if (userData.pConditions.length > 1) {
-              const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
-              setOtherCondition(userData.pConditions[otherConditionIdx].condition);
-              const otherPassageDoc = await firebase.db
+              const secondPassageDoc = await firebase.db
                 .collection("passages")
-                .doc(userData.pConditions[otherConditionIdx].passage)
+                .doc(userData.pConditions[1].passage)
                 .get();
-              setOtherPassage(otherPassageDoc.data().title);
+              cOrders +=
+                "\n2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition;
             }
+            setConditionsOrder(cOrders);
 
             foundResponse = true;
           }
@@ -401,20 +393,18 @@ const CodeFeedback = props => {
           if (allowOtherResearchersToVote) {
             setDocId(feedbackDoc.id);
             setSentences(response);
-            setChosenPassage(chosenPassageDoc.data().title);
-            setChosenCondition(userData.pConditions[feedbackData.expIdx].condition);
-            setConditionsOrder(
-              "1st Passage: " + userData.pConditions[0].condition + " 2nd Passage: " + userData.pConditions[1].condition
-            );
+            setChosenCondition(feedbackData.choice);
+            let cOrders =
+              "1st Passage: " + firstPassageDoc.data().title + " under " + userData.pConditions[0].condition;
             if (userData.pConditions.length > 1) {
-              const otherConditionIdx = feedbackData.expIdx === 0 ? 1 : 0;
-              setOtherCondition(userData.pConditions[otherConditionIdx].condition);
-              const otherPassageDoc = await firebase.db
+              const secondPassageDoc = await firebase.db
                 .collection("passages")
-                .doc(userData.pConditions[otherConditionIdx].passage)
+                .doc(userData.pConditions[1].passage)
                 .get();
-              setOtherPassage(otherPassageDoc.data().title);
+              cOrders +=
+                "\n2nd Passage: " + secondPassageDoc.data().title + " under " + userData.pConditions[1].condition;
             }
+            setConditionsOrder(cOrders);
             foundResponse = true;
           }
         }
@@ -525,7 +515,6 @@ const CodeFeedback = props => {
       });
       setRetrieveNext(oldValue => oldValue + 1);
       setSentences("");
-      setChosenPassage("");
       setChosenCondition("");
       setSnackbarMessage("Your evaluation was submitted successfully.");
       setSubmitting(false);
@@ -1030,16 +1019,10 @@ const CodeFeedback = props => {
           <Alert severity="warning">
             <h2>{conditionsOrder}</h2>
 
-            {chosenCondition === "both" ? (
-              <h2>
-                The participant chose both conditions for passage {chosenPassage} and passage {otherPassage}.
-              </h2>
-            ) : (
-              <h2>
-                The participant chose {chosenCondition} / passage {chosenPassage}, over {otherCondition} / passage{" "}
-                {otherPassage}.
-              </h2>
-            )}
+            <h2>
+              The participant chose {chosenCondition} condition
+              {["Both", "Neither"].includes(chosenCondition) ? "s" : ""}.
+            </h2>
             <ol>
               <li>
                 Read the participant's qualitative response that we've divided into sentences and listed in the right
@@ -1161,7 +1144,7 @@ const CodeFeedback = props => {
                       <ListItem key={index} disablePadding>
                         <ListItemButton
                           role={undefined}
-                          style={{ width: 500}}
+                          style={{ width: 500 }}
                           onClick={handleQuotesSelected(sentence)}
                           dense
                         >
