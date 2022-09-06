@@ -383,11 +383,12 @@ const CodeFeedback = props => {
                 return data.code;
               })
               .sort();
-
-            if (JSON.stringify(myCodes) !== JSON.stringify(approvedCodesStrings)) {
-              allowOtherResearchersToVote = false;
+            // if the some of the approved codes doesn't exist the codeschoices for coders we should not allow the auth reserhers to vote on it yet
+            for (let approvedCode of approvedCodesStrings) {
+              if (!myCodes.includes(approvedCode)) {
+                allowOtherResearchersToVote = false;
+              }
             }
-          }
           if (allowOtherResearchersToVote) {
             setDocId(feedbackDoc.id);
             setSentences(response);
@@ -411,7 +412,7 @@ const CodeFeedback = props => {
       }
       setSubmitting(false);
     }
-  }, [retrieveNext, project]);
+  }}, [retrieveNext, project]);
 
   useEffect(() => {
     retriveNextResponse();
@@ -821,7 +822,7 @@ const CodeFeedback = props => {
         return index + 1;
       };
       try {
-        await questionArray.map(async (x, index) => {
+         questionArray.map(async (x, index) => {
           const docRef = await feedbackCodeBooksRef.add({
             project,
             approved: true,
