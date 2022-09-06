@@ -549,7 +549,7 @@ exports.retrieveData = async (req, res) => {
             const questions = passages[pCond.passage].questions;
             for (let idx = 0; idx < questions.length; idx++) {
               if (pCond.test) {
-                rowLong = [...row];
+                rowLong = row.slice(0, 15);
                 rowLong.push("1st");
                 rowLong.push(pCond.passage + "Q" + idx);
                 rowLong.push(questions[idx].type);
@@ -557,7 +557,7 @@ exports.retrieveData = async (req, res) => {
                 rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
                 rowsLongData.push(rowLong);
                 if (pCond.test3Days) {
-                  rowLong = [...row];
+                  rowLong = row.slice(0, 15);
                   rowLong.push("2nd");
                   rowLong.push(pCond.passage + "Q" + idx);
                   rowLong.push(questions[idx].type);
@@ -565,7 +565,7 @@ exports.retrieveData = async (req, res) => {
                   rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
                   rowsLongData.push(rowLong);
                   if (pCond.test1Week) {
-                    rowLong = [...row];
+                    rowLong = row.slice(0, 15);
                     rowLong.push("3rd");
                     rowLong.push(pCond.passage + "Q" + idx);
                     rowLong.push(questions[idx].type);
