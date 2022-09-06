@@ -79,19 +79,18 @@ const getDateString = dateObj => {
 };
 
 const getDateTimeString = dateObj => {
-  const m = dateObj.getDate();
   return (
-    m.getUTCFullYear() +
+    dateObj.getUTCFullYear() +
     "/" +
-    ("0" + (m.getUTCMonth() + 1)).slice(-2) +
+    ("0" + (dateObj.getUTCMonth() + 1)).slice(-2) +
     "/" +
-    ("0" + m.getUTCDate()).slice(-2) +
+    ("0" + dateObj.getUTCDate()).slice(-2) +
     " " +
-    ("0" + m.getUTCHours()).slice(-2) +
+    ("0" + dateObj.getUTCHours()).slice(-2) +
     ":" +
-    ("0" + m.getUTCMinutes()).slice(-2) +
+    ("0" + dateObj.getUTCMinutes()).slice(-2) +
     ":" +
-    ("0" + m.getUTCSeconds()).slice(-2)
+    ("0" + dateObj.getUTCSeconds()).slice(-2)
   );
 };
 
