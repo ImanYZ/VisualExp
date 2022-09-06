@@ -573,7 +573,7 @@ exports.retrieveData = async (req, res) => {
           // Three participants had issues with their demographic data and modified them a few days later.
           if (pretestToEnd && pretestToEnd > 90) {
             pretestToEnd = "";
-          } else if (pretestToEnd && pretestToEnd < 0) {
+          } else if (pretestToEnd && pretestToEnd < 5) {
             pretestToEnd = "";
           }
           row.push(pretestToEnd);
@@ -584,7 +584,7 @@ exports.retrieveData = async (req, res) => {
                     userData.pConditions[0].recall3DaysStart.toDate().getTime()) /
                   60000
                 : "";
-            if (secondDuration && secondDuration > 0) {
+            if (secondDuration && secondDuration > 5) {
               row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
               row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
               row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
@@ -633,7 +633,7 @@ exports.retrieveData = async (req, res) => {
                     userData.pConditions[0].recall1WeekStart.toDate().getTime()) /
                   60000
                 : "";
-            if (thirdDuration && thirdDuration > 0) {
+            if (thirdDuration && thirdDuration > 5) {
               row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
               row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
               row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
