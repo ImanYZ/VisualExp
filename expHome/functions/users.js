@@ -572,98 +572,104 @@ exports.retrieveData = async (req, res) => {
               : "";
           // Three participants had issues with their demographic data and modified them a few days later.
           if (pretestToEnd && pretestToEnd > 90) {
-            pretestToEnd = 60;
+            pretestToEnd = "";
           } else if (pretestToEnd && pretestToEnd < 0) {
-            pretestToEnd = 45;
+            pretestToEnd = "";
           }
           row.push(pretestToEnd);
           if (userData.post3DaysQsEnded) {
-            row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
-            row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
-            row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
-            row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
-            row.push("recall3DaysStart" in pCond ? getDateTimeString(pCond.recall3DaysStart.toDate()) : "");
-            row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
-            row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-            row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
-            // itemScore = 0;
-            // isGraded = false;
-            // recallreGrade = 0;
-            // if (
-            //   userDoc.id in recallGrades &&
-            //   pCond.passage in recallGrades[userDoc.id] &&
-            //   "2nd" in recallGrades[userDoc.id][pCond.passage]
-            // ) {
-            //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
-            //     itemScore = 0;
-            //     for (let grade of recallGradePhrase) {
-            //       itemScore += grade;
-            //     }
-            //     recallreGrade += itemScore / recallGradePhrase.length;
-            //     isGraded = true;
-            //   }
-            // }
-            // row.push(isGraded ? recallreGrade : "");
-            row.push(pCond.test3DaysEnded ? getDateTimeString(pCond.test3DaysEnded.toDate()) : "");
-            row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
-            row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
-            row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
             let secondDuration =
               "post3DaysQsEnded" in userData && "recall3DaysStart" in userData.pConditions[0]
                 ? (userData.post3DaysQsEnded.toDate().getTime() -
                     userData.pConditions[0].recall3DaysStart.toDate().getTime()) /
                   60000
                 : "";
-            if (secondDuration && secondDuration < 0) {
-              secondDuration = 15;
+            if (secondDuration && secondDuration > 0) {
+              row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
+              row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
+              row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
+              row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
+              row.push("recall3DaysStart" in pCond ? getDateTimeString(pCond.recall3DaysStart.toDate()) : "");
+              row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
+              row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
+              row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
+              // itemScore = 0;
+              // isGraded = false;
+              // recallreGrade = 0;
+              // if (
+              //   userDoc.id in recallGrades &&
+              //   pCond.passage in recallGrades[userDoc.id] &&
+              //   "2nd" in recallGrades[userDoc.id][pCond.passage]
+              // ) {
+              //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["2nd"]) {
+              //     itemScore = 0;
+              //     for (let grade of recallGradePhrase) {
+              //       itemScore += grade;
+              //     }
+              //     recallreGrade += itemScore / recallGradePhrase.length;
+              //     isGraded = true;
+              //   }
+              // }
+              // row.push(isGraded ? recallreGrade : "");
+              row.push(pCond.test3DaysEnded ? getDateTimeString(pCond.test3DaysEnded.toDate()) : "");
+              row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
+              row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
+              row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
+              row.push(secondDuration);
+            } else {
+              for (let idx = 0; idx < 13; idx++) {
+                row.push("");
+              }
             }
-            row.push(secondDuration);
           } else {
             for (let idx = 0; idx < 13; idx++) {
               row.push("");
             }
           }
           if (userData.post1WeekQsEnded) {
-            row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
-            row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
-            row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
-            row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
-            row.push("recall1WeekStart" in pCond ? getDateTimeString(pCond.recall1WeekStart.toDate()) : "");
-            row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
-            row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-            row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
-            // itemScore = 0;
-            // isGraded = false;
-            // recallreGrade = 0;
-            // if (
-            //   userDoc.id in recallGrades &&
-            //   pCond.passage in recallGrades[userDoc.id] &&
-            //   "3rd" in recallGrades[userDoc.id][pCond.passage]
-            // ) {
-            //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
-            //     itemScore = 0;
-            //     for (let grade of recallGradePhrase) {
-            //       itemScore += grade;
-            //     }
-            //     recallreGrade += itemScore / recallGradePhrase.length;
-            //     isGraded = true;
-            //   }
-            // }
-            // row.push(isGraded ? recallreGrade : "");
-            row.push(pCond.test1WeekEnded ? getDateTimeString(pCond.test1WeekEnded.toDate()) : "");
-            row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
-            row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
-            row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
             let thirdDuration =
               "post1WeekQsEnded" in userData && "recall1WeekStart" in userData.pConditions[0]
                 ? (userData.post1WeekQsEnded.toDate().getTime() -
                     userData.pConditions[0].recall1WeekStart.toDate().getTime()) /
                   60000
                 : "";
-            if (thirdDuration && thirdDuration < 0) {
-              thirdDuration = 15;
+            if (thirdDuration && thirdDuration > 0) {
+              row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
+              row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
+              row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
+              row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
+              row.push("recall1WeekStart" in pCond ? getDateTimeString(pCond.recall1WeekStart.toDate()) : "");
+              row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
+              row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
+              row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
+              // itemScore = 0;
+              // isGraded = false;
+              // recallreGrade = 0;
+              // if (
+              //   userDoc.id in recallGrades &&
+              //   pCond.passage in recallGrades[userDoc.id] &&
+              //   "3rd" in recallGrades[userDoc.id][pCond.passage]
+              // ) {
+              //   for (let recallGradePhrase of recallGrades[userDoc.id][pCond.passage]["3rd"]) {
+              //     itemScore = 0;
+              //     for (let grade of recallGradePhrase) {
+              //       itemScore += grade;
+              //     }
+              //     recallreGrade += itemScore / recallGradePhrase.length;
+              //     isGraded = true;
+              //   }
+              // }
+              // row.push(isGraded ? recallreGrade : "");
+              row.push(pCond.test1WeekEnded ? getDateTimeString(pCond.test1WeekEnded.toDate()) : "");
+              row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
+              row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
+              row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
+              row.push(thirdDuration);
+            } else {
+              for (let idx = 0; idx < 13; idx++) {
+                row.push("");
+              }
             }
-            row.push(thirdDuration);
           } else {
             for (let idx = 0; idx < 13; idx++) {
               row.push("");
