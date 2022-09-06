@@ -39,7 +39,7 @@ const voteFn = async (voter, activity, vote) => {
         const researcherRef = db.collection("researchers").doc(activityData.fullname);
         const researcherDoc = await t.get(researcherRef);
         const researcherData = researcherDoc.data();
-        const voteQuery = db.collection("votes").where("activity", "==", activity).where("voter", "==", voter).limit(1);
+        const voteQuery = db.collection("votes").where("activity", "==", activity).where("voter", "==", voter).where("project","==",activityData.project).limit(1);
         const voteDocs = await t.get(voteQuery);
         let upVote = false;
         let noVote = false;
