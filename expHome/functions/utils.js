@@ -78,6 +78,23 @@ const getDateString = dateObj => {
   );
 };
 
+const getDateTimeString = dateObj => {
+  const m = dateObj.getDate();
+  return (
+    m.getUTCFullYear() +
+    "/" +
+    ("0" + (m.getUTCMonth() + 1)).slice(-2) +
+    "/" +
+    ("0" + m.getUTCDate()).slice(-2) +
+    " " +
+    ("0" + m.getUTCHours()).slice(-2) +
+    ":" +
+    ("0" + m.getUTCMinutes()).slice(-2) +
+    ":" +
+    ("0" + m.getUTCSeconds()).slice(-2)
+  );
+};
+
 const nextWeek = () => {
   let nextWeek = new Date();
   nextWeek = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -115,6 +132,7 @@ module.exports = {
   isToday,
   datesAreOnSameDay,
   getDateString,
+  getDateTimeString,
   nextWeek,
   capitalizeFirstLetter,
   capitalizeSentence,
