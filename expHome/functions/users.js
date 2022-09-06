@@ -699,7 +699,7 @@ exports.retrieveData = async (req, res) => {
           row.push("explanations" in userData && userData.explanations[pCIdx] ? userData.explanations[pCIdx] : "");
           row.push(userData.explanations3Days ? userData.explanations3Days[pCIdx] : "");
           row.push(userData.explanations1Week ? userData.explanations1Week[pCIdx] : "");
-          if (pretestToEnd && pretestToEnd > 90 && pretestToEnd < 5) {
+          if (pretestToEnd) {
             rowsData.push(row);
           }
         }
