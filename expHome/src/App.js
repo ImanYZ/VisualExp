@@ -343,6 +343,10 @@ const App = () => {
         ...userUpdates,
         pConditions
       };
+      userUpdates = {
+        ...userUpdates,
+        pConditions
+      };
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
@@ -362,7 +366,8 @@ const App = () => {
         }
       }
       if (allResponsesReady) {
-        for (let pCond of userData.pConditions) {
+        for (let index = 0; index < userData.pConditions.length; ++index) {
+          const pCond = userData.pConditions[index];
           passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
           passageData = passageDoc.data();
           for (let session of ["1st", "2nd", "3rd"]) {
@@ -371,24 +376,43 @@ const App = () => {
               responseName = "recall3DaysreText";
             } else if (session === "3rd") {
               responseName = "recall1WeekreText";
-            }
-            const recallGradeData = {
-              done: false,
-              condition: pCond.condition,
-              createdAt: currentTime,
-              passage: pCond.passage,
-              project: userData.project,
-              grades: [],
-              researchers: [],
-              researchersNum: 0,
-              session,
-              user: fullname,
-              response: pCond[responseName]
-            };
-            for (let phras of passageData.phrases) {
-              recallGradeData.phrase = phras;
-              const recallGradeRef = firebase.db.collection(collName).doc();
-              await firebase.batchSet(recallGradeRef, recallGradeData);
+            }            
+            const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
+            if (filtered.length > 2) {
+              const recallGradeData = {
+                done: false,
+                condition: pCond.condition,
+                createdAt: currentTime,
+                passage: pCond.passage,
+                project: userData.project,
+                grades: [],
+                researchers: [],
+                researchersNum: 0,
+                session,
+                user: fullname,
+                response: pCond[responseName]
+              };
+              for (let phras of passageData.phrases) {
+                recallGradeData.phrase = phras;
+                const recallGradeRef = firebase.db.collection(collName).doc();
+                await firebase.batchSet(recallGradeRef, recallGradeData);
+              }
+            } else {
+              let recallResponse;
+              switch (session) {
+                case "1st":
+                  recallResponse = "recallreGrade";
+                  break;
+                case "2nd":
+                  recallResponse = "recall3DaysreGrade";
+                  break;
+                case "3rd":
+                  recallResponse = "recall1WeekreGrade";
+                  break;
+                default:
+                // code block
+              }
+              userUpdates.pConditions[index][recallResponse] = 0;
             }
           }
         }
@@ -444,7 +468,7 @@ const App = () => {
                 coders: [],
                 choice: userData[choice],
                 project: userData.project,
-                fullname: userData.fullname,
+                fullname: fullname,
                 session: session,
                 explanation: response,
                 createdAt: new Date(),
