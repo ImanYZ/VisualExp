@@ -317,8 +317,9 @@ exports.bulkGradeFreeRecall = async (req, res) => {
 
                 // fetch all the researcher projects and
                 // check if it has in payload or not.
+
                 const researcherObj = otherResearchersData[recallGradeData.researchers[fResearcherIdx]];
-                const researcherHasProjectFromPayloadProject = project in researcherObj.projects;
+                const researcherHasProjectFromPayloadProject = project in researcherObj.data.projects;
                 if (
                   (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
                   (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
@@ -328,8 +329,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   // recall response.
                   recallGradeUpdates.approved = approved;
                   if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.projects[project].gradingPoints = researcherObj.projects[project].gradingPoints
-                      ? researcherObj.projects[project].gradingPoints + 0.5
+                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project].gradingPoints
+                      ? researcherObj.data.projects[project].gradingPoints + 0.5
                       : 0.5;
                   }
                 }
@@ -341,12 +342,12 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
                 ) {
                   if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.projects[project].gradingPoints = researcherObj.projects[project].gradingPoints
-                      ? researcherObj.projects[project].gradingPoints - 0.5
+                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project].gradingPoints
+                      ? researcherObj.data.projects[project].gradingPoints - 0.5
                       : -0.5;
-                    researcherObj.projects[project].negativeGradingPoints = researcherObj.projects[project]
+                    researcherObj.data.projects[project].negativeGradingPoints = researcherObj.data.projects[project]
                       .negativeGradingPoints
-                      ? researcherObj.projects[project].negativeGradingPoints + 0.5
+                      ? researcherObj.data.projects[project].negativeGradingPoints + 0.5
                       : 0.5;
                   }
                 }
