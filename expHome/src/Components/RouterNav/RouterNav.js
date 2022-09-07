@@ -196,7 +196,7 @@ const RouterNav = props => {
                 setExpPoints(0);
               }
               if (theProject.instructors) {
-                setInstructorPoints(Number.parseFloat(theProject.instructors).toFixed(1));
+                setInstructorPoints(theProject.instructors);
               } else {
                 setInstructorPoints(0);
               }
@@ -206,7 +206,7 @@ const RouterNav = props => {
                 setDayInstructorUpVotes(0);
               }
               if (theProject.administrators) {
-                setAdministratorPoints(Number.parseFloat(theProject.administrators).toFixed(1));
+                setAdministratorPoints(theProject.administrators);
               } else {
                 setAdministratorPoints(0);
               }
@@ -758,6 +758,8 @@ const RouterNav = props => {
     </Menu>
   );
 
+  const roundNum = (num) => Number(Number.parseFloat(Number(num).toFixed(2)));
+
   const navigate = useNavigate();
 
   return (
@@ -896,7 +898,7 @@ const RouterNav = props => {
                       <Tooltip
                         title={
                           <div>
-                            <div>You've earned {expPoints} points from running experiments.</div>
+                            <div>You've earned {roundNum(expPoints)} points from running experiments.</div>
                           </div>
                         }
                       >
@@ -907,7 +909,7 @@ const RouterNav = props => {
                           style={{ marginLeft: "19px" }}
                         >
                           <div>
-                            <span id="ExpPointsLabel">👨‍🔬 {expPoints}</span>
+                            <span id="ExpPointsLabel">👨‍🔬 {roundNum(expPoints)}</span>
                           </div>
                         </Button>
                       </Tooltip>
@@ -917,7 +919,7 @@ const RouterNav = props => {
                         title={
                           <div>
                             <div>
-                              You've earned {oneCademyPoints + dayOneUpVotes} total 1Cademy points, including{" "}
+                              You've earned {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)} total 1Cademy points, including{" "}
                               {oneCademyPoints} from others' votes and {dayOneUpVotes} points for casting 25 upvotes per
                               day on others' proposals.
                             </div>
@@ -932,10 +934,10 @@ const RouterNav = props => {
                         >
                           {username ? (
                             <div>
-                              <img src={favicon} width="15.1" /> {oneCademyPoints + dayOneUpVotes}
+                              <img src={favicon} width="15.1" /> {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)}
                               <br />✔ {oneCademyPoints}
                               <br />
-                              <span>🌞 {proposalUpvotesToday} / 25</span>
+                              <span>🌞 {roundNum(proposalUpvotesToday)} / 25</span>
                             </div>
                           ) : (
                             <div>
@@ -952,10 +954,10 @@ const RouterNav = props => {
                         title={
                           <div>
                             <div>
-                              You've earned {intellectualPoints} intellectual points from others' votes and{" "}
+                              You've earned {roundNum(intellectualPoints)} intellectual points from others' votes and{" "}
                               {upVotedDays} points for casting 25 upvotes per day on others' activities.
                             </div>
-                            <div>You cast {upVotedToday} / 25 up-votes today on others' activities.</div>
+                            <div>You cast {roundNum(upVotedToday)} / 25 up-votes today on others' activities.</div>
                           </div>
                         }
                       >
@@ -966,11 +968,11 @@ const RouterNav = props => {
                         >
                           <div>
                             <span>
-                              🎓 {intellectualPoints}
-                              <br />✔ {upVotedDays}
+                              🎓 {roundNum(intellectualPoints)}
+                              <br />✔ {roundNum(upVotedDays)}
                             </span>
                             <br />
-                            <span>🌞 {upVotedToday} / 25</span>
+                            <span>🌞 {roundNum(upVotedToday)} / 25</span>
                           </div>
                         </Button>
                       </Tooltip>
@@ -982,25 +984,25 @@ const RouterNav = props => {
                           projectPoints.dayInstructorUpVotes ? (
                             <div>
                               <div>
-                                You've earned {instructorPoints} instructor points from others' votes and{" "}
-                                {dayInstructorUpVotes} points for casting 16 upvotes per day on others' collected data.
+                                You've earned {roundNum(instructorPoints)} instructor points from others' votes and{" "}
+                                {roundNum(dayInstructorUpVotes)} points for casting 16 upvotes per day on others' collected data.
                               </div>
                               <div>
-                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected instructors'
+                                You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected instructors'
                                 data.
                               </div>
                             </div>
                           ) : (
                             <div>
                               <div>
-                                You've earned {Number(instructorPoints) + Number(dayInstructorUpVotes)} total points, including{" "}
+                                You've earned {roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)} total points, including{" "}
                                 {instructorPoints} points for collecting instructors' contact info and{" "}
                                 {dayInstructorUpVotes} points for casting 16 up-voting per day on other's collected
                                 data.
                               </div>
-                              <div>You collected {instructorsToday} / 7 instructors' info today.</div>
+                              <div>You collected {roundNum(instructorsToday)} / 7 instructors' info today.</div>
                               <div>
-                                You cast {upvotedInstructorsToday} / 16 up-votes today on others' collected instructors'
+                                You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected instructors'
                                 data.
                               </div>
                             </div>
@@ -1014,13 +1016,13 @@ const RouterNav = props => {
                         >
                           👨‍🏫{" "}
                           {projectPoints.dayInstructorUpVotes
-                            ? instructorPoints
-                            : Number(instructorPoints) + Number(dayInstructorUpVotes)}{" "}
+                            ? roundNum(instructorPoints)
+                            : roundNum(instructorPoints) + roundNum(dayInstructorUpVotes) }{" "}
                           <br />{" "}
                           {projectPoints.dayInstructorUpVotes
-                            ? "✔ " + dayInstructorUpVotes
+                            ? "✔ " + roundNum(dayInstructorUpVotes)
                             : "🌞 " + instructorsToday + " / 7"}
-                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {upvotedInstructorsToday} / 16
+                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {roundNum(upvotedInstructorsToday)} / 16
                         </Button>
                       </Tooltip>
                     ) : null}
@@ -1030,26 +1032,26 @@ const RouterNav = props => {
                           projectPoints.dayAdministratorUpVotes ? (
                             <div>
                               <div>
-                                You've earned {administratorPoints} administrator points from others' votes and{" "}
-                                {dayAdministratorUpVotes} points for casting 16 upvotes per day on others' collected
+                                You've earned {roundNum(administratorPoints)} administrator points from others' votes and{" "}
+                                {roundNum(dayAdministratorUpVotes)} points for casting 16 upvotes per day on others' collected
                                 data.
                               </div>
                               <div>
-                                You cast {upvotedAdministratorsToday} / 16 up-votes today on others' collected
+                                You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others' collected
                                 administrators' data.
                               </div>
                             </div>
                           ) : (
                             <div>
                               <div>
-                                You've earned {Number(administratorPoints) + Number(dayAdministratorUpVotes)} total points, including{" "}
-                                {administratorPoints} points for collecting administrators' contact info and{" "}
+                                You've earned {roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)} total points, including{" "}
+                                {roundNum(administratorPoints)} points for collecting administrators' contact info and{" "}
                                 {dayAdministratorUpVotes} points for casting 16 up-voting per day on other's collected
                                 data.
                               </div>
-                              <div>You collected {administratorsToday} / 7 administrators' info today.</div>
+                              <div>You collected {roundNum(administratorsToday)} / 7 administrators' info today.</div>
                               <div>
-                                You cast {upvotedAdministratorsToday} / 16 up-votes today on others' collected
+                                You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others' collected
                                 administrators' data.
                               </div>
                             </div>
@@ -1064,12 +1066,12 @@ const RouterNav = props => {
                           💼{" "}
                           {projectPoints.dayAdministratorUpVotes
                             ? administratorPoints
-                            : Number(administratorPoints) + Number(dayAdministratorUpVotes)}{" "}
+                            : roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)}{" "}
                           <br />{" "}
                           {projectPoints.dayAdministratorUpVotes
-                            ? "✔ " + dayAdministratorUpVotes
-                            : "🌞 " + administratorsToday + " / 7"}
-                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"} {upvotedAdministratorsToday} / 16
+                            ? "✔ " + roundNum(dayAdministratorUpVotes)
+                            : "🌞 " + roundNum(administratorsToday) + " / 7"}
+                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"} {roundNum(upvotedAdministratorsToday)} / 16
                         </Button>
                       </Tooltip>
                     ) : null}
@@ -1077,12 +1079,12 @@ const RouterNav = props => {
                       <Tooltip
                         title={
                           <div>
-                            <div>You've earned {gradingPoints} total 🧠 free-recall grading points.</div>
+                            <div>You've earned {roundNum(gradingPoints)} total 🧠 free-recall grading points.</div>
                             <div>
-                              From that total, we've already excluded your negative {negativeGradingPoints} ❌ points.
+                              From that total, we've already excluded your negative {roundNum(negativeGradingPoints)} ❌ points.
                             </div>
                             <div>
-                              This means, 2 X {Number(gradingPoints) + Number(negativeGradingPoints)} times at least 3 other researchers
+                              This means, 2 X {roundNum(gradingPoints) + roundNum(negativeGradingPoints)} times at least 3 other researchers
                               have agreed with you on existance or non-existance of a specific phrase in a free-recall
                               response. Also, 2 x {negativeGradingPoints} times exactly 3 out of 4 researchers agreed
                               with each other on existance (non-existance) of a specific key phrase in a free-recall
@@ -1097,7 +1099,7 @@ const RouterNav = props => {
                           className={activePage === "FreeRecallGrading" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/FreeRecallGrading")}
                         >
-                          🧠 {gradingPoints} <br /> ❌ {negativeGradingPoints}
+                          🧠 {roundNum(gradingPoints)} <br /> ❌ {roundNum(negativeGradingPoints)}
                         </Button>
                       </Tooltip>
                     ) : null}
@@ -1105,8 +1107,8 @@ const RouterNav = props => {
                       <Tooltip
                         title={
                           <div>
-                            You've earned {positiveCodesPoints} total 💬 coding participants responses and{" "}
-                            {negativeCodesPionts} ❌ negative point.
+                            You've earned {roundNum(positiveCodesPoints)} total 💬 coding participants responses and{" "}
+                            {roundNum(negativeCodesPionts)} ❌ negative point.
                           </div>
                         }
                       >
@@ -1115,8 +1117,8 @@ const RouterNav = props => {
                           className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/CodeFeedback")}
                         >
-                          💬 {positiveCodesPoints}
-                          <br /> ❌ {negativeCodesPionts}
+                          💬 {roundNum(positiveCodesPoints)}
+                          <br /> ❌ {roundNum(negativeCodesPionts)}
                         </Button>
                       </Tooltip>
                     ):null}
