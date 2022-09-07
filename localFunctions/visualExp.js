@@ -1692,8 +1692,8 @@ exports.appendPointsFieldForEmptyRecalls = async (req,res) => {
             }
 
 
-            const filtered = (pcond[recall] || "").split("").filter(l => l);
-
+            const filtered = (pcond[recall] || "").split(" ").filter(w => w.trim());
+          
             if (filtered.length <= 2) {
               userUpdate.pConditions[index][recallResponse] = 0;
             }
