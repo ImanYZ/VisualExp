@@ -343,6 +343,10 @@ const App = () => {
         ...userUpdates,
         pConditions
       };
+      userUpdates = {
+        ...userUpdates,
+        pConditions
+      };
       // recallGrades collection is huge and it's extremely inefficient to
       // search through it if all the docs for all projects are in the same
       // collection. Also, when querying them to find the appropriate doc to
@@ -362,7 +366,7 @@ const App = () => {
         }
       }
       if (allResponsesReady) {
-        for (let index = 0; index < userData.pConditions.length;  ++index) {
+        for (let index = 0; index < userData.pConditions.length; ++index) {
           const pCond = userData.pConditions[index];
           passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
           passageData = passageDoc.data();
@@ -373,7 +377,7 @@ const App = () => {
             } else if (session === "3rd") {
               responseName = "recall1WeekreText";
             }            
-            const filtered = (pCond[responseName]|| "").split(" ").filter(w => w.trim());
+            const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
             if (filtered.length > 2) {
               const recallGradeData = {
                 done: false,
@@ -464,7 +468,7 @@ const App = () => {
                 coders: [],
                 choice: userData[choice],
                 project: userData.project,
-                fullname: userData.fullname,
+                fullname: fullname,
                 session: session,
                 explanation: response,
                 createdAt: new Date(),
