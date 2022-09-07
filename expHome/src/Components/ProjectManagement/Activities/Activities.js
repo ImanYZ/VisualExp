@@ -181,6 +181,10 @@ const Activities = props => {
               totalPoints += projectData.gradingPoints;
               gradingPoints += projectData.gradingPoints;
             }
+            if(projectData.positiveCodingPoints){
+              totalPoints += projectData.positiveCodingPoints;
+              commentsPoints+=projectData.positiveCodingPoints;
+            }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
               if (resears[reIdx].id === change.doc.id) {
