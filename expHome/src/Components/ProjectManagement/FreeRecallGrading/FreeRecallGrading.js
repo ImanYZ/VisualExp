@@ -143,8 +143,8 @@ const FreeRecallGrading = props => {
     }
     for (let recallGradeDoc of recallGradeDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
-
-      if (recallGradeData.user !== fullname && !recallGradeData.researchers.includes(fullname)) {
+       const filtered = (recallGradeData.response|| "").split(" ").filter(w => w.trim());
+      if (recallGradeData.user !== fullname && !recallGradeData.researchers.includes(fullname) && filtered.length > 2) {
         if (firstBatch.length > 0 && recallGradeData.response !== firstBatch[0].data.response) {
           break;
         }
