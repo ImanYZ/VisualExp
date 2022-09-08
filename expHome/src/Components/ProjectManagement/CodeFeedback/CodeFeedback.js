@@ -194,6 +194,10 @@ const CodeFeedback = props => {
       }
     }
   ];
+  useEffect(()=>{
+    setSentences("");
+    setChosenCondition("");
+  },[project])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -275,7 +279,7 @@ const CodeFeedback = props => {
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelected(codesSelecting);
     }
-  }, [approvedCodes, retrieveNext]);
+  }, [approvedCodes, retrieveNext,project]);
 
   const adminCodes = useMemo(() => {
     const mapped = allExperimentCodes.map(c => {
@@ -947,7 +951,6 @@ const CodeFeedback = props => {
     setChoiceConditions(_choiceConditions);
     setSwitchState(_switchState);
   };
-
   return (
     <>
       {unApprovedCodes.length > 0 && (
