@@ -300,6 +300,12 @@ const CodeFeedback = props => {
     });
   }, [allExperimentCodes]);
 
+  const getResponseNotAnsweredYet = feedbackCodesDocs => {
+    const data = [];
+    for (let doc of feedbackCodesDocs) {
+    }
+  };
+
   const retriveNextResponse = useCallback(async () => {
     const feedbackCodesDocs = await firebase.db
       .collection("feedbackCode")
@@ -307,6 +313,7 @@ const CodeFeedback = props => {
       .where("approved", "==", false)
       .get();
     let foundResponse = false;
+
     for (let feedbackDoc of feedbackCodesDocs.docs) {
       const feedbackData = feedbackDoc.data();
       setChosenCondition(feedbackData.choice);
@@ -319,13 +326,7 @@ const CodeFeedback = props => {
       ) {
         const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
 
-        const lengthSentence = feedbackData.explanation.split(".").length;
-        let response;
-        if (lengthSentence > 1) {
-          response = feedbackData.explanation.split(".", lengthSentence - 1);
-        } else {
-          response = feedbackData.explanation.split(".");
-        }
+        const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
 
         //we check if the authenticated reserchers have aleardy casted his vote
         //if so we get all his recorded past choices
@@ -389,6 +390,7 @@ const CodeFeedback = props => {
                 allowOtherResearchersToVote = false;
               }
             }
+          }
           if (allowOtherResearchersToVote) {
             setDocId(feedbackDoc.id);
             setSentences(response);
@@ -405,21 +407,21 @@ const CodeFeedback = props => {
             foundResponse = true;
           }
         }
-      }
 
-      if (foundResponse) {
-        break;
+        if (foundResponse) {
+          break;
+        }
+        setSubmitting(false);
       }
-      setSubmitting(false);
     }
-  }}, [retrieveNext, project]);
+  }, [retrieveNext, project]);
 
   useEffect(() => {
     retriveNextResponse();
     return () => {
       return;
     };
-  }, [retrieveNext]);
+  }, [retrieveNext, project]);
 
   // add new code to the database
   const handleAddNewCode = async () => {
@@ -822,7 +824,7 @@ const CodeFeedback = props => {
         return index + 1;
       };
       try {
-         questionArray.map(async (x, index) => {
+        questionArray.map(async (x, index) => {
           const docRef = await feedbackCodeBooksRef.add({
             project,
             approved: true,
