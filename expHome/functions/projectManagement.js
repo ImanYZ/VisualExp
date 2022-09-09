@@ -12,6 +12,8 @@ const {
   remindResearcherToSpecifyAvailability
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
+const { isDataView } = require("util/types");
+const { fontFamily } = require("@mui/system");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -39,7 +41,12 @@ const voteFn = async (voter, activity, vote) => {
         const researcherRef = db.collection("researchers").doc(activityData.fullname);
         const researcherDoc = await t.get(researcherRef);
         const researcherData = researcherDoc.data();
-        const voteQuery = db.collection("votes").where("activity", "==", activity).where("voter", "==", voter).where("project","==",activityData.project).limit(1);
+        const voteQuery = db
+          .collection("votes")
+          .where("activity", "==", activity)
+          .where("voter", "==", voter)
+          .where("project", "==", activityData.project)
+          .limit(1);
         const voteDocs = await t.get(voteQuery);
         let upVote = false;
         let noVote = false;
@@ -329,7 +336,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   // recall response.
                   recallGradeUpdates.approved = approved;
                   if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project].gradingPoints
+                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project]
+                      .gradingPoints
                       ? researcherObj.data.projects[project].gradingPoints + 0.5
                       : 0.5;
                   }
@@ -342,7 +350,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
                   (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
                 ) {
                   if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project].gradingPoints
+                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project]
+                      .gradingPoints
                       ? researcherObj.data.projects[project].gradingPoints - 0.5
                       : -0.5;
                     researcherObj.data.projects[project].negativeGradingPoints = researcherObj.data.projects[project]
@@ -400,7 +409,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
           transactionWrites.push({
             type: "update",
             refObj: researcherRef,
-            updateObj: otherResearchersData[researcherId]
+            updateObj: otherResearchersData[researcherId].data
           });
         }
       }
@@ -2351,6 +2360,10 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         let recievePositivePoints = [];
         let recieveNegativePoints = [];
         const feedbackCodesRef = db.collection("feedbackCode").doc(docId);
+        const feedbackOrderRef = db.collection("feedbackCodeOrder").doc(project);
+        const feedOrderDoc = await t.get(feedbackOrderRef);
+        const feedOrderData = feedOrderDoc.data();
+        feedOrderData[fullname].splice(feedOrderData[fullname].indexOf(docId), 1);
         const feedbackCodesDoc = await t.get(feedbackCodesRef);
         const feedbackCodeData = feedbackCodesDoc.data();
         let codesVotes = {};
@@ -2462,7 +2475,7 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         }
 
         tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
-
+        tWriteOperations.push({ docRef: feedbackOrderRef, data: feedOrderData });
         for (let operation of tWriteOperations) {
           t.update(operation.docRef, operation.data);
         }
@@ -2474,5 +2487,129 @@ exports.handleSubmitFeebackCode = async (req, res) => {
   } catch (err) {
     console.error({ err });
     return res.status(500).json({ errMsg: err.message, success: false });
+  }
+};
+
+exports.createTemporaryFeedbacodeCollection = async (req, res) => {
+  try {
+    if ("fullname" in req.body && "approvedCodes" in req.body && "project" in req.body) {
+      const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
+
+      const approvedCodes = new Set();
+      for (let codeDoc of feedbackCodesBooksDocs.docs) {
+        const codeData = codeDoc.data();
+        if (codeData.approved && !approvedCodes.has(codeData.code)) {
+          approvedCodes.add(codeData.code);
+        }
+      }
+      const fullname = req.body.fullname;
+      const project = req.body.project;
+
+      const passagesInH2K2 = [
+        "zlS4Gh2AXaLZV7HM2oXd",
+        "lmGQvzSit4LBTj1Zptot",
+        "97D6P4unPYqzkpVeUY2c",
+        "zbcUNl5593vOeChp1G8O",
+        "UowdqbVHYMJ9Hhh5zNY3",
+        "qOO4Yn9oyUthKaifSIl1",
+        "6rc4k1su3txN6ZK4CJ0h",
+        "xuNQUYbAEFfTD1PHuLGV",
+        "s1oo3G4n3jeE8fJQRs3g"
+      ];
+
+      const feedbackCodesDocs = await db
+        .collection("feedbackCode")
+        .where("project", "==", project)
+        .where("approved", "==", false)
+        .get();
+      let foundResponse = false;
+      const feedbackRef = db.collection("feedbackCodeOrder").doc(project);
+      const feedDoc = await feedbackRef.get();
+      const feedData = feedDoc.data();
+      let allIds = new Set();
+      for (let resea of Object.keys(feedData)) {
+        for (let id of feedData[resea]) {
+          allIds.add(id);
+        }
+      }
+      let feedBackCodeIds = [];
+      if (!feedData[fullname] || feedData[fullname].length <= 5) {
+        console.log("IF");
+        for (let feedbackDoc of feedbackCodesDocs.docs) {
+          if (!allIds.has(feedbackDoc.id)) {
+            const feedbackData = feedbackDoc.data();
+
+            // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
+            const userDoc = await db.collection("users").doc(feedbackData.fullname).get();
+            const userData = userDoc.data();
+            if (
+              userData.pConditions.length > 1 &&
+              passagesInH2K2.includes(userData.pConditions[0].passage) &&
+              passagesInH2K2.includes(userData.pConditions[1].passage)
+            ) {
+              //we check if the authenticated reserchers have aleardy casted his vote
+              //if so we get all his recorded past choices
+              if (feedbackData.coders.includes(fullname)) {
+                let voteAgain = false;
+                const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+                // if the string representations of these arrays ar enot same that means they have been changed.
+                for (let approvedCode of approvedCodes) {
+                  if (!myCodes.includes(approvedCode)) {
+                    voteAgain = true;
+                  }
+                }
+
+                if (voteAgain) {
+                  feedBackCodeIds.push(feedbackDoc.id);
+                  if (feedBackCodeIds.length === 5) {
+                    foundResponse = true;
+                  }
+                }
+                // if the authenticated researcher didn't vote on this  explanation yet
+                // we check if all the others coders who previously casted their vote that they checked
+                //the new code added ,so that way we would know if we can show this explanation or not
+              } else if (!feedbackData.coders.includes(fullname)) {
+                let allowOtherResearchersToVote = true;
+                if (feedbackData.coders.length !== 0) {
+                  for (let coder of feedbackData.coders) {
+                    const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
+                    // if the some of the approved codes doesn't exist the codeschoices for coders we should not allow the auth reserhers to vote on it yet
+                    for (let approvedCode of approvedCodes) {
+                      if (!myCodes.includes(approvedCode)) {
+                        allowOtherResearchersToVote = false;
+                      }
+                    }
+                  }
+                }
+                if (allowOtherResearchersToVote) {
+                  feedBackCodeIds.push(feedbackDoc.id);
+                  if (feedBackCodeIds.length === 5) {
+                    foundResponse = true;
+                  }
+                }
+              }
+              if (foundResponse) {
+                break;
+              }
+            }
+          }
+        }
+
+        let updates = {};
+        if (feedData[fullname]) {
+          updates = {
+            [fullname]: [...feedData[fullname], ...feedBackCodeIds]
+          };
+        } else {
+          updates = {
+            [fullname]: feedBackCodeIds
+          };
+        }
+        await batchUpdate(feedbackRef, updates);
+      }
+      await commitBatch();
+    }
+  } catch (error) {
+    console.log({ error });
   }
 };
