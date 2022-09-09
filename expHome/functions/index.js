@@ -20,7 +20,8 @@ const {
   bulkGradeFreeRecall,
   markPaidEndpoint,
   passagesNumberCorrection,
-  handleSubmitFeebackCode
+  handleSubmitFeebackCode,
+  createTemporaryFeedbacodeCollection
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -98,6 +99,7 @@ app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 app.post("/handleSubmitFeebackCode", handleSubmitFeebackCode);
+app.post("/createTemporaryFeedbacodeCollection",createTemporaryFeedbacodeCollection)
 
 
 // Emailing
