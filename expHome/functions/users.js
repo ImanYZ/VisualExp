@@ -304,7 +304,7 @@ exports.loadContacts = async (req, res) => {
 // Download the dataset in CSV
 exports.retrieveData = async (req, res) => {
   console.log("retrieveData");
-  let usersDocs, userData, row, pCond, rowLong;
+  let usersDocs, userData, commonFields, row, pCond, rowLong;
   try {
     const rowsData = [
       [
@@ -331,6 +331,7 @@ exports.retrieveData = async (req, res) => {
         "pretestTime",
         "previewEnded",
         "previewTime",
+        "session",
         "recallEnded",
         "recallScore",
         "recallScoreRatio",
@@ -343,45 +344,13 @@ exports.retrieveData = async (req, res) => {
         "recognitionScore",
         "recognitionScoreRatio",
         "recognitionTime",
-        "firstDuration",
-        "recall3DaysEnded",
-        "recall3DaysScore",
-        "recall3DaysScoreRatio",
-        "recall3DaysCosineSim",
-        "recall3DaysStart",
-        "recall3DaysTime",
-        "recall3DaysreText",
-        "recall3DaysreGrade",
-        "recognition3DaysEnded",
-        "recognition3DaysScore",
-        "recognition3DaysScoreRatio",
-        "recognition3DaysTime",
-        "secondDuration",
-        "recall1WeekEnded",
-        "recall1WeekScore",
-        "recall1WeekScoreRatio",
-        "recall1WeekCosineSim",
-        "recall1WeekStart",
-        "recall1WeekTime",
-        "recall1WeekreText",
-        "recall1WeekreGrade",
-        "recognition1WeekEnded",
-        "recognition1WeekScore",
-        "recognition1WeekScoreRatio",
-        "recognition1WeekTime",
-        "thirdDuration",
-        "postQChoice",
+        "duration",
+        "postQ1Choice",
+        "postQ2Choice",
         "postQsEnded",
         "postQsStart",
-        "post3DaysQChoice",
-        "post3DaysQsEnded",
-        "post3DaysQsStart",
-        "post1WeekQChoice",
-        "post1WeekQsEnded",
-        "post1WeekQsStart",
         "explanation1",
-        "explanation3Days",
-        "explanation1Week"
+        "explanation2"
       ]
     ];
     const rowsLongData = [
@@ -476,31 +445,33 @@ exports.retrieveData = async (req, res) => {
         userIndex += 1;
         console.log({ userIndex });
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
-          row = [];
-          // row.push(userDoc.id);
-          row.push(userIndex);
-          row.push(userData.birthDate ? getDateString(userData.birthDate.toDate()) : "");
-          row.push(userData.cond2Start ? getDateTimeString(userData.cond2Start.toDate()) : "");
-          row.push(userData.createdAt ? getDateTimeString(userData.createdAt.toDate()) : "");
-          row.push(userData.demoQsEnded ? getDateTimeString(userData.demoQsEnded.toDate()) : "");
-          row.push(userData.demoQsStart ? getDateTimeString(userData.demoQsStart.toDate()) : "");
-          row.push(userData.education ? userData.education : "");
-          // row.push(userData.email ? userData.email : "");
-          row.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
-          row.push(userData.gender ? userData.gender : "");
-          row.push(userData.language ? userData.language : "");
-          row.push(userData.major ? userData.major : "");
-          row.push(passages[userData.nullPassage].title);
-          row.push(pCIdx);
+          commonFields = [];
+          // commonFields.push(userDoc.id);
+          commonFields.push(userIndex);
+          commonFields.push(userData.birthDate ? getDateString(userData.birthDate.toDate()) : "");
+          commonFields.push(userData.cond2Start ? getDateTimeString(userData.cond2Start.toDate()) : "");
+          commonFields.push(userData.createdAt ? getDateTimeString(userData.createdAt.toDate()) : "");
+          commonFields.push(userData.demoQsEnded ? getDateTimeString(userData.demoQsEnded.toDate()) : "");
+          commonFields.push(userData.demoQsStart ? getDateTimeString(userData.demoQsStart.toDate()) : "");
+          commonFields.push(userData.education ? userData.education : "");
+          // commonFields.push(userData.email ? userData.email : "");
+          commonFields.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
+          commonFields.push(userData.gender ? userData.gender : "");
+          commonFields.push(userData.language ? userData.language : "");
+          commonFields.push(userData.major ? userData.major : "");
+          commonFields.push(passages[userData.nullPassage].title);
+          commonFields.push(pCIdx);
           pCond = userData.pConditions[pCIdx];
-          row.push(pCond.condition);
-          row.push(passages[pCond.passage].title);
-          row.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
-          row.push("pretestScore" in pCond ? pCond.pretestScore : "");
-          row.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
-          row.push("pretestTime" in pCond ? pCond.pretestTime : "");
-          row.push("previewEnded" in pCond ? getDateTimeString(pCond.previewEnded.toDate()) : "");
-          row.push("previewTime" in pCond ? pCond.previewTime : "");
+          commonFields.push(pCond.condition);
+          commonFields.push(passages[pCond.passage].title);
+          commonFields.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
+          commonFields.push("pretestScore" in pCond ? pCond.pretestScore : "");
+          commonFields.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
+          commonFields.push("pretestTime" in pCond ? pCond.pretestTime : "");
+          commonFields.push("previewEnded" in pCond ? getDateTimeString(pCond.previewEnded.toDate()) : "");
+          commonFields.push("previewTime" in pCond ? pCond.previewTime : "");
+          row = [...commonFields];
+          row.push("1st");
           row.push("recallEnded" in pCond ? getDateTimeString(pCond.recallEnded.toDate()) : "");
           row.push("recallScore" in pCond ? pCond.recallScore : "");
           row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
@@ -540,6 +511,7 @@ exports.retrieveData = async (req, res) => {
                   userData.pConditions[0].previewTime) /
                 60
               : "";
+          row.push(pretestToEnd);
           // Three participants had issues with their demographic data and modified them a few days later.
           if (pretestToEnd && pretestToEnd > 90) {
             pretestToEnd = "";
@@ -577,8 +549,30 @@ exports.retrieveData = async (req, res) => {
               }
             }
           }
-          row.push(pretestToEnd);
+          row.push(userData.postQ1Choice ? userData.postQ1Choice : "");
+          row.push(userData.postQ2Choice ? userData.postQ2Choice : "");
+          row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
+          row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
+          row.push(
+            "explanations" in userData
+              ? typeof userData.explanations[0] === "object"
+                ? userData.explanations[0].explanation
+                : userData.explanations[0]
+              : ""
+          );
+          row.push(
+            "explanations" in userData
+              ? typeof userData.explanations[1] === "object"
+                ? userData.explanations[1].explanation
+                : userData.explanations[1]
+              : ""
+          );
+          if (pretestToEnd) {
+            rowsData.push(row);
+          }
+          // The particinapt has finished the second session:
           if (userData.post3DaysQsEnded) {
+            row = [...commonFields];
             let secondDuration =
               "post3DaysQsEnded" in userData && "recall3DaysStart" in userData.pConditions[0]
                 ? (userData.post3DaysQsEnded.toDate().getTime() -
@@ -586,6 +580,7 @@ exports.retrieveData = async (req, res) => {
                   60000
                 : "";
             if (secondDuration && secondDuration > 5) {
+              row.push("2nd");
               row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
               row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
               row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
@@ -617,17 +612,29 @@ exports.retrieveData = async (req, res) => {
               row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
               row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
               row.push(secondDuration);
-            } else {
-              for (let idx = 0; idx < 13; idx++) {
-                row.push("");
-              }
-            }
-          } else {
-            for (let idx = 0; idx < 13; idx++) {
-              row.push("");
+              row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
+              row.push(userData.post3DaysQ2Choice ? userData.post3DaysQ2Choice : "");
+              row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
+              row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
+              row.push(
+                "explanations3Days" in userData
+                  ? typeof userData.explanations3Days[0] === "object"
+                    ? userData.explanations3Days[0].explanation
+                    : userData.explanations3Days[0]
+                  : ""
+              );
+              row.push(
+                "explanations3Days" in userData
+                  ? typeof userData.explanations3Days[1] === "object"
+                    ? userData.explanations3Days[1].explanation
+                    : userData.explanations3Days[1]
+                  : ""
+              );
+              rowsData.push(row);
             }
           }
           if (userData.post1WeekQsEnded) {
+            row = [...commonFields];
             let thirdDuration =
               "post1WeekQsEnded" in userData && "recall1WeekStart" in userData.pConditions[0]
                 ? (userData.post1WeekQsEnded.toDate().getTime() -
@@ -635,6 +642,7 @@ exports.retrieveData = async (req, res) => {
                   60000
                 : "";
             if (thirdDuration && thirdDuration > 5) {
+              row.push("3rd");
               row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
               row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
               row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
@@ -666,42 +674,26 @@ exports.retrieveData = async (req, res) => {
               row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
               row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
               row.push(thirdDuration);
-            } else {
-              for (let idx = 0; idx < 13; idx++) {
-                row.push("");
-              }
+              row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
+              row.push(userData.post1WeekQ2Choice ? userData.post1WeekQ2Choice : "");
+              row.push(userData.post1WeekQsEnded ? getDateTimeString(userData.post1WeekQsEnded.toDate()) : "");
+              row.push(userData.post1WeekQsStart ? getDateTimeString(userData.post1WeekQsStart.toDate()) : "");
+              row.push(
+                "explanations1Week" in userData
+                  ? typeof userData.explanations1Week[0] === "object"
+                    ? userData.explanations1Week[0].explanation
+                    : userData.explanations1Week[0]
+                  : ""
+              );
+              row.push(
+                "explanations1Week" in userData
+                  ? typeof userData.explanations1Week[1] === "object"
+                    ? userData.explanations1Week[1].explanation
+                    : userData.explanations1Week[1]
+                  : ""
+              );
+              rowsData.push(row);
             }
-          } else {
-            for (let idx = 0; idx < 13; idx++) {
-              row.push("");
-            }
-          }
-          row.push(pCIdx === 0 ? userData.postQ1Choice : userData.postQ2Choice);
-          row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
-          row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
-          if (userData.post3DaysQsEnded) {
-            row.push(pCIdx === 0 ? userData.post3DaysQ1Choice : userData.post3DaysQ2Choice);
-            row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
-            row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
-          } else {
-            for (let idx = 0; idx < 3; idx++) {
-              row.push("");
-            }
-          }
-          if (userData.post1WeekQsEnded) {
-            row.push(pCIdx === 0 ? userData.post1WeekQ1Choice : userData.post1WeekQ2Choice);
-            row.push(userData.post1WeekQsEnded ? getDateTimeString(userData.post1WeekQsEnded.toDate()) : "");
-            row.push(userData.post1WeekQsStart ? getDateTimeString(userData.post1WeekQsStart.toDate()) : "");
-          } else {
-            for (let idx = 0; idx < 3; idx++) {
-              row.push("");
-            }
-          }
-          row.push("explanations" in userData && userData.explanations[pCIdx] ? userData.explanations[pCIdx] : "");
-          row.push(userData.explanations3Days ? userData.explanations3Days[pCIdx] : "");
-          row.push(userData.explanations1Week ? userData.explanations1Week[pCIdx] : "");
-          if (pretestToEnd) {
-            rowsData.push(row);
           }
         }
       }
@@ -776,6 +768,112 @@ exports.feedbackData = async (req, res) => {
     }
     csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
+    });
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
+// Download the feedbackCode dataset in CSV
+exports.feedbackCodeData = async (req, res) => {
+  try {
+    const codes = [
+      `All the information was in a single page.`,
+      `I could better recall the information.`,
+      `I prefer the horizontal orientation.`,
+      `I prefer the vertical orientation.`,
+      `I prefer to follow sentences rather than choppy pieces.`,
+      `It felt too much to read.`,
+      `It is more appropriate for informational content.`,
+      `It is more appropriate for literary narrative.`,
+      `It took me less time to read the passage.`,
+      `It was easier to find the answers to the multiple-choice questions.`,
+      `It was easier to follow the information from basic to advanced.`,
+      `It was easier to follow the story.`,
+      `It was easier to navigate/maneuver through.`,
+      `It was easier to quickly skim through the passage.`,
+      `Reading it felt more natural/comfortable.`,
+      `The choppy sentences have no follow. It's frustrating to read disconnected sentences.`,
+      `The information was better organized on the page.`,
+      `The information was presented in groups.`,
+      `The information was presented in multiple pages.`,
+      `The information was presented in smaller pieces.`,
+      `The information was presented more concisely.`,
+      `The key information was easier to identify.`,
+      `There were clear, explicit, links between related paragraphs/nodes`
+    ];
+    const rowsData = [
+      ["id", "choice", "passage1", "condition1", "passage2", "condition2", "qIdx", "session", ...codes, "explanation"]
+    ];
+    const passages = {};
+    const passageDocs = await db.collection("passages").get();
+    for (let passageDoc of passageDocs.docs) {
+      const passageData = passageDoc.data();
+      passages[passageDoc.id] = passageData;
+    }
+    const users = {};
+    const userDocs = await db.collection("users").get();
+    for (let userDoc of userDocs.docs) {
+      const userData = userDoc.data();
+      if (userData.pConditions && userData.pConditions.length === 2) {
+        users[userDoc.id] = [
+          {
+            passage: userData.pConditions[0].passage,
+            condition: userData.pConditions[0].condition
+          },
+          {
+            passage: userData.pConditions[1].passage,
+            condition: userData.pConditions[1].condition
+          }
+        ];
+      }
+    }
+    const feedbackCodeDocs = await db
+      .collection("feedbackCode")
+      .where("approved", "==", true)
+      .where("project", "==", "H2K2")
+      .get();
+    for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
+      const feedbackCodeData = feedbackCodeDoc.data();
+      const row = [];
+      row.push(feedbackCodeDoc.id);
+      "session", row.push(feedbackCodeData.choice);
+      row.push(users[feedbackCodeData.fullname][0].passage);
+      row.push(users[feedbackCodeData.fullname][0].condition);
+      row.push(users[feedbackCodeData.fullname][1].passage);
+      row.push(users[feedbackCodeData.fullname][1].condition);
+      row.push(feedbackCodeData.expIdx);
+      row.push(feedbackCodeData.session);
+      for (let code of codes) {
+        if (code in feedbackCodeData.codesVotes) {
+          const conditionNums = { H2: 0, K2: 0 };
+          if ("codersChoiceConditions" in feedbackCodeData && feedbackCodeData.codesVotes[code].length > 1) {
+            for (let researcher of feedbackCodeData.codesVotes[code]) {
+              conditionNums[feedbackCodeData.codersChoiceConditions[researcher][code]] += 1;
+            }
+            row.push(
+              conditionNums.H2 !== conditionNums.K2
+                ? conditionNums.H2 > conditionNums.K2
+                  ? "H2"
+                  : "K2"
+                : conditionNums.H2 === 0
+                ? "None"
+                : "Both"
+            );
+          } else {
+            row.push(feedbackCodeData.codesVotes[code].length);
+          }
+        } else {
+          row.push("");
+        }
+      }
+      row.push(feedbackCodeData.explanation);
+      rowsData.push(row);
+    }
+    csv.writeToPath("datasets/feedbackCodeData.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("Done");
     });
   } catch (err) {
     console.log({ err });

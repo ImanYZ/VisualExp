@@ -1,14 +1,7 @@
 const axios = require("axios");
 const fs = require("fs");
 
-const {
-  admin,
-  db,
-  commitBatch,
-  batchSet,
-  batchUpdate,
-  batchDelete,
-} = require("./admin_Knowledge");
+const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin_Knowledge");
 const { getTypedCollections } = require("./getTypedCollections");
 const { typesenseIndex } = require("./typsenseIndex");
 
@@ -28,7 +21,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       nodes: 0,
       links: 0,
       proposals: 0,
-      createdAt: new Date(),
+      createdAt: new Date()
     };
     const userDocs = await db.collection("users").get();
     for (let userDoc of userDocs.docs) {
@@ -53,9 +46,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       nodesData[nodeDoc.id] = nodeData;
       stats.nodes += 1;
       stats.links +=
-        (nodeData.parents.length + nodeData.children.length) / 2 +
-        nodeData.tags.length +
-        nodeData.references.length;
+        (nodeData.parents.length + nodeData.children.length) / 2 + nodeData.tags.length + nodeData.references.length;
       for (let tag of nodeData.tags) {
         if (tag.node in tags) {
           tags[tag.node].push(nodeDoc.id);
@@ -72,14 +63,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
       }
     }
     // We should retrieve all the accepted versions for all types of nodes.
-    const nodeTypes = [
-      "Concept",
-      "Code",
-      "Relation",
-      "Question",
-      "Reference",
-      "Idea",
-    ];
+    const nodeTypes = ["Concept", "Code", "Relation", "Question", "Reference", "Idea"];
     for (let nodeType of nodeTypes) {
       console.log("Started nodeType: ", nodeType);
       // We cannot update the reputations on nodes only looking at the
@@ -105,7 +89,7 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
             // and add the nodeRef to be able to update the node at the end.
             if (!(versionData.node in nodesUpdates)) {
               nodesUpdates[versionData.node] = {
-                nodeRef,
+                nodeRef
               };
             }
             // In institutions and contributors, each key represents an
@@ -130,87 +114,58 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
               nodesUpdates[versionData.node].institNames = [];
             }
             if (
-              !(
-                versionData.proposer in
-                nodesUpdates[versionData.node].contributors
-              ) &&
+              !(versionData.proposer in nodesUpdates[versionData.node].contributors) &&
               versionData.proposer in userFullnames &&
               "imageUrl" in versionData
             ) {
-              nodesUpdates[versionData.node].contribNames.push(
-                versionData.proposer
-              );
-              nodesUpdates[versionData.node].contributors[
-                versionData.proposer
-              ] = {
+              nodesUpdates[versionData.node].contribNames.push(versionData.proposer);
+              nodesUpdates[versionData.node].contributors[versionData.proposer] = {
                 fullname: userFullnames[versionData.proposer],
                 imageUrl: versionData.imageUrl,
-                chooseUname: versionData.chooseUname
-                  ? versionData.chooseUname
-                  : false,
-                reputation: 0,
+                chooseUname: versionData.chooseUname ? versionData.chooseUname : false,
+                reputation: 0
               };
               if (
                 versionData.proposer in userInstitutions &&
-                !(
-                  userInstitutions[versionData.proposer] in
-                  nodesUpdates[versionData.node].institutions
-                )
+                !(userInstitutions[versionData.proposer] in nodesUpdates[versionData.node].institutions)
               ) {
-                nodesUpdates[versionData.node].institNames.push(
-                  userInstitutions[versionData.proposer]
-                );
-                nodesUpdates[versionData.node].institutions[
-                  userInstitutions[versionData.proposer]
-                ] = {
-                  reputation: 0,
+                nodesUpdates[versionData.node].institNames.push(userInstitutions[versionData.proposer]);
+                nodesUpdates[versionData.node].institutions[userInstitutions[versionData.proposer]] = {
+                  reputation: 0
                 };
               }
             }
-            if (
-              versionData.proposer in
-              nodesUpdates[versionData.node].contributors
-            ) {
-              nodesUpdates[versionData.node].contributors[
-                versionData.proposer
-              ].reputation += versionData.corrects - versionData.wrongs;
+            if (versionData.proposer in nodesUpdates[versionData.node].contributors) {
+              nodesUpdates[versionData.node].contributors[versionData.proposer].reputation +=
+                versionData.corrects - versionData.wrongs;
             }
             if (
               versionData.proposer in userInstitutions &&
-              userInstitutions[versionData.proposer] in
-                nodesUpdates[versionData.node].institutions
+              userInstitutions[versionData.proposer] in nodesUpdates[versionData.node].institutions
             ) {
-              nodesUpdates[versionData.node].institutions[
-                userInstitutions[versionData.proposer]
-              ].reputation += versionData.corrects - versionData.wrongs;
+              nodesUpdates[versionData.node].institutions[userInstitutions[versionData.proposer]].reputation +=
+                versionData.corrects - versionData.wrongs;
             }
             if (versionData.proposer in contributors) {
-              contributors[versionData.proposer].reputation +=
-                versionData.corrects - versionData.wrongs;
+              contributors[versionData.proposer].reputation += versionData.corrects - versionData.wrongs;
             } else {
               contributors[versionData.proposer] = {
                 docRef: db.collection("users").doc(versionData.proposer),
-                reputation: versionData.corrects - versionData.wrongs,
+                reputation: versionData.corrects - versionData.wrongs
               };
             }
             if (userInstitutions[versionData.proposer] in institutions) {
-              institutions[userInstitutions[versionData.proposer]] +=
-                versionData.corrects - versionData.wrongs;
+              institutions[userInstitutions[versionData.proposer]] += versionData.corrects - versionData.wrongs;
             } else {
+              console.log({ proposer: versionData.proposer, userInstitution: userInstitutions[versionData.proposer] });
               const institutionDocs = await db
                 .collection("institutions")
-                .where(
-                  "name",
-                  "==",
-                  institutions[userInstitutions[versionData.proposer]]
-                )
+                .where("name", "==", institutions[userInstitutions[versionData.proposer]])
                 .get();
               if (institutionDocs.docs.length > 0) {
                 institutions[userInstitutions[versionData.proposer]] = {
-                  docRef: db
-                    .collection("institutions")
-                    .doc(institutionDocs.docs[0].id),
-                  reputation: versionData.corrects - versionData.wrongs,
+                  docRef: db.collection("institutions").doc(institutionDocs.docs[0].id),
+                  reputation: versionData.corrects - versionData.wrongs
                 };
               }
             }
@@ -222,17 +177,17 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
           contributors: nodesUpdates[nodeId].contributors,
           institutions: nodesUpdates[nodeId].institutions,
           contribNames: nodesUpdates[nodeId].contribNames,
-          institNames: nodesUpdates[nodeId].institNames,
+          institNames: nodesUpdates[nodeId].institNames
         });
       }
       for (let contributorId in contributors) {
         await batchUpdate(contributors[contributorId].docRef, {
-          totalPoints: contributors[contributorId].reputation,
+          totalPoints: contributors[contributorId].reputation
         });
       }
       for (let institutionName in institutions) {
         await batchUpdate(institutions[institutionName].docRef, {
-          totalPoints: institutions[institutionName].reputation,
+          totalPoints: institutions[institutionName].reputation
         });
       }
     }
@@ -251,11 +206,9 @@ exports.assignNodeContributorsInstitutionsStats = async (req, res) => {
 // On 1Cademy.com when users sign up, we do not make the corresponding changes
 // to the institutions collection. We should run this function every 25 hours in
 // a PubSub to assign these arrays.
-exports.updateInstitutions = async (context) => {
+exports.updateInstitutions = async context => {
   try {
-    const rawdata = fs.readFileSync(
-      __dirname + "/datasets/edited_universities.json"
-    );
+    const rawdata = fs.readFileSync(__dirname + "/datasets/edited_universities.json");
     const institutionCountries = {};
     for (let institObj of JSON.parse(rawdata)) {
       institutionCountries[institObj.name] = institObj.country;
@@ -266,16 +219,11 @@ exports.updateInstitutions = async (context) => {
       const userData = userDoc.data();
       if (!userData.institUpdated) {
         const domainName = userData.email.match("@(.+)$")[0];
-        const instQuery = db
-          .collection("institutions")
-          .where("name", "==", userData.deInstit)
-          .limit(1);
-        await db.runTransaction(async (t) => {
+        const instQuery = db.collection("institutions").where("name", "==", userData.deInstit).limit(1);
+        await db.runTransaction(async t => {
           const instDocs = await t.get(instQuery);
           if (instDocs.docs.length > 0) {
-            const instRef = db
-              .collection("institutions")
-              .doc(instDocs.docs[0].id);
+            const instRef = db.collection("institutions").doc(instDocs.docs[0].id);
             const institData = instDocs.docs[0].data();
             if (!institData.users.includes(userDoc.id)) {
               const instDomains = [...institData.domains];
@@ -285,15 +233,12 @@ exports.updateInstitutions = async (context) => {
               t.update(instRef, {
                 users: [...institData.users, userDoc.id],
                 usersNum: institData.usersNum + 1,
-                domains: instDomains,
+                domains: instDomains
               });
             }
           } else {
             const instRef = db.collection("institutions").doc();
-            const country =
-              userData.deInstit in institutionCountries
-                ? institutionCountries[userData.deInstit]
-                : "";
+            const country = userData.deInstit in institutionCountries ? institutionCountries[userData.deInstit] : "";
             let response = await axios.get(
               encodeURI(
                 "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDdW02hAK8Y2_2SWMwLGV9RJr4wm17IZUc&address=" +
@@ -326,11 +271,11 @@ exports.updateInstitutions = async (context) => {
               } else {
                 geoLoc = {
                   lng: "",
-                  lat: "",
+                  lat: ""
                 };
                 console.log({
                   institution: userData.deInstit,
-                  geocodeResponse: response.data,
+                  geocodeResponse: response.data
                 });
               }
             }
@@ -339,14 +284,12 @@ exports.updateInstitutions = async (context) => {
               lng: geoLoc.lng,
               lat: geoLoc.lat,
               logoURL: encodeURI(
-                "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" +
-                  userData.deInstit +
-                  ".png"
+                "https://storage.googleapis.com/onecademy-1.appspot.com/Logos/" + userData.deInstit + ".png"
               ),
               domains: [domainName],
               name: userData.deInstit,
               users: [userDoc.id],
-              usersNum: 1,
+              usersNum: 1
             });
           }
           const userRef = db.collection("users").doc(userDoc.id);
@@ -364,7 +307,7 @@ exports.updateInstitutions = async (context) => {
 // This function should run periodically to update the typesense index and keep the data updated in Typesense.
 // A better option is to create firebase functions to trigger on write requests on the collections.
 // We cannot do that currently. So this function is our best option for the moment.
-exports.updateTypesenseIndex = async (context) => {
+exports.updateTypesenseIndex = async context => {
   try {
     await typesenseIndex();
     return null;
