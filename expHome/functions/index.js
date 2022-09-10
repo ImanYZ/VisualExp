@@ -5,7 +5,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 
-const { deleteUser, retrieveData, feedbackData, recallData, applicationReminder } = require("./users");
+const { deleteUser, retrieveData, feedbackCodeData, recallData, applicationReminder } = require("./users");
 const {
   voteEndpoint,
   voteActivityReset,
@@ -87,8 +87,9 @@ app.post("/trackStudentInvite", trackStudentInvite);
 app.post("/trackStudentEmailTemplateCopy", trackStudentEmailTemplateCopy);
 app.get("/retrieveData", retrieveData);
 app.get("/passagesNumberCorrection", passagesNumberCorrection);
-// app.get("/feedbackData", feedbackData);
+app.get("/feedbackCodeData", feedbackCodeData);
 app.get("/recallData", recallData);
+app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
 app.post("/vote", voteEndpoint);
 app.post("/markPaid", markPaidEndpoint);
 app.post("/voteAdministrator", voteAdministratorEndpoint);
@@ -99,8 +100,7 @@ app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
 app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 app.post("/handleSubmitFeebackCode", handleSubmitFeebackCode);
-app.post("/createTemporaryFeedbacodeCollection",createTemporaryFeedbacodeCollection)
-
+app.post("/createTemporaryFeedbacodeCollection", createTemporaryFeedbacodeCollection);
 
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
@@ -191,21 +191,21 @@ exports.passagesNumberCorrection = functions
   .onRun(passagesNumberCorrection);
 
 // Knowledge
-exports.assignNodeContributorsInstitutionsStats = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 25 hours")
-  .onRun(assignNodeContributorsInstitutionsStats);
+// exports.assignNodeContributorsInstitutionsStats = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520
+//   })
+//   .pubsub.schedule("every 25 hours")
+//   .onRun(assignNodeContributorsInstitutionsStats);
 
-exports.updateInstitutions = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 25 hours")
-  .onRun(updateInstitutions);
+// exports.updateInstitutions = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520
+//   })
+//   .pubsub.schedule("every 25 hours")
+//   .onRun(updateInstitutions);
 
 // LifeLog:
 // exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
