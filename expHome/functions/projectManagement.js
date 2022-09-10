@@ -12,8 +12,6 @@ const {
   remindResearcherToSpecifyAvailability
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
-const { isDataView } = require("util/types");
-const { fontFamily } = require("@mui/system");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
