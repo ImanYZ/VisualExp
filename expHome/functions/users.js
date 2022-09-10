@@ -309,74 +309,74 @@ exports.retrieveData = async (req, res) => {
     const rowsData = [
       [
         // "fullname",
-        "userIndex",
-        "birthDate",
-        "cond2Start",
-        "createdAt",
-        "demoQsEnded",
-        "demoQsStart",
-        "education",
+        "ParticipantID",
+        "BirthDate",
+        // "Cond2Start",
+        // "CreatedAt",
+        // "demoQsEnded",
+        // "demoQsStart",
+        "Education",
         // "email",
-        "ethnicity",
-        "gender",
-        "language",
-        "major",
-        "nullPassage",
-        "phase",
-        "condition",
-        "passage",
-        "pretestEnded",
-        "pretestScore",
-        "pretestScoreRatio",
-        "pretestTime",
-        "previewEnded",
-        "previewTime",
-        "session",
-        "recallEnded",
-        "recallScore",
-        "recallScoreRatio",
-        "recallCosineSim",
-        "recallStart",
-        "recallTime",
-        "recallreText",
-        "recallreGrade",
-        "recognitionEnded",
-        "recognitionScore",
-        "recognitionScoreRatio",
-        "recognitionTime",
-        "duration",
-        "postQ1Choice",
-        "postQ2Choice",
-        "postQsEnded",
-        "postQsStart",
-        "explanation1",
-        "explanation2"
+        "Ethnicity",
+        "Gender",
+        "Language",
+        "Major",
+        // "nullPassage",
+        "Order",
+        "Condition",
+        "Passage",
+        // "pretestEnded",
+        "PretestScore",
+        "PretestScoreRatio",
+        "PretestTime",
+        // "previewEnded",
+        "PreviewTime",
+        "Session",
+        // "recallEnded",
+        "RecallScore",
+        "RecallScoreRatio",
+        // "recallCosineSim",
+        // "recallStart",
+        "RecallTime",
+        "RecallreText",
+        // "recallreGrade",
+        // "recognitionEnded",
+        "RecognitionScore",
+        "RecognitionScoreRatio",
+        "RecognitionTime",
+        "Duration",
+        "PostQ1Choice",
+        "PostQ2Choice",
+        // "PostQsEnded",
+        // "PostQsStart",
+        "Feedback1",
+        "Feedback2"
       ]
     ];
     const rowsLongData = [
       [
         // "fullname",
-        "userIndex",
-        "birthDate",
-        "cond2Start",
-        "createdAt",
-        "demoQsEnded",
-        "demoQsStart",
+        "ParticipantID",
+        "BirthDate",
+        // "cond2Start",
+        // "createdAt",
+        // "demoQsEnded",
+        // "demoQsStart",
         "education",
         // "email",
-        "ethnicity",
-        "gender",
-        "language",
-        "major",
-        "nullPassage",
-        "phase",
-        "condition",
-        "passage",
-        "session",
-        "question",
-        "questionType",
-        "pretest",
-        "recognition"
+        "Ethnicity",
+        "Gender",
+        "Language",
+        "Major",
+        // "nullPassage",
+        "Order",
+        "Condition",
+        "Passage",
+        "Session",
+        "Question",
+        "QuestionType",
+        "PretestPerQuestion",
+        "RecognitionPerQuestion"
       ]
     ];
     // const recallGrades = {};
@@ -449,37 +449,37 @@ exports.retrieveData = async (req, res) => {
           // commonFields.push(userDoc.id);
           commonFields.push(userIndex);
           commonFields.push(userData.birthDate ? getDateString(userData.birthDate.toDate()) : "");
-          commonFields.push(userData.cond2Start ? getDateTimeString(userData.cond2Start.toDate()) : "");
-          commonFields.push(userData.createdAt ? getDateTimeString(userData.createdAt.toDate()) : "");
-          commonFields.push(userData.demoQsEnded ? getDateTimeString(userData.demoQsEnded.toDate()) : "");
-          commonFields.push(userData.demoQsStart ? getDateTimeString(userData.demoQsStart.toDate()) : "");
+          // commonFields.push(userData.cond2Start ? getDateTimeString(userData.cond2Start.toDate()) : "");
+          // commonFields.push(userData.createdAt ? getDateTimeString(userData.createdAt.toDate()) : "");
+          // commonFields.push(userData.demoQsEnded ? getDateTimeString(userData.demoQsEnded.toDate()) : "");
+          // commonFields.push(userData.demoQsStart ? getDateTimeString(userData.demoQsStart.toDate()) : "");
           commonFields.push(userData.education ? userData.education : "");
           // commonFields.push(userData.email ? userData.email : "");
           commonFields.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
           commonFields.push(userData.gender ? userData.gender : "");
           commonFields.push(userData.language ? userData.language : "");
           commonFields.push(userData.major ? userData.major : "");
-          commonFields.push(passages[userData.nullPassage].title);
+          // commonFields.push(passages[userData.nullPassage].title);
           commonFields.push(pCIdx);
           pCond = userData.pConditions[pCIdx];
           commonFields.push(pCond.condition);
           commonFields.push(passages[pCond.passage].title);
-          commonFields.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
+          // commonFields.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
           commonFields.push("pretestScore" in pCond ? pCond.pretestScore : "");
           commonFields.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
           commonFields.push("pretestTime" in pCond ? pCond.pretestTime : "");
-          commonFields.push("previewEnded" in pCond ? getDateTimeString(pCond.previewEnded.toDate()) : "");
+          // commonFields.push("previewEnded" in pCond ? getDateTimeString(pCond.previewEnded.toDate()) : "");
           commonFields.push("previewTime" in pCond ? pCond.previewTime : "");
           row = [...commonFields];
           row.push("1st");
-          row.push("recallEnded" in pCond ? getDateTimeString(pCond.recallEnded.toDate()) : "");
+          // row.push("recallEnded" in pCond ? getDateTimeString(pCond.recallEnded.toDate()) : "");
           row.push("recallScore" in pCond ? pCond.recallScore : "");
           row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
-          row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
-          row.push("recallStart" in pCond ? getDateTimeString(pCond.recallStart.toDate()) : "");
+          // row.push("recallCosineSim" in pCond ? pCond.recallCosineSim : "");
+          // row.push("recallStart" in pCond ? getDateTimeString(pCond.recallStart.toDate()) : "");
           row.push("recallTime" in pCond ? pCond.recallTime : "");
           row.push("recallreText" in pCond ? pCond.recallreText : "");
-          row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
+          // row.push("recallreGrade" in pCond ? pCond.recallreGrade : "");
           // let itemScore = 0;
           // let isGraded = false;
           // let recallreGrade = 0;
@@ -498,7 +498,7 @@ exports.retrieveData = async (req, res) => {
           //   }
           // }
           // row.push(isGraded ? recallreGrade : "");
-          row.push("testEnded" in pCond ? getDateTimeString(pCond.testEnded.toDate()) : "");
+          // row.push("testEnded" in pCond ? getDateTimeString(pCond.testEnded.toDate()) : "");
           row.push("testScore" in pCond ? pCond.testScore : "");
           row.push("testScoreRatio" in pCond ? pCond.testScoreRatio : "");
           row.push("testTime" in pCond ? pCond.testTime : "");
@@ -551,8 +551,8 @@ exports.retrieveData = async (req, res) => {
           }
           row.push(userData.postQ1Choice ? userData.postQ1Choice : "");
           row.push(userData.postQ2Choice ? userData.postQ2Choice : "");
-          row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
-          row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
+          // row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
+          // row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
           row.push(
             "explanations" in userData
               ? typeof userData.explanations[0] === "object"
@@ -581,14 +581,14 @@ exports.retrieveData = async (req, res) => {
                 : "";
             if (secondDuration && secondDuration > 5) {
               row.push("2nd");
-              row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
+              // row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
               row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
               row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
-              row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
-              row.push("recall3DaysStart" in pCond ? getDateTimeString(pCond.recall3DaysStart.toDate()) : "");
+              // row.push("recall3DaysCosineSim" in pCond ? pCond.recall3DaysCosineSim : "");
+              // row.push("recall3DaysStart" in pCond ? getDateTimeString(pCond.recall3DaysStart.toDate()) : "");
               row.push("recall3DaysTime" in pCond ? pCond.recall3DaysTime : "");
               row.push("recall3DaysreText" in pCond ? pCond.recall3DaysreText : "");
-              row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
+              // row.push("recall3DaysreGrade" in pCond ? pCond.recall3DaysreGrade : "");
               // itemScore = 0;
               // isGraded = false;
               // recallreGrade = 0;
@@ -607,15 +607,15 @@ exports.retrieveData = async (req, res) => {
               //   }
               // }
               // row.push(isGraded ? recallreGrade : "");
-              row.push(pCond.test3DaysEnded ? getDateTimeString(pCond.test3DaysEnded.toDate()) : "");
+              // row.push(pCond.test3DaysEnded ? getDateTimeString(pCond.test3DaysEnded.toDate()) : "");
               row.push("test3DaysScore" in pCond ? pCond.test3DaysScore : "");
               row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
               row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
               row.push(secondDuration);
               row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
               row.push(userData.post3DaysQ2Choice ? userData.post3DaysQ2Choice : "");
-              row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
-              row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
+              // row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
+              // row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
               row.push(
                 "explanations3Days" in userData
                   ? typeof userData.explanations3Days[0] === "object"
@@ -643,14 +643,14 @@ exports.retrieveData = async (req, res) => {
                 : "";
             if (thirdDuration && thirdDuration > 5) {
               row.push("3rd");
-              row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
+              // row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
               row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
               row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
-              row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
-              row.push("recall1WeekStart" in pCond ? getDateTimeString(pCond.recall1WeekStart.toDate()) : "");
+              // row.push("recall1WeekCosineSim" in pCond ? pCond.recall1WeekCosineSim : "");
+              // row.push("recall1WeekStart" in pCond ? getDateTimeString(pCond.recall1WeekStart.toDate()) : "");
               row.push("recall1WeekTime" in pCond ? pCond.recall1WeekTime : "");
               row.push("recall1WeekreText" in pCond ? pCond.recall1WeekreText : "");
-              row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
+              // row.push("recall1WeekreGrade" in pCond ? pCond.recall1WeekreGrade : "");
               // itemScore = 0;
               // isGraded = false;
               // recallreGrade = 0;
@@ -669,15 +669,15 @@ exports.retrieveData = async (req, res) => {
               //   }
               // }
               // row.push(isGraded ? recallreGrade : "");
-              row.push(pCond.test1WeekEnded ? getDateTimeString(pCond.test1WeekEnded.toDate()) : "");
+              // row.push(pCond.test1WeekEnded ? getDateTimeString(pCond.test1WeekEnded.toDate()) : "");
               row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
               row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
               row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
               row.push(thirdDuration);
               row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
               row.push(userData.post1WeekQ2Choice ? userData.post1WeekQ2Choice : "");
-              row.push(userData.post1WeekQsEnded ? getDateTimeString(userData.post1WeekQsEnded.toDate()) : "");
-              row.push(userData.post1WeekQsStart ? getDateTimeString(userData.post1WeekQsStart.toDate()) : "");
+              // row.push(userData.post1WeekQsEnded ? getDateTimeString(userData.post1WeekQsEnded.toDate()) : "");
+              // row.push(userData.post1WeekQsStart ? getDateTimeString(userData.post1WeekQsStart.toDate()) : "");
               row.push(
                 "explanations1Week" in userData
                   ? typeof userData.explanations1Week[0] === "object"
