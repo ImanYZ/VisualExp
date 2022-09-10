@@ -317,7 +317,7 @@ const CodeFeedback = props => {
       const orderData = feedbackCodesOrderDoc.data();
       if (orderData[fullname] && orderData[fullname].length === 0) {
         setAllResponsesGraded(true);
-      }else{
+      } else {
         setAllResponsesGraded(false);
       }
       docID = orderData[fullname][0];
@@ -988,15 +988,15 @@ const CodeFeedback = props => {
                 code to the codebook.
               </li>
               <li>
-                For every code that you select, please click the switch next to it, to specify which experimental
-                condition the participant has mentioned this code about.
-              </li>
-              <li>
                 In the final paper, we need to quote some of the sentences from the users' feedback. If you find any
                 sentence that seems very supportive of each of the codes that you select and you think it's valuable
                 enough to be quoted in the final paper, please click the "Save as Quote" button next it.
               </li>
             </ol>
+            <h2>
+              For every code that you select, please click the switch next to it, to specify which condition the
+              participant favors based on this specific code.
+            </h2>
           </Alert>
 
           <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
