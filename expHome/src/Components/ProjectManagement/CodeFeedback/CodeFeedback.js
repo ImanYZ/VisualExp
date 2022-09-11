@@ -253,7 +253,6 @@ const CodeFeedback = props => {
       func();
     }
   }, [codeBooksChanges]);
-  console.log(allFeedbackCodeCodes);
   const feedBackCodesChoices = useMemo(() => {
     return allFeedbackCodeCodes.map(c => {
       return {
@@ -984,7 +983,6 @@ const CodeFeedback = props => {
   };
   const handleCellClickFeedBackCode = async clickedCell => {
     let docID = clickedCell.id;
-    console.log(docID);
     const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
     const feedbackData = feedbackCodesDoc.data();
     const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
@@ -1016,7 +1014,6 @@ const CodeFeedback = props => {
     const _switchState = {};
 
     let codesSelecting = {};
-    console.log(feedbackData.codersChoiceConditions[fullname]);
     for (let code in feedbackData.codersChoiceConditions[fullname]) {
       const choiceCode = feedbackData.codersChoiceConditions[fullname][code]
       codesSelecting[code] = false;
@@ -1032,7 +1029,6 @@ const CodeFeedback = props => {
     setSubmitting(false);
   };
 
-  console.log(choiceConditions);
   
   return (
     <>
