@@ -4,8 +4,7 @@ const {
   downloadNodes,
   fixInstitutionInUsers,
   identifyDuplicateInstitutionDomains,
-  assignNodeContributorsInstitutionsStats,
-} = require('./knowledge');
+} = require("./knowledge");
 
 const {
   addRecallGradesColl,
@@ -74,10 +73,6 @@ app.get("/deleteTheKeyPhrasesForPassage", deleteTheKeyPhrasesForPassage);
 app.get("/recreateNewRecallGradesDocuments", recreateNewRecallGradesDocuments);
 app.get("/addNexDataToFeedbackCode", addNexDataToFeedbackCode);
 app.get("/appendPointsFieldForEmptyRecalls", appendPointsFieldForEmptyRecalls);
-app.get('/deleteTheKeyPhrasesForPassage', deleteTheKeyPhrasesForPassage);
-app.get('/recreateNewRecallGradesDocuments', recreateNewRecallGradesDocuments);
-app.get('/addNexDataToFeedbackCode', addNexDataToFeedbackCode);
-app.get('/assignNodeContributorsInstitutionsStats',assignNodeContributorsInstitutionsStats);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
