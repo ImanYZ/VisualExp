@@ -64,6 +64,7 @@ const CodeFeedback = props => {
   const [selecte, setSelecte] = useState(null);
   const [docId, setDocId] = useState("");
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
+  const [feedbackCodeChanges, setFeedbackCodeChanges] = useState([]);
   const [codeBooksLoaded, setCodeBooksLoaded] = useState(false);
   const [enableSaveQuote, setEnableSaveQuote] = useState(new Array(100).fill(true));
   const [submittingUpdate, setSubmittingUpdate] = useState(false);
@@ -72,6 +73,7 @@ const CodeFeedback = props => {
   // const isAdmin = useRecoilValue(isAdminState);
   const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
+  const [allFeedbackCodeCodes, setAllFeedbackCodeCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
   const [code, setCode] = useState("");
   const [conditionsOrder, setConditionsOrder] = useState([]);
@@ -183,6 +185,98 @@ const CodeFeedback = props => {
       }
     }
   ];
+
+  const feedBackCodesColumns = [
+    {
+      field: "explanation",
+      headerName: "Explanation",
+      width: "900",
+      renderCell: cellValues => {
+        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      }
+    },
+    {
+      field: "choice",
+      headerName: "The participant choice",
+      width: "500",
+      renderCell: cellValues => {
+        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      }
+    }
+  ];
+  useEffect(() => {
+    if (firebase) {
+      const feedbackCodeQuery = firebase.db.collection("feedbackCode").where("coders", "array-contains", fullname);
+
+      const feedbackCodeSnapshot = feedbackCodeQuery.onSnapshot(snapshot => {
+        const docChanges = snapshot.docChanges();
+        setFeedbackCodeChanges([...docChanges]);
+      });
+      return () => {
+        setFeedbackCodeChanges([]);
+        feedbackCodeSnapshot();
+      };
+    }
+  }, [firebase]);
+
+  useEffect(() => {
+    const func = async () => {
+      const allCodes = [...allFeedbackCodeCodes];
+
+      for (let change of feedbackCodeChanges) {
+        const data = change.doc.data();
+        const id = change.doc.id;
+
+        if (change.type === "added") {
+          const obj = { id, ...data };
+          allCodes.push(obj);
+        } else if (change.type === "modified") {
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
+          }
+        } else if (change.type === "removed") {
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex !== -1) {
+            allCodes.splice(existingIndex, 1);
+          }
+        }
+      }
+      setAllFeedbackCodeCodes(allCodes);
+    };
+
+    if (codeBooksChanges.length > 0) {
+      func();
+    }
+  }, [codeBooksChanges]);
+  console.log(allFeedbackCodeCodes);
+  const feedBackCodesChoices = useMemo(() => {
+    return allFeedbackCodeCodes.map(c => {
+      return {
+        id: c.id,
+        explanation: c.explanation,
+        choice: c.choice
+      };
+    });
+  }, [allFeedbackCodeCodes]);
+
+  useEffect(() => {
+    const func = async () => {
+      const feedbackCodeDocs = await firebase.db
+        .collection("feedbackCode")
+        .where("coders", "array-contains", fullname)
+        .get();
+
+      for (let feedBack of feedbackCodeDocs.docs) {
+      }
+    };
+
+    func();
+  }, [project]);
   useEffect(() => {
     setSentences("");
     setChosenCondition("");
@@ -313,7 +407,6 @@ const CodeFeedback = props => {
     const retriveNextResponse = async () => {
       let docID;
       const feedbackCodesOrderDoc = await firebase.db.collection("feedbackCodeOrder").doc(project).get();
-
       const orderData = feedbackCodesOrderDoc.data();
       if (orderData[fullname] && orderData[fullname].length === 0) {
         setAllResponsesGraded(true);
@@ -889,6 +982,58 @@ const CodeFeedback = props => {
     setChoiceConditions(_choiceConditions);
     setSwitchState(_switchState);
   };
+  const handleCellClickFeedBackCode = async clickedCell => {
+    let docID = clickedCell.id;
+    console.log(docID);
+    const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
+    const feedbackData = feedbackCodesDoc.data();
+    const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+    const userData = userDoc.data();
+    const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
+    const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
+    setDocId(docID);
+    setSentences(response);
+    setChosenCondition(feedbackData.choice);
+    const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
+    if (userData.pConditions.length > 1) {
+      const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
+      cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
+    }
+    setConditionsOrder(cOrders);
+    const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+    const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+    setApprovedNewCodes(newCodes);
+    const quotesSelectedForCode = { ...quotesSelectedForCodes };
+    for (let code of myCodes) {
+      quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
+    }
+    for (let code of newCodes) {
+      quotesSelectedForCode[code] = [];
+    }
+    setQuotesSelectedForCodes(quotesSelectedForCode);
+
+    const _choiceConditions = {};
+    const _switchState = {};
+
+    let codesSelecting = {};
+    console.log(feedbackData.codersChoiceConditions[fullname]);
+    for (let code in feedbackData.codersChoiceConditions[fullname]) {
+      const choiceCode = feedbackData.codersChoiceConditions[fullname][code]
+      codesSelecting[code] = false;
+      _choiceConditions[code] = choiceCode;
+      _switchState[code] = project==="H2K2"?(choiceCode==="H2"?false:true):(choiceCode==="H1"?false:true);
+    }
+    setSwitchState(_switchState);
+    setChoiceConditions(_choiceConditions);
+    setSelected(codesSelecting);
+
+    //we check if the authenticated reserchers have aleardy casted his vote
+    //if so we get all his recorded past choices
+    setSubmitting(false);
+  };
+
+  console.log(choiceConditions);
+  
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1039,11 +1184,17 @@ const CodeFeedback = props => {
                         </ListItemButton>
 
                         {project === "H2K2" ? "H2" : "H1"}
-                        <Switch
-                          checked={switchState[codeData.code]}
+                        {switchState[codeData.code]?<Switch
+                          checked={true}
                           onChange={event => changeChoices(event, codeData.code)}
                           color="secondary"
                         />
+                        :
+                        <Switch
+                          checked={false}
+                          onChange={event => changeChoices(event, codeData.code)}
+                          color="secondary"
+                        />}
                         {project === "H2K2" ? "K2" : "L2"}
                       </ListItem>
                     ))}
@@ -1139,7 +1290,24 @@ const CodeFeedback = props => {
       ) : (
         <CircularProgress color="warning" sx={{ margin: "300px 600px 500px 580px" }} size="100px" />
       )}
-
+      <Alert severity="info" className="VoteActivityAlert">
+        Take a look at your choices and take a look ;you can also modify you votes{" "}
+      </Alert>
+      <Box sx={{ mb: "50px" }}>
+        <Paper>
+          <DataGrid
+            rows={feedBackCodesChoices}
+            columns={feedBackCodesColumns}
+            pageSize={15}
+            rowsPerPageOptions={[10]}
+            autoPageSize
+            autoHeight
+            hideFooterSelectedRowCount
+            loading={false}
+            onCellClick={handleCellClickFeedBackCode}
+          />
+        </Paper>
+      </Box>
       {email === "oneweb@umich.edu" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
