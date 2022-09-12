@@ -1015,10 +1015,11 @@ const CodeFeedback = props => {
 
     let codesSelecting = {};
     for (let code in feedbackData.codersChoiceConditions[fullname]) {
-      const choiceCode = feedbackData.codersChoiceConditions[fullname][code]
+      const choiceCode = feedbackData.codersChoiceConditions[fullname][code];
       codesSelecting[code] = false;
       _choiceConditions[code] = choiceCode;
-      _switchState[code] = project==="H2K2"?(choiceCode==="H2"?false:true):(choiceCode==="H1"?false:true);
+      _switchState[code] =
+        project === "H2K2" ? (choiceCode === "H2" ? false : true) : choiceCode === "H1" ? false : true;
     }
     setSwitchState(_switchState);
     setChoiceConditions(_choiceConditions);
@@ -1029,7 +1030,6 @@ const CodeFeedback = props => {
     setSubmitting(false);
   };
 
-  
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1180,17 +1180,19 @@ const CodeFeedback = props => {
                         </ListItemButton>
 
                         {project === "H2K2" ? "H2" : "H1"}
-                        {switchState[codeData.code]?<Switch
-                          checked={true}
-                          onChange={event => changeChoices(event, codeData.code)}
-                          color="secondary"
-                        />
-                        :
-                        <Switch
-                          checked={false}
-                          onChange={event => changeChoices(event, codeData.code)}
-                          color="secondary"
-                        />}
+                        {switchState[codeData.code] ? (
+                          <Switch
+                            checked={true}
+                            onChange={event => changeChoices(event, codeData.code)}
+                            color="secondary"
+                          />
+                        ) : (
+                          <Switch
+                            checked={false}
+                            onChange={event => changeChoices(event, codeData.code)}
+                            color="secondary"
+                          />
+                        )}
                         {project === "H2K2" ? "K2" : "L2"}
                       </ListItem>
                     ))}
@@ -1286,8 +1288,9 @@ const CodeFeedback = props => {
       ) : (
         <CircularProgress color="warning" sx={{ margin: "300px 600px 500px 580px" }} size="100px" />
       )}
-      <Alert severity="info" className="VoteActivityAlert">
-        Take a look at your choices and take a look ;you can also modify you votes{" "}
+      <Alert severity="warning" className="VoteActivityAlert">
+        Click any of the feedback that you previously coded. It'll populate your codes on top. Then, you can revise
+        them.
       </Alert>
       <Box sx={{ mb: "50px" }}>
         <Paper>
