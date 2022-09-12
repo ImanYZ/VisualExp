@@ -819,7 +819,7 @@ const ResearcherPassage = () => {
                   <ul key={index}>
                     <li>
                       <div>{phrase}</div>
-                      {email === "oneweb@umich.edu" && (
+                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
                         <>
                           <IconButton
                             edge="end"
