@@ -301,6 +301,31 @@ exports.loadContacts = async (req, res) => {
   return res.status(500).json({ done: true });
 };
 
+const convertConditionNames = abbreviation => {
+  return abbreviation
+    ? abbreviation === "H2"
+      ? "Hybrid Map"
+      : abbreviation === "K2"
+      ? "Knowledge Model"
+      : abbreviation
+    : "";
+};
+
+const getPassageType = passageTitle => {
+  return passageTitle == "Managerial Decision Making"
+    ? "CmapTools"
+    : passageTitle == "The Jaws That Jump" || passageTitle == "The Hearing of the Barn Owl"
+    ? "ACT Natural Sciences"
+    : passageTitle == "Conservationist  and Diplomat: The Grey Areas of Panda Conservation" ||
+      passageTitle == "How to Watch Television"
+    ? "ACT Social Sciences"
+    : passageTitle == "The Buzz in Our Pockets"
+    ? "ACT Humanities"
+    : passageTitle == "Prima Ballerina" || passageTitle == "Reena"
+    ? "ACT Prose Fiction/Literary Narrative"
+    : "";
+};
+
 // Download the dataset in CSV
 exports.retrieveData = async (req, res) => {
   console.log("retrieveData");
@@ -325,6 +350,7 @@ exports.retrieveData = async (req, res) => {
         "Order",
         "Condition",
         "Passage",
+        "PassageType",
         // "pretestEnded",
         "PretestScore",
         "PretestScoreRatio",
@@ -345,8 +371,8 @@ exports.retrieveData = async (req, res) => {
         "RecognitionScoreRatio",
         // "RecognitionTime",
         "Duration",
-        "PostQ1Choice",
-        "PostQ2Choice",
+        "Readability",
+        "Learnability",
         // "PostQsEnded",
         // "PostQsStart",
         "Feedback1",
@@ -362,7 +388,7 @@ exports.retrieveData = async (req, res) => {
         // "createdAt",
         // "demoQsEnded",
         // "demoQsStart",
-        "education",
+        "Education",
         // "email",
         "Ethnicity",
         "Gender",
@@ -372,6 +398,7 @@ exports.retrieveData = async (req, res) => {
         "Order",
         "Condition",
         "Passage",
+        "PassageType",
         "Session",
         "Question",
         "QuestionType",
@@ -463,8 +490,9 @@ exports.retrieveData = async (req, res) => {
           // commonFields.push(passages[userData.nullPassage].title);
           commonFields.push(pCIdx);
           pCond = userData.pConditions[pCIdx];
-          commonFields.push(pCond.condition);
+          commonFields.push(convertConditionNames(pCond.condition));
           commonFields.push(passages[pCond.passage].title);
+          commonFields.push(getPassageType(passages[pCond.passage].title));
           // commonFields.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
           commonFields.push("pretestScore" in pCond ? pCond.pretestScore : "");
           commonFields.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
@@ -520,7 +548,7 @@ exports.retrieveData = async (req, res) => {
             const questions = passages[pCond.passage].questions;
             for (let idx = 0; idx < questions.length; idx++) {
               if (pCond.test) {
-                rowLong = row.slice(0, 15);
+                rowLong = row.slice(0, 11);
                 rowLong.push("1st");
                 rowLong.push(pCond.passage + "Q" + idx);
                 rowLong.push(questions[idx].type);
@@ -528,7 +556,7 @@ exports.retrieveData = async (req, res) => {
                 rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
                 rowsLongData.push(rowLong);
                 if (pCond.test3Days) {
-                  rowLong = row.slice(0, 15);
+                  rowLong = row.slice(0, 11);
                   rowLong.push("2nd");
                   rowLong.push(pCond.passage + "Q" + idx);
                   rowLong.push(questions[idx].type);
@@ -536,7 +564,7 @@ exports.retrieveData = async (req, res) => {
                   rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
                   rowsLongData.push(rowLong);
                   if (pCond.test1Week) {
-                    rowLong = row.slice(0, 15);
+                    rowLong = row.slice(0, 11);
                     rowLong.push("3rd");
                     rowLong.push(pCond.passage + "Q" + idx);
                     rowLong.push(questions[idx].type);
@@ -548,8 +576,8 @@ exports.retrieveData = async (req, res) => {
               }
             }
           }
-          row.push(userData.postQ1Choice ? userData.postQ1Choice : "");
-          row.push(userData.postQ2Choice ? userData.postQ2Choice : "");
+          row.push(convertConditionNames(userData.postQ1Choice));
+          row.push(convertConditionNames(userData.postQ2Choice));
           // row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
           // row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
           row.push(
@@ -611,8 +639,8 @@ exports.retrieveData = async (req, res) => {
               row.push("test3DaysScoreRatio" in pCond ? pCond.test3DaysScoreRatio : "");
               // row.push("test3DaysTime" in pCond ? pCond.test3DaysTime : "");
               row.push(secondDuration);
-              row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
-              row.push(userData.post3DaysQ2Choice ? userData.post3DaysQ2Choice : "");
+              row.push(convertConditionNames(userData.post3DaysQ1Choice));
+              row.push(convertConditionNames(userData.post3DaysQ2Choice));
               // row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
               // row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
               row.push(
@@ -673,8 +701,8 @@ exports.retrieveData = async (req, res) => {
               row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
               // row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
               row.push(thirdDuration);
-              row.push(userData.post3DaysQ1Choice ? userData.post3DaysQ1Choice : "");
-              row.push(userData.post1WeekQ2Choice ? userData.post1WeekQ2Choice : "");
+              row.push(convertConditionNames(userData.post1WeekQ1Choice));
+              row.push(convertConditionNames(userData.post1WeekQ2Choice));
               // row.push(userData.post1WeekQsEnded ? getDateTimeString(userData.post1WeekQsEnded.toDate()) : "");
               // row.push(userData.post1WeekQsStart ? getDateTimeString(userData.post1WeekQsStart.toDate()) : "");
               row.push(
