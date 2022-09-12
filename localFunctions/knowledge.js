@@ -3,7 +3,7 @@ const fs = require("fs");
 
 const {
   admin,
-  db,
+  oneDb,
   commitBatch,
   batchSet,
   batchUpdate,
@@ -11,7 +11,7 @@ const {
 } = require("./admin_Knowledge");
 
 exports.downloadNodes = async (req, res) => {
-  const nodesDocs = await db.collection("nodes").get();
+  const nodesDocs = await oneDb.collection("nodes").get();
   if (nodesDocs.docs.length > 0) {
     const createCsvWriter = require("csv-writer").createObjectCsvWriter;
     const csvWriter = createCsvWriter({
@@ -117,7 +117,7 @@ exports.fixInstitutionInUsers = async (req, res) => {
     );
     const institutionsData = JSON.parse(rawdata);
 
-    let userDocs = await db.collection("users").get();
+    let userDocs = await oneDb.collection("users").get();
     userDocs = [...userDocs.docs];
     let domainsNW = [];
     for (let instObj1 of institutionsData) {
@@ -143,7 +143,7 @@ exports.fixInstitutionInUsers = async (req, res) => {
           (instObj.domains === domainName )
         ) {
           console.log({ username: userData.uname, instObj });
-          const userRef = db.collection("users").doc(userDoc.id);
+          const userRef = oneDb.collection("users").doc(userDoc.id);
           await batchUpdate(userRef, { deInstit: instObj.name });
         }
       }
@@ -199,13 +199,13 @@ exports.identifyDuplicateInstitutionDomains = async (req, res) => {
 //       ];
 //       for (let { email, institution } of emailsInsts) {
 //         if (institution !== "" && email !== "Email") {
-//           userDocs = await db
+//           userDocs = await oneDb
 //             .collection("users")
 //             .where("email", "==", email)
 //             .limit(1)
 //             .get();
 //           if (userDocs.docs.length > 0) {
-//             userRef = db.collection("users").doc(userDocs.docs[0].id);
+//             userRef = oneDb.collection("users").doc(userDocs.docs[0].id);
 //             await userRef.update({ deInstit: institution });
 //           }
 //         }

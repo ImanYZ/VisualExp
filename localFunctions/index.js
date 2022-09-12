@@ -26,6 +26,7 @@ const {
   addNexDataToFeedbackCode,
   fixActivityProject,
   appendPointsFieldForEmptyRecalls,
+  addTheInstitutionFeildForUsers,
 } = require("./visualExp");
 
 const app = express();
@@ -73,6 +74,7 @@ app.get("/deleteTheKeyPhrasesForPassage", deleteTheKeyPhrasesForPassage);
 app.get("/recreateNewRecallGradesDocuments", recreateNewRecallGradesDocuments);
 app.get("/addNexDataToFeedbackCode", addNexDataToFeedbackCode);
 app.get("/appendPointsFieldForEmptyRecalls", appendPointsFieldForEmptyRecalls);
+app.get("/addTheInstitutionFeildForUsers",addTheInstitutionFeildForUsers);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
