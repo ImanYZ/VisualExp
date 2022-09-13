@@ -2369,14 +2369,24 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         approvedCodes.forEach(codeData => {
           if (quotesSelectedForCodes[codeData.code].length !== 0) {
             if (feedbackCodeData.codesVotes[codeData.code]) {
-              const voters = feedbackCodeData.codesVotes[codeData.code];
-              voters.push(fullname);
-              codesVotes[codeData.code] = voters;
+              if (!feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
+                const voters = feedbackCodeData.codesVotes[codeData.code];
+                voters.push(fullname);
+                codesVotes[codeData.code] = voters;
+              }
             } else {
               codesVotes[codeData.code] = [fullname];
             }
           } else {
-            codesVotes[codeData.code] = [];
+            if (feedbackCodeData.codesVotes[codeData.code]) {
+              if (feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
+                const voters = feedbackCodeData.codesVotes[codeData.code];
+                voters.splice(voters.indexOf(fullname), 1);
+                codesVotes[codeData.code] = voters;
+              }
+            } else {
+              codesVotes[codeData.code] = [];
+            }
           }
         });
         let feedbackCodeUpdate = {
