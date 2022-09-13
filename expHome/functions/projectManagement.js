@@ -2369,7 +2369,7 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         approvedCodes.forEach(codeData => {
           if (quotesSelectedForCodes[codeData.code].length !== 0) {
             if (feedbackCodeData.codesVotes[codeData.code]) {
-              if (feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
+              if (!feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
                 const voters = feedbackCodeData.codesVotes[codeData.code];
                 voters.push(fullname);
                 codesVotes[codeData.code] = voters;
