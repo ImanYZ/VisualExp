@@ -596,7 +596,7 @@ const ResearcherPassage = () => {
                       <Typography variant="h6" gutterBottom component="div" mb={2}>
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
-                      {email === "oneweb@umich.edu" && (
+                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
                         <List>
                           {["Inference", "memory"].map(type => (
                             <ListItem disablePadding>
@@ -770,7 +770,7 @@ const ResearcherPassage = () => {
                         Answer: <mark>{question[question.answer]}</mark>
                       </Typography>
 
-                      {email === "oneweb@umich.edu" && (
+                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
                         <List>
                           {["Inference", "memory"].map(type => (
                             <ListItem disablePadding>
@@ -819,7 +819,7 @@ const ResearcherPassage = () => {
                   <ul key={index}>
                     <li>
                       <div>{phrase}</div>
-                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
+                      {email === "oneweb@umich.edu" && (
                         <>
                           <IconButton
                             edge="end"
