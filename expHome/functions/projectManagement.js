@@ -2381,7 +2381,6 @@ exports.handleSubmitFeebackCode = async (req, res) => {
             if (feedbackCodeData.codesVotes[codeData.code]) {
               if (feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
                 const voters = feedbackCodeData.codesVotes[codeData.code];
-                voters.push(fullname);
                 voters.splice(voters.indexOf(fullname), 1);
                 codesVotes[codeData.code] = voters;
               }
