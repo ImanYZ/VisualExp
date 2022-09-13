@@ -2544,9 +2544,9 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
       if (!feedData[fullname] || feedData[fullname].length <= 5) {
         console.log("IF");
         for (let feedbackDoc of feedbackCodesDocs.docs) {
-          if (!allIds.has(feedbackDoc.id)) {
-            const feedbackData = feedbackDoc.data();
-
+          const feedbackData = feedbackDoc.data();
+          const filtered = (feedbackData.explanation || "").split(" ").filter(w => w.trim());
+          if (!allIds.has(feedbackDoc.id) && filtered.length > 4) {
             // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
             const userDoc = await db.collection("users").doc(feedbackData.fullname).get();
             const userData = userDoc.data();

@@ -413,42 +413,42 @@ const CodeFeedback = props => {
         setAllResponsesGraded(false);
       }
       docID = orderData[fullname][0];
-
-      const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
-      const feedbackData = feedbackCodesDoc.data();
-
-      setChosenCondition(feedbackData.choice);
-      const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
-      const userData = userDoc.data();
-
-      const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
-
-      const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
-      setDocId(docID);
-      setSentences(response);
-      setChosenCondition(feedbackData.choice);
-      const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
-      if (userData.pConditions.length > 1) {
-        const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
-        cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
-      }
-      setConditionsOrder(cOrders);
-      if (feedbackData.coders.includes(fullname)) {
-        const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
-        const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-        setApprovedNewCodes(newCodes);
-        const quotesSelectedForCode = { ...quotesSelectedForCodes };
-        for (let code of myCodes) {
-          quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
+      if(docID){
+        const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
+        const feedbackData = feedbackCodesDoc.data();
+  
+        setChosenCondition(feedbackData.choice);
+        const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+        const userData = userDoc.data();
+  
+        const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
+  
+        const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
+        setDocId(docID);
+        setSentences(response);
+        setChosenCondition(feedbackData.choice);
+        const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
+        if (userData.pConditions.length > 1) {
+          const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
+          cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
         }
-        for (let code of newCodes) {
-          quotesSelectedForCode[code] = [];
+        setConditionsOrder(cOrders);
+        if (feedbackData.coders.includes(fullname)) {
+          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
+          const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
+          setApprovedNewCodes(newCodes);
+          const quotesSelectedForCode = { ...quotesSelectedForCodes };
+          for (let code of myCodes) {
+            quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
+          }
+          for (let code of newCodes) {
+            quotesSelectedForCode[code] = [];
+          }
+          setQuotesSelectedForCodes(quotesSelectedForCode);
         }
-        setQuotesSelectedForCodes(quotesSelectedForCode);
+        //we check if the authenticated reserchers have aleardy casted his vote
+        //if so we get all his recorded past choices
       }
-      //we check if the authenticated reserchers have aleardy casted his vote
-      //if so we get all his recorded past choices
-
       setSubmitting(false);
     };
     retriveNextResponse();
