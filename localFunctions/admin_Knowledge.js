@@ -28,12 +28,12 @@ const isFirestoreDeadlineError = (err) => {
   );
 };
 
-const db = admin.firestore();
+const oneDb = admin.firestore();
 
 // How many transactions/batchWrites out of 500 so far.
 // I wrote the following functions to easily use batchWrites wthout worrying about the 500 limit.
 let writeCounts = 0;
-let batch = db.batch();
+let batch = oneDb.batch();
 let isCommitting = false;
 
 // Commit and reset batchWrites and the counter.
@@ -43,7 +43,7 @@ const makeCommitBatch = async () => {
     isCommitting = true;
     await batch.commit();
     writeCounts = 0;
-    batch = db.batch();
+    batch = oneDb.batch();
     isCommitting = false;
   } else {
     const batchWaitInterval = setInterval(async () => {
@@ -51,7 +51,7 @@ const makeCommitBatch = async () => {
         isCommitting = true;
         await batch.commit();
         writeCounts = 0;
-        batch = db.batch();
+        batch = oneDb.batch();
         isCommitting = false;
         clearInterval(batchWaitInterval);
       }
@@ -137,7 +137,7 @@ const batchDelete = async (docRef) => {
 
 module.exports = {
   admin,
-  db,
+  oneDb,
   MAX_TRANSACTION_WRITES,
   checkRestartBatchWriteCounts,
   commitBatch,

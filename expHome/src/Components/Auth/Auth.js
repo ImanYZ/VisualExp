@@ -7,8 +7,9 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
+import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
-
+import { Autocomplete, TextField } from "@mui/material";
 import {
   currentProjectState,
   phaseState,
@@ -45,6 +46,7 @@ const Auth = props => {
   const [condition, setCondition] = useRecoilState(conditionState);
   const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
+  const [institutions, setInstitutions] = useState([]);
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -70,6 +72,7 @@ const Auth = props => {
   const [signUpSubmitable, setSignUpSubmitable] = useState(false);
   const [submitable, setSubmitable] = useState(false);
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
+  const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
@@ -196,6 +199,7 @@ const Auth = props => {
           email: uEmail,
           firstname,
           lastname: lName,
+          institution:nameFromInstitutionSelected.name,
           project: currentProject
         };
         if (course) {
@@ -384,6 +388,26 @@ const Auth = props => {
     setValidPasswordResetEmail(isEmail(resetPasswordEmail));
   }, [resetPasswordEmail]);
 
+  useEffect(() => {
+    const getInstitutions = async () => {
+      const institutionsRequest = await axios.get("/getInstitutions");
+      console.log(institutionsRequest);
+      setInstitutions(institutionsRequest.data);
+    };
+    getInstitutions();
+  }, []);
+
+  useEffect(() => {
+    const getNameFromInstitutionSelected = async () => {
+      if (email !== "") {
+        const data = await axios.post("/checkEmailInstitution", { email });
+        if (data?.data.institution) {
+          setNameFromInstitutionSelected(data.data.institution);
+        }
+      }
+    };
+    getNameFromInstitutionSelected();
+  }, [email]);
   const switchAccount = event => {
     event.preventDefault();
     setIsSubmitting(false);
@@ -566,6 +590,22 @@ const Auth = props => {
                 errorMessage={validEmail ? null : "Please enter your valid email address!"}
                 onKeyPress={onKeyPress}
               />
+              <Autocomplete
+                id="institution"
+                value={nameFromInstitutionSelected}
+                options={institutions}
+                onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
+                renderInput={params => <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />}
+                getOptionLabel={option => option.name?option.name:""}
+                renderOption={(props, option) => (
+                  <li key={option.id} {...props}>
+                    {option.name}
+                  </li>
+                )}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                fullWidth
+                sx={{ mb: "16px" }}
+              />
               <ValidatedInput
                 className="PleaseSpecify"
                 onChange={passwordChange}
@@ -588,6 +628,7 @@ const Auth = props => {
                 errorMessage={validConfirmPassword ? null : "Your password and the re-entered password should match!"}
                 onKeyPress={onKeyPress}
               />
+
               {/* <p>If participating for course credit, specify the course:</p>
           <FormControl fullWidth>
             <InputLabel id="CourseSelectLabel">Select course:</InputLabel>

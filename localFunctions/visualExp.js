@@ -10,6 +10,7 @@ const {
   batchUpdate,
   batchDelete,
 } = require("./admin");
+const { oneDb } = require("./admin_Knowledge");
 
 exports.addRecallGradesColl = async (req, res) => {
   try {
@@ -1660,7 +1661,7 @@ exports.fixActivityProject = async (req, res) => {
   }
 };
 
-exports.appendPointsFieldForEmptyRecalls = async (req,res) => {
+exports.appendPointsFieldForEmptyRecalls = async (req, res) => {
   try {
     const userDocs = await db.collection("users").get();
 
@@ -1669,11 +1670,10 @@ exports.appendPointsFieldForEmptyRecalls = async (req,res) => {
       userData = userDoc.data();
       if (userData.pConditions) {
         const userUpdate = {
-          ...userData
+          ...userData,
         };
-        for (let index = 0; index < userData.pConditions.length;  ++index) {
-
-          const pcond = userData.pConditions[index]
+        for (let index = 0; index < userData.pConditions.length; ++index) {
+          const pcond = userData.pConditions[index];
           for (let recall of [
             "recallreText",
             "recall3DaysreText",
@@ -1691,17 +1691,92 @@ exports.appendPointsFieldForEmptyRecalls = async (req,res) => {
                 break;
             }
 
+            const filtered = (pcond[recall] || "")
+              .split(" ")
+              .filter((w) => w.trim());
 
-            const filtered = (pcond[recall] || "").split(" ").filter(w => w.trim());
-          
             if (filtered.length <= 2) {
               userUpdate.pConditions[index][recallResponse] = 0;
             }
           }
         }
-      await batchUpdate(userRef, userUpdate);
-
+        await batchUpdate(userRef, userUpdate);
       }
+    }
+    await commitBatch();
+    console.log("Done");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const checkEmailInstitution = async (email) => {
+  const domainName = email.match("@(.+)$")?.[0];
+  const institutionDoc = await oneDb
+    .collection("institutions")
+    .where("domains", "array-contains", domainName)
+    .limit(1)
+    .get();
+
+  if (institutionDoc && institutionDoc.docs.length > 0) {
+    const institutionData = institutionDoc.docs[0].data();
+    return institutionData.name;
+  }else{
+    return null;
+  }
+};
+
+exports.addTheInstitutionFeildForUsers = async (req, res) => {
+  try {
+    console.log("Start");
+    const oneUsersData = {};
+    const usersOneCademyDocs = await oneDb.collection("users").get();
+    for (let oneUserDoc of usersOneCademyDocs.docs) {
+      const oneUserData = oneUserDoc.data();  
+      oneUsersData[
+        {
+          email: oneUserData.email,
+          fName: oneUserData.fName,
+          lName: oneUserData.lName,
+        }
+      ] = oneUserDoc.data();
+    }
+    const usersDocs = await db.collection("users").get();
+    for (let userDoc of usersDocs.docs) {
+      const userData = userDoc.data();
+      const userRef = db.collection("users").doc(userDoc.id);
+      let userUpdate = {};
+      let foundeInst = false;
+      for (let key in oneUsersData) {
+        if (userData.email === key.email) {
+          userUpdate = {
+            institution: oneUsersData[key].deInstit,
+          };
+          foundeInst=true;
+        } else if (
+          userData.firstname === key.fName &&
+          userData.lastname === key.lName
+        ) {
+          userUpdate = {
+            institution: oneUsersData[key].deInstit,
+          };
+          foundeInst=true;
+        } 
+      }
+      if(!foundeInst){
+        const inst = await checkEmailInstitution(userData.email);
+        if (inst) {
+          userUpdate = {
+            institution: inst,
+          };
+        } else {
+          userUpdate = {
+            institution: "",
+          };
+        }
+      }
+      console.log({ userUpdate });
+      await batchUpdate(userRef, userUpdate);
     }
     await commitBatch();
     console.log("Done");

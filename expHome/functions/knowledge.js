@@ -316,3 +316,45 @@ exports.updateTypesenseIndex = async context => {
     return null;
   }
 };
+
+exports.checkEmailInstitution = async (req, res) => {
+  try {
+    const email = req.body.email;
+
+    const domainName = email.match("@(.+)$")?.[0];
+    const institutionDoc = await db
+      .collection("institutions")
+      .where("domains", "array-contains", domainName)
+      .limit(1)
+      .get();
+
+    if (institutionDoc && institutionDoc.docs.length > 0) {
+      const institutionData = institutionDoc.docs[0].data();
+      return res.status(200).json({ institution: institutionData });
+    }
+    return res.status(200).json("Not Found");
+  } catch (err) {
+    return res.status(400).json({ err });
+  }
+};
+
+exports.getInstitutions = async (req, res) => {
+  try {
+    const institutionsDocs = await db.collection("institutions").get();
+    let institutions = [];
+    institutionsDocs.docs.forEach(doc => {
+      const findIndex = institutions.find(element => element.id === doc.id);
+      if (!findIndex) {
+        institutions.push({ id: doc.id, ...doc.data() });
+      }
+    });
+
+    const institutionSorted = institutions
+      .sort((l1, l2) => (l1.name < l2.name ? -1 : 1))
+      .sort((l1, l2) => (l1.country < l2.country ? -1 : 1));
+
+    return res.status(200).json(institutionSorted);
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+};
