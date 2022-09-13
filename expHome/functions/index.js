@@ -51,7 +51,12 @@ const {
   lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
-const { assignNodeContributorsInstitutionsStats, updateInstitutions } = require("./knowledge");
+const {
+  assignNodeContributorsInstitutionsStats,
+  updateInstitutions,
+  checkEmailInstitution,
+  getInstitutions
+} = require("./knowledge");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -90,6 +95,7 @@ app.get("/passagesNumberCorrection", passagesNumberCorrection);
 app.get("/feedbackCodeData", feedbackCodeData);
 app.get("/recallData", recallData);
 app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
+app.get("/getInstitutions", getInstitutions);
 app.post("/vote", voteEndpoint);
 app.post("/markPaid", markPaidEndpoint);
 app.post("/voteAdministrator", voteAdministratorEndpoint);
@@ -101,7 +107,7 @@ app.post("/deleteActivity", deleteActivity);
 app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
 app.post("/handleSubmitFeebackCode", handleSubmitFeebackCode);
 app.post("/createTemporaryFeedbacodeCollection", createTemporaryFeedbacodeCollection);
-
+app.post("/checkEmailInstitution", checkEmailInstitution);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);
 app.post("/rescheduleEventNotificationEmail", rescheduleEventNotificationEmail);
