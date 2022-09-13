@@ -589,7 +589,6 @@ const App = () => {
         // the participant has not gone through that paragraph.
         const pendingPConIndex = pConditions.findIndex(pCon => !("testScore" in pCon) && pCon.condition !== condition);
         const pendingPCon = pConditions[pendingPConIndex];
-        console.log(pendingPCon);
         userUpdates = {};
         if (pendingPCon) {
           userUpdates = {
