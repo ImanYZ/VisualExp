@@ -376,7 +376,7 @@ const App = () => {
               responseName = "recall3DaysreText";
             } else if (session === "3rd") {
               responseName = "recall1WeekreText";
-            }            
+            }
             const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
             if (filtered.length > 2) {
               const recallGradeData = {
@@ -588,23 +588,18 @@ const App = () => {
         // and it's condition is not equal to the current condition that means
         // the participant has not gone through that paragraph.
         const pendingPConIndex = pConditions.findIndex(pCon => !("testScore" in pCon) && pCon.condition !== condition);
-
         const pendingPCon = pConditions[pendingPConIndex];
-
+        console.log(pendingPCon);
         userUpdates = {};
         if (pendingPCon) {
           userUpdates = {
-            phase: pendingPConIndex === -1 ? 1 : pendingPConIndex,
+            phase: pendingPConIndex,
             currentPCon: {
               passage: pendingPCon.passage,
               condition: pendingPCon.condition
             }
           };
-          if (pendingPConIndex === -1) {
-            newStep = 4;
-          } else {
-            newStep = 0;
-          }
+          newStep = 0;
         } else {
           newStep = 4;
         }
