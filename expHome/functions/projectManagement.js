@@ -2525,11 +2525,7 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         "s1oo3G4n3jeE8fJQRs3g"
       ];
 
-      const feedbackCodesDocs = await db
-        .collection("feedbackCode")
-        .where("project", "==", project)
-        .where("approved", "==", false)
-        .get();
+      const feedbackCodesDocs = await db.collection("feedbackCode").orderBy("session").get();
       let foundResponse = false;
       const feedbackRef = db.collection("feedbackCodeOrder").doc(project);
       const feedDoc = await feedbackRef.get();
@@ -2546,7 +2542,12 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         for (let feedbackDoc of feedbackCodesDocs.docs) {
           const feedbackData = feedbackDoc.data();
           const filtered = (feedbackData.explanation || "").split(" ").filter(w => w.trim());
-          if (!allIds.has(feedbackDoc.id) && filtered.length > 4) {
+          if (
+            !allIds.has(feedbackDoc.id) &&
+            filtered.length > 4 &&
+            feedbackData.project === project &&
+            !feedbackData.approved
+          ) {
             // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
             const userDoc = await db.collection("users").doc(feedbackData.fullname).get();
             const userData = userDoc.data();
@@ -2557,43 +2558,10 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
             ) {
               //we check if the authenticated reserchers have aleardy casted his vote
               //if so we get all his recorded past choices
-              if (feedbackData.coders.includes(fullname)) {
-                let voteAgain = false;
-                const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
-                // if the string representations of these arrays ar enot same that means they have been changed.
-                for (let approvedCode of approvedCodes) {
-                  if (!myCodes.includes(approvedCode)) {
-                    voteAgain = true;
-                  }
-                }
-
-                if (voteAgain) {
-                  feedBackCodeIds.push(feedbackDoc.id);
-                  if (feedBackCodeIds.length === 5) {
-                    foundResponse = true;
-                  }
-                }
-                // if the authenticated researcher didn't vote on this  explanation yet
-                // we check if all the others coders who previously casted their vote that they checked
-                //the new code added ,so that way we would know if we can show this explanation or not
-              } else if (!feedbackData.coders.includes(fullname)) {
-                let allowOtherResearchersToVote = true;
-                if (feedbackData.coders.length !== 0) {
-                  for (let coder of feedbackData.coders) {
-                    const myCodes = Object.keys(feedbackData.codersChoices[coder]).sort();
-                    // if the some of the approved codes doesn't exist the codeschoices for coders we should not allow the auth reserhers to vote on it yet
-                    for (let approvedCode of approvedCodes) {
-                      if (!myCodes.includes(approvedCode)) {
-                        allowOtherResearchersToVote = false;
-                      }
-                    }
-                  }
-                }
-                if (allowOtherResearchersToVote) {
-                  feedBackCodeIds.push(feedbackDoc.id);
-                  if (feedBackCodeIds.length === 5) {
-                    foundResponse = true;
-                  }
+              if (!feedbackData.coders.includes(fullname)) {
+                feedBackCodeIds.push(feedbackDoc.id);
+                if (feedBackCodeIds.length === 5) {
+                  foundResponse = true;
                 }
               }
               if (foundResponse) {
