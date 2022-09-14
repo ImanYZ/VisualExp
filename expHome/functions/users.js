@@ -341,6 +341,7 @@ exports.retrieveData = async (req, res) => {
         // "demoQsEnded",
         // "demoQsStart",
         "Education",
+        "Institution",
         // "email",
         "Ethnicity",
         "Gender",
@@ -389,6 +390,7 @@ exports.retrieveData = async (req, res) => {
         // "demoQsEnded",
         // "demoQsStart",
         "Education",
+        "Institution",
         // "email",
         "Ethnicity",
         "Gender",
@@ -482,6 +484,7 @@ exports.retrieveData = async (req, res) => {
           // commonFields.push(userData.demoQsEnded ? getDateTimeString(userData.demoQsEnded.toDate()) : "");
           // commonFields.push(userData.demoQsStart ? getDateTimeString(userData.demoQsStart.toDate()) : "");
           commonFields.push(userData.education ? userData.education : "");
+          commonFields.push(userData.institution ? userData.institution : "");
           // commonFields.push(userData.email ? userData.email : "");
           commonFields.push(userData.ethnicity ? userData.ethnicity.join(" - ") : "");
           commonFields.push(userData.gender ? userData.gender : "");
@@ -548,26 +551,26 @@ exports.retrieveData = async (req, res) => {
             const questions = passages[pCond.passage].questions;
             for (let idx = 0; idx < questions.length; idx++) {
               if (pCond.test) {
-                rowLong = row.slice(0, 11);
+                rowLong = row.slice(0, 12);
                 rowLong.push("1st");
                 rowLong.push(pCond.passage + "Q" + idx);
-                rowLong.push(questions[idx].type);
+                rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                 rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                 rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
                 rowsLongData.push(rowLong);
                 if (pCond.test3Days) {
-                  rowLong = row.slice(0, 11);
+                  rowLong = row.slice(0, 12);
                   rowLong.push("2nd");
                   rowLong.push(pCond.passage + "Q" + idx);
-                  rowLong.push(questions[idx].type);
+                  rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                   rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                   rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
                   rowsLongData.push(rowLong);
                   if (pCond.test1Week) {
-                    rowLong = row.slice(0, 11);
+                    rowLong = row.slice(0, 12);
                     rowLong.push("3rd");
                     rowLong.push(pCond.passage + "Q" + idx);
-                    rowLong.push(questions[idx].type);
+                    rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                     rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                     rowLong.push(questions[idx] && pCond.test1Week[idx] === questions[idx].answer ? 1 : 0);
                     rowsLongData.push(rowLong);
@@ -731,7 +734,7 @@ exports.retrieveData = async (req, res) => {
     csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Created the CSV file!");
     });
-    csv.writeToPath("datasets/dataLong.csv", rowsLongData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/dataPerQuestion.csv", rowsLongData, { headers: true }).on("finish", () => {
       console.log("Created the Long CSV file!");
     });
   } catch (err) {
@@ -794,6 +797,25 @@ exports.feedbackData = async (req, res) => {
       rowsData.push(row);
     }
     csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("done process data!");
+    });
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
+// Download the feedback Quotes dataset in CSV
+exports.quotesData = async (req, res) => {
+  try {
+    const rowsData = [["QUOTE"]];
+    const quotesDocs = await db.collection("quotes").get();
+    for (let quoteDoc of quotesDocs.docs) {
+      const quoteData = quoteDoc.data();
+      rowsData.push([quoteData.quote]);
+    }
+    csv.writeToPath("datasets/quotesData.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
