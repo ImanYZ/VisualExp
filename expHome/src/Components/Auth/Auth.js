@@ -391,7 +391,6 @@ const Auth = props => {
   useEffect(() => {
     const getInstitutions = async () => {
       const institutionsRequest = await axios.get("/getInstitutions");
-      console.log(institutionsRequest);
       setInstitutions(institutionsRequest.data);
     };
     getInstitutions();
