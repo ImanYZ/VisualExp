@@ -2525,11 +2525,7 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         "s1oo3G4n3jeE8fJQRs3g"
       ];
 
-      const feedbackCodesDocs = await db
-        .collection("feedbackCode")
-        .where("project", "==", project)
-        .where("approved", "==", false)
-        .get();
+      const feedbackCodesDocs = await db.collection("feedbackCode").orderBy("session").get();
       let foundResponse = false;
       const feedbackRef = db.collection("feedbackCodeOrder").doc(project);
       const feedDoc = await feedbackRef.get();
@@ -2546,7 +2542,12 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         for (let feedbackDoc of feedbackCodesDocs.docs) {
           const feedbackData = feedbackDoc.data();
           const filtered = (feedbackData.explanation || "").split(" ").filter(w => w.trim());
-          if (!allIds.has(feedbackDoc.id) && filtered.length > 4) {
+          if (
+            !allIds.has(feedbackDoc.id) &&
+            filtered.length > 4 &&
+            feedbackData.project === project &&
+            !feedbackData.approved
+          ) {
             // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
             const userDoc = await db.collection("users").doc(feedbackData.fullname).get();
             const userData = userDoc.data();
