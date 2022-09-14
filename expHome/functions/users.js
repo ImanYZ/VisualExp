@@ -768,14 +768,39 @@ exports.feedbackData = async (req, res) => {
       row = [];
       row.push(userDoc.id);
       row.push(userData.postQ1Choice);
-      row.push(userData.explanations[0]);
+      row.push(
+        "explanations" in userData
+          ? typeof userData.explanations[0] === "object"
+            ? userData.explanations[0].explanation
+            : userData.explanations[0]
+          : ""
+      );
       row.push(userData.postQ2Choice);
-      row.push(userData.explanations[1]);
+      row.push(
+        "explanations" in userData
+          ? typeof userData.explanations[1] === "object"
+            ? userData.explanations[1].explanation
+            : userData.explanations[1]
+          : ""
+      );
       if (userData.post3DaysQsEnded) {
         row.push(userData.post3DaysQ1Choice);
-        row.push(userData.explanations3Days ? userData.explanations3Days[0] : "");
+
+        row.push(
+          "explanations3Days" in userData
+            ? typeof userData.explanations3Days[0] === "object"
+              ? userData.explanations3Days[0].explanation
+              : userData.explanations3Days[0]
+            : ""
+        );
         row.push(userData.post3DaysQ2Choice);
-        row.push(userData.explanations3Days ? userData.explanations3Days[1] : "");
+        row.push(
+          "explanations3Days" in userData
+            ? typeof userData.explanations3Days[1] === "object"
+              ? userData.explanations3Days[1].explanation
+              : userData.explanations3Days[1]
+            : ""
+        );
       } else {
         for (let idx = 0; idx < 4; idx++) {
           row.push("");
@@ -783,9 +808,22 @@ exports.feedbackData = async (req, res) => {
       }
       if (userData.post1WeekQsEnded) {
         row.push(userData.post1WeekQ1Choice);
-        row.push(userData.explanations1Week ? userData.explanations1Week[0] : "");
+
+        row.push(
+          "explanations1Week" in userData
+            ? typeof userData.explanations1Week[0] === "object"
+              ? userData.explanations1Week[0].explanation
+              : userData.explanations1Week[0]
+            : ""
+        );
         row.push(userData.post1WeekQ2Choice);
-        row.push(userData.explanations1Week ? userData.explanations1Week[1] : "");
+        row.push(
+          "explanations1Week" in userData
+            ? typeof userData.explanations1Week[1] === "object"
+              ? userData.explanations1Week[1].explanation
+              : userData.explanations1Week[1]
+            : ""
+        );
       } else {
         for (let idx = 0; idx < 4; idx++) {
           row.push("");
@@ -866,7 +904,7 @@ exports.feedbackCodeData = async (req, res) => {
       const feedbackCodeData = feedbackCodeDoc.data();
       const row = [];
       row.push(feedbackCodeDoc.id);
-      "session", row.push(feedbackCodeData.choice);
+      row.push(feedbackCodeData.choice);
       row.push(users[feedbackCodeData.fullname][0].passage);
       row.push(users[feedbackCodeData.fullname][0].condition);
       row.push(users[feedbackCodeData.fullname][1].passage);
