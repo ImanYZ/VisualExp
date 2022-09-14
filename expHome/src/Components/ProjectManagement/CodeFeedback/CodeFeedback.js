@@ -433,19 +433,7 @@ const CodeFeedback = props => {
           cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
         }
         setConditionsOrder(cOrders);
-        if (feedbackData.coders.includes(fullname)) {
-          const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
-          const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-          setApprovedNewCodes(newCodes);
-          const quotesSelectedForCode = { ...quotesSelectedForCodes };
-          for (let code of myCodes) {
-            quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
-          }
-          for (let code of newCodes) {
-            quotesSelectedForCode[code] = [];
-          }
-          setQuotesSelectedForCodes(quotesSelectedForCode);
-        }
+
         //we check if the authenticated reserchers have aleardy casted his vote
         //if so we get all his recorded past choices
       }
