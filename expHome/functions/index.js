@@ -5,7 +5,7 @@ const cors = require("cors");
 
 require("dotenv").config();
 
-const { deleteUser, retrieveData, feedbackCodeData, recallData, applicationReminder } = require("./users");
+const { deleteUser, retrieveData, feedbackCodeData, quotesData, recallData, applicationReminder } = require("./users");
 const {
   voteEndpoint,
   voteActivityReset,
@@ -93,6 +93,7 @@ app.post("/trackStudentEmailTemplateCopy", trackStudentEmailTemplateCopy);
 app.get("/retrieveData", retrieveData);
 app.get("/passagesNumberCorrection", passagesNumberCorrection);
 app.get("/feedbackCodeData", feedbackCodeData);
+app.get("/quotesData", quotesData);
 app.get("/recallData", recallData);
 app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
 app.get("/getInstitutions", getInstitutions);
