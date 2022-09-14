@@ -866,33 +866,19 @@ exports.quotesData = async (req, res) => {
 // Download the feedbackCode dataset in CSV
 exports.feedbackCodeData = async (req, res) => {
   try {
-    const codes = [
-      `All the information was in a single page.`,
-      `I could better recall the information.`,
-      `I prefer the horizontal orientation.`,
-      `I prefer the vertical orientation.`,
-      `I prefer to follow sentences rather than choppy pieces.`,
-      `It felt too much to read.`,
-      `It is more appropriate for informational content.`,
-      `It is more appropriate for literary narrative.`,
-      `It took me less time to read the passage.`,
-      `It was easier to find the answers to the multiple-choice questions.`,
-      `It was easier to follow the information from basic to advanced.`,
-      `It was easier to follow the story.`,
-      `It was easier to navigate/maneuver through.`,
-      `It was easier to quickly skim through the passage.`,
-      `Reading it felt more natural/comfortable.`,
-      `The choppy sentences have no follow. It's frustrating to read disconnected sentences.`,
-      `The information was better organized on the page.`,
-      `The information was presented in groups.`,
-      `The information was presented in multiple pages.`,
-      `The information was presented in smaller pieces.`,
-      `The information was presented more concisely.`,
-      `The key information was easier to identify.`,
-      `There were clear, explicit, links between related paragraphs/nodes`
-    ];
+    const feedbackCodesBooksDocs = await db
+      .collection("feedbackCodeBooks")
+      .get();
+
+    const codes = [];
+    for (let codeDoc of feedbackCodesBooksDocs.docs) {
+      const codeData = codeDoc.data();
+      if (codeData.approved && !codes.includes(codeData.code)) {
+        codes.push(codeData.code);
+      }
+    }
     const rowsData = [
-      ["id", "choice", "passage1", "condition1", "passage2", "condition2", "qIdx", "session", ...codes, "explanation"]
+      ["fullname","id", "choice", "passage1", "condition1", "passage2", "condition2", "qIdx", "session", ...codes, "explanation"]
     ];
     const passages = {};
     const passageDocs = await db.collection("passages").get();
@@ -922,9 +908,11 @@ exports.feedbackCodeData = async (req, res) => {
       .where("approved", "==", true)
       .where("project", "==", "H2K2")
       .get();
+
     for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
       const feedbackCodeData = feedbackCodeDoc.data();
       const row = [];
+      row.push(feedbackCodeData.fullname);
       row.push(feedbackCodeDoc.id);
       row.push(feedbackCodeData.choice);
       row.push(users[feedbackCodeData.fullname][0].passage);
