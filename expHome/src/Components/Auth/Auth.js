@@ -199,8 +199,8 @@ const Auth = props => {
           email: uEmail,
           firstname,
           lastname: lName,
-          institution:nameFromInstitutionSelected.name,
-          project: currentProject
+          institution: nameFromInstitutionSelected.name?nameFromInstitutionSelected.name:"",
+          project: currentProject,
         };
         if (course) {
           userData.course = course;
@@ -501,7 +501,6 @@ const Auth = props => {
       signUp(event);
     }
   };
-
   return (
     <div id="Auth">
       {/* <img
@@ -594,8 +593,10 @@ const Auth = props => {
                 value={nameFromInstitutionSelected}
                 options={institutions}
                 onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
-                renderInput={params => <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />}
-                getOptionLabel={option => option.name?option.name:""}
+                renderInput={params => (
+                  <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />
+                )}
+                getOptionLabel={option => (option.name ? option.name : "")}
                 renderOption={(props, option) => (
                   <li key={option.id} {...props}>
                     {option.name}
