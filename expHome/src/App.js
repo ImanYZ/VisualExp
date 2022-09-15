@@ -893,7 +893,7 @@ const App = () => {
   }, [fullname, secondSession, thirdSession]);
 
   useEffect(() => {
-    if (![0, 5, 19].includes(step) || phase === 1) {
+    if (![0, 5, 19].includes(step)) {
       const timerTimeout = setTimeout(() => {
         if (timer <= 1) {
           nextStep();
