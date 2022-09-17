@@ -1721,7 +1721,7 @@ const checkEmailInstitution = async (email) => {
   if (institutionDoc && institutionDoc.docs.length > 0) {
     const institutionData = institutionDoc.docs[0].data();
     return institutionData.name;
-  }else{
+  } else {
     return null;
   }
 };
@@ -1732,7 +1732,7 @@ exports.addTheInstitutionFeildForUsers = async (req, res) => {
     const oneUsersData = {};
     const usersOneCademyDocs = await oneDb.collection("users").get();
     for (let oneUserDoc of usersOneCademyDocs.docs) {
-      const oneUserData = oneUserDoc.data();  
+      const oneUserData = oneUserDoc.data();
       oneUsersData[
         {
           email: oneUserData.email,
@@ -1752,7 +1752,7 @@ exports.addTheInstitutionFeildForUsers = async (req, res) => {
           userUpdate = {
             institution: oneUsersData[key].deInstit,
           };
-          foundeInst=true;
+          foundeInst = true;
         } else if (
           userData.firstname === key.fName &&
           userData.lastname === key.lName
@@ -1760,10 +1760,10 @@ exports.addTheInstitutionFeildForUsers = async (req, res) => {
           userUpdate = {
             institution: oneUsersData[key].deInstit,
           };
-          foundeInst=true;
-        } 
+          foundeInst = true;
+        }
       }
-      if(!foundeInst){
+      if (!foundeInst) {
         const inst = await checkEmailInstitution(userData.email);
         if (inst) {
           userUpdate = {
@@ -1783,4 +1783,20 @@ exports.addTheInstitutionFeildForUsers = async (req, res) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+// Add H2K2 project to Quotes collection.
+exports.addH2K2toQuotes = async (req, res) => {
+  try {
+    const quotesDocs = await db.collection("quotes").get();
+    for (let quoteDoc of quotesDocs.docs) {
+      const quoteRef = db.collection("quotes").doc(quoteDoc.id);
+      await batchUpdate(quoteRef, { project: "H2K2" });
+    }
+    await commitBatch();
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
 };

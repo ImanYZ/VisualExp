@@ -413,16 +413,16 @@ const CodeFeedback = props => {
         setAllResponsesGraded(false);
       }
       docID = orderData[fullname][0];
-      if(docID){
+      if (docID) {
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
         const feedbackData = feedbackCodesDoc.data();
-  
+
         setChosenCondition(feedbackData.choice);
         const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
         const userData = userDoc.data();
-  
+
         const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
-  
+
         const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
         setDocId(docID);
         setSentences(response);
@@ -921,7 +921,11 @@ const CodeFeedback = props => {
       const _enableSaveQuote = [...enableSaveQuote];
       _enableSaveQuote[sentences.indexOf(quote)] = false;
       setEnableSaveQuote(_enableSaveQuote);
-      const quoteDocs = await firebase.db.collection("quotes").where("quote", "==", quote).get();
+      const quoteDocs = await firebase.db
+        .collection("quotes")
+        .where("quote", "==", quote)
+        .where("project", "==", project)
+        .get();
       if (quoteDocs.docs.length > 0) {
         let quoteData = quoteDocs.docs[0].data();
         if (!quoteData.researchers.includes(fullname)) {
@@ -938,6 +942,7 @@ const CodeFeedback = props => {
         const quoteRef = firebase.db.collection("quotes").doc();
         await quoteRef.set({
           researchers: [fullname],
+          project,
           quote,
           createdAt: new Date()
         });
