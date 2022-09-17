@@ -752,6 +752,30 @@ exports.retrieveData = async (req, res) => {
   return res.status(200).json({ done: false });
 };
 
+// Download the questions dataset in CSV
+exports.questionsData = async (req, res) => {
+  let rowsData;
+  try {
+    rowsData = [["Passage", "Question Stem", "Option 1", "Option 2", "Option 3", "Option 4", "Type"]];
+    const passageDocs = await db.collection("passages").get();
+    for (let passageDoc of passageDocs.docs) {
+      const passageData = passageDoc.data();
+      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
+        for (let question of passageData.questions) {
+          rowsData.push([question.stem, question.a, question.b, question.c, question.d, question.type]);
+        }
+      }
+    }
+    csv.writeToPath("datasets/questionsData.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("done process data!");
+    });
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
 // Download the feedback dataset in CSV
 exports.feedbackData = async (req, res) => {
   let rowsData, usersDocs, userData, row;
