@@ -233,11 +233,18 @@ const Activities = props => {
   };
 
   const isResearcherCriteriaMet = resear => {
-    let met = false;
+    let met = true;
     for (let key in projectPoints) {
-      if ((resear[key] || 0) > projectPoints[key]) {
-        met = true;
-        break;
+      if (key === "instructorsPoints") {
+        if (resear.dayInstructorUpVotes?resear.dayInstructorUpVotes:0 + resear.instructorsPoints < projectPoints.instructorsPoints) {
+          met = false;
+          break;
+        }
+      } else {
+        if ((resear[key] || 0) < projectPoints[key]) {
+          met = false;
+          break;
+        }
       }
     }
     return met;
