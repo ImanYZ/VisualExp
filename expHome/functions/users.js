@@ -454,6 +454,30 @@ exports.retrieveData = async (req, res) => {
     //     };
     //   }
     // }
+    let choiceCounts = {
+      first: { Readability: {}, Learnability: {} },
+      second: { Readability: {}, Learnability: {} },
+      third: { Readability: {}, Learnability: {} }
+    };
+    if (theProject === "H2K2") {
+      for (let cSession in choiceCounts) {
+        for (let cQuestion in choiceCounts[cSession]) {
+          choiceCounts[cSession][cQuestion]["H2"] = 0;
+          choiceCounts[cSession][cQuestion]["K2"] = 0;
+          choiceCounts[cSession][cQuestion]["Both"] = 0;
+          choiceCounts[cSession][cQuestion]["Neither"] = 0;
+        }
+      }
+    } else if (theProject === "H1L2") {
+      for (let cSession in choiceCounts) {
+        for (let cQuestion in choiceCounts[cSession]) {
+          choiceCounts[cSession][cQuestion]["H1"] = 0;
+          choiceCounts[cSession][cQuestion]["L2"] = 0;
+          choiceCounts[cSession][cQuestion]["Both"] = 0;
+          choiceCounts[cSession][cQuestion]["Neither"] = 0;
+        }
+      }
+    }
     const passages = {};
     const usedPassages = [];
     const passageDocs = await db.collection("passages").get();
@@ -600,6 +624,8 @@ exports.retrieveData = async (req, res) => {
           }
           row.push(userData.postQ1Choice ? convertConditionNames(userData.postQ1Choice) : "");
           row.push(userData.postQ2Choice ? convertConditionNames(userData.postQ2Choice) : "");
+          choiceCounts["first"]["Readability"][userData.postQ1Choice] += 1;
+          choiceCounts["first"]["Learnability"][userData.postQ2Choice] += 1;
           // row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
           // row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
           row.push(
@@ -663,6 +689,8 @@ exports.retrieveData = async (req, res) => {
               row.push(secondDuration);
               row.push(convertConditionNames(userData.post3DaysQ1Choice));
               row.push(convertConditionNames(userData.post3DaysQ2Choice));
+              choiceCounts["second"]["Readability"][userData.post1WeekQ1Choice] += 1;
+              choiceCounts["second"]["Learnability"][userData.post1WeekQ2Choice] += 1;
               // row.push(userData.post3DaysQsEnded ? getDateTimeString(userData.post3DaysQsEnded.toDate()) : "");
               // row.push(userData.post3DaysQsStart ? getDateTimeString(userData.post3DaysQsStart.toDate()) : "");
               row.push(
@@ -721,6 +749,8 @@ exports.retrieveData = async (req, res) => {
               // row.push(pCond.test1WeekEnded ? getDateTimeString(pCond.test1WeekEnded.toDate()) : "");
               row.push("test1WeekScore" in pCond ? pCond.test1WeekScore : "");
               row.push("test1WeekScoreRatio" in pCond ? pCond.test1WeekScoreRatio : "");
+              choiceCounts["third"]["Readability"][userData.post1WeekQ1Choice] += 1;
+              choiceCounts["third"]["Learnability"][userData.post1WeekQ2Choice] += 1;
               // row.push("test1WeekTime" in pCond ? pCond.test1WeekTime : "");
               row.push(thirdDuration);
               row.push(convertConditionNames(userData.post1WeekQ1Choice));
@@ -752,6 +782,7 @@ exports.retrieveData = async (req, res) => {
     // }
     csv.writeToPath("datasets/data" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Created the CSV file!");
+      console.log(JSON.stringify(choiceCounts));
     });
     csv
       .writeToPath("datasets/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true })
