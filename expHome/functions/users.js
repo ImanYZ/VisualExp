@@ -329,6 +329,7 @@ const getPassageType = passageTitle => {
 // Download the dataset in CSV
 exports.retrieveData = async (req, res) => {
   console.log("retrieveData");
+  const theProject = "H2K2";
   let usersDocs, userData, commonFields, row, pCond, rowLong;
   try {
     const rowsData = [
@@ -452,16 +453,16 @@ exports.retrieveData = async (req, res) => {
     //   }
     // }
     const passages = {};
-    const passagesH2K2 = [];
+    const usedPassages = [];
     const passageDocs = await db.collection("passages").get();
     for (let passageDoc of passageDocs.docs) {
       const passageData = passageDoc.data();
       passages[passageDoc.id] = passageData;
-      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
-        passagesH2K2.push(passageDoc.id);
+      if (theProject in passageData.projects && passageData.title !== "The Quiet Sideman") {
+        usedPassages.push(passageDoc.id);
       }
     }
-    usersDocs = await db.collection("users").where("project", "==", "H2K2").get();
+    usersDocs = await db.collection("users").where("project", "==", theProject).get();
     let userIndex = 0;
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
@@ -470,8 +471,8 @@ exports.retrieveData = async (req, res) => {
         userData.pConditions.length === 2 &&
         "recallScore" in userData.pConditions[0] &&
         "recallScore" in userData.pConditions[1] &&
-        passagesH2K2.includes(userData.pConditions[0].passage) &&
-        passagesH2K2.includes(userData.pConditions[1].passage) &&
+        usedPassages.includes(userData.pConditions[0].passage) &&
+        usedPassages.includes(userData.pConditions[1].passage) &&
         !["Rebecca Wang", "Yash Gandhi"].includes(userDoc.id)
       ) {
         userIndex += 1;
@@ -739,12 +740,14 @@ exports.retrieveData = async (req, res) => {
     // for (let recallGradeUser in recallGrades) {
     //   console.log(recallGradeUser);
     // }
-    csv.writeToPath("datasets/data.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/data" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Created the CSV file!");
     });
-    csv.writeToPath("datasets/dataPerQuestion.csv", rowsLongData, { headers: true }).on("finish", () => {
-      console.log("Created the Long CSV file!");
-    });
+    csv
+      .writeToPath("datasets/dataPerQuestion" + theProject + ".csv", rowsLongData, { headers: true })
+      .on("finish", () => {
+        console.log("Created the Long CSV file!");
+      });
   } catch (err) {
     console.log({ err });
     return res.status(400).json({ err });
@@ -754,19 +757,28 @@ exports.retrieveData = async (req, res) => {
 
 // Download the questions dataset in CSV
 exports.questionsData = async (req, res) => {
+  const theProject = "H2K2";
   let rowsData;
   try {
     rowsData = [["Passage", "Question Stem", "Option 1", "Option 2", "Option 3", "Option 4", "Type"]];
     const passageDocs = await db.collection("passages").get();
     for (let passageDoc of passageDocs.docs) {
       const passageData = passageDoc.data();
-      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
+      if (theProject in passageData.projects && passageData.title !== "The Quiet Sideman") {
         for (let question of passageData.questions) {
-          rowsData.push([question.stem, question.a, question.b, question.c, question.d, question.type]);
+          rowsData.push([
+            passageData.title,
+            question.stem,
+            question.a,
+            question.b,
+            question.c,
+            question.d,
+            question.type
+          ]);
         }
       }
     }
-    csv.writeToPath("datasets/questionsData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/questionsData" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
@@ -778,6 +790,7 @@ exports.questionsData = async (req, res) => {
 
 // Download the feedback dataset in CSV
 exports.feedbackData = async (req, res) => {
+  const theProject = "H2K2";
   let rowsData, usersDocs, userData, row;
   try {
     rowsData = [
@@ -798,15 +811,15 @@ exports.feedbackData = async (req, res) => {
         "explanation2-1Week"
       ]
     ];
-    const passagesH2K2 = [];
+    const usedPassages = [];
     const passageDocs = await db.collection("passages").get();
     for (let passageDoc of passageDocs.docs) {
       const passageData = passageDoc.data();
-      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
-        passagesH2K2.push(passageDoc.id);
+      if (theProject in passageData.projects && passageData.title !== "The Quiet Sideman") {
+        usedPassages.push(passageDoc.id);
       }
     }
-    usersDocs = await db.collection("users").where("project", "==", "H2K2").get();
+    usersDocs = await db.collection("users").where("project", "==", theProject).get();
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
       if (
@@ -814,8 +827,8 @@ exports.feedbackData = async (req, res) => {
         userData.pConditions.length === 2 &&
         "recallScore" in userData.pConditions[0] &&
         "recallScore" in userData.pConditions[1] &&
-        passagesH2K2.includes(userData.pConditions[0].passage) &&
-        passagesH2K2.includes(userData.pConditions[1].passage) &&
+        usedPassages.includes(userData.pConditions[0].passage) &&
+        usedPassages.includes(userData.pConditions[1].passage) &&
         !["Rebecca Wang", "Yash Gandhi"].includes(userDoc.id) &&
         "explanations" in userData
       ) {
@@ -887,7 +900,7 @@ exports.feedbackData = async (req, res) => {
         rowsData.push(row);
       }
     }
-    csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/feedbackData" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
@@ -899,14 +912,15 @@ exports.feedbackData = async (req, res) => {
 
 // Download the feedback Quotes dataset in CSV
 exports.quotesData = async (req, res) => {
+  const theProject = "H2K2";
   try {
     const rowsData = [["QUOTE"]];
-    const quotesDocs = await db.collection("quotes").get();
+    const quotesDocs = await db.collection("quotes").where("project", "==", theProject).get();
     for (let quoteDoc of quotesDocs.docs) {
       const quoteData = quoteDoc.data();
       rowsData.push([quoteData.quote]);
     }
-    csv.writeToPath("datasets/quotesData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/quotesData" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
     });
   } catch (err) {
@@ -918,6 +932,7 @@ exports.quotesData = async (req, res) => {
 
 // Download the feedbackCode dataset in CSV
 exports.feedbackCodeData = async (req, res) => {
+  const theProject = "H2K2";
   try {
     const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
 
@@ -969,7 +984,7 @@ exports.feedbackCodeData = async (req, res) => {
     const feedbackCodeDocs = await db
       .collection("feedbackCode")
       .where("approved", "==", true)
-      .where("project", "==", "H2K2")
+      .where("project", "==", theProject)
       .get();
 
     for (let feedbackCodeDoc of feedbackCodeDocs.docs) {
@@ -1010,7 +1025,7 @@ exports.feedbackCodeData = async (req, res) => {
       row.push(feedbackCodeData.explanation);
       rowsData.push(row);
     }
-    csv.writeToPath("datasets/feedbackCodeData.csv", rowsData, { headers: true }).on("finish", () => {
+    csv.writeToPath("datasets/feedbackCodeData" + theProject + ".csv", rowsData, { headers: true }).on("finish", () => {
       console.log("Done");
     });
   } catch (err) {
