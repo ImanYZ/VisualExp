@@ -27,6 +27,7 @@ const {
   fixActivityProject,
   appendPointsFieldForEmptyRecalls,
   addTheInstitutionFeildForUsers,
+  addH2K2toQuotes,
 } = require("./visualExp");
 
 const app = express();
@@ -74,7 +75,8 @@ app.get("/deleteTheKeyPhrasesForPassage", deleteTheKeyPhrasesForPassage);
 app.get("/recreateNewRecallGradesDocuments", recreateNewRecallGradesDocuments);
 app.get("/addNexDataToFeedbackCode", addNexDataToFeedbackCode);
 app.get("/appendPointsFieldForEmptyRecalls", appendPointsFieldForEmptyRecalls);
-app.get("/addTheInstitutionFeildForUsers",addTheInstitutionFeildForUsers);
+app.get("/addTheInstitutionFeildForUsers", addTheInstitutionFeildForUsers);
+app.get("/addH2K2toQuotes", addH2K2toQuotes);
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
