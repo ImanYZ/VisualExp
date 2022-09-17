@@ -303,10 +303,12 @@ exports.loadContacts = async (req, res) => {
 
 const convertConditionNames = abbreviation => {
   return abbreviation
-    ? abbreviation === "H2"
+    ? abbreviation === "H2" || abbreviation === "H1"
       ? "Hybrid Map"
-      : abbreviation === "K2"
+      : abbreviation === "K2" || abbreviation === "K1"
       ? "Knowledge Model"
+      : abbreviation === "L2" || abbreviation === "L1"
+      ? "Linear Text"
       : abbreviation
     : "";
 };
@@ -476,7 +478,7 @@ exports.retrieveData = async (req, res) => {
         !["Rebecca Wang", "Yash Gandhi"].includes(userDoc.id)
       ) {
         userIndex += 1;
-        console.log({ userIndex });
+        console.log({ userIndex, fullname: userDoc.id });
         for (let pCIdx = 0; pCIdx < userData.pConditions.length; pCIdx++) {
           commonFields = [];
           // commonFields.push(userDoc.id);
@@ -496,9 +498,9 @@ exports.retrieveData = async (req, res) => {
           // commonFields.push(passages[userData.nullPassage].title);
           commonFields.push(pCIdx);
           pCond = userData.pConditions[pCIdx];
-          commonFields.push(convertConditionNames(pCond.condition));
-          commonFields.push(passages[pCond.passage].title);
-          commonFields.push(getPassageType(passages[pCond.passage].title));
+          commonFields.push(pCond.condition ? convertConditionNames(pCond.condition) : "");
+          commonFields.push(passages[pCond.passage] ? passages[pCond.passage].title : "");
+          commonFields.push(passages[pCond.passage] ? getPassageType(passages[pCond.passage].title) : "");
           // commonFields.push(pCond.pretestEnded ? getDateTimeString(pCond.pretestEnded.toDate()) : "");
           commonFields.push("pretestScore" in pCond ? pCond.pretestScore : "");
           commonFields.push("pretestScoreRatio" in pCond ? pCond.pretestScoreRatio : "");
@@ -558,38 +560,46 @@ exports.retrieveData = async (req, res) => {
                 rowLong.push("Immediately");
                 rowLong.push(pCond.passage + "Q" + idx);
                 rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
-                rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+                rowLong.push(
+                  pCond.pretest && pCond.pretest.lenght > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
+                );
                 rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
-                rowLong.push(convertConditionNames(userData.postQ1Choice));
-                rowLong.push(convertConditionNames(userData.postQ2Choice));
+                rowLong.push(userData.postQ1Choice ? convertConditionNames(userData.postQ1Choice) : "");
+                rowLong.push(userData.postQ2Choice ? convertConditionNames(userData.postQ2Choice) : "");
                 rowsLongData.push(rowLong);
                 if (pCond.test3Days) {
                   rowLong = row.slice(0, 12);
                   rowLong.push("After 3 Days");
                   rowLong.push(pCond.passage + "Q" + idx);
                   rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
-                  rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+                  rowLong.push(
+                    pCond.pretest && pCond.pretest.lenght > idx && pCond.pretest[idx] === questions[idx].answer ? 1 : 0
+                  );
                   rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
-                  rowLong.push(convertConditionNames(userData.post3DaysQ1Choice));
-                  rowLong.push(convertConditionNames(userData.post3DaysQ2Choice));
+                  rowLong.push(userData.post3DaysQ1Choice ? convertConditionNames(userData.post3DaysQ1Choice) : "");
+                  rowLong.push(userData.post3DaysQ2Choice ? convertConditionNames(userData.post3DaysQ2Choice) : "");
                   rowsLongData.push(rowLong);
                   if (pCond.test1Week) {
                     rowLong = row.slice(0, 12);
                     rowLong.push("After 1 Week");
                     rowLong.push(pCond.passage + "Q" + idx);
                     rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
-                    rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
+                    rowLong.push(
+                      pCond.pretest && pCond.pretest.lenght > idx && pCond.pretest[idx] === questions[idx].answer
+                        ? 1
+                        : 0
+                    );
                     rowLong.push(questions[idx] && pCond.test1Week[idx] === questions[idx].answer ? 1 : 0);
-                    rowLong.push(convertConditionNames(userData.post1WeekQ1Choice));
-                    rowLong.push(convertConditionNames(userData.post1WeekQ2Choice));
+                    rowLong.push(userData.post1WeekQ1Choice ? convertConditionNames(userData.post1WeekQ1Choice) : "");
+                    rowLong.push(userData.post1WeekQ2Choice ? convertConditionNames(userData.post1WeekQ2Choice) : "");
                     rowsLongData.push(rowLong);
                   }
                 }
               }
             }
           }
-          row.push(convertConditionNames(userData.postQ1Choice));
-          row.push(convertConditionNames(userData.postQ2Choice));
+          row.push(userData.postQ1Choice ? convertConditionNames(userData.postQ1Choice) : "");
+          row.push(userData.postQ2Choice ? convertConditionNames(userData.postQ2Choice) : "");
           // row.push(userData.postQsEnded ? getDateTimeString(userData.postQsEnded.toDate()) : "");
           // row.push(userData.postQsStart ? getDateTimeString(userData.postQsStart.toDate()) : "");
           row.push(
