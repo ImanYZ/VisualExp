@@ -8,6 +8,7 @@ require("dotenv").config();
 const {
   deleteUser,
   retrieveData,
+  questionsData,
   feedbackCodeData,
   quotesData,
   feedbackData,
@@ -99,6 +100,7 @@ app.post("/instructorNo", instructorNo);
 app.post("/trackStudentInvite", trackStudentInvite);
 app.post("/trackStudentEmailTemplateCopy", trackStudentEmailTemplateCopy);
 app.get("/retrieveData", retrieveData);
+app.get("/questionsData", questionsData);
 app.get("/passagesNumberCorrection", passagesNumberCorrection);
 app.get("/feedbackData", feedbackData);
 app.get("/feedbackCodeData", feedbackCodeData);
