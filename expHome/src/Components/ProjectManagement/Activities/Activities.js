@@ -236,7 +236,7 @@ const Activities = props => {
     let met = true;
     for (let key in projectPoints) {
       if (key === "instructorsPoints") {
-        if (resear.dayInstructorUpVotes?resear.dayInstructorUpVotes:0 + resear.instructorsPoints < projectPoints.instructorsPoints) {
+        if ((resear.dayInstructorUpVotes || 0) + resear.instructorsPoints < projectPoints.instructorsPoints) {
           met = false;
           break;
         }
