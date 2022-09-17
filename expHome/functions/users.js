@@ -360,7 +360,7 @@ exports.retrieveData = async (req, res) => {
         "PreviewTime",
         "Session",
         // "recallEnded",
-        "RecallScore",
+        "Recall",
         "RecallScoreRatio",
         // "recallCosineSim",
         // "recallStart",
@@ -404,8 +404,10 @@ exports.retrieveData = async (req, res) => {
         "Session",
         "Question",
         "QuestionType",
-        "PretestPerQuestion",
-        "RecognitionPerQuestion"
+        "PretestRecognition",
+        "Recognition",
+        "Readability",
+        "Learnability"
       ]
     ];
     // const recallGrades = {};
@@ -503,7 +505,7 @@ exports.retrieveData = async (req, res) => {
           // commonFields.push("previewEnded" in pCond ? getDateTimeString(pCond.previewEnded.toDate()) : "");
           commonFields.push("previewTime" in pCond ? pCond.previewTime : "");
           row = [...commonFields];
-          row.push("1st");
+          row.push("Immediately");
           // row.push("recallEnded" in pCond ? getDateTimeString(pCond.recallEnded.toDate()) : "");
           row.push("recallScore" in pCond ? pCond.recallScore : "");
           row.push("recallScoreRatio" in pCond ? pCond.recallScoreRatio : "");
@@ -552,27 +554,33 @@ exports.retrieveData = async (req, res) => {
             for (let idx = 0; idx < questions.length; idx++) {
               if (pCond.test) {
                 rowLong = row.slice(0, 12);
-                rowLong.push("1st");
+                rowLong.push("Immediately");
                 rowLong.push(pCond.passage + "Q" + idx);
                 rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                 rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                 rowLong.push(questions[idx] && pCond.test[idx] === questions[idx].answer ? 1 : 0);
+                rowLong.push(convertConditionNames(userData.postQ1Choice));
+                rowLong.push(convertConditionNames(userData.postQ2Choice));
                 rowsLongData.push(rowLong);
                 if (pCond.test3Days) {
                   rowLong = row.slice(0, 12);
-                  rowLong.push("2nd");
+                  rowLong.push("After 3 Days");
                   rowLong.push(pCond.passage + "Q" + idx);
                   rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                   rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                   rowLong.push(questions[idx] && pCond.test3Days[idx] === questions[idx].answer ? 1 : 0);
+                  rowLong.push(convertConditionNames(userData.post3DaysQ1Choice));
+                  rowLong.push(convertConditionNames(userData.post3DaysQ2Choice));
                   rowsLongData.push(rowLong);
                   if (pCond.test1Week) {
                     rowLong = row.slice(0, 12);
-                    rowLong.push("3rd");
+                    rowLong.push("After 1 Week");
                     rowLong.push(pCond.passage + "Q" + idx);
                     rowLong.push(questions[idx].type === "Inference" ? "Inferential" : "Factual");
                     rowLong.push(pCond.pretest[idx] === questions[idx].answer ? 1 : 0);
                     rowLong.push(questions[idx] && pCond.test1Week[idx] === questions[idx].answer ? 1 : 0);
+                    rowLong.push(convertConditionNames(userData.post1WeekQ1Choice));
+                    rowLong.push(convertConditionNames(userData.post1WeekQ2Choice));
                     rowsLongData.push(rowLong);
                   }
                 }
@@ -610,7 +618,7 @@ exports.retrieveData = async (req, res) => {
                   60000
                 : "";
             if (secondDuration && secondDuration > 5) {
-              row.push("2nd");
+              row.push("After 3 Days");
               // row.push(pCond.recall3DaysEnded ? getDateTimeString(pCond.recall3DaysEnded.toDate()) : "");
               row.push("recall3DaysScore" in pCond ? pCond.recall3DaysScore : "");
               row.push("recall3DaysScoreRatio" in pCond ? pCond.recall3DaysScoreRatio : "");
@@ -672,7 +680,7 @@ exports.retrieveData = async (req, res) => {
                   60000
                 : "";
             if (thirdDuration && thirdDuration > 5) {
-              row.push("3rd");
+              row.push("After 1 Week");
               // row.push(pCond.recall1WeekEnded ? getDateTimeString(pCond.recall1WeekEnded.toDate()) : "");
               row.push("recall1WeekScore" in pCond ? pCond.recall1WeekScore : "");
               row.push("recall1WeekScoreRatio" in pCond ? pCond.recall1WeekScoreRatio : "");
@@ -751,6 +759,7 @@ exports.feedbackData = async (req, res) => {
     rowsData = [
       [
         "fullname",
+        "1stCondition",
         "postQ1Choice",
         "explanation1",
         "postQ2Choice",
@@ -765,74 +774,94 @@ exports.feedbackData = async (req, res) => {
         "explanation2-1Week"
       ]
     ];
-    usersDocs = await db.collection("users").get();
+    const passagesH2K2 = [];
+    const passageDocs = await db.collection("passages").get();
+    for (let passageDoc of passageDocs.docs) {
+      const passageData = passageDoc.data();
+      if ("H2K2" in passageData.projects && passageData.title !== "The Quiet Sideman") {
+        passagesH2K2.push(passageDoc.id);
+      }
+    }
+    usersDocs = await db.collection("users").where("project", "==", "H2K2").get();
     for (let userDoc of usersDocs.docs) {
       userData = userDoc.data();
-      row = [];
-      row.push(userDoc.id);
-      row.push(userData.postQ1Choice);
-      row.push(
+      if (
+        Array.isArray(userData.pConditions) &&
+        userData.pConditions.length === 2 &&
+        "recallScore" in userData.pConditions[0] &&
+        "recallScore" in userData.pConditions[1] &&
+        passagesH2K2.includes(userData.pConditions[0].passage) &&
+        passagesH2K2.includes(userData.pConditions[1].passage) &&
+        !["Rebecca Wang", "Yash Gandhi"].includes(userDoc.id) &&
         "explanations" in userData
-          ? typeof userData.explanations[0] === "object"
-            ? userData.explanations[0].explanation
-            : userData.explanations[0]
-          : ""
-      );
-      row.push(userData.postQ2Choice);
-      row.push(
-        "explanations" in userData
-          ? typeof userData.explanations[1] === "object"
-            ? userData.explanations[1].explanation
-            : userData.explanations[1]
-          : ""
-      );
-      if (userData.post3DaysQsEnded) {
-        row.push(userData.post3DaysQ1Choice);
+      ) {
+        row = [];
+        row.push(userDoc.id);
+        row.push(userData.pConditions[0].condition);
+        row.push(userData.postQ1Choice);
+        row.push(
+          "explanations" in userData
+            ? typeof userData.explanations[0] === "object"
+              ? userData.explanations[0].explanation
+              : userData.explanations[0]
+            : ""
+        );
+        row.push(userData.postQ2Choice);
+        row.push(
+          "explanations" in userData
+            ? typeof userData.explanations[1] === "object"
+              ? userData.explanations[1].explanation
+              : userData.explanations[1]
+            : ""
+        );
+        if (userData.post3DaysQsEnded) {
+          row.push(userData.post3DaysQ1Choice);
 
-        row.push(
-          "explanations3Days" in userData
-            ? typeof userData.explanations3Days[0] === "object"
-              ? userData.explanations3Days[0].explanation
-              : userData.explanations3Days[0]
-            : ""
-        );
-        row.push(userData.post3DaysQ2Choice);
-        row.push(
-          "explanations3Days" in userData
-            ? typeof userData.explanations3Days[1] === "object"
-              ? userData.explanations3Days[1].explanation
-              : userData.explanations3Days[1]
-            : ""
-        );
-      } else {
-        for (let idx = 0; idx < 4; idx++) {
-          row.push("");
+          row.push(
+            "explanations3Days" in userData
+              ? typeof userData.explanations3Days[0] === "object"
+                ? userData.explanations3Days[0].explanation
+                : userData.explanations3Days[0]
+              : ""
+          );
+          row.push(userData.post3DaysQ2Choice);
+          row.push(
+            "explanations3Days" in userData
+              ? typeof userData.explanations3Days[1] === "object"
+                ? userData.explanations3Days[1].explanation
+                : userData.explanations3Days[1]
+              : ""
+          );
+        } else {
+          for (let idx = 0; idx < 4; idx++) {
+            row.push("");
+          }
         }
-      }
-      if (userData.post1WeekQsEnded) {
-        row.push(userData.post1WeekQ1Choice);
+        if (userData.post1WeekQsEnded) {
+          row.push(userData.post1WeekQ1Choice);
 
-        row.push(
-          "explanations1Week" in userData
-            ? typeof userData.explanations1Week[0] === "object"
-              ? userData.explanations1Week[0].explanation
-              : userData.explanations1Week[0]
-            : ""
-        );
-        row.push(userData.post1WeekQ2Choice);
-        row.push(
-          "explanations1Week" in userData
-            ? typeof userData.explanations1Week[1] === "object"
-              ? userData.explanations1Week[1].explanation
-              : userData.explanations1Week[1]
-            : ""
-        );
-      } else {
-        for (let idx = 0; idx < 4; idx++) {
-          row.push("");
+          row.push(
+            "explanations1Week" in userData
+              ? typeof userData.explanations1Week[0] === "object"
+                ? userData.explanations1Week[0].explanation
+                : userData.explanations1Week[0]
+              : ""
+          );
+          row.push(userData.post1WeekQ2Choice);
+          row.push(
+            "explanations1Week" in userData
+              ? typeof userData.explanations1Week[1] === "object"
+                ? userData.explanations1Week[1].explanation
+                : userData.explanations1Week[1]
+              : ""
+          );
+        } else {
+          for (let idx = 0; idx < 4; idx++) {
+            row.push("");
+          }
         }
+        rowsData.push(row);
       }
-      rowsData.push(row);
     }
     csv.writeToPath("datasets/feedbackData.csv", rowsData, { headers: true }).on("finish", () => {
       console.log("done process data!");
@@ -866,9 +895,7 @@ exports.quotesData = async (req, res) => {
 // Download the feedbackCode dataset in CSV
 exports.feedbackCodeData = async (req, res) => {
   try {
-    const feedbackCodesBooksDocs = await db
-      .collection("feedbackCodeBooks")
-      .get();
+    const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
 
     const codes = [];
     for (let codeDoc of feedbackCodesBooksDocs.docs) {
@@ -878,7 +905,19 @@ exports.feedbackCodeData = async (req, res) => {
       }
     }
     const rowsData = [
-      ["fullname","id", "choice", "passage1", "condition1", "passage2", "condition2", "qIdx", "session", ...codes, "explanation"]
+      [
+        "fullname",
+        "id",
+        "choice",
+        "passage1",
+        "condition1",
+        "passage2",
+        "condition2",
+        "qIdx",
+        "session",
+        ...codes,
+        "explanation"
+      ]
     ];
     const passages = {};
     const passageDocs = await db.collection("passages").get();
