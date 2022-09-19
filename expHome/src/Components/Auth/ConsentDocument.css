@@ -42,3 +42,6 @@ td, th {
   text-align: left;
   padding: 8px;
 }
+.inputValidate {
+  background-color: rgb(250, 248, 246);
+}

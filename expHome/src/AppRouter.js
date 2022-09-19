@@ -12,7 +12,7 @@ import {
   leadingState
 } from "./store/AuthAtoms";
 import { secondSessionState, thirdSessionState } from "./store/ExperimentAtoms";
-
+import AppAppBar from "../src/Components/Home/modules/views/AppAppBar";
 import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
@@ -249,30 +249,45 @@ const AppRouter = props => {
       <Route path={"/interestedFacultyLater/:instructorId"} element={<InstructorLater />} />
       <Route path={"/notInterestedAdministrator/:administratorId"} element={<AdministratorNo />} />
       <Route path={"/interestedAdministratorLater/:administratorId"} element={<AdministratorLater />} />
-      <Route path="/*" element={<RouterNav duringAnExperiment={duringAnExperiment} />}>
+
+      <Route path="*" element={<RouterNav notARese={true} />}>
+        {fullname && email && emailVerified === "Verified" ? (
+          <Route path="/*" element={<Home />} />
+        ) : (
+          <>
+            <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
+            <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
+            <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
+            <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
+            <Route path="*" element={<AuthConsent />} />
+          </>
+        )}
+      </Route>
+
+      <Route path="/Activities/" element={<RouterNav duringAnExperiment={duringAnExperiment} />}>
         {fullname && email && emailVerified === "Verified" ? (
           <>
             {duringAnExperiment ? (
               <>
                 {startedByResearcher ? (
-                  <Route path="*" element={<App />} />
+                  <Route path="Activities/" element={<App />} />
                 ) : (
-                  <Route path="*" element={<WaitingForSessionStart />} />
+                  <Route path="Activities/" element={<WaitingForSessionStart />} />
                 )}
               </>
             ) : (
               <>
-                <Route path="Activities/Experiments" element={<Activities activityName="Experiments" />} />
-                <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
-                <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
-                <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
-                <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
+                <Route path="/Activities/Experiments" element={<Activities activityName="Experiments" />} />
+                <Route path="/Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
+                <Route path="/Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
+                <Route path="/Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
+                <Route path="/Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
                 <Route
-                  path="Activities/ResearcherPassage"
+                  path="/Activities/ResearcherPassage"
                   element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
                 />
-                <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
-                <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
+                <Route path="/Activities/" element={<Activities activityName="Intellectual" />} />
+                <Route path="/Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
                 <Route
                   path="LifeLog"
                   element={
@@ -285,15 +300,13 @@ const AppRouter = props => {
                 />
                 {/* Everything else, including /schedule goes to this one. */}
                 <Route
-                  path="/*"
+                  path="/Activities/"
                   element={
-                    startedFirstSession ? (
+                    startedFirstSession && (
                       <div className="Error">
                         At this point, you cannot change your scheduled sessions! Please convey your questions or
                         concerns to Iman Yeckehzaare at oneweb@umich.edu
                       </div>
-                    ) : (
-                      <SchedulePage />
                     )
                   }
                 />
@@ -306,7 +319,7 @@ const AppRouter = props => {
             <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
             <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
-            <Route path="*" element={<AuthConsent />} />
+            <Route path="/Activities/" element={<AuthConsent />} />
           </>
         )}
       </Route>

@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
+import SignUpPage from "./SignUpPage";
 import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
@@ -18,7 +19,11 @@ const AuthConsent = props => {
   }
 
   return (
-    <Grid
+   <>
+    {!props.project?(
+      <SignUpPage/>
+    ):
+    (<Grid
       container
       spacing={{ xs: 1, md: 2.2 }}
       sx={{
@@ -74,7 +79,8 @@ const AuthConsent = props => {
           {authComponent}
         </Paper>
       </Grid>
-    </Grid>
+    </Grid>)}
+    </>
   );
 };
 
