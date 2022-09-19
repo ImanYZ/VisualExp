@@ -103,7 +103,7 @@ export const LeaderBoard = ({
                     <span className="ChipContent">😔</span>
                   )
                 }
-                variant={resear.id === fullname ? "" : "outlined"}
+                variant="outlined"
                 color={isResearcherCriteriaMet(resear) ? "success" : "error"}
                 label={
                   <span className="ChipContent">
