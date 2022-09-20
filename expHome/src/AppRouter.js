@@ -211,7 +211,9 @@ const AppRouter = props => {
 
   return (
     <Routes>
-      <Route path="/Home/*" element={<Home />} />
+      <Route path="/" element={<Home />} />
+      <Route path="/Home" element={<Home />} />
+      <Route path="/Auth" element={<AuthConsent />} />
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
@@ -250,10 +252,8 @@ const AppRouter = props => {
       <Route path={"/notInterestedAdministrator/:administratorId"} element={<AdministratorNo />} />
       <Route path={"/interestedAdministratorLater/:administratorId"} element={<AdministratorLater />} />
 
-      <Route path="*" element={<RouterNav notARese={true} />}>
-        {fullname && email && emailVerified === "Verified" ? (
-          <Route path="/*" element={<Home />} />
-        ) : (
+      <Route path="*" element={<RouterNav noNav={true} />}>
+        {!(fullname && email && emailVerified === "Verified") && (
           <>
             <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
             <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
@@ -277,6 +277,19 @@ const AppRouter = props => {
               </>
             ) : (
               <>
+                <Route
+                  path="/Activities/"
+                  element={
+                    startedFirstSession ? (
+                      <div className="Error">
+                        At this point, you cannot change your scheduled sessions! Please convey your questions or
+                        concerns to Iman Yeckehzaare at oneweb@umich.edu
+                      </div>
+                    ) : (
+                      <SchedulePage />
+                    )
+                  }
+                />
                 <Route path="/Activities/Experiments" element={<Activities activityName="Experiments" />} />
                 <Route path="/Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
                 <Route path="/Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
@@ -299,17 +312,6 @@ const AppRouter = props => {
                   }
                 />
                 {/* Everything else, including /schedule goes to this one. */}
-                <Route
-                  path="/Activities/"
-                  element={
-                    startedFirstSession && (
-                      <div className="Error">
-                        At this point, you cannot change your scheduled sessions! Please convey your questions or
-                        concerns to Iman Yeckehzaare at oneweb@umich.edu
-                      </div>
-                    )
-                  }
-                />
               </>
             )}
           </>
@@ -323,6 +325,7 @@ const AppRouter = props => {
           </>
         )}
       </Route>
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 };

@@ -7,30 +7,37 @@ import Button from "../components/Button";
 import Typography from "../components/Typography";
 import LandingLayout from "./LandingLayout";
 
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import AnimatediconLoop from "../../../../assets/AnimatediconLoop.gif";
 import backgroundImage from "../../../../assets/LibraryBackground.jpg";
-
+import { useNavigate, createSearchParams } from "react-router-dom";
+// import pathState from "../"
 export default function Landing() {
+  const navigateTo = useNavigate();
+  const params = { navigateToSchedulePage: true };
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     setChecked(true);
   }, []);
 
+  const navigateToActivities = () => {
+    navigateTo({
+      pathname: '/Activities',
+      search: `?${createSearchParams(params)}`,
+    });
+  }
+
   return (
     <LandingLayout
       sxBackground={{
         backgroundImage: `url(${backgroundImage})`,
         backgroundColor: "primary.light", // Average color of the background image.
-        backgroundPosition: "center",
+        backgroundPosition: "center"
       }}
     >
       {/* Increase the network loading priority of the background image. */}
-      <img
-        style={{ display: "none" }}
-        src={backgroundImage}
-        alt="increase priority"
-      />
+      <img style={{ display: "none" }} src={backgroundImage} alt="increase priority" />
       <img src={AnimatediconLoop} alt="Animated Logo" width="190px" />
       <Typography color="inherit" align="center" variant="h2" marked="center">
         {/* 1<Box sx={{ display: "inline", color: "secondary.main" }}>Cademy</Box>{" "}
@@ -48,11 +55,22 @@ export default function Landing() {
         variant="contained"
         size="large"
         component="a"
-        href="#JoinUsSection"
+        onClick={navigateToActivities}
         sx={{ minWidth: 200, color: "common.white" }}
       >
-        Apply to Join Us!
+        Join Our Experiments
       </Button>
+      <Box>
+        <Button
+          size="large"
+          component="a"
+          href="#CommunitiesSection"
+          sx={{ minWidth: 200, color: "common.white" }}
+        >
+          What is 1Cademy <ArrowForwardIcon />
+        </Button>
+      </Box>
+
       {/* <Typography variant="body2" color="inherit" sx={{ mt: 2 }}>
         Discover the experience
       </Typography> */}

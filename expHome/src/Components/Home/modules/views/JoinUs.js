@@ -18,6 +18,7 @@ import {
   resumeUrlState,
   transcriptUrlState,
   communiTestsEndedState,
+  emailVerifiedState,
   applicationsSubmittedState
 } from "../../../../store/AuthAtoms";
 import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
@@ -40,7 +41,7 @@ const JoinUs = props => {
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
-
+  const emailVerified = useRecoilValue(emailVerifiedState);
   const [activeStep, setActiveStep] = useState(0);
   const [checkedInnerStep, setCheckedInnerStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
@@ -712,7 +713,7 @@ const JoinUs = props => {
                     <Button
                       variant="contained"
                       component="a"
-                      href="/tutorial"
+                      href={fullname && emailVerified === "Verified" ? "/tutorial":"Auth"}
                       sx={{ mt: 1, mr: 1, color: "common.white" }}
                     >
                       1Cademy Tutorial

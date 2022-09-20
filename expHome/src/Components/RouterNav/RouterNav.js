@@ -17,7 +17,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-import { firebaseState, fullnameState, isAdminState, emailState } from "../../store/AuthAtoms";
+
+import { firebaseState, fullnameState, isAdminState, emailState,emailVerifiedState } from "../../store/AuthAtoms";
 
 import { firebaseOneState, usernameState, emailOneState } from "../../store/OneCademyAtoms";
 
@@ -65,6 +66,7 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
 };
 
 const RouterNav = props => {
+  const navigateTo = useNavigate();
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
   const userEmail = useRecoilValue(emailState);
@@ -120,7 +122,7 @@ const RouterNav = props => {
   const [nodesLoaded, setNodesLoaded] = useState(false);
   const [userNodesChanges, setUserNodesChanges] = useState([]);
   const [userNodes, setUserNodes] = useState([]);
-
+  const emailVerified = useRecoilValue(emailVerifiedState);
   const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
@@ -684,6 +686,7 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
+    navigateTo("/")
   };
 
   const changeProject = (event, index) => {
@@ -761,10 +764,10 @@ const RouterNav = props => {
   const roundNum = (num) => Number(Number.parseFloat(Number(num).toFixed(2)));
 
   const navigate = useNavigate();
-
+console.log("::::::::::::",fullname , email, emailVerified);
   return (
     <>
-      {!props.duringAnExperiment && !props.notARese && (
+      {(!props.duringAnExperiment) && (fullname && emailVerified==="Verified") && (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>

@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import What from "./modules/views/What";
 import AppFooter from "./modules/views/AppFooter";
 import Landing from "./modules/views/Landing";
+import Progress from "./modules/views/Progress"
 import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
@@ -101,6 +102,7 @@ function Index() {
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       />
       <Landing />
+      <Progress/>
       <HowItWorks section={section} />
       <What />
       <Values />

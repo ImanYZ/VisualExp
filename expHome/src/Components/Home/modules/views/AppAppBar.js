@@ -24,12 +24,9 @@ import {
   transcriptUrlState,
   applicationsSubmittedState,
   colorModeState,
-  leadingState,
+  leadingState
 } from "../../../../store/AuthAtoms";
-import {
-  hasScheduledState,
-  completedExperimentState,
-} from "../../../../store/ExperimentAtoms";
+import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
 
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
@@ -39,11 +36,11 @@ import { getFullname } from "../../../../utils";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
-const LinkTab = (props) => {
+const LinkTab = props => {
   return (
     <Tooltip title={props.titl}>
       <Tab
-        onClick={(event) => {
+        onClick={event => {
           event.preventDefault();
           props.onClick(event);
         }}
@@ -54,17 +51,13 @@ const LinkTab = (props) => {
   );
 };
 
-const AppAppBar = (props) => {
+const AppAppBar = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const setHasScheduled = useSetRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(
-    completedExperimentState
-  );
-  const setApplicationsSubmitted = useSetRecoilState(
-    applicationsSubmittedState
-  );
+  const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
+  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const leading = useRecoilValue(leadingState);
@@ -74,15 +67,12 @@ const AppAppBar = (props) => {
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
 
   useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async (user) => {
+    return firebase.auth.onAuthStateChanged(async user => {
       if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         const uEmail = user.email.toLowerCase();
-        const userDocs = await firebase.db
-          .collection("users")
-          .where("email", "==", uEmail)
-          .get();
+        const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
         if (userDocs.docs.length > 0) {
           setEmail(uEmail.toLowerCase());
           const userData = userDocs.docs[0].data();
@@ -103,13 +93,8 @@ const AppAppBar = (props) => {
             setHasScheduled(true);
             setCompletedExperiment(true);
           } else {
-            const scheduleDocs = await firebase.db
-              .collection("schedule")
-              .where("email", "==", uEmail)
-              .get();
-            const nowTimestamp = firebase.firestore.Timestamp.fromDate(
-              new Date()
-            );
+            const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
+            const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
             let allPassed = true;
             if (scheduleDocs.docs.length >= 3) {
               let scheduledSessions = 0;
@@ -145,18 +130,18 @@ const AppAppBar = (props) => {
     });
   }, [firebase]);
 
-  const signOut = async (event) => {
+  const signOut = async event => {
     console.log("Signing out!");
     setEmail("");
     setFullname("");
     await firebase.logout();
   };
 
-  const toggleColorMode = (event) => {
-    setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  const toggleColorMode = event => {
+    setColorMode(prevMode => (prevMode === "light" ? "dark" : "light"));
   };
 
-  const handleProfileMenuOpen = (event) => {
+  const handleProfileMenuOpen = event => {
     setProfileMenuOpen(event.currentTarget);
   };
 
@@ -165,17 +150,9 @@ const AppAppBar = (props) => {
   };
 
   const renderProfileMenu = (
-    <Menu
-      id="ProfileMenu"
-      anchorEl={profileMenuOpen}
-      open={isProfileMenuOpen}
-      onClose={handleProfileMenuClose}
-    >
+    <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
       {fullname && email && (
-        <MenuItem
-          disabled
-          sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}
-        >
+        <MenuItem disabled sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}>
           {fullname}
         </MenuItem>
       )}
@@ -200,7 +177,7 @@ const AppAppBar = (props) => {
               sx={{
                 fontSize: 24,
                 margin: "7px 19px 0px -10px",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
             >
               <img src={LogoDarkMode} alt="logo" width="52px" />
@@ -216,17 +193,17 @@ const AppAppBar = (props) => {
               marginLeft: "auto",
               fontWeight: 400,
               "& .MuiTab-root": {
-                color: "#AAAAAA",
+                color: "#AAAAAA"
               },
               "& .MuiTab-root.Mui-selected": {
-                color: "common.white",
+                color: "common.white"
               },
               "& .MuiTabs-indicator": {
-                backgroundColor: "secondary.main",
-              },
+                backgroundColor: "secondary.main"
+              }
             }}
           >
-            {[0, 1, 2, 3, 4].map((idx) => {
+            {[0, 1, 2, 3, 4].map(idx => {
               return (
                 <LinkTab
                   key={"Key" + idx}
@@ -237,21 +214,11 @@ const AppAppBar = (props) => {
               );
             })}
             {(leading || props.thisPage) && (
-              <LinkTab
-                onClick={props.switchSection(5)}
-                label={props.thisPage}
-                titl={props.thisPage}
-              />
+              <LinkTab onClick={props.switchSection(5)} label={props.thisPage} titl={props.thisPage} />
             )}
             {fullname && !props.tutorial && completedExperiment && (
               <Tooltip title="1Cademy Tutorial">
-                <Tab
-                  component="a"
-                  href="/tutorial"
-                  target="_blank"
-                  label="Tutorial"
-                  color="inherit"
-                />
+                <Tab component="a" href="/tutorial" target="_blank" label="Tutorial" color="inherit" />
               </Tooltip>
             )}
           </Tabs>
@@ -291,14 +258,14 @@ const AppAppBar = (props) => {
                     fontSize: 16,
                     color: "common.white",
                     ml: 2.5,
-                    borderRadius: 40,
+                    borderRadius: 40
                   }}
                 >
                   Apply!
                 </Button>
               </Tooltip>
             )}
-            {fullname && (
+            {fullname ? (
               <Tooltip title="Account">
                 <IconButton
                   size="large"
@@ -312,6 +279,21 @@ const AppAppBar = (props) => {
                 >
                   <AccountCircle />
                 </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="SIGN IN/UP">
+                <Button
+                  variant="contained"
+                  href="Auth"
+                  sx={{
+                    fontSize: 16,
+                    color: "common.white",
+                    ml: 2.5,
+                    borderRadius: 40
+                  }}
+                >
+                  SIGN IN/UP
+                </Button>
               </Tooltip>
             )}
           </Box>

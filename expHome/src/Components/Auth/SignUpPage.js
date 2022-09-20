@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Tabs from "@mui/material/Tabs";
@@ -9,7 +9,7 @@ import Alert from "@mui/material/Alert";
 
 import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
-import { Autocomplete, Paper, TextField } from "@mui/material";
+import { Autocomplete, Paper, TextField, Backdrop, CircularProgress, Link } from "@mui/material";
 import backgroundImage from "../../assets/HomeBackGroundDarkMode.png";
 import { styled } from "@mui/material/styles";
 import {
@@ -34,8 +34,16 @@ import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
 import AppConfig from "../../AppConfig";
 import { color } from "@mui/system";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+const CookiePolicy = React.lazy(() => import("../../Components/modals/CookiePolicy"));
+const PrivacyPolicy = React.lazy(() => import("../../Components/modals/PrivacyPolicy"));
+const TermsOfUse = React.lazy(() => import("../../Components/modals/TermsOfUse"));
+const InformedConsent = React.lazy(() => import("../../Components/modals/InformedConsent"));
 
 const SignUpPage = props => {
+  const navigateTo = useNavigate();
+  const [params] = useSearchParams();
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
@@ -76,6 +84,12 @@ const SignUpPage = props => {
   const [submitable, setSubmitable] = useState(false);
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
+
+  const [openInformedConsent, setOpenInformedConsent] = useState(false);
+  const [openTermOfUse, setOpenTermsOfUse] = useState(false);
+  const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
+  const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
+
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
@@ -458,6 +472,13 @@ const SignUpPage = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
+      const navigateToSchedulePage = params.get('navigateToSchedulePage');
+      console.log({navigateToSchedulePage})
+      if (navigateToSchedulePage) {
+        navigateTo("/Activities");
+      } else {
+        navigateTo("/");
+      }
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
@@ -678,6 +699,36 @@ const SignUpPage = props => {
                     onKeyPress={onKeyPress}
                   />
                 </Box>
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  By clicking "Sign Up," you acknowledge that you agree to 1Cademy's{" "}
+                  <Link
+                    onClick={() => {
+                      setOpenTermsOfUse(true);
+                    }}
+                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                  >
+                    Terms of Use
+                  </Link>
+                  ,{" "}
+                  <Link
+                    onClick={() => {
+                      setOpenPrivacyPolicy(true);
+                    }}
+                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                  >
+                    Privacy Policy
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    onClick={() => {
+                      setOpenCookiePolicy(true);
+                    }}
+                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                  >
+                    Cookie Policy
+                  </Link>
+                  .
+                </Box>
               </TabPanel>
               {databaseAccountNotCreatedYet && (
                 <div className="Error">
@@ -686,6 +737,7 @@ const SignUpPage = props => {
                 </div>
               )}
               {invalidAuth && <div className="Error">{invalidAuth.replace("Firebase:", "")}</div>}
+
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <Button
                   className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
@@ -698,6 +750,14 @@ const SignUpPage = props => {
                   {isSignUp === 0 ? "Sign In" : isSubmitting ? "Creating your account..." : " Sign Up"}
                 </Button>
               </div>
+              <Suspense fallback={<div></div>}>
+                <>
+                  <InformedConsent open={openInformedConsent} handleClose={() => setOpenInformedConsent(false)} />
+                  <CookiePolicy open={openCookiePolicy} handleClose={() => setOpenCookiePolicy(false)} />
+                  <PrivacyPolicy open={openPrivacyPolicy} handleClose={() => setOpenPrivacyPolicy(false)} />
+                  <TermsOfUse open={openTermOfUse} handleClose={() => setOpenTermsOfUse(false)} />
+                </>
+              </Suspense>
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <Button
                   onClick={openForgotPassword}
