@@ -90,7 +90,7 @@ const SignUpPage = props => {
   const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
   const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
 
-  const projectSpecs = useRecoilValue(projectSpecsState);
+  const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
   useEffect(() => {
@@ -105,6 +105,19 @@ const SignUpPage = props => {
     getCourses();
   }, [firebase]);
 
+
+  useEffect(() => {
+    const getProjectSpecs = async () => {
+      const pSpec = await firebase.db.collection("projectSpecs").doc(project).get();
+
+      setProjectSpecs({ ...pSpec.data() });
+    };
+
+    if (firebase && project) {
+      getProjectSpecs();
+    }
+    // update project settings
+  }, [firebase, project]);
   const authChangedVerified = async user => {
     setEmailVerified("Verified");
     const uid = user.uid;
@@ -530,6 +543,7 @@ const SignUpPage = props => {
     backgroundRepeat: "no-repeat",
     zIndex: -2
   });
+  console.log("projectSpecs",projectSpecs);
   return (
     <Box
       sx={{

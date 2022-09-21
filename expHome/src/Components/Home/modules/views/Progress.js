@@ -31,25 +31,6 @@ import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
 import { useNavigate, createSearchParams } from "react-router-dom";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "OurProcessSection");
 
-const item = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  backgroundColor: "white"
-};
-
-const number = {
-  fontSize: 24,
-  fontFamily: "default",
-  color: "secondary.main",
-  fontWeight: "medium",
-  margin: "10px 0px 10px 0px"
-};
-
-const image = {
-  height: 130,
-  my: 4
-};
 
 const howElements = [
   {

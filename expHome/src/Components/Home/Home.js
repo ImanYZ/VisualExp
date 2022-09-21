@@ -103,11 +103,11 @@ function Index() {
       />
       <Landing />
       <Progress/>
-      <HowItWorks section={section} />
+      {/* <HowItWorks section={section} /> */}
       <What />
-      <Values />
-      <UniversitiesMap theme={"Light"} />
-      <WhoWeAre />
+      {/* <Values /> */}
+      {/* <UniversitiesMap theme={"Light"} /> */}
+      {/* <WhoWeAre /> */}
       <JoinUs />
       <AppFooter />
     </Box>
