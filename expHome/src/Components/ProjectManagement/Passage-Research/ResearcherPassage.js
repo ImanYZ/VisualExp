@@ -27,6 +27,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import TextField from "@mui/material/TextField";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -356,6 +358,16 @@ const ResearcherPassage = () => {
     passageRef.update(passageUpdate);
   };
 
+  const onChangePhrases = ({ key, event, phrase, valueIdx }) => {
+    console.log(key, event.target.value, phrase, valueIdx);
+    const updatePassage = { ...passage1 };
+    updatePassage.keys[phrase][key][valueIdx] = event.target.value;
+    console.log(updatePassage?.keys[phrase][key]);
+    setPassage1(updatePassage);
+    setTimeout(() => {
+      console.log(updatePassage);
+    }, 1000);
+  };
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal
@@ -691,6 +703,59 @@ const ResearcherPassage = () => {
                               </ListItem>
                             ))}
                           </List>
+                          <Box>
+                            {passage1?.keys[phrase] &&
+                              Object.entries(passage1?.keys[phrase]).map(([key, values]) => {
+                                return (
+                                  <div style={{ display: "flex", marginBottom: "10px" }}>
+                                    <KeyboardArrowRightIcon />
+                                    <div style={{ display: "flex" }}>
+                                      {values.map((elemen, vIdx) => (
+                                        <Box sx={{ display: "flex", alignItems: "center", marginRight: "10px" }}>
+                                          <TextField
+                                          key={`${key}-${elemen}`}
+                                            id={elemen}
+                                            value={elemen}
+                                            onChange={event =>
+                                              onChangePhrases({
+                                                key,
+                                                event,
+                                                phrase,
+                                                passage1,
+                                                valueIdx: vIdx
+                                              })
+                                            }
+                                          />
+                                          {values[values.length - 1] !== elemen && (
+                                            <div>
+                                              <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
+                                            </div>
+                                          )}
+                                          {values[values.length - 1] === elemen && (
+                                            <Box>
+                                              <Button onClick={() => {}}>
+                                                <AddIcon /> OR
+                                              </Button>
+                                            </Box>
+                                          )}
+                                        </Box>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                          </Box>
+
+                          <Box>
+                            <Button onClick={() => {}}>
+                              <AddIcon /> AND
+                            </Button>
+                          </Box>
+                          <Box>
+                            <Button variant="contained" onClick={() => {}}>
+                              Submit
+                            </Button>
+                          </Box>
                         </div>
                       )}
                     </li>
