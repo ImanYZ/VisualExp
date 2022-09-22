@@ -27,8 +27,9 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import TextField from "@mui/material/TextField";
+import CustomTextInput from "./customTextField";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -53,6 +54,8 @@ const ResearcherPassage = () => {
   const [userCondition2, setUserCondition2] = React.useState({});
   const [passage2, setPassage2] = useState({});
   const [passage1, setPassage1] = useState({});
+  const [passageKeys1, setPassageKeys1] = useState({});
+  const [passageKeys2, setPassageKeys2] = useState({});
   const [passageCondition, setPassageCondition] = React.useState(0);
   const [passageCondition2, setPassageCondition2] = React.useState(0);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -137,12 +140,16 @@ const ResearcherPassage = () => {
         setPConURL2(passags[0]["linkK2"]);
         setPassage2(passags[0]);
         setPassage1(passags[0]);
+        setPassageKeys1(passags[0].keys);
+        setPassageKeys2(passags[0].keys);
         setFirstLoad(false);
       } else {
         const index1 = titles.indexOf(passage1.title);
         const index2 = titles.indexOf(passage2.title);
         setPassage1(passags[index1]);
         setPassage2(passags[index2]);
+        setPassageKeys1(passags[index1].keys);
+        setPassageKeys2(passags[index2].keys);
       }
       setPassagesLoadedUse(false);
     }
@@ -157,6 +164,7 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
+    setPassageKeys1(passage.keys);
   };
 
   const handlePassageConditionChange = event => {
@@ -174,6 +182,7 @@ const ResearcherPassage = () => {
     setUserCondition2(userCondition);
     setPassageCondition2("K2");
     setPassage2(passage);
+    setPassageKeys2(passage.keys);
   };
 
   const handlePassageConditionChange2 = event => {
@@ -359,15 +368,70 @@ const ResearcherPassage = () => {
   };
 
   const onChangePhrases = ({ key, event, phrase, valueIdx }) => {
-    console.log(key, event.target.value, phrase, valueIdx);
-    const updatePassage = { ...passage1 };
-    updatePassage.keys[phrase][key][valueIdx] = event.target.value;
-    console.log(updatePassage?.keys[phrase][key]);
-    setPassage1(updatePassage);
-    setTimeout(() => {
-      console.log(updatePassage);
-    }, 1000);
+    event.preventDefault();
+    console.log({ key, event: event.target.value, phrase, valueIdx });
+    const allKeys = { ...passageKeys1 };
+    allKeys[phrase][key][valueIdx] = event.target.value;
+    // console.log({ allKeys })
+    // const updatePassage = { ...passage1 };
+    // updatePassage.keys = allKeys;
+    // setPassage1(updatePassage);
+    setPassageKeys1(allKeys);
+    // console.log(updatePassage?.keys[phrase][key]);
+    // setPassage1(updatePassage);
+    // setTimeout(() => {
+    //   console.log(updatePassage);
+    // }, 1000);
   };
+
+  const addOR = ({ phrase, key }) => {
+    const allKeys = { ...passageKeys1 };
+    const orValues = allKeys[phrase][key] || [];
+    orValues.push("");
+    console.log({ orValues });
+    allKeys[phrase][key] = orValues;
+    setPassageKeys1(allKeys);
+  }
+
+  const addAND = ({ phrase, key }) => {
+    const allKeys = { ...passageKeys1 };
+    const andLength = Object.keys(allKeys[phrase]).length;
+    allKeys[phrase][`AND${andLength + 1}`] = [""];
+    setPassageKeys1(allKeys);
+  }
+
+  const deletePhrases = ({ phrase, key, value }) => {
+    const allKeys = { ...passageKeys1 };
+    const orValues = allKeys[phrase][key] || [];
+
+    const findIndex = orValues.findIndex(x => x === value);
+    orValues.splice(findIndex, 1);
+
+    if (orValues.length <= 0) {
+      delete allKeys[phrase][key];
+      setPassageKeys1(allKeys);
+      return;
+    }
+
+    allKeys[phrase][key] = orValues;
+    setPassageKeys1(allKeys);
+  }
+
+  const handleSubmit = () => {
+    const allKeys = { ...passageKeys1 };
+    const validateKeys = {};
+
+    Object.entries(allKeys).forEach(([key, values]) => {
+      validateKeys[key] = {};
+      Object.entries(values).forEach(([and, or]) => {
+        const filteredElements = or.filter(x => x && (x !== null || x !== ""));
+        validateKeys[key][and] = filteredElements;
+      })
+    });
+
+    setPassageKeys1(validateKeys);
+  }
+
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal
@@ -652,11 +716,10 @@ const ResearcherPassage = () => {
             <div>
               {passage1 &&
                 passage1?.phrases?.length > 0 &&
-                passage1.phrases.map((phrase, index) => (
+                ["Barn owls locate prey by having face structure"].map((phrase, index) => (
                   <ul key={index}>
                     <li>
-                      <div> {phrase}</div>
-
+                      <div>{phrase}</div>
                       {email === "oneweb@umich.edu" && (
                         <div>
                           <IconButton
@@ -704,55 +767,66 @@ const ResearcherPassage = () => {
                             ))}
                           </List>
                           <Box>
-                            {passage1?.keys[phrase] &&
-                              Object.entries(passage1?.keys[phrase]).map(([key, values]) => {
+                            {passageKeys1[phrase] &&
+                              Object.entries(passageKeys1[phrase]).map(([key, values], index) => {
                                 return (
-                                  <div style={{ display: "flex", marginBottom: "10px" }}>
+                                  <div key={`${index}`} style={{ display: "flex", marginBottom: "10px" }}>
                                     <KeyboardArrowRightIcon />
-                                    <div style={{ display: "flex" }}>
-                                      {values.map((elemen, vIdx) => (
-                                        <Box sx={{ display: "flex", alignItems: "center", marginRight: "10px" }}>
-                                          <TextField
-                                          key={`${key}-${elemen}`}
-                                            id={elemen}
-                                            value={elemen}
-                                            onChange={event =>
-                                              onChangePhrases({
-                                                key,
-                                                event,
-                                                phrase,
-                                                passage1,
-                                                valueIdx: vIdx
-                                              })
-                                            }
-                                          />
-                                          {values[values.length - 1] !== elemen && (
-                                            <div>
-                                              <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
-                                            </div>
-                                          )}
-                                          {values[values.length - 1] === elemen && (
-                                            <Box>
-                                              <Button onClick={() => {}}>
-                                                <AddIcon /> OR
-                                              </Button>
-                                            </Box>
-                                          )}
+                                    <div style={{ width: '100%' }}>
+                                      <div style={{ width: '100%' }}>
+                                        {values.map((elemen, vIdx) => (
+                                          <Box key={`${vIdx}`} sx={{ display: "flex", alignItems: "center", marginRight: "10px", width: '100%' }}>
+                                            <CustomTextInput
+                                              value={elemen}
+                                              onChange={event =>
+                                                onChangePhrases({
+                                                  key,
+                                                  event,
+                                                  phrase,
+                                                  passage1,
+                                                  valueIdx: vIdx
+                                                })
+                                              }
+                                            />
+                                            {(vIdx + 1) === values.length ? (
+                                              <Box sx={{ display: 'flex' }}>
+                                                <IconButton
+                                                  sx={{ mR: "10px" }}
+                                                  edge="end"
+                                                  aria-label="edit"
+                                                  onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}
+                                                >
+                                                  <DeleteIcon />
+                                                </IconButton>
+                                                <Button onClick={() => addOR({ phrase, key })}>
+                                                  <AddIcon /> OR
+                                                </Button>
+                                              </Box>
+                                            ) : (
+                                              <div style={{ display: 'flex' }}>
+                                                <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
+                                                <Button onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}>
+                                                  <DeleteIcon />
+                                                </Button>
+                                              </div>
+                                            )}
+                                          </Box>
+                                        ))}
+                                      </div>
+                                      {(index + 1) === Object.keys(passageKeys1[phrase]).length &&
+                                        <Box>
+                                          <Button onClick={() => addAND({ phrase, key })}>
+                                            <AddIcon /> AND
+                                          </Button>
                                         </Box>
-                                      ))}
+                                      }
                                     </div>
                                   </div>
                                 );
                               })}
                           </Box>
-
                           <Box>
-                            <Button onClick={() => {}}>
-                              <AddIcon /> AND
-                            </Button>
-                          </Box>
-                          <Box>
-                            <Button variant="contained" onClick={() => {}}>
+                            <Button variant="contained" onClick={handleSubmit}>
                               Submit
                             </Button>
                           </Box>
