@@ -148,8 +148,8 @@ const ResearcherPassage = () => {
         const index2 = titles.indexOf(passage2.title);
         setPassage1(passags[index1]);
         setPassage2(passags[index2]);
-        setPassageKeys1(passags[index1].keys);
-        setPassageKeys2(passags[index2].keys);
+        // setPassageKeys1(passags[index1].keys);
+        // setPassageKeys2(passags[index2].keys);
       }
       setPassagesLoadedUse(false);
     }
@@ -164,7 +164,7 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
-    setPassageKeys1(passage.keys?passage.keys:{});
+    setPassageKeys1(passage.keys ? passage.keys : {});
   };
 
   const handlePassageConditionChange = event => {
@@ -424,45 +424,63 @@ const ResearcherPassage = () => {
     setPassageKeys1(allKeys);
   };
 
-  const handleSubmit = async (passage, phrase) => {
+  const handleSubmit = async ({ passage, phrase }) => {
     try {
       const passageDoc = await firebase.db.collection("passages").where("title", "==", passage.title).get();
       const passageData = passageDoc.docs[0].data();
-      const allKeys = { ...passageKeys1 };
-      const validateKeys = {};
-      Object.entries(allKeys).forEach(([key, values]) => {
-        validateKeys[key] = {};
-        Object.entries(values).forEach(([and, or]) => {
-          const filteredElements = or.filter(x => x && (x !== null || x !== ""));
-          validateKeys[key][and] = filteredElements;
-        });
-      });
+      const currentPhrase = Object.keys(passageKeys1).length > 0 && passageKeys1[phrase];
+      const checkPhrase = Object.keys(currentPhrase).length > 0;
+      console.log({ currentPhrase, checkPhrase, passageKeys1 });
       let passageUpdate;
-      if (passageData.keys) {
-        passageUpdate = {
-          keys: {
-            ...passageData.keys,
-            [phrase]: validateKeys[phrase]
+      if (checkPhrase) {
+        const updatedPhrase = {};
+        Object.entries(currentPhrase).forEach(([and, or]) => {
+          const filteredElements = or.filter(x => x && (x !== null || x !== ""));
+          if (filteredElements.length > 0) {
+            updatedPhrase[and] = filteredElements;
           }
-        };
-      } else {
-        passageUpdate = {
-          keys: {
-            [phrase]: validateKeys[phrase]
-          }
-        };
-      }
+        });
 
-      const pssageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-      console.log(validateKeys);
-      pssageRef.update(passageUpdate);
-      setPassageKeys1(validateKeys);
+        if (passageData.keys) {
+          passageUpdate = {
+            ...passageData,
+            keys: {
+              ...passageData.keys,
+              [phrase]: updatedPhrase
+            }
+          };
+        } else {
+          passageUpdate = {
+            ...passageData,
+            keys: {
+              [phrase]: updatedPhrase
+            }
+          };
+        }
+
+        const pssageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+        console.log({ passageUpdate, currentPhrase, checkPhrase });
+        pssageRef.update(passageUpdate);
+        // console.log('passageUpdatepassageUpdate', passageKeys1);
+        setPassage1({ ...passageUpdate });
+        setPassageKeys1({ ...passageKeys1 });
+      } else {
+        if (passageData.keys) {
+          passageUpdate = {
+            ...passageData,
+            keys: {
+              ...passageData.keys,
+              phrase
+            }
+          };
+        }
+      }
     } catch (error) {
-      console.log(error);
+      console.error(':::::::ERROR ON PHRASE SUBMIT FUNC::::::::', { error });
     }
   };
   console.log("passageKeys1", passageKeys1);
-  console.log("passage1", passage1);
+  // console.log("passage1", passage1);
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal
@@ -872,7 +890,7 @@ const ResearcherPassage = () => {
                                 <AddIcon /> AND
                               </Button>
                             )}
-                            <Button variant="contained" onClick={() => handleSubmit(passage1, phrase)}>
+                            <Button variant="contained" onClick={() => handleSubmit({ passage: passage1, phrase })}>
                               Submit
                             </Button>
                           </Box>
