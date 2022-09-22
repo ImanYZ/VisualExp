@@ -164,7 +164,7 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
-    setPassageKeys1(passage.keys);
+    setPassageKeys1(passage.keys?passage.keys:{});
   };
 
   const handlePassageConditionChange = event => {
@@ -391,14 +391,21 @@ const ResearcherPassage = () => {
     console.log({ orValues });
     allKeys[phrase][key] = orValues;
     setPassageKeys1(allKeys);
-  }
+  };
 
   const addAND = ({ phrase, key }) => {
     const allKeys = { ...passageKeys1 };
-    const andLength = Object.keys(allKeys[phrase]).length;
-    allKeys[phrase][`AND${andLength + 1}`] = [""];
+    const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
+    if (andLength > 0) {
+      allKeys[phrase][`AND${andLength + 1}`] = [""];
+    } else {
+      allKeys[phrase] = {
+        AND1: [""]
+      };
+    }
+
     setPassageKeys1(allKeys);
-  }
+  };
 
   const deletePhrases = ({ phrase, key, value }) => {
     const allKeys = { ...passageKeys1 };
@@ -415,23 +422,47 @@ const ResearcherPassage = () => {
 
     allKeys[phrase][key] = orValues;
     setPassageKeys1(allKeys);
-  }
+  };
 
-  const handleSubmit = () => {
-    const allKeys = { ...passageKeys1 };
-    const validateKeys = {};
+  const handleSubmit = async (passage, phrase) => {
+    try {
+      const passageDoc = await firebase.db.collection("passages").where("title", "==", passage.title).get();
+      const passageData = passageDoc.docs[0].data();
+      const allKeys = { ...passageKeys1 };
+      const validateKeys = {};
+      Object.entries(allKeys).forEach(([key, values]) => {
+        validateKeys[key] = {};
+        Object.entries(values).forEach(([and, or]) => {
+          const filteredElements = or.filter(x => x && (x !== null || x !== ""));
+          validateKeys[key][and] = filteredElements;
+        });
+      });
+      let passageUpdate;
+      if (passageData.keys) {
+        passageUpdate = {
+          keys: {
+            ...passageData.keys,
+            [phrase]: validateKeys[phrase]
+          }
+        };
+      } else {
+        passageUpdate = {
+          keys: {
+            [phrase]: validateKeys[phrase]
+          }
+        };
+      }
 
-    Object.entries(allKeys).forEach(([key, values]) => {
-      validateKeys[key] = {};
-      Object.entries(values).forEach(([and, or]) => {
-        const filteredElements = or.filter(x => x && (x !== null || x !== ""));
-        validateKeys[key][and] = filteredElements;
-      })
-    });
-
-    setPassageKeys1(validateKeys);
-  }
-
+      const pssageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+      console.log(validateKeys);
+      pssageRef.update(passageUpdate);
+      setPassageKeys1(validateKeys);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log("passageKeys1", passageKeys1);
+  console.log("passage1", passage1);
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal
@@ -716,7 +747,7 @@ const ResearcherPassage = () => {
             <div>
               {passage1 &&
                 passage1?.phrases?.length > 0 &&
-                ["Barn owls locate prey by having face structure"].map((phrase, index) => (
+                passage1?.phrases?.map((phrase, index) => (
                   <ul key={index}>
                     <li>
                       <div>{phrase}</div>
@@ -772,10 +803,18 @@ const ResearcherPassage = () => {
                                 return (
                                   <div key={`${index}`} style={{ display: "flex", marginBottom: "10px" }}>
                                     <KeyboardArrowRightIcon />
-                                    <div style={{ width: '100%' }}>
-                                      <div style={{ width: '100%' }}>
+                                    <div style={{ width: "100%" }}>
+                                      <div style={{ width: "100%" }}>
                                         {values.map((elemen, vIdx) => (
-                                          <Box key={`${vIdx}`} sx={{ display: "flex", alignItems: "center", marginRight: "10px", width: '100%' }}>
+                                          <Box
+                                            key={`${vIdx}`}
+                                            sx={{
+                                              display: "flex",
+                                              alignItems: "center",
+                                              marginRight: "10px",
+                                              width: "100%"
+                                            }}
+                                          >
                                             <CustomTextInput
                                               value={elemen}
                                               onChange={event =>
@@ -788,8 +827,8 @@ const ResearcherPassage = () => {
                                                 })
                                               }
                                             />
-                                            {(vIdx + 1) === values.length ? (
-                                              <Box sx={{ display: 'flex' }}>
+                                            {vIdx + 1 === values.length ? (
+                                              <Box sx={{ display: "flex" }}>
                                                 <IconButton
                                                   sx={{ mR: "10px" }}
                                                   edge="end"
@@ -803,9 +842,11 @@ const ResearcherPassage = () => {
                                                 </Button>
                                               </Box>
                                             ) : (
-                                              <div style={{ display: 'flex' }}>
+                                              <div style={{ display: "flex" }}>
                                                 <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
-                                                <Button onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}>
+                                                <Button
+                                                  onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}
+                                                >
                                                   <DeleteIcon />
                                                 </Button>
                                               </div>
@@ -813,20 +854,25 @@ const ResearcherPassage = () => {
                                           </Box>
                                         ))}
                                       </div>
-                                      {(index + 1) === Object.keys(passageKeys1[phrase]).length &&
+                                      {index + 1 === Object.keys(passageKeys1[phrase]).length && (
                                         <Box>
                                           <Button onClick={() => addAND({ phrase, key })}>
                                             <AddIcon /> AND
                                           </Button>
                                         </Box>
-                                      }
+                                      )}
                                     </div>
                                   </div>
                                 );
                               })}
                           </Box>
                           <Box>
-                            <Button variant="contained" onClick={handleSubmit}>
+                            {!passageKeys1[phrase] && (
+                              <Button onClick={() => addAND({ phrase })}>
+                                <AddIcon /> AND
+                              </Button>
+                            )}
+                            <Button variant="contained" onClick={() => handleSubmit(passage1, phrase)}>
                               Submit
                             </Button>
                           </Box>
