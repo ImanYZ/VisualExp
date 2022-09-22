@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
-import SignUpPage from "./SignUpPage";
+
 import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
@@ -19,67 +19,65 @@ const AuthConsent = props => {
   }
 
   return (
-   <>
-    {!props.project?(
-      <SignUpPage/>
-    ):
-    (<Grid
-      container
-      spacing={{ xs: 1, md: 2.2 }}
-      sx={{
-        width: "100%",
-        height: "100vh",
-        overflowY: { xs: "auto", md: "hidden" },
-        overflowX: "hidden"
-      }}
-    >
+    <>
       <Grid
-        item
-        xs={12}
-        md={8}
-        style={{
-          overflowY: "hidden",
+        container
+        spacing={{ xs: 1, md: 2.2 }}
+        sx={{
+          width: "100%",
+          height: "100vh",
+          overflowY: { xs: "auto", md: "hidden" },
           overflowX: "hidden"
         }}
       >
-        <Paper
-          sx={{
-            overflowY: "auto",
-            overflowX: "hidden",
-            margin: "10px 0px 25px 10px",
-            width: "100%",
-            height: "100vh"
+        <Grid
+          item
+          xs={12}
+          md={8}
+          style={{
+            overflowY: "hidden",
+            overflowX: "hidden"
           }}
         >
-          {props.project && props.project === "StudentCoNoteSurvey" ? (
-            <ConsentStudentCoNoteSurvey />
-          ) : (
-            <ConsentDocument />
-          )}
-        </Paper>
-      </Grid>
-      <Grid
-        item
-        xs={12}
-        md={4}
-        style={{
-          overflowY: "hidden",
-          overflowX: "hidden"
-        }}
-      >
-        <Paper
-          sx={{
-            overflowY: "auto",
-            overflowX: "hidden",
-            margin: "10px 0px 25px 0px",
-            width: "100%",
-            height: "100vh"
+          <Paper
+            sx={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              margin: "10px 0px 25px 10px",
+              width: "100%",
+              height: "100vh"
+            }}
+          >
+            {props.project && props.project === "StudentCoNoteSurvey" ? (
+              <ConsentStudentCoNoteSurvey />
+            ) : (
+              <ConsentDocument />
+            )}
+          </Paper>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          md={4}
+          style={{
+            overflowY: "hidden",
+            overflowX: "hidden"
           }}
         >
-          {authComponent}
-        </Paper>
+          <Paper
+            sx={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              margin: "10px 0px 25px 0px",
+              width: "100%",
+              height: "100vh"
+            }}
+          >
+            {authComponent}
+          </Paper>
+        </Grid>
       </Grid>
-    </Grid>)}
+      }
     </>
   );
 };

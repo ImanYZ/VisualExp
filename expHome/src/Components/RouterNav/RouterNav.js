@@ -686,7 +686,7 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
-    navigateTo("/")
+    navigateTo("/HomeExperiment")
   };
 
   const changeProject = (event, index) => {

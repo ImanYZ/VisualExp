@@ -488,7 +488,7 @@ const SignUpPage = props => {
       const navigateToSchedulePage = params.get('navigateToSchedulePage');
       console.log({navigateToSchedulePage})
       if (navigateToSchedulePage) {
-        navigateTo("/Activities");
+        navigateTo("/HomeExperiment/Auth");
       } else {
         navigateTo("/");
       }

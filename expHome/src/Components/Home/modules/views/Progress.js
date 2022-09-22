@@ -190,7 +190,7 @@ const Progress = props => {
   const params = { navigateToSchedulePage: true };
   const navigateToActivities = () => {
     navigateTo({
-      pathname: "/Activities",
+      pathname: "/HomeExperiment/Auth",
       search: `?${createSearchParams(params)}`
     });
   };
