@@ -140,16 +140,16 @@ const ResearcherPassage = () => {
         setPConURL2(passags[0]["linkK2"]);
         setPassage2(passags[0]);
         setPassage1(passags[0]);
-        setPassageKeys1(passags[0].keys);
-        setPassageKeys2(passags[0].keys);
+        setPassageKeys1(passags[0].keys || {});
+        setPassageKeys2(passags[0].keys || {});
         setFirstLoad(false);
       } else {
         const index1 = titles.indexOf(passage1.title);
         const index2 = titles.indexOf(passage2.title);
         setPassage1(passags[index1]);
         setPassage2(passags[index2]);
-        setPassageKeys1(passags[index1].keys);
-        setPassageKeys2(passags[index2].keys);
+        setPassageKeys1(passags[index1].keys || {});
+        setPassageKeys2(passags[index2].keys || {});
       }
       setPassagesLoadedUse(false);
     }
@@ -164,7 +164,7 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
-    setPassageKeys1(passage.keys ? passage.keys : {});
+    setPassageKeys1(passage.keys ||  {});
   };
 
   const handlePassageConditionChange = event => {
@@ -182,7 +182,7 @@ const ResearcherPassage = () => {
     setUserCondition2(userCondition);
     setPassageCondition2("K2");
     setPassage2(passage);
-    setPassageKeys2(passage.keys ? passage.keys : {});
+    setPassageKeys2(passage.keys || {});
   };
 
   const handlePassageConditionChange2 = event => {
