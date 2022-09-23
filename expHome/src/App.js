@@ -117,6 +117,8 @@ const postQuestions = [
   }
 ];
 
+const roundNum = (num) => Number(Number.parseFloat(Number(num).toFixed(2)));
+
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
   // eslint-disable-next-line no-unused-vars
@@ -327,9 +329,9 @@ const App = () => {
     pConditions[phase] = {
       ...pConditions[phase],
       [prefieldName + "reText"]: reText,
-      [prefieldName + "Score"]: score,
-      [prefieldName + "ScoreRatio"]: score / keywordsText.length,
-      [prefieldName + "CosineSim"]: textCosineSimilarity(mainText, recalledText),
+      [prefieldName + "Score"]: roundNum(score),
+      [prefieldName + "ScoreRatio"]: roundNum(score / keywordsText.length),
+      [prefieldName + "CosineSim"]: roundNum(textCosineSimilarity(mainText, recalledText)),
       [prefieldName + "Ended"]: currentTime,
       [prefieldName + "Time"]: timeSpent
     };
@@ -500,22 +502,22 @@ const App = () => {
         const passageData = passageDoc.data();
         tempScores.push({
           title: passageData.title,
-          questionsNum: passageData.questions.length,
-          pretestScore: pConditions[pNum].pretestScore,
-          pretestScoreRatio: pConditions[pNum].pretestScoreRatio,
-          testScore: pConditions[pNum].testScore,
-          testScoreRatio: pConditions[pNum].testScoreRatio,
-          test3DaysScore: pConditions[pNum].test3DaysScore,
-          test3DaysScoreRatio: pConditions[pNum].test3DaysScoreRatio,
-          test1WeekScore: pConditions[pNum].test1WeekScore,
-          test1WeekScoreRatio: pConditions[pNum].test1WeekScoreRatio,
-          recallScore: pConditions[pNum].recallScore,
-          recallScoreRatio: pConditions[pNum].recallScoreRatio,
-          recall3DaysScore: pConditions[pNum].recall3DaysScore,
-          recall3DaysScoreRatio: pConditions[pNum].recall3DaysScoreRatio,
-          recall1WeekScore: pConditions[pNum].recall1WeekScore,
-          recall1WeekScoreRatio: pConditions[pNum].recall1WeekScoreRatio,
-          keywordsLen: passageData.keywords.length
+          questionsNum: roundNum(passageData.questions.length),
+          pretestScore: roundNum(pConditions[pNum].pretestScore),
+          pretestScoreRatio: roundNum(pConditions[pNum].pretestScoreRatio),
+          testScore: roundNum(pConditions[pNum].testScore),
+          testScoreRatio: roundNum(pConditions[pNum].testScoreRatio),
+          test3DaysScore: roundNum(pConditions[pNum].test3DaysScore),
+          test3DaysScoreRatio: roundNum(pConditions[pNum].test3DaysScoreRatio),
+          test1WeekScore: roundNum(pConditions[pNum].test1WeekScore),
+          test1WeekScoreRatio: roundNum(pConditions[pNum].test1WeekScoreRatio),
+          recallScore: roundNum(pConditions[pNum].recallScore),
+          recallScoreRatio: roundNum(pConditions[pNum].recallScoreRatio),
+          recall3DaysScore: roundNum(pConditions[pNum].recall3DaysScore),
+          recall3DaysScoreRatio: roundNum(pConditions[pNum].recall3DaysScoreRatio),
+          recall1WeekScore: roundNum(pConditions[pNum].recall1WeekScore),
+          recall1WeekScoreRatio: roundNum(pConditions[pNum].recall1WeekScoreRatio),
+          keywordsLen: roundNum(passageData.keywords.length)
         });
       }
       setScores(tempScores);
