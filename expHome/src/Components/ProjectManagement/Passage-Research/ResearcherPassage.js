@@ -164,7 +164,7 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
-    setPassageKeys1(passage.keys ||  {});
+    setPassageKeys1(passage.keys || {});
   };
 
   const handlePassageConditionChange = event => {
@@ -440,6 +440,13 @@ const ResearcherPassage = () => {
     const allKeys = { ...passageKeys1 };
     const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
     if (andLength > 0) {
+      let num = 1;
+      let checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
+      while (checkKeyNumbers) {
+        num = (num + 1);
+        // eslint-disable-next-line no-loop-func
+        checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
+      }
       allKeys[phrase][`AND${andLength + 1}`] = [""];
     } else {
       allKeys[phrase] = {
@@ -453,10 +460,18 @@ const ResearcherPassage = () => {
     }
   };
   const addAND2 = ({ phrase, key }) => {
+    debugger;
     const allKeys = { ...passageKeys2 };
     const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
     if (andLength > 0) {
-      allKeys[phrase][`AND${andLength + 1}`] = [""];
+      let num = 1;
+      let checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
+      while (checkKeyNumbers) {
+        num = (num + 1);
+        // eslint-disable-next-line no-loop-func
+        checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
+      }
+      allKeys[phrase][`AND${num}`] = [""];
     } else {
       allKeys[phrase] = {
         AND1: [""]
