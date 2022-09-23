@@ -748,7 +748,7 @@ const ResearcherPassage = () => {
         </Box>
       </Modal>
 
-      <div style={{ userSelect: "none", background: "#e2e2e2" }}>
+      <div style={{ background: "#e2e2e2" }}>
         <div style={{ display: "flex", height: "100%" }}>
           <div style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
             <div style={{ display: "flex" }}>
@@ -1120,6 +1120,7 @@ const ResearcherPassage = () => {
                 )}
               </>
             )}
+
             <Box>
               {passage2 &&
                 passage2?.phrases?.length > 0 &&
