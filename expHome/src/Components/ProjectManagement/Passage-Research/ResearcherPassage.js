@@ -447,7 +447,7 @@ const ResearcherPassage = () => {
         // eslint-disable-next-line no-loop-func
         checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
       }
-      allKeys[phrase][`AND${andLength + 1}`] = [""];
+      allKeys[phrase][`AND${num}`] = [""];
     } else {
       allKeys[phrase] = {
         AND1: [""]
@@ -460,7 +460,6 @@ const ResearcherPassage = () => {
     }
   };
   const addAND2 = ({ phrase, key }) => {
-    debugger;
     const allKeys = { ...passageKeys2 };
     const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
     if (andLength > 0) {
