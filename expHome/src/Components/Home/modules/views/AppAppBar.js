@@ -10,7 +10,7 @@ import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
@@ -72,7 +72,7 @@ const AppAppBar = (props) => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
-
+  const navigateTo = useNavigate();
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -150,6 +150,7 @@ const AppAppBar = (props) => {
     setEmail("");
     setFullname("");
     await firebase.logout();
+    navigateTo("/");
   };
 
   const toggleColorMode = (event) => {
@@ -298,7 +299,7 @@ const AppAppBar = (props) => {
                 </Button>
               </Tooltip>
             )}
-            {fullname && (
+           {fullname ? (
               <Tooltip title="Account">
                 <IconButton
                   size="large"
@@ -312,6 +313,21 @@ const AppAppBar = (props) => {
                 >
                   <AccountCircle />
                 </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="SIGN IN/UP">
+                <Button
+                  variant="contained"
+                  href="Auth"
+                  sx={{
+                    fontSize: 16,
+                    color: "common.white",
+                    ml: 2.5,
+                    borderRadius: 40
+                  }}
+                >
+                  SIGN IN/UP
+                </Button>
               </Tooltip>
             )}
           </Box>
