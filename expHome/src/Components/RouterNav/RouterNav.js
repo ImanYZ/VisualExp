@@ -764,7 +764,7 @@ const RouterNav = props => {
 
   return (
     <>
-      {!props.duringAnExperiment && (
+      {!props.duringAnExperiment && fullname &&  (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
