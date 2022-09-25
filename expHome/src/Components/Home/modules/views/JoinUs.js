@@ -388,11 +388,11 @@ console.log(props.community);
           </StepContent>
         </Step> */}
         <Step>
-          {props.community && (
+          {/* {props.community && (
             <StepLabel optional={<Typography variant="caption">Last step</Typography>}>
               Complete the community-specific application requirements.
             </StepLabel>
-          )}
+          )} */}
           <StepContent>
             {props.community ? (
               <Stepper
