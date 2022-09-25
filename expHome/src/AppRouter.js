@@ -211,7 +211,7 @@ const AppRouter = props => {
 
   return (
     <Routes>
-      <Route path="/Home/*" element={<Home />} />
+      <Route path="*" element={<Home />} />
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
@@ -252,6 +252,7 @@ const AppRouter = props => {
       <Route path="/*" element={<RouterNav duringAnExperiment={duringAnExperiment} />}>
         {fullname && email && emailVerified === "Verified" ? (
           <>
+
             {duringAnExperiment ? (
               <>
                 {startedByResearcher ? (
@@ -306,7 +307,8 @@ const AppRouter = props => {
             <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
             <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
             <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
-            <Route path="*" element={<AuthConsent />} />
+            <Route path="Auth" element={<AuthConsent />} />
+            <Route path="*" element={<Home />} />
           </>
         )}
       </Route>
