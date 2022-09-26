@@ -19,7 +19,7 @@ import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import FormGroup from "@mui/material/FormGroup";
 import Switch from "@mui/material/Switch";
-
+import RouterNav from "../../Components/RouterNav/RouterNav";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { firebaseState } from "../../store/AuthAtoms";
@@ -205,6 +205,7 @@ const LifeLogger = () => {
 
   return (
     <div id="LifeLoggerContainer">
+      <RouterNav/>
       <Paper sx={{ width: "100%", margin: "19px" }}>
         <Paper
           sx={{ backgroundColor: "#00aa44", width: lightProportion + "%", height: "40px", display: "inline-block" }}
