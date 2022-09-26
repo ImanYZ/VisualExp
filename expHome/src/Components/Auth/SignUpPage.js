@@ -34,7 +34,7 @@ import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
 import AppConfig from "../../AppConfig";
 import { color } from "@mui/system";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const CookiePolicy = React.lazy(() => import("../../Components/modals/CookiePolicy"));
 const PrivacyPolicy = React.lazy(() => import("../../Components/modals/PrivacyPolicy"));
@@ -43,7 +43,7 @@ const InformedConsent = React.lazy(() => import("../../Components/modals/Informe
 
 const SignUpPage = props => {
   const navigateTo = useNavigate();
-  const [params] = useSearchParams();
+
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
@@ -484,9 +484,11 @@ const SignUpPage = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
-      const navigateToSchedulePage = params.get("navigateToSchedulePage");
-      console.log({ navigateToSchedulePage });
-      navigateTo("/Home");
+      if (window.location.pathname.includes("Activities") || window.location.pathname.includes("tutorial")) {
+        navigateTo(window.location.pathname);
+      } else {
+        navigateTo("/");
+      }
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
@@ -538,7 +540,6 @@ const SignUpPage = props => {
     backgroundRepeat: "no-repeat",
     zIndex: -2
   });
-  console.log("projectSpecs", projectSpecs);
   return (
     <Box sx={{ p: { xs: "8px", md: "24px", width: "100%" } }}>
       <Background
@@ -548,16 +549,25 @@ const SignUpPage = props => {
           backgroundPosition: "center"
         }}
       />
-      <Paper sx={{ m: "10px 500px 20px 500px" }}>
+      <Paper sx={{ m: "10px 500px 200px 500px" }}>
         {emailVerified === "Sent" ? (
-          <div style={{ height: "200px", marginTop: "20px" }}>
-            <Box sx={{ m: "200px 20px 20px 100px" }}>
+          <div
+            style={{
+              height: "200px",
+              marginTop: "200px",
+              flexDirection: "column",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Box>
               <p>
                 We just sent you a verification email. Please click the link in the email to verify and complete your
                 sign-up.
               </p>
             </Box>
-            <Box sx={{ m: "20px 200px 20px 250px" }}>
+            <Box>
               <Button
                 variant="contained"
                 color="warning"
@@ -697,8 +707,8 @@ const SignUpPage = props => {
                   />
                 </Box>
                 <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
-                  <Checkbox checked={signUpAgreement} onChange={(_, value) => setSignUpAgreement(value)} />
-                  you acknowledge that you agree to 1Cademy's{" "}
+                  <Checkbox checked={signUpAgreement} onChange={(_, value) => setSignUpAgreement(value)} />I acknowledge
+                  and agree to 1Cademy's{" "}
                   <Link
                     onClick={() => {
                       setOpenTermsOfUse(true);
