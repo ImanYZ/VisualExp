@@ -27,7 +27,7 @@ import CodeFeedback from "../CodeFeedback/CodeFeedback";
 import { LeaderBoard, ProjectPointThresholds } from "./components";
 import { formatPoints } from "../../../utils";
 import ResearcherPassage from "../Passage-Research/ResearcherPassage";
-
+import RouterNav from "../../RouterNav/RouterNav";
 import favicon from "../../../assets/favicon.png";
 
 import "./Activities.css";
@@ -377,11 +377,17 @@ const Activities = props => {
   })();
 
   if (notAResearcher) {
-    return <h1>You're not a researcher on {projects.length > 0 ? `the project ${project}!` : "any project!"}</h1>;
+    return (
+      <>
+        <RouterNav />
+        <h1>You're not a researcher on {projects.length > 0 ? `the project ${project}!` : "any project!"}</h1>
+      </>
+    );
   }
 
   return (
     <div id="ActivitiesContainer">
+      <RouterNav />
       {showLeaderBoard && (
         <div className="Columns40_60">
           <Alert severity="warning">

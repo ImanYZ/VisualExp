@@ -270,7 +270,6 @@ const JoinUs = props => {
       setActiveInnerStep(newStep);
     }
   };
-console.log(props.community);
   return (
     <Container
       id="JoinUsSection"
@@ -713,7 +712,7 @@ console.log(props.community);
                     <Button
                       variant="contained"
                       component="a"
-                      href={fullname && emailVerified === "Verified" ? "/tutorial":"Auth"}
+                      href={"/tutorial"}
                       sx={{ mt: 1, mr: 1, color: "common.white" }}
                     >
                       1Cademy Tutorial
