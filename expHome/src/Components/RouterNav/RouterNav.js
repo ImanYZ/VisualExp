@@ -67,6 +67,7 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
 const RouterNav = props => {
   const firebase = useRecoilValue(firebaseState);
   const firebaseOne = useRecoilValue(firebaseOneState);
+  const navigateTo = useNavigate();
   const userEmail = useRecoilValue(emailState);
   const [username, setUsername] = useRecoilState(usernameState);
   const [email, setEmail] = useRecoilState(emailOneState);
@@ -683,6 +684,7 @@ const RouterNav = props => {
     setGradingPoints(0);
     setGradingNums({});
     setNegativeGradingPoints(0);
+    navigateTo("/");
     await firebase.logout();
   };
 
@@ -764,7 +766,7 @@ const RouterNav = props => {
 
   return (
     <>
-      {!props.duringAnExperiment && fullname &&  (
+      {!props.duringAnExperiment &&  (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>

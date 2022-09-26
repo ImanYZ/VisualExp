@@ -62,7 +62,7 @@ const Communities = props => {
   useEffect(() => {
     if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunities(oldCommunities => {
-        return [oldCommunities[props.commIdx], ...oldCommunities.filter(communi => communi.id !== props.commIdx)];
+        return [oldCommunities[props.commIdx], ...oldCommunities.filter(communi => communi.id !== oldCommunities[props.commIdx].id)];
       });
       setExpanded(0);
     }
