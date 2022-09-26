@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
 
@@ -187,7 +188,9 @@ const AppAppBar = (props) => {
       )}
     </Menu>
   );
-
+  const signUpHandler = () => { 
+    navigateTo("/auth");
+   }
   return (
     <div>
       <AppBar>
@@ -318,7 +321,7 @@ const AppAppBar = (props) => {
               <Tooltip title="SIGN IN/UP">
                 <Button
                   variant="contained"
-                  href="Auth"
+                  onClick={signUpHandler}
                   sx={{
                     fontSize: 16,
                     color: "common.white",

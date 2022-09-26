@@ -18,7 +18,7 @@ import { projectSpecsState } from "../../store/ProjectAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import { currentProjectState } from "../../store/ExperimentAtoms";
-
+import RouterNav from "../../../src/Components/RouterNav/RouterNav";
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
 
@@ -369,7 +369,10 @@ const SchedulePage = props => {
   };
 
   return (
+    <>
+    <RouterNav/>
     <div id="SchedulePageContainer">
+
       {submitted ? (
         <div className="DateDescription">
           <p>
@@ -495,6 +498,7 @@ const SchedulePage = props => {
         </DialogActions>
       </Dialog>
     </div>
+    </>
   );
 };
 

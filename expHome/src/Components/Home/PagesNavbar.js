@@ -10,12 +10,12 @@ import sectionsOrder from "./modules/views/sectionsOrder";
 
 const switchSection = (newValue) => (event) => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
-    window.location.replace("/Home#" + sectionsOrder[newValue + 1].id);
+    window.location.replace("/#" + sectionsOrder[newValue + 1].id);
   }
 };
 
 const homeClick = (event) => {
-  window.location.replace("/Home");
+  window.location.replace("/");
 };
 
 const joinUsClick = (event) => {
