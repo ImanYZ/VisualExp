@@ -684,7 +684,6 @@ const RouterNav = props => {
     setGradingPoints(0);
     setGradingNums({});
     setNegativeGradingPoints(0);
-    navigateTo("/");
     await firebase.logout();
   };
 

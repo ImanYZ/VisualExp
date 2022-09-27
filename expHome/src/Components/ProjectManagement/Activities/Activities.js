@@ -181,9 +181,9 @@ const Activities = props => {
               totalPoints += projectData.gradingPoints;
               gradingPoints += projectData.gradingPoints;
             }
-            if(projectData.positiveCodingPoints){
+            if (projectData.positiveCodingPoints) {
               totalPoints += projectData.positiveCodingPoints;
-              commentsPoints+=projectData.positiveCodingPoints;
+              commentsPoints += projectData.positiveCodingPoints;
             }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
@@ -386,33 +386,35 @@ const Activities = props => {
   }
 
   return (
-    <div id="ActivitiesContainer">
+    <>
       <RouterNav />
-      {showLeaderBoard && (
-        <div className="Columns40_60">
-          <Alert severity="warning">
-            <ProjectPointThresholds projectPoints={projectPoints} />
-            <Button
-              onClick={expandLeaderboard}
-              className={expanded ? "Button Red" : "Button Green"}
-              variant="contained"
-            >
-              {expanded ? "Collapse" : "Expand"} leaderboard details
-            </Button>
-          </Alert>
-          <LeaderBoard
-            fullname={fullname}
-            expanded={expanded}
-            researchers={researchers}
-            isResearcherCriteriaMet={isResearcherCriteriaMet}
-            makeResearcherChipContent={makeResearcherChipContent}
-            onGoingEvents={onGoingEvents}
-            setOnGoingEvents={setOnGoingEvents}
-          />
-        </div>
-      )}
-      {currentPage}
-    </div>
+      <div id="ActivitiesContainer">
+        {showLeaderBoard && (
+          <div className="Columns40_60">
+            <Alert severity="warning">
+              <ProjectPointThresholds projectPoints={projectPoints} />
+              <Button
+                onClick={expandLeaderboard}
+                className={expanded ? "Button Red" : "Button Green"}
+                variant="contained"
+              >
+                {expanded ? "Collapse" : "Expand"} leaderboard details
+              </Button>
+            </Alert>
+            <LeaderBoard
+              fullname={fullname}
+              expanded={expanded}
+              researchers={researchers}
+              isResearcherCriteriaMet={isResearcherCriteriaMet}
+              makeResearcherChipContent={makeResearcherChipContent}
+              onGoingEvents={onGoingEvents}
+              setOnGoingEvents={setOnGoingEvents}
+            />
+          </div>
+        )}
+        {currentPage}
+      </div>
+    </>
   );
 };
 
