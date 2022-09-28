@@ -19,7 +19,7 @@ const homeClick = (event) => {
 };
 
 const joinUsClick = (event) => {
-  window.location.replace("/Home#JoinUsSection");
+  window.location.replace("/#JoinUsSection");
 };
 
 const PagesNavbar = ({ children, tutorial, communities, thisPage }) => {
