@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import BiotechIcon from "@mui/icons-material/Biotech";
 
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -27,6 +28,7 @@ import {
   colorModeState,
   leadingState,
 } from "../../../../store/AuthAtoms";
+import { notAResearcherState } from "../../../../store/ProjectAtoms";
 import {
   hasScheduledState,
   completedExperimentState,
@@ -69,7 +71,7 @@ const AppAppBar = (props) => {
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const leading = useRecoilValue(leadingState);
-
+  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
@@ -145,7 +147,17 @@ const AppAppBar = (props) => {
       }
     });
   }, [firebase]);
-
+  useEffect(() => {
+    const checkResearcher = async () => {
+      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
+      if (researcherDoc.exists) {
+        setNotAResearcher(false);
+      }
+    };
+    if (firebase && fullname) {
+      checkResearcher();
+    }
+  }, [firebase, fullname]);
   const signOut = async (event) => {
     console.log("Signing out!");
     setEmail("");
@@ -153,7 +165,9 @@ const AppAppBar = (props) => {
     await firebase.logout();
     navigateTo("/");
   };
-
+  const navigateToExperiment = () => {
+    navigateTo("Activities/Experiment");
+  };
   const toggleColorMode = (event) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
   };
@@ -182,9 +196,16 @@ const AppAppBar = (props) => {
         </MenuItem>
       )}
       {fullname && email && (
+        <>
+          {!notAResearcher && (
+            <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
+              <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
+            </MenuItem>
+          )}
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
           <LogoutIcon /> <span id="LogoutText">Logout</span>
         </MenuItem>
+        </>
       )}
     </Menu>
   );
