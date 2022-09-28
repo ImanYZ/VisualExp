@@ -17,6 +17,7 @@ import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms"
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
 import { currentProjectState } from "../../store/ExperimentAtoms";
+import RouterNav from "../../Components/RouterNav/RouterNav";
 
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
@@ -327,6 +328,8 @@ const ScheduleAdministratorPage = props => {
   };
 
   return (
+    <>
+    <RouterNav/>
     <div id="SchedulePageContainer">
       {submitted ? (
         <div className="DateDescription">
@@ -454,6 +457,7 @@ const ScheduleAdministratorPage = props => {
         </DialogActions>
       </Dialog>
     </div>
+    </>
   );
 };
 

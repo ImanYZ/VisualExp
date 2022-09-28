@@ -776,7 +776,7 @@ const ManageEvents = props => {
                 //   subject: "Your 1Cademy Application is Incomplete!",
                 //   content:
                 //     "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
-                //   hyperlink: "https://1cademy.us/home#JoinUsSection",
+                //   hyperlink: "https://1cademy.us/#JoinUsSection",
                 // });
                 // }
                 // const user1CademyDocs = await firebaseOne.db
@@ -800,7 +800,7 @@ const ManageEvents = props => {
                 //   subject: "Your 1Cademy Application is Incomplete!",
                 //   content:
                 //     "completed the first two steps in 1Cademy application process, but have not completed the 1Cademy tutorial yet",
-                //   hyperlink: "https://1cademy.us/home#JoinUsSection",
+                //   hyperlink: "https://1cademy.us/#JoinUsSection",
                 // });
               }
               // } else {
@@ -810,7 +810,7 @@ const ManageEvents = props => {
               //   subject: "Your 1Cademy Application is Incomplete!",
               //   content:
               //     "completed the first two steps in 1Cademy application process, but have not started the 1Cademy tutorial yet",
-              //   hyperlink: "https://1cademy.us/home#JoinUsSection",
+              //   hyperlink: "https://1cademy.us/#JoinUsSection",
               // });
             }
             appls.push(appl);
