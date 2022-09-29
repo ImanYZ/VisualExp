@@ -62,6 +62,8 @@ const JoinUs = props => {
       applicationsSubmitted[props.community.id]
     ) {
       setActiveStep(1);
+    } else {
+      setActiveStep(0);
     }
     //  else if (completedExperiment) {
     //   setActiveStep(2);
