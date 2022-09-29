@@ -685,7 +685,7 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
-    if(!notAResearcher){
+    if (!notAResearcher) {
       navigateTo("/");
     }
   };
@@ -742,7 +742,7 @@ const RouterNav = props => {
         <MenuItem
           key={`${proj}MenuItem`}
           selected={index === projectIndex}
-          // onClick={(event) => changeProject(event, index)}
+        // onClick={(event) => changeProject(event, index)}
         >
           {proj}
           <Switch
@@ -756,6 +756,7 @@ const RouterNav = props => {
           />
         </MenuItem>
       ))}
+      {/* <MenuItem sx={{ flexGrow: 3 }}>Schema Generation Tool</MenuItem> */}
       <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
         <LogoutIcon /> <span id="LogoutText">Logout</span>
       </MenuItem>
@@ -768,7 +769,7 @@ const RouterNav = props => {
 
   return (
     <>
-      {!props.duringAnExperiment &&  (
+      {!props.duringAnExperiment && (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
@@ -828,9 +829,8 @@ const RouterNav = props => {
                     >
                       {projectPoints.onePoints ? (
                         <Tooltip
-                          title={`You've submitted ${
-                            proposalsNums[username] ? proposalsNums[username].num : ""
-                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          title={`You've submitted ${proposalsNums[username] ? proposalsNums[username].num : ""
+                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
                             # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
@@ -1021,7 +1021,7 @@ const RouterNav = props => {
                           👨‍🏫{" "}
                           {projectPoints.dayInstructorUpVotes
                             ? roundNum(instructorPoints)
-                            : roundNum(instructorPoints) + roundNum(dayInstructorUpVotes) }{" "}
+                            : roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)}{" "}
                           <br />{" "}
                           {projectPoints.dayInstructorUpVotes
                             ? "✔ " + roundNum(dayInstructorUpVotes)
@@ -1125,7 +1125,7 @@ const RouterNav = props => {
                           <br /> ❌ {roundNum(negativeCodesPionts)}
                         </Button>
                       </Tooltip>
-                    ):null}
+                    ) : null}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
@@ -1145,6 +1145,19 @@ const RouterNav = props => {
                   </Box> */}
                   </>
                 )}
+
+                <Tooltip
+                  title={"Schema Generation Tool"}
+                >
+                  <Button
+                    id="SchemaGenerationTool"
+                    className={activePage === "SchemaGenerationTool" ? "ActiveNavLink" : "NavLink"}
+                    onClick={event => navigate("/Activities/SchemaGeneration")}
+                  >
+                    Schema Generation Tool
+                  </Button>
+                </Tooltip>
+
                 {fullname && (
                   <Tooltip title="Account">
                     <IconButton
