@@ -436,6 +436,7 @@ const ResearcherPassage = () => {
       setPassageKeys1(allKeys);
     }
   };
+
   const addAND = ({ phrase, key }) => {
     const allKeys = { ...passageKeys1 };
     const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
@@ -459,6 +460,7 @@ const ResearcherPassage = () => {
       setPassageKeys2(allKeys);
     }
   };
+
   const addAND2 = ({ phrase, key }) => {
     const allKeys = { ...passageKeys2 };
     const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
@@ -508,6 +510,7 @@ const ResearcherPassage = () => {
       setPassageKeys2(allKeys);
     }
   };
+
   const deletePhrases2 = ({ phrase, key, value }) => {
     const allKeys = { ...passageKeys2 };
     const orValues = allKeys[phrase][key] || [];
@@ -594,8 +597,7 @@ const ResearcherPassage = () => {
       console.error(":::::::ERROR ON PHRASE SUBMIT FUNC::::::::", { error });
     }
   };
-  console.log("passageKeys1", passageKeys1);
-  // console.log("passage1", passage1);
+
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
       <Modal

@@ -1,0 +1,105 @@
+.more-skewed-right {
+  display: inline-block;
+  position: relative;
+  color: black;
+  text-decoration: none;
+  border: solid 2px black;
+  border-right: none;
+  box-sizing: border-box;
+  padding: 16px 40px;
+  letter-spacing: 3px;
+  margin: 10px;
+}
+
+.more-skewed-right:before,
+.more-skewed-right:after {
+  position: absolute;
+  content: '';
+  height: 50%;
+  width: 100%;
+  left: 0;
+  border-right: 3px solid black;
+  transition: all 1s ease-out;
+}
+
+.more-skewed-right:before {
+  top: -2px;
+  border-top: 2px solid black;
+  transform-origin: left top;
+  transform: perspective(100px) rotateX(30deg);
+}
+
+.more-skewed-right:after {
+  bottom: -2px;
+  border-bottom: 2px solid black;
+  transform-origin: left bottom;
+  transform: perspective(100px) rotateX(-30deg);
+}
+
+.more-skewed-right:hover {
+  color: black;
+}
+
+.more-skewed-right:hover:before,
+.more-skewed-right:hover:after {
+  background: black;
+}
+
+.more-skewed-right span {
+  position: relative;
+  z-index: 1;
+}
+
+
+
+.more-skewed-left {
+  display: inline-block;
+  position: relative;
+  color: black;
+  text-decoration: none;
+  border: solid 2px black;
+  border-right: none;
+  box-sizing: border-box;
+  padding: 16px 40px;
+  letter-spacing: 3px;
+  margin: 10px;
+}
+
+.more-skewed-left:before,
+.more-skewed-left:after {
+  position: absolute;
+  content: '';
+  height: 50%;
+  width: 100%;
+  left: 0;
+  border-right: 3px solid black;
+  transition: all 1s ease-out;
+}
+
+.more-skewed-left:before {
+  top: -2px;
+  border-top: 2px solid black;
+  transform-origin: left top;
+  transform: perspective(100px) rotateX(30deg);
+}
+
+.more-skewed-left:after {
+  bottom: -2px;
+  border-bottom: 2px solid black;
+  transform-origin: left bottom;
+  transform: perspective(100px) rotateX(-30deg);
+}
+
+.more-skewed-left:hover {
+  color: black;
+}
+
+.more-skewed-left:hover:before,
+.more-skewed-left:hover:after {
+  background: black;
+}
+
+.more-skewed-left span {
+  position: relative;
+  z-index: 1;
+}
