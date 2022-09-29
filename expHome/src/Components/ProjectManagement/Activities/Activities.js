@@ -17,6 +17,7 @@ import {
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
+import { SchemaGeneration } from '../SchemaGeneration';
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
@@ -46,7 +47,8 @@ const CommonPages = [
   { page: "1Cademy", view: <OneCademy /> },
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
-  { page: "ResearcherPassage", view: <ResearcherPassage /> }
+  { page: "ResearcherPassage", view: <ResearcherPassage /> },
+  { page: "SchemaGenerationTool", view: <SchemaGeneration /> }
 ];
 
 const Activities = props => {
