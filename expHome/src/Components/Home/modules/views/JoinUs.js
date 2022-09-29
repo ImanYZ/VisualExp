@@ -52,24 +52,25 @@ const JoinUs = props => {
   const [portfolioUrlError, setPortfolioUrlError] = useState(false);
   const [needsUpdate, setNeedsUpdate] = useState(false);
 
-  // useEffect(() => {
-  //   if (
-  //     applicationsSubmitted &&
-  //     Object.keys(applicationsSubmitted).length > 0 &&
-  //     "community" in props &&
-  //     props.community &&
-  //     props.community.id &&
-  //     applicationsSubmitted[props.community.id]
-  //   ) {
-  //     setActiveStep(3);
-  //   } else if (completedExperiment) {
-  //     setActiveStep(2);
-  //   } else if (hasScheduled) {
-  //     setActiveStep(1);
-  //   } else {
-  //     setActiveStep(0);
-  //   }
-  // }, [hasScheduled, completedExperiment, applicationsSubmitted, props.community]);
+  useEffect(() => {
+    if (
+      applicationsSubmitted &&
+      Object.keys(applicationsSubmitted).length > 0 &&
+      "community" in props &&
+      props.community &&
+      props.community.id &&
+      applicationsSubmitted[props.community.id]
+    ) {
+      setActiveStep(1);
+    }
+    //  else if (completedExperiment) {
+    //   setActiveStep(2);
+    // } else if (hasScheduled) {
+    //   setActiveStep(1);
+    // } else {
+    //   setActiveStep(0);
+    // }
+  }, [hasScheduled, completedExperiment, applicationsSubmitted, props.community]);
 
   useEffect(() => {
     if (needsUpdate) {
@@ -749,7 +750,7 @@ const JoinUs = props => {
           </StepContent>
         </Step> */}
       </Stepper>
-      {activeStep === 3 && (
+      {activeStep === 1 && (
         <Paper square elevation={0} sx={{ p: 3 }}>
           <Typography>
             All steps completed. After reviewing your application, our community leaders will email you regarding their
