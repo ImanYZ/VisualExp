@@ -13,6 +13,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -25,6 +27,22 @@ const initialSchema = {
   nots: ["not1", "not2"]
 };
 
+const temp_schema = [
+  {
+    combinator: "OR",
+    keyWords: ["prey", "mouse"]
+  },
+  {
+    combinator: "AND",
+    keyWords: ["and", "and"]
+  },
+  {
+    combinator: "NOT",
+    operator: "OR",
+    keyWords: ["skull", "crani"]
+  }
+];
+
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
@@ -32,6 +50,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary
 }));
 
+// eslint-disable-next-line no-empty-pattern
 export const SchemaGeneration = ({ }) => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -84,7 +103,7 @@ export const SchemaGeneration = ({ }) => {
     allSchema.ands.push("and");
     setSchema(allSchema)
   }
-  
+
   const onAddOR = () => {
     const allSchema = { ...schema };
     allSchema.ors.push("or");
@@ -96,6 +115,26 @@ export const SchemaGeneration = ({ }) => {
     allSchema.nots.push("not");
     setSchema(allSchema)
   }
+
+  const renderOperators = ({ op, not }) => {
+    if (op && op?.keyWords && op?.keyWords?.length > 0) {
+      return (
+        <>
+          {not && <span>not</span>}
+          {op.keyWords.map((x, index) => {
+            return (
+              <div key={index}>
+                <input value={x} />
+                {op.keyWords.length !== (index + 1) && <span>{op?.combinator?.toLowerCase()}</span>}
+              </div>
+            );
+          })
+          }
+        </>
+      );
+    }
+    return null;
+  };
 
   if (passages.length <= 0) return null;
 
@@ -149,6 +188,21 @@ export const SchemaGeneration = ({ }) => {
             <button onClick={onAddOR}>or</button>
             <button onClick={onAddNot}>not</button>
 
+            {temp_schema.map((op, index) => {
+              if (op.combinator === "OR" || op.combinator === "AND") {
+                return renderOperators({ op, not: false });
+              } else if (op.combinator === "NOT") {
+                return renderOperators({
+                  not: true,
+                  op: {
+                    combinator: op.operator,
+                    keyWords: op.keyWords
+                  }
+                });
+              }
+              return null;
+            })}
+
             <div>
               {schema.ors.map((x, index) => (
                 <>
@@ -180,6 +234,22 @@ export const SchemaGeneration = ({ }) => {
               {/* <input /> */}
             </div>
 
+
+            <div>
+              {/* <Button
+                sx={{ borderRadius: 10 }}
+                variant="contained"
+                startIcon={<SaveIcon />}
+              >
+                Save
+              </Button> */}
+              {/* <IconButton size="large"> */}
+              <ArrowLeftIcon style={{ fontSize: '6.1875rem', color: '4DA14C' }} />
+              <ArrowRightIcon style={{ fontSize: '6.1875rem', color: '4DA14C' }} />
+
+              {/* </IconButton> */}
+            </div>
+
             {/* <div>
               <input />
               <span>and</span>
@@ -193,18 +263,6 @@ export const SchemaGeneration = ({ }) => {
               <input />
             </div>
 
-            <div>
-              <Button
-                sx={{ borderRadius: 10 }}
-                variant="contained"
-                startIcon={<SaveIcon />}
-              >
-                Save
-              </Button>
-              <IconButton size="large">
-                <DeleteIcon fontSize="large" />
-              </IconButton>
-            </div>
             <div>
               <a className="more-skewed-right" href="#">
                 <span>MORE LONGER TEXT</span>
