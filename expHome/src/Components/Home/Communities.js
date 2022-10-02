@@ -316,10 +316,10 @@ const Communities = props => {
                       communi.qualifications.map((qualifi, qIdx) => {
                         return <li key={qIdx}>{qualifi}</li>;
                       })}
-                    <li>
+                    {/* <li>
                       Complete the three online sessions of one of our ongoing research studies, as a participant, to
                       better learn how we conduct our experiments.
-                    </li>
+                    </li> */}
                     <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
                     <li>Explain in a few paragraphs why you apply to this specific community.</li>
                     <li>
