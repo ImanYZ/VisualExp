@@ -7,6 +7,7 @@ import AppRouter from "./AppRouter";
 import reportWebVitals from "./reportWebVitals";
 
 import "./index.css";
+import 'react-querybuilder/dist/query-builder.css';
 
 ReactDOM.render(
   <React.StrictMode>

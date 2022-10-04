@@ -14,3 +14,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.queryBuilder .ruleGroup .ruleGroup-body .rule .rule-fields,
+/* .queryBuilder .ruleGroup .ruleGroup-body .rule .rule-operators, */
+select.rule-fields {
+  display: none;
+}
