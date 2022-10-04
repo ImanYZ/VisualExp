@@ -1,20 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
+import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 
 // mui imports
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Select from "@mui/material/Select";
-import { styled } from "@mui/material/styles";
+import { alpha, styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
-// import Button from "@mui/material/Button";
+import Button from "@mui/material/Button";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import { QueryBuilder } from "react-querybuilder";
-import Button from "@mui/material/Button";
+import TreeView from "@mui/lab/TreeView";
+import TreeItem, { treeItemClasses } from "@mui/lab/TreeItem";
+import PropTypes from "prop-types";
+// import { useSpring, animated } from "react-spring/web.cjs";
+import Collapse from "@mui/material/Collapse";
+import SvgIcon from "@mui/material/SvgIcon";
+import AddIcon from "@mui/icons-material/Add";
+import "./SchemaGeneration.css";
+import Checkbox from "@mui/material/Checkbox";
+
+const temp_schema = {
+  id:"1",
+  combinator: "AND",
+  negations: [true, false],
+  keyWords: [
+    {
+      id:"2",
+      combinator: "OR",
+      negations: [true, false],
+      keyWords: ["skull", "crani"]
+    },
+    {
+      id:"3",
+      combinator: "OR",
+      negations: [true, false],
+      keyWords: ["skull", "crani"]
+    },
+    "prey",
+    "mouse"
+  ],
+};
+
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
@@ -30,29 +65,8 @@ export const SchemaGeneration = ({}) => {
   const [phrases, setSelectedPhrases] = useState([]);
   const [selectedPassage, setSelectedPassage] = useState({});
   const [selectedPhrase, setSelectedPhrase] = useState(null);
-  const email = useRecoilValue(emailState);
-  const [schemasBoolean, setSchemasBoolean] = useState([]);
-  const [query, setQuery] = useState({
-    combinator: "and",
-    rules: []
-  });
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (selectedPhrase) {
-      const schemas = [];
-      console.log("selectedPhrase", selectedPhrase);
-      const schemaDoc = await firebase.db.collection("booleanScratch").where("phrase", "==", selectedPhrase).get();
-      for (let schDoc of schemaDoc.docs) {
-        const data = schDoc.data();
-        console.log("booleanScratch data", data);
-        schemas.push(data);
-      }
-      console.log("schemas", schemas);
-      setSchemasBoolean(schemas);
-    }
-  }, [firebase, selectedPhrase]);
-
+  const [schema, setSchema] = useState(temp_schema);
+  const [select, setSelect] = useState("AND");
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     const passagesDocs = await firebase.db.collection("passages").get();
@@ -67,7 +81,7 @@ export const SchemaGeneration = ({}) => {
         return null;
       })
       .filter(x => x !== null);
-    console.log({ passages });
+    // console.log({ passages });
     setPassages(passages);
     setSelectedPassage(passages[0]);
     const phrases = passages[0].phrases;
@@ -84,31 +98,69 @@ export const SchemaGeneration = ({}) => {
     setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
   };
-  const handleSubmitSearch = () => {
-    console.log({ query });
-    const newbooleanScratch = {
-      email,
-      fullname,
-      schema: query,
-      createdAt: new Date(),
-      phrase: selectedPhrase,
-      passage: selectedPassage.title,
-      upvotes: 0,
-      downvotes: 0
-    };
-    const schemaGenerationRef = firebase.db.collection("booleanScratch").doc();
-    schemaGenerationRef
-      .set(newbooleanScratch)
-      .then(() => {
-        console.log("Document successfully written!");
-      })
-      .catch(error => {
-        console.error("Error writing document: ", error);
-      });
+
+  const handleChange = event => {
+    setSelect(event.target.value);
   };
 
-  if (passages.length <= 0) return null;
-  console.log("schemasB", schemasBoolean);
+  const addRule = () => {
+    const tmpSchma = { ...schema };
+    tmpSchma.keyWords.push({
+      combinator: "OR",
+      negations: [true, false],
+      keyWords: ["skull", "crani"]
+    });
+    setSchema(tmpSchma);
+  };
+
+  const addKeyword = () => {
+    const tmpSchma = { ...schema };
+    tmpSchma.keyWords.push("key");
+    setSchema(tmpSchma);
+    console.log(tmpSchma);
+  };
+
+  const renderSchema = (tempSchema) => {
+    return (
+      <Paper elevation={3} sx={{ minheight: "300px", width: "97%", padding: "10px" }}>
+        <div style={{ flexDirection: "row", marginLeft: "500px", alignItems: "flex-start" }}>
+          <Button onClick={addKeyword}>ADD A KEYWORD</Button>
+          <Button onClick={addRule}>ADD A RULE</Button>
+        </div>
+        <div class="clt">
+          <ul>
+            <li>
+              <Box sx={{ marginRight: "890px" }}>
+                <div style={{ padding: "0px" }}>
+                  <select value={select} onChange={handleChange}>
+                    <option value="AND">AND</option>
+                    <option value="OR">OR</option>
+                  </select>
+                </div>
+              </Box>
+            </li>
+            {tempSchema?.keyWords?.map(element => {
+              return (
+                <li>
+                  {typeof element === "object" ? (
+                    <>{renderSchema(element)}</>
+                  ) : (
+                    <Paper elevation={5} sx={{ height: "30px", width: "200px", padding: "10px" }}>
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
+                        NOT
+                        <input type="checkbox" /* defaultChecked={checked} onChange={() => setChecked(!checked)} */ />
+                        <input style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }} />
+                      </div>
+                    </Paper>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </Paper>
+    );
+  };
   return (
     <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
       <Grid item xs={6}>
@@ -154,66 +206,14 @@ export const SchemaGeneration = ({}) => {
               sx={{ mb: "16px" }}
             />
           </Box>
+          <>{renderSchema(schema)}</>
 
-          <QueryBuilder
-            fields={[]}
-            translations={{
-              addRule: {
-                label: "+keyword",
-                title: "Add rule"
-              }
-            }}
-            operators={[
-              { name: "", label: "------" },
-              { name: "not", label: "NOT" }
-            ]}
-            query={query}
-            onQueryChange={q => setQuery(q)}
-          />
-
-          <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-            <Button onClick={handleSubmitSearch}>Submit</Button>
-            <Button onClick={handleSubmitSearch}>{`Search >>`}</Button>
-          </div>
+          <Button>Submit</Button>
+          <Button>Search</Button>
         </Item>
-        <Typography variant="h6" component="div" align="left">
-          Previous Proposals:
-        </Typography>
-
-        <Paper>
-          {schemasBoolean?.length > 0 &&
-            schemasBoolean.map(queryE => {
-              return (
-                <div style={{ height: "95%" }}>
-                  <QueryBuilder
-                    fields={[]}
-                    translations={{
-                      addRule: {
-                        label: "+keyword",
-                        title: "Add rule"
-                      }
-                    }}
-                    operators={[
-                      { name: "", label: "-----" },
-                      { name: "not", label: "NOT" }
-                    ]}
-                    query={queryE.schema}
-                  />
-                  <div style={{ display: "flex", width: "100%", justifyContent: "space-between" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <Button onClick={() => {}}>{queryE.upvotes}👍</Button>
-                      <Button onClick={() => {}}>{queryE.downvotes}👎</Button>
-                    </div>
-
-                    <Button onClick={handleSubmitSearch} >{`Search >>`}</Button>
-                  </div>
-                </div>
-              );
-            })}
-        </Paper>
       </Grid>
       <Grid item xs={6}>
-        <Item>We found that schema in the followings:</Item>
+        <Item>xs=4</Item>
       </Grid>
     </Grid>
   );
