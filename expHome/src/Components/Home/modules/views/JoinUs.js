@@ -18,7 +18,7 @@ import {
   resumeUrlState,
   transcriptUrlState,
   communiTestsEndedState,
-  emailVerifiedState,
+  // emailVerifiedState,
   applicationsSubmittedState
 } from "../../../../store/AuthAtoms";
 import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
@@ -41,7 +41,7 @@ const JoinUs = props => {
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
-  const emailVerified = useRecoilValue(emailVerifiedState);
+  // const emailVerified = useRecoilValue(emailVerifiedState);
   const [activeStep, setActiveStep] = useState(0);
   const [checkedInnerStep, setCheckedInnerStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
@@ -65,31 +65,24 @@ const JoinUs = props => {
     } else {
       setActiveStep(0);
     }
-    //  else if (completedExperiment) {
-    //   setActiveStep(2);
-    // } else if (hasScheduled) {
-    //   setActiveStep(1);
-    // } else {
-    //   setActiveStep(0);
-    // }
   }, [hasScheduled, completedExperiment, applicationsSubmitted, props.community]);
 
   useEffect(() => {
     if (needsUpdate) {
-      let stepsIdx = 0;
+      let stepsIdx = 1;
       const commTestEnded = props.community.id in communiTestsEnded && communiTestsEnded[props.community.id];
       if (courseraUrl && portfolioUrl && commTestEnded) {
-        stepsIdx = 6;
+        stepsIdx = 7;
       } else if ((courseraUrl && portfolioUrl) || (courseraUrl && commTestEnded) || (portfolioUrl && commTestEnded)) {
-        stepsIdx = 5;
+        stepsIdx = 6;
       } else if (courseraUrl || commTestEnded || portfolioUrl) {
-        stepsIdx = 4;
+        stepsIdx = 5;
       } else if (explanation) {
-        stepsIdx = 3;
+        stepsIdx = 4;
       } else if (transcriptUrl) {
-        stepsIdx = 2;
+        stepsIdx = 3;
       } else if (resumeUrl) {
-        stepsIdx = 1;
+        stepsIdx = 2;
       }
       setCheckedInnerStep(stepsIdx);
       setActiveInnerStep(stepsIdx);
@@ -273,6 +266,7 @@ const JoinUs = props => {
       setActiveInnerStep(newStep);
     }
   };
+
   return (
     <Container
       id="JoinUsSection"
@@ -290,7 +284,7 @@ const JoinUs = props => {
         <Alert severity="warning">
           <strong>Note: </strong> Participation is unpaid, solely for the purpose of improving research and education,
           and this position meets{" "}
-          <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank">
+          <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank" rel="noreferrer">
             US Department of Labor Federal Internship Guidelines
           </a>
           . We DO NOT sponsor CPT or OPT for international students. If you have any questions regarding this community,
@@ -298,7 +292,7 @@ const JoinUs = props => {
           <a
             href={"mailto:onecademy@umich.edu?subject=" + props.community.title + " - Question"}
             aria-label="email"
-            target="_blank"
+            target="_blank" rel="noreferrer"
           >
             the community leaders
           </a>
@@ -422,17 +416,34 @@ const JoinUs = props => {
                   }
                 }}
               >
+                <Step onClick={changeInnerStep(0)}>
+                  <StepLabel>
+                    Create an account
+                  </StepLabel>
+                  <StepContent>
+                    <Button
+                      variant="contained"
+                      component="a"
+                      href="/auth"
+                      target="_blank"
+                      disabled={fullname}
+                      sx={{ mt: 1, mr: 1, color: "common.white" }}
+                    >
+                      Create My Account
+                    </Button>
+                  </StepContent>
+                </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(0)}
+                    onClick={changeInnerStep(1)}
                     sx={
                       0 <= checkedInnerStep
                         ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                            }
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                           }
+                        }
                         : {}
                     }
                   >
@@ -455,15 +466,15 @@ const JoinUs = props => {
                 </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(1)}
+                    onClick={changeInnerStep(2)}
                     sx={
                       1 <= checkedInnerStep
                         ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                            }
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                           }
+                        }
                         : {}
                     }
                   >
@@ -486,15 +497,15 @@ const JoinUs = props => {
                 </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(2)}
+                    onClick={changeInnerStep(3)}
                     sx={
                       2 <= checkedInnerStep
                         ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                            }
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                           }
+                        }
                         : {}
                     }
                   >
@@ -530,20 +541,20 @@ const JoinUs = props => {
                 {props.community.coursera && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(3)}
+                      onClick={changeInnerStep(4)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                              cursor: "pointer",
-                              "&:hover": {
-                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                              }
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                             }
+                          }
                           : {}
                       }
                     >
                       Complete{" "}
-                      <a href={props.community.coursera} target="_blank">
+                      <a href={props.community.coursera} target="_blank" rel="noreferrer">
                         this Coursera MOOC
                       </a>
                       and enter the certificate URL.
@@ -551,7 +562,7 @@ const JoinUs = props => {
                     <StepContent>
                       <Typography>
                         As a requirement to apply to this community, you should complete{" "}
-                        <a href={props.community.coursera} target="_blank">
+                        <a href={props.community.coursera} target="_blank" rel="noreferrer">
                           this Coursera MOOC
                         </a>
                         . Please enter the webpage address (URL) of your Coursera MOOC certificate in the textbox below.
@@ -559,7 +570,7 @@ const JoinUs = props => {
                         <ol>
                           <li>
                             Complete{" "}
-                            <a href={props.community.coursera} target="_blank">
+                            <a href={props.community.coursera} target="_blank" rel="noreferrer">
                               this Coursera MOOC
                             </a>
                             .
@@ -606,15 +617,15 @@ const JoinUs = props => {
                 {props.community.portfolio && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(3)}
+                      onClick={changeInnerStep(4)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                              cursor: "pointer",
-                              "&:hover": {
-                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                              }
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                             }
+                          }
                           : {}
                       }
                     >
@@ -649,15 +660,15 @@ const JoinUs = props => {
                 {props.community.hasTest && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(3)}
+                      onClick={changeInnerStep(4)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                              cursor: "pointer",
-                              "&:hover": {
-                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
-                              }
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
                             }
+                          }
                           : {}
                       }
                     >
