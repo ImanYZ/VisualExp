@@ -1143,6 +1143,134 @@ exports.recallData = async (req, res) => {
   return res.status(200).json({ done: true });
 };
 
+// Download the recall key phrases dataset in CSV
+exports.keyPhrasesData = async (req, res) => {
+  try {
+    const rowsData = [
+      [
+        "Passage",
+        "Key Phrase",
+        "Keyword 1",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 2",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 3",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 4",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 5",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 6",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 7",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 8",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 9",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Keyword 10",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    ];
+    const passagesDocs = await db.collection("passages").get();
+    for (let passageDoc of passagesDocs.docs) {
+      const passageData = passageDoc.data();
+      if (passageData.phrases && passageData.phrases.length > 0) {
+        for (let phrase of passageData.phrases) {
+          rowsData.push([passageData.title, phrase]);
+        }
+      }
+    }
+    csv.writeToPath("datasets/keyPhrases.csv", rowsData, { headers: true }).on("finish", () => {
+      console.log("Done!");
+    });
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
 // Call this in a PubSub every 25 hours.
 // Email reminder to community leaders of the applicants who have completed the
 // application and waiting for their response.

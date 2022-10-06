@@ -2070,7 +2070,7 @@ export default {
           Once you make a proposal it will either be immediately accepted or sent to the pending proposals list. The
           route it takes depends on how many upvotes and downvotes there are for the edited node. The total number of
           downvotes is subtracted from the total number of upvotes. If this number is less than three, any proposals
-          will automatically be accepted and if this number is more than three, such as with the Library Science node,
+          will automatically be accepted and if this number is three or more, such as with the Library Science node,
           which has eight upvotes and zeroes downvotes, the proposal will go to the pending proposals list.
         </p>
         <p>

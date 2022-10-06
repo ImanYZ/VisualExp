@@ -13,6 +13,7 @@ const {
   quotesData,
   feedbackData,
   recallData,
+  keyPhrasesData,
   applicationReminder
 } = require("./users");
 const {
@@ -106,6 +107,7 @@ app.get("/feedbackData", feedbackData);
 app.get("/feedbackCodeData", feedbackCodeData);
 app.get("/quotesData", quotesData);
 app.get("/recallData", recallData);
+app.get("/keyPhrasesData", keyPhrasesData);
 app.get("/assignNodeContributorsInstitutionsStats", assignNodeContributorsInstitutionsStats);
 app.get("/getInstitutions", getInstitutions);
 app.post("/vote", voteEndpoint);
