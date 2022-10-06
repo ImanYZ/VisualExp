@@ -89,6 +89,7 @@ const SignUpPage = props => {
   const [openTermOfUse, setOpenTermsOfUse] = useState(false);
   const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
   const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
+  const [createAccount, setCreateAccount] = useState(false);
 
   const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
@@ -106,6 +107,11 @@ const SignUpPage = props => {
   }, [firebase]);
 
   useEffect(() => {
+    setParticipatedBefore(false);
+    setInvalidAuth(false);
+    setDatabaseAccountNotCreatedYet(false);
+  }, [firstname, lastname, email]);
+  useEffect(() => {
     const getProjectSpecs = async () => {
       const pSpec = await firebase.db.collection("projectSpecs").doc(project).get();
 
@@ -117,8 +123,9 @@ const SignUpPage = props => {
     }
     // update project settings
   }, [firebase, project]);
+
   const authChangedVerified = async user => {
-    setEmailVerified("Verified");
+    setCreateAccount(true);
     const uid = user.uid;
     const uEmail = user.email.toLowerCase();
     let userNotExists = false;
@@ -324,8 +331,9 @@ const SignUpPage = props => {
       await firebase.batchSet(userRef, userData, { merge: true });
       const userLogRef = firebase.db.collection("userLogs").doc();
       await firebase.batchSet(userLogRef, {
-        ...userData,
-        id: userRef.id
+        updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        id: userRef.id,
+        email: uEmail.toLowerCase()
       });
       console.log("Committing batch!");
       await firebase.commitBatch();
@@ -333,6 +341,12 @@ const SignUpPage = props => {
     setLastname(lName);
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
+    setEmailVerified("Verified");
+    if (window.location.pathname.includes("Activities") || window.location.pathname.includes("tutorial")) {
+      navigateTo(window.location.pathname);
+    } else {
+      navigateTo("/");
+    }
   };
 
   useEffect(() => {
@@ -484,11 +498,6 @@ const SignUpPage = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
-      if (window.location.pathname.includes("Activities") || window.location.pathname.includes("tutorial")) {
-        navigateTo(window.location.pathname);
-      } else {
-        navigateTo("/");
-      }
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
@@ -551,36 +560,43 @@ const SignUpPage = props => {
       />
       <Paper sx={{ m: "10px 500px 200px 500px" }}>
         {emailVerified === "Sent" ? (
-          <div
-            style={{
-              height: "200px",
-              marginTop: "200px",
-              flexDirection: "column",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Box>
-              <p>
-                We just sent you a verification email. Please click the link in the email to verify and complete your
-                sign-up.
-              </p>
-            </Box>
-            <Box>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={resendVerificationEmail}
-                style={{ marginRight: "19px" }}
-              >
-                <EmailIcon /> Resend Verification Email
-              </Button>
-              <Button variant="contained" color="error" onClick={switchAccount}>
-                <SwitchAccountIcon /> Switch Account
-              </Button>
-            </Box>
-          </div>
+          createAccount ? (
+            <>
+              <Alert severity="warning">wait a couple seconds . we are craeting your account !</Alert>
+              <Alert severity="warning">Please don't close this page while we are creating your account </Alert>
+            </>
+          ) : (
+            <div
+              style={{
+                height: "200px",
+                marginTop: "200px",
+                flexDirection: "column",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Box>
+                <p>
+                  We just sent you a verification email. Please click the link in the email to verify and complete your
+                  sign-up.
+                </p>
+              </Box>
+              <Box>
+                <Button
+                  variant="contained"
+                  color="warning"
+                  onClick={resendVerificationEmail}
+                  style={{ marginRight: "19px" }}
+                >
+                  <EmailIcon /> Resend Verification Email
+                </Button>
+                <Button variant="contained" color="error" onClick={switchAccount}>
+                  <SwitchAccountIcon /> Switch Account
+                </Button>
+              </Box>
+            </div>
+          )
         ) : (
           <>
             <Alert severity="error">
@@ -750,7 +766,7 @@ const SignUpPage = props => {
                 <Button
                   className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
                   onClick={signUp}
-                  sx={{ width: "150px" }}
+                  sx={{ width: isSignUp === 0 ? "150px" : "250" }}
                   variant="contained"
                   color="secondary"
                   disabled={

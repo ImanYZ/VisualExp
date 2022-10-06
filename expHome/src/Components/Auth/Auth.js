@@ -73,6 +73,7 @@ const Auth = props => {
   const [submitable, setSubmitable] = useState(false);
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
+  const [createAccount, setCreateAccount] = useState(false);
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
@@ -95,7 +96,7 @@ const Auth = props => {
   }, [firstname, lastname, email]);
 
   const authChangedVerified = async user => {
-    setEmailVerified("Verified");
+    setCreateAccount(true);
     const uid = user.uid;
     const uEmail = user.email.toLowerCase();
     let userNotExists = false;
@@ -199,8 +200,8 @@ const Auth = props => {
           email: uEmail,
           firstname,
           lastname: lName,
-          institution: nameFromInstitutionSelected.name?nameFromInstitutionSelected.name:"",
-          project: currentProject,
+          institution: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
+          project: currentProject
         };
         if (course) {
           userData.course = course;
@@ -300,9 +301,11 @@ const Auth = props => {
       setStep(1);
       await firebase.batchSet(userRef, userData, { merge: true });
       const userLogRef = firebase.db.collection("userLogs").doc();
+      console.log("userRef.id ::::: :::: ", userRef.id);
       await firebase.batchSet(userLogRef, {
-        ...userData,
-        id: userRef.id
+        updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+        id: userRef.id,
+        email: uEmail.toLowerCase()
       });
       console.log("Committing batch!");
       await firebase.commitBatch();
@@ -310,6 +313,7 @@ const Auth = props => {
     setLastname(lName);
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
+    setEmailVerified("Verified");
   };
 
   useEffect(() => {
@@ -509,18 +513,30 @@ const Auth = props => {
         width="100%"
       /> */}
       {emailVerified === "Sent" ? (
-        <div>
-          <p>
-            We just sent you a verification email. Please click the link in the email to verify and complete your
-            sign-up.
-          </p>
-          <Button variant="contained" color="warning" onClick={resendVerificationEmail} style={{ marginRight: "19px" }}>
-            <EmailIcon /> Resend Verification Email
-          </Button>
-          <Button variant="contained" color="error" onClick={switchAccount}>
-            <SwitchAccountIcon /> Switch Account
-          </Button>
-        </div>
+        createAccount ? (
+          <>
+            <Alert severity="warning">wait a couple seconds . we are craeting your account !</Alert>
+            <Alert severity="warning">Please don't close this page while we are creating your account </Alert>
+          </>
+        ) : (
+          <div>
+            <p>
+              We just sent you a verification email. Please click the link in the email to verify and complete your
+              sign-up.
+            </p>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={resendVerificationEmail}
+              style={{ marginRight: "19px" }}
+            >
+              <EmailIcon /> Resend Verification Email
+            </Button>
+            <Button variant="contained" color="error" onClick={switchAccount}>
+              <SwitchAccountIcon /> Switch Account
+            </Button>
+          </div>
+        )
       ) : (
         <>
           <h2>Sign the Consent Form to Get Started!</h2>
