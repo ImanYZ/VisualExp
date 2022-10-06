@@ -2589,3 +2589,17 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
     console.log({ error });
   }
 };
+
+exports.searchRecall = async (req, res) => {
+  try {
+    const recallGradesDocs = db.collection("recallGrades").get();
+    const recallTexts = [];
+    for (let recallGrdaeDoc of recallGradesDocs.docs) {
+      const recallData = recallGrdaeDoc.data();
+      recallTexts.push(recallData.response);
+    }
+    console.log(recallTexts);
+  } catch (error) {
+    console.log({ error });
+  }
+};
