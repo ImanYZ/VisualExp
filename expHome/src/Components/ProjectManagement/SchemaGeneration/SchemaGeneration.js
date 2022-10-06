@@ -19,7 +19,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import "./SchemaGeneration.css";
 
 import QueryBuilder from "./QueryBuilder";
-import QuerySearch from "./QuerySearch";
 
 const temp_schema = {
   id: new Date(),
