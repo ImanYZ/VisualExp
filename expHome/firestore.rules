@@ -151,6 +151,10 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+    match /booleanScratch/{booleanScratchId} {
+      allow read: if request.auth != null;
+      allow write: if true;
+    }
     match /approvedFeedbackCodes/{approvedFeedbackCodeId} {
       allow read: if request.auth != null;
       allow write: if false;
