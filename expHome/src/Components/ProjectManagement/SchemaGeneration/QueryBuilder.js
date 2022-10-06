@@ -15,11 +15,8 @@ export default function QueryBuilder(props) {
       const tempIds = [...ids];
       const indexs = [];
       tempIds.shift();
-      console.log(ids);
-      console.log(tempSchema);
       for (let id of tempIds) {
         const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        console.log(index);
         indexs.push(index);
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
@@ -28,8 +25,6 @@ export default function QueryBuilder(props) {
         not: false,
         value: ""
       });
-      console.log(tempSchema);
-      console.log(Date.now());
       props.onQueryChange(tempSchema);
     };
     const addGroup = ids => {
@@ -38,11 +33,8 @@ export default function QueryBuilder(props) {
       const tempIds = [...ids];
       const indexs = [];
       tempIds.shift();
-      console.log(ids);
-      console.log(tempSchema);
       for (let id of tempIds) {
         const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        console.log(index);
         indexs.push(index);
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
@@ -51,8 +43,6 @@ export default function QueryBuilder(props) {
         combinator: "AND",
         rules: []
       });
-      console.log(tempSchema);
-      console.log(Date.now());
       props.onQueryChange(tempSchema);
     };
     const editValue = (event, ids) => {
@@ -69,14 +59,10 @@ export default function QueryBuilder(props) {
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
       const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      console.log("rules ::::: :::::: ", tempSchema1.rules);
-      console.log(index);
-      console.log(tempSchema1.rules[index]);
       tempSchema1.rules[index] = {
         ...tempSchema1.rules[index],
-        key: event.currentTarget.value
+        value: event.currentTarget.value
       };
-      console.log(tempSchema);
       props.onQueryChange(tempSchema);
     };
     const setChecked = ids => {
@@ -92,12 +78,10 @@ export default function QueryBuilder(props) {
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
       const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      console.log(tempSchema1.rules[index]);
       tempSchema1.rules[index] = {
         ...tempSchema1.rules[index],
         not: !tempSchema1.rules[index].not
       };
-      console.log(tempSchema);
       props.onQueryChange(tempSchema);
     };
 
@@ -107,18 +91,12 @@ export default function QueryBuilder(props) {
       const tempIds = [...ids];
       const indexs = [];
       tempIds.shift();
-      console.log(ids);
-      console.log(tempSchema);
       for (let id of tempIds) {
         const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        console.log(index);
         indexs.push(index);
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
-      console.log("befor", tempSchema);
       tempSchema1.combinator = tempSchema1.combinator === "OR" ? "AND" : "OR";
-      console.log(tempSchema1);
-      console.log(Date.now());
       if (tempIds.length === 0) {
         props.onQueryChange(tempSchema1);
       } else {
@@ -140,17 +118,14 @@ export default function QueryBuilder(props) {
         tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
       }
       const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      console.log("rules ::::: :::::: ", tempSchema1.rules);
-      console.log(index);
-      console.log(tempSchema1.rules[index]);
       tempSchema1.rules.splice(index, 1);
-      console.log(tempSchema);
       props.onQueryChange(tempSchema);
     };
     return (
-      <Paper elevation={3} sx={{ minheight: "300px", width: "80%", padding: "5px" }}>
+      <Paper elevation={3} sx={{ minheight: "300px", width: "95%", padding: "5px" }}>
         <div style={{ flexDirection: "row", marginLeft: "50%", alignItems: "flex-start" }}>
           <Button
+            disabled={props.noEdit}
             onClick={() => {
               addKeyword(ids);
             }}
@@ -158,6 +133,7 @@ export default function QueryBuilder(props) {
             ADD A KEYWORD
           </Button>
           <Button
+            disabled={props.noEdit}
             onClick={() => {
               addGroup(ids);
             }}
@@ -186,9 +162,9 @@ export default function QueryBuilder(props) {
               return (
                 <li>
                   {element.rules ? (
-                    <div style={{display: "flex", flexDirection: "row", alignItems: "flex-start" }} >
+                    <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
                       {renderSchema(element, [...ids, element.id])}
-                      <IconButton style={{ marginLeft: "5px" }} size="small">
+                      <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
                         <DeleteIcon
                           onClick={() => {
                             deleteKeyword([...ids, element.id]);
@@ -206,13 +182,14 @@ export default function QueryBuilder(props) {
                           onChange={() => setChecked([...ids, element.id])}
                         />
                         <input
+                          disabled={props.noEdit}
                           onChange={event => {
                             editValue(event, [...ids, element.id]);
                           }}
-                          value={element.key}
+                          value={element.value}
                           style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }}
                         />
-                        <IconButton style={{ marginLeft: "5px" }} size="small">
+                        <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
                           <DeleteIcon
                             onClick={() => {
                               deleteKeyword([...ids, element.id]);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilStateLoadable, useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 
 // mui imports
@@ -14,6 +14,7 @@ import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import "./SchemaGeneration.css";
 
@@ -21,42 +22,9 @@ import QueryBuilder from "./QueryBuilder";
 import QuerySearch from "./QuerySearch";
 
 const temp_schema = {
-  id: "g-0.6224544849727727",
+  id: new Date(),
   combinator: "AND",
-  rules: [
-    {
-      id: "g-0.3939927960314584",
-      combinator: "OR",
-      rules: [
-        {
-          id: "r-0.569942811653946",
-          combinator: "AND",
-          rules: [
-            {
-              id: "r-0.8457265715736604",
-              not: false,
-              key: "prey"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      id: "r-0.84572657157304",
-      not: true,
-      key: "fac"
-    },
-    {
-      id: "r-0.8457265715736604",
-      not: false,
-      key: "prey"
-    },
-    {
-      id: "r-0.84572655736604",
-      not: false,
-      key: "mouse"
-    }
-  ]
+  rules: []
 };
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -80,6 +48,80 @@ export const SchemaGeneration = ({}) => {
   const [schemasBoolean, setSchemasBoolean] = useState([]);
   const [schmaChanges, setSchmaChanges] = useState([]);
   const [schmaLoadedUse, setSchmaLoadedUse] = useState(false);
+  const [recallResponses, setRecallResponses] = useState([]);
+  const [searchResules, setSearchResules] = useState([]);
+  const [searching, setSearching] = useState(false);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+    const usersDoc = await firebase.db.collection("users").get();
+    const recallTexts = [];
+    for (let userDoc of usersDoc.docs) {
+      const userData = userDoc.data();
+      if (userData.pConditions) {
+        for (let pCon of userData.pConditions) {
+          for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
+            if (pCon[recall] && pCon[recall] !== "" && !recallTexts.includes(pCon[recall])) {
+              recallTexts.push(pCon[recall]);
+            }
+          }
+        }
+      }
+    }
+    setRecallResponses(recallTexts);
+
+    return () => {};
+  }, [firebase]);
+
+  const checkResponse = (sentence, schema) => {
+    let canShow = true;
+    if (schema.combinator === "AND") {
+      for (let key of schema.rules) {
+        if (key.rules) {
+          canShow = checkResponse(sentence, key);
+        } else {
+          if (!sentence.includes(key.value)) {
+            canShow = false;
+          }
+        }
+      }
+    } else {
+      let canShow2 = false;
+      for (let key of schema.rules) {
+        if (key.rules) {
+          canShow = checkResponse(sentence, key);
+        } else {
+          if (sentence.includes(key.value)) {
+            canShow2 = true;
+          }
+        }
+      }
+      canShow = canShow2;
+    }
+    return canShow;
+  };
+  const QuerySearching = schemaEp => {
+    setSearching(true);
+    setSearchResules([]);
+
+    const searchRes = [];
+    for (let text of recallResponses) {
+      const filtered = (text || "").split(".").filter(w => w.trim());
+      for (let sentence of filtered) {
+        if (checkResponse(sentence, schemaEp)) {
+          const oldResponse = searchRes.find(elm => elm.text === text);
+          if (!oldResponse) {
+            searchRes.push({ text, sentences: [sentence] });
+          } else {
+            searchRes[searchRes.indexOf(oldResponse)].sentences.push(sentence);
+          }
+        }
+      }
+    }
+
+    setSearchResules(searchRes);
+    setSearching(false);
+  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
@@ -95,9 +137,7 @@ export const SchemaGeneration = ({}) => {
         return null;
       })
       .filter(x => x !== null);
-    // console.log({ passages });
     setPassages(passages);
-    console.log(passages);
     setSelectedPassage(passages[0]);
     const phrases = passages[0].phrases;
     setSelectedPhrases([...phrases]);
@@ -143,24 +183,20 @@ export const SchemaGeneration = ({}) => {
 
     for (let change of tempSchemaChanges) {
       const shemaData = change.doc.data();
-      console.log(change.type);
 
       if (change.type === "added") {
         schemas.push({ id: change.doc.id, ...shemaData });
-        console.log(shemaData);
       } else if (change.type === "modified") {
         const index = schemas.indexOf(elm => elm.id === change.doc.id);
         schemas[index] = { id: change.doc.id, ...shemaData };
       }
     }
-    console.log("schemas", schemas);
     setSchemasBoolean(schemas);
     setSchmaLoadedUse(false);
     setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
 
   const handleSubmit = () => {
-    console.log({ schema });
     const newbooleanScratch = {
       email,
       fullname,
@@ -176,9 +212,7 @@ export const SchemaGeneration = ({}) => {
     const schemaGenerationRef = firebase.db.collection("booleanScratch").doc();
     schemaGenerationRef
       .set(newbooleanScratch)
-      .then(() => {
-        console.log("Document successfully written!");
-      })
+      .then(() => {})
       .catch(error => {
         console.error("Error writing document: ", error);
       });
@@ -219,9 +253,7 @@ export const SchemaGeneration = ({}) => {
         downVoters: _downVoters
       };
       setSchemasBoolean(_schemasBoolean);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
   const downVote = async schema => {
     try {
@@ -258,14 +290,12 @@ export const SchemaGeneration = ({}) => {
         downVoters: _downVoters
       };
       setSchemasBoolean(_schemasBoolean);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
-  console.log(schemasBoolean);
+
   return (
-    <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
-      <Grid item xs={6}>
+    <Grid container spacing={2} sx={{background: "#e2e2e2" }}>
+      <Grid sx={{ height :"100%"}} item xs={6}>
         <Item>
           <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
             <Typography variant="h6" component="div" align="left">
@@ -273,7 +303,7 @@ export const SchemaGeneration = ({}) => {
             </Typography>
             <Select
               id="demo-simple-select-helper"
-              value={selectedPassage && selectedPassage?.title ? selectedPassage?.title : passages[0]?.title}
+              value={selectedPassage?.title || passages[0]?.title || ""}
               onChange={handlePassageChange}
             >
               {passages &&
@@ -321,7 +351,12 @@ export const SchemaGeneration = ({}) => {
             <Button variant="contained" onClick={handleSubmit}>
               Submit
             </Button>
-            <Button variant="contained" onClick={handleSubmit}>{`Search >>`}</Button>
+            <Button
+              variant="contained"
+              onClick={() => {
+                QuerySearching(schema);
+              }}
+            >{`Search >>`}</Button>
           </div>
           {schemasBoolean?.length > 0 && (
             <Typography variant="h6" component="div" align="left">
@@ -333,8 +368,8 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map(schemaE => {
                 return (
-                  <div style={{ height: "95%" }}>
-                    <QueryBuilder query={schemaE.schema} />
+                  <div >
+                    <QueryBuilder query={schemaE.schema} noEdit={true} />
                     <div style={{ display: "flex", width: "80%", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <IconButton
@@ -350,13 +385,23 @@ export const SchemaGeneration = ({}) => {
                             downVote(schemaE);
                           }}
                           size="small"
-                          style={{ color: "green" }}
                         >
                           {schemaE.downVotes}👎
                         </IconButton>
                       </div>
-
-                      <Button onClick={handleSubmit}>{`Search >>`}</Button>
+                      <div
+                        style={{
+                          paddingTop: "10px",
+                          paddingBottom: "20px"
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            QuerySearching(schemaE.schema);
+                          }}
+                        >{`Search >>`}</Button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -364,9 +409,41 @@ export const SchemaGeneration = ({}) => {
           </Paper>
         </Item>
       </Grid>
-      <Grid item xs={6}>
-        <Item>We found that schema in the followings:</Item>
-        {/* <QuerySearch /> */}
+      <Grid sx={{ height :"100%"}} item xs={6}>
+        <Item>
+          {searchResules.length > 0 && (
+            <Typography variant="h6" component="div" align="center">
+              We found that schema in the followings:
+            </Typography>
+          )}
+
+          <Box sx={{ height: "110vh", overflow: "scroll" }}>
+            {searchResules.length > 0 ? (
+              searchResules.map(respon => {
+                return (
+                  <Paper elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
+                    {(respon.text || "")
+                      .split(".")
+                      .filter(w => w.trim())
+                      .map(sentence =>
+                        respon.sentences.includes(sentence) ? (
+                          <mark>{sentence + "."}</mark>
+                        ) : (
+                          <span>{sentence + "."}</span>
+                        )
+                      )}
+                  </Paper>
+                );
+              })
+            ) : searching ? (
+              <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
+            ) : (
+              <Typography variant="h6" component="div" align="center">
+                Click search to search for your schema
+              </Typography>
+            )}
+          </Box>
+        </Item>
       </Grid>
     </Grid>
   );
