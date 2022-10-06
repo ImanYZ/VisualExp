@@ -215,6 +215,11 @@ export const SchemaGeneration = ({}) => {
       .catch(error => {
         console.error("Error writing document: ", error);
       });
+    setSchema({
+      id: new Date(),
+      combinator: "AND",
+      rules: []
+    });
   };
   const upVote = async schema => {
     try {
