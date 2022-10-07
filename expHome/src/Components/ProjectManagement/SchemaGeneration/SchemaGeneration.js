@@ -79,7 +79,7 @@ export const SchemaGeneration = ({}) => {
         if (key.rules) {
           canShow = checkResponse(sentence, key);
         } else {
-          if (!sentence.includes(key.value)) {
+          if (!sentence.includes(key.value) && !key.not) {
             canShow = false;
           }
         }
@@ -90,7 +90,7 @@ export const SchemaGeneration = ({}) => {
         if (key.rules) {
           canShow = checkResponse(sentence, key);
         } else {
-          if (sentence.includes(key.value)) {
+          if (sentence.includes(key.value) && !key.not) {
             canShow2 = true;
           }
         }
@@ -297,6 +297,17 @@ export const SchemaGeneration = ({}) => {
     } catch (error) {}
   };
 
+  const previousPhrase = () => {
+    const indexPhrase = phrases.indexOf(selectedPhrase);
+    setSelectedPhrase(phrases[indexPhrase - 1]);
+    console.log(phrases[indexPhrase + 1]);
+  };
+
+  const nextPhrase = () => {
+    const indexPhrase = phrases.indexOf(selectedPhrase);
+    setSelectedPhrase(phrases[indexPhrase + 1]);
+    console.log(phrases[indexPhrase + 1]);
+  };
   return (
     <Grid container spacing={2} sx={{background: "#e2e2e2" }}>
       <Grid sx={{ height :"100%"}} item xs={6}>
@@ -341,6 +352,25 @@ export const SchemaGeneration = ({}) => {
               sx={{ mb: "16px" }}
             />
           </Box>
+          <div
+            style={{
+              display: "flex",
+              width: "80%",
+              paddingTop: "10px",
+              paddingBottom: "20px",
+              justifyContent: "space-between"
+            }}
+          >
+            <Button variant="contained" disabled={phrases.indexOf(selectedPhrase) === 0} onClick={previousPhrase}>
+              Previous Phrase
+            </Button>
+            <Button
+              variant="contained"
+              disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
+              onClick={nextPhrase}
+            >{`NEXT Phrase`}</Button>
+          </div>
+
           <QueryBuilder query={schema} onQueryChange={q => setSchema(q)} />
 
           <div
