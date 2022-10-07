@@ -213,7 +213,6 @@ const AppRouter = props => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/home/*" element={<Home />} />
-      <Route path="/Home/*" element={<Home />} />
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
