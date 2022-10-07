@@ -189,13 +189,15 @@ export default function QueryBuilder(props) {
                           value={element.value}
                           style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }}
                         />
-                        <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
-                          <DeleteIcon
-                            onClick={() => {
-                              deleteKeyword([...ids, element.id]);
-                            }}
-                          />
-                        </IconButton>
+                        {!props.noEdit && (
+                          <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
+                            <DeleteIcon
+                              onClick={() => {
+                                deleteKeyword([...ids, element.id]);
+                              }}
+                            />
+                          </IconButton>
+                        )}
                       </div>
                     </Paper>
                   )}
