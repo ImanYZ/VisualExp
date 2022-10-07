@@ -342,10 +342,10 @@ const SignUpPage = props => {
     setFullname(fuName);
     setEmail(uEmail.toLowerCase());
     setEmailVerified("Verified");
-    if (window.location.pathname.includes("Activities") || window.location.pathname.includes("tutorial")) {
-      navigateTo(window.location.pathname);
-    } else {
+    if (window.location.pathname === "/" || window.location.pathname === "/auth"){
       navigateTo("/");
+    } else {
+      navigateTo(window.location.pathname);
     }
   };
 
