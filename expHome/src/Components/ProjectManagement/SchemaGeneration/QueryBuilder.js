@@ -164,13 +164,15 @@ export default function QueryBuilder(props) {
                   {element.rules ? (
                     <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
                       {renderSchema(element, [...ids, element.id])}
-                      <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
-                        <DeleteIcon
-                          onClick={() => {
-                            deleteKeyword([...ids, element.id]);
-                          }}
-                        />
-                      </IconButton>
+                      {!props.noEdit && (
+                        <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
+                          <DeleteIcon
+                            onClick={() => {
+                              deleteKeyword([...ids, element.id]);
+                            }}
+                          />
+                        </IconButton>
+                      )}
                     </div>
                   ) : (
                     <Paper elevation={5} sx={{ height: "30px", width: "200px", padding: "10px" }}>
