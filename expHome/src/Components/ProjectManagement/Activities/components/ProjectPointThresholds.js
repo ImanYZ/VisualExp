@@ -56,7 +56,12 @@ export const ProjectPointThresholds = ({ projectPoints }) => {
           )}
           {projectPoints.gradingPoints && (
             <li>
-              <strong>{projectPoints.gradingPoints}</strong> 🧠 Coding participants' recall responses points
+              <strong>{projectPoints.gradingPoints}</strong> 🧠 Coding participants' recall responses points and 
+            </li>
+          )}
+          {projectPoints.BooleanExpressionGenerationPoints && (
+            <li>
+              <strong>{projectPoints.commentsPoints}</strong>  🤖 Boolean expression generation points 
             </li>
           )}
         </ul>
