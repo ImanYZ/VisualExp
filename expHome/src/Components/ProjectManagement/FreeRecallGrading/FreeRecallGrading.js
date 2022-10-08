@@ -67,7 +67,7 @@ const FreeRecallGrading = props => {
     let lastVisibleRecallGradesDocAutoGrading;
     let recallGradeDocs;
     let collName = "recallGrades";
-    if (project !== "H2K2" && project !== "AutoGrading") {
+    if (project !== "H2K2" && project !== "Autograding") {
       collName += project;
     }
     if (lastRetreivedDocument === "" || !allowNextBatch) {
@@ -100,7 +100,7 @@ const FreeRecallGrading = props => {
         setAllowNextBatch(false);
       }
     } else {
-      if (project === "AutoGrading") {
+      if (project === "Autograding") {
         if (lastRetreivedDocumentAutoGrading === "" || !allowNextBatch) {
           let recallGradeDocsInitial = await firebase.db
             .collection("recallGradesH1L2")
