@@ -1,6 +1,7 @@
-const axios = require("axios");
 const { app } = require("firebase-admin");
 const fs = require("fs");
+const csv = require("fast-csv");
+const { v4: uuidv4 } = require('uuid');
 
 const {
   admin,
@@ -244,14 +245,14 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
         ) {
           const previousRecallGrade =
             recallGrades[
-              [
-                recallGradeData.user,
-                recallGradeData.session,
-                recallGradeData.project,
-                recallGradeData.condition,
-                recallGradeData.passage,
-                recallGradeData.phrase,
-              ]
+            [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ]
             ];
           console.log(recallGradeDoc.id, previousRecallGrade.id);
           duplicate.push(recallGradeDoc.id);
@@ -482,14 +483,14 @@ exports.deleteDuplicatesWithVotes = async (req, res) => {
         ) {
           const previousRecallGrade =
             recallGrades[
-              [
-                recallGradeData.user,
-                recallGradeData.session,
-                recallGradeData.project,
-                recallGradeData.condition,
-                recallGradeData.passage,
-                recallGradeData.phrase,
-              ]
+            [
+              recallGradeData.user,
+              recallGradeData.session,
+              recallGradeData.project,
+              recallGradeData.condition,
+              recallGradeData.passage,
+              recallGradeData.phrase,
+            ]
             ];
           let previousRecallGradeRef = db
             .collection("recallGrades")
@@ -1379,7 +1380,7 @@ exports.deleteTheKeyPhrasesForPassage = async (req, res) => {
 
     let lastVisibleRecallGradesH1L2Doc =
       recallGradeH1L2DocsInitial.docs[
-        recallGradeH1L2DocsInitial.docs.length - 1
+      recallGradeH1L2DocsInitial.docs.length - 1
       ];
 
     const lastVisibleRecallGradesH1L2Data =
@@ -1799,4 +1800,83 @@ exports.addH2K2toQuotes = async (req, res) => {
     return res.status(400).json({ err });
   }
   return res.status(200).json({ done: true });
+};
+
+exports.generatedBooleanExpressionData = async (req, res) => {
+  try {
+    const ws = fs.createReadStream("./csv/Key-phrases.csv");
+    const parser =
+      csv
+        .parseStream(ws, { headers: true })
+        .on("data", async (data) => {
+          // We need to pause reading from the CSV file to process the row
+          // before continuing with the next row.
+          parser.pause();
+          const extractKeyWords = {};
+          console.log('datamatftatr', data)
+          const keyWords = Object.keys(data).filter((x => x.includes('Keyword')));
+
+          keyWords.map((keys, KeyIndex) => {
+            const indexKeys = KeyIndex + 1;
+            extractKeyWords[`Keyword ${indexKeys}`] = [];
+            Object.entries(data).map(([key, value]) => {
+              if (`Keyword ${indexKeys}`) {
+                const isValid = key.includes(`K${indexKeys}`) || key === keys;
+                const isArray = Array.isArray(extractKeyWords[`Keyword ${indexKeys}`]);
+                if (isValid && isArray && value) {
+                  extractKeyWords[`Keyword ${indexKeys}`].push(value)
+                }
+              }
+            });
+          });
+
+          const schema = { combinator: 'AND', id: `r-${uuidv4()}`, rules: [] };
+
+          for (let keys in extractKeyWords) {
+            const keyWordRules = [];
+            for (let key of extractKeyWords[keys]) {
+              keyWordRules.push({
+                id: `r-${uuidv4()}`,
+                not: false,
+                value: key
+              });
+            }
+            if (keyWordRules.length > 0) {
+              schema.rules.push({
+                combinator: 'OR',
+                id: `r-${uuidv4()}`,
+                rules: keyWordRules
+              });
+            }
+          }
+
+          if (schema.rules.length > 0) {
+            const newbooleanScratch = {
+              email: "oneweb@umich.edu",
+              fullname: "Iman YeckehZaare",
+              schema: schema,
+              createdAt: new Date(),
+              phrase: data['Key Phrase'],
+              passage: data['Passage'],
+              upVotes: 0,
+              downVotes: 0,
+              upVoters: [],
+              downVoters: []
+            };
+
+            console.log({ newbooleanScratch })
+
+            const booleanRef = db.collection("booleanScratch").doc();
+            await batchSet(booleanRef, newbooleanScratch);
+          }
+          parser.resume();
+        })
+        .on("end", async (e) => {
+          await commitBatch();
+        });
+    res.status(200).json({ success: true, process: 'end' });
+  } catch (error) {
+    console.log('error:::::', error);
+    res.status(400).json({ success: false, data: [], process: 'end' });
+  }
 };
