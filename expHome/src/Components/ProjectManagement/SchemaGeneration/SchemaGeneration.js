@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilStateLoadable, useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
-
+import { projectState } from "../../../store/ProjectAtoms";
 // mui imports
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -50,7 +50,7 @@ export const SchemaGeneration = ({}) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-
+  const project = useRecoilValue(projectState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     const usersDoc = await firebase.db.collection("users").get();
@@ -163,12 +163,12 @@ export const SchemaGeneration = ({}) => {
       setSelectedPhrases(passage.phrases);
       setSelectedPhrase(passage.phrases[0]);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   useEffect(() => {
-    if ((selectedPhrase && selectedPassage)) {
+    if (selectedPhrase && selectedPassage) {
       const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
       const logsData = {
         passage: selectedPassage.title,
@@ -252,6 +252,11 @@ export const SchemaGeneration = ({}) => {
   const upVote = async schema => {
     try {
       const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
       const _upVoters = [...schema.upVoters];
       const _downVoters = [...schema.downVoters];
 
@@ -284,12 +289,32 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
-      setSchemasBoolean(_schemasBoolean);
+      let calulatedProject = project;
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      const researcherUpdate = {
+        projects: {
+          ...researcherData.projects,
+          [calulatedProject]: {
+            ...researcherData.projects[calulatedProject],
+            positiveBooleanExpPionts: _upVotes - _downVotes,
+            negativeBooleanExpPionts: _downVotes
+          }
+        }
+      };
+      await researcherRef.update(researcherUpdate);
+      researcherData.projects[project][""] = setSchemasBoolean(_schemasBoolean);
     } catch (error) {}
   };
   const downVote = async schema => {
     try {
       const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
       const _downVoters = [...schema.downVoters];
       let _downVotes = schema.downVotes;
       const _upVoters = [...schema.upVoters];
@@ -321,6 +346,21 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
+      let calulatedProject = project;
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      const researcherUpdate = {
+        projects: {
+          ...researcherData.projects,
+          [calulatedProject]: {
+            ...researcherData.projects[calulatedProject],
+            positiveBooleanExpPionts: _upVotes - _downVotes,
+            negativeBooleanExpPionts: _downVotes
+          }
+        }
+      };
+      await researcherRef.update(researcherUpdate);
       setSchemasBoolean(_schemasBoolean);
     } catch (error) {}
   };
@@ -328,17 +368,15 @@ export const SchemaGeneration = ({}) => {
   const previousPhrase = () => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase - 1]);
-    console.log(phrases[indexPhrase + 1]);
   };
 
   const nextPhrase = () => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase + 1]);
-    console.log(phrases[indexPhrase + 1]);
   };
   return (
-    <Grid container spacing={2} sx={{background: "#e2e2e2" }}>
-      <Grid sx={{ height :"100%"}} item xs={6}>
+    <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
+      <Grid sx={{ height: "100%" }} item xs={6}>
         <Item>
           <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
             <Typography variant="h6" component="div" align="left">
@@ -383,7 +421,7 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               display: "flex",
-              width: "80%",
+              width: "95%",
               paddingTop: "10px",
               paddingBottom: "20px",
               justifyContent: "space-between"
@@ -404,7 +442,7 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               display: "flex",
-              width: "80%",
+              width: "95%",
               paddingTop: "10px",
               paddingBottom: "20px",
               justifyContent: "space-between"
@@ -430,9 +468,9 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map(schemaE => {
                 return (
-                  <div >
+                  <div>
                     <QueryBuilder query={schemaE.schema} noEdit={true} />
-                    <div style={{ display: "flex", width: "80%", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", width: "95%", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", justifyContent: "space-between" }}>
                         <IconButton
                           onClick={() => {
@@ -471,7 +509,7 @@ export const SchemaGeneration = ({}) => {
           </Paper>
         </Item>
       </Grid>
-      <Grid sx={{ height :"100%"}} item xs={6}>
+      <Grid sx={{ height: "100%" }} item xs={6}>
         <Item>
           {searchResules.length > 0 && (
             <Typography variant="h6" component="div" align="center">
