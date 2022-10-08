@@ -533,7 +533,7 @@ export const SchemaGeneration = ({}) => {
             </Typography>
           )}
 
-          <Box sx={{ height: "110vh", overflow: "scroll" }}>
+          <Paper sx={{ height: "1110px", overflow: "scroll" }}>
             {searchResules.length > 0 ? (
               searchResules.map(respon => {
                 return (
@@ -558,7 +558,7 @@ export const SchemaGeneration = ({}) => {
                 Click search to search for your schema
               </Typography>
             )}
-          </Box>
+          </Paper>
         </Item>
       </Grid>
     </Grid>
