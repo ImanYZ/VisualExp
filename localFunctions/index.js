@@ -28,6 +28,7 @@ const {
   appendPointsFieldForEmptyRecalls,
   addTheInstitutionFeildForUsers,
   addH2K2toQuotes,
+  generatedBooleanExpressionData
 } = require("./visualExp");
 
 const app = express();
@@ -77,6 +78,8 @@ app.get("/addNexDataToFeedbackCode", addNexDataToFeedbackCode);
 app.get("/appendPointsFieldForEmptyRecalls", appendPointsFieldForEmptyRecalls);
 app.get("/addTheInstitutionFeildForUsers", addTheInstitutionFeildForUsers);
 app.get("/addH2K2toQuotes", addH2K2toQuotes);
+app.get("/generatedBooleanExpressionData", generatedBooleanExpressionData);
+
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);
