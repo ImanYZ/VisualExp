@@ -15,7 +15,10 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
+import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
+import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import "./SchemaGeneration.css";
 
 import QueryBuilder from "./QueryBuilder";
@@ -251,15 +254,8 @@ export const SchemaGeneration = ({}) => {
   };
   const upVote = async schema => {
     try {
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
       const _upVoters = [...schema.upVoters];
       const _downVoters = [...schema.downVoters];
-
       let _upVotes = schema.upVotes;
       let _downVotes = schema.downVotes;
       if (_upVoters.includes(fullname)) {
@@ -273,13 +269,6 @@ export const SchemaGeneration = ({}) => {
           _downVotes = _downVotes - 1;
         }
       }
-      const schemaGenerationUpdate = {
-        upVotes: _upVotes,
-        upVoters: _upVoters,
-        downVotes: _downVotes,
-        downVoters: _downVoters
-      };
-      await schemaGenerationRef.update(schemaGenerationUpdate);
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
       _schemasBoolean[index] = {
@@ -289,7 +278,21 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
+      setSchemasBoolean(_schemasBoolean);
+      const schemaGenerationUpdate = {
+        upVotes: _upVotes,
+        upVoters: _upVoters,
+        downVotes: _downVotes,
+        downVoters: _downVoters
+      };
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      await schemaGenerationRef.update(schemaGenerationUpdate);
       let calulatedProject = project;
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
       if (!(project in researcherData.projects)) {
         calulatedProject = Object.keys(researcherData.projects)[0];
       }
@@ -304,17 +307,10 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-      researcherData.projects[project][""] = setSchemasBoolean(_schemasBoolean);
     } catch (error) {}
   };
   const downVote = async schema => {
     try {
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
       const _downVoters = [...schema.downVoters];
       let _downVotes = schema.downVotes;
       const _upVoters = [...schema.upVoters];
@@ -330,13 +326,6 @@ export const SchemaGeneration = ({}) => {
           _upVotes = _upVotes - 1;
         }
       }
-      const schemaGenerationUpdate = {
-        upVotes: _upVotes,
-        upVoters: _upVoters,
-        downVotes: _downVotes,
-        downVoters: _downVoters
-      };
-      await schemaGenerationRef.update(schemaGenerationUpdate);
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
       _schemasBoolean[index] = {
@@ -346,6 +335,21 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
+      setSchemasBoolean(_schemasBoolean);
+      const schemaGenerationUpdate = {
+        upVotes: _upVotes,
+        upVoters: _upVoters,
+        downVotes: _downVotes,
+        downVoters: _downVoters
+      };
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      await schemaGenerationRef.update(schemaGenerationUpdate);
+
       let calulatedProject = project;
       if (!(project in researcherData.projects)) {
         calulatedProject = Object.keys(researcherData.projects)[0];
@@ -361,7 +365,6 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-      setSchemasBoolean(_schemasBoolean);
     } catch (error) {}
   };
 
@@ -470,24 +473,37 @@ export const SchemaGeneration = ({}) => {
                 return (
                   <div>
                     <QueryBuilder query={schemaE.schema} noEdit={true} />
-                    <div style={{ display: "flex", width: "95%", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <IconButton
-                          onClick={() => {
-                            upVote(schemaE);
-                          }}
-                          size="small"
-                        >
-                          {schemaE.upVotes}👍
-                        </IconButton>
-                        <IconButton
-                          onClick={() => {
-                            downVote(schemaE);
-                          }}
-                          size="small"
-                        >
-                          {schemaE.downVotes}👎
-                        </IconButton>
+                    <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <div>
+                            <IconButton
+                              sx={{ color: "#00bcd4" }}
+                              component="label"
+                              onClick={() => {
+                                upVote(schemaE);
+                              }}
+                              size="small"
+                            >
+                              {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
+                            </IconButton>
+                          </div>
+                          <div style={{ marginTop: "7px" }}>{schemaE.upVotes}</div>
+                        </div>
+                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <div>
+                            <IconButton
+                              sx={{ color: "red" }}
+                              onClick={() => {
+                                downVote(schemaE);
+                              }}
+                              size="small"
+                            >
+                              {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
+                            </IconButton>
+                          </div>
+                          <div style={{ marginTop: "5px" }}>{schemaE.downVotes}</div>
+                        </div>
                       </div>
                       <div
                         style={{
