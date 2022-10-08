@@ -137,21 +137,49 @@ export const SchemaGeneration = ({}) => {
       })
       .filter(x => x !== null);
     setPassages(passages);
-    setSelectedPassage(passages[0]);
-    const phrases = passages[0].phrases;
-    setSelectedPhrases([...phrases]);
-    setSelectedPhrase(phrases[0]);
+    const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
+    if (booleanLogsDoc.exists) {
+      const booleanLogsData = booleanLogsDoc.data();
+      const passage = passages.find(elem => elem.title === booleanLogsData.passage);
+      setSelectedPassage(passage);
+      const phrases = passage.phrases;
+      setSelectedPhrases(phrases);
+      setSelectedPhrase(booleanLogsData.selectedPhrase);
+    } else {
+      setSelectedPassage(passages[0]);
+      const phrases = passages[0].phrases;
+      setSelectedPhrases([...phrases]);
+      setSelectedPhrase(phrases[0]);
+    }
   }, [firebase.db, fullname]);
 
-  const handlePassageChange = event => {
-    const title = event.target.value;
-    const allPassages = [...passages];
-    const fIndex = allPassages.findIndex(i => i.title === title);
-    const passage = allPassages[fIndex];
-    setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
-    setSelectedPhrase(passage.phrases[0]);
+  const handlePassageChange = async event => {
+    try {
+      const title = event.target.value;
+      const allPassages = [...passages];
+      const fIndex = allPassages.findIndex(i => i.title === title);
+      const passage = allPassages[fIndex];
+      setSelectedPassage(passage);
+      setSelectedPhrases(passage.phrases);
+      setSelectedPhrase(passage.phrases[0]);
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    if ((selectedPhrase && selectedPassage)) {
+      const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
+      const logsData = {
+        passage: selectedPassage.title,
+        selectedPhrase: selectedPhrase,
+        email
+      };
+      logsRef.set(logsData);
+    }
+
+    return () => {};
+  }, [selectedPhrase, selectedPassage]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {

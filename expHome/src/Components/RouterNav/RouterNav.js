@@ -1136,7 +1136,10 @@ const RouterNav = props => {
                           className={activePage === "SchemaGenerationTool" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/SchemaGeneration")}
                         >
-                          📓
+                          🤖{0}
+                          <br/>
+                          ❌{0}
+
                         </Button>
                       </Tooltip>
                     ) : null}
