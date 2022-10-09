@@ -115,6 +115,9 @@ const RouterNav = props => {
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
   const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
+  const [negativeBooleanExpPionts, setNegativeBooleanExpPionts] = useState(0);
+  const [positiveBooleanExpPionts, setPositiveBooleanExpPionts] = useState(0);
+
   const [userVersionsLoaded, setUserVersionsLoaded] = useState(false);
   const [nodesChanges, setNodesChanges] = useState([]);
   const [nodes, setNodes] = useState([]);
@@ -156,7 +159,6 @@ const RouterNav = props => {
   useEffect(() => {
     const getProjectSpecs = async () => {
       const pSpec = await firebase.db.collection("projectSpecs").doc(project).get();
-
       setProjectSpecs({ ...pSpec.data() });
     };
 
@@ -235,6 +237,16 @@ const RouterNav = props => {
                 setPositiveCodesPoints(theProject.positiveCodingPoints);
               } else {
                 setPositiveCodesPoints(0);
+              }
+              if (theProject.negativeBooleanExpPionts) {
+                setNegativeBooleanExpPionts(theProject.negativeBooleanExpPionts);
+              } else {
+                setNegativeBooleanExpPionts(0);
+              }
+              if (theProject.positiveBooleanExpPionts) {
+                setPositiveBooleanExpPionts(theProject.positiveBooleanExpPionts);
+              } else {
+                setPositiveBooleanExpPionts(0);
               }
             }
             if ("gradingNum" in theProject) {
@@ -742,7 +754,7 @@ const RouterNav = props => {
         <MenuItem
           key={`${proj}MenuItem`}
           selected={index === projectIndex}
-        // onClick={(event) => changeProject(event, index)}
+          // onClick={(event) => changeProject(event, index)}
         >
           {proj}
           <Switch
@@ -763,7 +775,7 @@ const RouterNav = props => {
     </Menu>
   );
 
-  const roundNum = (num) => Number(Number.parseFloat(Number(num).toFixed(2)));
+  const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
   const navigate = useNavigate();
 
@@ -829,8 +841,9 @@ const RouterNav = props => {
                     >
                       {projectPoints.onePoints ? (
                         <Tooltip
-                          title={`You've submitted ${proposalsNums[username] ? proposalsNums[username].num : ""
-                            } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
+                          title={`You've submitted ${
+                            proposalsNums[username] ? proposalsNums[username].num : ""
+                          } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
                             # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
@@ -1027,7 +1040,8 @@ const RouterNav = props => {
                           {projectPoints.dayInstructorUpVotes
                             ? "✔ " + roundNum(dayInstructorUpVotes)
                             : "🌞 " + instructorsToday + " / 7"}
-                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {roundNum(upvotedInstructorsToday)} / 16
+                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {roundNum(upvotedInstructorsToday)}{" "}
+                          / 16
                         </Button>
                       </Tooltip>
                     ) : null}
@@ -1129,14 +1143,15 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectPoints.gradingPoints ? (
+                    {projectPoints.BooleanExpressionGenerationPoints ? (
                       <Tooltip title={"Schema Generation Tool"}>
                         <Button
                           id="SchemaGenerationTool"
                           className={activePage === "SchemaGenerationTool" ? "ActiveNavLink" : "NavLink"}
                           onClick={event => navigate("/Activities/SchemaGeneration")}
                         >
-                          📓
+                          🤖 {roundNum(positiveBooleanExpPionts)}
+                          <br />❌ {roundNum(negativeBooleanExpPionts)}
                         </Button>
                       </Tooltip>
                     ) : null}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilStateLoadable, useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
-
+import { projectState } from "../../../store/ProjectAtoms";
 // mui imports
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -15,7 +15,10 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
+import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
+import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
+import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import "./SchemaGeneration.css";
 
 import QueryBuilder from "./QueryBuilder";
@@ -50,7 +53,7 @@ export const SchemaGeneration = ({}) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-
+  const project = useRecoilValue(projectState);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     const usersDoc = await firebase.db.collection("users").get();
@@ -137,21 +140,49 @@ export const SchemaGeneration = ({}) => {
       })
       .filter(x => x !== null);
     setPassages(passages);
-    setSelectedPassage(passages[0]);
-    const phrases = passages[0].phrases;
-    setSelectedPhrases([...phrases]);
-    setSelectedPhrase(phrases[0]);
+    const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
+    if (booleanLogsDoc.exists) {
+      const booleanLogsData = booleanLogsDoc.data();
+      const passage = passages.find(elem => elem.title === booleanLogsData.passage);
+      setSelectedPassage(passage);
+      const phrases = passage.phrases;
+      setSelectedPhrases(phrases);
+      setSelectedPhrase(booleanLogsData.selectedPhrase);
+    } else {
+      setSelectedPassage(passages[0]);
+      const phrases = passages[0].phrases;
+      setSelectedPhrases([...phrases]);
+      setSelectedPhrase(phrases[0]);
+    }
   }, [firebase.db, fullname]);
 
-  const handlePassageChange = event => {
-    const title = event.target.value;
-    const allPassages = [...passages];
-    const fIndex = allPassages.findIndex(i => i.title === title);
-    const passage = allPassages[fIndex];
-    setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
-    setSelectedPhrase(passage.phrases[0]);
+  const handlePassageChange = async event => {
+    try {
+      const title = event.target.value;
+      const allPassages = [...passages];
+      const fIndex = allPassages.findIndex(i => i.title === title);
+      const passage = allPassages[fIndex];
+      setSelectedPassage(passage);
+      setSelectedPhrases(passage.phrases);
+      setSelectedPhrase(passage.phrases[0]);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    if (selectedPhrase && selectedPassage) {
+      const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
+      const logsData = {
+        passage: selectedPassage.title,
+        selectedPhrase: selectedPhrase,
+        email
+      };
+      logsRef.set(logsData);
+    }
+
+    return () => {};
+  }, [selectedPhrase, selectedPassage]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {
@@ -223,10 +254,8 @@ export const SchemaGeneration = ({}) => {
   };
   const upVote = async schema => {
     try {
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
       const _upVoters = [...schema.upVoters];
       const _downVoters = [...schema.downVoters];
-
       let _upVotes = schema.upVotes;
       let _downVotes = schema.downVotes;
       if (_upVoters.includes(fullname)) {
@@ -240,13 +269,6 @@ export const SchemaGeneration = ({}) => {
           _downVotes = _downVotes - 1;
         }
       }
-      const schemaGenerationUpdate = {
-        upVotes: _upVotes,
-        upVoters: _upVoters,
-        downVotes: _downVotes,
-        downVoters: _downVoters
-      };
-      await schemaGenerationRef.update(schemaGenerationUpdate);
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
       _schemasBoolean[index] = {
@@ -257,11 +279,38 @@ export const SchemaGeneration = ({}) => {
         downVoters: _downVoters
       };
       setSchemasBoolean(_schemasBoolean);
+      const schemaGenerationUpdate = {
+        upVotes: _upVotes,
+        upVoters: _upVoters,
+        downVotes: _downVotes,
+        downVoters: _downVoters
+      };
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      await schemaGenerationRef.update(schemaGenerationUpdate);
+      let calulatedProject = project;
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      const researcherUpdate = {
+        projects: {
+          ...researcherData.projects,
+          [calulatedProject]: {
+            ...researcherData.projects[calulatedProject],
+            positiveBooleanExpPionts: _upVotes - _downVotes,
+            negativeBooleanExpPionts: _downVotes
+          }
+        }
+      };
+      await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
   const downVote = async schema => {
     try {
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
       const _downVoters = [...schema.downVoters];
       let _downVotes = schema.downVotes;
       const _upVoters = [...schema.upVoters];
@@ -277,13 +326,6 @@ export const SchemaGeneration = ({}) => {
           _upVotes = _upVotes - 1;
         }
       }
-      const schemaGenerationUpdate = {
-        upVotes: _upVotes,
-        upVoters: _upVoters,
-        downVotes: _downVotes,
-        downVoters: _downVoters
-      };
-      await schemaGenerationRef.update(schemaGenerationUpdate);
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
       _schemasBoolean[index] = {
@@ -294,23 +336,50 @@ export const SchemaGeneration = ({}) => {
         downVoters: _downVoters
       };
       setSchemasBoolean(_schemasBoolean);
+      const schemaGenerationUpdate = {
+        upVotes: _upVotes,
+        upVoters: _upVoters,
+        downVotes: _downVotes,
+        downVoters: _downVoters
+      };
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      await schemaGenerationRef.update(schemaGenerationUpdate);
+
+      let calulatedProject = project;
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      const researcherUpdate = {
+        projects: {
+          ...researcherData.projects,
+          [calulatedProject]: {
+            ...researcherData.projects[calulatedProject],
+            positiveBooleanExpPionts: _upVotes - _downVotes,
+            negativeBooleanExpPionts: _downVotes
+          }
+        }
+      };
+      await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
 
   const previousPhrase = () => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase - 1]);
-    console.log(phrases[indexPhrase + 1]);
   };
 
   const nextPhrase = () => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase + 1]);
-    console.log(phrases[indexPhrase + 1]);
   };
   return (
-    <Grid container spacing={2} sx={{background: "#e2e2e2" }}>
-      <Grid sx={{ height :"100%"}} item xs={6}>
+    <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
+      <Grid sx={{ height: "100%" }} item xs={6}>
         <Item>
           <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
             <Typography variant="h6" component="div" align="left">
@@ -355,7 +424,7 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               display: "flex",
-              width: "80%",
+              width: "95%",
               paddingTop: "10px",
               paddingBottom: "20px",
               justifyContent: "space-between"
@@ -376,7 +445,7 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               display: "flex",
-              width: "80%",
+              width: "95%",
               paddingTop: "10px",
               paddingBottom: "20px",
               justifyContent: "space-between"
@@ -402,26 +471,39 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map(schemaE => {
                 return (
-                  <div >
+                  <div>
                     <QueryBuilder query={schemaE.schema} noEdit={true} />
-                    <div style={{ display: "flex", width: "80%", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <IconButton
-                          onClick={() => {
-                            upVote(schemaE);
-                          }}
-                          size="small"
-                        >
-                          {schemaE.upVotes}👍
-                        </IconButton>
-                        <IconButton
-                          onClick={() => {
-                            downVote(schemaE);
-                          }}
-                          size="small"
-                        >
-                          {schemaE.downVotes}👎
-                        </IconButton>
+                    <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <div>
+                            <IconButton
+                              sx={{ color: "#00bcd4" }}
+                              component="label"
+                              onClick={() => {
+                                upVote(schemaE);
+                              }}
+                              size="small"
+                            >
+                              {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
+                            </IconButton>
+                          </div>
+                          <div style={{ marginTop: "7px" }}>{schemaE.upVotes}</div>
+                        </div>
+                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <div>
+                            <IconButton
+                              sx={{ color: "red" }}
+                              onClick={() => {
+                                downVote(schemaE);
+                              }}
+                              size="small"
+                            >
+                              {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
+                            </IconButton>
+                          </div>
+                          <div style={{ marginTop: "5px" }}>{schemaE.downVotes}</div>
+                        </div>
                       </div>
                       <div
                         style={{
@@ -443,7 +525,7 @@ export const SchemaGeneration = ({}) => {
           </Paper>
         </Item>
       </Grid>
-      <Grid sx={{ height :"100%"}} item xs={6}>
+      <Grid sx={{ height: "100%" }} item xs={6}>
         <Item>
           {searchResules.length > 0 && (
             <Typography variant="h6" component="div" align="center">
@@ -451,7 +533,7 @@ export const SchemaGeneration = ({}) => {
             </Typography>
           )}
 
-          <Box sx={{ height: "110vh", overflow: "scroll" }}>
+          <Paper sx={{ height: "1110px", overflow: "scroll" }}>
             {searchResules.length > 0 ? (
               searchResules.map(respon => {
                 return (
@@ -476,7 +558,7 @@ export const SchemaGeneration = ({}) => {
                 Click search to search for your schema
               </Typography>
             )}
-          </Box>
+          </Paper>
         </Item>
       </Grid>
     </Grid>
