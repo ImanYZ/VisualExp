@@ -7,9 +7,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
-
+import Autocomplete from "@mui/material/Autocomplete";
+import Chip from "@mui/material/Chip";
+import { uuidv4 } from "../../../utils";
 export default function QueryBuilder(props) {
-  const renderSchema = (schema, ids) => {
+  const renderSchema = (schema, ids, selectedPhrase) => {
     const handleAddAlternative = (schemaE, id, event) => {
       if (event.key !== "Enter") return;
       const value = event.target.value;
@@ -35,12 +37,12 @@ export default function QueryBuilder(props) {
 
     const handleAddKeyword = id => {
       const schemaE = [...schema];
-      schemaE.push({ id: new Date(), not: false, keyword: "", alternatives: [] });
+      schemaE.push({ id: uuidv4(), not: false, keyword: "", alternatives: [] });
       props.onQueryChange(schemaE);
     };
     const handleExcludeKeyword = id => {
       const schemaE = [...schema];
-      schemaE.push({ id: new Date(), not: true, keyword: "", alternatives: [] });
+      schemaE.push({ id: uuidv4(), not: true, keyword: "", alternatives: [] });
       props.onQueryChange(schemaE);
     };
 
@@ -61,6 +63,7 @@ export default function QueryBuilder(props) {
       schemaE[index].keyword = event.currentTarget.value;
       props.onQueryChange(schemaE);
     };
+
     return (
       <Paper elevation={3} sx={{ minheight: "300px", width: "95%", padding: "5px" }}>
         <div style={{}}>
@@ -93,7 +96,6 @@ export default function QueryBuilder(props) {
                     }}
                   >
                     <TextField
-                      disabled={props.noEdit}
                       label={"Keyword" + (index + 1)}
                       onChange={event => {
                         handleEditValue(event, element.id);
@@ -103,11 +105,7 @@ export default function QueryBuilder(props) {
                     />
 
                     {!props.noEdit && (
-                      <IconButton
-                        disabled={props.noEdit}
-                        style={{ color: "red", marginLeft: "5px", marginTop: "15px" }}
-                        size="small"
-                      >
+                      <IconButton style={{ color: "red", marginLeft: "5px", marginTop: "15px" }} size="small">
                         <DeleteIcon
                           onClick={() => {
                             handleDeleteKeyword(element.id);
@@ -119,17 +117,13 @@ export default function QueryBuilder(props) {
                   <div style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}>
                     <div className="alternative-input-container">
                       {element?.alternatives?.map((alt, index) => (
-                        <div className="alternative-item">
-                          <span className="text">{alt}</span>
-                          <span
-                            className="close"
-                            onClick={() => {
-                              handleRemoveAlternative(alt, schema, element.id);
-                            }}
-                          >
-                            &times;
-                          </span>
-                        </div>
+                        <Chip
+                          size="large"
+                          label={alt}
+                          onDelete={() => {
+                            handleRemoveAlternative(alt, schema, element.id);
+                          }}
+                        />
                       ))}
                       <input
                         onKeyDown={event => {
@@ -218,17 +212,13 @@ export default function QueryBuilder(props) {
                     >
                       <div className="alternative-input-container">
                         {element?.alternatives?.map((alt, index) => (
-                          <div className="alternative-item">
-                            <span className="text">{alt}</span>
-                            <span
-                              className="close"
-                              onClick={() => {
-                                handleRemoveAlternative(alt, schema, element.id);
-                              }}
-                            >
-                              &times;
-                            </span>
-                          </div>
+                          <Chip
+                            size="large"
+                            label={alt}
+                            onDelete={() => {
+                              handleRemoveAlternative(alt, schema, element.id);
+                            }}
+                          />
                         ))}
                         <input
                           onKeyDown={event => {
@@ -265,5 +255,5 @@ export default function QueryBuilder(props) {
     );
   };
 
-  return <>{renderSchema(props.query, [props.query.id])}</>;
+  return <>{renderSchema(props.query, [props.query.id], props.selectedPhrase)}</>;
 }
