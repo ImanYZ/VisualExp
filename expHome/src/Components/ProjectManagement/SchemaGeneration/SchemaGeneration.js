@@ -20,13 +20,12 @@ import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import "./SchemaGeneration.css";
-import AppBar from "../../Home/modules/components/AppBar";
-
+import { uuidv4 } from "../../../utils"
 import QueryBuilder from "./QueryBuilder";
 
 const temp_schema = [
-  { id: "lmqskdmlsdkmlsdkfmls", keyword: "mouse", alternatives: ["tall", "rat"] },
-  { id: "okokok", not: true, keyword: "tree", alternatives: [] }
+  { id: uuidv4(), not: false, keyword: "", alternatives: [] },
+  { id: uuidv4(), not: true, keyword: "", alternatives: [] }
 ];
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
@@ -235,11 +234,7 @@ export const SchemaGeneration = ({}) => {
       .catch(error => {
         console.error("Error writing document: ", error);
       });
-    setSchema({
-      id: new Date(),
-      combinator: "AND",
-      rules: []
-    });
+    setSchema([{ id: uuidv4(), keyword: "", alternatives: ["", ""] }]);
   };
   const upVote = async schema => {
     try {
@@ -390,6 +385,8 @@ export const SchemaGeneration = ({}) => {
     return () => {};
   }, [schema]);
 
+
+
   return (
     <div style={{ overflow: "visible" }}>
       <div style={{ display: "flex", height: "100px", backgroundColor: "#212121", flexDirection: "row" }}>
@@ -519,7 +516,7 @@ export const SchemaGeneration = ({}) => {
               schemasBoolean.map(schemaE => {
                 return (
                   <div>
-                    <QueryBuilder query={schemaE.schema} noEdit={true} />
+                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} noEdit={true} />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>

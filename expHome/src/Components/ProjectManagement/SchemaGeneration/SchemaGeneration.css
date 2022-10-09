@@ -129,22 +129,26 @@
   gap: .5em;
 }
 
-.alternative-item {
-  background-color: rgb(206, 237, 237);
+.alternative-input-container .alternative-item {
+  background-color: rgb(255, 255, 255);
   display: inline-block;
   padding: .5em .75em;
+  white-space: 30px;
+  border: 1px solid rgb(132, 131, 131);
+  border-radius: 90px;
 }
 
-.alternative-item .close {
+.alternative-input-container .alternative-item .close {
   height: 20px;
-  width: 2px;
-  background-color: rgb(239, 232, 232);
+  width: 40px;
+  background-color: rgb(255, 255, 255);
   color: rgb(11, 5, 5);
   display: inline-flex;
   justify-content: center;
   text-align: center;
   margin-left: .5em;
   font-size: 18px;
+
 }
 .alternative-input {
   flex-grow: 1;
