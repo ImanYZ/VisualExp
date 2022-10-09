@@ -6,207 +6,260 @@ import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import IconButton from "@mui/material/IconButton";
+import TextField from "@mui/material/TextField";
 
 export default function QueryBuilder(props) {
   const renderSchema = (schema, ids) => {
-    const addKeyword = ids => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      tempSchema1.rules.push({
-        id: "r-" + Date.now(),
-        not: false,
-        value: ""
+    const handleAddAlternative = (schemaE, id, event) => {
+      if (event.key !== "Enter") return;
+      const value = event.target.value;
+      if (!value.trim()) return;
+      const index = schemaE.findIndex(elm => {
+        return elm.id === id;
       });
-      props.onQueryChange(tempSchema);
+      const _schemaE = [...schemaE];
+      console.log(_schemaE, index);
+      _schemaE[index].alternatives.push(value);
+      props.onQueryChange(_schemaE);
+      event.target.value = "";
     };
-    const addGroup = ids => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      tempSchema1.rules.push({
-        id: "r-" + Date.now(),
-        combinator: "AND",
-        rules: []
+    const handleRemoveAlternative = (alt, schemaE, id) => {
+      const index = schemaE.findIndex(elm => {
+        return elm.id === id;
       });
-      props.onQueryChange(tempSchema);
-    };
-    const editValue = (event, ids) => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      const lastId = tempIds.pop();
-
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      tempSchema1.rules[index] = {
-        ...tempSchema1.rules[index],
-        value: event.currentTarget.value
-      };
-      props.onQueryChange(tempSchema);
-    };
-    const setChecked = ids => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      const lastId = tempIds.pop();
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      tempSchema1.rules[index] = {
-        ...tempSchema1.rules[index],
-        not: !tempSchema1.rules[index].not
-      };
-      props.onQueryChange(tempSchema);
+      const _schemaE = [...schemaE];
+      const indexOFAlt = _schemaE[index].alternatives.indexOf(alt);
+      _schemaE[index].alternatives.splice(indexOFAlt, 1);
+      props.onQueryChange(_schemaE);
     };
 
-    const changeAndOr = ids => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      tempSchema1.combinator = tempSchema1.combinator === "OR" ? "AND" : "OR";
-      if (tempIds.length === 0) {
-        props.onQueryChange(tempSchema1);
-      } else {
-        props.onQueryChange(tempSchema);
-      }
+    const handleAddKeyword = id => {
+      const schemaE = [...schema];
+      schemaE.push({ id: new Date(), not: false, keyword: "", alternatives: [] });
+      props.onQueryChange(schemaE);
+    };
+    const handleExcludeKeyword = id => {
+      const schemaE = [...schema];
+      schemaE.push({ id: new Date(), not: true, keyword: "", alternatives: [] });
+      props.onQueryChange(schemaE);
     };
 
-    const deleteKeyword = ids => {
-      let tempSchema = { ...props.query };
-      let tempSchema1 = { ...props.query };
-      const tempIds = [...ids];
-      const indexs = [];
-      tempIds.shift();
-      const lastId = tempIds.pop();
+    const handleDeleteKeyword = id => {
+      const schemaE = [...schema];
+      const index = schemaE.findIndex(elm => {
+        return elm.id === id;
+      });
+      schemaE.splice(index, 1);
+      props.onQueryChange(schemaE);
+    };
 
-      for (let id of tempIds) {
-        const index = tempSchema.rules.findIndex(elm => elm.id === id);
-        indexs.push(index);
-        tempSchema1 = tempSchema1.rules.find(elm => elm.id === id);
-      }
-      const index = tempSchema1.rules.findIndex(elm => elm.id === lastId);
-      tempSchema1.rules.splice(index, 1);
-      props.onQueryChange(tempSchema);
+    const handleEditValue = (event, id) => {
+      const schemaE = [...schema];
+      const index = schemaE.findIndex(elm => {
+        return elm.id === id;
+      });
+      schemaE[index].keyword = event.currentTarget.value;
+      props.onQueryChange(schemaE);
     };
     return (
       <Paper elevation={3} sx={{ minheight: "300px", width: "95%", padding: "5px" }}>
-        <div style={{ flexDirection: "row", marginLeft: "50%", alignItems: "flex-start" }}>
-          <Button
-            disabled={props.noEdit}
-            onClick={() => {
-              addKeyword(ids);
+        <div style={{}}>
+          <div style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}>
+            The response should <strong> contain ALL the following keywords</strong>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              marginBottom: "25px",
+              marginLeft: "50px",
+              flexDirection: "row",
+              alignItems: "flex-start"
             }}
           >
-            ADD A KEYWORD
-          </Button>
-          <Button
-            disabled={props.noEdit}
-            onClick={() => {
-              addGroup(ids);
-            }}
-          >
-            ADD A GROUP
-          </Button>
-        </div>
-        <div class="clt">
-          <ul>
-            <li>
-              <Box sx={{ marginRight: "890px" }}>
-                <div style={{ padding: "0px" }}>
-                  <select
-                    value={schema.combinator}
-                    onChange={() => {
-                      changeAndOr(ids);
+            Below each keyword, you can enter alternative words that serve the same meaning in this context.
+          </div>
+          {schema
+            .filter(elem => !elem.not)
+            .map((element, index) => {
+              return (
+                <div style={{ marginBottom: "40px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      marginLeft: "50px",
+                      marginTop: "10px",
+                      flexDirection: "row",
+                      alignItems: "flex-start"
                     }}
                   >
-                    <option value="AND">AND</option>
-                    <option value="OR">OR</option>
-                  </select>
+                    <TextField
+                      disabled={props.noEdit}
+                      label={"Keyword" + (index + 1)}
+                      onChange={event => {
+                        handleEditValue(event, element.id);
+                      }}
+                      value={element.keyword}
+                      style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }}
+                    />
+
+                    {!props.noEdit && (
+                      <IconButton
+                        disabled={props.noEdit}
+                        style={{ color: "red", marginLeft: "5px", marginTop: "15px" }}
+                        size="small"
+                      >
+                        <DeleteIcon
+                          onClick={() => {
+                            handleDeleteKeyword(element.id);
+                          }}
+                        />
+                      </IconButton>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}>
+                    <div className="alternative-input-container">
+                      {element?.alternatives?.map((alt, index) => (
+                        <div className="alternative-item">
+                          <span className="text">{alt}</span>
+                          <span
+                            className="close"
+                            onClick={() => {
+                              handleRemoveAlternative(alt, schema, element.id);
+                            }}
+                          >
+                            &times;
+                          </span>
+                        </div>
+                      ))}
+                      <input
+                        onKeyDown={event => {
+                          handleAddAlternative(schema, element.id, event);
+                        }}
+                        className="alternative-input"
+                        type="text"
+                        placeholder="Add an alternative keyword"
+                      />
+                    </div>
+                  </div>
+                  {schema.filter(elem => !elem.not).indexOf(element) ===
+                    schema.filter(elem => !elem.not).length - 1 && (
+                    <div style={{ flexDirection: "row", marginRight: "71%", alignItems: "flex-start" }}>
+                      <Button
+                        sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
+                        variant="contained"
+                        disabled={props.noEdit}
+                        onClick={() => {
+                          handleAddKeyword(element.id);
+                        }}
+                      >
+                        ADD A KEYWORD
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </Box>
-            </li>
-            {schema?.rules?.map(element => {
+              );
+            })}
+
+          {schema
+            .filter(elem => elem.not)
+            .map((element, index) => {
               return (
-                <li>
-                  {element.rules ? (
-                    <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
-                      {renderSchema(element, [...ids, element.id])}
+                <>
+                  {schema.filter(elem => elem.not).length > 0 && (
+                    <div
+                      style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}
+                    >
+                      <span> The response should </span>
+
+                      <span>
+                        <strong style={{ color: "red" }}> NOT </strong>
+                      </span>
+                      <span>
+                        <strong> contain ALL the following concepts</strong>
+                      </span>
+                    </div>
+                  )}
+                  <div style={{ marginBottom: "40px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        marginLeft: "50px",
+                        marginTop: "10px",
+                        flexDirection: "row",
+                        alignItems: "flex-start"
+                      }}
+                    >
+                      <TextField
+                        disabled={props.noEdit}
+                        label={"Keyword" + (index + 1)}
+                        onChange={event => {
+                          handleEditValue(event, element.id);
+                        }}
+                        value={element.keyword}
+                        style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }}
+                      />
+
                       {!props.noEdit && (
-                        <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
+                        <IconButton
+                          disabled={props.noEdit}
+                          style={{ color: "red", marginLeft: "5px", marginTop: "15px" }}
+                          size="small"
+                        >
                           <DeleteIcon
                             onClick={() => {
-                              deleteKeyword([...ids, element.id]);
+                              handleDeleteKeyword(element.id);
                             }}
                           />
                         </IconButton>
                       )}
                     </div>
-                  ) : (
-                    <Paper elevation={5} sx={{ height: "30px", width: "200px", padding: "10px" }}>
-                      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
-                        NOT
-                        <input
-                          type="checkbox"
-                          checked={element.not}
-                          onChange={() => setChecked([...ids, element.id])}
-                        />
-                        <input
-                          disabled={props.noEdit}
-                          onChange={event => {
-                            editValue(event, [...ids, element.id]);
-                          }}
-                          value={element.value}
-                          style={{ fontSize: "19px", padding: "2px 5px", width: "140px" }}
-                        />
-                        {!props.noEdit && (
-                          <IconButton disabled={props.noEdit} style={{ marginLeft: "5px" }} size="small">
-                            <DeleteIcon
+                    <div
+                      style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}
+                    >
+                      <div className="alternative-input-container">
+                        {element?.alternatives?.map((alt, index) => (
+                          <div className="alternative-item">
+                            <span className="text">{alt}</span>
+                            <span
+                              className="close"
                               onClick={() => {
-                                deleteKeyword([...ids, element.id]);
+                                handleRemoveAlternative(alt, schema, element.id);
                               }}
-                            />
-                          </IconButton>
-                        )}
+                            >
+                              &times;
+                            </span>
+                          </div>
+                        ))}
+                        <input
+                          onKeyDown={event => {
+                            handleAddAlternative(schema, element.id, event);
+                          }}
+                          className="alternative-input"
+                          type="text"
+                          placeholder="Add an alternative keyword"
+                        />
                       </div>
-                    </Paper>
-                  )}
-                </li>
+                    </div>
+
+                    {schema.filter(elem => elem.not).indexOf(element) ===
+                      schema.filter(elem => elem.not).length - 1 && (
+                      <div style={{ flexDirection: "row", marginRight: "71%", alignItems: "flex-start" }}>
+                        <Button
+                          sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
+                          variant="contained"
+                          disabled={props.noEdit}
+                          onClick={() => {
+                            handleExcludeKeyword(element.id);
+                          }}
+                        >
+                          exclude A Keyword
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </>
               );
             })}
-          </ul>
         </div>
       </Paper>
     );

@@ -20,15 +20,14 @@ import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import "./SchemaGeneration.css";
+import AppBar from "../../Home/modules/components/AppBar";
 
 import QueryBuilder from "./QueryBuilder";
 
-const temp_schema = {
-  id: new Date(),
-  combinator: "AND",
-  rules: []
-};
-
+const temp_schema = [
+  { id: "lmqskdmlsdkmlsdkfmls", keyword: "mouse", alternatives: ["tall", "rat"] },
+  { id: "okokok", not: true, keyword: "tree", alternatives: [] }
+];
 const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
@@ -76,31 +75,21 @@ export const SchemaGeneration = ({}) => {
   }, [firebase]);
 
   const checkResponse = (sentence, schema) => {
-    let canShow = true;
-    if (schema.combinator === "AND") {
-      for (let key of schema.rules) {
-        if (key.rules) {
-          canShow = checkResponse(sentence, key);
-        } else {
-          if (!sentence.includes(key.value) && !key.not) {
-            canShow = false;
-          }
+    console.log(schema);
+    for (let schemaE of schema) {
+      const keywords = [...schemaE.alternatives];
+      keywords.push(schemaE.keyword);
+      let _canShow = false;
+      for (let key of keywords) {
+        if (sentence.includes(key)) {
+          _canShow = true;
+        }
+        if (!_canShow) {
+          return false;
         }
       }
-    } else {
-      let canShow2 = false;
-      for (let key of schema.rules) {
-        if (key.rules) {
-          canShow = checkResponse(sentence, key);
-        } else {
-          if (sentence.includes(key.value) && !key.not) {
-            canShow2 = true;
-          }
-        }
-      }
-      canShow = canShow2;
     }
-    return canShow;
+    return true;
   };
   const QuerySearching = schemaEp => {
     setSearching(true);
@@ -377,97 +366,155 @@ export const SchemaGeneration = ({}) => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase + 1]);
   };
+
+  const previousPassage = () => {
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
+    const passage = passages[indexPassage - 1];
+    setSelectedPassage(passage);
+    setSelectedPhrases(passage.phrases);
+    setSelectedPhrase(passage.phrases[0]);
+  };
+  const NextPassage = () => {
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
+    const passage = passages[indexPassage + 1];
+    setSelectedPassage(passage);
+    setSelectedPhrases(passage.phrases);
+    setSelectedPhrase(passage.phrases[0]);
+  };
+  console.log(schemasBoolean);
+
+  useEffect(() => {
+    if (schema.keyword !== "" && schema?.alternatives?.length !== 0) {
+      QuerySearching(schema);
+    }
+    return () => {};
+  }, [schema]);
+
   return (
-    <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
-      <Grid sx={{ height: "100%" }} item xs={6}>
-        <Item>
-          <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-            <Typography variant="h6" component="div" align="left">
-              Passage
-            </Typography>
-            <Select
-              id="demo-simple-select-helper"
-              value={selectedPassage?.title || passages[0]?.title || ""}
-              onChange={handlePassageChange}
-            >
-              {passages &&
-                passages?.length > 0 &&
-                passages?.map(doc => (
-                  <MenuItem key={doc?.id} value={doc?.title}>
-                    {doc?.title}
-                  </MenuItem>
-                ))}
-            </Select>
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-            <Typography variant="h6" component="div" align="left">
-              Key Phrase
-            </Typography>
-
-            <Autocomplete
-              id="key-phrase"
-              value={selectedPhrase}
-              options={phrases}
-              onChange={(_, value) => setSelectedPhrase(value || null)}
-              renderInput={params => <TextField {...params} value={selectedPhrase} />}
-              getOptionLabel={phrase => (phrase ? phrase : "")}
-              renderOption={(props, phrase) => (
-                <li key={phrase} {...props}>
-                  {phrase}
-                </li>
-              )}
-              isOptionEqualToValue={(phrase, value) => phrase === value}
-              fullWidth
-              sx={{ mb: "16px" }}
-            />
-          </Box>
-          <div
-            style={{
-              display: "flex",
-              width: "95%",
-              paddingTop: "10px",
-              paddingBottom: "20px",
-              justifyContent: "space-between"
-            }}
+    <div style={{ overflow: "visible" }}>
+      <div style={{ display: "flex", height: "100px", backgroundColor: "#212121", flexDirection: "row" }}>
+        <div style={{ display: "center", marginLeft: "200px", marginTop: "20px", marginRight: "20px" }}>
+          <Button
+            variant="text"
+            disabled={passages.indexOf(selectedPassage) === 0}
+            sx={{ color: "white" }}
+            onClick={previousPassage}
           >
-            <Button variant="contained" disabled={phrases.indexOf(selectedPhrase) === 0} onClick={previousPhrase}>
-              Previous Phrase
-            </Button>
-            <Button
-              variant="contained"
-              disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
-              onClick={nextPhrase}
-            >{`NEXT Phrase`}</Button>
-          </div>
-
-          <QueryBuilder query={schema} onQueryChange={q => setSchema(q)} />
-
-          <div
-            style={{
-              display: "flex",
-              width: "95%",
-              paddingTop: "10px",
-              paddingBottom: "20px",
-              justifyContent: "space-between"
-            }}
+            {`< Previous Passage`}
+          </Button>
+        </div>
+        <Box
+          sx={{
+            display: "flex",
+            width: "1000px",
+            flexDirection: "column",
+            marginTop: "10px",
+            marginRight: "20px",
+            marginLeft: "10px"
+          }}
+        >
+          <Select
+            id="demo-simple-select-helper"
+            value={selectedPassage?.title || passages[0]?.title || ""}
+            onChange={handlePassageChange}
+            sx={{ color: "white", border: "1px", borderColor: "white" }}
           >
-            <Button variant="contained" onClick={handleSubmit}>
-              Submit
-            </Button>
-            <Button
-              variant="contained"
-              onClick={() => {
-                QuerySearching(schema);
+            {passages &&
+              passages?.length > 0 &&
+              passages?.map(doc => (
+                <MenuItem key={doc?.id} value={doc?.title} sx={{ display: "center" }}>
+                  {doc?.title}
+                </MenuItem>
+              ))}
+          </Select>
+        </Box>
+        <div style={{ display: "center", marginTop: "20px" }}>
+          <Button
+            variant="text"
+            /* disabled={phrases.indexOf(selectedPhrase) === 0} */ sx={{ color: "white" }}
+            onClick={NextPassage}
+          >
+            {` Next Passage >`}
+          </Button>
+        </div>
+      </div>
+      <Grid container spacing={2} sx={{ background: "white" }}>
+        <Grid sx={{ height: "100%", overflow: "scroll" }} item xs={7}>
+          <Item>
+            <div style={{ display: "flex", height: "100px", flexDirection: "row" }}>
+              <div style={{ display: "center", marginLeft: "40px", marginTop: "20px", marginRight: "20px" }}>
+                <Button
+                  sx={{ color: "black" }}
+                  variant="text"
+                  disabled={phrases.indexOf(selectedPhrase) === 0}
+                  onClick={previousPhrase}
+                >
+                  {`< Prev `}
+                </Button>
+              </div>
+              <Box
+                sx={{
+                  display: "flex",
+                  width: "700px",
+                  flexDirection: "column",
+                  marginTop: "10px",
+                  marginRight: "20px",
+                  marginLeft: "10px"
+                }}
+              >
+                <Autocomplete
+                  id="key-phrase"
+                  value={selectedPhrase}
+                  options={phrases}
+                  onChange={(_, value) => setSelectedPhrase(value || null)}
+                  renderInput={params => <TextField {...params} value={selectedPhrase} />}
+                  getOptionLabel={phrase => (phrase ? phrase : "")}
+                  renderOption={(props, phrase) => (
+                    <li key={phrase} {...props}>
+                      {phrase}
+                    </li>
+                  )}
+                  isOptionEqualToValue={(phrase, value) => phrase === value}
+                  fullWidth
+                  sx={{ mb: "16px" }}
+                />
+              </Box>
+              <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
+                <Button
+                  sx={{ color: "black", border: "none" }}
+                  variant="text"
+                  disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
+                  onClick={nextPhrase}
+                >{`NEXT >`}</Button>
+              </div>
+            </div>
+            <QueryBuilder query={schema} onQueryChange={q => setSchema(q)} />
+
+            <div
+              style={{
+                display: "flex",
+                paddingTop: "10px",
+                paddingBottom: "20px",
+                justifyContent: "space-between",
+                marginLeft: "400px",
+                marginRight: "50px"
               }}
-            >{`Search >>`}</Button>
-          </div>
-          {schemasBoolean?.length > 0 && (
-            <Typography variant="h6" component="div" align="left">
-              Previous Proposals:
-            </Typography>
-          )}
+            >
+              <div>Check what the result will look like on the right side, before you submit.</div>
+              <Button
+                sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
+                variant="contained"
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            </div>
+            {schemasBoolean?.length > 0 && (
+              <Typography variant="h6" component="div" align="left">
+                Previous Proposals:
+              </Typography>
+            )}
 
-          <Paper sx={{ height: "700px", overflow: "scroll" }}>
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map(schemaE => {
                 return (
@@ -512,56 +559,56 @@ export const SchemaGeneration = ({}) => {
                         }}
                       >
                         <Button
-                          variant="contained"
+                          variant="outlined"
                           onClick={() => {
                             QuerySearching(schemaE.schema);
                           }}
-                        >{`Search >>`}</Button>
+                        >{`Try it out `}</Button>
                       </div>
                     </div>
                   </div>
                 );
               })}
-          </Paper>
-        </Item>
-      </Grid>
-      <Grid sx={{ height: "100%" }} item xs={6}>
-        <Item>
-          {searchResules.length > 0 && (
-            <Typography variant="h6" component="div" align="center">
-              We found that schema in the followings:
-            </Typography>
-          )}
-
-          <Paper sx={{ height: "1110px", overflow: "scroll" }}>
-            {searchResules.length > 0 ? (
-              searchResules.map(respon => {
-                return (
-                  <Paper elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
-                    {(respon.text || "")
-                      .split(".")
-                      .filter(w => w.trim())
-                      .map(sentence =>
-                        respon.sentences.includes(sentence) ? (
-                          <mark>{sentence + "."}</mark>
-                        ) : (
-                          <span>{sentence + "."}</span>
-                        )
-                      )}
-                  </Paper>
-                );
-              })
-            ) : searching ? (
-              <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
-            ) : (
+          </Item>
+        </Grid>
+        <Grid sx={{ height: "100%" }} item xs={5}>
+          <Item>
+            {searchResules.length > 0 && (
               <Typography variant="h6" component="div" align="center">
-                Click search to search for your schema
+                We found that schema in the followings:
               </Typography>
             )}
-          </Paper>
-        </Item>
+
+            <Box>
+              {searchResules.length > 0 ? (
+                searchResules.map(respon => {
+                  return (
+                    <Paper elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
+                      {(respon.text || "")
+                        .split(".")
+                        .filter(w => w.trim())
+                        .map(sentence =>
+                          respon.sentences.includes(sentence) ? (
+                            <mark>{sentence + "."}</mark>
+                          ) : (
+                            <span>{sentence + "."}</span>
+                          )
+                        )}
+                    </Paper>
+                  );
+                })
+              ) : searching ? (
+                <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
+              ) : (
+                <Typography variant="h6" component="div" align="center">
+                  Click search to search for your schema
+                </Typography>
+              )}
+            </Box>
+          </Item>
+        </Grid>
       </Grid>
-    </Grid>
+    </div>
   );
 };
 
