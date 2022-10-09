@@ -17,7 +17,7 @@ import {
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
-import { SchemaGeneration } from '../SchemaGeneration';
+import { SchemaGeneration } from "../SchemaGeneration";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
 import AddInstructor from "../AddInstructor/AddInstructor";
@@ -131,6 +131,7 @@ const Activities = props => {
             let dayAdministratorUpVotes = 0;
             let commentsPoints = 0;
             let gradingPoints = 0;
+            let booleanExpPionts = 0;
             if (projectData.expPoints) {
               totalPoints += projectData.expPoints;
               expPoints = projectData.expPoints;
@@ -187,6 +188,10 @@ const Activities = props => {
               totalPoints += projectData.positiveCodingPoints;
               commentsPoints += projectData.positiveCodingPoints;
             }
+            if (projectData.positiveBooleanExpPionts) {
+              totalPoints += projectData.positiveBooleanExpPionts;
+              booleanExpPionts += projectData.positiveCodingPoints;
+            }
             let foundResear = false;
             for (let reIdx = 0; reIdx < resears.length; reIdx++) {
               if (resears[reIdx].id === change.doc.id) {
@@ -201,6 +206,7 @@ const Activities = props => {
                 resears[reIdx].dayAdministratorUpVotes = dayAdministratorUpVotes;
                 resears[reIdx].commentsPoints = commentsPoints;
                 resears[reIdx].gradingPoints = gradingPoints;
+                resears[reIdx].booleanExpPionts = booleanExpPionts;
                 foundResear = true;
                 break;
               }
@@ -347,7 +353,13 @@ const Activities = props => {
         </span>
       );
     }
-
+    if (projectPoints.BooleanExpressionGenerationPoints) {
+      content.push(
+        <span className={resear.booleanExpPionts >= projectPoints.BooleanExpressionGenerationPoints ? "GreenText" : ""}>
+          {"🤖 " + formatPoints(resear.booleanExpPionts)}
+        </span>
+      );
+    }
     return content.map((item, index) => {
       // if not last one append a " - "
       return content.length - 1 !== index ? (
@@ -391,7 +403,7 @@ const Activities = props => {
     <>
       <RouterNav />
       <div id="ActivitiesContainer">
-        {showLeaderBoard && (
+        {showLeaderBoard && project !== "Autograding" && (
           <div className="Columns40_60">
             <Alert severity="warning">
               <ProjectPointThresholds projectPoints={projectPoints} />
