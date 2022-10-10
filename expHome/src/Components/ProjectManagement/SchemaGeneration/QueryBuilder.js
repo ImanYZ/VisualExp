@@ -35,12 +35,12 @@ export default function QueryBuilder(props) {
       props.onQueryChange(_schemaE);
     };
 
-    const handleAddKeyword = id => {
+    const handleAddKeyword = () => {
       const schemaE = [...schema];
       schemaE.push({ id: uuidv4(), not: false, keyword: "", alternatives: [] });
       props.onQueryChange(schemaE);
     };
-    const handleExcludeKeyword = id => {
+    const handleExcludeKeyword = () => {
       const schemaE = [...schema];
       schemaE.push({ id: uuidv4(), not: true, keyword: "", alternatives: [] });
       props.onQueryChange(schemaE);
@@ -135,44 +135,39 @@ export default function QueryBuilder(props) {
                       />
                     </div>
                   </div>
-                  {schema.filter(elem => !elem.not).indexOf(element) ===
-                    schema.filter(elem => !elem.not).length - 1 && (
-                    <div style={{ flexDirection: "row", marginRight: "71%", alignItems: "flex-start" }}>
-                      <Button
-                        sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
-                        variant="contained"
-                        disabled={props.noEdit}
-                        onClick={() => {
-                          handleAddKeyword(element.id);
-                        }}
-                      >
-                        ADD A KEYWORD
-                      </Button>
-                    </div>
-                  )}
                 </div>
               );
             })}
+          {!props.noEdit && (
+            <div style={{ flexDirection: "row", marginRight: "79%", marginBottom: "30px", alignItems: "flex-start" }}>
+              <Button
+                sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
+                variant="contained"
+                disabled={props.noEdit}
+                onClick={handleAddKeyword}
+              >
+                ADD A KEYWORD
+              </Button>
+            </div>
+          )}
 
+          {
+            <div style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}>
+              <span> The response should </span>
+
+              <span>
+                <strong style={{ color: "red" }}> NOT </strong>
+              </span>
+              <span>
+                <strong> contain ALL the following concepts</strong>
+              </span>
+            </div>
+          }
           {schema
             .filter(elem => elem.not)
             .map((element, index) => {
               return (
                 <>
-                  {schema.filter(elem => elem.not).length > 0 && (
-                    <div
-                      style={{ display: "flex", marginLeft: "50px", flexDirection: "row", alignItems: "flex-start" }}
-                    >
-                      <span> The response should </span>
-
-                      <span>
-                        <strong style={{ color: "red" }}> NOT </strong>
-                      </span>
-                      <span>
-                        <strong> contain ALL the following concepts</strong>
-                      </span>
-                    </div>
-                  )}
                   <div style={{ marginBottom: "40px" }}>
                     <div
                       style={{
@@ -230,26 +225,22 @@ export default function QueryBuilder(props) {
                         />
                       </div>
                     </div>
-
-                    {schema.filter(elem => elem.not).indexOf(element) ===
-                      schema.filter(elem => elem.not).length - 1 && (
-                      <div style={{ flexDirection: "row", marginRight: "71%", alignItems: "flex-start" }}>
-                        <Button
-                          sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
-                          variant="contained"
-                          disabled={props.noEdit}
-                          onClick={() => {
-                            handleExcludeKeyword(element.id);
-                          }}
-                        >
-                          exclude A Keyword
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </>
               );
             })}
+          {!props.noEdit && (
+            <div style={{ flexDirection: "row", marginRight: "75%", marginBottom: "30px", alignItems: "flex-start" }}>
+              <Button
+                sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
+                variant="contained"
+                disabled={props.noEdit}
+                onClick={handleExcludeKeyword}
+              >
+                exclude A Keyword
+              </Button>
+            </div>
+          )}
         </div>
       </Paper>
     );
