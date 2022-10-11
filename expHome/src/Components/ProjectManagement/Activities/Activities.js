@@ -402,7 +402,10 @@ const Activities = props => {
   return (
     <>
       <RouterNav />
-      <div id="ActivitiesContainer">
+      <div id="ActivitiesContainer" style={{
+        position: activePage === 'SchemaGenerationTool' && 'fixed',
+        margin: activePage === 'SchemaGenerationTool' && 0,
+      }}>
         {showLeaderBoard && project !== "Autograding" && (
           <div className="Columns40_60">
             <Alert severity="warning">
