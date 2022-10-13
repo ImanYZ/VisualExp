@@ -69,7 +69,7 @@ const QueryBuilder = ({ ...props }) => {
   })();
 
   return (
-    <div className="query-container">
+    <div className="query-container" onClick={props.onClick}>
       <QueryBox
         className={'query-builder'}
         readOnly={props.readOnly}
@@ -115,7 +115,8 @@ const QueryBuilder = ({ ...props }) => {
             <Button
               sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
               variant="contained"
-              disabled={schema.length <= 0}
+              disabled={props.submitDisable }
+
               onClick={props.handleSubmit}
             >
               Submit
