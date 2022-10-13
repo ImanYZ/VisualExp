@@ -21,7 +21,7 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
 import QueryBuilder from "./components/QueryBuilder";
 import { uuidv4 } from "../../../utils";
-import './SchemaGeneration.css';
+import "./SchemaGeneration.css";
 
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
@@ -33,22 +33,22 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     height: "100px",
     backgroundColor: "#212121",
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    '& .MuiButtonBase-root.Mui-disabled': {
-      color: '#696565',
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    "& .MuiButtonBase-root.Mui-disabled": {
+      color: "#696565"
     },
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: '#fff !important',
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#fff !important"
     },
-    '& .MuiSvgIcon-root': {
-      color: '#fff',
+    "& .MuiSvgIcon-root": {
+      color: "#fff"
     }
-  },
+  }
 }));
 
 // eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({ }) => {
+export const SchemaGeneration = ({}) => {
   const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -65,32 +65,156 @@ export const SchemaGeneration = ({ }) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [searchKeyWords, setSearcKeyWords] = useState([]);
+  const [submitDisable, setSubmitDisable] = useState(false);
   const project = useRecoilValue(projectState);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const usersDoc = await firebase.db.collection("users").get();
-    const recallTexts = [];
-    for (let userDoc of usersDoc.docs) {
-      const userData = userDoc.data();
-      if (userData.pConditions) {
-        for (let pCon of userData.pConditions) {
-          for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
-            if (
-              pCon[recall] &&
-              pCon[recall] !== "" &&
-              !recallTexts.includes(pCon[recall]) &&
-              selectedPassage?.id === pCon?.passage
-            ) {
-              recallTexts.push(pCon[recall]);
-            }
+  const checkResponse = (text, schema) => {
+    let canShow = false;
+    for (let schemaE of schema) {
+      let _canShow = false;
+      if (!schemaE.not && schemaE.keyword !== "") {
+        const keywords = [...schemaE.alternatives];
+        keywords.push(schemaE.keyword);
+        for (let key of keywords) {
+          if (text.includes(key)) {
+            _canShow = true;
+            canShow = true;
+          }
+        }
+      } else {
+        _canShow = true;
+      }
+      if (!_canShow) {
+        return false;
+      }
+    }
+    return canShow;
+  };
+
+  const checkSentences = (sentence, schema) => {
+    for (let schemaE of schema) {
+      if (!schemaE.not && schemaE.keyword !== "") {
+        const keywords = [...schemaE.alternatives];
+        keywords.push(schemaE.keyword);
+        for (let key of keywords) {
+          if (sentence.includes(key)) {
+            return true;
           }
         }
       }
     }
-    setRecallResponses(recallTexts);
-  }, [firebase]);
+    return false;
+  };
+  const renderReonses = reponse => {
+    const notHighlightedWords = reponse.notHighlightedWords;
+    const highlightedWords = reponse.highlightedWords;
+    const sentences = reponse.text.split(".");
+    return (
+      <span>
+        {sentences.map(sentence => {
+          return (
+            <span>
+              {sentence.split(" ").map(word => {
+                return highlightedWords.includes(word) ? (
+                  <mark>
+                    <strong>{word}</strong>
+                  </mark>
+                ) : notHighlightedWords.includes(word) ? (
+                  <mark>
+                    <strong style={{ marginInline: "3px", color: "red" }}>{word}</strong>
+                  </mark>
+                ) : (
+                  <span style={{ marginInline: "3px" }}>{word}</span>
+                );
+              })}
+              {"."}
+            </span>
+          );
+        })}
+      </span>
+    );
+  };
+  const QuerySearching = schemaEp => {
+    setSearching(true);
+    // setSearchResules([]);
+    const searchRes = [];
+    let keys = [];
+    let notKeys = [];
+    let highlightedWords = [];
+    let notHighlightedWords = [];
+    for (let schemaE of schemaEp) {
+      const keywords = [...schemaE.alternatives];
+      keywords.push(schemaE.keyword);
+      if (schemaE.not) {
+        notKeys = [...notKeys, ...keywords];
+      } else {
+        keys = [...keys, ...keywords];
+      }
+    }
+    if (keys.length === 0 && notKeys.length === 0) return;
+    for (let text of recallResponses) {
+      const filtered = (text || "").split(".").filter(w => w.trim());
+      if (checkResponse(text, schemaEp)) {
+        const sentences = [];
+        for (let sentence of filtered) {
+          if (checkSentences(sentence, schemaEp)) {
+            sentences.push(sentence);
+          }
+        }
+        for (let word of text.split(" ")) {
+          for (let key of keys) {
+            if (key !== "" && word.includes(key) && !highlightedWords.includes(word)) {
+              highlightedWords.push(word);
+            }
+          }
+        }
+        for (let word of text.split(" ")) {
+          for (let key of notKeys) {
+            if (key !== "" && word.includes(key) && !notHighlightedWords.includes(word)) {
+              notHighlightedWords.push(word);
+            }
+          }
+        }
+        searchRes.push({ text, sentences, highlightedWords, notHighlightedWords });
+      }
+    }
+    if (searchRes.length !== 0) {
+      setSearchResules(searchRes);
+    }
+
+    setSearching(false);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+    if (firebase && selectedPassage) {
+      setSearching(true);
+      const usersDoc = await firebase.db.collection("users").get();
+      const recallTexts = [];
+      const temp_results = [];
+      for (let userDoc of usersDoc.docs) {
+        const userData = userDoc.data();
+        if (userData.pConditions) {
+          for (let pCon of userData.pConditions) {
+            for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
+              if (
+                pCon[recall] &&
+                pCon[recall] !== "" &&
+                !recallTexts.includes(pCon[recall]) &&
+                selectedPassage?.id === pCon?.passage
+              ) {
+                recallTexts.push(pCon[recall]);
+                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [], notHighlightedWords: [] });
+                setSearchResules(temp_results);
+                setRecallResponses(recallTexts);
+              }
+            }
+          }
+        }
+      }
+      setSearching(false);
+    }
+  }, [firebase, selectedPassage]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
@@ -115,6 +239,7 @@ export const SchemaGeneration = ({ }) => {
       const phrases = passage.phrases;
       setSelectedPhrases(phrases);
       setSelectedPhrase(booleanLogsData.selectedPhrase);
+      setSchema(booleanLogsData.schema);
     } else {
       setSelectedPassage(passages[0]);
       const phrases = passages[0].phrases;
@@ -129,13 +254,13 @@ export const SchemaGeneration = ({ }) => {
       const logsData = {
         passage: selectedPassage.title,
         selectedPhrase: selectedPhrase,
-        email
+        email,
+        schema
       };
       logsRef.set(logsData);
     }
-
-    return () => { };
-  }, [selectedPhrase, selectedPassage]);
+    return () => {};
+  }, [selectedPhrase, selectedPassage, schema]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {
@@ -180,108 +305,18 @@ export const SchemaGeneration = ({ }) => {
   }, [firebase, schmaLoadedUse]);
 
   useEffect(() => {
-    // if (schema.keyword !== "" || schema.keyword !== null) {
-    console.log('SCHEMA', schema);
-    QuerySearching(schema);
-    // }
+    if ((schema, selectedPhrase && selectedPassage)) {
+      let submit = false;
+      console.log(schema);
+      for (let schemaE of schema) {
+        if (schemaE.keyword === "") {
+          submit = true;
+        }
+      }
+      setSubmitDisable(submit);
+      QuerySearching(schema);
+    }
   }, [schema, selectedPhrase, selectedPassage]);
-
-  useEffect(() => {
-    console.log({ searchResules });
-    if (searchResules?.length > 0) {
-      const keyWords = schema.filter(elem => !elem.not).map(x => x.keyword);
-      console.log('keyWordskeyWordskeyWords', keyWords, schema.filter(elem => !elem.not).map(x => x.keyword))
-      setSearcKeyWords(keyWords);
-    }
-    if (searchResules?.length <= 0) {
-      setSearcKeyWords([]);
-    }
-  }, [searchResules])
-
-  const checkResponse = (text, schema) => {
-    for (let schemaE of schema) {
-      if (schemaE.keyword !== "") {
-        const keywords = [...schemaE.alternatives];
-        keywords.push(schemaE.keyword);
-        if (schemaE.not) {
-          for (let key of keywords) {
-            if (text.includes(key)) {
-              return false;
-            }
-          }
-          return true;
-        } else {
-          for (let key of keywords) {
-            if (text.includes(key)) {
-              return true;
-            }
-          }
-          return false;
-        }
-      }
-    }
-  };
-
-  const checkSentences = (sentence, schema) => {
-    console.log({ sentence, schema });
-    let canShow = true;
-
-    for (let schemaE of schema) {
-      if (schemaE.keyword !== "") {
-        const keywords = [...schemaE.alternatives];
-        keywords.push(schemaE.keyword);
-        if (schemaE.not) {
-          for (let key of keywords) {
-            if (sentence.includes(key)) {
-              return false;
-            }
-          }
-        } else {
-          let _canShow = false;
-          for (let key of keywords) {
-            if (sentence.includes(key)) {
-              _canShow = true;
-            }
-          }
-          if (!_canShow) {
-            return false;
-          }
-        }
-      }
-    }
-    return canShow;
-  };
-
-  const QuerySearching = schemaEp => {
-    setSearching(true);
-    setSearchResules([]);
-    const searchRes = [];
-
-    //   split.map((x) => { 
-    //     if (x.includes('barn')) 
-    //     { 
-    //         return `<mark>{x}</mark>`
-    //     } 
-    //     return x;
-    // })
-
-    for (let text of recallResponses) {
-      const filtered = (text || "").split(".").filter(w => w.trim());
-      console.log({ text, filtered });
-      if (checkResponse(text, schemaEp)) {
-        const sentences = [];
-        for (let sentence of filtered) {
-          if (checkSentences(sentence, schema)) {
-            sentences.push(sentence);
-          }
-        }
-        searchRes.push({ text, sentences });
-      }
-    }
-    // console.log('searchRes', { searchRes });
-    setSearchResules(searchRes);
-    setSearching(false);
-  };
 
   const handlePassageChange = async event => {
     try {
@@ -313,7 +348,7 @@ export const SchemaGeneration = ({ }) => {
     const schemaGenerationRef = firebase.db.collection("booleanScratch").doc();
     schemaGenerationRef
       .set(newbooleanScratch)
-      .then(() => { })
+      .then(() => {})
       .catch(error => {
         console.error("Error writing document: ", error);
       });
@@ -375,7 +410,7 @@ export const SchemaGeneration = ({ }) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const downVote = async schema => {
@@ -434,7 +469,7 @@ export const SchemaGeneration = ({ }) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const previousPhrase = () => {
@@ -462,9 +497,6 @@ export const SchemaGeneration = ({ }) => {
     setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
   };
-
-  console.log({ schema, searchKeyWords })
-
   return (
     <div className="schema-generation">
       <div>
@@ -479,12 +511,12 @@ export const SchemaGeneration = ({ }) => {
               {`< Previous Passage`}
             </Button>
           </div>
-          <Box sx={{ width: '55%' }}>
+          <Box sx={{ width: "55%" }}>
             <Select
               id="demo-simple-select-helper"
               value={selectedPassage?.title || passages[0]?.title || ""}
               onChange={handlePassageChange}
-              sx={{ width: '100%', color: "white", border: "1px", borderColor: "white" }}
+              sx={{ width: "100%", color: "white", border: "1px", borderColor: "white" }}
             >
               {passages &&
                 passages?.length > 0 &&
@@ -512,7 +544,7 @@ export const SchemaGeneration = ({ }) => {
           <div className="phrases-box">
             {/* <div> */}
             <Button
-              sx={{ color: "black", alignItems: 'center' }}
+              sx={{ color: "black", alignItems: "center" }}
               variant="text"
               disabled={phrases.indexOf(selectedPhrase) === 0}
               onClick={previousPhrase}
@@ -561,6 +593,7 @@ export const SchemaGeneration = ({ }) => {
               query={schema}
               onQueryChange={q => setSchema(q)}
               handleSubmit={handleSubmit}
+              submitDisable={submitDisable}
               readOnly={false}
             />
 
@@ -574,11 +607,7 @@ export const SchemaGeneration = ({ }) => {
               schemasBoolean.map((schemaE, index) => {
                 return (
                   <div key={index}>
-                    <QueryBuilder
-                      query={schemaE.schema}
-                      selectedPhrase={selectedPhrase}
-                      readOnly={true}
-                    />
+                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
@@ -631,63 +660,34 @@ export const SchemaGeneration = ({ }) => {
           </div>
         </div>
         <div className="blocks result-box">
-          <Box sx={{ padding: '15px' }}>
-            <span className="header">
-              All Responses
-            </span>
+          <Box sx={{ padding: "15px" }}>
+            <span className="header">All Responses</span>
             <br />
             <span className="subtitle">
-              The highlighted sentences satisfy your keyword rules and the bold words are the keywords you
-              entered
+              The highlighted sentences satisfy your keyword rules and the bold words are the keywords you entered
             </span>
           </Box>
           <div
             style={{
               overflow: "auto",
               marginBottom: "200px",
-              paddingLeft: '15px',
-              paddingRight: '15px',
-              paddingTop: '15px',
-              background: '#F8F8F8',
-              borderRadius: '10px',
+              paddingLeft: "15px",
+              paddingRight: "15px",
+              paddingTop: "15px",
+              background: "#F8F8F8",
+              borderRadius: "10px"
             }}
           >
             <Box>
               {searchResules.length > 0 ? (
                 searchResules.map((respon, index) => {
                   return (
-                    <Paper key={index} elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
-                      {(respon.text || "")
-                        .split(".")
-                        .filter(w => w.trim())
-                        .map((sentence, index) => {
-                          const splitSentence = sentence.toString().trim().split(" ");
-                          let passage;
-                          searchKeyWords.map((x) => {
-                            passage = splitSentence.map((y) => {
-                              if (y.includes(x)) {
-                                return `${<mark>{y}</mark>}`;
-                              } else {
-                                return y;
-                              }
-                            });
-                          });
-                          // return passage.map(x => {
-                          //   console.log(typeof x);
-                          //   if (typeof x === 'object') {
-                          //     return <span>{x}</span>
-                          //   } else {
-                          //     return x
-                          //   }
-                          // })
-                          // const temp = passage.join(" ");
-                          console.log({ sentences: respon.sentences, sentence, splitSentence, passage });
-                          if (respon.sentences.includes(sentence)) {
-                            return <mark key={index}>{`${sentence}.`}</mark>;
-                          } else {
-                            return <span key={index}>{`${sentence}.`}</span>
-                          }
-                        })}
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      sx={{ marginBottom: "10px", padding: "10px", textAlign: "justify", overflowWrap: "break-word" }}
+                    >
+                      <p>{renderReonses(respon)}</p>
                     </Paper>
                   );
                 })
@@ -702,7 +702,7 @@ export const SchemaGeneration = ({ }) => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
