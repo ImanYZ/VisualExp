@@ -1,0 +1,27 @@
+.query-container {
+  padding: 15px;
+  background: #e2e2e2;
+  border-radius: 10px;
+}
+
+.query-container.footer {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.query-container.footer .content {
+  width: 60%;
+  display: grid;
+  text-align: end;
+  align-items: end;
+  grid-template-columns: 80% 20%;
+}
+
+.query-container .result-text {
+  font-family: Roboto;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.15px;
+}
