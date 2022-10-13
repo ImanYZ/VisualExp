@@ -4,9 +4,9 @@ import { firebaseState, fullnameState, emailState } from "../../../store/AuthAto
 import { projectState } from "../../../store/ProjectAtoms";
 // mui imports
 import Paper from "@mui/material/Paper";
+import { makeStyles } from "@mui/styles";
 import Box from "@mui/material/Box";
 import Select from "@mui/material/Select";
-import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
@@ -18,17 +18,38 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
-import "./SchemaGeneration.css";
+
+import QueryBuilder from "./components/QueryBuilder";
 import { uuidv4 } from "../../../utils";
-import QueryBuilder from "./QueryBuilder";
+import './SchemaGeneration.css';
 
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
   { id: uuidv4(), not: true, keyword: "", alternatives: [] }
 ];
 
+const useStyles = makeStyles(() => ({
+  passageBox: {
+    display: "flex",
+    height: "100px",
+    backgroundColor: "#212121",
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    '& .MuiButtonBase-root.Mui-disabled': {
+      color: '#696565',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#fff !important',
+    },
+    '& .MuiSvgIcon-root': {
+      color: '#fff',
+    }
+  },
+}));
+
 // eslint-disable-next-line no-empty-pattern
 export const SchemaGeneration = ({ }) => {
+  const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const [passages, setPassages] = useState([]);
@@ -44,6 +65,7 @@ export const SchemaGeneration = ({ }) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [searchKeyWords, setSearcKeyWords] = useState([]);
   const project = useRecoilValue(projectState);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,12 +77,6 @@ export const SchemaGeneration = ({ }) => {
       if (userData.pConditions) {
         for (let pCon of userData.pConditions) {
           for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
-            console.log({
-              condition: pCon[recall] &&
-                pCon[recall] !== "" &&
-                !recallTexts.includes(pCon[recall]) &&
-                selectedPassage?.id === pCon?.passage
-            });
             if (
               pCon[recall] &&
               pCon[recall] !== "" &&
@@ -164,14 +180,25 @@ export const SchemaGeneration = ({ }) => {
   }, [firebase, schmaLoadedUse]);
 
   useEffect(() => {
-    // if (schema.keyword !== "" && schema?.alternatives?.length !== 0) {
-    console.log('SCHEMA');
+    // if (schema.keyword !== "" || schema.keyword !== null) {
+    console.log('SCHEMA', schema);
     QuerySearching(schema);
     // }
   }, [schema, selectedPhrase, selectedPassage]);
 
+  useEffect(() => {
+    console.log({ searchResules });
+    if (searchResules?.length > 0) {
+      const keyWords = schema.filter(elem => !elem.not).map(x => x.keyword);
+      console.log('keyWordskeyWordskeyWords', keyWords, schema.filter(elem => !elem.not).map(x => x.keyword))
+      setSearcKeyWords(keyWords);
+    }
+    if (searchResules?.length <= 0) {
+      setSearcKeyWords([]);
+    }
+  }, [searchResules])
+
   const checkResponse = (text, schema) => {
-    console.log(schema);
     for (let schemaE of schema) {
       if (schemaE.keyword !== "") {
         const keywords = [...schemaE.alternatives];
@@ -226,14 +253,21 @@ export const SchemaGeneration = ({ }) => {
   };
 
   const QuerySearching = schemaEp => {
-    console.log('schemaEp', { schemaEp })
     setSearching(true);
     setSearchResules([]);
     const searchRes = [];
-    console.log({ recallResponses });
+
+    //   split.map((x) => { 
+    //     if (x.includes('barn')) 
+    //     { 
+    //         return `<mark>{x}</mark>`
+    //     } 
+    //     return x;
+    // })
+
     for (let text of recallResponses) {
       const filtered = (text || "").split(".").filter(w => w.trim());
-      console.log({ filtered });
+      console.log({ text, filtered });
       if (checkResponse(text, schemaEp)) {
         const sentences = [];
         for (let sentence of filtered) {
@@ -241,11 +275,10 @@ export const SchemaGeneration = ({ }) => {
             sentences.push(sentence);
           }
         }
-        console.log({ sentences });
         searchRes.push({ text, sentences });
       }
     }
-    console.log({ searchRes });
+    // console.log('searchRes', { searchRes });
     setSearchResules(searchRes);
     setSearching(false);
   };
@@ -430,41 +463,28 @@ export const SchemaGeneration = ({ }) => {
     setSelectedPhrase(passage.phrases[0]);
   };
 
+  console.log({ schema, searchKeyWords })
+
   return (
-    <div style={{
-      // width: "calc(100% - 2.2%)",
-      width: "100%",
-      position: "fixed",
-      display: "flex",
-      flexDirection: "column",
-      height: "100%",
-    }}>
+    <div className="schema-generation">
       <div>
-        <div style={{
-          display: "flex",
-          height: "100px",
-          backgroundColor: "#212121",
-          justifyContent: 'space-evenly',
-          alignItems: 'center',
-        }}>
-          <div style={{}}>
+        <div className={classes.passageBox}>
+          <div>
             <Button
               variant="text"
-              disabled={passages.indexOf(selectedPassage) === 0}
+              disabled={selectedPassage === passages[0]}
               sx={{ color: "white" }}
               onClick={previousPassage}
             >
               {`< Previous Passage`}
             </Button>
           </div>
-          <Box
-            sx={{ width: '55%' }}
-          >
+          <Box sx={{ width: '55%' }}>
             <Select
               id="demo-simple-select-helper"
               value={selectedPassage?.title || passages[0]?.title || ""}
               onChange={handlePassageChange}
-              sx={{ width: '100%',color: "white", border: "1px", borderColor: "white" }}
+              sx={{ width: '100%', color: "white", border: "1px", borderColor: "white" }}
             >
               {passages &&
                 passages?.length > 0 &&
@@ -475,10 +495,11 @@ export const SchemaGeneration = ({ }) => {
                 ))}
             </Select>
           </Box>
-          <div style={{}}>
+          <div>
             <Button
               variant="text"
-              /* disabled={phrases.indexOf(selectedPhrase) === 0} */ sx={{ color: "white" }}
+              disabled={selectedPassage === passages[passages.length - 1]}
+              sx={{ color: "white" }}
               onClick={nextPassage}
             >
               {` Next Passage >`}
@@ -486,95 +507,62 @@ export const SchemaGeneration = ({ }) => {
           </div>
         </div>
       </div>
-      <div style={{ width: "100%", display: "flex", height: "100%" }}>
-        <div
-          style={{
-            width: "50%",
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0,
-            border: '1px solid #000'
-          }}
-        >
-          <div>
-            <div style={{ display: "flex", height: "100px", }}>
-              <div>
-                <Button
-                  sx={{ color: "black" }}
-                  variant="text"
-                  disabled={phrases.indexOf(selectedPhrase) === 0}
-                  onClick={previousPhrase}
-                >
-                  {`< Prev `}
-                </Button>
-              </div>
-              <Box
-                sx={{
-                  display: "flex",
-                  width: "700px",
-                  flexDirection: "column",
-                  marginTop: "10px",
-                  paddingRight: "20px",
-                  paddingLeft: "10px"
-                }}
-              >
-                <Autocomplete
-                  id="key-phrase"
-                  value={selectedPhrase}
-                  options={phrases}
-                  onChange={(_, value) => setSelectedPhrase(value || null)}
-                  renderInput={params => <TextField {...params} value={selectedPhrase} />}
-                  getOptionLabel={phrase => (phrase ? phrase : "")}
-                  renderOption={(props, phrase) => (
-                    <li key={phrase} {...props}>
-                      {phrase}
-                    </li>
-                  )}
-                  isOptionEqualToValue={(phrase, value) => phrase === value}
-                  fullWidth
-                  sx={{ mb: "16px" }}
-                />
-              </Box>
-              <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
-                <Button
-                  sx={{ color: "black", border: "none" }}
-                  variant="text"
-                  disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
-                  onClick={nextPhrase}
-                >{`NEXT >`}</Button>
-              </div>
-            </div>
-          </div>
-          <div
-            style={{
-              overflow: "auto",
-              marginBottom: "200px",
-              marginLeft: '15px',
-              marginRight: '15px',
-            }}
-          >
-            <QueryBuilder query={schema} onQueryChange={q => setSchema(q)} />
-
-            <div
-              style={{
+      <div className="section">
+        <div className="blocks search-box">
+          <div className="phrases-box">
+            {/* <div> */}
+            <Button
+              sx={{ color: "black", alignItems: 'center' }}
+              variant="text"
+              disabled={phrases.indexOf(selectedPhrase) === 0}
+              onClick={previousPhrase}
+            >
+              {`< Prev `}
+            </Button>
+            {/* </div> */}
+            <Box
+              sx={{
                 display: "flex",
-                paddingTop: "10px",
-                paddingBottom: "20px",
-                justifyContent: "space-between",
-                marginLeft: "400px",
-                marginRight: "50px"
+                // width: "700px",
+                flexDirection: "column",
+                marginTop: "10px",
+                paddingRight: "20px",
+                paddingLeft: "10px"
               }}
             >
-              <div>Check what the result will look like on the right side, before you submit.</div>
+              <Autocomplete
+                id="key-phrase"
+                value={selectedPhrase}
+                options={phrases}
+                onChange={(_, value) => setSelectedPhrase(value || null)}
+                renderInput={params => <TextField {...params} value={selectedPhrase} />}
+                getOptionLabel={phrase => (phrase ? phrase : "")}
+                renderOption={(props, phrase) => (
+                  <li key={phrase} {...props}>
+                    {phrase}
+                  </li>
+                )}
+                isOptionEqualToValue={(phrase, value) => phrase === value}
+                fullWidth
+                sx={{ mb: "16px" }}
+              />
+            </Box>
+            <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
               <Button
-                sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
-                variant="contained"
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
+                sx={{ color: "black", border: "none" }}
+                variant="text"
+                disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
+                onClick={nextPhrase}
+              >{`NEXT >`}</Button>
             </div>
+          </div>
+          <div className="query-block">
+            <QueryBuilder
+              query={schema}
+              onQueryChange={q => setSchema(q)}
+              handleSubmit={handleSubmit}
+              readOnly={false}
+            />
 
             {schemasBoolean?.length > 0 && (
               <Typography variant="h6" component="div" align="left">
@@ -583,10 +571,14 @@ export const SchemaGeneration = ({ }) => {
             )}
 
             {schemasBoolean?.length > 0 &&
-              schemasBoolean.map(schemaE => {
+              schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div>
-                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} noEdit={true} />
+                  <div key={index}>
+                    <QueryBuilder
+                      query={schemaE.schema}
+                      selectedPhrase={selectedPhrase}
+                      readOnly={true}
+                    />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
@@ -638,43 +630,64 @@ export const SchemaGeneration = ({ }) => {
               })}
           </div>
         </div>
-        <div
-          style={{
-            width: "50%",
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 0,
-            border: '1px solid #000'
-          }}
-        >
-          <div>
-            All Responses The highlighted sentences satisfy your keyword rules and the bold words are the keywords you
-            entered
-          </div>
+        <div className="blocks result-box">
+          <Box sx={{ padding: '15px' }}>
+            <span className="header">
+              All Responses
+            </span>
+            <br />
+            <span className="subtitle">
+              The highlighted sentences satisfy your keyword rules and the bold words are the keywords you
+              entered
+            </span>
+          </Box>
           <div
             style={{
               overflow: "auto",
               marginBottom: "200px",
               paddingLeft: '15px',
               paddingRight: '15px',
+              paddingTop: '15px',
+              background: '#F8F8F8',
+              borderRadius: '10px',
             }}
           >
             <Box>
               {searchResules.length > 0 ? (
-                searchResules.map(respon => {
+                searchResules.map((respon, index) => {
                   return (
-                    <Paper elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
+                    <Paper key={index} elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
                       {(respon.text || "")
                         .split(".")
                         .filter(w => w.trim())
-                        .map(sentence =>
-                          respon.sentences.includes(sentence) ? (
-                            <mark>{sentence + "."}</mark>
-                          ) : (
-                            <span>{sentence + "."}</span>
-                          )
-                        )}
+                        .map((sentence, index) => {
+                          const splitSentence = sentence.toString().trim().split(" ");
+                          let passage;
+                          searchKeyWords.map((x) => {
+                            passage = splitSentence.map((y) => {
+                              if (y.includes(x)) {
+                                return `${<mark>{y}</mark>}`;
+                              } else {
+                                return y;
+                              }
+                            });
+                          });
+                          // return passage.map(x => {
+                          //   console.log(typeof x);
+                          //   if (typeof x === 'object') {
+                          //     return <span>{x}</span>
+                          //   } else {
+                          //     return x
+                          //   }
+                          // })
+                          // const temp = passage.join(" ");
+                          console.log({ sentences: respon.sentences, sentence, splitSentence, passage });
+                          if (respon.sentences.includes(sentence)) {
+                            return <mark key={index}>{`${sentence}.`}</mark>;
+                          } else {
+                            return <span key={index}>{`${sentence}.`}</span>
+                          }
+                        })}
                     </Paper>
                   );
                 })
@@ -682,7 +695,7 @@ export const SchemaGeneration = ({ }) => {
                 <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
               ) : (
                 <Typography variant="h6" component="div" align="center">
-                  Click search to search for your schema
+                  No data Found!
                 </Typography>
               )}
             </Box>
