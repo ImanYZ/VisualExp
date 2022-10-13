@@ -39,7 +39,7 @@ const QueryBox = ({
               onChange={event => {
                 handleEditValue(event, element.id);
               }}
-              disabled={props.readOnly}
+              // disabled={props.readOnly}
               value={element.keyword}
               style={{ fontSize: "19px" }}
             />
@@ -59,7 +59,7 @@ const QueryBox = ({
             <ChipInput
               selectedTags={handleSelecetedTags}
               fullWidth
-              disabled={props.readOnly}
+              // disabled={props.readOnly}
               variant="outlined"
               id={`Keyword ${index + 1} Alternatives`}
               name={`Keyword${index + 1}Alternatives`}
