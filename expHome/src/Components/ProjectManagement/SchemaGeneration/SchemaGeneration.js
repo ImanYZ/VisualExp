@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useRecoilStateLoadable, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 // mui imports
 import Paper from "@mui/material/Paper";
+import { makeStyles } from "@mui/styles";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
 import Select from "@mui/material/Select";
-import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
@@ -19,25 +18,38 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
+
+import QueryBuilder from "./components/QueryBuilder";
+import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
 
-import QueryBuilder from "./QueryBuilder";
+const temp_schema = [
+  { id: uuidv4(), not: false, keyword: "", alternatives: [] },
+  { id: uuidv4(), not: true, keyword: "", alternatives: [] }
+];
 
-const temp_schema = {
-  id: new Date(),
-  combinator: "AND",
-  rules: []
-};
-
-const Item = styled(Paper)(({ theme }) => ({
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary
+const useStyles = makeStyles(() => ({
+  passageBox: {
+    display: "flex",
+    height: "100px",
+    backgroundColor: "#212121",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    "& .MuiButtonBase-root.Mui-disabled": {
+      color: "#696565"
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#fff !important"
+    },
+    "& .MuiSvgIcon-root": {
+      color: "#fff"
+    }
+  }
 }));
 
 // eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({}) => {
+export const SchemaGeneration = ({ }) => {
+  const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const [passages, setPassages] = useState([]);
@@ -53,77 +65,39 @@ export const SchemaGeneration = ({}) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [submitDisable, setSubmitDisable] = useState(false);
   const project = useRecoilValue(projectState);
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    const usersDoc = await firebase.db.collection("users").get();
-    const recallTexts = [];
-    for (let userDoc of usersDoc.docs) {
-      const userData = userDoc.data();
-      if (userData.pConditions) {
-        for (let pCon of userData.pConditions) {
-          for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
-            if (pCon[recall] && pCon[recall] !== "" && !recallTexts.includes(pCon[recall])) {
-              recallTexts.push(pCon[recall]);
+    if (firebase && selectedPassage) {
+      setSearching(true);
+      const usersDoc = await firebase.db.collection("users").get();
+      const recallTexts = [];
+      const temp_results = [];
+      for (let userDoc of usersDoc.docs) {
+        const userData = userDoc.data();
+        if (userData.pConditions) {
+          for (let pCon of userData.pConditions) {
+            for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
+              if (
+                pCon[recall] &&
+                pCon[recall] !== "" &&
+                !recallTexts.includes(pCon[recall]) &&
+                selectedPassage?.id === pCon?.passage
+              ) {
+                recallTexts.push(pCon[recall]);
+                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [], notHighlightedWords: [] });
+                setSearchResules(temp_results);
+                setRecallResponses(recallTexts);
+              }
             }
           }
         }
       }
+      setSearching(false);
     }
-    setRecallResponses(recallTexts);
-
-    return () => {};
-  }, [firebase]);
-
-  const checkResponse = (sentence, schema) => {
-    let canShow = true;
-    if (schema.combinator === "AND") {
-      for (let key of schema.rules) {
-        if (key.rules) {
-          canShow = checkResponse(sentence, key);
-        } else {
-          if (!sentence.includes(key.value) && !key.not) {
-            canShow = false;
-          }
-        }
-      }
-    } else {
-      let canShow2 = false;
-      for (let key of schema.rules) {
-        if (key.rules) {
-          canShow = checkResponse(sentence, key);
-        } else {
-          if (sentence.includes(key.value) && !key.not) {
-            canShow2 = true;
-          }
-        }
-      }
-      canShow = canShow2;
-    }
-    return canShow;
-  };
-  const QuerySearching = schemaEp => {
-    setSearching(true);
-    setSearchResules([]);
-
-    const searchRes = [];
-    for (let text of recallResponses) {
-      const filtered = (text || "").split(".").filter(w => w.trim());
-      for (let sentence of filtered) {
-        if (checkResponse(sentence, schemaEp)) {
-          const oldResponse = searchRes.find(elm => elm.text === text);
-          if (!oldResponse) {
-            searchRes.push({ text, sentences: [sentence] });
-          } else {
-            searchRes[searchRes.indexOf(oldResponse)].sentences.push(sentence);
-          }
-        }
-      }
-    }
-
-    setSearchResules(searchRes);
-    setSearching(false);
-  };
+  }, [firebase, selectedPassage]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
@@ -148,6 +122,7 @@ export const SchemaGeneration = ({}) => {
       const phrases = passage.phrases;
       setSelectedPhrases(phrases);
       setSelectedPhrase(booleanLogsData.selectedPhrase);
+      setSchema(booleanLogsData.schema);
     } else {
       setSelectedPassage(passages[0]);
       const phrases = passages[0].phrases;
@@ -156,33 +131,19 @@ export const SchemaGeneration = ({}) => {
     }
   }, [firebase.db, fullname]);
 
-  const handlePassageChange = async event => {
-    try {
-      const title = event.target.value;
-      const allPassages = [...passages];
-      const fIndex = allPassages.findIndex(i => i.title === title);
-      const passage = allPassages[fIndex];
-      setSelectedPassage(passage);
-      setSelectedPhrases(passage.phrases);
-      setSelectedPhrase(passage.phrases[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     if (selectedPhrase && selectedPassage) {
       const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
       const logsData = {
         passage: selectedPassage.title,
         selectedPhrase: selectedPhrase,
-        email
+        email,
+        schema
       };
       logsRef.set(logsData);
     }
-
-    return () => {};
-  }, [selectedPhrase, selectedPassage]);
+    return () => { };
+  }, [selectedPhrase, selectedPassage, schema]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {
@@ -226,6 +187,33 @@ export const SchemaGeneration = ({}) => {
     setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
 
+  useEffect(() => {
+    if (schema && selectedPhrase && selectedPassage && !searching) {
+      let submit = false;
+      for (let schemaE of schema) {
+        if (schemaE.keyword === "") {
+          submit = true;
+        }
+      }
+      setSubmitDisable(submit);
+      QuerySearching(schema);
+    }
+  }, [schema, selectedPhrase, selectedPassage, searching]);
+
+  const handlePassageChange = async event => {
+    try {
+      const title = event.target.value;
+      const allPassages = [...passages];
+      const fIndex = allPassages.findIndex(i => i.title === title);
+      const passage = allPassages[fIndex];
+      setSelectedPassage(passage);
+      setSelectedPhrases(passage.phrases);
+      setSelectedPhrase(passage.phrases[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleSubmit = () => {
     const newbooleanScratch = {
       email,
@@ -242,16 +230,14 @@ export const SchemaGeneration = ({}) => {
     const schemaGenerationRef = firebase.db.collection("booleanScratch").doc();
     schemaGenerationRef
       .set(newbooleanScratch)
-      .then(() => {})
+      .then(() => {
+        setSchema([{ id: uuidv4(), keyword: "", alternatives: ["", ""] }]);
+      })
       .catch(error => {
         console.error("Error writing document: ", error);
       });
-    setSchema({
-      id: new Date(),
-      combinator: "AND",
-      rules: []
-    });
   };
+
   const upVote = async schema => {
     try {
       const _upVoters = [...schema.upVoters];
@@ -307,8 +293,9 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) {}
+    } catch (error) { }
   };
+
   const downVote = async schema => {
     try {
       const _downVoters = [...schema.downVoters];
@@ -365,7 +352,7 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const previousPhrase = () => {
@@ -377,102 +364,258 @@ export const SchemaGeneration = ({}) => {
     const indexPhrase = phrases.indexOf(selectedPhrase);
     setSelectedPhrase(phrases[indexPhrase + 1]);
   };
+
+  const previousPassage = () => {
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
+    const passage = passages[indexPassage - 1];
+    setSelectedPassage(passage);
+    setSelectedPhrases(passage.phrases);
+    setSelectedPhrase(passage.phrases[0]);
+  };
+
+  const nextPassage = () => {
+    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
+    const passage = passages[indexPassage + 1];
+    setSelectedPassage(passage);
+    setSelectedPhrases(passage.phrases);
+    setSelectedPhrase(passage.phrases[0]);
+  };
+
+  const renderResponses = reponse => {
+    const highlightedWords = reponse.highlightedWords;
+    const sentences = reponse.text.split(".");
+    const sentenceArray = [];
+    const margin = {
+      marginRight: '3px',
+    };
+
+    sentences.map((sentence, index) => (
+      sentence.toString().trim().split(" ").forEach((word, wordIndex) => {
+        const wordLowerCase = word.toString().toLowerCase();
+        const highlightedWordsLowerCase = highlightedWords.toString().toLowerCase();
+
+        highlightedWordsLowerCase.includes(wordLowerCase) ? (
+          sentenceArray.push({
+            highlighted: (
+              <span key={uuidv4()} style={margin}>
+                <mark>
+                  <strong>{word}</strong>
+                </mark>
+              </span>
+            ),
+          })
+        )
+          : sentenceArray.push({
+            normalWords: (
+              <span key={uuidv4()} style={margin}>
+                {word}
+              </span>
+            )
+          });
+      })
+    ));
+    return sentenceArray.map((text) => {
+      if (text?.highlighted) {
+        return text?.highlighted;
+      } else {
+        return text?.normalWords;
+      }
+    })
+  };
+
+  const QuerySearching = (schemaEp) => {
+    setSearching(true);
+    setSearchResules([]);
+    const searchRes = [];
+    let keys = [];
+    let highlightedWords = [];
+    let responses = [...recallResponses];
+
+    const notKeywords = schema.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
+    let updateResponses = [];
+    if (notKeywords.length > 0) {
+      updateResponses = responses.filter((str) => notKeywords.some(element => {
+        if (str.toLowerCase().includes(element.toLowerCase())) return false;
+        return true;
+      }));
+    };
+
+    responses = [...updateResponses];
+
+    for (let schemaE of schemaEp) {
+      if (!schemaE.not) {
+        const keywords = [...schemaE.alternatives];
+        console.log({ keywords });
+        if (schemaE.keyword !== "") {
+          keywords.push(schemaE.keyword);
+        }
+        keys = [...keys, ...keywords];
+      }
+    }
+
+    if (!keys.length) return;
+
+    for (let text of responses) {
+      const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
+      const filtered =
+        text.split(".")
+          .filter(w => w && w !== "")
+          .map(x => x.trim());
+
+      if (containsWord) {
+        const sentences = [];
+        for (let sentence of filtered) {
+          const sentenceContainsWord = keys.some(element => sentence.toLowerCase().includes(element.toLowerCase()));
+          if (sentenceContainsWord) {
+            sentences.push(sentence);
+          }
+        }
+
+        const textSplit = text.split(" ");
+        textSplit.forEach((str) => {
+          const replacedString = str.replace('\n', " ");
+          const strLowerCase = replacedString.toLowerCase();
+          const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
+          if (!ifExistingHighLighted) {
+            keys.forEach(element => {
+              if (strLowerCase.includes(element.toLowerCase())) {
+                const removeUnusedCharacters = strLowerCase.split(" ");
+                if (removeUnusedCharacters.length > 1) {
+                  const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()))
+                  const ifExist = highlightedWords.indexOf(fWord) >= 0;
+                  if (!ifExist) {
+                    highlightedWords.push(fWord);
+                  }
+                } else if (removeUnusedCharacters.length === 1) {
+                  highlightedWords.push(strLowerCase);
+                }
+              }
+            });
+          }
+        });
+
+        searchRes.push({ text, sentences, highlightedWords });
+      }
+    }
+    if (searchRes.length > 0) {
+      console.log({ searchRes });
+      setSearchResules(searchRes);
+    }
+
+    setSearching(false);
+  };
+
   return (
-    <Grid container spacing={2} sx={{ background: "#e2e2e2" }}>
-      <Grid sx={{ height: "100%" }} item xs={6}>
-        <Item>
-          <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-            <Typography variant="h6" component="div" align="left">
-              Passage
-            </Typography>
+    <div className="schema-generation">
+      <div>
+        <div className={classes.passageBox}>
+          <div>
+            <Button
+              variant="text"
+              disabled={selectedPassage === passages[0]}
+              sx={{ color: "white" }}
+              onClick={previousPassage}
+            >
+              {`< Previous Passage`}
+            </Button>
+          </div>
+          <Box sx={{ width: "55%" }}>
             <Select
               id="demo-simple-select-helper"
               value={selectedPassage?.title || passages[0]?.title || ""}
               onChange={handlePassageChange}
+              sx={{ width: "100%", color: "white", border: "1px", borderColor: "white" }}
             >
               {passages &&
                 passages?.length > 0 &&
                 passages?.map(doc => (
-                  <MenuItem key={doc?.id} value={doc?.title}>
+                  <MenuItem key={doc?.id} value={doc?.title} sx={{ display: "center" }}>
                     {doc?.title}
                   </MenuItem>
                 ))}
             </Select>
           </Box>
-          <Box sx={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-            <Typography variant="h6" component="div" align="left">
-              Key Phrase
-            </Typography>
-
-            <Autocomplete
-              id="key-phrase"
-              value={selectedPhrase}
-              options={phrases}
-              onChange={(_, value) => setSelectedPhrase(value || null)}
-              renderInput={params => <TextField {...params} value={selectedPhrase} />}
-              getOptionLabel={phrase => (phrase ? phrase : "")}
-              renderOption={(props, phrase) => (
-                <li key={phrase} {...props}>
-                  {phrase}
-                </li>
-              )}
-              isOptionEqualToValue={(phrase, value) => phrase === value}
-              fullWidth
-              sx={{ mb: "16px" }}
-            />
-          </Box>
-          <div
-            style={{
-              display: "flex",
-              width: "95%",
-              paddingTop: "10px",
-              paddingBottom: "20px",
-              justifyContent: "space-between"
-            }}
-          >
-            <Button variant="contained" disabled={phrases.indexOf(selectedPhrase) === 0} onClick={previousPhrase}>
-              Previous Phrase
-            </Button>
+          <div>
             <Button
-              variant="contained"
-              disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
-              onClick={nextPhrase}
-            >{`NEXT Phrase`}</Button>
+              variant="text"
+              disabled={selectedPassage === passages[passages.length - 1]}
+              sx={{ color: "white" }}
+              onClick={nextPassage}
+            >
+              {` Next Passage >`}
+            </Button>
           </div>
-
-          <QueryBuilder query={schema} onQueryChange={q => setSchema(q)} />
-
-          <div
-            style={{
-              display: "flex",
-              width: "95%",
-              paddingTop: "10px",
-              paddingBottom: "20px",
-              justifyContent: "space-between"
-            }}
-          >
-            <Button variant="contained" onClick={handleSubmit}>
-              Submit
-            </Button>
+        </div>
+      </div>
+      <div className="section">
+        <div className="blocks search-box">
+          <div className="phrases-box">
+            {/* <div> */}
             <Button
-              variant="contained"
-              onClick={() => {
-                QuerySearching(schema);
+              sx={{ color: "black", alignItems: "center" }}
+              variant="text"
+              disabled={phrases.indexOf(selectedPhrase) === 0}
+              onClick={previousPhrase}
+            >
+              {`< Prev `}
+            </Button>
+            {/* </div> */}
+            <Box
+              sx={{
+                display: "flex",
+                // width: "700px",
+                flexDirection: "column",
+                marginTop: "10px",
+                paddingRight: "20px",
+                paddingLeft: "10px"
               }}
-            >{`Search >>`}</Button>
+            >
+              <Autocomplete
+                id="key-phrase"
+                value={selectedPhrase}
+                options={phrases}
+                onChange={(_, value) => setSelectedPhrase(value || null)}
+                renderInput={params => <TextField {...params} value={selectedPhrase} />}
+                getOptionLabel={phrase => (phrase ? phrase : "")}
+                renderOption={(props, phrase) => (
+                  <li key={phrase} {...props}>
+                    {phrase}
+                  </li>
+                )}
+                isOptionEqualToValue={(phrase, value) => phrase === value}
+                fullWidth
+                sx={{ mb: "16px" }}
+              />
+            </Box>
+            <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
+              <Button
+                sx={{ color: "black", border: "none" }}
+                variant="text"
+                disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
+                onClick={nextPhrase}
+              >{`NEXT >`}</Button>
+            </div>
           </div>
-          {schemasBoolean?.length > 0 && (
-            <Typography variant="h6" component="div" align="left">
-              Previous Proposals:
-            </Typography>
-          )}
+          <div className="query-block">
+            <QueryBuilder
+              query={schema}
+              onQueryChange={q => setSchema(q)}
+              handleSubmit={handleSubmit}
+              submitDisable={submitDisable}
+              readOnly={false}
+            />
 
-          <Paper sx={{ height: "700px", overflow: "scroll" }}>
+            {schemasBoolean?.length > 0 && (
+              <Typography variant="h6" component="div" align="left">
+                Previous Proposals:
+              </Typography>
+            )}
+
             {schemasBoolean?.length > 0 &&
-              schemasBoolean.map(schemaE => {
+              schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div>
-                    <QueryBuilder query={schemaE.schema} noEdit={true} />
+                  <div key={index}>
+                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
@@ -480,9 +623,7 @@ export const SchemaGeneration = ({}) => {
                             <IconButton
                               sx={{ color: "#00bcd4" }}
                               component="label"
-                              onClick={() => {
-                                upVote(schemaE);
-                              }}
+                              onClick={() => upVote(schemaE)}
                               size="small"
                             >
                               {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
@@ -494,9 +635,7 @@ export const SchemaGeneration = ({}) => {
                           <div>
                             <IconButton
                               sx={{ color: "red" }}
-                              onClick={() => {
-                                downVote(schemaE);
-                              }}
+                              onClick={() => downVote(schemaE)}
                               size="small"
                             >
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
@@ -512,56 +651,65 @@ export const SchemaGeneration = ({}) => {
                         }}
                       >
                         <Button
-                          variant="contained"
-                          onClick={() => {
-                            QuerySearching(schemaE.schema);
-                          }}
-                        >{`Search >>`}</Button>
+                          variant="outlined"
+                          onClick={() => QuerySearching(schemaE.schema)}
+                        >{`Try it out `}</Button>
                       </div>
                     </div>
                   </div>
                 );
               })}
-          </Paper>
-        </Item>
-      </Grid>
-      <Grid sx={{ height: "100%" }} item xs={6}>
-        <Item>
-          {searchResules.length > 0 && (
-            <Typography variant="h6" component="div" align="center">
-              We found that schema in the followings:
-            </Typography>
-          )}
-
-          <Paper sx={{ height: "1110px", overflow: "scroll" }}>
-            {searchResules.length > 0 ? (
-              searchResules.map(respon => {
-                return (
-                  <Paper elevation={3} sx={{ marginBottom: "10px", padding: "10px", textAlign: "left" }}>
-                    {(respon.text || "")
-                      .split(".")
-                      .filter(w => w.trim())
-                      .map(sentence =>
-                        respon.sentences.includes(sentence) ? (
-                          <mark>{sentence + "."}</mark>
-                        ) : (
-                          <span>{sentence + "."}</span>
-                        )
-                      )}
-                  </Paper>
-                );
-              })
-            ) : searching ? (
-              <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
-            ) : (
-              <Typography variant="h6" component="div" align="center">
-                Click search to search for your schema
-              </Typography>
-            )}
-          </Paper>
-        </Item>
-      </Grid>
-    </Grid>
+          </div>
+        </div>
+        <div className="blocks result-box">
+          <Box sx={{ padding: "15px" }}>
+            <span className="header">All Responses</span>
+            <br />
+            <span className="subtitle">
+              The highlighted sentences satisfy your keyword rules and the bold words are the keywords you entered
+            </span>
+          </Box>
+          <div
+            style={{
+              overflow: "auto",
+              marginBottom: "200px",
+              paddingLeft: "15px",
+              paddingRight: "15px",
+              paddingTop: "15px",
+              background: "#F8F8F8",
+              borderRadius: "10px"
+            }}
+          >
+            <Box>
+              {searchResules.length > 0 ? (
+                searchResules.map((respon, index) => {
+                  return (
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        mb: '20px',
+                        p: '10px'
+                      }}
+                    >
+                      {renderResponses(respon)}
+                    </Paper>
+                  );
+                })
+              ) : searching ? (
+                <CircularProgress color="warning" size="100px" />
+              ) : (
+                <Typography variant="h6" component="div" align="center">
+                  No data Found!
+                </Typography>
+              )}
+            </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
