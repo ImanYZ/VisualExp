@@ -48,7 +48,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 // eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({}) => {
+export const SchemaGeneration = ({ }) => {
   const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -67,123 +67,6 @@ export const SchemaGeneration = ({}) => {
   const [searching, setSearching] = useState(false);
   const [submitDisable, setSubmitDisable] = useState(false);
   const project = useRecoilValue(projectState);
-
-  const checkResponse = (text, schema) => {
-    let canShow = false;
-    for (let schemaE of schema) {
-      let _canShow = false;
-      if (!schemaE.not && schemaE.keyword !== "") {
-        const keywords = [...schemaE.alternatives];
-        keywords.push(schemaE.keyword);
-        for (let key of keywords) {
-          if (text.includes(key)) {
-            _canShow = true;
-            canShow = true;
-          }
-        }
-      } else {
-        _canShow = true;
-      }
-      if (!_canShow) {
-        return false;
-      }
-    }
-    return canShow;
-  };
-
-  const checkSentences = (sentence, schema) => {
-    for (let schemaE of schema) {
-      if (!schemaE.not && schemaE.keyword !== "") {
-        const keywords = [...schemaE.alternatives];
-        keywords.push(schemaE.keyword);
-        for (let key of keywords) {
-          if (sentence.includes(key)) {
-            return true;
-          }
-        }
-      }
-    }
-    return false;
-  };
-  const renderReonses = reponse => {
-    const notHighlightedWords = reponse.notHighlightedWords;
-    const highlightedWords = reponse.highlightedWords;
-    const sentences = reponse.text.split(".");
-    return (
-      <span>
-        {sentences.map(sentence => {
-          return (
-            <span>
-              {sentence.split(" ").map(word => {
-                return highlightedWords.includes(word) ? (
-                  <mark>
-                    <strong>{word}</strong>
-                  </mark>
-                ) : notHighlightedWords.includes(word) ? (
-                  <mark>
-                    <strong style={{ marginInline: "3px", color: "red" }}>{word}</strong>
-                  </mark>
-                ) : (
-                  <span style={{ marginInline: "3px" }}>{word}</span>
-                );
-              })}
-              {"."}
-            </span>
-          );
-        })}
-      </span>
-    );
-  };
-  const QuerySearching = schemaEp => {
-    setSearching(true);
-    // setSearchResules([]);
-    const searchRes = [];
-    let keys = [];
-    let notKeys = [];
-    let highlightedWords = [];
-    let notHighlightedWords = [];
-    for (let schemaE of schemaEp) {
-      const keywords = [...schemaE.alternatives];
-      keywords.push(schemaE.keyword);
-      if (schemaE.not) {
-        notKeys = [...notKeys, ...keywords];
-      } else {
-        keys = [...keys, ...keywords];
-      }
-    }
-    if (keys.length === 0 && notKeys.length === 0) return;
-    for (let text of recallResponses) {
-      const filtered = (text || "").split(".").filter(w => w.trim());
-      if (checkResponse(text, schemaEp)) {
-        const sentences = [];
-        for (let sentence of filtered) {
-          if (checkSentences(sentence, schemaEp)) {
-            sentences.push(sentence);
-          }
-        }
-        for (let word of text.split(" ")) {
-          for (let key of keys) {
-            if (key !== "" && word.includes(key) && !highlightedWords.includes(word)) {
-              highlightedWords.push(word);
-            }
-          }
-        }
-        for (let word of text.split(" ")) {
-          for (let key of notKeys) {
-            if (key !== "" && word.includes(key) && !notHighlightedWords.includes(word)) {
-              notHighlightedWords.push(word);
-            }
-          }
-        }
-        searchRes.push({ text, sentences, highlightedWords, notHighlightedWords });
-      }
-    }
-    if (searchRes.length !== 0) {
-      setSearchResules(searchRes);
-    }
-
-    setSearching(false);
-  };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
@@ -259,7 +142,7 @@ export const SchemaGeneration = ({}) => {
       };
       logsRef.set(logsData);
     }
-    return () => {};
+    return () => { };
   }, [selectedPhrase, selectedPassage, schema]);
 
   useEffect(() => {
@@ -305,9 +188,8 @@ export const SchemaGeneration = ({}) => {
   }, [firebase, schmaLoadedUse]);
 
   useEffect(() => {
-    if ((schema, selectedPhrase && selectedPassage)) {
+    if (schema && selectedPhrase && selectedPassage && !searching) {
       let submit = false;
-      console.log(schema);
       for (let schemaE of schema) {
         if (schemaE.keyword === "") {
           submit = true;
@@ -316,7 +198,7 @@ export const SchemaGeneration = ({}) => {
       setSubmitDisable(submit);
       QuerySearching(schema);
     }
-  }, [schema, selectedPhrase, selectedPassage]);
+  }, [schema, selectedPhrase, selectedPassage, searching]);
 
   const handlePassageChange = async event => {
     try {
@@ -348,11 +230,12 @@ export const SchemaGeneration = ({}) => {
     const schemaGenerationRef = firebase.db.collection("booleanScratch").doc();
     schemaGenerationRef
       .set(newbooleanScratch)
-      .then(() => {})
+      .then(() => {
+        setSchema([{ id: uuidv4(), keyword: "", alternatives: ["", ""] }]);
+      })
       .catch(error => {
         console.error("Error writing document: ", error);
       });
-    setSchema([{ id: uuidv4(), keyword: "", alternatives: ["", ""] }]);
   };
 
   const upVote = async schema => {
@@ -410,7 +293,7 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const downVote = async schema => {
@@ -469,7 +352,7 @@ export const SchemaGeneration = ({}) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const previousPhrase = () => {
@@ -497,6 +380,131 @@ export const SchemaGeneration = ({}) => {
     setSelectedPhrases(passage.phrases);
     setSelectedPhrase(passage.phrases[0]);
   };
+
+  const renderResponses = reponse => {
+    const highlightedWords = reponse.highlightedWords;
+    const sentences = reponse.text.split(".");
+    const sentenceArray = [];
+    const margin = {
+      marginRight: '3px',
+    };
+
+    sentences.map((sentence, index) => (
+      sentence.toString().trim().split(" ").forEach((word, wordIndex) => {
+        const wordLowerCase = word.toString().toLowerCase();
+        const highlightedWordsLowerCase = highlightedWords.toString().toLowerCase();
+
+        highlightedWordsLowerCase.includes(wordLowerCase) ? (
+          sentenceArray.push({
+            highlighted: (
+              <span key={uuidv4()} style={margin}>
+                <mark>
+                  <strong>{word}</strong>
+                </mark>
+              </span>
+            ),
+          })
+        )
+          : sentenceArray.push({
+            normalWords: (
+              <span key={uuidv4()} style={margin}>
+                {word}
+              </span>
+            )
+          });
+      })
+    ));
+    return sentenceArray.map((text) => {
+      if (text?.highlighted) {
+        return text?.highlighted;
+      } else {
+        return text?.normalWords;
+      }
+    })
+  };
+
+  const QuerySearching = (schemaEp) => {
+    setSearching(true);
+    setSearchResules([]);
+    const searchRes = [];
+    let keys = [];
+    let highlightedWords = [];
+    let responses = [...recallResponses];
+
+    const notKeywords = schema.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
+    let updateResponses = [];
+    if (notKeywords.length > 0) {
+      updateResponses = responses.filter((str) => notKeywords.some(element => {
+        if (str.toLowerCase().includes(element.toLowerCase())) return false;
+        return true;
+      }));
+    };
+
+    responses = [...updateResponses];
+
+    for (let schemaE of schemaEp) {
+      if (!schemaE.not) {
+        const keywords = [...schemaE.alternatives];
+        console.log({ keywords });
+        if (schemaE.keyword !== "") {
+          keywords.push(schemaE.keyword);
+        }
+        keys = [...keys, ...keywords];
+      }
+    }
+
+    if (!keys.length) return;
+
+    for (let text of responses) {
+      const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
+      const filtered =
+        text.split(".")
+          .filter(w => w && w !== "")
+          .map(x => x.trim());
+
+      if (containsWord) {
+        const sentences = [];
+        for (let sentence of filtered) {
+          const sentenceContainsWord = keys.some(element => sentence.toLowerCase().includes(element.toLowerCase()));
+          if (sentenceContainsWord) {
+            sentences.push(sentence);
+          }
+        }
+
+        const textSplit = text.split(" ");
+        textSplit.forEach((str) => {
+          const replacedString = str.replace('\n', " ");
+          const strLowerCase = replacedString.toLowerCase();
+          const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
+          if (!ifExistingHighLighted) {
+            keys.forEach(element => {
+              if (strLowerCase.includes(element.toLowerCase())) {
+                const removeUnusedCharacters = strLowerCase.split(" ");
+                if (removeUnusedCharacters.length > 1) {
+                  const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()))
+                  const ifExist = highlightedWords.indexOf(fWord) >= 0;
+                  if (!ifExist) {
+                    highlightedWords.push(fWord);
+                  }
+                } else if (removeUnusedCharacters.length === 1) {
+                  highlightedWords.push(strLowerCase);
+                }
+              }
+            });
+          }
+        });
+
+        searchRes.push({ text, sentences, highlightedWords });
+      }
+    }
+    if (searchRes.length > 0) {
+      console.log({ searchRes });
+      setSearchResules(searchRes);
+    }
+
+    setSearching(false);
+  };
+
   return (
     <div className="schema-generation">
       <div>
@@ -615,9 +623,7 @@ export const SchemaGeneration = ({}) => {
                             <IconButton
                               sx={{ color: "#00bcd4" }}
                               component="label"
-                              onClick={() => {
-                                upVote(schemaE);
-                              }}
+                              onClick={() => upVote(schemaE)}
                               size="small"
                             >
                               {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
@@ -629,9 +635,7 @@ export const SchemaGeneration = ({}) => {
                           <div>
                             <IconButton
                               sx={{ color: "red" }}
-                              onClick={() => {
-                                downVote(schemaE);
-                              }}
+                              onClick={() => downVote(schemaE)}
                               size="small"
                             >
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
@@ -648,9 +652,7 @@ export const SchemaGeneration = ({}) => {
                       >
                         <Button
                           variant="outlined"
-                          onClick={() => {
-                            QuerySearching(schemaE.schema);
-                          }}
+                          onClick={() => QuerySearching(schemaE.schema)}
                         >{`Try it out `}</Button>
                       </div>
                     </div>
@@ -685,14 +687,19 @@ export const SchemaGeneration = ({}) => {
                     <Paper
                       key={index}
                       elevation={3}
-                      sx={{ marginBottom: "10px", padding: "10px", textAlign: "justify", overflowWrap: "break-word" }}
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        mb: '20px',
+                        p: '10px'
+                      }}
                     >
-                      <p>{renderReonses(respon)}</p>
+                      {renderResponses(respon)}
                     </Paper>
                   );
                 })
               ) : searching ? (
-                <CircularProgress color="warning" sx={{ margin: "350px 650px 500px 580px" }} size="100px" />
+                <CircularProgress color="warning" size="100px" />
               ) : (
                 <Typography variant="h6" component="div" align="center">
                   No data Found!
