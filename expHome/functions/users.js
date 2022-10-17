@@ -1283,7 +1283,7 @@ exports.applicationReminder = async context => {
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     // Retrieve all the applicants who have completed the 3 experiment sessions.
-    const usersDocs = await db.collection("users").where("projectDone", "==", true).get();
+    const usersDocs = await db.collection("users").get();
     // Array of information to be emailed to every applicant whose application
     // is incomplete.
     const reminders = [];
