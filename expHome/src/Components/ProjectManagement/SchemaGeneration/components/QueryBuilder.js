@@ -62,7 +62,7 @@ const QueryBuilder = ({ ...props }) => {
   }
 
   const showIfQueryExists = (() => {
-    const filteredNOTSchema = schema.filter(elem => elem.not).length > 0;
+    const filteredNOTSchema = Array.isArray(schema) && schema?.filter(elem => elem.not).length > 0;
     if (!props.readOnly) return true;
     if (props.readOnly && filteredNOTSchema) return true;
     return null;
