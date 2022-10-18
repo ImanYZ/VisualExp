@@ -188,7 +188,12 @@ export const SchemaGeneration = ({ }) => {
   }, [firebase, schmaLoadedUse]);
 
   useEffect(() => {
-    if (schema && selectedPhrase && selectedPassage && !searching) {
+    const containNOTWords = schema.filter(x => x.not && x.keyword !== "");
+    const containALLWords = schema.filter(x => !x.not && x.keyword !== "");
+    const allWords = [...containNOTWords, ...containALLWords];
+
+    if (allWords.length > 0 && selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
+      console.log('QUERY SEARCH CALLED');
       let submit = false;
       for (let schemaE of schema) {
         if (schemaE.keyword === "") {
@@ -198,7 +203,7 @@ export const SchemaGeneration = ({ }) => {
       setSubmitDisable(submit);
       QuerySearching(schema);
     }
-  }, [schema, selectedPhrase, selectedPassage, searching]);
+  }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
 
   const handlePassageChange = async event => {
     try {
@@ -430,22 +435,25 @@ export const SchemaGeneration = ({ }) => {
     let keys = [];
     let highlightedWords = [];
     let responses = [...recallResponses];
+    console.log({ respone: [...responses] })
 
-    const notKeywords = schema.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
+    const notKeywords = schema?.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
     let updateResponses = [];
     if (notKeywords.length > 0) {
-      updateResponses = responses.filter((str) => notKeywords.some(element => {
-        if (str.toLowerCase().includes(element.toLowerCase())) return false;
+      updateResponses = responses.filter((str) => notKeywords?.some(element => {
+        if (str.toLowerCase().includes(element?.toLowerCase())) return false;
         return true;
       }));
+    } else {
+      updateResponses = [...responses];
     };
 
     responses = [...updateResponses];
+    console.log({ resp: [...responses] })
 
     for (let schemaE of schemaEp) {
       if (!schemaE.not) {
         const keywords = [...schemaE.alternatives];
-        console.log({ keywords });
         if (schemaE.keyword !== "") {
           keywords.push(schemaE.keyword);
         }
@@ -453,14 +461,18 @@ export const SchemaGeneration = ({ }) => {
       }
     }
 
+    keys = keys.filter(x => x && x !== "");
+
+    console.log({ keys });
     if (!keys.length) return;
 
     for (let text of responses) {
-      const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
+
       const filtered =
         text.split(".")
           .filter(w => w && w !== "")
           .map(x => x.trim());
+      const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
 
       if (containsWord) {
         const sentences = [];
@@ -493,12 +505,12 @@ export const SchemaGeneration = ({ }) => {
             });
           }
         });
-
         searchRes.push({ text, sentences, highlightedWords });
       }
     }
+
+    console.log({ searchRes });
     if (searchRes.length > 0) {
-      console.log({ searchRes });
       setSearchResules(searchRes);
     }
 
