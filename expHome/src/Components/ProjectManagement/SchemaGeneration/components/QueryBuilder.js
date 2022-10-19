@@ -1,22 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import QueryBox from './QueryBox';
 import Button from "@mui/material/Button";
 import { uuidv4 } from "../../../../utils";
 import './QueryBuilder.css';
 
 const QueryBuilder = ({ ...props }) => {
+  const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
+
   const {
     query: schema,
     selectedPhrase,
   } = props;
 
+  useEffect(() => {
+    const containWords = Array.isArray(schema) && schema?.some(x => x.keyword && x.keyword !== "");
+    setDisableSubmitBtn(containWords);
+  }, [schema])
+
   const handleAddAlternative = (schemaE, id, event) => {
     if (event.key !== "Enter") return;
     const value = event.target.value;
     if (!value.trim()) return;
-    const index = schemaE.findIndex(elm => {
-      return elm.id === id;
-    });
+    const index = schemaE.findIndex(elm => elm.id === id);
     const _schemaE = [...schemaE];
     _schemaE[index].alternatives.push(value);
     props.onQueryChange(_schemaE);
@@ -57,7 +62,16 @@ const QueryBuilder = ({ ...props }) => {
     props.onQueryChange(schemaE);
   };
 
-  const handleSelecetedTags = (items) => {
+  // const handleSelectedTags = (items, id) => {
+  //   const _schemaE = [...schema];
+  //   const index = _schemaE.findIndex(elm => elm.id === id);
+  //   if (!props.readOnly) {
+  //     console.log({ _schemaE, id, _schemass: _schemaE[index], items });
+  //     _schemaE[index].alternatives = [...items];
+  //     // props.onQueryChange([..._schemaE]);
+  //   }
+  // }
+  const handleSelectedTags = (items) => {
     // console.log(items);
   }
 
@@ -75,14 +89,13 @@ const QueryBuilder = ({ ...props }) => {
         readOnly={props.readOnly}
         title={<>The response should <strong> contain ALL the following keywords</strong></>}
         schema={schema.filter(elem => !elem.not)}
-        ids={[schema.id]}
         selectedPhrase={selectedPhrase}
         subTitle={`Below each keyword, you can enter alternative words that serve the same meaning in this context.`}
         buttonText={'ADD A KEYWORD'}
         handleEditValue={handleEditValue}
         handleKeyword={handleAddKeyword}
         handleDeleteKeyword={handleDeleteKeyword}
-        handleSelecetedTags={handleSelecetedTags}
+        handleSelectedTags={(items, id) => handleSelectedTags(items, id)}
         // handleExcludeKeyword={handleExcludeKeyword}
         handleRemoveAlternative={handleRemoveAlternative}
         handleAddAlternative={handleAddAlternative}
@@ -93,18 +106,18 @@ const QueryBuilder = ({ ...props }) => {
           readOnly={props.readOnly}
           title={<>The response should <span style={{ color: '#C62828' }}><strong>NOT</strong></span> <strong> contain the following keywords </strong></>}
           schema={schema.filter(elem => elem.not)}
-          ids={[schema.id]}
           selectedPhrase={selectedPhrase}
           subTitle={''}
           buttonText={'EXCLUDE A KEYWORD'}
           handleEditValue={handleEditValue}
           // handleAddKeyword={handleAddKeyword}
           handleDeleteKeyword={handleDeleteKeyword}
-          handleSelecetedTags={handleSelecetedTags}
+          handleSelectedTags={handleSelectedTags}
           handleKeyword={handleExcludeKeyword}
           handleRemoveAlternative={handleRemoveAlternative}
           handleAddAlternative={handleAddAlternative}
-        />}
+        />
+      }
       {props.handleSubmit &&
         <div className="query-container footer">
           <div className="content">
@@ -115,8 +128,7 @@ const QueryBuilder = ({ ...props }) => {
             <Button
               sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
               variant="contained"
-              disabled={props.submitDisable }
-
+              disabled={!disableSubmitBtn}
               onClick={props.handleSubmit}
             >
               Submit
@@ -127,4 +139,4 @@ const QueryBuilder = ({ ...props }) => {
   );
 }
 
-export default QueryBuilder;
+export default React.memo(QueryBuilder);
