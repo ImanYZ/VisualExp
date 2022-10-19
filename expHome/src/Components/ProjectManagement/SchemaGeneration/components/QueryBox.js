@@ -17,7 +17,7 @@ const QueryBox = ({
   handleKeyword,
   handleEditValue,
   handleDeleteKeyword,
-  handleSelecetedTags,
+  handleSelectedTags,
   ...props
 }) => (
   <Paper className={className} elevation={3}>
@@ -35,11 +35,11 @@ const QueryBox = ({
         <React.Fragment key={index}>
           <div className="keyword">
             <TextField
-              label={"Keyword" + (index + 1)}
+              label={`Keyword ${index + 1}`}
               onChange={event => {
                 handleEditValue(event, element.id);
               }}
-              // disabled={props.readOnly}
+              disabled={props.readOnly}
               value={element.keyword}
               style={{ fontSize: "19px" }}
             />
@@ -55,18 +55,20 @@ const QueryBox = ({
               </IconButton>
             )}
           </div>
-          <div>
-            <ChipInput
-              selectedTags={handleSelecetedTags}
-              fullWidth
-              // disabled={props.readOnly}
-              variant="outlined"
-              id={`Keyword ${index + 1} Alternatives`}
-              name={`Keyword${index + 1}Alternatives`}
-              placeholder={`Keyword ${index + 1} Alternatives`}
-              label={`Keyword ${index + 1} Alternatives`}
-            />
-          </div>
+          {element.keyword && element.keyword !== "" &&
+            <div>
+              <ChipInput
+                selectedTags={(items) => handleSelectedTags(items, element.id)}
+                fullWidth
+                disabled={props.readOnly}
+                variant="outlined"
+                id={`Keyword ${index + 1} Alternatives`}
+                name={`Keyword${index + 1}Alternatives`}
+                placeholder={`Keyword ${index + 1} Alternatives`}
+                label={`Keyword ${index + 1} Alternatives`}
+              />
+            </div>
+          }
         </React.Fragment>
       )
       )}
@@ -80,103 +82,11 @@ const QueryBox = ({
           {buttonText}
         </Button>
       )}
-      {/* 
-        <>
-      <div style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
-        <span> The response should </span>
-
-        <span>
-          <strong style={{ color: "red" }}> NOT </strong>
-        </span>
-        <span>
-          <strong> contain ALL the following concepts</strong>
-        </span>
-      </div>
-      {schema
-        .filter(elem => elem.not)
-        .map((element, index) => {
-          return (
-            <>
-              <div style={{ marginBottom: "40px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    marginLeft: "50px",
-                    marginTop: "10px",
-                    flexDirection: "row",
-                    alignItems: "flex-start"
-                  }}
-                >
-                  <TextField
-                    disabled={props.noEdit}
-                    label={"Keyword" + (index + 1)}
-                    onChange={event => {
-                      handleEditValue(event, element.id);
-                    }}
-                    value={element.keyword}
-                    style={{ fontSize: "19px", padding: "2px 5px" }}
-                  />
-
-                  {!props.noEdit && (
-                    <IconButton
-                      disabled={props.noEdit}
-                      style={{ color: "red", marginLeft: "5px", marginTop: "15px" }}
-                      size="small"
-                    >
-                      <DeleteIcon
-                        onClick={() => {
-                          handleDeleteKeyword(element.id);
-                        }}
-                      />
-                    </IconButton>
-                  )}
-                </div>
-                <div
-                  style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}
-                >
-                  <div className="alternative-input-container">
-                    {element?.alternatives?.map((alt, index) => (
-                      <Chip
-                        size="large"
-                        label={alt}
-                        onDelete={() => {
-                          handleRemoveAlternative(alt, schema, element.id);
-                        }}
-                      />
-                    ))}
-                    <input
-                      onKeyDown={event => {
-                        handleAddAlternative(schema, element.id, event);
-                      }}
-                      className="alternative-input"
-                      type="text"
-                      placeholder="Add an alternative keyword"
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          );
-        })}
-      {!props.noEdit && (
-        <div style={{ flexDirection: "row", marginBottom: "30px", alignItems: "flex-start" }}>
-          <Button
-            sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
-            variant="contained"
-            disabled={props.noEdit}
-            onClick={handleExcludeKeyword}
-          >
-            exclude A Keyword
-          </Button>
-        </div>
-      )}
-      </> 
-      */}
     </div>
   </Paper>
 );
 
-export default QueryBox;
+export default React.memo(QueryBox);
 
 QueryBox.defaultProps = {
   title: <>The response should <strong> contain ALL the following keywords</strong></>,
