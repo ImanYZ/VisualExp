@@ -65,7 +65,6 @@ export const SchemaGeneration = ({ }) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [submitDisable, setSubmitDisable] = useState(false);
   const project = useRecoilValue(projectState);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -188,19 +187,8 @@ export const SchemaGeneration = ({ }) => {
   }, [firebase, schmaLoadedUse]);
 
   useEffect(() => {
-    const containNOTWords = schema.filter(x => x.not && x.keyword !== "");
-    const containALLWords = schema.filter(x => !x.not && x.keyword !== "");
-    const allWords = [...containNOTWords, ...containALLWords];
-
-    if (allWords.length > 0 && selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
+    if (selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
       console.log('QUERY SEARCH CALLED');
-      let submit = false;
-      for (let schemaE of schema) {
-        if (schemaE.keyword === "") {
-          submit = true;
-        }
-      }
-      setSubmitDisable(submit);
       QuerySearching(schema);
     }
   }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
@@ -236,7 +224,7 @@ export const SchemaGeneration = ({ }) => {
     schemaGenerationRef
       .set(newbooleanScratch)
       .then(() => {
-        setSchema([{ id: uuidv4(), keyword: "", alternatives: ["", ""] }]);
+        setSchema(temp_schema);
       })
       .catch(error => {
         console.error("Error writing document: ", error);
@@ -388,44 +376,47 @@ export const SchemaGeneration = ({ }) => {
 
   const renderResponses = reponse => {
     const highlightedWords = reponse.highlightedWords;
+
     const sentences = reponse.text.split(".");
     const sentenceArray = [];
     const margin = {
       marginRight: '3px',
     };
 
-    sentences.map((sentence, index) => (
-      sentence.toString().trim().split(" ").forEach((word, wordIndex) => {
-        const wordLowerCase = word.toString().toLowerCase();
-        const highlightedWordsLowerCase = highlightedWords.toString().toLowerCase();
+    sentences &&
+      sentences.length > 0 &&
+      sentences.map((sentence, index) => (
+        sentence.toString().trim().split(" ").forEach((word, wordIndex) => {
+          const wordLowerCase = word.toString().toLowerCase();
 
-        highlightedWordsLowerCase.includes(wordLowerCase) ? (
-          sentenceArray.push({
-            highlighted: (
-              <span key={uuidv4()} style={margin}>
-                <mark>
-                  <strong>{word}</strong>
-                </mark>
-              </span>
-            ),
-          })
-        )
-          : sentenceArray.push({
-            normalWords: (
-              <span key={uuidv4()} style={margin}>
-                {word}
-              </span>
-            )
-          });
-      })
-    ));
+          highlightedWords.length > 0 &&
+            highlightedWords.includes(wordLowerCase) ? (
+            sentenceArray.push({
+              highlighted: (
+                <span key={uuidv4()} style={margin}>
+                  <mark>
+                    <strong>{word}</strong>
+                  </mark>
+                </span>
+              ),
+            })
+          ) :
+            sentenceArray.push({
+              normalWords: (
+                <span key={uuidv4()} style={margin}>
+                  {word}
+                </span>
+              )
+            });
+        })
+      ));
     return sentenceArray.map((text) => {
       if (text?.highlighted) {
         return text?.highlighted;
       } else {
         return text?.normalWords;
       }
-    })
+    });
   };
 
   const QuerySearching = (schemaEp) => {
@@ -435,7 +426,6 @@ export const SchemaGeneration = ({ }) => {
     let keys = [];
     let highlightedWords = [];
     let responses = [...recallResponses];
-    console.log({ respone: [...responses] })
 
     const notKeywords = schema?.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
     let updateResponses = [];
@@ -449,7 +439,6 @@ export const SchemaGeneration = ({ }) => {
     };
 
     responses = [...updateResponses];
-    console.log({ resp: [...responses] })
 
     for (let schemaE of schemaEp) {
       if (!schemaE.not) {
@@ -463,8 +452,6 @@ export const SchemaGeneration = ({ }) => {
 
     keys = keys.filter(x => x && x !== "");
 
-    console.log({ keys });
-    if (!keys.length) return;
 
     for (let text of responses) {
 
@@ -482,38 +469,39 @@ export const SchemaGeneration = ({ }) => {
             sentences.push(sentence);
           }
         }
-
-        const textSplit = text.split(" ");
-        textSplit.forEach((str) => {
-          const replacedString = str.replace('\n', " ");
-          const strLowerCase = replacedString.toLowerCase();
-          const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
-          if (!ifExistingHighLighted) {
-            keys.forEach(element => {
-              if (strLowerCase.includes(element.toLowerCase())) {
-                const removeUnusedCharacters = strLowerCase.split(" ");
-                if (removeUnusedCharacters.length > 1) {
-                  const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()))
-                  const ifExist = highlightedWords.indexOf(fWord) >= 0;
-                  if (!ifExist) {
-                    highlightedWords.push(fWord);
+        if (keys.length > 0) {
+          const textSplit = text.split(" ");
+          textSplit.forEach((str) => {
+            const replacedString = str.replace('\n', " ");
+            const strLowerCase = replacedString.toLowerCase();
+            const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
+            if (!ifExistingHighLighted) {
+              keys.forEach(element => {
+                if (strLowerCase.includes(element.toLowerCase())) {
+                  const removeUnusedCharacters = strLowerCase.split(" ");
+                  if (removeUnusedCharacters.length > 1) {
+                    const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()))
+                    const ifExist = highlightedWords.indexOf(fWord) >= 0;
+                    if (!ifExist) {
+                      highlightedWords.push(fWord);
+                    }
+                  } else if (removeUnusedCharacters.length === 1) {
+                    highlightedWords.push(strLowerCase);
                   }
-                } else if (removeUnusedCharacters.length === 1) {
-                  highlightedWords.push(strLowerCase);
                 }
-              }
-            });
-          }
-        });
+              });
+            }
+          });
+        }
+        searchRes.push({ text, sentences, highlightedWords });
+      } else {
+        const sentences = [];
+        filtered.map(sentence => sentences.push(sentence));
         searchRes.push({ text, sentences, highlightedWords });
       }
     }
 
-    console.log({ searchRes });
-    if (searchRes.length > 0) {
-      setSearchResules(searchRes);
-    }
-
+    setSearchResules(searchRes);
     setSearching(false);
   };
 
@@ -611,9 +599,10 @@ export const SchemaGeneration = ({ }) => {
           <div className="query-block">
             <QueryBuilder
               query={schema}
-              onQueryChange={q => setSchema(q)}
+              onQueryChange={q => {
+                setSchema(q);
+              }}
               handleSubmit={handleSubmit}
-              submitDisable={submitDisable}
               readOnly={false}
             />
 
