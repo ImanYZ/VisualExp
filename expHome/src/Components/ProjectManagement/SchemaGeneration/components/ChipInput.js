@@ -71,7 +71,7 @@ const ChipInput = ({ ...props }) => {
     setSelectedItem(newSelectedItem);
   };
 
-const handleInputChange = (event) => {
+  const handleInputChange = (event) => {
     setInputValue(event.target.value);
   }
 
@@ -120,7 +120,7 @@ const handleInputChange = (event) => {
   );
 }
 
-export default ChipInput;
+export default React.memo(ChipInput);
 
 ChipInput.defaultProps = {
   tags: []
