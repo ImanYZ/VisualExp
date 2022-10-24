@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
@@ -20,8 +20,11 @@ import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
 import QueryBuilder from "./components/QueryBuilder";
+import { Pagination } from './components/Pagination';
 import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
+
+let PageSize = 10;
 
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
@@ -65,6 +68,7 @@ export const SchemaGeneration = ({ }) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const project = useRecoilValue(projectState);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -505,6 +509,12 @@ export const SchemaGeneration = ({ }) => {
     setSearching(false);
   };
 
+  const currentTableData = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * PageSize;
+    const lastPageIndex = firstPageIndex + PageSize;
+    return searchResules.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage]);
+
   return (
     <div className="schema-generation">
       <div>
@@ -673,17 +683,20 @@ export const SchemaGeneration = ({ }) => {
           <div
             style={{
               overflow: "auto",
-              marginBottom: "200px",
+              // marginBottom: "200px",
               paddingLeft: "15px",
               paddingRight: "15px",
               paddingTop: "15px",
               background: "#F8F8F8",
-              borderRadius: "10px"
+              borderRadius: "10px",
+              display: 'flex',
+              flex: '1',
+              minHeight: '0px',
             }}
           >
             <Box>
-              {searchResules.length > 0 ? (
-                searchResules.map((respon, index) => {
+              {currentTableData.length > 0 ? (
+                currentTableData.map((respon, index) => {
                   return (
                     <Paper
                       key={index}
@@ -708,6 +721,13 @@ export const SchemaGeneration = ({ }) => {
               )}
             </Box>
           </div>
+          <Pagination
+            className="pagination-bar"
+            currentPage={currentPage}
+            totalCount={searchResules.length}
+            pageSize={PageSize}
+            onPageChange={page => setCurrentPage(page)}
+          />
         </div>
       </div>
     </div>
