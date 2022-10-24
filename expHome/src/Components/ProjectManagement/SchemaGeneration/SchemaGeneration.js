@@ -20,7 +20,7 @@ import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
 import QueryBuilder from "./components/QueryBuilder";
-import { Pagination } from './components/Pagination';
+import { Pagination } from "./components/Pagination";
 import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
 
@@ -51,7 +51,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 // eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({ }) => {
+export const SchemaGeneration = ({}) => {
   const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -90,7 +90,7 @@ export const SchemaGeneration = ({ }) => {
                 selectedPassage?.id === pCon?.passage
               ) {
                 recallTexts.push(pCon[recall]);
-                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [], notHighlightedWords: [] });
+                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [] });
                 setSearchResules(temp_results);
                 setRecallResponses(recallTexts);
               }
@@ -145,7 +145,7 @@ export const SchemaGeneration = ({ }) => {
       };
       logsRef.set(logsData);
     }
-    return () => { };
+    return () => {};
   }, [selectedPhrase, selectedPassage, schema]);
 
   useEffect(() => {
@@ -189,13 +189,6 @@ export const SchemaGeneration = ({ }) => {
     setSchmaLoadedUse(false);
     setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
-
-  useEffect(() => {
-    if (selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
-      console.log('QUERY SEARCH CALLED');
-      QuerySearching(schema);
-    }
-  }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
 
   const handlePassageChange = async event => {
     try {
@@ -290,7 +283,7 @@ export const SchemaGeneration = ({ }) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const downVote = async schema => {
@@ -349,7 +342,7 @@ export const SchemaGeneration = ({ }) => {
         }
       };
       await researcherRef.update(researcherUpdate);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const previousPhrase = () => {
@@ -384,37 +377,39 @@ export const SchemaGeneration = ({ }) => {
     const sentences = reponse.text.split(".");
     const sentenceArray = [];
     const margin = {
-      marginRight: '3px',
+      marginRight: "3px"
     };
 
     sentences &&
       sentences.length > 0 &&
-      sentences.map((sentence, index) => (
-        sentence.toString().trim().split(" ").forEach((word, wordIndex) => {
-          const wordLowerCase = word.toString().toLowerCase();
+      sentences.map((sentence, index) =>
+        sentence
+          .toString()
+          .trim()
+          .split(" ")
+          .forEach((word, wordIndex) => {
+            const wordLowerCase = word.toString().toLowerCase();
 
-          highlightedWords.length > 0 &&
-            highlightedWords.includes(wordLowerCase) ? (
-            sentenceArray.push({
-              highlighted: (
-                <span key={uuidv4()} style={margin}>
-                  <mark>
-                    <strong>{word}</strong>
-                  </mark>
-                </span>
-              ),
-            })
-          ) :
-            sentenceArray.push({
-              normalWords: (
-                <span key={uuidv4()} style={margin}>
-                  {word}
-                </span>
-              )
-            });
-        })
-      ));
-    return sentenceArray.map((text) => {
+            highlightedWords.length > 0 && highlightedWords.includes(wordLowerCase)
+              ? sentenceArray.push({
+                  highlighted: (
+                    <span key={uuidv4()} style={margin}>
+                      <mark>
+                        <strong>{word}</strong>
+                      </mark>
+                    </span>
+                  )
+                })
+              : sentenceArray.push({
+                  normalWords: (
+                    <span key={uuidv4()} style={margin}>
+                      {word}
+                    </span>
+                  )
+                });
+          })
+      );
+    return sentenceArray.map(text => {
       if (text?.highlighted) {
         return text?.highlighted;
       } else {
@@ -423,24 +418,25 @@ export const SchemaGeneration = ({ }) => {
     });
   };
 
-  const QuerySearching = (schemaEp) => {
+  const QuerySearching = schemaEp => {
     setSearching(true);
     setSearchResules([]);
     const searchRes = [];
     let keys = [];
-    let highlightedWords = [];
     let responses = [...recallResponses];
 
     const notKeywords = schema?.filter(x => x.not && x.keyword !== "").map(y => y.keyword);
     let updateResponses = [];
     if (notKeywords.length > 0) {
-      updateResponses = responses.filter((str) => notKeywords?.some(element => {
-        if (str.toLowerCase().includes(element?.toLowerCase())) return false;
-        return true;
-      }));
+      updateResponses = responses.filter(str =>
+        notKeywords?.some(element => {
+          if (str.toLowerCase().includes(element?.toLowerCase())) return false;
+          return true;
+        })
+      );
     } else {
       updateResponses = [...responses];
-    };
+    }
 
     responses = [...updateResponses];
 
@@ -455,16 +451,21 @@ export const SchemaGeneration = ({ }) => {
     }
 
     keys = keys.filter(x => x && x !== "");
-
-
+    const _tempSearchResult = responses.map(elm => {
+      return { text: elm, sentences: [], highlightedWords: [] };
+    });
+    if (notKeywords.length === 0 && keys.length === 0) {
+      setSearchResules(_tempSearchResult);
+      setSearching(false);
+      return;
+    }
     for (let text of responses) {
-
-      const filtered =
-        text.split(".")
-          .filter(w => w && w !== "")
-          .map(x => x.trim());
+      let highlightedWords = [];
+      const filtered = text
+        .split(".")
+        .filter(w => w && w !== "")
+        .map(x => x.trim());
       const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-
       if (containsWord) {
         const sentences = [];
         for (let sentence of filtered) {
@@ -475,8 +476,8 @@ export const SchemaGeneration = ({ }) => {
         }
         if (keys.length > 0) {
           const textSplit = text.split(" ");
-          textSplit.forEach((str) => {
-            const replacedString = str.replace('\n', " ");
+          textSplit.forEach(str => {
+            const replacedString = str.replace("\n", " ");
             const strLowerCase = replacedString.toLowerCase();
             const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
             if (!ifExistingHighLighted) {
@@ -484,13 +485,13 @@ export const SchemaGeneration = ({ }) => {
                 if (strLowerCase.includes(element.toLowerCase())) {
                   const removeUnusedCharacters = strLowerCase.split(" ");
                   if (removeUnusedCharacters.length > 1) {
-                    const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()))
+                    const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()));
                     const ifExist = highlightedWords.indexOf(fWord) >= 0;
                     if (!ifExist) {
-                      highlightedWords.push(fWord);
+                      highlightedWords.push(fWord.replace(".", ""));
                     }
                   } else if (removeUnusedCharacters.length === 1) {
-                    highlightedWords.push(strLowerCase);
+                    highlightedWords.push(strLowerCase.replace(".", ""));
                   }
                 }
               });
@@ -498,22 +499,28 @@ export const SchemaGeneration = ({ }) => {
           });
         }
         searchRes.push({ text, sentences, highlightedWords });
-      } else {
-        const sentences = [];
-        filtered.map(sentence => sentences.push(sentence));
-        searchRes.push({ text, sentences, highlightedWords });
       }
+      //else {
+      //   const sentences = [];
+      //   filtered.map(sentence => sentences.push(sentence));
+      //   searchRes.push({ text, sentences, highlightedWords });
+      // }
     }
-
     setSearchResules(searchRes);
     setSearching(false);
   };
+
+  useEffect(() => {
+    if (selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
+      QuerySearching(schema);
+    }
+  }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
 
   const currentTableData = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * PageSize;
     const lastPageIndex = firstPageIndex + PageSize;
     return searchResules.slice(firstPageIndex, lastPageIndex);
-  }, [currentPage]);
+  }, [currentPage, searchResules]);
 
   return (
     <div className="schema-generation">
@@ -644,11 +651,7 @@ export const SchemaGeneration = ({ }) => {
                         </div>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
                           <div>
-                            <IconButton
-                              sx={{ color: "red" }}
-                              onClick={() => downVote(schemaE)}
-                              size="small"
-                            >
+                            <IconButton sx={{ color: "red" }} onClick={() => downVote(schemaE)} size="small">
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
                             </IconButton>
                           </div>
@@ -689,9 +692,9 @@ export const SchemaGeneration = ({ }) => {
               paddingTop: "15px",
               background: "#F8F8F8",
               borderRadius: "10px",
-              display: 'flex',
-              flex: '1',
-              minHeight: '0px',
+              display: "flex",
+              flex: "1",
+              minHeight: "0px"
             }}
           >
             <Box>
@@ -702,10 +705,10 @@ export const SchemaGeneration = ({ }) => {
                       key={index}
                       elevation={3}
                       sx={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        mb: '20px',
-                        p: '10px'
+                        display: "flex",
+                        flexWrap: "wrap",
+                        mb: "20px",
+                        p: "10px"
                       }}
                     >
                       {renderResponses(respon)}
