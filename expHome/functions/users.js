@@ -1284,6 +1284,7 @@ exports.applicationReminder = async context => {
     let waitTime = 0;
     // Retrieve all the applicants who have completed the 3 experiment sessions.
     const usersDocs = await db.collection("users").get();
+    const applicationDocs = await db.collection("applications").get();
     // Array of information to be emailed to every applicant whose application
     // is incomplete.
     const reminders = [];
@@ -1294,37 +1295,44 @@ exports.applicationReminder = async context => {
     // Array of objects of applicants' information and their communities to be sent to
     // Iman to invite to Microsoft Teams:
     const needInvite = [];
+    const applicationsByUserId = {};
+    for (let applicationDoc of applicationDocs.docs) {
+      const applicationData = applicationDoc.data();
+      if (applicationsByUserId.hasOwnProperty(applicationData.fullname)) {
+        applicationsByUserId[applicationData.fullname].push(applicationData);
+      } else {
+        applicationsByUserId[applicationData.fullname] = [applicationData];
+      }
+    }
     for (let userDoc of usersDocs.docs) {
       const userData = userDoc.data();
       // If the applicant has not withdrawn their application, retrieve all the completed
       // applications for this applicant.
-      if (!("withdrew" in userData) || !userData.withdrew) {
-        const applicationDocs = await db
-          .collection("applications")
-          .where("fullname", "==", userDoc.id)
-          .where("ended", "==", true)
-          .get();
-        for (let applicationDoc of applicationDocs.docs) {
-          const applicationData = applicationDoc.data();
-          // If the application is completed but the community leader has neither
-          // accpeted or rejected it:
-          if (!applicationData.accepted && !applicationData.rejected) {
-            if (applicationData.communiId in needReview) {
-              needReview[applicationData.communiId].push(applicationData.fullname);
-            } else {
-              needReview[applicationData.communiId] = [applicationData.fullname];
+
+      if (!userData.hasOwnProperty("withdrew") || !userData.withdrew) {
+        if (applicationsByUserId.hasOwnProperty(userDoc.id)) {
+          for (let application of applicationsByUserId[userDoc.id]) {
+            if (!application.ended) continue;
+            // If the application is completed but the community leader has neither
+            // accpeted or rejected it:
+            if (!application.accepted && !application.rejected) {
+              if (application.communiId in needReview) {
+                needReview[application.communiId].push(application.fullname);
+              } else {
+                needReview[application.communiId] = [application.fullname];
+              }
             }
-          }
-          if (applicationData.confirmed && !applicationData.invited) {
-            needInvite.push({
-              applicant: applicationData.fullname,
-              communiId: applicationData.communiId
-            });
+            if (application.confirmed && !application.invited) {
+              needInvite.push({
+                applicant: application.fullname,
+                communiId: application.communiId
+              });
+            }
           }
         }
       }
       if (
-        (!("withdrew" in userData) || !userData.withdrew) &&
+        (!userData.hasOwnProperty("withdrew") || !userData.withdrew) &&
         (!("applicationSubmitted" in userData) ||
           !userData.applicationSubmitted ||
           !("applicationsSubmitted" in userData) ||
@@ -1346,13 +1354,14 @@ exports.applicationReminder = async context => {
           //   const tutorialData = tutorialDoc.data();
           //   if ("ended" in tutorialData && tutorialData.ended) {
           let submittedOne = false;
-          const applicationDocs = await db.collection("applications").where("fullname", "==", userDoc.id).get();
-          for (let applicationDoc of applicationDocs.docs) {
-            const applicationData = applicationDoc.data();
-            if ("ended" in applicationData && applicationData.ended) {
-              submittedOne = true;
+          if (applicationsByUserId.hasOwnProperty(userDoc.id)) {
+            for (let application of applicationsByUserId[userDoc.id]) {
+              if (userData.hasOwnProperty("ended") && application.ended) {
+                submittedOne = true;
+              }
             }
           }
+
           if (!submittedOne) {
             reminders.push({
               email: userData.email,
@@ -1360,8 +1369,7 @@ exports.applicationReminder = async context => {
               fullname: userDoc.id,
               reminders: remindersNum,
               subject: "Your 1Cademy Application is Incomplete!",
-              content:
-                "completed the first three steps in 1Cademy application system, but have not submitted any application to any of our research communities yet",
+              content: "you have not submitted any application to any of our research communities yet",
               hyperlink: "https://1cademy.us/home#JoinUsSection"
             });
           }
