@@ -33,6 +33,7 @@
     "@testing-library/user-event": "^12.8.3",
     "animate.css": "^4.1.1",
     "axios": "^0.24.0",
+    "classnames": "^2.3.2",
     "country-state-city": "^3.0.1",
     "d3": "^7.1.1",
     "dagre": "^0.8.5",
