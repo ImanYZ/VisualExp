@@ -22,7 +22,7 @@
 
 .section .blocks.search-box {
   width: 60%;
-  height: calc(100%-20%);
+  height: calc(100% - 20%);
 }
 
 .section .blocks.result-box {
