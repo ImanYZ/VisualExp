@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
-import QueryBox from './QueryBox';
+import QueryBox from "./QueryBox";
 import Button from "@mui/material/Button";
 import { uuidv4 } from "../../../../utils";
-import './QueryBuilder.css';
+import "./QueryBuilder.css";
 
 const QueryBuilder = ({ ...props }) => {
   const [disableSubmitBtn, setDisableSubmitBtn] = useState(false);
 
-  const {
-    query: schema,
-    selectedPhrase,
-  } = props;
+  const { query: schema, selectedPhrase } = props;
 
   useEffect(() => {
     const containWords = Array.isArray(schema) && schema?.some(x => x.keyword && x.keyword !== "");
     setDisableSubmitBtn(containWords);
-  }, [schema])
+  }, [schema]);
 
   const handleAddAlternative = (schemaE, id, event) => {
     if (event.key !== "Enter") return;
@@ -71,9 +68,15 @@ const QueryBuilder = ({ ...props }) => {
   //     // props.onQueryChange([..._schemaE]);
   //   }
   // }
-  const handleSelectedTags = (items) => {
-    // console.log(items);
-  }
+  const handleSelectedTags = (items,id) => {
+    const schemaE = [...schema];
+    const index = schemaE.findIndex(elm => elm.id === id);
+    schemaE[index].alternatives = items;
+    console.log(items);
+    props.onQueryChange(schemaE);
+  };
+
+
 
   const showIfQueryExists = (() => {
     const filteredNOTSchema = Array.isArray(schema) && schema?.filter(elem => elem.not).length > 0;
@@ -85,30 +88,42 @@ const QueryBuilder = ({ ...props }) => {
   return (
     <div className="query-container" onClick={props.onClick}>
       <QueryBox
-        className={'query-builder'}
+        className={"query-builder"}
         readOnly={props.readOnly}
-        title={<>The response should <strong> contain ALL the following keywords</strong></>}
+        title={
+          <>
+            The response should <strong> contain ALL the following keywords</strong>
+          </>
+        }
         schema={schema.filter(elem => !elem.not)}
         selectedPhrase={selectedPhrase}
         subTitle={`Below each keyword, you can enter alternative words that serve the same meaning in this context.`}
-        buttonText={'ADD A KEYWORD'}
+        buttonText={"ADD A KEYWORD"}
         handleEditValue={handleEditValue}
         handleKeyword={handleAddKeyword}
         handleDeleteKeyword={handleDeleteKeyword}
-        handleSelectedTags={(items, id) => handleSelectedTags(items, id)}
+        handleSelectedTags={handleSelectedTags}
         // handleExcludeKeyword={handleExcludeKeyword}
         handleRemoveAlternative={handleRemoveAlternative}
         handleAddAlternative={handleAddAlternative}
       />
-      {showIfQueryExists &&
+      {showIfQueryExists && (
         <QueryBox
-          className={'query-builder not'}
+          className={"query-builder not"}
           readOnly={props.readOnly}
-          title={<>The response should <span style={{ color: '#C62828' }}><strong>NOT</strong></span> <strong> contain the following keywords </strong></>}
+          title={
+            <>
+              The response should{" "}
+              <span style={{ color: "#C62828" }}>
+                <strong>NOT</strong>
+              </span>{" "}
+              <strong> contain the following keywords </strong>
+            </>
+          }
           schema={schema.filter(elem => elem.not)}
           selectedPhrase={selectedPhrase}
-          subTitle={''}
-          buttonText={'EXCLUDE A KEYWORD'}
+          subTitle={""}
+          buttonText={"EXCLUDE A KEYWORD"}
           handleEditValue={handleEditValue}
           // handleAddKeyword={handleAddKeyword}
           handleDeleteKeyword={handleDeleteKeyword}
@@ -117,13 +132,14 @@ const QueryBuilder = ({ ...props }) => {
           handleRemoveAlternative={handleRemoveAlternative}
           handleAddAlternative={handleAddAlternative}
         />
-      }
-      {props.handleSubmit &&
+      )}
+      {props.handleSubmit && (
         <div className="query-container footer">
           <div className="content">
-            <div
-              style={{ marginRight: '15px' }}>
-              <span className="result-text">Check what the result will look like on the right side, before you submit.</span>
+            <div style={{ marginRight: "15px" }}>
+              <span className="result-text">
+                Check what the result will look like on the right side, before you submit.
+              </span>
             </div>
             <Button
               sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
@@ -134,9 +150,10 @@ const QueryBuilder = ({ ...props }) => {
               Submit
             </Button>
           </div>
-        </div>}
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default React.memo(QueryBuilder);
