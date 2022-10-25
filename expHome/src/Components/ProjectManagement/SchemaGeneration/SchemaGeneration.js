@@ -221,7 +221,10 @@ export const SchemaGeneration = ({}) => {
     schemaGenerationRef
       .set(newbooleanScratch)
       .then(() => {
-        setSchema(temp_schema);
+        setSchema([
+          { id: uuidv4(), not: false, keyword: "", alternatives: [] },
+          { id: uuidv4(), not: true, keyword: "", alternatives: [] }
+        ]);
       })
       .catch(error => {
         console.error("Error writing document: ", error);
@@ -625,7 +628,7 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div key={index} className="query-container" style={{ marginBottom: "30px" }} >
+                  <div key={index} className="query-container" style={{ marginBottom: "30px" }}>
                     <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>

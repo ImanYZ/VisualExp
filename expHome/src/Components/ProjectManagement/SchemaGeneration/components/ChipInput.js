@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
 
 const ChipInput = ({ ...props }) => {
   const classes = useStyles();
-  const { selectedTags, placeholder, tags, readOnly, ...other } = props;
+  const { selectedTags, placeholder, tags, readOnly, itemId, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState([]);
 
@@ -26,16 +26,12 @@ const ChipInput = ({ ...props }) => {
     setSelectedItem(tags);
   }, [tags]);
 
-  useEffect(() => {
-    selectedTags(selectedItem);
-  }, [selectedItem, selectedTags]);
+  
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = event => {
     if (event.key === "Enter") {
       const newSelectedItem = [...selectedItem];
-      const duplicatedValues = newSelectedItem.indexOf(
-        event.target.value.trim()
-      );
+      const duplicatedValues = newSelectedItem.indexOf(event.target.value.trim());
 
       if (duplicatedValues !== -1) {
         setInputValue("");
@@ -45,44 +41,39 @@ const ChipInput = ({ ...props }) => {
 
       newSelectedItem.push(event.target.value.trim());
       setSelectedItem(newSelectedItem);
+      selectedTags(newSelectedItem,itemId);
       setInputValue("");
     }
-    if (
-      selectedItem.length &&
-      !inputValue.length &&
-      event.key === "Backspace"
-    ) {
+    if (selectedItem.length && !inputValue.length && event.key === "Backspace") {
       setSelectedItem(selectedItem.slice(0, selectedItem.length - 1));
+      selectedTags(selectedItem.slice(0, selectedItem.length - 1),itemId);
     }
-  }
+  };
 
-  const handleChange = (item) => {
+  const handleChange = item => {
     let newSelectedItem = [...selectedItem];
     if (newSelectedItem.indexOf(item) === -1) {
       newSelectedItem = [...newSelectedItem, item];
     }
     setInputValue("");
     setSelectedItem(newSelectedItem);
-  }
+    selectedTags(newSelectedItem,itemId);
+  };
 
   const handleDelete = item => () => {
     const newSelectedItem = [...selectedItem];
     newSelectedItem.splice(newSelectedItem.indexOf(item), 1);
     setSelectedItem(newSelectedItem);
+    selectedTags(newSelectedItem,itemId);
   };
 
-  const handleInputChange = (event) => {
+  const handleInputChange = event => {
     setInputValue(event.target.value);
-  }
+  };
 
   return (
     <React.Fragment>
-      <Downshift
-        id="downshift-multiple"
-        inputValue={inputValue}
-        onChange={handleChange}
-        selectedItem={selectedItem}
-      >
+      <Downshift id="downshift-multiple" inputValue={inputValue} onChange={handleChange} selectedItem={selectedItem}>
         {({ getInputProps }) => {
           const { onBlur, onChange, onFocus, ...inputProps } = getInputProps({
             onKeyDown: handleKeyDown,
@@ -125,7 +116,7 @@ const ChipInput = ({ ...props }) => {
       </Downshift>
     </React.Fragment>
   );
-}
+};
 
 export default React.memo(ChipInput);
 
