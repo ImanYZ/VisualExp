@@ -109,6 +109,7 @@ const ChipInput = ({ ...props }) => {
                 }}
                 {...other}
                 {...inputProps}
+                disabled={props.readOnly}
               />
             </div>
           );
