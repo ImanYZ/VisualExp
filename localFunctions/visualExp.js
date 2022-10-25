@@ -1805,78 +1805,73 @@ exports.addH2K2toQuotes = async (req, res) => {
 exports.generatedBooleanExpressionData = async (req, res) => {
   try {
     const ws = fs.createReadStream("./csv/Key-phrases.csv");
-    const parser =
-      csv
-        .parseStream(ws, { headers: true })
-        .on("data", async (data) => {
-          // We need to pause reading from the CSV file to process the row
-          // before continuing with the next row.
-          parser.pause();
-          const extractKeyWords = {};
-          console.log('datamatftatr', data)
-          const keyWords = Object.keys(data).filter((x => x.includes('Keyword')));
+    const parser = csv
+      .parseStream(ws, { headers: true })
+      .on("data", async (data) => {
+        // We need to pause reading from the CSV file to process the row
+        // before continuing with the next row.
+        parser.pause();
+        const extractKeyWords = {};
+        const keyWords = Object.keys(data).filter((x) => x.includes("Keyword"));
 
-          keyWords.map((keys, KeyIndex) => {
-            const indexKeys = KeyIndex + 1;
-            extractKeyWords[`Keyword ${indexKeys}`] = [];
-            Object.entries(data).map(([key, value]) => {
-              if (`Keyword ${indexKeys}`) {
-                const isValid = key.includes(`K${indexKeys}`) || key === keys;
-                const isArray = Array.isArray(extractKeyWords[`Keyword ${indexKeys}`]);
-                if (isValid && isArray && value) {
-                  extractKeyWords[`Keyword ${indexKeys}`].push(value)
-                }
+        keyWords.map((keys, KeyIndex) => {
+          const indexKeys = KeyIndex + 1;
+          extractKeyWords[`Keyword ${indexKeys}`] = [];
+          Object.entries(data).map(([key, value]) => {
+            if (`Keyword ${indexKeys}`) {
+              const isValid = key.includes(`K${indexKeys}`) || key === keys;
+              const isArray = Array.isArray(
+                extractKeyWords[`Keyword ${indexKeys}`]
+              );
+              if (isValid && isArray && value) {
+                extractKeyWords[`Keyword ${indexKeys}`].push(value);
               }
-            });
+            }
           });
-
-          const schema = { combinator: 'AND', id: `r-${uuidv4()}`, rules: [] };
-
-          for (let keys in extractKeyWords) {
-            const keyWordRules = [];
-            for (let key of extractKeyWords[keys]) {
-              keyWordRules.push({
-                id: `r-${uuidv4()}`,
-                not: false,
-                value: key
-              });
-            }
-            if (keyWordRules.length > 0) {
-              schema.rules.push({
-                combinator: 'OR',
-                id: `r-${uuidv4()}`,
-                rules: keyWordRules
-              });
-            }
-          }
-
-          if (schema.rules.length > 0) {
-            const newbooleanScratch = {
-              email: "oneweb@umich.edu",
-              fullname: "Iman YeckehZaare",
-              schema: schema,
-              createdAt: new Date(),
-              phrase: data['Key Phrase'],
-              passage: data['Passage'],
-              upVotes: 0,
-              downVotes: 0,
-              upVoters: [],
-              downVoters: []
-            };
-
-            console.log({ newbooleanScratch })
-
-            const booleanRef = db.collection("booleanScratch").doc();
-            await batchSet(booleanRef, newbooleanScratch);
-          }
-          parser.resume();
-        })
-        .on("end", async (e) => {
-          await commitBatch();
         });
-    res.status(200).json({ success: true, process: 'end' });
+
+        const schema = [];
+        for (let keys in extractKeyWords) {
+          if (extractKeyWords[keys][0]) {
+            const _tempSchema = {
+              id: `r-${uuidv4()}`,
+              keyword: extractKeyWords[keys][0],
+              not:false,
+            };
+            let _alternatives = [];
+            if (extractKeyWords[keys].length > 1) {
+              extractKeyWords[keys].splice(0, 1);
+              _alternatives = extractKeyWords[keys];
+            }
+            _tempSchema.alternatives = _alternatives;
+            schema.push(_tempSchema);
+          }
+        }
+        if (schema && schema.length > 0) {
+          const newbooleanScratch = {
+            email: "oneweb@umich.edu",
+            fullname: "Iman YeckehZaare",
+            schema,
+            createdAt: new Date(),
+            phrase: data["Key Phrase"],
+            passage: data["Passage"],
+            upVotes: 0,
+            downVotes: 0,
+            upVoters: [],
+            downVoters: [],
+          };
+
+          const booleanRef = db.collection("booleanScratch").doc();
+          await batchSet(booleanRef, newbooleanScratch);
+        }
+        parser.resume();
+      })
+      .on("end", async (e) => {
+        await commitBatch();
+      });
+    res.status(200).json({ success: true, process: "end" });
   } catch (error) {
-    console.log('error:::::', error);
-    res.status(400).json({ success: false, data: [], process: 'end' });
+    console.log("error:::::", error);
+    res.status(400).json({ success: false, data: [], process: "end" });
   }
 };
