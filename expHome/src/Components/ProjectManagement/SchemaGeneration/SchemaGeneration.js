@@ -488,10 +488,12 @@ export const SchemaGeneration = ({}) => {
                     const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()));
                     const ifExist = highlightedWords.indexOf(fWord) >= 0;
                     if (!ifExist) {
-                      highlightedWords.push(fWord.replace(".", ""));
+                      const UWord = fWord.includes(".") ? fWord.replace(".", "") : fWord;
+                      highlightedWords.push(UWord);
                     }
                   } else if (removeUnusedCharacters.length === 1) {
-                    highlightedWords.push(strLowerCase.replace(".", ""));
+                    const UWord = strLowerCase.includes(".") ? strLowerCase.replace(".", "") : strLowerCase;
+                    highlightedWords.push(UWord);
                   }
                 }
               });
