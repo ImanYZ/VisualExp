@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
 
 const ChipInput = ({ ...props }) => {
   const classes = useStyles();
-  const { selectedTags, placeholder, tags, disabled, ...other } = props;
+  const { selectedTags, placeholder, tags, readOnly, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState([]);
 
@@ -94,14 +94,20 @@ const ChipInput = ({ ...props }) => {
                 className={classes.inputChip}
                 InputProps={{
                   startAdornment: selectedItem.map(item => (
-                    <Chip
-                      key={item}
-                      tabIndex={-1}
-                      label={item}
-                      disabled={disabled}
-                      className={classes.innerChip}
-                      onDelete={handleDelete(item)}
-                    />
+                    <>
+                      {readOnly ? (
+                        <Chip key={item} tabIndex={-1} label={item} className={classes.innerChip} />
+                      ) : (
+                        <Chip
+                          key={item}
+                          tabIndex={-1}
+                          label={item}
+                          disabled={readOnly}
+                          className={classes.innerChip}
+                          onDelete={handleDelete(item)}
+                        />
+                      )}
+                    </>
                   )),
                   onBlur,
                   onChange: event => {
