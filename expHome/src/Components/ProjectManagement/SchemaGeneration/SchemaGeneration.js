@@ -625,7 +625,7 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div key={index}>
+                  <div key={index} className="query-container" style={{ marginBottom: "30px" }} >
                     <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
                     <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
