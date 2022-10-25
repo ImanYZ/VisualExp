@@ -614,15 +614,6 @@ export const SchemaGeneration = ({}) => {
             </div>
           </div>
           <div className="query-block">
-            <QueryBuilder
-              query={schema}
-              onQueryChange={q => {
-                setSchema(q);
-              }}
-              handleSubmit={handleSubmit}
-              readOnly={false}
-            />
-
             {schemasBoolean?.length > 0 && (
               <Typography variant="h6" component="div" align="left">
                 Previous Proposals:
@@ -673,6 +664,14 @@ export const SchemaGeneration = ({}) => {
                   </div>
                 );
               })}
+            <QueryBuilder
+              query={schema}
+              onQueryChange={q => {
+                setSchema(q);
+              }}
+              handleSubmit={handleSubmit}
+              readOnly={false}
+            />
           </div>
         </div>
         <div className="blocks result-box">
