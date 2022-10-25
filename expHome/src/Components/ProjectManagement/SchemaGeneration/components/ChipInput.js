@@ -18,7 +18,7 @@ const useStyles = makeStyles(() => ({
 
 const ChipInput = ({ ...props }) => {
   const classes = useStyles();
-  const { selectedTags, placeholder, tags, ...other } = props;
+  const { selectedTags, placeholder, tags, disabled, ...other } = props;
   const [inputValue, setInputValue] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState([]);
 
@@ -98,6 +98,7 @@ const ChipInput = ({ ...props }) => {
                       key={item}
                       tabIndex={-1}
                       label={item}
+                      disabled={disabled}
                       className={classes.innerChip}
                       onDelete={handleDelete(item)}
                     />
