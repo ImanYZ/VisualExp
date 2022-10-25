@@ -34,16 +34,20 @@ const QueryBox = ({
       {schema.map((element, index) => (
         <React.Fragment key={index}>
           <div className="keyword">
-            <TextField
-              label={`Keyword ${index + 1}`}
-              onChange={event => {
-                handleEditValue(event, element.id);
-              }}
-              disabled={props.readOnly}
-              value={element.keyword}
-              style={{ fontSize: "19px" }}
-            />
-
+            {props.readOnly ? (
+              <span>
+                Keyword {index + 1} : <strong>{element.keyword}</strong>
+              </span>
+            ) : (
+              <TextField
+                label={`Keyword ${index + 1}`}
+                onChange={event => {
+                  handleEditValue(event, element.id);
+                }}
+                value={element.keyword}
+                style={{ fontSize: "19px" }}
+              />
+            )}
             {!props.readOnly && (
               <IconButton size="small">
                 <DeleteIcon
@@ -55,24 +59,38 @@ const QueryBox = ({
               </IconButton>
             )}
           </div>
-          {element.keyword && element.keyword !== "" &&
+          {element.keyword && element.keyword !== "" && (
             <div>
-              <ChipInput
-                tags={element.alternatives}
-                selectedTags={(items) => handleSelectedTags(items, element.id)}
-                fullWidth
-                disabled={props.readOnly}
-                variant="outlined"
-                id={`Keyword ${index + 1} Alternatives`}
-                name={`Keyword${index + 1}Alternatives`}
-                placeholder={`Keyword ${index + 1} Alternatives`}
-                label={`Keyword ${index + 1} Alternatives`}
-              />
+              {props.readOnly ? (
+                <>
+                  <ChipInput
+                    tags={element.alternatives}
+                    selectedTags={items => handleSelectedTags(items, element.id)}
+                    fullWidth
+                    readOnly={props.readOnly}
+                    variant="outlined"
+                    id={`Keyword ${index + 1} Alternatives`}
+                    name={`Keyword${index + 1}Alternatives`}
+                    label={`Keyword ${index + 1} Alternatives`}
+                  />
+                </>
+              ) : (
+                <ChipInput
+                  tags={element.alternatives}
+                  selectedTags={items => handleSelectedTags(items, element.id)}
+                  fullWidth
+                  disabled={props.readOnly}
+                  variant="outlined"
+                  id={`Keyword ${index + 1} Alternatives`}
+                  name={`Keyword${index + 1}Alternatives`}
+                  placeholder={`Keyword ${index + 1} Alternatives`}
+                  label={`Keyword ${index + 1} Alternatives`}
+                />
+              )}
             </div>
-          }
+          )}
         </React.Fragment>
-      )
-      )}
+      ))}
       {!props.readOnly && (
         <Button
           sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
@@ -90,15 +108,19 @@ const QueryBox = ({
 export default React.memo(QueryBox);
 
 QueryBox.defaultProps = {
-  title: <>The response should <strong> contain ALL the following keywords</strong></>,
+  title: (
+    <>
+      The response should <strong> contain ALL the following keywords</strong>
+    </>
+  ),
   subTitle: `Below each keyword, you can enter alternative words that serve the same meaning in this context.`,
-  buttonText: 'ADD A KEYWORD',
-  className: 'query-builder',
+  buttonText: "ADD A KEYWORD",
+  className: "query-builder"
 };
 
 QueryBox.propTypes = {
   title: PropTypes.any,
   subTitle: PropTypes.string,
   buttonText: PropTypes.string,
-  className: PropTypes.string,
+  className: PropTypes.string
 };
