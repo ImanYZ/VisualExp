@@ -5,8 +5,10 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
-import ChipInput from './ChipInput';
-import './QueryBox.css';
+import ChipInput from "./ChipInput";
+import "./QueryBox.css";
+
+
 
 const QueryBox = ({
   title,
@@ -23,13 +25,9 @@ const QueryBox = ({
   <Paper className={className} elevation={3}>
     <div>
       <div>
-        <span className="title">
-          {title}
-        </span>
+        <span className="title">{title}</span>
         <br />
-        <span className="subtitle">
-          {subTitle}
-        </span>
+        <span className="subtitle">{subTitle}</span>
       </div>
       {schema.map((element, index) => (
         <React.Fragment key={index}>
@@ -65,7 +63,7 @@ const QueryBox = ({
                 <>
                   <ChipInput
                     tags={element.alternatives}
-                    selectedTags={items => handleSelectedTags(items, element.id)}
+                    selectedTags={handleSelectedTags}
                     fullWidth
                     readOnly={props.readOnly}
                     variant="outlined"
@@ -80,6 +78,7 @@ const QueryBox = ({
                   selectedTags={items => handleSelectedTags(items, element.id)}
                   fullWidth
                   disabled={props.readOnly}
+                  itemId={element.id}
                   variant="outlined"
                   id={`Keyword ${index + 1} Alternatives`}
                   name={`Keyword${index + 1}Alternatives`}
