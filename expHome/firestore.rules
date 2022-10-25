@@ -233,6 +233,10 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /dissertationTimeLine/{dissertationTimeLineId} {
+      allow read: if true;
+      allow write: if false;
+    }
     match /lifeLog/{lifeLogId} {
       allow read: if true;
       allow write: if false;
