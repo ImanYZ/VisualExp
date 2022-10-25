@@ -58,6 +58,7 @@ const QueryBox = ({
           {element.keyword && element.keyword !== "" &&
             <div>
               <ChipInput
+                tags={element.alternatives}
                 selectedTags={(items) => handleSelectedTags(items, element.id)}
                 fullWidth
                 disabled={props.readOnly}
