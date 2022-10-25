@@ -40,6 +40,7 @@ import AdministratorNo from "./Components/Home/AdministratorNo";
 import AdministratorLater from "./Components/Home/AdministratorLater";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
 import SignUpPage from "./Components/Auth/SignUpPage";
+import DissertationGantt from "./Components/DissertationGantt";
 import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
@@ -216,6 +217,7 @@ const AppRouter = props => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
+      <Route path="/DissertationGantt" element={<DissertationGantt />} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
@@ -268,7 +270,10 @@ const AppRouter = props => {
               <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
               <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
               <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
-              <Route path="Activities/SchemaGeneration" element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />} />
+              <Route
+                path="Activities/SchemaGeneration"
+                element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />}
+              />
               <Route
                 path="Activities/ResearcherPassage"
                 element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
