@@ -117,8 +117,19 @@ export const SchemaGeneration = ({}) => {
       })
       .filter(x => x !== null);
     setPassages(passages);
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const phraseFromRecall = urlParams.get("phrase");
+    const passageFromRecall = urlParams.get("passage");
+
     const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
-    if (booleanLogsDoc.exists) {
+    if (phraseFromRecall && passageFromRecall) {
+      const _passage = passages.find(elem => elem.id === passageFromRecall);
+      setSelectedPassage(_passage);
+      const phrases = _passage.phrases;
+      setSelectedPhrases([...phrases]);
+      setSelectedPhrase(phraseFromRecall);
+    } else if (booleanLogsDoc.exists) {
       const booleanLogsData = booleanLogsDoc.data();
       const passage = passages.find(elem => elem.title === booleanLogsData.passage);
       setSelectedPassage(passage);

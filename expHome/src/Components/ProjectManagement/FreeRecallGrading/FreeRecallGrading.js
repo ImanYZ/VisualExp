@@ -10,7 +10,7 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import CircularProgress from "@mui/material/CircularProgress";
 import Switch from "@mui/material/Switch";
-
+import { useNavigate } from "react-router-dom";
 import withRoot from "../../Home/modules/withRoot";
 
 import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthAtoms";
@@ -18,6 +18,7 @@ import { firebaseState, fullnameState, isAdminState } from "../../../store/AuthA
 import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
+import { Navigate } from "react-router-dom";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -37,7 +38,7 @@ const FreeRecallGrading = props => {
   const fullname = useRecoilValue(fullnameState);
   const isAdmin = useRecoilValue(isAdminState);
   const project = useRecoilValue(projectState);
-
+  const navigateTo = useNavigate();
   // When the paper gets loaded and every time the researcher submits their
   // answer, we should retrive the next free-recall response for them to
   // evaluate. This states helps us signal the useEffect to invoke
@@ -143,7 +144,7 @@ const FreeRecallGrading = props => {
     }
     for (let recallGradeDoc of recallGradeDocs.docs) {
       const recallGradeData = recallGradeDoc.data();
-       const filtered = (recallGradeData.response|| "").split(" ").filter(w => w.trim());
+      const filtered = (recallGradeData.response || "").split(" ").filter(w => w.trim());
       if (recallGradeData.user !== fullname && !recallGradeData.researchers.includes(fullname) && filtered.length > 2) {
         if (firstBatch.length > 0 && recallGradeData.response !== firstBatch[0].data.response) {
           break;
@@ -238,6 +239,11 @@ const FreeRecallGrading = props => {
     setFirstBatchOfRecallGrades(grades);
   };
 
+  const openSchemaGeneration = (phrase) => {
+    // eslint-disable-next-line no-useless-concat
+    window.open("http://localhost:3001/Activities/SchemaGeneration"+'?phrase='+phrase+'&passage='+firstBatchOfRecallGrades[0].data.passage)
+  };
+
   return firstBatchOfRecallGrades.length === 0 ? (
     <Alert severity="info" size="large">
       <AlertTitle>Info</AlertTitle>
@@ -286,6 +292,16 @@ const FreeRecallGrading = props => {
                 YES
               </Box>
               <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
+              <Button
+                onClick={() => {
+                  openSchemaGeneration(row.data.phrase);
+                }}
+                mode="outlined"
+                variant="contained"
+                sx={{ ml: "13px", backgroundColor: "#ff9100" }}
+              >
+                Mistakenly Excluded
+              </Button>
             </Paper>
           </div>
         ))}
