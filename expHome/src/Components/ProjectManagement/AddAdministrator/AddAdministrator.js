@@ -1197,6 +1197,13 @@ const AddAdministrator = props => {
                   e.g., "Hello Office of Career Development at the University of Michigan, School of Information,"
                 </li>
               </ul>
+              <h2>Points to earn:</h2>
+              <ul>
+                <li>
+                  <strong>Your contribution:</strong> every upvote minus downvote you receive from others on your
+                  proposed administrators gives you one point.
+                </li>
+              </ul>
             </Alert>
           </Box>
           <Paper className="VoteActivityPaper">

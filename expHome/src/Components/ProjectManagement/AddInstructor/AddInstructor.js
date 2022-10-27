@@ -1450,6 +1450,13 @@ const AddInstructor = props => {
               </p>
             </Alert>
             <Alert className="VoteActivityAlert" severity="success">
+              <h2>Points to earn:</h2>
+              <ul>
+                <li>
+                  <strong>Your contribution:</strong> every upvote minus downvote you receive from others on your
+                  proposed instructors gives you one point.
+                </li>
+              </ul>
               <h2>Prefixes:</h2>
               <p>
                 If there is any declaration of their prefix on their profile page, we should use that exact prefix,
