@@ -166,7 +166,11 @@ const AppAppBar = (props) => {
     navigateTo("/");
   };
   const navigateToExperiment = () => {
-    navigateTo("Activities/Experiment");
+    if (!notAResearcher) {
+      navigateTo("Activities/");
+    } else {
+      navigateTo("Activities/experiment");
+    }
   };
   const toggleColorMode = (event) => {
     setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
@@ -197,11 +201,11 @@ const AppAppBar = (props) => {
       )}
       {fullname && email && (
         <>
-          {!notAResearcher && (
+          {
             <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
               <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
             </MenuItem>
-          )}
+          }
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
           <LogoutIcon /> <span id="LogoutText">Logout</span>
         </MenuItem>
