@@ -345,7 +345,7 @@ const RouterNav = props => {
       const nodeTypesInterval = setInterval(() => {
         nodeType = nodeTypes[nodeTypeIdx];
         const { versionsColl } = getTypedCollections(firebaseOne.db, nodeType);
-        const versionsQuery = versionsColl.where("tags", "array-contains", projectSpecs.deTag);
+        const versionsQuery = versionsColl.where("tagIds", "array-contains", projectSpecs.deTag.node);
         versionsSnapshots.push(
           versionsQuery.onSnapshot(snapshot => {
             const docChanges = snapshot.docChanges();
