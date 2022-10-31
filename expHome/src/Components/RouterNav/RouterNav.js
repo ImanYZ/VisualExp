@@ -518,7 +518,7 @@ const RouterNav = props => {
 
   useEffect(() => {
     if (firebaseOne && !notAResearcher && username && userVersionsLoaded && haveProjectSpecs) {
-      const nodesQuery = firebaseOne.db.collection("nodes").where("tags", "array-contains", projectSpecs.deTag);
+      const nodesQuery = firebaseOne.db.collection("nodes").where("tagIds", "array-contains", projectSpecs.deTag.node);
       const nodesSnapshot = nodesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setNodesChanges(oldNodesChanges => {
