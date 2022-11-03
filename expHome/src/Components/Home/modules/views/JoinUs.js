@@ -424,8 +424,7 @@ const JoinUs = props => {
                     <Button
                       variant="contained"
                       component="a"
-                      href="/auth"
-                      target="_blank"
+                      href={"/community/" + props.community.id + "/auth"}
                       disabled={fullname}
                       sx={{ mt: 1, mr: 1, color: "common.white" }}
                     >
