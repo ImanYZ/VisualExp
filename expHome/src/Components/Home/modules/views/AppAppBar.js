@@ -167,9 +167,9 @@ const AppAppBar = (props) => {
   };
   const navigateToExperiment = () => {
     if (!notAResearcher) {
-      navigateTo("Activities/");
+      navigateTo("/Activities/");
     } else {
-      navigateTo("Activities/experiment");
+      navigateTo("/Activities/experiment");
     }
   };
   const toggleColorMode = (event) => {
