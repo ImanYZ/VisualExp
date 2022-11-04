@@ -133,8 +133,6 @@ const AppAppBar = (props) => {
               }
             }
           }
-        } else {
-          window.location.href = "/";
         }
       } else {
         // User is signed out
