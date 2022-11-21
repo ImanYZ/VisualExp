@@ -59,9 +59,9 @@ const CodeFeedback = props => {
   const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
   const [sentences, setSentences] = useState([]);
-  const [selected, setSelected] = useState({});
+  const [selectedSentences, setSelectedSentences] = useState({});
   const [quotesSelectedForCodes, setQuotesSelectedForCodes] = useState({});
-  const [selecte, setSelecte] = useState(null);
+  const [selectedSentence, setSelectedSentence] = useState(null);
   const [docId, setDocId] = useState("");
   const [codeBooksChanges, setCodeBooksChanges] = useState([]);
   const [feedbackCodeChanges, setFeedbackCodeChanges] = useState([]);
@@ -84,6 +84,7 @@ const CodeFeedback = props => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openDeleteModalAdmin, setOpenDeleteModalAdmin] = useState(false);
+  const [fromTheCell, setFromTheCell] = useState(false);
 
   const [openAdminEditModal, setOpenEditAdminModal] = useState(false);
   const [openAdminAddModal, setOpenAddAdminModal] = useState(false);
@@ -264,19 +265,6 @@ const CodeFeedback = props => {
   }, [allFeedbackCodeCodes]);
 
   useEffect(() => {
-    const func = async () => {
-      const feedbackCodeDocs = await firebase.db
-        .collection("feedbackCode")
-        .where("coders", "array-contains", fullname)
-        .get();
-
-      for (let feedBack of feedbackCodeDocs.docs) {
-      }
-    };
-
-    func();
-  }, [project]);
-  useEffect(() => {
     setSentences("");
     setChosenCondition("");
   }, [project]);
@@ -343,25 +331,30 @@ const CodeFeedback = props => {
 
     return filtered.sort((a, b) => a.code - b.code);
   }, [allExperimentCodes]);
-
   useEffect(() => {
+    if (!approvedCodes.length) return;
+    if (fromTheCell) return;
     if (approvedCodes.length > 0) {
       const _choiceConditions = {};
       const _switchState = {};
       let quotesSelectedForCode = {};
-      let codesSelecting = {};
+      let sentencesSelecting = {};
+      for (let sentence of sentences) {
+        quotesSelectedForCode[sentence] = [];
+        sentencesSelecting[sentence] = false;
+      }
+      sentencesSelecting[sentences[0]] = true;
+      setSelectedSentence(sentences[0]);
       for (let codeData of approvedCodes) {
-        quotesSelectedForCode[codeData.code] = [];
-        codesSelecting[codeData.code] = false;
         _choiceConditions[codeData.code] = project === "H2K2" ? "H2" : "H1";
         _switchState[codeData.code] = false;
       }
       setSwitchState(_switchState);
       setChoiceConditions(_choiceConditions);
       setQuotesSelectedForCodes(quotesSelectedForCode);
-      setSelected(codesSelecting);
+      setSelectedSentences(sentencesSelecting);
     }
-  }, [approvedCodes, retrieveNext, project]);
+  }, [approvedCodes, retrieveNext, project, sentences]);
 
   const adminCodes = useMemo(() => {
     const mapped = allExperimentCodes.map(c => {
@@ -404,6 +397,7 @@ const CodeFeedback = props => {
 
   useEffect(() => {
     const retriveNextResponse = async () => {
+      setFromTheCell(false);
       let docID;
       const feedbackCodesOrderDoc = await firebase.db.collection("feedbackCodeOrder").doc(project).get();
       const orderData = feedbackCodesOrderDoc.data();
@@ -497,18 +491,17 @@ const CodeFeedback = props => {
     setCreating(false);
   };
 
-  const handleSelectedCode = async code => {
-    approvedCodes.forEach(thisCodeData => {
-      selected[thisCodeData.code] = false;
+  const handleSelectedSentence = async sentence => {
+    sentences.forEach(sentenc => {
+      selectedSentences[sentenc] = false;
     });
-    selected[code] = true;
-    setSelected(selected);
-    setSelecte(code);
+    selectedSentences[sentence] = true;
+    setSelectedSentences(selectedSentences);
+    setSelectedSentence(sentence);
   };
-
-  const handleQuotesSelected = value => () => {
-    const currentIndex = quotesSelectedForCodes[selecte].indexOf(value);
-    const newChecked = quotesSelectedForCodes[selecte];
+  const handleCodesSelected = value => () => {
+    const currentIndex = quotesSelectedForCodes[selectedSentence].indexOf(value);
+    const newChecked = quotesSelectedForCodes[selectedSentence];
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -516,7 +509,7 @@ const CodeFeedback = props => {
       newChecked.splice(currentIndex, 1);
     }
     let quotesSelectedForCode = { ...quotesSelectedForCodes };
-    quotesSelectedForCode[selecte] = newChecked;
+    quotesSelectedForCode[selectedSentence] = newChecked;
     setQuotesSelectedForCodes(quotesSelectedForCode);
   };
 
@@ -525,11 +518,21 @@ const CodeFeedback = props => {
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
+      const _quotesSelectedForCodes = {};
+      for (let codeQuote in quotesSelectedForCodes) {
+        for (let code of quotesSelectedForCodes[codeQuote]) {
+          if (_quotesSelectedForCodes[code]) {
+            _quotesSelectedForCodes[code] = [..._quotesSelectedForCodes[code], codeQuote];
+          } else {
+            _quotesSelectedForCodes[code] = [codeQuote];
+          }
+        }
+      }
       await firebase.idToken();
       await axios.post("/handleSubmitFeebackCode", {
         fullname,
         docId,
-        quotesSelectedForCodes,
+        quotesSelectedForCodes: _quotesSelectedForCodes,
         choiceConditions,
         approvedCodes,
         project
@@ -975,6 +978,7 @@ const CodeFeedback = props => {
     setSwitchState(_switchState);
   };
   const handleCellClickFeedBackCode = async clickedCell => {
+    setFromTheCell(true);
     let docID = clickedCell.id;
     const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
     const feedbackData = feedbackCodesDoc.data();
@@ -994,32 +998,49 @@ const CodeFeedback = props => {
     const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
     const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
     setApprovedNewCodes(newCodes);
-    const quotesSelectedForCode = { ...quotesSelectedForCodes };
+    const __quotesSelectedForCode = {};
     for (let code of myCodes) {
-      quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
+      __quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
     }
     for (let code of newCodes) {
-      quotesSelectedForCode[code] = [];
+      __quotesSelectedForCode[code] = [];
     }
-    setQuotesSelectedForCodes(quotesSelectedForCode);
+    const _quotesSelectedForCodes = {};
+    for (let codeQuote in __quotesSelectedForCode) {
+      for (let sentence of __quotesSelectedForCode[codeQuote]) {
+        if (_quotesSelectedForCodes[sentence]) {
+          _quotesSelectedForCodes[sentence] = [..._quotesSelectedForCodes[sentence], codeQuote];
+        } else {
+          _quotesSelectedForCodes[sentence] = [codeQuote];
+        }
+      }
+    }
+
+    let sentencesSelecting = {};
+    for (let sentence in _quotesSelectedForCodes) {
+      if (Object.keys(sentencesSelecting).length === 0) {
+        sentencesSelecting[sentence.trim()] = true;
+      } else {
+        sentencesSelecting[sentence.trim()] = false;
+      }
+    }
+    setSelectedSentences(sentencesSelecting);
+    setSelectedSentence(sentences[0]);
+    setSelectedSentence(Object.keys(_quotesSelectedForCodes)[0]);
+    setQuotesSelectedForCodes(_quotesSelectedForCodes);
 
     const _choiceConditions = {};
     const _switchState = {};
 
-    let codesSelecting = {};
     for (let code in feedbackData.codersChoiceConditions[fullname]) {
       const choiceCode = feedbackData.codersChoiceConditions[fullname][code];
-      codesSelecting[code] = false;
+
       _choiceConditions[code] = choiceCode;
       _switchState[code] =
         project === "H2K2" ? (choiceCode === "H2" ? false : true) : choiceCode === "H1" ? false : true;
     }
     setSwitchState(_switchState);
     setChoiceConditions(_choiceConditions);
-    setSelected(codesSelecting);
-
-    //we check if the authenticated reserchers have aleardy casted his vote
-    //if so we get all his recorded past choices
     setSubmitting(false);
   };
 
@@ -1072,7 +1093,7 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )}
-      {approvedNewCodes.length > 0 && (
+      {/* {approvedNewCodes.length > 0 && (
         <div>
           <Alert severity="error" className="VoteActivityAlert">
             You have submitted your vote(s) before for this response, but for the past peroid, new codes have been
@@ -1087,10 +1108,10 @@ const CodeFeedback = props => {
             </List>
           </Alert>
         </div>
-      )}
+      )} */}
       {sentences.length !== 0 ? (
         <>
-          <Alert severity="warning">
+          <Alert severity="warning" sx={{ mt: "15px", mb: "15px" }}>
             <h2>
               <ul>
                 {conditionsOrder.map((cOrder, idx) => {
@@ -1105,16 +1126,16 @@ const CodeFeedback = props => {
                 Read the participant's qualitative response that we've divided into sentences and listed in the right
                 box below.
               </li>
-              <li>Click and read every single code from the codebook listed in the left box below.</li>
+              <li>Click and read every single sentence from the codebook listed in the right box below.</li>
               <li>
-                If you see any sentence in the right box that indicates the clicked code in the left box, check-mark
+                If you see any code in the left box that indicates the clicked sentence in the right box, check-mark
                 that sentence in the right box.
               </li>
               <li>
-                For every code, if you check any of the sentences, it also check-marks the code indicating that the code
-                was mentioned by the participant due to the sentence that you checked.
+                For every sentence, if you check any of the codes, it also check-marks the sentence indicating that the
+                code was mentioned by the participant due to the code that you checked.
               </li>
-              <li>Select all the sentences that apply to the code you have selected.</li>
+              <li>Select all the codes that apply to the sentence you have selected.</li>
               <li>
                 After going through all the codes, if you found an important point in the participant's feedback that is
                 not mentioned in any of the codes in the codebook, then you can manually add a new concise code that
@@ -1133,7 +1154,7 @@ const CodeFeedback = props => {
             </h2>
           </Alert>
 
-          <Paper elevation={3} sx={{ margin: "19px 5px 70px 19px", width: "1500px" }}>
+          <Paper elevation={3} sx={{ width: "100%", ml: "5px" }}>
             <Box
               sx={{
                 display: "flex",
@@ -1143,8 +1164,8 @@ const CodeFeedback = props => {
               }}
             >
               <Box>
+                <h2 style={{ display: "flex", alignItems: "center" }}>The Codebook</h2>
                 <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-                  <h2>The Codebook</h2>
                   <List
                     sx={{
                       paddingBlock: 1,
@@ -1155,15 +1176,10 @@ const CodeFeedback = props => {
                     }}
                   >
                     {approvedCodes.map(codeData => (
-                      <ListItem key={codeData.id} disablePadding selected={selected[codeData.code]}>
-                        <ListItemButton
-                          value={codeData.code}
-                          onClick={() => {
-                            handleSelectedCode(codeData.code);
-                          }}
-                        >
-                          {quotesSelectedForCodes[codeData.code] &&
-                          quotesSelectedForCodes[codeData.code].length !== 0 ? (
+                      <ListItem key={codeData.id} disablePadding>
+                        <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)}>
+                          {quotesSelectedForCodes[selectedSentence] &&
+                          quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
                             <Checkbox checked={true} color="success" />
                           ) : (
                             <Checkbox checked={false} />
@@ -1177,13 +1193,13 @@ const CodeFeedback = props => {
                           <Switch
                             checked={true}
                             onChange={event => changeChoices(event, codeData.code)}
-                            color="secondary"
+                            color="warning"
                           />
                         ) : (
                           <Switch
                             checked={false}
                             onChange={event => changeChoices(event, codeData.code)}
-                            color="secondary"
+                            color="warning"
                           />
                         )}
                         {project === "H2K2" ? "K2" : "L2"}
@@ -1192,7 +1208,7 @@ const CodeFeedback = props => {
                   </List>
                 </Sheet>
 
-                <Alert severity="success" className="VoteActivityAlert">
+                <Alert severity="success" className="VoteActivityAlert" sx={{ ml: "0px" }}>
                   If the code you're looking for does not exist in the list above, add it below:
                   <br />
                 </Alert>
@@ -1216,8 +1232,8 @@ const CodeFeedback = props => {
                 </Box>
               </Box>
               <Box>
+                <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
                 <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-                  <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
                   <List
                     sx={{
                       paddingBlock: 1,
@@ -1226,18 +1242,31 @@ const CodeFeedback = props => {
                     }}
                   >
                     {sentences.map((sentence, index) => (
-                      <ListItem key={index} disablePadding>
+                      <ListItem
+                        key={index}
+                        disablePadding
+                        selected={selectedSentences[sentence]}
+                        sx={{
+                          mb: "5px",
+                          "&$selected": {
+                            backgroundColor: "orange",
+                            zIndex: 100
+                          }
+                        }}
+                      >
                         <ListItemButton
                           role={undefined}
                           style={{ width: 500 }}
-                          onClick={handleQuotesSelected(sentence)}
+                          onClick={() => {
+                            handleSelectedSentence(sentence);
+                          }}
                           dense
                         >
                           <ListItemIcon>
-                            {quotesSelectedForCodes[selecte] && quotesSelectedForCodes[selecte].includes(sentence) ? (
+                            {quotesSelectedForCodes[sentence] && quotesSelectedForCodes[sentence].length !== 0 ? (
                               <Checkbox checked={true} />
                             ) : (
-                              <Checkbox checked={false} />
+                              <></>
                             )}
                           </ListItemIcon>
                           <ListItemText id={sentence} primary={`${sentence}`} />
@@ -1248,6 +1277,7 @@ const CodeFeedback = props => {
                           disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
                           onClick={saveQuote(sentence)}
                           variant="contained"
+                          sx={{ mr: "5px" }}
                         >
                           <BookmarkIcon />
                           Save As A Quote
@@ -1300,6 +1330,7 @@ const CodeFeedback = props => {
           />
         </Paper>
       </Box>
+
       {email === "oneweb@umich.edu" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
@@ -1320,6 +1351,7 @@ const CodeFeedback = props => {
           </Paper>
         </Box>
       )}
+
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
       {/* Edit Code Researcher Modal */}
       <Modal

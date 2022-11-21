@@ -764,6 +764,7 @@ const SignUpPage = props => {
 
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <Button
+                  id="SignButton"
                   className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
                   onClick={signUp}
                   sx={{ width: isSignUp === 0 ? "150px" : "250" }}

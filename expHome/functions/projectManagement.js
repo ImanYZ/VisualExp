@@ -2367,7 +2367,7 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         let codesVotes = {};
 
         approvedCodes.forEach(codeData => {
-          if (quotesSelectedForCodes[codeData.code].length !== 0) {
+          if (quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0) {
             if (feedbackCodeData.codesVotes[codeData.code]) {
               if (!feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
                 const voters = feedbackCodeData.codesVotes[codeData.code];
@@ -2527,7 +2527,7 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
 
       const feedbackCodesDocs = await db.collection("feedbackCode").orderBy("session").get();
       let foundResponse = false;
-      const feedbackRef = db.collection("feedbackCodeOrder").doc(project);
+      const feedbackRef = db.collection("feedbackCodeOrder").doc(project.trim());
       const feedDoc = await feedbackRef.get();
       const feedData = feedDoc.data();
       let allIds = new Set();
@@ -2545,7 +2545,7 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
           if (
             !allIds.has(feedbackDoc.id) &&
             filtered.length > 4 &&
-            feedbackData.project === project &&
+            feedbackData.project.trim() === project.trim() &&
             !feedbackData.approved
           ) {
             // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
