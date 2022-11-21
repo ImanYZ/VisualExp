@@ -462,23 +462,26 @@ const App = () => {
               } else {
                 response = userData[explan][index];
               }
-              const newFeedbackDdoc = {
-                approved: false,
-                codersChoices: {},
-                coders: [],
-                choice: userData[choice],
-                project: userData.project,
-                fullname: fullname,
-                session: session,
-                explanation: response,
-                createdAt: new Date(),
-                expIdx: index,
-                codesVotes,
-                updatedAt: new Date()
-              };
-              const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
+              const filtered = (response || "").split(" ").filter(w => w.trim());
+              if (filtered.length > 4) {
+                const newFeedbackDdoc = {
+                  approved: false,
+                  codersChoices: {},
+                  coders: [],
+                  choice: userData[choice],
+                  project: userData.project,
+                  fullname: fullname,
+                  session: session,
+                  explanation: response,
+                  createdAt: new Date(),
+                  expIdx: index,
+                  codesVotes,
+                  updatedAt: new Date()
+                };
+                const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
 
-              await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
+                await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
+              }
             }
           }
         }
