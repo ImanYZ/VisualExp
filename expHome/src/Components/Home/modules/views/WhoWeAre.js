@@ -196,6 +196,27 @@ const WhoWeAre = (props) => {
               2022 Published Papers
             </Typography>
             <List sx={{ width: "100%" }}>
+            <ListItemButton component="a">
+                {/* <ListItemAvatar>
+                  <Avatar sx={{ backgroundColor: "success.main" }}>
+                    <MenuBookIcon />
+                  </Avatar>
+                </ListItemAvatar> */}
+                <ListItemText
+                  primary="ACM SIGCSE 2023"
+                  secondary={
+                    <Typography variant="body2" color="text.secondary">
+                      YeckehZaare, I., Chen, S., & Barghi, T. (2023). Reducing Procrastination Without Sacrificing
+                      Students' Autonomy Through Optional Weekly Presentations of Student-Generated Content. In{" "}
+                      <br></br>
+                      <Box component="span" sx={{ fontStyle: "italic" }}>
+                        Proceedings of the 54th ACM Technical Symposium on Computer Science Education (SIGCSE 2023),
+                        March 15--18, 2023, Toronto, Canada. ACM.
+                      </Box>
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
               <ListItemButton
                 component="a"
                 target="_blank"
