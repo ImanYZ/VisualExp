@@ -133,10 +133,10 @@ const Communities = props => {
       for (let change of tempReputationsChanges) {
         const reputationData = change.doc.data();
         const points =
-          reputationData.dCorrects +
+          reputationData.cdCorrects +
           reputationData.iCorrects +
           reputationData.mCorrects -
-          reputationData.dWrongs -
+          reputationData.cdWrongs -
           reputationData.iWrongs -
           reputationData.mWrongs;
         if (change.type === "removed" || reputationData.deleted) {
