@@ -38,6 +38,16 @@ export default [
         <p>We have recently published the following papers in ACM conferences:</p>
         <ul>
           <li>
+            <a>
+              YeckehZaare, I., Chen, S., & Barghi, T. (2023). Reducing Procrastination Without Sacrificing Students'
+              Autonomy Through Optional Weekly Presentations of Student-Generated Content. In <br></br>
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 54th ACM Technical Symposium on Computer Science Education (SIGCSE 2023), March
+                15--18, 2023, Toronto, Canada. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
             <a href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907" target="_blank">
               YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P. (2022). Semester-level Spacing but Not
               Procrastination Affected Student Exam Performance. In{" "}
