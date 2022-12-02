@@ -584,12 +584,49 @@ export default [
     accomplishments: (
       <div>
         We have recently published:{" "}
-        <a href="https://arxiv.org/pdf/2206.03702.pdf">
-          Wang Z, Zhang G, Lashkarashvili N. 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of
-          Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv preprint
-          arXiv:2206.03702, 2022.
-        </a>{" "}
-        Will appear on Semeval 2022.
+        <ul>
+          <li>
+            <a href="https://arxiv.org/pdf/2206.03702.pdf">
+              Wang Z, Zhang G, Lashkarashvili N. 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of
+              Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv preprint
+              arXiv:2206.03702, 2022.
+            </a>{" "}
+            Will appear on Semeval 2022.
+          </li>
+          <li>
+            <a>
+              Liu, R., Jia, C., Zhang, G., Zhuang, Z., Liu, T. X., & Vosoughi, S.{" "}
+              <a href="https://openreview.net/forum?id=u6OfmaGIya1">
+                Second Thoughts are Best: Learning to Re-Align With Human Values from Text Edits.
+              </a>{" "}
+              In Advances in Neural Information Processing Systems.
+            </a>{" "}
+          </li>
+          <li>
+            Ruibo Liu, Ge Zhang, Xinyu Feng, and Soroush Vosoughi. 2022.
+            <a href="https://aclanthology.org/2022.findings-naacl.18/">
+              Aligning Generative Language Models with Human Values.
+            </a>{" "}
+            In Findings of the Association for Computational Linguistics: NAACL 2022, pages 241–252, Seattle, United
+            States. Association for Computational Linguistics.
+          </li>
+          <li>
+            Yizhi Li, Ge Zhang, Bohao Yang, Chenghua Lin, Anton Ragni, Shi Wang, and Jie Fu. 2022.{" "}
+            <a href="https://aclanthology.org/2022.findings-aacl.32/">
+              HERB: Measuring Hierarchical Regional Bias in Pre-trained Language Models.
+            </a>{" "}
+            In Findings of the Association for Computational Linguistics: AACL-IJCNLP 2022.
+          </li>
+          <li>
+            Zhiyong Wang, Ge Zhang, and Nineli Lashkarashvili. 2022.
+            <a href="https://aclanthology.org/2022.semeval-1.2/">
+              1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of Multilingual, Multitask, and
+              Language-Agnostic Tricks for the Reverse Dictionary Task.
+            </a>{" "}
+            In Proceedings of the 16th International Workshop on Semantic Evaluation (SemEval-2022), pages 15–22,
+            Seattle, United States. Association for Computational Linguistics.
+          </li>
+        </ul>
       </div>
     ),
     gains: [
