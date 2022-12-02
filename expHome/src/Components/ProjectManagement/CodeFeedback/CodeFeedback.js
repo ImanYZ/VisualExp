@@ -1164,6 +1164,61 @@ const CodeFeedback = props => {
               }}
             >
               <Box>
+                <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
+                <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                  <List
+                    sx={{
+                      paddingBlock: 1,
+                      width: 800,
+                      height: 500
+                    }}
+                  >
+                    {sentences.map((sentence, index) => (
+                      <ListItem
+                        key={index}
+                        disablePadding
+                        selected={selectedSentences[sentence]}
+                        sx={{
+                          mb: "5px",
+                          "&$selected": {
+                            backgroundColor: "orange",
+                            zIndex: 100
+                          }
+                        }}
+                      >
+                        <ListItemButton
+                          role={undefined}
+                          style={{ width: 500 }}
+                          onClick={() => {
+                            handleSelectedSentence(sentence);
+                          }}
+                        >
+                          <ListItemIcon>
+                            {quotesSelectedForCodes[sentence] && quotesSelectedForCodes[sentence].length !== 0 ? (
+                              <Checkbox checked={true} />
+                            ) : (
+                              <></>
+                            )}
+                          </ListItemIcon>
+                          <ListItemText id={sentence} primary={`${sentence}`} />
+                        </ListItemButton>
+
+                        <Button
+                          mode="outlined"
+                          disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
+                          onClick={saveQuote(sentence)}
+                          variant="contained"
+                          sx={{ mr: "5px" }}
+                        >
+                          <BookmarkIcon />
+                          Save As A Quote
+                        </Button>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Sheet>
+              </Box>
+              <Box>
                 <h2 style={{ display: "flex", alignItems: "center" }}>The Codebook</h2>
                 <Sheet variant="outlined" sx={{ overflow: "auto" }}>
                   <List
@@ -1231,62 +1286,7 @@ const CodeFeedback = props => {
                   </Button>
                 </Box>
               </Box>
-              <Box>
-                <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
-                <Sheet variant="outlined" sx={{ overflow: "auto" }}>
-                  <List
-                    sx={{
-                      paddingBlock: 1,
-                      width: 800,
-                      height: 500
-                    }}
-                  >
-                    {sentences.map((sentence, index) => (
-                      <ListItem
-                        key={index}
-                        disablePadding
-                        selected={selectedSentences[sentence]}
-                        sx={{
-                          mb: "5px",
-                          "&$selected": {
-                            backgroundColor: "orange",
-                            zIndex: 100
-                          }
-                        }}
-                      >
-                        <ListItemButton
-                          role={undefined}
-                          style={{ width: 500 }}
-                          onClick={() => {
-                            handleSelectedSentence(sentence);
-                          }}
-                          dense
-                        >
-                          <ListItemIcon>
-                            {quotesSelectedForCodes[sentence] && quotesSelectedForCodes[sentence].length !== 0 ? (
-                              <Checkbox checked={true} />
-                            ) : (
-                              <></>
-                            )}
-                          </ListItemIcon>
-                          <ListItemText id={sentence} primary={`${sentence}`} />
-                        </ListItemButton>
 
-                        <Button
-                          mode="outlined"
-                          disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
-                          onClick={saveQuote(sentence)}
-                          variant="contained"
-                          sx={{ mr: "5px" }}
-                        >
-                          <BookmarkIcon />
-                          Save As A Quote
-                        </Button>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Sheet>
-              </Box>
               <Box>
                 <Button
                   variant="contained"
