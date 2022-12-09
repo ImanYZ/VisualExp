@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import Box from "@mui/material/Box";
 
@@ -18,6 +18,8 @@ import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 function Index() {
   const [section, setSection] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
+
+  const step0Ref = useRef(null);
 
   const updatePosition = (event) => {
     if (notSectionSwitching) {
@@ -100,11 +102,13 @@ function Index() {
         joinUsClick={joinUsClick}
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       />
-      <Landing />
-      <HowItWorks section={section} />
+      <Box id="step-0" ref={step0Ref}>
+        <Landing />
+      </Box>
+      <HowItWorks section={section} ref={step0Ref} />
       <What />
       <Values />
-      <UniversitiesMap theme={"Light"} />
+      {/* <UniversitiesMap theme={"Light"} /> */}
       <WhoWeAre />
       <JoinUs />
       <AppFooter />
