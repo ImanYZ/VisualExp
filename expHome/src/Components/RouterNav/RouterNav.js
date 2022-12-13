@@ -1143,7 +1143,7 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectPoints.BooleanExpressionGenerationPoints ? (
+                    {/* {projectPoints.BooleanExpressionGenerationPoints ? (
                       <Tooltip title={"Schema Generation Tool"}>
                         <Button
                           id="SchemaGenerationTool"
@@ -1154,7 +1154,7 @@ const RouterNav = props => {
                           <br />❌ {roundNum(negativeBooleanExpPionts)}
                         </Button>
                       </Tooltip>
-                    ) : null}
+                    ) : null} */}
                     {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
                     <div id="ProjectLabel">Project</div>
                     <Tooltip title="Current Project">
