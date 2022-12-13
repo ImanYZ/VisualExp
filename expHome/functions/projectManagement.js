@@ -181,7 +181,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     "session" in req.body &&
     "phraseNum" in req.body &&
     "response" in req.body &&
-    "voterProject" in req.body
+    "voterProject" in req.body && 
+    "viewedRecalllDocument" in req.body
   ) {
     const phrasesWithGrades = req.body.phrasesWithGrades || [];
     const fullname = req.body.fullname;
@@ -192,7 +193,8 @@ exports.bulkGradeFreeRecall = async (req, res) => {
     const passageIdx = req.body.passageIdx;
     const session = req.body.session;
     const phraseNum = req.body.phraseNum;
-    const voterProject = req.body.voterProject;
+    const voterProject = req.body.voterProject; 
+    const viewedRecalllDocument = req.body.viewedRecalllDocument;
     db.runTransaction(async t => {
       // Accumulate all the transaction writes in an array to commit all of them
       // after all the reads to abide by the Firestore transaction law
@@ -247,6 +249,20 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       for (let recallDoc of recallGradeDocs.docs) {
         const recallData = recallDoc.data();
         recallGradesData[recallData.phrase] = { id: recallDoc.id, ...recallData };
+      }
+
+      for (let viewedGrade of viewedRecalllDocument) {
+        const recallGradeData = recallGradesData[viewedGrade.data.phrase];
+        const recallGradeRef = db.collection(collName).doc(`${recallGradeData.id}`);
+        const _viewers = recallGradeData.viewers || [];
+        _viewers.push(fullname);
+        transactionWrites.push({
+          type: "update",
+          refObj: recallGradeRef,
+          updateObj: {
+           viewers :_viewers,
+          }
+        });
       }
       // phraseGrade loop
 
