@@ -323,7 +323,7 @@ function Index() {
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       /> */}
       <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10 }}>
-        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#0000008f", filter: 'blur(2px)', }} />
+        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#000000c2", filter: 'blur(2px)', }} />
         <Box sx={{ height: "70px", width: "100%", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}>
           <Box>
             <img src={LogoDarkMode} alt="logo" width="52px" />
