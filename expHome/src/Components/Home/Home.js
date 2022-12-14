@@ -21,9 +21,12 @@ import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
 import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
+import { colorModeState, emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
+import { TableOfContent } from "./modules/components/TableOfContent";
+import { ThemeProvider } from "@mui/styles";
+import theme from "./modules/theme";
 
 const artboards = [
   { name: "animation1", durationMs: 5000 },
@@ -34,6 +37,16 @@ const artboards = [
   { name: "animation6", durationMs: 3000 }
 ]
 
+
+const sectionsTmp = [
+  { id: "LandingSection", title: "1Cademy's Landing Page", children: [] },
+  { id: "HowItWorksSection", title: "How We Work", children: [{ id: "1", title: "child 1" }, { id: "2", title: "child 2" }] },
+  { id: "CommunitiesSection", title: "Our Communities", children: [] },
+  { id: "ValuesSection", title: "Why 1Cademy Helps", children: [] },
+  { id: "SchoolsSection", title: "Where Are We From?", children: [] },
+  { id: "WhoWeAreSection", title: "Who Is Behind 1Cademy?", children: [] },
+  { id: "JoinUsSection", title: "Apply to Join Us!", children: [] },
+]
 function Index() {
   const firebase = useRecoilValue(firebaseState);
   const [section, setSection] = useState(0);
@@ -308,6 +321,7 @@ function Index() {
   }
 
   return (
+    // <ThemeProvider theme={theme("dark")}>
     <Box
       id="ScrollableContainer"
       onScroll={updatePosition}
@@ -315,8 +329,8 @@ function Index() {
         height: "100vh",
         overflowY: "auto",
         overflowX: "auto",
-        position: "relative"
-        // background: "red"
+        position: "relative",
+        backgroundColor: "#28282a"
       }}
     >
       {/* <AppAppBar
@@ -327,8 +341,9 @@ function Index() {
         joinUsClick={joinUsClick}
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       /> */}
+
       <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10 }}>
-        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#000000c2", filter: 'blur(2px)', }} />
+        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#000000c2", filter: 'blur(1px)', }} />
         <Box sx={{ height: "70px", width: "100%", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}>
           <Box>
             <img src={LogoDarkMode} alt="logo" width="52px" />
@@ -386,27 +401,41 @@ function Index() {
           {fullname && renderProfileMenu}
         </Box>
       </Box>
+
       <Box id="step-0" ref={section1Ref}>
         <Landing />
       </Box>
-      <Box ref={section2Ref} sx={{ background: "yellow" }}>
-        <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
-      </Box>
-      <Box ref={section3Ref}>
-        <What />
-      </Box>
-      <Box ref={section4Ref}>
-        <Values />
-      </Box>
-      <UniversitiesMap theme={"Light"} />
-      <Box ref={section5Ref}>
-        <WhoWeAre />
-      </Box>
-      <Box ref={section6Ref}>
-        <JoinUs />
+
+      <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", border: 'solid 2px white', zIndex: 10 }}>
+          {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
+          </h2> */}
+          <TableOfContent menuItems={sectionsTmp} />
+          {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference" }}>test</h2> */}
+        </Box>
+        <Box>
+          <Box ref={section2Ref} >
+            <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
+          </Box>
+          <Box ref={section3Ref} sx={{ border: 'solid 2px' }}>
+            <What />
+          </Box>
+          <Box ref={section4Ref}>
+            <Values />
+          </Box>
+          <UniversitiesMap theme={"Light"} />
+          <Box ref={section5Ref}>
+            <WhoWeAre />
+          </Box>
+          <Box ref={section6Ref}>
+            <JoinUs />
+          </Box>
+        </Box>
       </Box>
       <AppFooter />
     </Box>
+    // </ThemeProvider>
   );
 }
 
