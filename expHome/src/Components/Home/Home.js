@@ -20,7 +20,7 @@ const artboards = [
   { name: "animation1", durationMs: 5000 },
   { name: "animation2", durationMs: 30000 },
   { name: "animation3", durationMs: 8000 },
-  { name: "animation4", durationMs: 24000 },
+  { name: "animation4", durationMs: 22000 },
   { name: "animation5", durationMs: 13000 },
   { name: "animation6", durationMs: 3000 }
 ]
@@ -224,6 +224,7 @@ function Index() {
         height: "100vh",
         overflowY: "auto",
         overflowX: "auto",
+        // background: "red"
       }}
     >
       <AppAppBar
@@ -237,7 +238,7 @@ function Index() {
       <Box id="step-0" ref={section1Ref}>
         <Landing />
       </Box>
-      <Box ref={section2Ref}>
+      <Box ref={section2Ref} sx={{ background: "yellow" }}>
         <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
       </Box>
       <Box ref={section3Ref}>
