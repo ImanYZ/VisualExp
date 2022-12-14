@@ -180,7 +180,7 @@ const HowItWorks = (props) => {
           {props.riveComponent}
         </div>
         <div ref={animation1Ref} style={{ height: "100vh", width: "100%" /* background: "#123" */ }}></div>
-        <div ref={animation2Ref} style={{ height: "300vh", width: "100%" /* background: "#2769aa" */ }}></div>
+        <div ref={animation2Ref} style={{ height: "500vh", width: "100%" /* background: "#2769aa" */ }}></div>
         <div ref={animation3Ref} style={{ height: "300vh", width: "100%" /* background: "#3696f7" */ }}></div>
         <div ref={animation4Ref} style={{ height: "300vh", width: "100%" /* background: "#26c2ff" */ }}></div>
         <div ref={animation5Ref} style={{ height: "300vh", width: "100%" /* background: "#24f0ff" */ }}></div>
