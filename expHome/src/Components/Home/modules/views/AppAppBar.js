@@ -204,16 +204,16 @@ const AppAppBar = (props) => {
               <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
             </MenuItem>
           }
-        <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
-          <LogoutIcon /> <span id="LogoutText">Logout</span>
-        </MenuItem>
+          <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
+            <LogoutIcon /> <span id="LogoutText">Logout</span>
+          </MenuItem>
         </>
       )}
     </Menu>
   );
-  const signUpHandler = () => { 
+  const signUpHandler = () => {
     navigateTo("/auth");
-   }
+  }
   return (
     <div>
       <AppBar>
@@ -325,7 +325,7 @@ const AppAppBar = (props) => {
                 </Button>
               </Tooltip>
             )}
-           {fullname ? (
+            {fullname ? (
               <Tooltip title="Account">
                 <IconButton
                   size="large"
