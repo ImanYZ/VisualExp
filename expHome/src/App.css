@@ -155,3 +155,8 @@ button.Button.Green {
 button.Button.Red {
   background-color: rgb(255, 70, 45);
 }
+
+.rive-canvas {
+  width: inherit;
+  height: inherit;
+}
