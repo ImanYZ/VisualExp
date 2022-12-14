@@ -4,21 +4,17 @@ import { firebaseState, fullnameState, emailState } from "../../../store/AuthAto
 import { projectState } from "../../../store/ProjectAtoms";
 // mui imports
 import Paper from "@mui/material/Paper";
-import { makeStyles } from "@mui/styles";
 import Box from "@mui/material/Box";
-import Select from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
-
+import Switch from "@mui/material/Switch";
+import Alert from "@mui/material/Alert";
 import QueryBuilder from "./components/QueryBuilder";
 import { Pagination } from "./components/Pagination";
 import { uuidv4 } from "../../../utils";
@@ -31,33 +27,10 @@ const temp_schema = [
   { id: uuidv4(), not: true, keyword: "", alternatives: [] }
 ];
 
-const useStyles = makeStyles(() => ({
-  passageBox: {
-    display: "flex",
-    height: "100px",
-    backgroundColor: "#212121",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    "& .MuiButtonBase-root.Mui-disabled": {
-      color: "#696565"
-    },
-    "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#fff !important"
-    },
-    "& .MuiSvgIcon-root": {
-      color: "#fff"
-    }
-  }
-}));
-
 // eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({}) => {
-  const classes = useStyles();
+export const SchemaGenRecalls = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const [passages, setPassages] = useState([]);
-  const [phrases, setSelectedPhrases] = useState([]);
-  const [selectedPassage, setSelectedPassage] = useState({});
   const [selectedPhrase, setSelectedPhrase] = useState(null);
   const [selectedPhrase1, setSelectedPhrase1] = useState(null);
   const [schema, setSchema] = useState(temp_schema);
@@ -69,11 +42,29 @@ export const SchemaGeneration = ({}) => {
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [wrongRecallVotes, setWrongRecallVotes] = useState([]);
+  const [selectedGrade, setSelectedGrade] = useState();
+
+  const [selectedPassageId, setSelectedPassageId] = useState("");
+  const [satisfiedRecalls, setSatisfiedRecalls] = useState([]);
+
+  const [submitButtonLoader, setSubmitButtonLoader] = useState(false);
   const project = useRecoilValue(projectState);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    if (firebase && selectedPassage) {
+    if (!selectedPhrase) return;
+    const passageDoc = await firebase.db
+      .collection("passages")
+      .where("phrases", "array-contains", selectedPhrase)
+      .get();
+    if (!passageDoc.docs[0]) return;
+    setSelectedPassageId(passageDoc.docs[0].id);
+  }, [firebase, selectedPhrase]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+    if (firebase && selectedPassageId) {
       setSearching(true);
       const usersDoc = await firebase.db.collection("users").get();
       const recallTexts = [];
@@ -87,7 +78,7 @@ export const SchemaGeneration = ({}) => {
                 pCon[recall] &&
                 pCon[recall] !== "" &&
                 !recallTexts.includes(pCon[recall]) &&
-                selectedPassage?.id === pCon?.passage
+                selectedPassageId === pCon?.passage
               ) {
                 recallTexts.push(pCon[recall]);
                 temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [] });
@@ -100,53 +91,7 @@ export const SchemaGeneration = ({}) => {
       }
       setSearching(false);
     }
-  }, [firebase, selectedPassage]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const passagesDocs = await firebase.db.collection("passages").get();
-    // const passageData = passagesDoc.data();
-    let passages = [];
-    passages = passagesDocs.docs
-      .map(x => {
-        const data = x.data();
-        if (data?.phrases?.length > 0) {
-          return { ...data, id: x.id };
-        }
-        return null;
-      })
-      .filter(x => x !== null);
-    setPassages(passages);
-    const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
-    if (booleanLogsDoc.exists) {
-      const booleanLogsData = booleanLogsDoc.data();
-      const passage = passages.find(elem => elem.title === booleanLogsData.passage);
-      setSelectedPassage(passage);
-      const phrases = passage.phrases;
-      setSelectedPhrases(phrases);
-      setSelectedPhrase(booleanLogsData.selectedPhrase);
-      setSchema(booleanLogsData.schema);
-    } else {
-      setSelectedPassage(passages[0]);
-      const phrases = passages[0].phrases;
-      setSelectedPhrases([...phrases]);
-      setSelectedPhrase(phrases[0]);
-    }
-  }, [firebase.db, fullname]);
-
-  useEffect(() => {
-    if (selectedPhrase && selectedPassage) {
-      const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
-      const logsData = {
-        passage: selectedPassage.title,
-        selectedPhrase: selectedPhrase,
-        email,
-        schema
-      };
-      logsRef.set(logsData);
-    }
-    return () => {};
-  }, [selectedPhrase, selectedPassage, schema]);
+  }, [firebase, selectedPassageId]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {
@@ -190,20 +135,6 @@ export const SchemaGeneration = ({}) => {
     setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
 
-  const handlePassageChange = async event => {
-    try {
-      const title = event.target.value;
-      const allPassages = [...passages];
-      const fIndex = allPassages.findIndex(i => i.title === title);
-      const passage = allPassages[fIndex];
-      setSelectedPassage(passage);
-      setSelectedPhrases(passage.phrases);
-      setSelectedPhrase(passage.phrases[0]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const handleSubmit = () => {
     const newbooleanScratch = {
       email,
@@ -211,7 +142,7 @@ export const SchemaGeneration = ({}) => {
       schema: schema,
       createdAt: new Date(),
       phrase: selectedPhrase,
-      passage: selectedPassage.title,
+      passage: selectedPassageId,
       upVotes: 0,
       downVotes: 0,
       upVoters: [],
@@ -233,6 +164,18 @@ export const SchemaGeneration = ({}) => {
 
   const upVote = async schema => {
     try {
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      let calulatedProject = project;
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+
+      let _newGradingPoints = 0;
       const _upVoters = [...schema.upVoters];
       const _downVoters = [...schema.downVoters];
       let _upVotes = schema.upVotes;
@@ -240,6 +183,7 @@ export const SchemaGeneration = ({}) => {
       if (_upVoters.includes(fullname)) {
         _upVoters.splice(_upVoters.indexOf(fullname), 1);
         _upVotes = _upVotes - 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) - 1;
       } else {
         _upVoters.push(fullname);
         _upVotes = _upVotes + 1;
@@ -247,6 +191,7 @@ export const SchemaGeneration = ({}) => {
           _downVoters.splice(_downVoters.indexOf(fullname), 1);
           _downVotes = _downVotes - 1;
         }
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) + 1;
       }
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
@@ -264,33 +209,43 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
+
       await schemaGenerationRef.update(schemaGenerationUpdate);
-      let calulatedProject = project;
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
-      if (!(project in researcherData.projects)) {
-        calulatedProject = Object.keys(researcherData.projects)[0];
-      }
+      console.log(
+        ":::: ::: researcherData.projects[calulatedProject].gradingPoints ::: ::: ",
+        researcherData.projects[calulatedProject].gradingPoints
+      );
+      console.log(":::: :::: researcherUpdate ::: ::: ===", _newGradingPoints);
       const researcherUpdate = {
         projects: {
           ...researcherData.projects,
           [calulatedProject]: {
             ...researcherData.projects[calulatedProject],
-            positiveBooleanExpPionts: _upVotes - _downVotes,
-            negativeBooleanExpPionts: _downVotes
+            gradingPoints: _newGradingPoints
           }
         }
       };
+
       await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
 
   const downVote = async schema => {
     try {
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+
+      let calulatedProject = project;
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      let _newGradingPoints = 0;
+      let _newNegativeGradingPoints = 0;
+
       const _downVoters = [...schema.downVoters];
       let _downVotes = schema.downVotes;
       const _upVoters = [...schema.upVoters];
@@ -298,6 +253,8 @@ export const SchemaGeneration = ({}) => {
       if (_downVoters.includes(fullname)) {
         _downVoters.splice(_downVoters.indexOf(fullname), 1);
         _downVotes = _downVotes - 1;
+        _newNegativeGradingPoints = (researcherData.projects[calulatedProject].negativeGradingPoints || 0) + 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) - 1;
       } else {
         _downVoters.push(fullname);
         _downVotes = _downVotes + 1;
@@ -305,6 +262,8 @@ export const SchemaGeneration = ({}) => {
           _upVoters.splice(_upVoters.indexOf(fullname), 1);
           _upVotes = _upVotes - 1;
         }
+        _newNegativeGradingPoints = (researcherData.projects[calulatedProject].negativeGradingPoints || 0) - 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) + 1;
       }
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
@@ -322,25 +281,16 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
+
       await schemaGenerationRef.update(schemaGenerationUpdate);
 
-      let calulatedProject = project;
-      if (!(project in researcherData.projects)) {
-        calulatedProject = Object.keys(researcherData.projects)[0];
-      }
       const researcherUpdate = {
         projects: {
           ...researcherData.projects,
           [calulatedProject]: {
             ...researcherData.projects[calulatedProject],
-            positiveBooleanExpPionts: _upVotes - _downVotes,
-            negativeBooleanExpPionts: _downVotes
+            gradingPoints: _newGradingPoints,
+            negativeGradingPoints: _newNegativeGradingPoints
           }
         }
       };
@@ -348,31 +298,10 @@ export const SchemaGeneration = ({}) => {
     } catch (error) {}
   };
 
-  const previousPhrase = () => {
-    const indexPhrase = phrases.indexOf(selectedPhrase);
-    setSelectedPhrase(phrases[indexPhrase - 1]);
-  };
-
-  const nextPhrase = () => {
-    const indexPhrase = phrases.indexOf(selectedPhrase);
-    setSelectedPhrase(phrases[indexPhrase + 1]);
-  };
-
-  const previousPassage = () => {
-    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
-    const passage = passages[indexPassage - 1];
-    setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
-    setSelectedPhrase(passage.phrases[0]);
-  };
-
-  const nextPassage = () => {
-    const indexPassage = passages.findIndex(i => i.title === selectedPassage.title);
-    const passage = passages[indexPassage + 1];
-    setSelectedPassage(passage);
-    setSelectedPhrases(passage.phrases);
-    setSelectedPhrase(passage.phrases[0]);
-  };
+  useEffect(() => {
+    if (!props.firstBatchOfRecallGrades.length) return;
+    setSelectedPhrase(props.firstBatchOfRecallGrades[0].data.phrase);
+  }, [props.firstBatchOfRecallGrades]);
 
   const renderResponses = reponse => {
     const highlightedWords = reponse.highlightedWords;
@@ -516,10 +445,11 @@ export const SchemaGeneration = ({}) => {
   };
 
   useEffect(() => {
-    if (selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
+    if (selectedPhrase && recallResponses.length > 0 && !searching) {
       QuerySearching(schema);
     }
-  }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [schema, selectedPhrase, recallResponses, searching]);
 
   const currentTableData = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * PageSize;
@@ -527,97 +457,119 @@ export const SchemaGeneration = ({}) => {
     return searchResules.slice(firstPageIndex, lastPageIndex);
   }, [currentPage, searchResules]);
 
+  useEffect(() => {
+    if (!props.notSatisfiedRecallGrades.length) return;
+    if (!props.firstBatchOfRecallGrades.length) return;
+    const notSatisfiedRecalls = [];
+    const satisfiedRecalls = [];
+    for (let recallGrade of props.firstBatchOfRecallGrades) {
+      if (recallGrade.grade && props.notSatisfiedRecallGrades.includes(recallGrade)) {
+        notSatisfiedRecalls.push(recallGrade);
+      } else {
+        satisfiedRecalls.push(recallGrade);
+      }
+    }
+    if (notSatisfiedRecalls.length) {
+      const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
+      recallGradesLogsRef.set({
+        wrongRecallGrades: notSatisfiedRecalls,
+        firstBatchOfRecallGrades: props.firstBatchOfRecallGrades
+      });
+
+      setSatisfiedRecalls(satisfiedRecalls);
+      setWrongRecallVotes(notSatisfiedRecalls);
+      setSelectedPhrase(notSatisfiedRecalls[0].data.phrase);
+      setSelectedGrade(notSatisfiedRecalls[0]);
+    }
+  }, [props.firstBatchOfRecallGrades, props.notSatisfiedRecallGrades]);
+
+  const changeTheVote = () => {
+    const _wrongRecallVotes = wrongRecallVotes.slice();
+    const _index = wrongRecallVotes.findIndex(object => {
+      return selectedGrade.data.phrase === object.data.phrase;
+    });
+    const _checked = _wrongRecallVotes[_index].grade;
+    if (_index !== -1) {
+      _wrongRecallVotes[_index].grade = !_checked;
+      setWrongRecallVotes(_wrongRecallVotes);
+      setSelectedPhrase(wrongRecallVotes[_index].data.phrase);
+      setSelectedGrade(_wrongRecallVotes[_index]);
+    }
+  };
+
+  const handleNext = () => {
+    const indexOFthis = wrongRecallVotes.findIndex(object => {
+      return selectedGrade.data.phrase === object.data.phrase;
+    });
+    if (indexOFthis + 1 === wrongRecallVotes.length) {
+      setSubmitButtonLoader(true);
+      const requestAnswers = satisfiedRecalls.concat(wrongRecallVotes);
+      props.gradeIt(requestAnswers);
+      setSubmitButtonLoader(true);
+    } else {
+      setSelectedPhrase(wrongRecallVotes[indexOFthis + 1].data.phrase);
+      setSelectedGrade(wrongRecallVotes[indexOFthis + 1]);
+    }
+    const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
+    recallGradesLogsRef.set({
+      wrongRecallGrades: wrongRecallVotes,
+      firstBatchOfRecallGrades: props.firstBatchOfRecallGrades
+    });
+  };
+
+  if (!selectedGrade) return <></>;
   return (
     <div className="schema-generation">
-      <div>
-        <div className={classes.passageBox}>
-          <div>
-            <Button
-              variant="text"
-              disabled={selectedPassage === passages[0]}
-              sx={{ color: "white" }}
-              onClick={previousPassage}
-            >
-              {`< Previous Passage`}
-            </Button>
-          </div>
-          <Box sx={{ width: "55%" }}>
-            <Select
-              id="demo-simple-select-helper"
-              value={selectedPassage?.title || passages[0]?.title || ""}
-              onChange={handlePassageChange}
-              sx={{ width: "100%", color: "white", border: "1px", borderColor: "white" }}
-            >
-              {passages &&
-                passages?.length > 0 &&
-                passages?.map(doc => (
-                  <MenuItem key={doc?.id} value={doc?.title} sx={{ display: "center" }}>
-                    {doc?.title}
-                  </MenuItem>
-                ))}
-            </Select>
-          </Box>
-          <div>
-            <Button
-              variant="text"
-              disabled={selectedPassage === passages[passages.length - 1]}
-              sx={{ color: "white" }}
-              onClick={nextPassage}
-            >
-              {` Next Passage >`}
-            </Button>
-          </div>
-        </div>
-      </div>
       <div className="section">
         <div className="blocks search-box">
-          <div className="phrases-box">
-            {/* <div> */}
-            <Button
-              sx={{ color: "black", alignItems: "center" }}
-              variant="text"
-              disabled={phrases.indexOf(selectedPhrase) === 0}
-              onClick={previousPhrase}
-            >
-              {`< Prev `}
-            </Button>
-            {/* </div> */}
+          <div>
             <Box
               sx={{
                 display: "flex",
-                // width: "700px",
                 flexDirection: "column",
                 marginTop: "10px",
                 paddingRight: "20px",
                 paddingLeft: "10px"
               }}
             >
-              <Autocomplete
-                id="key-phrase"
-                value={selectedPhrase}
-                options={phrases}
-                onChange={(_, value) => setSelectedPhrase(value || null)}
-                renderInput={params => <TextField {...params} value={selectedPhrase} />}
-                getOptionLabel={phrase => (phrase ? phrase : "")}
-                renderOption={(props, phrase) => (
-                  <li key={phrase} {...props}>
-                    {phrase}
-                  </li>
-                )}
-                isOptionEqualToValue={(phrase, value) => phrase === value}
-                fullWidth
-                sx={{ mb: "16px" }}
-              />
+              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>{selectedGrade.data.response}</Paper>
+              <Alert severity="warning">
+                You checked this phrase as "YES" and that belongs to the participant response above ; but according to
+                the Boolean schema the phrase does not satify the response . Do you want to change your vote or propose
+                a new schema that satifys the Response ?
+              </Alert>
+              <div>
+                <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+                  <Box sx={{ display: "inline", mr: "19px" }}>
+                    NO
+                    <Switch checked={selectedGrade.grade} onChange={changeTheVote} color="secondary" />
+                    YES
+                  </Box>
+                  <Box sx={{ display: "inline" }}>{selectedPhrase}</Box>
+                </Paper>
+              </div>
             </Box>
-            <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
-              <Button
-                sx={{ color: "black", border: "none" }}
-                variant="text"
-                disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
-                onClick={nextPhrase}
-              >{`NEXT >`}</Button>
-            </div>
           </div>
+          <Box sx={{}}>
+            <Button onClick={handleNext} className="Button" variant="contained" color="success" disabled={false}>
+              {submitButtonLoader ? (
+                <CircularProgress color="warning" size="15px" />
+              ) : wrongRecallVotes.findIndex(object => {
+                  return selectedGrade.data.phrase === object.data.phrase;
+                }) +
+                  1 ===
+                wrongRecallVotes.length ? (
+                "Submit"
+              ) : (
+                "Next"
+              )}
+            </Button>
+            {wrongRecallVotes.findIndex(object => {
+              return selectedGrade.data.phrase === object.data.phrase;
+            }) + 1}{" "}
+            / {wrongRecallVotes.length}
+          </Box>
+
           <div className="query-block">
             {schemasBoolean?.length > 0 && (
               <Typography variant="h6" component="div" align="left">
@@ -634,12 +586,7 @@ export const SchemaGeneration = ({}) => {
                       <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
                           <div>
-                            <IconButton
-                              sx={{ color: "#00bcd4" }}
-                              component="label"
-                              onClick={() => upVote(schemaE)}
-                              size="small"
-                            >
+                            <IconButton component="label" onClick={() => upVote(schemaE)} size="small" color="success">
                               {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
                             </IconButton>
                           </div>
@@ -647,7 +594,7 @@ export const SchemaGeneration = ({}) => {
                         </div>
                         <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
                           <div>
-                            <IconButton sx={{ color: "red" }} onClick={() => downVote(schemaE)} size="small">
+                            <IconButton color="secondary" onClick={() => downVote(schemaE)} size="small">
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
                             </IconButton>
                           </div>
@@ -690,7 +637,6 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               overflow: "auto",
-              // marginBottom: "200px",
               paddingLeft: "15px",
               paddingRight: "15px",
               paddingTop: "15px",
@@ -741,4 +687,4 @@ export const SchemaGeneration = ({}) => {
   );
 };
 
-export default SchemaGeneration;
+export default SchemaGenRecalls;
