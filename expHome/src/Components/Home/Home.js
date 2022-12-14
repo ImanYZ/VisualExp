@@ -39,13 +39,13 @@ const artboards = [
 
 
 const sectionsTmp = [
-  { id: "LandingSection", title: "1Cademy's Landing Page", children: [] },
-  { id: "HowItWorksSection", title: "How We Work", children: [{ id: "1", title: "child 1" }, { id: "2", title: "child 2" }] },
-  { id: "CommunitiesSection", title: "Our Communities", children: [] },
-  { id: "ValuesSection", title: "Why 1Cademy Helps", children: [] },
-  { id: "SchoolsSection", title: "Where Are We From?", children: [] },
-  { id: "WhoWeAreSection", title: "Who Is Behind 1Cademy?", children: [] },
-  { id: "JoinUsSection", title: "Apply to Join Us!", children: [] },
+  { id: "LandingSection", active: true, title: "1Cademy's Landing Page", children: [] },
+  { id: "HowItWorksSection", active: false, title: "How We Work", children: [{ id: "1", title: "child 1" }, { id: "2", title: "child 2" }] },
+  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
+  { id: "ValuesSection", active: false, title: "Why 1Cademy Helps", children: [] },
+  { id: "SchoolsSection", active: false, title: "Where Are We From?", children: [] },
+  { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", children: [] },
+  { id: "JoinUsSection", active: false, title: "Apply to Join Us!", children: [] },
 ]
 function Index() {
   const firebase = useRecoilValue(firebaseState);
@@ -56,6 +56,7 @@ function Index() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
 
   const { rive, RiveComponent } = useRive({
@@ -72,6 +73,7 @@ function Index() {
   const section4Ref = useRef(null)
   const section5Ref = useRef(null)
   const section6Ref = useRef(null)
+  const section7Ref = useRef(null)
 
   useEffect(() => {
     const checkResearcher = async () => {
@@ -97,6 +99,7 @@ function Index() {
     if (!section4Ref.current) return
     if (!section5Ref.current) return
     if (!section6Ref.current) return
+    if (!section7Ref.current) return
     // const pageHeight = target.scrollHeight
     const section1Height = section1Ref.current.clientHeight
     const section2Height = section2Ref.current.clientHeight
@@ -104,8 +107,9 @@ function Index() {
     const section4Height = section4Ref.current.clientHeight
     const section5Height = section5Ref.current.clientHeight
     const section6Height = section6Ref.current.clientHeight
+    const section7Height = section7Ref.current.clientHeight
 
-    const sectionsHeight = [section1Height, section2Height, section3Height, section4Height, section5Height, section6Height]
+    const sectionsHeight = [section1Height, section2Height, section3Height, section4Height, section5Height, section6Height, section7Height]
     const animationSectionIndex = 1
 
     const { index, cumulativeHeight } = sectionsHeight.reduce((acu, cur, idx) => {
@@ -178,6 +182,11 @@ function Index() {
       rive.reset({ artboard: artboards[indexAnimation].name })
       const timeInSeconds = artboards[indexAnimation].durationMs / 1000 * percentageFrame / 100
       rive.scrub("Timeline 1", timeInSeconds)
+
+      // setSections(prev => prev.map((cur, idx) => {
+      //   if (idx === index) return { ...cur, active: true }
+      //   return cur
+      // }))
       // setFramePercentage(percentageFrame)
     }
 
@@ -407,28 +416,30 @@ function Index() {
       </Box>
 
       <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", border: 'solid 2px white', zIndex: 10 }}>
+        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", zIndex: 10 }}>
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
           </h2> */}
-          <TableOfContent menuItems={sectionsTmp} />
+          <TableOfContent menuItems={sections} />
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference" }}>test</h2> */}
         </Box>
         <Box>
           <Box ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
-          <Box ref={section3Ref} sx={{ border: 'solid 2px' }}>
+          <Box ref={section3Ref} >
             <What />
           </Box>
           <Box ref={section4Ref}>
             <Values />
           </Box>
-          <UniversitiesMap theme={"Light"} />
           <Box ref={section5Ref}>
-            <WhoWeAre />
+            <UniversitiesMap theme={"Light"} />
           </Box>
           <Box ref={section6Ref}>
+            <WhoWeAre />
+          </Box>
+          <Box ref={section7Ref}>
             <JoinUs />
           </Box>
         </Box>
