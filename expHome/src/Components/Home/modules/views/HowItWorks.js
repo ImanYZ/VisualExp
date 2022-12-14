@@ -176,7 +176,7 @@ const HowItWorks = (props) => {
 
         {/* --- animations start */}
 
-        <div style={{ position: 'sticky', top: height / 2 - boxLarge / 2 + 35, border: 'solid 2px royalBlue', width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'sticky', top: height / 2 - boxLarge / 2 + 35, /* border: 'solid 2px royalBlue', */ width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column' }}>
           {props.riveComponent}
         </div>
         <div ref={animation1Ref} style={{ height: "100vh", width: "100%" /* background: "#123" */ }}></div>
