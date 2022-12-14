@@ -1,5 +1,5 @@
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -40,6 +40,15 @@ const image = {
   my: 4,
 };
 
+const artboards = [
+  { name: "animation1", durationMs: 5000 },
+  { name: "animation2", durationMs: 30000 },
+  { name: "animation3", durationMs: 1000 }
+  // {name:"animation1",durationMs:2000},
+  // {name:"animation2",durationMs:1000},
+  // {name:"animation3",durationMs:1500}
+]
+
 const howElements = [
   {
     id: "Summarizing",
@@ -75,91 +84,30 @@ const howElements = [
 
 const HowItWorks = (props) => {
 
+  const animation1Ref = useRef(null)
+  const animation2Ref = useRef(null)
+  const animation3Ref = useRef(null)
+  const animation4Ref = useRef(null)
+  const animation5Ref = useRef(null)
+  const animation6Ref = useRef(null)
 
-  const step1Ref = useRef(null);
-  const step2Ref = useRef(null);
-  const step3Ref = useRef(null);
-  const step4Ref = useRef(null);
-  const step5Ref = useRef(null);
-  const step6Ref = useRef(null);
-  const step7Ref = useRef(null);
-
+  useImperativeHandle(props.innerRef, () => {
+    return {
+      getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
+      getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
+      getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
+      getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
+      getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
+      getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
+    };
+  }, []);
   const { height, width } = useWindowSize();
 
-  const { rive, RiveComponent } = useRive({
-    src: "gg.riv",
-    stateMachines: "State Machine 1",
-    autoplay: true,
-  });
-
-  const scrollInput = useStateMachineInput(rive, "State Machine 1", "scroll");
-
-  const onChangeObserver = useCallback(
-    (e) => {
-      if (!scrollInput) return;
-
-      e.forEach(({ isIntersecting, target }) => {
-        let idx = null;
-        if (target.id === "step-0") idx = 0;
-        if (target.id === "step-1") idx = 1;
-        if (target.id === "step-2") idx = 2;
-        if (target.id === "step-3") idx = 3;
-        if (target.id === "step-4") idx = 4;
-        if (target.id === "step-5") idx = 5;
-        if (target.id === "step-6") idx = 6;
-        if (target.id === "step-7") idx = 7;
-        if (isIntersecting && idx !== null) {
-          scrollInput.value = 5 + idx * 10;
-        }
-
-        // let cumulativeHeight = 0;
-        // for (let sIdx = -1; sIdx < newValue; sIdx++) {
-        //   const sectOffsetHeight = window.document.getElementById(
-        //     sectionsOrder[sIdx + 1].id
-        //   ).scrollHeight;
-        //   cumulativeHeight += sectOffsetHeight;
-        // }
-        // window.document.getElementById("ScrollableContainer").scroll({
-        //   top: cumulativeHeight,
-        //   left: 0,
-        //   behavior: "smooth",
-        // });
-      });
-    },
-    [scrollInput]
-  );
-
-  useEffect(() => {
-    if (
-      !props.innerRef ||
-      !step1Ref.current ||
-      !step2Ref.current ||
-      !step3Ref.current ||
-      !step4Ref.current ||
-      !step5Ref.current ||
-      !step6Ref.current ||
-      !step7Ref.current
-    )
-      return;
-
-    let options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 0.51,
-    };
-    const ob = new IntersectionObserver(onChangeObserver, options);
-    ob.observe(props.innerRef.current);
-    ob.observe(step1Ref.current);
-    ob.observe(step2Ref.current);
-    ob.observe(step3Ref.current);
-    ob.observe(step4Ref.current);
-    ob.observe(step5Ref.current);
-    ob.observe(step6Ref.current);
-    ob.observe(step7Ref.current);
-    return () => {
-      ob.disconnect();
-    };
-  }, [onChangeObserver, props.innerRef]);
+  // const { rive, RiveComponent } = useRive({
+  //   src: "gg.riv",
+  //   stateMachines: artboards[0].name,
+  //   autoplay: false,
+  // });
 
   // const [stepChecked, setStepChecked] = useState(iniStepChecked);
 
@@ -186,21 +134,32 @@ const HowItWorks = (props) => {
   //   }
   // }, [props.section, stepChecked]);
 
+  const boxLarge = useMemo(() => {
+    if (height < width) return height
+    return width
+  }, [height, width])
+
   return (
-    <Container
-      id="HowItWorksSection"
-      component="section"
-      sx={{
-        pt: 7,
-        pb: 10,
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        bgcolor: "secondary.light",
-      }}
-    >
-      {/* <Box
+    <>
+      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
+        {sectionsOrder[sectionIdx].title}
+      </Typography>
+
+      <Container
+        id="HowItWorksSection"
+        component="section"
+        sx={{
+          pt: 7,
+          pb: 10,
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          bgcolor: "secondary.light",
+          border: 'dashed 6px orange'
+        }}
+      >
+        {/* <Box
         component="img"
         src="/static/CurvyLines.png"
         alt="curvy lines"
@@ -212,100 +171,85 @@ const HowItWorks = (props) => {
           zIndex: 0,
         }}
       /> */}
-      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
-        {sectionsOrder[sectionIdx].title}
-      </Typography>
-
-      {/* --- animations start */}
 
 
-      <Box sx={{ position: "relative", /* border: "dashed 2px royalBlue" */ background: "#cacaca79", width: "inherit" }}>
-        <div id="step-1" ref={step1Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#0f375f79" */ }}>Learning a topic is challenging because there are an ever growing number of sources. How can we learn as much as possible with our limited available time?</div>
-        <div id="step-2" ref={step2Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#218f7d79" */ }}>As a community, people can identify more concepts in available literature.</div>
-        <div id="step-3" ref={step3Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#4bb48079" */ }}>They can explain these concepts in a concise way.</div>
-        <div id="step-4" ref={step4Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#73bed179" */ }}>They can visualize how concepts are related by linking them together.</div>
-        <div id="step-5" ref={step5Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#e864a679" */ }}>By adding prerequisite concepts they can learn concepts they do not understand</div>
-        <div id="step-6" ref={step6Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center" /* background: "#edb05579" */ }}>And they can dive deeper into subjects by adding children concepts.</div>
-        <div id="step-7" ref={step7Ref} style={{ height: height - 100, borderBottom: "2px solid #eee", padding: "20px", fontSize: "20px", textAlign: "center", position: "absolute", bottom: "0px", left: "0px" /* background: "#f4fa5779" */ }}>What starts as a collection of notes becomes a community generated learning pathway. </div>
-        {/* step-4 is an empty reference to know show last animation */}
-        {/* <div
-          id="step-8"
-          ref={step7Ref}
-          style={{ height, background: "#c5f35b79", position: "absolute", bottom: "0px", left: "0px" }}
-        ></div> */}
-        <Box
-          sx={{
-            height,
-            borderRight: "solid 6px pink",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            position: "sticky",
-            bottom: "0px",
-          }}
-        >
-          <Box sx={{ height: (10 * Math.min(height, width)) / 12, width: (10 * Math.min(height, width)) / 12 }}>
-            <RiveComponent className="rive-canvas" />
-          </Box>
-        </Box>
-      </Box>
+        {/* --- animations start */}
 
-      {/* animation ends */}
 
-      <Box sx={{ zIndex: 1, mx: "auto" }}>
-        <Grid container spacing={2.5} align="center">
-          {howElements.map((elem, idx) => {
-            return (
-              <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
-                <Card sx={{ ...item, maxWidth: 355 }}>
-                  {/* <CardActionArea onClick={flipCard(idx)}> */}
-                  <Box sx={number}>{idx + 1}.</Box>
-                  <Box
-                    alignItems="center"
-                    sx={{
-                      display: "flex",
-                      justify: "center",
-                      alignItems: "center",
-                      height: "190px",
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      src={"/static/" + elem.id + ".svg"}
-                      alt={elem.id}
-                      height="100%"
-                      width="100%"
-                      sx={{ px: "10px" }}
-                    />
-                  </Box>
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                      {elem.title}
-                    </Typography>
-                    {/* <Collapse in={!stepChecked[idx]} timeout={1000}>
+        <div ref={animation1Ref} style={{ height: "100vh", width: "100%", background: "#123" }}></div>
+        <div ref={animation2Ref} style={{ height: "300vh", width: "100%", background: "#2769aa" }}></div>
+        <div ref={animation3Ref} style={{ height: "300vh", width: "100%", background: "#3696f7" }}></div>
+        <div ref={animation4Ref} style={{ height: "300vh", width: "100%", background: "#26c2ff" }}></div>
+        <div ref={animation5Ref} style={{ height: "300vh", width: "100%", background: "#24f0ff" }}></div>
+        <div ref={animation6Ref} style={{ height: "100vh", width: "100%", background: "#15e9a2", position: "absolute", bottom: "0px", left: "0px" }}></div>
+        <div style={{ position: 'sticky', bottom: "0px", border: 'solid 2px royalBlue', height: boxLarge, width: boxLarge, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+          {/* <div style={{ position: 'absolute', bottom: "0px", right: "0px" }}>
+          <h2 style={{ color: 'orange' }}>scroll percentage:{scrollPercentage.toFixed(1)}%</h2>
+          <h3 style={{ color: 'orange' }}>animation scroll percentage:{animationScrollPercentage.toFixed(1)}%</h3>
+          <h4 style={{ color: 'orange' }}>Frame percentage:{framePercentage.toFixed(1)}%</h4>
+
+          <h4>{value}</h4>
+          <input type="range" value={value} onChange={e => onChange(e.target.value)} max={1000} />
+        </div> */}
+          {props.riveComponent}
+        </div>
+
+        {/* animation ends */}
+
+        <Box sx={{ zIndex: 1, mx: "auto" }}>
+          <Grid container spacing={2.5} align="center">
+            {howElements.map((elem, idx) => {
+              return (
+                <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
+                  <Card sx={{ ...item, maxWidth: 355 }}>
+                    {/* <CardActionArea onClick={flipCard(idx)}> */}
+                    <Box sx={number}>{idx + 1}.</Box>
+                    <Box
+                      alignItems="center"
+                      sx={{
+                        display: "flex",
+                        justify: "center",
+                        alignItems: "center",
+                        height: "190px",
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        src={"/static/" + elem.id + ".svg"}
+                        alt={elem.id}
+                        height="100%"
+                        width="100%"
+                        sx={{ px: "10px" }}
+                      />
+                    </Box>
+                    <CardContent>
+                      <Typography gutterBottom variant="h5" component="div">
+                        {elem.title}
+                      </Typography>
+                      {/* <Collapse in={!stepChecked[idx]} timeout={1000}>
                         Learn more ...
                       </Collapse>
                       <Collapse in={stepChecked[idx]} timeout={1000}> */}
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {elem.content}
-                    </Typography>
-                    {/* </Collapse> */}
-                  </CardContent>
-                  {/* </CardActionArea> */}
-                </Card>
-              </Grid>
-            );
-          })}
-        </Grid>
-        <Box sx={{ mt: "19px" }}>
-          <YoutubeEmbed embedId="vkNx-QUmbNI" />
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ textAlign: "left" }}
+                      >
+                        {elem.content}
+                      </Typography>
+                      {/* </Collapse> */}
+                    </CardContent>
+                    {/* </CardActionArea> */}
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+          <Box sx={{ mt: "19px" }}>
+            <YoutubeEmbed embedId="vkNx-QUmbNI" />
+          </Box>
         </Box>
-      </Box>
-      {/* <Button
+        {/* <Button
         color="secondary"
         size="large"
         variant="contained"
@@ -315,7 +259,8 @@ const HowItWorks = (props) => {
       >
         Get started
       </Button> */}
-    </Container >
+      </Container >
+    </>
   );
 };
 
