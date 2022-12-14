@@ -23,6 +23,10 @@ import UMLogo from "../../../../assets/umsi-logo-vert-u.png";
 import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
 
+const gray01 = "#28282a"
+const gray02 = "#202020"
+const gray03 = "#AAAAAA"
+
 const WhoWeAre = (props) => {
   return (
     <Container
@@ -35,19 +39,19 @@ const WhoWeAre = (props) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        bgcolor: "secondary.light",
+        // bgcolor: "secondary.light",
       }}
     >
-      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
+      <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8" }}>
         Who Is Behind 1Cademy?
       </Typography>
       <Grid container spacing={2.5} align="center">
         <Grid item xs={12} sm={6} md={4}>
-          <Paper>
+          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
             <Typography
               variant="h5"
               component="div"
-              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+              sx={{ pt: "19px", pb: "19px", borderBottom: `1px solid ${gray03}` }}
             >
               Recently Published Papers
             </Typography>
@@ -65,7 +69,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM ICER 2021"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak,
                       C., Kwon, K., ... &amp; Silverstein, N. (2021, August).
                       Incentivized Spacing and Gender in Computer Science
@@ -92,7 +96,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM CHI 2020"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020,
                       April). QMaps: Engaging Students in Voluntary Question
                       Generation and Linking. In{" "}
@@ -118,7 +122,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM ICER 2019"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019,
                       July). A spaced, interleaved retrieval practice tool that
                       is motivating and effective. In{" "}
@@ -144,7 +148,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM SIGCSE 2019"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed
                       and Studying: Gendered Pathways to Success. In{" "}
                       <Box component="span" sx={{ fontStyle: "italic" }}>
@@ -169,7 +173,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="SPLICE 2019"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       Ericson, B. J., YeckehZaare, I., &amp; Guzdial, M. J.
                       (2019). Runestone Interactive Ebooks: A Research Platform
                       for On-line Computer Science Learning. In{" "}
@@ -187,16 +191,18 @@ const WhoWeAre = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Paper>
+          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
             <Typography
               variant="h5"
               component="div"
-              sx={{ pt: "19px", pb: "19px", borderBottom: "1px solid #AAAAAA" }}
+              sx={{
+                pt: "19px", pb: "19px", borderBottom: `1px solid ${gray03}`
+              }}
             >
               2022 Published Papers
             </Typography>
             <List sx={{ width: "100%" }}>
-            <ListItemButton component="a">
+              <ListItemButton component="a">
                 {/* <ListItemAvatar>
                   <Avatar sx={{ backgroundColor: "success.main" }}>
                     <MenuBookIcon />
@@ -205,7 +211,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM SIGCSE 2023"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Chen, S., & Barghi, T. (2023). Reducing Procrastination Without Sacrificing
                       Students' Autonomy Through Optional Weekly Presentations of Student-Generated Content. In{" "}
                       <br></br>
@@ -230,7 +236,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM SIGCSE 2022"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022).
                       Retrieval-based Teaching Incentivizes Spacing and Improves
                       Grades in Computer Science Education. In{" "}
@@ -256,7 +262,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="ACM SIGCSE 2022"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K.,
                       &amp; Fox, E. (2022). Another Victim of COVID-19: Computer
                       Science Education. In{" "}
@@ -282,7 +288,7 @@ const WhoWeAre = (props) => {
                 <ListItemText
                   primary="Accepted by ACM LAK 2022"
                   secondary={
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{ color: gray03 }}>
                       YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp;
                       Resnick, P. (2022). Semester-level Spacing but Not
                       Procrastination Affected Student Exam Performance. In{" "}
@@ -299,8 +305,8 @@ const WhoWeAre = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Paper>
-            <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
+            <List sx={{ width: "100%", }}>
               <ListItemButton
                 alignItems="flex-start"
                 component="a"
@@ -319,18 +325,21 @@ const WhoWeAre = (props) => {
                   secondary={
                     <React.Fragment>
                       <Typography
-                        sx={{ display: "inline" }}
+                        sx={{ display: "inline", color: "#f8f8f8" }}
                         component="span"
                         variant="body2"
-                        color="text.primary"
+                      // color="text.primary"
                       >
                         Paul Resnick
                       </Typography>
-                      {
-                        " — Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
-                      }
+                      <Box sx={{ color: gray03 }}>
+                        {
+                          " — Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
+                        }
+                      </Box>
                     </React.Fragment>
                   }
+
                 />
               </ListItemButton>
               <Divider variant="inset" component="li" />
@@ -352,16 +361,18 @@ const WhoWeAre = (props) => {
                   secondary={
                     <React.Fragment>
                       <Typography
-                        sx={{ display: "inline" }}
+                        sx={{ display: "inline", color: "#f8f8f8" }}
                         component="span"
                         variant="body2"
                         color="text.primary"
                       >
                         Iman YeckehZaare
                       </Typography>
-                      {
-                        " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
-                      }
+                      <Box sx={{ color: gray03 }}>
+                        {
+                          " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
+                        }
+                      </Box>
                     </React.Fragment>
                   }
                 />
@@ -388,7 +399,8 @@ const WhoWeAre = (props) => {
                         sx={{ display: "inline" }}
                         component="span"
                         variant="body2"
-                        color="text.primary"
+                        // color="text.primary"
+                        color="#f8f8f8"
                       >
                         Honor Education
                       </Typography>
@@ -418,7 +430,8 @@ const WhoWeAre = (props) => {
                         sx={{ display: "inline" }}
                         component="span"
                         variant="body2"
-                        color="text.primary"
+                        // color="text.primary"
+                        color="#f8f8f8"
                       >
                         School of Information
                       </Typography>
@@ -448,13 +461,16 @@ const WhoWeAre = (props) => {
                         sx={{ display: "inline" }}
                         component="span"
                         variant="body2"
-                        color="text.primary"
+                        // color="text.primary"
+                        color="#f8f8f8"
                       >
                         Google Cloud
                       </Typography>
-                      {
-                        " — awarded research credits to host 1Cademy on GCP services, under award number 205607640."
-                      }
+                      <Box sx={{ color: gray03 }}>
+                        {
+                          " — awarded research credits to host 1Cademy on GCP services, under award number 205607640."
+                        }
+                      </Box>
                     </React.Fragment>
                   }
                 />
@@ -462,8 +478,8 @@ const WhoWeAre = (props) => {
             </List>
           </Paper>
         </Grid>
-      </Grid>
-    </Container>
+      </Grid >
+    </Container >
   );
 };
 
