@@ -1,5 +1,9 @@
-import React, { useMemo, useRef, useState } from "react";
+import LogoutIcon from "@mui/icons-material/Logout";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import LogoDarkMode from "../../assets/DarkModeLogo.svg";
 import Box from "@mui/material/Box";
 
 import What from "./modules/views/What";
@@ -15,6 +19,11 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
+import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
+import { useNavigate } from "react-router-dom";
+import { notAResearcherState } from "../../store/ProjectAtoms";
 
 const artboards = [
   { name: "animation1", durationMs: 5000 },
@@ -26,8 +35,15 @@ const artboards = [
 ]
 
 function Index() {
+  const firebase = useRecoilValue(firebaseState);
   const [section, setSection] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
+  const [fullname, setFullname] = useRecoilState(fullnameState);
+  const [email, setEmail] = useRecoilState(emailState);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(null);
+  const isProfileMenuOpen = Boolean(profileMenuOpen);
+  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const navigateTo = useNavigate();
 
   const { rive, RiveComponent } = useRive({
     src: "gg.riv",
@@ -43,6 +59,18 @@ function Index() {
   const section4Ref = useRef(null)
   const section5Ref = useRef(null)
   const section6Ref = useRef(null)
+
+  useEffect(() => {
+    const checkResearcher = async () => {
+      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
+      if (researcherDoc.exists) {
+        setNotAResearcher(false);
+      }
+    };
+    if (firebase && fullname) {
+      checkResearcher();
+    }
+  }, [firebase, fullname]);
 
   const onScrollAnimation = (target) => {
     const scrollOffset = target.scrollTop
@@ -216,6 +244,64 @@ function Index() {
     switchSection(sectionsOrder.length - 2)(event);
   };
 
+  const handleProfileMenuOpen = (event) => {
+    setProfileMenuOpen(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setProfileMenuOpen(null);
+  };
+
+  const navigateToExperiment = () => {
+    if (!notAResearcher) {
+      navigateTo("/Activities/");
+    } else {
+      navigateTo("/Activities/experiment");
+    }
+  };
+
+  const signOut = async (event) => {
+    console.log("Signing out!");
+    setEmail("");
+    setFullname("");
+    await firebase.logout();
+    navigateTo("/");
+  };
+
+  const renderProfileMenu = (
+    <Menu
+      id="ProfileMenu"
+      anchorEl={profileMenuOpen}
+      open={isProfileMenuOpen}
+      onClose={handleProfileMenuClose}
+    >
+      {fullname && email && (
+        <MenuItem
+          disabled
+          sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}
+        >
+          {fullname}
+        </MenuItem>
+      )}
+      {fullname && email && (
+        <>
+          {
+            <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
+              <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
+            </MenuItem>
+          }
+          <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
+            <LogoutIcon /> <span id="LogoutText">Logout</span>
+          </MenuItem>
+        </>
+      )}
+    </Menu>
+  );
+
+  const signUpHandler = () => {
+    navigateTo("/auth");
+  }
+
   return (
     <Box
       id="ScrollableContainer"
@@ -224,17 +310,77 @@ function Index() {
         height: "100vh",
         overflowY: "auto",
         overflowX: "auto",
+        position: "relative"
         // background: "red"
       }}
     >
-      <AppAppBar
+      {/* <AppAppBar
         section={section}
         joinNowSec={section === sectionsOrder.length - 2}
         switchSection={switchSection}
         homeClick={homeClick}
         joinUsClick={joinUsClick}
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
-      />
+      /> */}
+      <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10 }}>
+        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#0000008f", filter: 'blur(2px)', }} />
+        <Box sx={{ height: "70px", width: "100%", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}>
+          <Box>
+            <img src={LogoDarkMode} alt="logo" width="52px" />
+          </Box>
+          <Box>
+            {!(section === sectionsOrder.length - 2) && (
+              <Tooltip title="Apply to join 1Cademy">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={joinUsClick}
+                  sx={{
+                    fontSize: 16,
+                    color: "common.white",
+                    ml: 2.5,
+                    borderRadius: 40,
+                  }}
+                >
+                  Apply!
+                </Button>
+              </Tooltip>
+            )}
+            {fullname ? (
+              <Tooltip title="Account">
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-haspopup="true"
+                  aria-controls="lock-menu"
+                  aria-label={`${fullname}'s Account`}
+                  aria-expanded={isProfileMenuOpen ? "true" : undefined}
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="SIGN IN/UP">
+                <Button
+                  variant="contained"
+                  onClick={signUpHandler}
+                  sx={{
+                    fontSize: 16,
+                    color: "common.white",
+                    ml: 2.5,
+                    borderRadius: 40
+                  }}
+                >
+                  SIGN IN/UP
+                </Button>
+              </Tooltip>
+            )}
+          </Box>
+          {fullname && renderProfileMenu}
+        </Box>
+      </Box>
       <Box id="step-0" ref={section1Ref}>
         <Landing />
       </Box>
