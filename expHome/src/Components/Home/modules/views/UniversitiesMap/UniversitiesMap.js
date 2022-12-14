@@ -88,7 +88,7 @@ const UniversitiesMap = (props) => {
           marked="center"
           align="center"
           component="h2"
-          sx={{ mb: 7 }}
+          sx={{ mb: 7, color: "#f8f8f8" }}
         >
           Our Researchers Are From
         </Typography>

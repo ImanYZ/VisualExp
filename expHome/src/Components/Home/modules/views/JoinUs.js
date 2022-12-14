@@ -277,7 +277,7 @@ const JoinUs = props => {
       }}
     >
       {!props.community ? (
-        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
           {sectionsOrder[sectionIdx].title}
         </Typography>
       ) : (
@@ -698,7 +698,7 @@ const JoinUs = props => {
               </Stepper>
             ) : (
               <>
-                <Typography>
+                <Typography sx={{ color: "#f8f8f8" }}>
                   Choose one of our communities and complete its application requirements. These requirements may differ
                   from community to community. Click the following button to jump to our list of communities. Then, you
                   can find more information about each community and their requirements by clicking the corresponding
@@ -717,7 +717,7 @@ const JoinUs = props => {
                     </Button>
                   </div>
                 </Box>
-                <Typography>
+                <Typography sx={{ color: "#f8f8f8" }}>
                   Meanwhile, you can go through the 1Cademy tutorial by clicking the following button:
                 </Typography>
                 <Box sx={{ mb: 2 }}>
