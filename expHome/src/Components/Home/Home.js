@@ -119,6 +119,7 @@ function Index() {
       return { ...acu, cumulativeHeight: newCumulativeHeight }
     }, { cumulativeHeight: 0, index: -1 })
 
+    console.log('INDEX', index)
     if (index < 0) return Error('cant detect current` section')
 
     if (index < animationSectionIndex) {
@@ -131,6 +132,7 @@ function Index() {
       rive.reset({ artboard: artboards[artboards.length - 1].name })
       rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
     }
+
     if (index === animationSectionIndex) {
       console.log('Scroll in animation section')
       // check local percentage
@@ -166,6 +168,8 @@ function Index() {
         return { ...acu, cumulativeAnimationHeight }
       }, { cumulativeAnimationHeight: lowerLimit, indexAnimation: -1 })
 
+      console.log('INDEX_ANIMATION', indexAnimation)
+
       if (indexAnimation < 0) return Error('cant detect current animation')
 
       console.log('--->', { indexAnimation, cumulativeAnimationHeight })
@@ -183,10 +187,17 @@ function Index() {
       const timeInSeconds = artboards[indexAnimation].durationMs / 1000 * percentageFrame / 100
       rive.scrub("Timeline 1", timeInSeconds)
 
-      // setSections(prev => prev.map((cur, idx) => {
-      //   if (idx === index) return { ...cur, active: true }
-      //   return cur
-      // }))
+
+
+      setSections(prev => {
+        const tt = prev.map((cur, idx) => {
+          if (idx === index) return { ...cur, active: true }
+          return { ...cur, active: false }
+        })
+
+        console.log({ tt })
+        return tt
+      })
       // setFramePercentage(percentageFrame)
     }
 
@@ -212,7 +223,12 @@ function Index() {
         ).scrollHeight;
         cumulativeHeight += sectOffsetHeight;
         if (event.target.scrollTop < cumulativeHeight) {
+          console.log('-----> INDEX', sIdx - 1)
           setSection(sIdx - 1);
+          setSections(prev => prev.map((cur, idx) => {
+            if (idx === sIdx) return { ...cur, active: true }
+            return { ...cur, active: false }
+          }))
           window.history.replaceState(
             null,
             sectionsOrder[sIdx].title,
@@ -221,6 +237,7 @@ function Index() {
           break;
         }
       }
+
     }
   };
 
