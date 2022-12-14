@@ -203,20 +203,24 @@ function Index() {
   };
 
   const switchSection = (newValue) => (event) => {
+    console.log(1)
     setNotSectionSwitching(false);
     setSection(newValue);
     let cumulativeHeight = 0;
+    console.log(2)
     for (let sIdx = -1; sIdx < newValue; sIdx++) {
       const sectOffsetHeight = window.document.getElementById(
         sectionsOrder[sIdx + 1].id
       ).scrollHeight;
       cumulativeHeight += sectOffsetHeight;
     }
+    console.log(3)
     window.document.getElementById("ScrollableContainer").scroll({
       top: cumulativeHeight,
       left: 0,
       behavior: "smooth",
     });
+    console.log(5)
     // document
     //   .getElementById(sectionsOrder[newValue + 1].id)
     //   .scrollIntoView({
@@ -224,6 +228,7 @@ function Index() {
     //     inline: "nearest",
     //     behavior: "smooth",
     //   });
+    console.log(6)
     window.history.replaceState(
       null,
       sectionsOrder[newValue + 1].title,
@@ -393,7 +398,7 @@ function Index() {
       <Box ref={section4Ref}>
         <Values />
       </Box>
-      {/* <UniversitiesMap theme={"Light"} /> */}
+      <UniversitiesMap theme={"Light"} />
       <Box ref={section5Ref}>
         <WhoWeAre />
       </Box>
