@@ -135,17 +135,14 @@ const HowItWorks = (props) => {
   // }, [props.section, stepChecked]);
 
   const boxLarge = useMemo(() => {
-    if (height < width) return height
-    return width
+    if (height < width) return height - 100
+    return width - 100
   }, [height, width])
 
   return (
     <>
-      <Typography variant="h4" marked="center" sx={{ mb: 7 }}>
-        {sectionsOrder[sectionIdx].title}
-      </Typography>
 
-      <Container
+      <Box
         id="HowItWorksSection"
         component="section"
         sx={{
@@ -155,10 +152,14 @@ const HowItWorks = (props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          bgcolor: "secondary.light",
-          border: 'dashed 6px orange'
+          backgroundColor: "#28282a"
+          // bgcolor: "secondary.light",
+          // border: 'dashed 6px orange'
         }}
       >
+        <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          {sectionsOrder[sectionIdx].title}
+        </Typography>
         {/* <Box
         component="img"
         src="/static/CurvyLines.png"
@@ -175,34 +176,24 @@ const HowItWorks = (props) => {
 
         {/* --- animations start */}
 
-
-        <div ref={animation1Ref} style={{ height: "100vh", width: "100%", background: "#123" }}></div>
-        <div ref={animation2Ref} style={{ height: "300vh", width: "100%", background: "#2769aa" }}></div>
-        <div ref={animation3Ref} style={{ height: "300vh", width: "100%", background: "#3696f7" }}></div>
-        <div ref={animation4Ref} style={{ height: "300vh", width: "100%", background: "#26c2ff" }}></div>
-        <div ref={animation5Ref} style={{ height: "300vh", width: "100%", background: "#24f0ff" }}></div>
-        <div ref={animation6Ref} style={{ height: "100vh", width: "100%", background: "#15e9a2", position: "absolute", bottom: "0px", left: "0px" }}></div>
-        <div style={{ position: 'sticky', bottom: "0px", border: 'solid 2px royalBlue', height: boxLarge, width: boxLarge, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-          {/* <div style={{ position: 'absolute', bottom: "0px", right: "0px" }}>
-          <h2 style={{ color: 'orange' }}>scroll percentage:{scrollPercentage.toFixed(1)}%</h2>
-          <h3 style={{ color: 'orange' }}>animation scroll percentage:{animationScrollPercentage.toFixed(1)}%</h3>
-          <h4 style={{ color: 'orange' }}>Frame percentage:{framePercentage.toFixed(1)}%</h4>
-
-          <h4>{value}</h4>
-          <input type="range" value={value} onChange={e => onChange(e.target.value)} max={1000} />
-        </div> */}
+        <div style={{ position: 'sticky', top: height / 2 - boxLarge / 2 + 35, border: 'solid 2px royalBlue', width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column' }}>
           {props.riveComponent}
         </div>
+        <div ref={animation1Ref} style={{ height: "100vh", width: "100%" /* background: "#123" */ }}></div>
+        <div ref={animation2Ref} style={{ height: "300vh", width: "100%" /* background: "#2769aa" */ }}></div>
+        <div ref={animation3Ref} style={{ height: "300vh", width: "100%" /* background: "#3696f7" */ }}></div>
+        <div ref={animation4Ref} style={{ height: "300vh", width: "100%" /* background: "#26c2ff" */ }}></div>
+        <div ref={animation5Ref} style={{ height: "300vh", width: "100%" /* background: "#24f0ff" */ }}></div>
+        <div ref={animation6Ref} style={{ height: "100vh", width: "100%" /* background: "#15e9a2" */, position: "absolute", bottom: "0px", left: "0px" }}></div>
 
-        {/* animation ends */}
+        {/* --- animation ends */}
 
         <Box sx={{ zIndex: 1, mx: "auto" }}>
-          <Grid container spacing={2.5} align="center">
+          {/* <Grid container spacing={2.5} align="center">
             {howElements.map((elem, idx) => {
               return (
                 <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
                   <Card sx={{ ...item, maxWidth: 355 }}>
-                    {/* <CardActionArea onClick={flipCard(idx)}> */}
                     <Box sx={number}>{idx + 1}.</Box>
                     <Box
                       alignItems="center"
@@ -226,10 +217,6 @@ const HowItWorks = (props) => {
                       <Typography gutterBottom variant="h5" component="div">
                         {elem.title}
                       </Typography>
-                      {/* <Collapse in={!stepChecked[idx]} timeout={1000}>
-                        Learn more ...
-                      </Collapse>
-                      <Collapse in={stepChecked[idx]} timeout={1000}> */}
                       <Typography
                         variant="body2"
                         color="text.secondary"
@@ -237,14 +224,12 @@ const HowItWorks = (props) => {
                       >
                         {elem.content}
                       </Typography>
-                      {/* </Collapse> */}
                     </CardContent>
-                    {/* </CardActionArea> */}
                   </Card>
                 </Grid>
               );
             })}
-          </Grid>
+          </Grid> */}
           <Box sx={{ mt: "19px" }}>
             <YoutubeEmbed embedId="vkNx-QUmbNI" />
           </Box>
@@ -259,7 +244,7 @@ const HowItWorks = (props) => {
       >
         Get started
       </Button> */}
-      </Container >
+      </Box >
     </>
   );
 };
