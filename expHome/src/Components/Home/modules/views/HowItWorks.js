@@ -20,67 +20,6 @@ const sectionIdx = sectionsOrder.findIndex(
   (sect) => sect.id === "HowItWorksSection"
 );
 
-const item = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  backgroundColor: "white",
-};
-
-const number = {
-  fontSize: 24,
-  fontFamily: "default",
-  color: "secondary.main",
-  fontWeight: "medium",
-  margin: "10px 0px 10px 0px",
-};
-
-const image = {
-  height: 130,
-  my: 4,
-};
-
-const artboards = [
-  { name: "animation1", durationMs: 5000 },
-  { name: "animation2", durationMs: 30000 },
-  { name: "animation3", durationMs: 1000 }
-  // {name:"animation1",durationMs:2000},
-  // {name:"animation2",durationMs:1000},
-  // {name:"animation3",durationMs:1500}
-]
-
-const howElements = [
-  {
-    id: "Summarizing",
-    title: "Summarize",
-    content: `We summarize the gist of every valuable piece of knowledge
-    on the Web into small chunks of knowledge that we call
-    "nodes."`,
-  },
-  {
-    id: "Linking",
-    title: "Link",
-    content: `We identify and visualize the prerequisite knowledge "links"
-    between nodes.`,
-  },
-  {
-    id: "Evaluating",
-    title: "Evaluate",
-    content: `We group-evaluate the nodes and links, through up/down-votes
-    and comments.`,
-  },
-  {
-    id: "Improving",
-    title: "Improve",
-    content: `We collaboratively improve and up-date nodes and links
-    through proposals and community approvals.`,
-  },
-];
-
-// const iniStepChecked = [];
-// for (let value of howElements) {
-//   iniStepChecked.push(false);
-// }
 
 const HowItWorks = (props) => {
 
@@ -90,6 +29,7 @@ const HowItWorks = (props) => {
   const animation4Ref = useRef(null)
   const animation5Ref = useRef(null)
   const animation6Ref = useRef(null)
+  const { height, width } = useWindowSize();
 
   useImperativeHandle(props.innerRef, () => {
     return {
@@ -101,38 +41,6 @@ const HowItWorks = (props) => {
       getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
     };
   }, []);
-  const { height, width } = useWindowSize();
-
-  // const { rive, RiveComponent } = useRive({
-  //   src: "gg.riv",
-  //   stateMachines: artboards[0].name,
-  //   autoplay: false,
-  // });
-
-  // const [stepChecked, setStepChecked] = useState(iniStepChecked);
-
-  // const flipCard = (idx) => (event) => {
-  //   const sChecked = [...stepChecked];
-  //   sChecked[idx] = !sChecked[idx];
-  //   setStepChecked(sChecked);
-  // };
-
-  // const [stepChecked, setStepChecked] = useState([false, false, false, false]);
-
-  // useEffect(() => {
-  //   if (props.section >= sectionIdx - 1 && !stepChecked[0]) {
-  //     setStepChecked([true, false, false, false]);
-  //     setTimeout(() => {
-  //       setStepChecked([true, true, false, false]);
-  //       setTimeout(() => {
-  //         setStepChecked([true, true, true, false]);
-  //         setTimeout(() => {
-  //           setStepChecked([true, true, true, true]);
-  //         }, 1000);
-  //       }, 1000);
-  //     }, 1000);
-  //   }
-  // }, [props.section, stepChecked]);
 
   const boxLarge = useMemo(() => {
     if (height < width) return height - 100
@@ -179,12 +87,12 @@ const HowItWorks = (props) => {
         <div style={{ position: 'sticky', top: height / 2 - boxLarge / 2 + 35, /* border: 'solid 2px royalBlue', */ width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column' }}>
           {props.riveComponent}
         </div>
-        <div ref={animation1Ref} style={{ height: "100vh", width: "100%" /* background: "#123" */ }}></div>
-        <div ref={animation2Ref} style={{ height: "500vh", width: "100%" /* background: "#2769aa" */ }}></div>
-        <div ref={animation3Ref} style={{ height: "300vh", width: "100%" /* background: "#3696f7" */ }}></div>
-        <div ref={animation4Ref} style={{ height: "300vh", width: "100%" /* background: "#26c2ff" */ }}></div>
-        <div ref={animation5Ref} style={{ height: "300vh", width: "100%" /* background: "#24f0ff" */ }}></div>
-        <div ref={animation6Ref} style={{ height: "100vh", width: "100%" /* background: "#15e9a2" */, position: "absolute", bottom: "0px", left: "0px" }}></div>
+        <div ref={animation1Ref} style={{ height: "100vh", width: "100%", background: "#123" }}></div>
+        <div ref={animation2Ref} style={{ height: "500vh", width: "100%", background: "#2769aa" }}></div>
+        <div ref={animation3Ref} style={{ height: "300vh", width: "100%", background: "#3696f7" }}></div>
+        <div ref={animation4Ref} style={{ height: "300vh", width: "100%", background: "#26c2ff" }}></div>
+        <div ref={animation5Ref} style={{ height: "300vh", width: "100%", background: "#24f0ff" }}></div>
+        <div ref={animation6Ref} style={{ height: "100vh", width: "100%", background: "#15e9a2", position: "absolute", bottom: "0px", left: "0px" }}></div>
 
         {/* --- animation ends */}
 
