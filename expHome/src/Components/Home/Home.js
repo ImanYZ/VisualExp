@@ -40,7 +40,19 @@ const artboards = [
 
 const sectionsTmp = [
   { id: "LandingSection", active: true, title: "1Cademy's Landing Page", children: [] },
-  { id: "HowItWorksSection", active: false, title: "How We Work", children: [{ id: "1", title: "child 1" }, { id: "2", title: "child 2" }] },
+  {
+    id: "HowItWorksSection",
+    active: false,
+    title: "How We Work",
+    children: [
+      { id: "animation1", title: "Start" },
+      { id: "animation2", title: "Searching" },
+      { id: "animation3", title: "Summary" },
+      { id: "animation4", title: "Pathway" },
+      { id: "animation5", title: "Evaluate Nodes" },
+      { id: "animation6", title: "End" },
+    ]
+  },
   { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
   { id: "ValuesSection", active: false, title: "Why 1Cademy Helps", children: [] },
   { id: "SchoolsSection", active: false, title: "Where Are We From?", children: [] },
@@ -191,7 +203,14 @@ function Index() {
 
       setSections(prev => {
         const tt = prev.map((cur, idx) => {
-          if (idx === index) return { ...cur, active: true }
+          if (idx === animationSectionIndex) {
+            console.log('cur-section', cur)
+            let childrenCopy = cur.children.map(c => ({ ...c, active: false }))
+            childrenCopy[indexAnimation].active = true
+            console.log('cur-section:childrenCopy', childrenCopy)
+            const animationSection = { ...cur, active: true, children: childrenCopy }
+            return animationSection
+          }
           return { ...cur, active: false }
         })
 
@@ -241,51 +260,149 @@ function Index() {
     }
   };
 
-  const switchSection = (newValue) => (event) => {
-    console.log(1)
-    setNotSectionSwitching(false);
-    setSection(newValue);
-    let cumulativeHeight = 0;
-    console.log(2)
-    for (let sIdx = -1; sIdx < newValue; sIdx++) {
-      const sectOffsetHeight = window.document.getElementById(
-        sectionsOrder[sIdx + 1].id
-      ).scrollHeight;
-      cumulativeHeight += sectOffsetHeight;
+  const scrollToSection = ({ height, sectionSelected }) => {
+    window.document.getElementById("ScrollableContainer")
+      .scroll({ top: height, left: 0, behavior: "smooth" });
+
+    window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
+  }
+
+  const switchSection = (newValue, animationIndex = 0) => {
+    if (!section1Ref?.current) return
+    if (!section2Ref?.current) return
+    if (!section3Ref?.current) return
+    if (!section4Ref?.current) return
+    if (!section5Ref?.current) return
+    if (!section6Ref?.current) return
+    if (!section7Ref?.current) return
+
+    const sectionsHeight = [
+      { id: section1Ref.current.id, height: 0 },
+      { id: section2Ref.current.id, height: section1Ref.current.clientHeight },
+      { id: section3Ref.current.id, height: section2Ref.current.clientHeight },
+      { id: section4Ref.current.id, height: section3Ref.current.clientHeight },
+      { id: section5Ref.current.id, height: section4Ref.current.clientHeight },
+      { id: section6Ref.current.id, height: section5Ref.current.clientHeight },
+      { id: section7Ref.current.id, height: section6Ref.current.clientHeight },
+    ]
+
+    const previousSections = sectionsHeight.slice(0, newValue + 1)
+    const sectionResult = previousSections.reduce((a, c) => {
+      return { id: c.id, height: a.height + c.height }
+    })
+
+
+    let cumulativeAnimationHeight = 0
+    if (sectionAnimationControllerRef.current) {
+
+      const animation1Height = 0
+      const animation2Height = sectionAnimationControllerRef.current.getAnimation1Height()
+      const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
+      const animation4Height = sectionAnimationControllerRef.current.getAnimation3Height()
+      const animation5Height = sectionAnimationControllerRef.current.getAnimation4Height()
+      const animation6Height = sectionAnimationControllerRef.current.getAnimation5Height()
+      const animationsHeight = [animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
+
+      // console.log('reduce', animationsHeight.slice(0, animationIndex))
+      const previousAnimationHeight = animationsHeight.slice(0, animationIndex + 1)
+      console.log({ previousAnimationHeight })
+      cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c)
+
+      // console.log({ cumulativeAnimationHeight })
+
+      // const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight
     }
-    console.log(3)
-    window.document.getElementById("ScrollableContainer").scroll({
-      top: cumulativeHeight,
-      left: 0,
-      behavior: "smooth",
-    });
-    console.log(5)
-    // document
-    //   .getElementById(sectionsOrder[newValue + 1].id)
-    //   .scrollIntoView({
-    //     block: "start",
-    //     inline: "nearest",
-    //     behavior: "smooth",
-    //   });
-    console.log(6)
-    window.history.replaceState(
-      null,
-      sectionsOrder[newValue + 1].title,
-      "#" + sectionsOrder[newValue + 1].id
-    );
+
+    const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight
+    console.log('RESULT', { sectionsHeight, sectionResult, cumulativeAnimationHeight, cumulativeHeight })
+    // }
+    scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue + 1] })
+
     setTimeout(() => {
       setNotSectionSwitching(true);
     }, 1000);
   };
 
+  // const scrollToSection = ({ height, sectionSelected }) => {
+  //   window.document.getElementById("ScrollableContainer")
+  //     .scroll({ top: height, left: 0, behavior: "smooth" });
+
+  //   window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
+  // }
+
+  // const switchSection = (newValue, animationIndex = -1) => {
+  //   console.log(1)
+  //   setNotSectionSwitching(false);
+  //   setSection(newValue);
+  //   let cumulativeHeight = 0;
+  //   console.log(2)
+  //   for (let sIdx = -1; sIdx < newValue; sIdx++) {
+  //     const sectOffsetHeight = window.document.getElementById(
+  //       sectionsOrder[sIdx + 1].id
+  //     ).scrollHeight;
+  //     cumulativeHeight += sectOffsetHeight;
+  //   }
+
+  //   console.log('move to an animation-prev', { newValue, animationIndex })
+  //   // if (animationIndex >= 0) {
+  //   if (!sectionAnimationControllerRef.current) return
+
+  //   const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
+  //   const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
+  //   const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
+  //   const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
+  //   const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
+  //   const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
+  //   const animationsHeight = [animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
+
+  //   const cumulativeAnimationHeight = animationsHeight.slice(0, animationIndex).reduce((a, c) => a + c)
+
+  //   console.log({ hh: animationsHeight.slice(0, animationIndex), cumulativeAnimationHeight })
+  //   // -1
+  //   // const { cumulativeAnimationHeight } = animationsHeight.reduce((acu, cur, idx) => {
+  //   //   if (idx <= animationIndex) return acu
+
+  //   //   const cumulativeAnimationHeight = acu.cumulativeAnimationHeight + cur
+  //   //   return { cumulativeAnimationHeight, indexAnimation: idx }
+  //   // }, { cumulativeAnimationHeight: 0, indexAnimation: -1 })
+
+  //   cumulativeHeight += cumulativeAnimationHeight
+  //   console.log('move to an animation', { cumulativeHeight })
+  //   // }
+  //   scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue + 1] })
+  //   // console.log(3)
+  //   // window.document.getElementById("ScrollableContainer").scroll({
+  //   //   top: cumulativeHeight,
+  //   //   left: 0,
+  //   //   behavior: "smooth",
+  //   // });
+  //   // console.log(5)
+  //   // // document
+  //   // //   .getElementById(sectionsOrder[newValue + 1].id)
+  //   // //   .scrollIntoView({
+  //   // //     block: "start",
+  //   // //     inline: "nearest",
+  //   // //     behavior: "smooth",
+  //   // //   });
+  //   // console.log(6)
+  //   // window.history.replaceState(
+  //   //   null,
+  //   //   sectionsOrder[newValue + 1].title,
+  //   //   "#" + sectionsOrder[newValue + 1].id
+  //   // );
+  //   setTimeout(() => {
+  //     setNotSectionSwitching(true);
+  //   }, 1000);
+  // };
+
   const homeClick = (event) => {
     event.preventDefault();
-    switchSection(-1)(event);
+    switchSection(-1)
   };
 
   const joinUsClick = (event) => {
     event.preventDefault();
-    switchSection(sectionsOrder.length - 2)(event);
+    switchSection(sectionsOrder.length - 1)
   };
 
   const handleProfileMenuOpen = (event) => {
@@ -428,7 +545,7 @@ function Index() {
         </Box>
       </Box>
 
-      <Box id="step-0" ref={section1Ref}>
+      <Box id={sectionsOrder[0].id} ref={section1Ref}>
         <Landing />
       </Box>
 
@@ -437,26 +554,37 @@ function Index() {
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
           </h2> */}
-          <TableOfContent menuItems={sections} />
+          <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
+            console.log('called switchSection', idx, idxAnimation)
+            switchSection(idx, idxAnimation)
+          }} />
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference" }}>test</h2> */}
         </Box>
         <Box>
-          <Box ref={section2Ref} >
+          <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
-          <Box ref={section3Ref} >
+          <Box id={sectionsOrder[2].id} ref={section3Ref} >
             <What />
           </Box>
-          <Box ref={section4Ref}>
+          <Box id={sectionsOrder[3].id} ref={section4Ref}>
             <Values />
           </Box>
-          <Box ref={section5Ref}>
-            <UniversitiesMap theme={"Light"} />
+          <Box id={sectionsOrder[4].id} ref={section5Ref}>
+            <div id="SchoolsSection">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
+            </div>
+
+            {/* <UniversitiesMap theme={"Light"} /> */}
           </Box>
-          <Box ref={section6Ref}>
+          <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
           </Box>
-          <Box ref={section7Ref}>
+          <Box id={sectionsOrder[6].id} ref={section7Ref}>
             <JoinUs />
           </Box>
         </Box>
