@@ -15,7 +15,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
           pl: "20px"
         }}
       >
-        {menuItems.map((item) => (
+        {menuItems.map((item, idx) => (
           <Box component={"ul"}
             key={item.id}
             sx={{
@@ -36,48 +36,62 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
                 left: "-4px",
                 top: "26px",
                 background: item.active ? "#f1f1f1" : "#666666",
-                // border: "solid 1px #666666",
-              }
+              },
+              ":hover": {
+                fontWeight: "700",
+                color: "#ff8a33",
+                "&::after": {
+                  background: "#ff8a33"
+                }
+              },
             }}
           >
-            <Typography sx={{
-              fontSize: "16px",
-              // fontWeight: "700",
-              py: "20px",
-              cursor: "pointer",
-              ":hover": {
-                color: "orange"
-              }
-            }}>
+            <Typography
+              onClick={() => onChangeContent(idx)}
+              sx={{
+                fontSize: "16px",
+                py: "15px",
+                cursor: "pointer",
+                ":hover": {
+                  fontWeight: "700",
+                  color: "#ff8a33"
+                }
+              }}>
               {item.title}
             </Typography>
-            {item.children.length > 0 && (
-              <Box
-                component={"ul"}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  listStyle: "none",
-                  pl: "15px"
-                }}
-              >
-                {item.children.map((child) => (
-                  <Box component={"li"} key={child.id} onClick={() => onChangeContent(child.target)}>
-                    <Typography sx={{
-                      fontSize: "16px",
-                      cursor: "pointer",
-                      py: "10px",
-                      ":hover": {
-                        color: "orange"
-                      },
-                    }}>
-                      {child.title}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
+            {
+              item.children.length > 0 && (
+                <Box
+                  component={"ul"}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    listStyle: "none",
+                    pl: "15px"
+                  }}
+                >
+                  {item.children.map((child, idx) => (
+                    <Box component={"li"} key={child.id}>
+                      <Typography
+                        onClick={() => onChangeContent(1, idx)}
+                        sx={{
+                          color: child.active ? "#f1f1f1" : "#666666",
+                          fontSize: "16px",
+                          cursor: "pointer",
+                          py: "5px",
+                          ":hover": {
+                            fontWeight: "700",
+                            color: "#ff8a33"
+                          },
+                        }}>
+                        {child.title}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )
+            }
           </Box>
         ))}
       </Box>
