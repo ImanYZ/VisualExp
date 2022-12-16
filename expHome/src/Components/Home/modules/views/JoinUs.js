@@ -273,7 +273,7 @@ const JoinUs = props => {
       component="section"
       sx={{
         pt: !props.community ? 7 : 1,
-        pb: 10
+        pb: 10,
       }}
     >
       {!props.community ? (
