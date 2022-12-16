@@ -89,7 +89,7 @@ const HowItWorks = (props) => {
           {props.riveComponent}
         </div>
         <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center" }}>
+          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center",paddingTop:"56px" }}>
             {sectionsOrder[sectionIdx].title}
           </Typography>
           {/* <h2 style={{ color: 'orange', background: "black" }}>0: {animation0Ref?.current?.clientHeight ?? 0}</h2> */}
