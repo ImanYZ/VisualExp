@@ -228,4 +228,4 @@ exports.passagesNumberCorrection = functions
 //   .onRun(updateInstitutions);
 
 // LifeLog:
-exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
+// exports.lifeLoggerScheduler = functions.pubsub.schedule("every hour").onRun(lifeLoggerScheduler);
