@@ -13,15 +13,16 @@ import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
 import AppAppBar from "./modules/views/AppAppBar";
+
 import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
-import { Button, IconButton, Menu, MenuItem, Tooltip, useMediaQuery } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Tab, Tabs, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { colorModeState, emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
+import { colorModeState, emailState, firebaseState, fullnameState, leadingState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
@@ -75,6 +76,7 @@ function Index() {
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
+  const leading = useRecoilValue(leadingState);
   const [ap, setAP] = useState(0)
 
   // const matches = useMediaQuery(theme.breakpoints.up('lg'));
@@ -758,6 +760,25 @@ function Index() {
     navigateTo("/auth");
   }
 
+  const LinkTab = (props) => {
+    return (
+      <Tooltip title={props.titl}>
+        <Tab
+          onClick={(event) => {
+            event.preventDefault();
+            props.onClick(event);
+          }}
+          color="inherit"
+          {...props}
+        />
+      </Tooltip>
+    );
+  };
+
+  const thisPage = useMemo(() => {
+    return section === sectionsOrder.length - 2 ? "Apply!" : undefined
+  }, [section])
+
   return (
     // <ThemeProvider theme={theme("dark")}>
     <Box
@@ -785,8 +806,14 @@ function Index() {
         <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
         <Container sx={{ height: "70px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {/* <Box sx={{ height: "70px", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}> */}
-          <Box>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#f8f8f8" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
+
+            {/* <Typography>{sectionsOrder}</Typography>
+            <Typography>2</Typography>
+            <Typography>3</Typography>
+            <Typography>4</Typography>
+            <Typography>4</Typography> */}
           </Box>
           <Box>
             {!(section === sectionsOrder.length - 2) && (
@@ -837,9 +864,8 @@ function Index() {
                 </Button>
               </Tooltip>
             )}
+            {fullname && renderProfileMenu}
           </Box>
-          {fullname && renderProfileMenu}
-          {/* </Box> */}
         </Container>
 
       </Box>
