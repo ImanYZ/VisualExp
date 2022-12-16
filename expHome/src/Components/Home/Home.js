@@ -22,12 +22,12 @@ import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
 import { Button, IconButton, Menu, MenuItem, Tab, Tabs, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { colorModeState, emailState, firebaseState, fullnameState, leadingState } from "../../store/AuthAtoms";
+import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
-import { ThemeProvider } from "@mui/styles";
-import theme from "./modules/theme";
+// import { ThemeProvider } from "@mui/styles";
+// import theme from "./modules/theme";
 import { Container } from "@mui/system";
 
 
@@ -45,7 +45,7 @@ const artboards = [
 const SECTION_WITH_ANIMATION = 1
 
 const sectionsTmp = [
-  { id: "LandingSection", active: true, title: "1Cademy's Landing Page", children: [] },
+  { id: "LandingSection", active: true, title: "Home", children: [] },
   {
     id: "HowItWorksSection",
     active: false,
@@ -59,8 +59,8 @@ const sectionsTmp = [
       { id: "animation6", title: "Join us" },
     ]
   },
-  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
   { id: "ValuesSection", active: false, title: "Why 1Cademy Helps", children: [] },
+  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
   { id: "SchoolsSection", active: false, title: "Where Are We From?", children: [] },
   { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", children: [] },
   { id: "JoinUsSection", active: false, title: "Apply to Join Us!", children: [] },
@@ -76,10 +76,8 @@ function Index() {
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
-  const leading = useRecoilValue(leadingState);
+  // const leading = useRecoilValue(leadingState);
   const [ap, setAP] = useState(0)
-
-  // const matches = useMediaQuery(theme.breakpoints.up('lg'));
   const matches = useMediaQuery('(min-width:1200px)');
 
   // const [ap,setAP] =(0)
@@ -119,240 +117,6 @@ function Index() {
     }
   }, [firebase, fullname]);
 
-  const onScrollAnimation = (target) => {
-
-    if (!notSectionSwitching) return
-
-    console.log('on-scroll')
-    const scrollOffset = target.scrollTop
-
-    const sectionsPositions = getSectionHeights()
-    console.log({ sectionsHeight: sectionsPositions })
-    if (!sectionsPositions) return
-
-    // console.log({sectionsHeight})
-    console.log('---------------->>', { sectionsPositions })
-    const { startSection, idx: idxSectionSelected } = sectionsPositions.reduce((acu, cur, idx) => {
-      const endSection = cur.height + acu.endSection
-      if (scrollOffset > endSection) {// scrollPosition is not in cur section
-        return { ...acu, endSection, startSection: acu.endSection }
-      }
-      return { endSection, startSection: acu.endSection, idx }
-    }, { endSection: 0, startSection: 0, idx: -1 })
-    // const { index: currentSectionIndex, min: cumulativeHeight } = sectionsPositions.reduce((acu, cur, idx) => {
-    //   if (acu.index >= 0) return acu
-    //   const max = acu.max + cur.height
-    //   console.log({ scrollOffset, newCumulativeHeight: max })
-    //   if (scrollOffset <= acu.min) return { max: max, index: idx, min: acu.min }//
-    //   return { ...acu, max: max, min: acu.min }
-    // }, { max: 0, min: 0, index: -1 })
-
-    console.log({ startSection, idxSectionSelected, scrollOffset })
-
-    console.log('<<----------------')
-    // if (currentSectionIndex < 0) return Error('cant detect current` section')
-    // const animationSectionIndex = 1
-
-    // console.log({ currentSectionIndex, animationSectionIndex })
-    // if (currentSectionIndex < animationSectionIndex) {
-    //   // show first artboard and first frame
-    //   rive.reset({ artboard: artboards[0].name })
-    //   rive.scrub("Timeline 1", 0)
-    // }
-    // if (currentSectionIndex > animationSectionIndex) {
-    //   // show last artboard and last frame
-    //   rive.reset({ artboard: artboards[artboards.length - 1].name })
-    //   rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
-    // }
-
-    // console.log('SECTION-ID', currentSectionIndex, animationSectionIndex)
-    // if (currentSectionIndex === animationSectionIndex) {
-    //   // check local percentage
-    //   const lowerLimit = cumulativeHeight - sectionsPositions[animationSectionIndex]
-    //   // const upperLimit = cumulativeHeight
-
-    //   // const rangeAnimation = upperLimit - lowerLimit
-    //   // const positionAnimation = scrollOffset - lowerLimit
-    //   // const percentageAnimation = positionAnimation * 100 / rangeAnimation
-    //   // console.log({ percentageAnimation })
-    //   // setAnimationScrollPercentage(percentageAnimation)
-
-    //   // get animation section selected
-    //   // if (!sectionAnimationControllerRef.current) return
-
-    //   // const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
-    //   // const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
-    //   // const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
-    //   // const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
-    //   // const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
-    //   // const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-
-    //   // const animationsHeight = [animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
-
-    //   const animationsHeight = getAnimationsPositions()
-    //   // let cumulativeAnimationHeight = 0
-    //   if (animationsHeight) {
-    //     console.log({ animationsHeight })
-    //     const { indexAnimation, cumulativeAnimationHeight } = animationsHeight.reduce((acu, cur, idx) => {
-    //       if (acu.indexAnimation >= 0) return acu
-    //       const cumulativeAnimationHeight = acu.cumulativeAnimationHeight + cur
-    //       if (scrollOffset < cumulativeAnimationHeight) return { cumulativeAnimationHeight, indexAnimation: idx }
-    //       return { ...acu, cumulativeAnimationHeight }
-    //     }, { cumulativeAnimationHeight: lowerLimit, indexAnimation: -1 })
-    //     console.log({ cumulativeAnimationHeight, indexAnimation })
-    //     if (indexAnimation < 0) return Error('cant detect current animation')
-
-    //     const lowerAnimationLimit = cumulativeAnimationHeight - animationsHeight[indexAnimation]
-    //     const upperAnimationLimit = cumulativeAnimationHeight
-
-    //     const rangeFrames = upperAnimationLimit - lowerAnimationLimit
-    //     const positionFrame = scrollOffset - lowerAnimationLimit
-    //     const percentageFrame = positionFrame * 100 / rangeFrames
-
-    //     rive.reset({ artboard: artboards[indexAnimation].name })
-    //     const timeInSeconds = artboards[indexAnimation].durationMs / 1000 * percentageFrame / 100
-    //     rive.scrub("Timeline 1", timeInSeconds)
-    //   }
-    //   setSections(prev => {
-    //     const tt = prev.map((cur, idx) => {
-    //       if (idx === animationSectionIndex) {
-    //         const animationSection = { ...cur, active: true }
-    //         return animationSection
-    //       }
-    //       return { ...cur, active: false }
-    //     })
-
-    //     return tt
-    //   })
-    //   // setFramePercentage(percentageFrame)
-    // }
-
-  }
-
-  // const onScrollAnimation = (target) => {
-  //   console.log('on-scroll')
-  //   const scrollOffset = target.scrollTop
-  //   // const scrollTotal = target.scrollHeight - window.innerHeight
-  //   // const percentage = 100 * scrollOffset / scrollTotal
-  //   // setScrollPercentage(percentage)
-
-  //   if (!section1Ref.current) return
-  //   if (!section2Ref.current) return
-  //   if (!section3Ref.current) return
-  //   if (!section4Ref.current) return
-  //   if (!section5Ref.current) return
-  //   if (!section6Ref.current) return
-  //   if (!section7Ref.current) return
-  //   // const pageHeight = target.scrollHeight
-  //   const section1Height = section1Ref.current.clientHeight
-  //   const section2Height = section2Ref.current.clientHeight
-  //   const section3Height = section3Ref.current.clientHeight
-  //   const section4Height = section4Ref.current.clientHeight
-  //   const section5Height = section5Ref.current.clientHeight
-  //   const section6Height = section6Ref.current.clientHeight
-  //   const section7Height = section7Ref.current.clientHeight
-
-  //   const sectionsHeight = [section1Height, section2Height, section3Height, section4Height, section5Height, section6Height, section7Height]
-  //   const animationSectionIndex = 1
-
-  //   const { index, cumulativeHeight } = sectionsHeight.reduce((acu, cur, idx) => {
-  //     if (acu.index >= 0) return acu
-  //     const newCumulativeHeight = acu.cumulativeHeight + cur
-  //     if (scrollOffset < newCumulativeHeight) return { cumulativeHeight: newCumulativeHeight, index: idx }
-  //     return { ...acu, cumulativeHeight: newCumulativeHeight }
-  //   }, { cumulativeHeight: 0, index: -1 })
-
-  //   console.log('INDEX', index)
-  //   if (index < 0) return Error('cant detect current` section')
-
-  //   if (index < animationSectionIndex) {
-  //     // show first artboard and first frame
-  //     rive.reset({ artboard: artboards[0].name })
-  //     rive.scrub("Timeline 1", 0)
-  //   }
-  //   if (index > animationSectionIndex) {
-  //     // show last artboard and last frame
-  //     rive.reset({ artboard: artboards[artboards.length - 1].name })
-  //     rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
-  //   }
-
-  //   if (index === animationSectionIndex) {
-  //     console.log('Scroll in animation section')
-  //     // check local percentage
-  //     const lowerLimit = cumulativeHeight - sectionsHeight[animationSectionIndex]
-  //     const upperLimit = cumulativeHeight
-
-  //     const rangeAnimation = upperLimit - lowerLimit
-  //     const positionAnimation = scrollOffset - lowerLimit
-  //     const percentageAnimation = positionAnimation * 100 / rangeAnimation
-  //     console.log({ percentageAnimation })
-  //     // setAnimationScrollPercentage(percentageAnimation)
-
-  //     // get animation section selected
-  //     if (!sectionAnimationControllerRef.current) return
-
-  //     const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
-  //     const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
-  //     const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
-  //     const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
-  //     const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
-  //     const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-
-  //     const animationsHeight = [animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
-
-  //     console.log({ lowerLimit })
-
-  //     const { indexAnimation, cumulativeAnimationHeight } = animationsHeight.reduce((acu, cur, idx) => {
-  //       if (acu.indexAnimation >= 0) return acu
-  //       const cumulativeAnimationHeight = acu.cumulativeAnimationHeight + cur
-  //       // console.log(1, { acu })
-  //       // console.log(2, '<', { scrollOffset, cumulativeAnimationHeight })
-  //       if (scrollOffset < cumulativeAnimationHeight) return { cumulativeAnimationHeight, indexAnimation: idx }
-  //       return { ...acu, cumulativeAnimationHeight }
-  //     }, { cumulativeAnimationHeight: lowerLimit, indexAnimation: -1 })
-
-  //     console.log('INDEX_ANIMATION', indexAnimation)
-
-  //     if (indexAnimation < 0) return Error('cant detect current animation')
-
-  //     console.log('--->', { indexAnimation, cumulativeAnimationHeight })
-
-  //     const lowerAnimationLimit = cumulativeAnimationHeight - animationsHeight[indexAnimation]
-  //     const upperAnimationLimit = cumulativeAnimationHeight
-
-  //     const rangeFrames = upperAnimationLimit - lowerAnimationLimit
-  //     const positionFrame = scrollOffset - lowerAnimationLimit
-  //     const percentageFrame = positionFrame * 100 / rangeFrames
-  //     console.log({ lowerAnimationLimit, upperAnimationLimit, rangeFrames, positionFrame })
-  //     console.log('percentageFrame', percentageFrame.toFixed(1))
-
-  //     rive.reset({ artboard: artboards[indexAnimation].name })
-  //     const timeInSeconds = artboards[indexAnimation].durationMs / 1000 * percentageFrame / 100
-  //     rive.scrub("Timeline 1", timeInSeconds)
-
-
-
-  //     setSections(prev => {
-  //       const tt = prev.map((cur, idx) => {
-  //         if (idx === animationSectionIndex) {
-  //           // console.log('cur-section', cur)
-  //           // let childrenCopy = cur.children.map(c => ({ ...c, active: false }))
-  //           // childrenCopy[indexAnimation].active = true
-  //           // console.log('cur-section:childrenCopy', childrenCopy)
-  //           // const animationSection = { ...cur, active: true, children: childrenCopy }
-  //           const animationSection = { ...cur }
-  //           return animationSection
-  //         }
-  //         return { ...cur, active: false }
-  //       })
-
-  //       console.log({ tt })
-  //       return tt
-  //     })
-  //     // setFramePercentage(percentageFrame)
-  //   }
-
-  // }
 
   const RiveComponentMemo = useMemo(() => {
     return <RiveComponent
@@ -374,10 +138,6 @@ function Index() {
   }
 
   const detectScrollPosition = (event) => {
-    console.log('update_Position', event.target.scrollTop)
-    // onScrollAnimation(event.currentTarget)
-
-
 
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
@@ -387,8 +147,6 @@ function Index() {
         if (acu.max > currentScrollPosition) return acu
         return { max: acu.max + cur.height, min: acu.max, idx }
       }, { max: 0, min: 0, idx: -1 })
-
-      // console.log('xx:1>', { max, min, idx: idxSection })
 
       if (idxSection < 0) return
 
@@ -400,16 +158,7 @@ function Index() {
         if (acu.maxAnimation > currentScrollPosition) return acu
         return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx }
       }, { maxAnimation: min, minAnimation: min, idxAnimation: -1 })
-      // console.log('xx:2>', { maxAnimation, minAnimation, idxAnimation, animationsHeight })
-      // console.log('xx:--->', { idxSection, idxAnimation })
 
-      // let childrenCopy = sections[idxSection].children.map((c, i) => {
-      //   if(idxAnimation!==i) return {...c,active:false}
-      //   return {...c,active:false}
-      // }
-      //   if (i !== idxAnimation) return { ...c }
-
-      // })
       const sectionSelected = sections[idxSection]
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
       setSection(idxSection)
@@ -449,56 +198,6 @@ function Index() {
       }
     }
   };
-
-  // const updatePosition = (event) => {
-  //   console.log('update_Position')
-  //   // onScrollAnimation(event.currentTarget)
-
-
-
-  //   if (notSectionSwitching) {
-  //     const currentScrollPosition = event.target.scrollTop
-  //     let cumulativeHeight = 0;
-  //     for (let sIdx = 0; sIdx < sectionsOrder.length; sIdx++) {
-  //       const sectOffsetHeight = window.document.getElementById(
-  //         sectionsOrder[sIdx].id
-  //       ).scrollHeight;
-  //       cumulativeHeight += sectOffsetHeight;
-  //       if (currentScrollPosition < cumulativeHeight) {
-  //         // execute 1 time
-  //         console.log('----->update_Position: sIndex', sIdx)
-  //         const cumulativeHeightCopy = cumulativeHeight
-  //         setSection(sIdx - 1);
-  //         setSections(prev => prev.map((cur, idx) => {
-  //           if (idx !== sIdx) return { ...cur, active: false }
-  //           const animationPositions = getAnimationsHeight()
-  //           if (!animationPositions) return { ...cur, active: true }
-
-  //           console.log({ cumulativeHeightCopy, animationPositions, currentScrollPosition })
-  //           const childrenIdxSelected = getChildrenIndexSelected(cumulativeHeightCopy, animationPositions, currentScrollPosition)
-  //           console.log({ childrenIdxSelected })
-  //           if (!childrenIdxSelected < 0) return { ...cur, active: true }
-
-  //           console.log('----->update_Position: childrenIdxSelected', childrenIdxSelected)
-  //           let childrenCopy = [...cur.children]
-  //           childrenCopy[childrenIdxSelected] = true
-  //           const sectionCopy = { ...cur, children: childrenCopy, active: true }
-  //           console.log('----->update_Position: sectionCopy', sectionCopy)
-  //           return sectionCopy
-
-  //         }))
-
-  //         window.history.replaceState(
-  //           null,
-  //           sectionsOrder[sIdx].title,
-  //           "#" + sectionsOrder[sIdx].id
-  //         );
-  //         break;
-  //       }
-  //     }
-
-  //   }
-  // };
 
   const scrollToSection = ({ height, sectionSelected }) => {
     window.document.getElementById("ScrollableContainer")
@@ -622,78 +321,6 @@ function Index() {
       setNotSectionSwitching(true);
     }, 1000);
   };
-
-  // const scrollToSection = ({ height, sectionSelected }) => {
-  //   window.document.getElementById("ScrollableContainer")
-  //     .scroll({ top: height, left: 0, behavior: "smooth" });
-
-  //   window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
-  // }
-
-  // const switchSection = (newValue, animationIndex = -1) => {
-  //   console.log(1)
-  //   setNotSectionSwitching(false);
-  //   setSection(newValue);
-  //   let cumulativeHeight = 0;
-  //   console.log(2)
-  //   for (let sIdx = -1; sIdx < newValue; sIdx++) {
-  //     const sectOffsetHeight = window.document.getElementById(
-  //       sectionsOrder[sIdx + 1].id
-  //     ).scrollHeight;
-  //     cumulativeHeight += sectOffsetHeight;
-  //   }
-
-  //   console.log('move to an animation-prev', { newValue, animationIndex })
-  //   // if (animationIndex >= 0) {
-  //   if (!sectionAnimationControllerRef.current) return
-
-  //   const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
-  //   const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
-  //   const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
-  //   const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
-  //   const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
-  //   const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-  //   const animationsHeight = [animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
-
-  //   const cumulativeAnimationHeight = animationsHeight.slice(0, animationIndex).reduce((a, c) => a + c)
-
-  //   console.log({ hh: animationsHeight.slice(0, animationIndex), cumulativeAnimationHeight })
-  //   // -1
-  //   // const { cumulativeAnimationHeight } = animationsHeight.reduce((acu, cur, idx) => {
-  //   //   if (idx <= animationIndex) return acu
-
-  //   //   const cumulativeAnimationHeight = acu.cumulativeAnimationHeight + cur
-  //   //   return { cumulativeAnimationHeight, indexAnimation: idx }
-  //   // }, { cumulativeAnimationHeight: 0, indexAnimation: -1 })
-
-  //   cumulativeHeight += cumulativeAnimationHeight
-  //   console.log('move to an animation', { cumulativeHeight })
-  //   // }
-  //   scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue + 1] })
-  //   // console.log(3)
-  //   // window.document.getElementById("ScrollableContainer").scroll({
-  //   //   top: cumulativeHeight,
-  //   //   left: 0,
-  //   //   behavior: "smooth",
-  //   // });
-  //   // console.log(5)
-  //   // // document
-  //   // //   .getElementById(sectionsOrder[newValue + 1].id)
-  //   // //   .scrollIntoView({
-  //   // //     block: "start",
-  //   // //     inline: "nearest",
-  //   // //     behavior: "smooth",
-  //   // //   });
-  //   // console.log(6)
-  //   // window.history.replaceState(
-  //   //   null,
-  //   //   sectionsOrder[newValue + 1].title,
-  //   //   "#" + sectionsOrder[newValue + 1].id
-  //   // );
-  //   setTimeout(() => {
-  //     setNotSectionSwitching(true);
-  //   }, 1000);
-  // };
 
   const homeClick = (event) => {
     event.preventDefault();
@@ -829,7 +456,7 @@ function Index() {
             </Tooltip>
           </Box>
           <Box>
-            {!(section === sectionsOrder.length - 2) && (
+            {(
               <Tooltip title="Apply to join 1Cademy">
                 <Button
                   variant="contained"
@@ -887,28 +514,24 @@ function Index() {
         <Landing />
       </Box>
 
-      {/* <Box sx={{ position: "relative", display: "grid", gridTemplateColumns: "200px auto", gridTemplateRows: "1fr" }}> */}
-      <Box sx={{ position: "relative", display: "flex" }}>
-        {matches && <Box sx={{ minWidth: "200px", maxWidth: "300px" }}>
-          {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
-          </h2> */}
-          {/* <div style={{ position: "sticky", top: "100px", color: "pink" }}>FRAME:{ap}%</div> */}
-          <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
-            console.log('called switchSection', idx, idxAnimation)
-            switchSection(idx, idxAnimation)
-          }} />
-          {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference" }}>test</h2> */}
+      <Box sx={{ position: "relative" }}>
+        {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "200px", maxWidth: "300px", }}>
+          <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
+            <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
+              console.log('called switchSection', idx, idxAnimation)
+              switchSection(idx, idxAnimation)
+            }} />
+          </Box>
         </Box>}
         <Box>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
-          <Box id={sectionsOrder[2].id} ref={section3Ref} >
-            <What />
+          <Box id={sectionsOrder[2].id} ref={section3Ref}>
+            <Values /> {/* why */}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={section4Ref}>
-            <Values />
+          <Box id={sectionsOrder[3].id} ref={section4Ref} >
+            <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
             <UniversitiesMap theme={"Light"} />
