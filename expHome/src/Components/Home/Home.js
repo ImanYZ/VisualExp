@@ -59,8 +59,8 @@ const sectionsTmp = [
       { id: "animation6", title: "Join us" },
     ]
   },
-  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
   { id: "ValuesSection", active: false, title: "Why 1Cademy Helps", children: [] },
+  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
   { id: "SchoolsSection", active: false, title: "Where Are We From?", children: [] },
   { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", children: [] },
   { id: "JoinUsSection", active: false, title: "Apply to Join Us!", children: [] },
@@ -527,11 +527,11 @@ function Index() {
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
-          <Box id={sectionsOrder[2].id} ref={section3Ref} >
-            <What />
+          <Box id={sectionsOrder[2].id} ref={section3Ref}>
+            <Values /> {/* why */}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={section4Ref}>
-            <Values />
+          <Box id={sectionsOrder[3].id} ref={section4Ref} >
+            <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
             <UniversitiesMap theme={"Light"} />
