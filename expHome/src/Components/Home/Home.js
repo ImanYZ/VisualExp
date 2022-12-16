@@ -50,12 +50,12 @@ const sectionsTmp = [
     active: false,
     title: "How We Work",
     children: [
-      { id: "animation1", title: "Start" },
+      { id: "animation1", title: "Problem" },
       { id: "animation2", title: "Searching" },
-      { id: "animation3", title: "Summary" },
-      { id: "animation4", title: "Pathway" },
-      { id: "animation5", title: "Evaluate Nodes" },
-      { id: "animation6", title: "End" },
+      { id: "animation3", title: "Summarizing" },
+      { id: "animation4", title: "Linking" },
+      { id: "animation5", title: "Evaluating/Improving" },
+      { id: "animation6", title: "Join" },
     ]
   },
   { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
