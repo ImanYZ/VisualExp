@@ -112,7 +112,16 @@ const HowItWorks = (props) => {
         {/* <div ref={animation6Ref} style={{ height: "100vh", width: "100%", borderRight: "solid 20px #15e9a2", position: "absolute", bottom: "0px", left: "0px" }}>6</div> */}
 
         {/* --- animation ends */}
-
+        <Button
+        color="secondary"
+        variant="contained"
+        size="large"
+        component="a"
+        href="#JoinUsSection"
+        sx={{ minWidth: 200, color: "common.white" ,zIndex:"10"}}
+      >
+        Apply to Join Us!
+      </Button>
         <Box sx={{ zIndex: 1, mx: "auto" }}>
           {/* <Grid container spacing={2.5} align="center">
             {howElements.map((elem, idx) => {
