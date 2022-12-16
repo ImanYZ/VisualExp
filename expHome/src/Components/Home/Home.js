@@ -42,7 +42,7 @@ const sectionsTmp = [
   {
     id: "HowItWorksSection",
     active: false,
-    title: "How We Work",
+    title: "How We Work?",
     children: [
       { id: "animation1", title: "Problem" },
       { id: "animation2", title: "Searching" },
@@ -52,9 +52,9 @@ const sectionsTmp = [
       { id: "animation6", title: "Join us" },
     ]
   },
-  { id: "ValuesSection", active: false, title: "Why 1Cademy Helps", children: [] },
-  { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
-  { id: "SchoolsSection", active: false, title: "Where Are We From?", children: [] },
+  { id: "ValuesSection", active: false, title: "Why 1Cademy?", children: [] },
+  { id: "CommunitiesSection", active: false, title: "What we study?", children: [] },
+  { id: "SchoolsSection", active: false, title: "Where Are We?", children: [] },
   { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", children: [] },
   { id: "JoinUsSection", active: false, title: "Apply to Join Us!", children: [] },
 ]
