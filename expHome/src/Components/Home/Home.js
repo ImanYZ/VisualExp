@@ -80,6 +80,12 @@ function Index() {
     autoplay: false,
   });
 
+  useEffect(() => {
+    if (!rive) return
+    rive.reset({ artboard: artboards[0].name })
+    rive.scrub("Timeline 1", 0)
+  }, [rive])
+
   // const step0Ref = useRef(null);
   const sectionAnimationControllerRef = useRef(null)
   const section1Ref = useRef(null)
@@ -371,7 +377,7 @@ function Index() {
         return { max: acu.max + cur.height, min: acu.max, idx }
       }, { max: 0, min: 0, idx: -1 })
 
-      console.log('xx:1>', { max, min, idx: idxSection })
+      // console.log('xx:1>', { max, min, idx: idxSection })
 
       if (idxSection < 0) return
 
@@ -383,8 +389,8 @@ function Index() {
         if (acu.maxAnimation > currentScrollPosition) return acu
         return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx }
       }, { maxAnimation: min, minAnimation: min, idxAnimation: -1 })
-      console.log('xx:2>', { maxAnimation, minAnimation, idxAnimation, animationsHeight })
-      console.log('xx:--->', { idxSection, idxAnimation })
+      // console.log('xx:2>', { maxAnimation, minAnimation, idxAnimation, animationsHeight })
+      // console.log('xx:--->', { idxSection, idxAnimation })
 
       // let childrenCopy = sections[idxSection].children.map((c, i) => {
       //   if(idxAnimation!==i) return {...c,active:false}
@@ -423,7 +429,7 @@ function Index() {
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
         setAP(percentageFrame)
-        console.log('xx:--->', { percentageFrame })
+        // console.log('xx:--->', { percentageFrame })
 
         rive.reset({ artboard: artboards[idxAnimation].name })
         const timeInSeconds = artboards[idxAnimation].durationMs / 1000 * percentageFrame / 100
@@ -574,6 +580,30 @@ function Index() {
     }
     const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight
     scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue] })
+
+    // set animation and  frame
+    if (newValue < SECTION_WITH_ANIMATION) {
+      rive.reset({ artboard: artboards[0].name })
+      rive.scrub("Timeline 1", 0)
+    }
+    if (newValue > SECTION_WITH_ANIMATION) {
+      rive.reset({ artboard: artboards[artboards.length - 1].name })
+      rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
+    }
+    if (newValue === SECTION_WITH_ANIMATION) {
+      rive.reset({ artboard: artboards[animationIndex].name })
+      rive.scrub("Timeline 1", 0)
+    }
+
+    // change selected item in TOC
+    setSections(prev => prev.map((cur, idx) => {
+      if (newValue !== idx) return { ...cur, children: cur.children.map(c => ({ ...c, active: false })), active: false }
+      const childrenFixed = cur.children.map((c, i) => {
+        if (animationIndex !== i) return { ...c, active: false }
+        return { ...c, active: true }
+      })
+      return { ...cur, active: true, children: childrenFixed }
+    }))
 
     setTimeout(() => {
       setNotSectionSwitching(true);
