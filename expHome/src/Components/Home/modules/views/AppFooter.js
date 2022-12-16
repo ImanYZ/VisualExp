@@ -45,7 +45,7 @@ export default function AppFooter() {
   return (
     <Typography
       component="footer"
-      sx={{ display: "flex", bgcolor: "secondary.light" }}
+      sx={{ display: "flex", background: "#202020", color: "#f8f8f8" }}
     >
       <Container sx={{ my: 4, display: "flex" }}>
         <Grid container spacing={5}>
@@ -53,17 +53,17 @@ export default function AppFooter() {
             <Copyright />
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link target="_blank" href="/terms">
+            <Link sx={{color: "#f8f8f8"}} target="_blank" href="/terms">
               Terms
             </Link>
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link target="_blank" href="/privacy">
+            <Link sx={{color: "#f8f8f8"}} target="_blank" href="/privacy">
               Privacy
             </Link>
           </Grid>
           <Grid item xs={6} sm={2}>
-            <Link target="_blank" href="/cookie">
+            <Link sx={{color: "#f8f8f8"}} target="_blank" href="/cookie">
               Cookie
             </Link>
           </Grid>
