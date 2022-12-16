@@ -767,7 +767,8 @@ function Index() {
         overflowY: "auto",
         overflowX: "auto",
         position: "relative",
-        backgroundColor: "#28282a"
+        backgroundColor: "#28282a",
+        // zIndex: -3
       }}
     >
       {/* <AppAppBar
@@ -849,7 +850,7 @@ function Index() {
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
           </h2> */}
-          <div style={{ position: "sticky", top: "100px", color: "pink" }}>FRAME:{ap}%</div>
+          {/* <div style={{ position: "sticky", top: "100px", color: "pink" }}>FRAME:{ap}%</div> */}
           <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
             console.log('called switchSection', idx, idxAnimation)
             switchSection(idx, idxAnimation)
