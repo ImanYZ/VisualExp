@@ -56,7 +56,7 @@ const sectionsTmp = [
       { id: "animation3", title: "Summarizing" },
       { id: "animation4", title: "Linking" },
       { id: "animation5", title: "Evaluating/Improving" },
-      { id: "animation6", title: "Join" },
+      { id: "animation6", title: "Join us" },
     ]
   },
   { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
