@@ -456,7 +456,7 @@ function Index() {
             </Tooltip>
           </Box>
           <Box>
-            {!(section === sectionsOrder.length - 2) && (
+            {(
               <Tooltip title="Apply to join 1Cademy">
                 <Button
                   variant="contained"
