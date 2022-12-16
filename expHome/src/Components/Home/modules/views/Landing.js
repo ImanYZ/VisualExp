@@ -8,7 +8,7 @@ import Typography from "../components/Typography";
 import LandingLayout from "./LandingLayout";
 
 import AnimatediconLoop from "../../../../assets/AnimatediconLoop.gif";
-import backgroundImage from "../../../../assets/LibraryBackground.jpg";
+import backgroundImage from "../../../../assets/darkModeLibraryBackground.jpg";
 
 export default function Landing() {
   const [checked, setChecked] = useState(false);
@@ -39,7 +39,7 @@ export default function Landing() {
       <Box align="center" sx={{ mb: 4, mt: 4 }}>
         <Collapse in={checked} timeout={1000}>
           <Typography color="inherit" variant="h5">
-          We Break Down Learning & Research Content and Build Learning Pathways.
+            We Break Down Learning & Research Content and Build Learning Pathways.
           </Typography>
         </Collapse>
       </Box>
