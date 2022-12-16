@@ -27,6 +27,7 @@ import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { ThemeProvider } from "@mui/styles";
 import theme from "./modules/theme";
+import { Container } from "@mui/system";
 
 
 
@@ -780,9 +781,10 @@ function Index() {
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       /> */}
 
-      <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10 }}>
-        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "#000000c2", filter: 'blur(1px)', }} />
-        <Box sx={{ height: "70px", width: "100%", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}>
+      <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10, display: "flex", justifyContent: "center" }}>
+        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
+        <Container sx={{ height: "70px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          {/* <Box sx={{ height: "70px", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}> */}
           <Box>
             <img src={LogoDarkMode} alt="logo" width="52px" />
           </Box>
@@ -837,7 +839,9 @@ function Index() {
             )}
           </Box>
           {fullname && renderProfileMenu}
-        </Box>
+          {/* </Box> */}
+        </Container>
+
       </Box>
 
       <Box id={sectionsOrder[0].id} ref={section1Ref}>
