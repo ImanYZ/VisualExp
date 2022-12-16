@@ -20,79 +20,21 @@ const sectionIdx = sectionsOrder.findIndex(
   (sect) => sect.id === "HowItWorksSection"
 );
 
-const item = {
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  backgroundColor: "white",
-};
-
-const number = {
-  fontSize: 24,
-  fontFamily: "default",
-  color: "secondary.main",
-  fontWeight: "medium",
-  margin: "10px 0px 10px 0px",
-};
-
-const image = {
-  height: 130,
-  my: 4,
-};
-
-const artboards = [
-  { name: "animation1", durationMs: 5000 },
-  { name: "animation2", durationMs: 30000 },
-  { name: "animation3", durationMs: 1000 }
-  // {name:"animation1",durationMs:2000},
-  // {name:"animation2",durationMs:1000},
-  // {name:"animation3",durationMs:1500}
-]
-
-const howElements = [
-  {
-    id: "Summarizing",
-    title: "Summarize",
-    content: `We summarize the gist of every valuable piece of knowledge
-    on the Web into small chunks of knowledge that we call
-    "nodes."`,
-  },
-  {
-    id: "Linking",
-    title: "Link",
-    content: `We identify and visualize the prerequisite knowledge "links"
-    between nodes.`,
-  },
-  {
-    id: "Evaluating",
-    title: "Evaluate",
-    content: `We group-evaluate the nodes and links, through up/down-votes
-    and comments.`,
-  },
-  {
-    id: "Improving",
-    title: "Improve",
-    content: `We collaboratively improve and up-date nodes and links
-    through proposals and community approvals.`,
-  },
-];
-
-// const iniStepChecked = [];
-// for (let value of howElements) {
-//   iniStepChecked.push(false);
-// }
 
 const HowItWorks = (props) => {
 
+  const animation0Ref = useRef(null)
   const animation1Ref = useRef(null)
   const animation2Ref = useRef(null)
   const animation3Ref = useRef(null)
   const animation4Ref = useRef(null)
   const animation5Ref = useRef(null)
   const animation6Ref = useRef(null)
+  const { height, width } = useWindowSize();
 
   useImperativeHandle(props.innerRef, () => {
     return {
+      getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0,
       getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
       getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
       getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
@@ -101,43 +43,13 @@ const HowItWorks = (props) => {
       getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
     };
   }, []);
-  const { height, width } = useWindowSize();
-
-  // const { rive, RiveComponent } = useRive({
-  //   src: "gg.riv",
-  //   stateMachines: artboards[0].name,
-  //   autoplay: false,
-  // });
-
-  // const [stepChecked, setStepChecked] = useState(iniStepChecked);
-
-  // const flipCard = (idx) => (event) => {
-  //   const sChecked = [...stepChecked];
-  //   sChecked[idx] = !sChecked[idx];
-  //   setStepChecked(sChecked);
-  // };
-
-  // const [stepChecked, setStepChecked] = useState([false, false, false, false]);
-
-  // useEffect(() => {
-  //   if (props.section >= sectionIdx - 1 && !stepChecked[0]) {
-  //     setStepChecked([true, false, false, false]);
-  //     setTimeout(() => {
-  //       setStepChecked([true, true, false, false]);
-  //       setTimeout(() => {
-  //         setStepChecked([true, true, true, false]);
-  //         setTimeout(() => {
-  //           setStepChecked([true, true, true, true]);
-  //         }, 1000);
-  //       }, 1000);
-  //     }, 1000);
-  //   }
-  // }, [props.section, stepChecked]);
 
   const boxLarge = useMemo(() => {
     if (height < width) return height - 100
     return width - 100
   }, [height, width])
+
+  const topCenteredPosition = height / 2 - boxLarge / 2 + 35
 
   return (
     <>
@@ -146,8 +58,8 @@ const HowItWorks = (props) => {
         id="HowItWorksSection"
         component="section"
         sx={{
-          pt: 7,
-          pb: 10,
+          // pt: 7,
+          // pb: 10,
           position: "relative",
           display: "flex",
           flexDirection: "column",
@@ -157,9 +69,7 @@ const HowItWorks = (props) => {
           // border: 'dashed 6px orange'
         }}
       >
-        <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8" }}>
-          {sectionsOrder[sectionIdx].title}
-        </Typography>
+
         {/* <Box
         component="img"
         src="/static/CurvyLines.png"
@@ -175,16 +85,31 @@ const HowItWorks = (props) => {
 
 
         {/* --- animations start */}
-
-        <div style={{ position: 'sticky', top: height / 2 - boxLarge / 2 + 35, /* border: 'solid 2px royalBlue', */ width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10/* , border: "solid 2px pink" */ }}>
           {props.riveComponent}
         </div>
-        <div ref={animation1Ref} style={{ height: "100vh", width: "100%" /* background: "#123" */ }}></div>
-        <div ref={animation2Ref} style={{ height: "500vh", width: "100%" /* background: "#2769aa" */ }}></div>
-        <div ref={animation3Ref} style={{ height: "300vh", width: "100%" /* background: "#3696f7" */ }}></div>
-        <div ref={animation4Ref} style={{ height: "300vh", width: "100%" /* background: "#26c2ff" */ }}></div>
-        <div ref={animation5Ref} style={{ height: "300vh", width: "100%" /* background: "#24f0ff" */ }}></div>
-        <div ref={animation6Ref} style={{ height: "100vh", width: "100%" /* background: "#15e9a2" */, position: "absolute", bottom: "0px", left: "0px" }}></div>
+        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
+          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center" }}>
+            {sectionsOrder[sectionIdx].title}
+          </Typography>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>0: {animation0Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        <div ref={animation1Ref} style={{ height: "1000vh", width: "100%"/* , borderRight: "solid 20px #8031a5" */ }}>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>1: {animation1Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        <div ref={animation2Ref} style={{ height: "500vh", width: "100%"/* , borderRight: "solid 20px #2769aa" */ }}>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>2: {animation2Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        <div ref={animation3Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #3696f7" */ }}>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>3: {animation3Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        <div ref={animation4Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #26c2ff" */ }}>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>4: {animation4Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        <div ref={animation5Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #24f0ff" */ }}>
+          {/* <h2 style={{ color: 'orange', background: "black" }}>5: {animation5Ref?.current?.clientHeight ?? 0}</h2> */}
+        </div>
+        {/* <div ref={animation6Ref} style={{ height: "100vh", width: "100%", borderRight: "solid 20px #15e9a2", position: "absolute", bottom: "0px", left: "0px" }}>6</div> */}
 
         {/* --- animation ends */}
 

@@ -73,7 +73,7 @@ const What = (props) => {
       component="section"
       sx={{ pt: 10, pb: 4 }}
     >
-      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
         {sectionsOrder[sectionIdx].title}
       </Typography>
       <Box sx={{ mt: 7, display: "flex", flexWrap: "wrap" }}>
