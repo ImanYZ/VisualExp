@@ -89,7 +89,7 @@ const HowItWorks = (props) => {
           {props.riveComponent}
         </div>
         <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center" }}>
+          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center",paddingTop:"56px" }}>
             {sectionsOrder[sectionIdx].title}
           </Typography>
           {/* <h2 style={{ color: 'orange', background: "black" }}>0: {animation0Ref?.current?.clientHeight ?? 0}</h2> */}
@@ -112,7 +112,16 @@ const HowItWorks = (props) => {
         {/* <div ref={animation6Ref} style={{ height: "100vh", width: "100%", borderRight: "solid 20px #15e9a2", position: "absolute", bottom: "0px", left: "0px" }}>6</div> */}
 
         {/* --- animation ends */}
-
+        <Button
+        color="secondary"
+        variant="contained"
+        size="large"
+        component="a"
+        href="#JoinUsSection"
+        sx={{ minWidth: 200, color: "common.white" ,zIndex:"10"}}
+      >
+        Apply to Join Us!
+      </Button>
         <Box sx={{ zIndex: 1, mx: "auto" }}>
           {/* <Grid container spacing={2.5} align="center">
             {howElements.map((elem, idx) => {
