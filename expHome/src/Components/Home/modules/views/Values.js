@@ -64,7 +64,7 @@ const Values = (props) => {
         {valuesItems.map((value, idx) => {
           return (
             <Grid key={value.name} item xs={12} sm={6} md={4} lg={3}>
-              <Card sx={{ maxWidth: 340 }}>
+              <Card sx={{ maxWidth: 340,  background: "#202020", color: "#f8f8f8" }}>
                 <CardActionArea onClick={flipCard(idx)}>
                   <Box
                     sx={{
@@ -72,6 +72,7 @@ const Values = (props) => {
                       justify: "center",
                       alignItems: "center",
                       height: "250px",
+                     
                     }}
                   >
                     <CardMedia
