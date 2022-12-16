@@ -88,8 +88,8 @@ const HowItWorks = (props) => {
         <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10/* , border: "solid 2px pink" */ }}>
           {props.riveComponent}
         </div>
-        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8" }}>
+        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
+          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center" }}>
             {sectionsOrder[sectionIdx].title}
           </Typography>
           {/* <h2 style={{ color: 'orange', background: "black" }}>0: {animation0Ref?.current?.clientHeight ?? 0}</h2> */}

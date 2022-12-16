@@ -19,12 +19,12 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
           <Box component={"ul"}
             key={item.id}
             sx={{
-              color: item.active ? "#f1f1f1" : "#666666",
+              color: item.active ? "#f1f1f1" : "#9c9c9c",
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
               listStyle: "none",
-              borderLeft: "solid 1px #666666",
+              borderLeft: "solid 1px #9c9c9c",
               px: "10px",
               position: "relative",
               "&::after": {
@@ -35,7 +35,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
                 position: "absolute",
                 left: "-4px",
                 top: "26px",
-                background: item.active ? "#f1f1f1" : "#666666",
+                background: item.active ? "#f1f1f1" : "#9c9c9c",
               },
               ":hover": {
                 fontWeight: "700",
@@ -76,7 +76,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
                       <Typography
                         onClick={() => onChangeContent(1, idx)}
                         sx={{
-                          color: child.active ? "#f1f1f1" : "#666666",
+                          color: child.active ? "#f1f1f1" : "#9c9c9c",
                           fontSize: "16px",
                           cursor: "pointer",
                           py: "5px",
