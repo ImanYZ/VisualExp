@@ -38,7 +38,7 @@ const artboards = [
   { name: "animation2", durationMs: 22000 },
   { name: "animation3", durationMs: 8000 },
   { name: "animation4", durationMs: 22000 },
-  { name: "animation5", durationMs: 13000 },
+  { name: "animation5", durationMs: 14000 },
   { name: "animation6", durationMs: 3000 }
 ]
 
@@ -411,6 +411,7 @@ function Index() {
       // })
       const sectionSelected = sections[idxSection]
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
+      setSection(idxSection)
 
       setSections(prev => prev.map((cur, idx) => {
         if (idxSection !== idx) return { ...cur, children: cur.children.map(c => ({ ...c, active: false })), active: false }
@@ -591,6 +592,7 @@ function Index() {
     const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight
     scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue] })
 
+    setSection(newValue)
     // set animation and  frame
     if (newValue < SECTION_WITH_ANIMATION) {
       rive.reset({ artboard: artboards[0].name })
@@ -806,14 +808,24 @@ function Index() {
         <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
         <Container sx={{ height: "70px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           {/* <Box sx={{ height: "70px", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}> */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#f8f8f8" }}>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#f8f8f8", gap: "20px" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
 
-            {/* <Typography>{sectionsOrder}</Typography>
-            <Typography>2</Typography>
-            <Typography>3</Typography>
-            <Typography>4</Typography>
-            <Typography>4</Typography> */}
+            <Tooltip title={sectionsOrder[1].title}>
+              <Typography sx={{ cursor: "pointer", borderBottom: section === 1 ? "solid 2px orange" : undefined }} onClick={() => switchSection(1)}>{sectionsOrder[1].label}</Typography>
+            </Tooltip>
+            <Tooltip title={sectionsOrder[2].title}>
+              <Typography sx={{ cursor: "pointer", borderBottom: section === 2 ? "solid 2px orange" : undefined }} onClick={() => switchSection(2)}>{sectionsOrder[2].label}</Typography>
+            </Tooltip>
+            <Tooltip title={sectionsOrder[3].title}>
+              <Typography sx={{ cursor: "pointer", borderBottom: section === 3 ? "solid 2px orange" : undefined }} onClick={() => switchSection(3)}>{sectionsOrder[3].label}</Typography>
+            </Tooltip>
+            <Tooltip title={sectionsOrder[4].title}>
+              <Typography sx={{ cursor: "pointer", borderBottom: section === 4 ? "solid 2px orange" : undefined }} onClick={() => switchSection(4)}>{sectionsOrder[4].label}</Typography>
+            </Tooltip>
+            <Tooltip title={sectionsOrder[5].title}>
+              <Typography sx={{ cursor: "pointer", borderBottom: section === 5 ? "solid 2px orange" : undefined }} onClick={() => switchSection(5)}>{sectionsOrder[5].label}</Typography>
+            </Tooltip>
           </Box>
           <Box>
             {!(section === sectionsOrder.length - 2) && (
