@@ -14,6 +14,7 @@ const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 const UniversitiesMap = (props) => {
   const firebase = useRecoilValue(firebaseOneState);
   const [institutions, setInstitutions] = useState([]);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const fetchInstitutions = async () => {
@@ -31,6 +32,12 @@ const UniversitiesMap = (props) => {
       fetchInstitutions();
     }
   }, [firebase]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setShowMap(true);
+    }, 4000)
+  }, [])
 
   // console.log(institutions);
   // // API KEY: AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE
@@ -72,7 +79,7 @@ const UniversitiesMap = (props) => {
   //   </GoogleMap>
   // ));
 
-  return (
+  return showMap ? (
     // <div
     //   id="SchoolsSection"
     //   className={
@@ -88,7 +95,7 @@ const UniversitiesMap = (props) => {
           marked="center"
           align="center"
           component="h2"
-          sx={{ mb: 7 }}
+          sx={{ mb: 7, color: "#f8f8f8" }}
         >
           Our Researchers Are From
         </Typography>
@@ -102,7 +109,7 @@ const UniversitiesMap = (props) => {
       </div>
     </Container>
     // </div>
-  );
+  ) : <div />;
 };
 
 export default React.memo(UniversitiesMap);

@@ -25,7 +25,7 @@ const Background = styled(Box)({
   bottom: 0,
   backgroundSize: "cover",
   backgroundRepeat: "no-repeat",
-  zIndex: -2,
+  zIndex: 0,
 });
 
 function LandingLayout(props) {
@@ -33,6 +33,19 @@ function LandingLayout(props) {
 
   return (
     <LandingLayoutRoot id="LandingSection">
+      <Box
+        sx={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0,
+          backgroundColor: "common.black",
+          opacity: 0.5,
+          zIndex: 1,
+        }}
+      />
+      <Background sx={sxBackground} />
       <Container
         sx={{
           mt: 3,
@@ -40,28 +53,10 @@ function LandingLayout(props) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          zIndex: 2,
         }}
       >
-        {/* <img
-          src="/static/LandingWonder.png"
-          alt="wonder"
-          width="147"
-          height="80"
-        /> */}
         {children}
-        <Box
-          sx={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            backgroundColor: "common.black",
-            opacity: 0.5,
-            zIndex: -1,
-          }}
-        />
-        <Background sx={sxBackground} />
         <Box
           component="img"
           src="/static/LandingArrowDown.png"
