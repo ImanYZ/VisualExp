@@ -880,7 +880,7 @@ function Index() {
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
             </div>
 
-            {/* <UniversitiesMap theme={"Light"} /> */}
+            <UniversitiesMap theme={"Light"} />
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
