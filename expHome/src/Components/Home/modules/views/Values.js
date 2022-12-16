@@ -39,7 +39,7 @@ const Values = (props) => {
       sx={{
         pt: 7,
         pb: 10,
-        bgcolor: "secondary.light",
+        // bgcolor: "secondary.light",
         position: "relative",
         display: "flex",
         flexDirection: "column",
@@ -57,7 +57,7 @@ const Values = (props) => {
             opacity: 0.7,
           }}
         /> */}
-      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
         {sectionsOrder[sectionIdx].title}
       </Typography>
       <Grid container spacing={2.5} align="center">
