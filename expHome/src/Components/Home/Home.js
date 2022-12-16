@@ -50,12 +50,12 @@ const sectionsTmp = [
     active: false,
     title: "How We Work",
     children: [
-      { id: "animation1", title: "Start" },
+      { id: "animation1", title: "Problem" },
       { id: "animation2", title: "Searching" },
-      { id: "animation3", title: "Summary" },
-      { id: "animation4", title: "Pathway" },
-      { id: "animation5", title: "Evaluate Nodes" },
-      { id: "animation6", title: "End" },
+      { id: "animation3", title: "Summarizing" },
+      { id: "animation4", title: "Linking" },
+      { id: "animation5", title: "Evaluating/Improving" },
+      { id: "animation6", title: "Join" },
     ]
   },
   { id: "CommunitiesSection", active: false, title: "Our Communities", children: [] },
@@ -872,15 +872,7 @@ function Index() {
             <Values />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            <div id="SchoolsSection">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-            </div>
-
-            {/* <UniversitiesMap theme={"Light"} /> */}
+            <UniversitiesMap theme={"Light"} />
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
