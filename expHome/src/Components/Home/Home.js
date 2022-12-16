@@ -19,7 +19,7 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
-import { Button, IconButton, Menu, MenuItem, Tooltip } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Tooltip, useMediaQuery } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { colorModeState, emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +27,9 @@ import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { ThemeProvider } from "@mui/styles";
 import theme from "./modules/theme";
+
+
+
 
 const artboards = [
   { name: "animation1", durationMs: 5000 },
@@ -72,6 +75,10 @@ function Index() {
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
   const [ap, setAP] = useState(0)
+
+  // const matches = useMediaQuery(theme.breakpoints.up('lg'));
+  const matches = useMediaQuery('(min-width:1200px)');
+
   // const [ap,setAP] =(0)
 
   const { rive, RiveComponent } = useRive({
@@ -836,8 +843,9 @@ function Index() {
         <Landing />
       </Box>
 
-      <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", zIndex: 10 }}>
+      {/* <Box sx={{ position: "relative", display: "grid", gridTemplateColumns: "200px auto", gridTemplateRows: "1fr" }}> */}
+      <Box sx={{ position: "relative", display: "flex" }}>
+        {matches && <Box sx={{ minWidth: "200px", maxWidth: "300px" }}>
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference", zIndex: 20 }}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente dignissimos cum repudiandae in debitis voluptatibus dolorem, alias maiores sed dolorum? Modi provident non commodi minus unde. Quia tempore nostrum sapiente!
           </h2> */}
@@ -847,7 +855,7 @@ function Index() {
             switchSection(idx, idxAnimation)
           }} />
           {/* <h2 style={{ position: "sticky", bottom: "0px", mixBlendMode: "difference" }}>test</h2> */}
-        </Box>
+        </Box>}
         <Box>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
@@ -878,7 +886,7 @@ function Index() {
         </Box>
       </Box>
       <AppFooter />
-    </Box>
+    </Box >
     // </ThemeProvider>
   );
 }
