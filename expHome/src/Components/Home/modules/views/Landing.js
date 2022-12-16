@@ -39,7 +39,7 @@ export default function Landing() {
       <Box align="center" sx={{ mb: 4, mt: 4 }}>
         <Collapse in={checked} timeout={1000}>
           <Typography color="inherit" variant="h5">
-            We Visualize Learning Pathways from Books &amp; Research Papers.
+          We Break Down Learning & Research Content and Build Learning Pathways.
           </Typography>
         </Collapse>
       </Box>
