@@ -45,7 +45,7 @@ const artboards = [
 const SECTION_WITH_ANIMATION = 1
 
 const sectionsTmp = [
-  { id: "LandingSection", active: true, title: "1Cademy's Landing Page", children: [] },
+  { id: "LandingSection", active: true, title: "Home", children: [] },
   {
     id: "HowItWorksSection",
     active: false,
