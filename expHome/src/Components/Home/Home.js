@@ -138,10 +138,6 @@ function Index() {
   }
 
   const detectScrollPosition = (event) => {
-    console.log('update_Position', event.target.scrollTop)
-    // onScrollAnimation(event.currentTarget)
-
-
 
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
@@ -151,8 +147,6 @@ function Index() {
         if (acu.max > currentScrollPosition) return acu
         return { max: acu.max + cur.height, min: acu.max, idx }
       }, { max: 0, min: 0, idx: -1 })
-
-      // console.log('xx:1>', { max, min, idx: idxSection })
 
       if (idxSection < 0) return
 
@@ -520,13 +514,14 @@ function Index() {
         <Landing />
       </Box>
 
-      <Box sx={{ position: "relative", display: "flex" }}>
-        {matches && <Box sx={{ minWidth: "200px", maxWidth: "300px" }}>
-
-          <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
-            console.log('called switchSection', idx, idxAnimation)
-            switchSection(idx, idxAnimation)
-          }} />
+      <Box sx={{ position: "relative" }}>
+        {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "200px", maxWidth: "300px", }}>
+          <Box sx={{ position: "sticky", top: "200px", zIndex: 10 }}>
+            <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
+              console.log('called switchSection', idx, idxAnimation)
+              switchSection(idx, idxAnimation)
+            }} />
+          </Box>
         </Box>}
         <Box>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
