@@ -872,14 +872,6 @@ function Index() {
             <Values />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            <div id="SchoolsSection">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam aut eaque atque, doloribus ducimus perspiciatis quos fugit voluptate? Soluta modi labore nemo maiores, eligendi adipisci deserunt! Sunt deserunt aut magni.
-            </div>
-
             <UniversitiesMap theme={"Light"} />
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
