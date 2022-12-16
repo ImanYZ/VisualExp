@@ -516,7 +516,7 @@ function Index() {
 
       <Box sx={{ position: "relative" }}>
         {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "200px", maxWidth: "300px", }}>
-          <Box sx={{ position: "sticky", top: "200px", zIndex: 10 }}>
+          <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
             <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
               console.log('called switchSection', idx, idxAnimation)
               switchSection(idx, idxAnimation)
