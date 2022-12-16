@@ -268,7 +268,7 @@ const JoinUs = props => {
   };
 
   return (
-    <Container
+    <Box
       id="JoinUsSection"
       component="section"
       sx={{
@@ -770,7 +770,7 @@ const JoinUs = props => {
           </Typography>
         </Paper>
       )}
-    </Container>
+    </Box>
   );
 };
 

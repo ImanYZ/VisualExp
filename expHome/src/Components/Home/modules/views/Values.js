@@ -33,7 +33,7 @@ const Values = (props) => {
   };
 
   return (
-    <Container
+    <Box
       id="ValuesSection"
       component="section"
       sx={{
@@ -117,7 +117,7 @@ const Values = (props) => {
       >
         Join/Initiate Communities
       </Button> */}
-    </Container>
+    </Box>
   );
 };
 

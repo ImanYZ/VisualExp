@@ -12,7 +12,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
           alignItems: "start",
           listStyle: "none",
           padding: 0,
-          pl: "20px"
+          pl: "15px"
         }}
       >
         {menuItems.map((item, idx) => (
@@ -68,7 +68,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
                     flexDirection: "column",
                     alignItems: "flex-start",
                     listStyle: "none",
-                    pl: "15px"
+                    pl: "12px"
                   }}
                 >
                   {item.children.map((child, idx) => (
@@ -77,7 +77,7 @@ export const TableOfContent = ({ menuItems, onChangeContent }) => {
                         onClick={() => onChangeContent(1, idx)}
                         sx={{
                           color: child.active ? "#f1f1f1" : "#9c9c9c",
-                          fontSize: "16px",
+                          fontSize: "14px",
                           cursor: "pointer",
                           py: "5px",
                           ":hover": {

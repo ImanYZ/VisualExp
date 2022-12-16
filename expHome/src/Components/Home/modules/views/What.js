@@ -68,7 +68,7 @@ const goToCommPage = (commId) => (event) => {
 
 const What = (props) => {
   return (
-    <Container
+    <Box
       id="CommunitiesSection"
       component="section"
       sx={{ pt: 10, pb: 4 }}
@@ -136,7 +136,7 @@ const What = (props) => {
           </ImageIconButton>
         ))}
       </Box>
-    </Container>
+    </Box>
   );
 };
 
