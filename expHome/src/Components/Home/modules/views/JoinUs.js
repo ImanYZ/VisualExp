@@ -274,7 +274,6 @@ const JoinUs = props => {
       sx={{
         pt: !props.community ? 7 : 1,
         pb: 10,
-        minHeight: "100vh"
       }}
     >
       {!props.community ? (
