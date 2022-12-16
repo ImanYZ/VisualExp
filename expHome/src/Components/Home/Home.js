@@ -88,6 +88,7 @@ function Index() {
     src: "gg.riv",
     stateMachines: artboards[0].name,
     autoplay: false,
+    onLoad: () => console.log('load-finish')
   });
 
   useEffect(() => {
