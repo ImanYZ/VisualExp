@@ -12,7 +12,6 @@ import Landing from "./modules/views/Landing";
 import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
-import AppAppBar from "./modules/views/AppAppBar";
 
 import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
@@ -20,18 +19,12 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import { useRive } from "@rive-app/react-canvas";
-import { Button, IconButton, Menu, MenuItem, Tab, Tabs, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import { Button, IconButton, Menu, MenuItem, Stack, Tab, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
-// import { ThemeProvider } from "@mui/styles";
-// import theme from "./modules/theme";
-import { Container } from "@mui/system";
-
-
-
 
 const artboards = [
   { name: "animation1", durationMs: 5000 },
@@ -76,11 +69,8 @@ function Index() {
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
-  // const leading = useRecoilValue(leadingState);
   const [ap, setAP] = useState(0)
   const matches = useMediaQuery('(min-width:1200px)');
-
-  // const [ap,setAP] =(0)
 
   const { rive, RiveComponent } = useRive({
     src: "gg.riv",
@@ -432,11 +422,10 @@ function Index() {
         thisPage={section === sectionsOrder.length - 2 ? "Apply!" : undefined}
       /> */}
 
-      <Box component={'header'} sx={{ position: "sticky", top: "0px", left: "0px", right: "0px", zIndex: 10, display: "flex", justifyContent: "center" }}>
-        <Box sx={{ height: "70px", width: "100%", position: "absolute", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
-        <Container sx={{ height: "70px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {/* <Box sx={{ height: "70px", position: "absolute", color: "#f8f8f8", display: "flex", justifyContent: "space-between", alignItems: "center", px: "10px" }} component={'nav'}> */}
-          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#f8f8f8", gap: "20px" }}>
+      <Box component={'header'} sx={{ position: "sticky", width: "100%", top: "0px", zIndex: 12, display: "flex", justifyContent: "center" }}>
+        <Box sx={{ height: "70px", width: "100%", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
+        <Box sx={{ width: "100%", maxWidth: "980px", height: "70px", px: matches ? "0px" : "10px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Stack spacing={"20px"} alignItems={"center"} justifyContent={"space-between"} direction={"row"} sx={{ color: "#f8f8f8" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
 
             <Tooltip title={sectionsOrder[1].title}>
@@ -454,7 +443,7 @@ function Index() {
             <Tooltip title={sectionsOrder[5].title}>
               <Typography sx={{ cursor: "pointer", borderBottom: section === 5 ? "solid 2px orange" : undefined }} onClick={() => switchSection(5)}>{sectionsOrder[5].label}</Typography>
             </Tooltip>
-          </Box>
+          </Stack>
           <Box>
             {(
               <Tooltip title="Apply to join 1Cademy">
@@ -506,7 +495,7 @@ function Index() {
             )}
             {fullname && renderProfileMenu}
           </Box>
-        </Container>
+        </Box>
 
       </Box>
 
@@ -515,7 +504,8 @@ function Index() {
       </Box>
 
       <Box sx={{ position: "relative" }}>
-        {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "200px", maxWidth: "300px", }}>
+
+        {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "100px", maxWidth: "180px", }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
             <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
               console.log('called switchSection', idx, idxAnimation)
@@ -523,7 +513,8 @@ function Index() {
             }} />
           </Box>
         </Box>}
-        <Box>
+
+        <Box sx={{ width: "100%", maxWidth: "980px", px: matches ? "0px" : "10px", margin: "auto", }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
