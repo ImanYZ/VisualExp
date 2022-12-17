@@ -160,3 +160,9 @@ button.Button.Red {
   width: inherit;
   height: inherit;
 }
+
+.page-wrapper{
+  max-width: 980px;
+  margin: auto;
+  border:"solid 2px pink"
+}
