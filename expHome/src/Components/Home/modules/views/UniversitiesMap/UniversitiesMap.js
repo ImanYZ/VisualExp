@@ -8,6 +8,7 @@ import Typography from "../../components/Typography";
 import { firebaseOneState } from "../../../../../store/OneCademyAtoms";
 
 import "./UniversitiesMap.css";
+import { Box } from "@mui/material";
 
 const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 
@@ -88,7 +89,7 @@ const UniversitiesMap = (props) => {
     //       : "UniversitiesMapDiv"
     //   }
     // >
-    <Container id="SchoolsSection" component="section" sx={{ mt: 8, mb: 4 }}>
+    <Box id="SchoolsSection" component="section" sx={{ mt: 8, mb: 4 }}>
       <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
         <Typography
           variant="h4"
@@ -107,7 +108,7 @@ const UniversitiesMap = (props) => {
           ) : null}
         </div>
       </div>
-    </Container>
+    </Box>
     // </div>
   ) : <div />;
 };

@@ -29,7 +29,7 @@ const gray03 = "#AAAAAA"
 
 const WhoWeAre = (props) => {
   return (
-    <Container
+    <Box
       id="WhoWeAreSection"
       component="section"
       sx={{
@@ -479,7 +479,7 @@ const WhoWeAre = (props) => {
           </Paper>
         </Grid>
       </Grid >
-    </Container >
+    </Box >
   );
 };
 
