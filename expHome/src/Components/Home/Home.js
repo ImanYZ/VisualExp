@@ -18,13 +18,13 @@ import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
-import { useRive } from "@rive-app/react-canvas";
 import { Button, IconButton, Menu, MenuItem, Stack, Tab, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
+import { useRive } from "rive-react/dist";
 
 const artboards = [
   { name: "animation1", durationMs: 5000 },
@@ -128,7 +128,7 @@ function Index() {
   }
 
   const detectScrollPosition = (event) => {
-
+    if(!rive) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
 
