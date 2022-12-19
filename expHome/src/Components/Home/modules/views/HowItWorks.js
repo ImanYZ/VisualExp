@@ -1,4 +1,3 @@
-import { useRive, useStateMachineInput } from "@rive-app/react-canvas";
 import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 
 import Box from "@mui/material/Box";
