@@ -68,17 +68,18 @@ const HowItWorks = (props) => {
           // border: 'dashed 6px orange'
         }}
       >
+        <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center", paddingTop: "56px" }}>
+          {sectionsOrder[sectionIdx].title}
+        </Typography>
 
         {/* --- animations start */}
         <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10/* , border: "solid 2px pink" */ }}>
           {props.riveComponent}
         </div>
         <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center", paddingTop: "56px" }}>
-            {sectionsOrder[sectionIdx].title}
-          </Typography>
 
         </div>
+
         <div ref={animation1Ref} style={{ height: "1000vh", width: "100%"/* , borderRight: "solid 20px #8031a5" */ }}>
 
         </div>
