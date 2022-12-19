@@ -515,7 +515,7 @@ const Auth = props => {
       {emailVerified === "Sent" ? (
         createAccount ? (
           <>
-            <Alert severity="warning">wait a couple seconds . we are craeting your account !</Alert>
+            <Alert severity="warning">wait a couple seconds . we are creating your account !</Alert>
             <Alert severity="warning">Please don't close this page while we are creating your account </Alert>
           </>
         ) : (
