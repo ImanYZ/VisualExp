@@ -130,11 +130,12 @@ function Index() {
 
   const detectScrollPosition = (event) => {
     if (!rive) return
+    if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
 
       const sectionsHeight = getSectionPositions()
-      const { max, min, idx: idxSection } = sectionsHeight.reduce((acu, cur, idx) => {
+      const { min, idx: idxSection } = sectionsHeight.reduce((acu, cur, idx) => {
         if (acu.max > currentScrollPosition) return acu
         return { max: acu.max + cur.height, min: acu.max, idx }
       }, { max: 0, min: 0, idx: -1 })
@@ -142,13 +143,13 @@ function Index() {
       if (idxSection < 0) return
 
       const animationsHeight = getAnimationsPositions()
-
+      const sectionHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
 
       const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce((acu, cur, idx) => {
         // console.log({ ...acu, cur, currentScrollPosition })
         if (acu.maxAnimation > currentScrollPosition) return acu
         return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx }
-      }, { maxAnimation: min, minAnimation: min, idxAnimation: -1 })
+      }, { maxAnimation: min + sectionHeight, minAnimation: min + sectionHeight, idxAnimation: -1 })
 
       const sectionSelected = sections[idxSection]
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
@@ -162,6 +163,8 @@ function Index() {
         })
         return { ...cur, active: true, children: childrenFixed }
       }))
+
+      if (idxAnimation < 0) return
 
       if (idxSection < SECTION_WITH_ANIMATION) {
         // show first artboard and first frame
@@ -240,7 +243,7 @@ function Index() {
   const getAnimationsHeight = useCallback(() => {
     if (!sectionAnimationControllerRef.current) return null
 
-    const animation0Height = 0
+    const animation0Height = 0 + sectionAnimationControllerRef.current.getSectionHeaderHeight()
     const animation1Height = sectionAnimationControllerRef.current.getAnimation0Height()
     const animation2Height = sectionAnimationControllerRef.current.getAnimation1Height()
     const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
