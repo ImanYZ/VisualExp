@@ -71,6 +71,7 @@ function Index() {
   const navigateTo = useNavigate();
   const [ap, setAP] = useState(0)
   const matches = useMediaQuery('(min-width:1200px)');
+  const isMovil = useMediaQuery('(max-width:600px)');
 
   const { rive, RiveComponent } = useRive({
     src: "gg.riv",
@@ -128,7 +129,7 @@ function Index() {
   }
 
   const detectScrollPosition = (event) => {
-    if(!rive) return
+    if (!rive) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
 
@@ -428,21 +429,24 @@ function Index() {
           <Stack spacing={"20px"} alignItems={"center"} justifyContent={"space-between"} direction={"row"} sx={{ color: "#f8f8f8" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
 
-            <Tooltip title={sectionsOrder[1].title}>
-              <Typography sx={{ cursor: "pointer", borderBottom: section === 1 ? "solid 2px orange" : undefined }} onClick={() => switchSection(1)}>{sectionsOrder[1].label}</Typography>
-            </Tooltip>
-            <Tooltip title={sectionsOrder[2].title}>
-              <Typography sx={{ cursor: "pointer", borderBottom: section === 2 ? "solid 2px orange" : undefined }} onClick={() => switchSection(2)}>{sectionsOrder[2].label}</Typography>
-            </Tooltip>
-            <Tooltip title={sectionsOrder[3].title}>
-              <Typography sx={{ cursor: "pointer", borderBottom: section === 3 ? "solid 2px orange" : undefined }} onClick={() => switchSection(3)}>{sectionsOrder[3].label}</Typography>
-            </Tooltip>
-            <Tooltip title={sectionsOrder[4].title}>
-              <Typography sx={{ cursor: "pointer", borderBottom: section === 4 ? "solid 2px orange" : undefined }} onClick={() => switchSection(4)}>{sectionsOrder[4].label}</Typography>
-            </Tooltip>
-            <Tooltip title={sectionsOrder[5].title}>
-              <Typography sx={{ cursor: "pointer", borderBottom: section === 5 ? "solid 2px orange" : undefined }} onClick={() => switchSection(5)}>{sectionsOrder[5].label}</Typography>
-            </Tooltip>
+            {!isMovil && <>
+              <Tooltip title={sectionsOrder[1].title}>
+                <Typography sx={{ cursor: "pointer", borderBottom: section === 1 ? "solid 2px orange" : undefined }} onClick={() => switchSection(1)}>{sectionsOrder[1].label}</Typography>
+              </Tooltip>
+              <Tooltip title={sectionsOrder[2].title}>
+                <Typography sx={{ cursor: "pointer", borderBottom: section === 2 ? "solid 2px orange" : undefined }} onClick={() => switchSection(2)}>{sectionsOrder[2].label}</Typography>
+              </Tooltip>
+              <Tooltip title={sectionsOrder[3].title}>
+                <Typography sx={{ cursor: "pointer", borderBottom: section === 3 ? "solid 2px orange" : undefined }} onClick={() => switchSection(3)}>{sectionsOrder[3].label}</Typography>
+              </Tooltip>
+              <Tooltip title={sectionsOrder[4].title}>
+                <Typography sx={{ cursor: "pointer", borderBottom: section === 4 ? "solid 2px orange" : undefined }} onClick={() => switchSection(4)}>{sectionsOrder[4].label}</Typography>
+              </Tooltip>
+              <Tooltip title={sectionsOrder[5].title}>
+                <Typography sx={{ cursor: "pointer", borderBottom: section === 5 ? "solid 2px orange" : undefined }} onClick={() => switchSection(5)}>{sectionsOrder[5].label}</Typography>
+              </Tooltip>
+            </>
+            }
           </Stack>
           <Box>
             {(
@@ -451,6 +455,7 @@ function Index() {
                   variant="contained"
                   color="secondary"
                   onClick={joinUsClick}
+                  size={isMovil ? "small" : "medium"}
                   sx={{
                     fontSize: 16,
                     color: "common.white",
@@ -482,6 +487,7 @@ function Index() {
                 <Button
                   variant="contained"
                   onClick={signUpHandler}
+                  size={isMovil ? "small" : "medium"}
                   sx={{
                     fontSize: 16,
                     color: "common.white",
