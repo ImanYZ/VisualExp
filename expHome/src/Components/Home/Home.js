@@ -27,12 +27,12 @@ import { TableOfContent } from "./modules/components/TableOfContent";
 import { useRive } from "rive-react/dist";
 
 const artboards = [
-  { name: "animation1", durationMs: 5000 },
+  { name: "animation1", durationMs: 8000 },
   { name: "animation2", durationMs: 22000 },
-  { name: "animation3", durationMs: 8000 },
-  { name: "animation4", durationMs: 22000 },
-  { name: "animation5", durationMs: 14000 },
-  { name: "animation6", durationMs: 3000 }
+  { name: "animation3", durationMs: 5000 },
+  { name: "animation4", durationMs: 8500 },
+  { name: "animation5", durationMs: 2000 },
+  // { name: "animation6", durationMs: 3000 }
 ]
 
 const SECTION_WITH_ANIMATION = 1
@@ -45,12 +45,13 @@ const sectionsTmp = [
     title: "How We Work?",
     simpleTitle: "How?",
     children: [
-      { id: "animation1", title: "Problem", simpleTitle: "Problem", },
-      { id: "animation2", title: "Searching", simpleTitle: "Searching", },
-      { id: "animation3", title: "Summarizing", simpleTitle: "Summarizing", },
-      { id: "animation4", title: "Linking", simpleTitle: "Linking", },
-      { id: "animation5", title: "Evaluating/Improving", simpleTitle: "Evaluating", },
-      { id: "animation6", title: "Join us", simpleTitle: "Join us", },
+      // { id: "animation1", title: "Problem", simpleTitle: "Problem", },
+      // { id: "animation2", title: "Searching", simpleTitle: "Searching", },
+      { id: "animation1", title: "Summarizing", simpleTitle: "Summarizing", },
+      { id: "animation2", title: "Linking", simpleTitle: "Linking", },
+      { id: "animation3", title: "Evaluating", simpleTitle: "Evaluating", },
+      { id: "animation4", title: "Improving", simpleTitle: "Improving", },
+      { id: "animation5", title: "Join us", simpleTitle: "Join us", },
     ]
   },
   { id: "ValuesSection", active: false, title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
@@ -251,8 +252,8 @@ function Index() {
     const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
     const animation4Height = sectionAnimationControllerRef.current.getAnimation3Height()
     const animation5Height = sectionAnimationControllerRef.current.getAnimation4Height()
-    const animation6Height = sectionAnimationControllerRef.current.getAnimation5Height()
-    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
+    // const animation6Height = sectionAnimationControllerRef.current.getAnimation5Height()
+    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height]
   }, [])
 
   const getAnimationsPositions = useCallback(() => {
@@ -264,8 +265,8 @@ function Index() {
     const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
     const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
     const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
-    const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height, animation6Height]
+    // const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
+    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height]
   }, [])
 
   const switchSection = (newValue, animationIndex = 0) => {

@@ -2,7 +2,7 @@ import { Box, Tooltip, Typography } from "@mui/material";
 import React from 'react'
 
 export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx }) => {
-  console.log({ viewType })
+
   return (
     <Box component={"nav"} sx={{ position: "sticky", top: "200px", ...customSx }} style={{ mixBlendMode: "difference" }}>
       <Box
@@ -18,9 +18,7 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
       >
         {menuItems.map((item, idx) => (
           <Box component={"li"}
-            // onClick={() => onChangeContent(idx)}
             sx={{
-              // height: `${56 + item.children.length * 36}px`,
               display: "flex",
               flexDirection: "column",
               alignItems: "flex-start",
@@ -30,11 +28,9 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
             <Tooltip key={item.id} title={item.title} placement="right" arrow disableInteractive>
               <Box onClick={() => onChangeContent(idx)}
                 sx={{
-
                   height: "56px",
                   color: item.active ? "#f1f1f1" : "#9c9c9c",
                   display: "flex",
-                  // flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "flex-start",
                   listStyle: "none",
@@ -43,20 +39,14 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                   position: "relative",
                   "&::before": {
                     content: '""',
-                    // width: viewType === "SIMPLE" ? "10px" : "7px",
-                    // height: viewType === "SIMPLE" ? "10px" : "7px",
                     width: "7px",
                     height: "7px",
                     borderRadius: "50%",
                     position: "absolute",
-                    // left: viewType === "SIMPLE" ? "-5px" : "-4px",
-                    // top: viewType === "SIMPLE" ? "13px" : "26px",
                     left: "-4px",
                     top: "22px",
                     background: item.active ? "#f1f1f1" : "#9c9c9c",
                     outline: item.active ? "solid 4px #8d8d8d7a" : undefined
-                    // border: "solid 1px red"
-                    // outline: item.active ? "solid 2px #202020" : undefined
                   },
                   ":hover": {
                     color: "#ff8a33",
@@ -108,21 +98,14 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                           justifyContent: "flex-start",
                           "&::before": {
                             content: '""',
-                            // width: viewType === "SIMPLE" ? "7px" : "5px",
-                            // height: viewType === "SIMPLE" ? "7px" : "5px",
                             width: "5px",
                             height: "5px",
                             borderRadius: "50%",
                             position: "absolute",
-                            // left: viewType === "SIMPLE" ? "-22px" : "-21px",
-                            // top: viewType === "SIMPLE" ? "12px" : "12px",
                             left: viewType === "SIMPLE" ? "-3px" : "-21px",
                             top: "16px",
-                            // background: child.active ? "#f1f1f1" : "#000000",
                             background: child.active ? "#f1f1f1" : "#9c9c9c",
                             outline: child.active ? "solid 3px #8d8d8d7a" : undefined
-                            // border: "solid 1px red"
-                            // outline: child.active ? "solid 2px #202020" : undefined
                           },
                           ":hover": {
                             color: "#ff8a33",
@@ -144,7 +127,6 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                           {viewType === "COMPLETE" && child.title}
                           {viewType === "NORMAL" && child.simpleTitle}
                           {viewType === "SIMPLE" && " "}
-                          {/* {viewType ? " " : child.title} */}
                           &nbsp;
                         </Typography>
                       </Box>
