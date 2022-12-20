@@ -22,6 +22,7 @@ const sectionIdx = sectionsOrder.findIndex(
 
 const HowItWorks = (props) => {
 
+  const sectionHeaderRef = useRef(null)
   const animation0Ref = useRef(null)
   const animation1Ref = useRef(null)
   const animation2Ref = useRef(null)
@@ -33,6 +34,7 @@ const HowItWorks = (props) => {
 
   useImperativeHandle(props.innerRef, () => {
     return {
+      getSectionHeaderHeight: () => sectionHeaderRef?.current?.clientHeight ?? 0,
       getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0,
       getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
       getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
@@ -68,17 +70,20 @@ const HowItWorks = (props) => {
           // border: 'dashed 6px orange'
         }}
       >
+        <div ref={sectionHeaderRef} style={{ width: boxLarge, /* background: "#9cd82c27", */ top: "0px", padding: "20px" }}>
+          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center", paddingTop: "56px" }}>
+            {sectionsOrder[sectionIdx].title}
+          </Typography>
+        </div>
 
         {/* --- animations start */}
         <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10/* , border: "solid 2px pink" */ }}>
           {props.riveComponent}
         </div>
-        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute"/* , background: "#3b5015" */, top: "0px", padding: "20px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center", paddingTop: "56px" }}>
-            {sectionsOrder[sectionIdx].title}
-          </Typography>
+        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute", /* background: "#ff00ea83", */ top: sectionHeaderRef?.current?.clientHeight ?? 0, padding: "20px" }}>
 
         </div>
+
         <div ref={animation1Ref} style={{ height: "1000vh", width: "100%"/* , borderRight: "solid 20px #8031a5" */ }}>
 
         </div>
@@ -91,9 +96,7 @@ const HowItWorks = (props) => {
         <div ref={animation4Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #26c2ff" */ }}>
 
         </div>
-        <div ref={animation5Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #24f0ff" */ }}>
 
-        </div>
 
         {/* --- animation ends */}
         <Button
