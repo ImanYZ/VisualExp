@@ -541,8 +541,7 @@ function Index() {
             <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            {/* <UniversitiesMap theme={"Light"} /> */}
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quos, a! Hic expedita accusantium assumenda ipsam perspiciatis veniam, tempora iure ipsa quam sint, sapiente officia eaque iste. Inventore voluptatibus vel molestias ipsam, tempore neque sunt debitis accusantium fugiat eligendi, impedit aliquam, ea deleniti repellendus! Eos deserunt fuga voluptas repellat molestias quod necessitatibus, et praesentium earum autem repellendus eligendi, id similique aspernatur. Odit, necessitatibus eos! Deleniti dolorem et corporis impedit commodi maxime repellat voluptatum quidem voluptatibus eum inventore, in animi ratione neque fugit modi at nam possimus sequi dolore! Perferendis consequuntur quis veniam magni ipsum suscipit non delectus, ducimus facere illum odio?
+            <UniversitiesMap theme={"Dark"} />
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
