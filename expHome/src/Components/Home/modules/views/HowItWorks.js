@@ -96,9 +96,7 @@ const HowItWorks = (props) => {
         <div ref={animation4Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #26c2ff" */ }}>
 
         </div>
-        <div ref={animation5Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #24f0ff" */ }}>
 
-        </div>
 
         {/* --- animation ends */}
         <Button
