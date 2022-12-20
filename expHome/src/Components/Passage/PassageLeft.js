@@ -5,16 +5,14 @@ import "./Passage.css";
 
 import {
   stepState,
-  secondSessionState,
-  thirdSessionState,
+  startedSessionState
 } from "../../store/ExperimentAtoms";
 
 import thankYouImg from "../../assets/ThankYou.jpg";
 
 const PassageLeft = (props) => {
   const step = useRecoilValue(stepState);
-  const secondSession = useRecoilValue(secondSessionState);
-  const thirdSession = useRecoilValue(thirdSessionState);
+  const startedSession = useRecoilValue(startedSessionState);
 
   return [1.5, 2].includes(step) ? (
     <div id="QuestionsInstructions">
@@ -75,7 +73,7 @@ const PassageLeft = (props) => {
   ) : step === 11 ? (
     <div id="QuestionsInstructions">
       <h2>
-        Welcome to the {secondSession ? "second" : thirdSession && "last"} phase
+        Welcome to the {startedSession === 2 ? "second" : startedSession === 3 && "last"} phase
         of our UX Research Experiment!
       </h2>
       <p>
