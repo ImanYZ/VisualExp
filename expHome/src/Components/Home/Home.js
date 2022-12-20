@@ -38,25 +38,26 @@ const artboards = [
 const SECTION_WITH_ANIMATION = 1
 
 const sectionsTmp = [
-  { id: "LandingSection", active: true, title: "Home", children: [] },
+  { id: "LandingSection", active: true, title: "Home", simpleTitle: "Home", children: [] },
   {
     id: "HowItWorksSection",
     active: false,
     title: "How We Work?",
+    simpleTitle: "How?",
     children: [
-      { id: "animation1", title: "Problem" },
-      { id: "animation2", title: "Searching" },
-      { id: "animation3", title: "Summarizing" },
-      { id: "animation4", title: "Linking" },
-      { id: "animation5", title: "Evaluating/Improving" },
-      { id: "animation6", title: "Join us" },
+      { id: "animation1", title: "Problem", simpleTitle: "Problem", },
+      { id: "animation2", title: "Searching", simpleTitle: "Searching", },
+      { id: "animation3", title: "Summarizing", simpleTitle: "Summarizing", },
+      { id: "animation4", title: "Linking", simpleTitle: "Linking", },
+      { id: "animation5", title: "Evaluating/Improving", simpleTitle: "Evaluating", },
+      { id: "animation6", title: "Join us", simpleTitle: "Join us", },
     ]
   },
-  { id: "ValuesSection", active: false, title: "Why 1Cademy?", children: [] },
-  { id: "CommunitiesSection", active: false, title: "What we study?", children: [] },
-  { id: "SchoolsSection", active: false, title: "Where Are We?", children: [] },
-  { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", children: [] },
-  { id: "JoinUsSection", active: false, title: "Apply to Join Us!", children: [] },
+  { id: "ValuesSection", active: false, title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
+  { id: "CommunitiesSection", active: false, title: "What we study?", simpleTitle: "What?", children: [] },
+  { id: "SchoolsSection", active: false, title: "Where Are We?", simpleTitle: "Where?", children: [] },
+  { id: "WhoWeAreSection", active: false, title: "Who Is Behind 1Cademy?", simpleTitle: "Who?", children: [] },
+  { id: "JoinUsSection", active: false, title: "Apply to Join Us!", simpleTitle: "Apply", children: [] },
 ]
 function Index() {
   const firebase = useRecoilValue(firebaseState);
@@ -70,7 +71,8 @@ function Index() {
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
   const [ap, setAP] = useState(0)
-  const matches = useMediaQuery('(min-width:1200px)');
+  const isLargeDesktop = useMediaQuery('(min-width:1350px)');
+  const isDesktop = useMediaQuery('(min-width:1200px)');
   const isMovil = useMediaQuery('(max-width:600px)');
 
   const { rive, RiveComponent } = useRive({
@@ -428,7 +430,7 @@ function Index() {
 
       <Box component={'header'} sx={{ position: "sticky", width: "100%", top: "0px", zIndex: 12, display: "flex", justifyContent: "center" }}>
         <Box sx={{ height: "70px", width: "100%", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
-        <Box sx={{ width: "100%", maxWidth: "980px", height: "70px", px: matches ? "0px" : "10px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box sx={{ width: "100%", maxWidth: "980px", height: "70px", px: isDesktop ? "0px" : "10px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Stack spacing={"20px"} alignItems={"center"} justifyContent={"space-between"} direction={"row"} sx={{ color: "#f8f8f8" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
 
@@ -514,16 +516,21 @@ function Index() {
 
       <Box sx={{ position: "relative" }}>
 
-        {matches && <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "100px", maxWidth: "180px", }}>
+        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px", }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
-            <TableOfContent menuItems={sections} onChangeContent={(idx, idxAnimation) => {
-              console.log('called switchSection', idx, idxAnimation)
-              switchSection(idx, idxAnimation)
-            }} />
+            <TableOfContent
+              menuItems={sections}
+              viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
+              onChangeContent={(idx, idxAnimation) => {
+                console.log('called switchSection', idx, idxAnimation)
+                switchSection(idx, idxAnimation)
+              }}
+              customSx={{}}
+            />
           </Box>
-        </Box>}
+        </Box>
 
-        <Box sx={{ width: "100%", maxWidth: "980px", px: matches ? "0px" : "10px", margin: "auto", }}>
+        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto", }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
           </Box>
