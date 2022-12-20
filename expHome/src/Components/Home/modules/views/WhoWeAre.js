@@ -42,7 +42,7 @@ const WhoWeAre = (props) => {
         // bgcolor: "secondary.light",
       }}
     >
-      <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+      <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8", textAlign: "center" }}>
         Who Is Behind 1Cademy?
       </Typography>
       <Grid container spacing={2.5} align="center">
@@ -51,6 +51,7 @@ const WhoWeAre = (props) => {
             <Typography
               variant="h5"
               component="div"
+              align="center"
               sx={{ pt: "19px", pb: "19px", borderBottom: `1px solid ${gray03}` }}
             >
               Recently Published Papers
