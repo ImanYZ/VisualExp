@@ -9,8 +9,7 @@ import {
   conditionState,
   nullPassageState,
   choicesState,
-  secondSessionState,
-  thirdSessionState
+  startedSessionState
 } from "./store/ExperimentAtoms";
 
 import PassageLeft from "./Components/Passage/PassageLeft";
@@ -129,9 +128,7 @@ const App = () => {
   const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
   // eslint-disable-next-line no-unused-vars
-  const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
-  // eslint-disable-next-line no-unused-vars
-  const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
+  const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
 
   const [passageTitle, setPassageTitle] = useState("");
   const [pConURL, setPConURL] = useState("");
@@ -236,9 +233,9 @@ const App = () => {
       if (step === 3) {
         testName = "test";
       } else if (step === 13 || step === 16) {
-        if (secondSession) {
+        if (startedSession === 2) {
           testName = "test3Days";
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           testName = "test1Week";
         }
       }
@@ -318,9 +315,9 @@ const App = () => {
     }
     let prefieldName = "recall";
     if (step > 10) {
-      if (secondSession) {
+      if (startedSession === 2) {
         prefieldName = "recall3Days";
-      } else if (thirdSession) {
+      } else if (startedSession === 3) {
         prefieldName = "recall1Week";
       }
     }
@@ -337,7 +334,7 @@ const App = () => {
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
     // user
-    if (thirdSession) {
+    if (startedSession === 3) {
       userData = {
         ...userData,
         ...userUpdates,
@@ -457,12 +454,8 @@ const App = () => {
                   choice = "post1WeekQ2Choice";
                 }
               }
-              if (userData[explan][index].explanation) {
-                response = userData[explan][index].explanation;
-              } else {
-                response = userData[explan][index];
-              }
-              const filtered = (response || "").split(" ").filter(w => w.trim());
+              response = userData[explan][index].explanation || "";
+              const filtered = (response).split(" ").filter(w => w.trim());
               if (filtered.length > 4) {
                 const newFeedbackDdoc = {
                   approved: false,
@@ -710,12 +703,12 @@ const App = () => {
         }
         break;
       case 11:
-        if (secondSession) {
+        if (startedSession === 2) {
           pConditions[0] = {
             ...pConditions[0],
             recall3DaysStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           pConditions[0] = {
             ...pConditions[0],
             recall1WeekStart: currentTime
@@ -755,12 +748,12 @@ const App = () => {
         setReText("");
         break;
       case 14:
-        if (secondSession) {
+        if (startedSession === 2) {
           pConditions[1] = {
             ...pConditions[1],
             recall3DaysStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           pConditions[1] = {
             ...pConditions[1],
             recall1WeekStart: currentTime
@@ -792,7 +785,7 @@ const App = () => {
               condition: pConditions[0].condition
             }
           },
-          secondSession ? 19 : 17
+          startedSession === 2 ? 19 : 17
         );
         setTimer(30 * 60);
         setPhase(0);
@@ -818,11 +811,11 @@ const App = () => {
         break;
       case 18:
         userUpdates = {};
-        if (secondSession) {
+        if (startedSession === 2) {
           userUpdates = {
             post3DaysQsStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           userUpdates = {
             post1WeekQsStart: currentTime
           };
@@ -845,14 +838,14 @@ const App = () => {
       case 19:
         ({ choice1, choice2 } = convertChoices(pConditions));
         userUpdates = {};
-        if (secondSession) {
+        if (startedSession === 2) {
           userUpdates = {
             post3DaysQsEnded: currentTime,
             post3DaysQ1Choice: choice1,
             post3DaysQ2Choice: choice2,
             explanations3Days: explanations
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           userUpdates = {
             post1WeekQsEnded: currentTime,
             post1WeekQ1Choice: choice1,
@@ -869,14 +862,14 @@ const App = () => {
 
   useEffect(() => {
     const setUserStatus = () => {
-      if (secondSession || thirdSession) {
+      if (startedSession === 2 || startedSession === 3) {
         setTimeout(async () => {
           const userDoc = await firebase.db.collection("users").doc(fullname).get();
           if (userDoc.exists) {
             const userData = userDoc.data();
             if (
               (userData.gender && userData.step < 11) ||
-              (thirdSession && userData.step === 20 && !userData.projectDone)
+              (startedSession === 3 && userData.step === 20 && !userData.projectDone)
             ) {
               setPhase(0);
               setStep(11);
@@ -893,7 +886,7 @@ const App = () => {
       setUserStatus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullname, secondSession, thirdSession]);
+  }, [fullname, startedSession]);
 
   useEffect(() => {
     if (![0, 5, 19].includes(step)) {

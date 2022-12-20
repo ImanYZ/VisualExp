@@ -459,9 +459,6 @@ const ManageEvents = props => {
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
   const [scheduleStart, setScheduleStart] = useState(new Date());
-  const [firstSession, setFirstSession] = useState(null);
-  const [secondSession, setSecondSession] = useState(null);
-  const [thirdSession, setThirdSession] = useState(null);
   const [submitable, setSubmitable] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
