@@ -317,8 +317,8 @@ const Auth = props => {
   };
 
   useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async user => {
-      if (user && haveProjectSpecs) {
+    firebase.auth.onAuthStateChanged(async user => {
+      if (user) {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         if (!user.emailVerified) {
@@ -350,7 +350,7 @@ const Auth = props => {
         setChoices([]);
       }
     });
-  }, [firebase, firstname, lastname, currentProject, isSignUp, course, haveProjectSpecs]);
+  }, []);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
