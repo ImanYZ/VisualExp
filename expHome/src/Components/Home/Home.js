@@ -1,3 +1,4 @@
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import AnimatediconLoop from "../../assets/AnimatediconLoop.gif";
 import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -33,10 +34,10 @@ import { useWindowSize } from "./hooks/useWindowSize";
 const HEADER_HEIGTH = 70
 
 const artboards = [
-  { name: "animation1", durationMs: 2000, getHeight: (vh) => vh - HEADER_HEIGTH,color:"red" },
-  { name: "animation2", durationMs: 1000, getHeight: (vh) => vh ,color:"yellow"},
-  { name: "animation3", durationMs: 8000, getHeight: (vh) => vh ,color:"pink"},
-  { name: "animation4", durationMs: 22000, getHeight: (vh) => vh ,color:"purple"},
+  { name: "logo-animation", durationMs: 2000, getHeight: (vh) => vh - HEADER_HEIGTH, color: "red" },
+  { name: "animation2", durationMs: 1000, getHeight: (vh) => vh, color: "yellow" },
+  { name: "animation3", durationMs: 8000, getHeight: (vh) => vh, color: "pink" },
+  { name: "animation4", durationMs: 22000, getHeight: (vh) => vh, color: "purple" },
 
   // { name: "animation1", durationMs: 8000 },
   // { name: "animation2", durationMs: 22000 },
@@ -74,6 +75,7 @@ const sectionsTmp = [
 function Index() {
   const firebase = useRecoilValue(firebaseState);
   const [section, setSection] = useState(0);
+  const [animation, setAnimation] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [email, setEmail] = useRecoilState(emailState);
@@ -83,6 +85,7 @@ function Index() {
   const [sections, setSections] = useState(sectionsTmp)
   const navigateTo = useNavigate();
   const [ap, setAP] = useState(0)
+  const [idxRiveComponent, setIdxRiveComponent] = useState(0)
   const isLargeDesktop = useMediaQuery('(min-width:1350px)');
   const isDesktop = useMediaQuery('(min-width:1200px)');
   const isMovil = useMediaQuery('(max-width:600px)');
@@ -91,12 +94,21 @@ function Index() {
 
   const { rive, RiveComponent } = useRive({
     src: "1-logo-animation.riv",
-    stateMachines: artboards[0].name,
+    // stateMachines: artboards[0].name,
+    artboard: "logo-animation",
     autoplay: false,
     onLoad: () => console.log('load-finish'),
-    
   });
-  
+
+  const { rive: rive3, RiveComponent: RiveComponent3 } = useRive({
+    src: "3-summarizing.riv",
+    // stateMachines: artboards[2].name,
+    artboard: "summarize",
+    autoplay: false,
+    onLoad: () => console.log('load-finish'),
+  });
+
+  console.log({ rive })
   useEffect(() => {
     if (!rive) return
     rive.reset({ artboard: artboards[0].name })
@@ -128,13 +140,28 @@ function Index() {
 
 
   const RiveComponentMemo = useMemo(() => {
-    return <RiveComponent
-      // onMouseEnter={() => rive && rive.play()}
-      // onMouseLeave={() => rive && rive.pause()}
-      className="rive-canvas"
-    />
-  }, [])
 
+    if (idxRiveComponent === 0) {
+
+      return <RiveComponent
+        // onMouseEnter={() => rive && rive.play()}
+        // onMouseLeave={() => rive && rive.pause()}
+        className="rive-canvas"
+      />
+    }
+    if (idxRiveComponent === 1) {
+
+      return <RiveComponent3
+        // onMouseEnter={() => rive && rive.play()}
+        // onMouseLeave={() => rive && rive.pause()}
+        className="rive-canvas"
+      />
+    }
+
+    return null
+  }, [idxRiveComponent])
+
+  console.log({ idxRiveComponent, RiveComponentMemo })
 
   const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
     const res = childrenPosistions.reduce((acu, cur, idx) => {
@@ -147,13 +174,14 @@ function Index() {
   }
 
   const detectScrollPosition = (event) => {
+    console.log({ rive })
     if (!rive) return
     // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
 
       const sectionsHeight = getSectionPositions()
-      console.log("sectionsHeight",sectionsHeight)
+      console.log("sectionsHeight", sectionsHeight)
       const { min, idx: idxSection } = sectionsHeight.reduce((acu, cur, idx) => {
         if (acu.max > currentScrollPosition) return acu
         return { max: acu.max + cur.height, min: acu.max, idx }
@@ -173,6 +201,7 @@ function Index() {
       const sectionSelected = sections[idxSection]
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
       setSection(idxSection)
+      setAnimation(idxAnimation)
 
       setSections(prev => prev.map((cur, idx) => {
         if (idxSection !== idx) return { ...cur, children: cur.children.map(c => ({ ...c, active: false })), active: false }
@@ -182,33 +211,47 @@ function Index() {
         })
         return { ...cur, active: true, children: childrenFixed }
       }))
+      console.log({ idxSection, idxAnimation })
 
       if (idxAnimation < 0) return
-      
-      if(idxSection===0) {
+
+      if (idxSection === 0) {
+
         const lowerAnimationLimit = minAnimation
         const upperAnimationLimit = maxAnimation
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
-        if(percentageFrame<50){
-          if(!rive.isPlaying){
-            rive.reset({ artboard: artboards[0].name })
-            rive.scrub("Timeline 1", 0)
-            rive.play()
-          }
-          
-        }else{
-          const newLowerAnimationLimit=lowerAnimationLimit+rangeFrames/2;
+        if (percentageFrame < 50) { // show loop logo
+          rive.scrub("Timeline 1", 0)
+          rive.play()
+          setIdxRiveComponent(0)
+        } else {// translate logo to left bottom
+          // if (rive.src !== "3-summarizing.riv") {
+          //   rive.load({
+          //     src: "3-summarizing.riv",
+          //     artboard: 'summarize',
+          //     // stateMachines: 'logo-transition',
+          //     autoplay: false,
+          //     onLoad: () => console.log('load-sencond-finish'),
+          //   })
+          // }
+
+          const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
           const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
-          const newPercentageFrame = newPositionFrame * 100 / (rangeFrames/2)
+          const newPercentageFrame = newPositionFrame * 100 / (rangeFrames / 2)
 
-          const timeInSeconds = artboards[1].durationMs / 1000 * 2*newPercentageFrame / 100
-          rive.reset({ artboard: artboards[1].name })
-          rive.scrub("Timeline 1", timeInSeconds)
-        console.log("percentageFrame",percentageFrame,timeInSeconds)
-
+          const timeInSeconds = artboards[1].durationMs / 1000 * 2 * newPercentageFrame / 100
+          // rive.reset({ artboard: 'summarize' })
+          rive3.scrub("Timeline 1", timeInSeconds)
+          console.log("percentageFrame", percentageFrame, timeInSeconds)
+          setIdxRiveComponent(1)
         }
+      }
+
+      if (idxSection === SECTION_WITH_ANIMATION) {
+        // replace canvas
+        setIdxRiveComponent(2)
       }
 
       // if (idxSection < SECTION_WITH_ANIMATION) {
@@ -256,7 +299,7 @@ function Index() {
 
     return [
       { id: section1Ref.current.id, height: 0 },
-      { id: section2Ref.current.id, height: section1Ref.current.clientHeight},
+      { id: section2Ref.current.id, height: section1Ref.current.clientHeight },
       { id: section3Ref.current.id, height: section2Ref.current.clientHeight },
       { id: section4Ref.current.id, height: section3Ref.current.clientHeight },
       { id: section5Ref.current.id, height: section4Ref.current.clientHeight },
@@ -276,7 +319,7 @@ function Index() {
 
     return [
       { id: section1Ref.current.id, height: section1Ref.current.clientHeight },
-      { id: section2Ref.current.id, height: section2Ref.current.clientHeight-section1Ref.current.clientHeight },
+      { id: section2Ref.current.id, height: section2Ref.current.clientHeight - section1Ref.current.clientHeight },
       { id: section3Ref.current.id, height: section3Ref.current.clientHeight },
       { id: section4Ref.current.id, height: section4Ref.current.clientHeight },
       { id: section5Ref.current.id, height: section5Ref.current.clientHeight },
@@ -310,7 +353,7 @@ function Index() {
     // const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
     // const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
     // return [animationHeaderHeight, animation0Height/*, animation1Height , animation2Height, animation3Height, animation4Height, animation5Height */]
-    return artboards.map(artboard=>artboard.getHeight(height))
+    return artboards.map(artboard => artboard.getHeight(height))
   }, [height])
 
   const switchSection = (newValue, animationIndex = 0) => {
@@ -527,7 +570,7 @@ function Index() {
                   aria-label={`${fullname}'s Account`}
                   aria-expanded={isProfileMenuOpen ? "true" : undefined}
                   onClick={handleProfileMenuOpen}
-                  color="inherit"
+                  color="common.white"
                 >
                   <AccountCircle />
                 </IconButton>
@@ -577,7 +620,7 @@ function Index() {
 
         <Stack
           ref={section1Ref}
-          spacing="10px"
+          spacing="20px"
           direction={"column"}
           alignItems={"center"}
           justifyContent="flex-end"
@@ -590,8 +633,8 @@ function Index() {
             // justifyContent: "flex-end",
             // border: "solid 10px red"
           }}
-        
-          >
+
+        >
           {/* Increase the network loading priority of the background image. */}
           {/* <img
             style={{ display: "none" }}
@@ -600,7 +643,8 @@ function Index() {
           />
           <img src={AnimatediconLoop} alt="Animated Logo" width="190px" /> */}
           <Typography color="white" variant="h5" sx={{ textAlign: "center" }}>
-            We Break Down Learning & Research Content and Build Learning Pathways.
+            Where we take notes <b>together</b>.
+            {/* We Break Down Learning & Research Content and Build Learning Pathways. */}
           </Typography>
           <Button
             color="secondary"
@@ -612,11 +656,18 @@ function Index() {
           >
             Apply to Join Us!
           </Button>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}>
+            Scroll
+            <KeyboardDoubleArrowDownIcon />
+          </Box>
         </Stack>
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto", }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
-            <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} artboards={artboards} />
+            <HowItWorks section={section} ref={sectionAnimationControllerRef} artboards={artboards} >
+              {RiveComponentMemo}
+              {/* RiveComponentMemo3 */}
+            </HowItWorks>
           </Box>
           <Box id={sectionsOrder[2].id} ref={section3Ref}>
             <Values /> {/* why */}
@@ -636,6 +687,8 @@ function Index() {
         </Box>
       </Box>
       <AppFooter />
+      <link rel="preload" href="3-summarizing.riv" as="fetch" crossOrigin="anonymous" />
+
     </Box >
     // </ThemeProvider>
   );
