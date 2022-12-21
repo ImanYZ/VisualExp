@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
-import { phaseState, stepState, secondSessionState, thirdSessionState } from "../../store/ExperimentAtoms";
+import { phaseState, stepState, startedSessionState } from "../../store/ExperimentAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import MCQuestion from "../MCQuestion/MCQuestion";
@@ -28,16 +28,15 @@ const style = {
 const PassageRight = props => {
   const phase = useRecoilValue(phaseState);
   const step = useRecoilValue(stepState);
-  const secondSession = useRecoilValue(secondSessionState);
-  const thirdSession = useRecoilValue(thirdSessionState);
+  const startedSession = useRecoilValue(startedSessionState);
   const projectSpecs = useRecoilValue(projectSpecsState);
 
   const [nextSessionDate, setNextSessionDate] = useState("");
 
   useEffect(() => {
-    if (!thirdSession && [10, 20].includes(step)) {
+    if (startedSession !== 3 && [10, 20].includes(step)) {
       const daysLater = projectSpecs?.daysLater || AppConfig.daysLater;
-      const daysInNextSession = secondSession
+      const daysInNextSession = startedSession === 2
         ? daysLater?.[1] || AppConfig.daysLater[1]
         : daysLater?.[0] || AppConfig.daysLater[0];
       let d = new Date();
@@ -56,7 +55,7 @@ const PassageRight = props => {
       const da = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(d);
       setNextSessionDate(weekDay + ", " + mo + " " + da + ", " + ye);
     }
-  }, [secondSession, thirdSession, step]);
+  }, [startedSession, step]);
 
   return (
     <div id="QuestionsContainer">
@@ -118,9 +117,9 @@ const PassageRight = props => {
         </>
       ) : [5, 19].includes(step) ? (
         <>
-          {thirdSession && step === 19 && <p>Now that you know your scores, rethink through these two questions.</p>}
+          {startedSession === 3 && step === 19 && <p>Now that you know your scores, rethink through these two questions.</p>}
           <p>Please click the "Submit &amp; Continue!" button on the left after answering both questions.</p>
-          {thirdSession &&
+          {startedSession === 3 &&
             props.scores.length > 0 &&
             step === 19 &&
             [0, 1].map(num => {
@@ -219,7 +218,7 @@ const PassageRight = props => {
           {nextSessionDate ? (
             <>
               <h1>
-                See you at our {secondSession ? "final" : "second"} session on <i>{nextSessionDate}!</i>
+                See you at our {startedSession === 2 ? "final" : "second"} session on <i>{nextSessionDate}!</i>
               </h1>
               <Fireworks options={options} style={style} />
             </>
@@ -236,9 +235,9 @@ const PassageRight = props => {
         </>
       ) : step === 11 ? (
         <>
-          {(secondSession || thirdSession) && (
+          {(startedSession === 2 || startedSession === 3) && (
             <>
-              <h2>Welcome to the {secondSession ? "second" : thirdSession && "last"} session!</h2>
+              <h2>Welcome to the {startedSession === 2 ? "second" : startedSession === 3 && "last"} session!</h2>
               <p>When you feel comfortable, please click the "START THE TEST!" button.</p>
               <div id="StartTestContainer">
                 <Button id="StartTestButton" className="Button" onClick={props.nextStep} variant="contained">
@@ -358,6 +357,7 @@ const PassageRight = props => {
               questions={props.questions}
               setOrderQuestions={props.setOrderQuestions}
               nextStep={props.nextStep}
+              showSubmit={true}
             />
           )}
           {step !== 2 && (

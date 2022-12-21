@@ -11,7 +11,7 @@ import {
   themeOSState,
   leadingState
 } from "./store/AuthAtoms";
-import { secondSessionState, thirdSessionState } from "./store/ExperimentAtoms";
+import { startedSessionState } from "./store/ExperimentAtoms";
 
 import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
@@ -52,14 +52,12 @@ const AppRouter = props => {
   const emailVerified = useRecoilValue(emailVerifiedState);
   const fullname = useRecoilValue(fullnameState);
   const leading = useRecoilValue(leadingState);
-  const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
-  const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
   // selected theme for authenticated user (dark mode/light mode)
   const [theme, setTheme] = useRecoilState(themeState);
   const [themeOS, setThemeOS] = useRecoilState(themeOSState);
 
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
-  const [startedFirstSession, setStartedFirstSession] = useState(false);
+  const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
   const [startedByResearcher, setStartedByResearcher] = useState(false);
 
   useEffect(() => {
@@ -86,15 +84,15 @@ const AppRouter = props => {
             if (currentTime >= minTime && currentTime <= maxTime) {
               duringSession = true;
               if (scheduleData.order === "2nd") {
-                setSecondSession(true);
+                setStartedSession(2);
                 secondSessionDoc = scheduleDoc;
               } else if (scheduleData.order === "3rd") {
-                setThirdSession(true);
+                setStartedSession(3);
                 thirdSessionDoc = scheduleDoc;
               }
             }
             if (currentTime >= session) {
-              setStartedFirstSession(true);
+              setStartedSession(1);
             }
           }
         }
@@ -297,7 +295,7 @@ const AppRouter = props => {
               <Route
                 path="Activities/Experiment"
                 element={
-                  startedFirstSession ? (
+                  startedSession === 1 ? (
                     <div className="Error">
                       At this point, you cannot change your scheduled sessions! Please convey your questions or concerns
                       to Iman Yeckehzaare at oneweb@umich.edu
