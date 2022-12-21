@@ -558,7 +558,12 @@ const SignUpPage = props => {
           backgroundPosition: "center"
         }}
       />
-      <Paper sx={{ m: "10px 500px 200px 500px" }}>
+      <Paper sx={{
+        m: "10px 500px 200px 500px",
+        "@media (max-width: 1120px)": {
+          m: "0px"
+        }
+      }}>
         {emailVerified === "Sent" ? (
           createAccount ? (
             <>

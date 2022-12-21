@@ -9,8 +9,6 @@ import Checkbox from "@mui/material/Checkbox";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import FormLabel from "@mui/material/FormLabel";
-import Button from "@mui/material/Button";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
 import List from '@mui/material/List';
@@ -24,8 +22,7 @@ import ValidatedInput from "../ValidatedInput/ValidatedInput";
 import { ETHNICITY_VALUES, EDUCATION_VALUES } from "./DemographicConstants";
 
 import "./PersonalInfo.css";
-import { Paper } from "@mui/material";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 import { personalInfoProcessChoicesState } from "../../store/ExperimentAtoms";
 
 const sameThing = value => value;
@@ -47,9 +44,7 @@ const MUISelectMenuItem = item => option => {
 const PersonalInfo = props => {
   const [sortedLanguages, setSortedLanguages] = useState(["English"]);
   const [majors, setMajors] = useState([]);
- 
 
-  // const [category, setCategory] = useState({});
   const [personalInfoChoices, setPersonalInfoChoices] = useState({});
   const [personalInfoProcessChoices, setPersonalInfoProcessChoices] = useRecoilState(personalInfoProcessChoicesState);
 
@@ -218,14 +213,61 @@ const PersonalInfo = props => {
       <Box style={{margin:"10px 10px 10px 10px", overflow: "auto" }}>  
       {!props.answeredPersonalTrait && (
         <>
-              <Box style={{margin:"10px 0px 100px 0px"}}>
+              <Box style={{margin:"10px 0px 10px"}}>
               <h4  >I am someone who:</h4>
                 
               </Box>
-        <Box sx={{ width: "100%", height: "calc(100vh - 80px)", overflow: "auto" }}>
-          <FormControl >
+        <Box sx={{
+          width: "100%", height: "calc(100vh - 80px)", overflow: "auto",
+          ["@media (max-width: 1120px)"]: {
+            "& .answer-radiogroup": {
+              width: "calc(100% - 250px)",
+              ".MuiRadio-root": {
+                margin: "0px 20px"
+              }
+            },
+            "& .answer-label-group": {
+              width: "100% !important",
+              margin: "10px 0px 10px 200px !important",
+              ".MuiFormControlLabel-root": {
+                marginInline: "12px !important",
+                width: "60px"
+              },
+              ".MuiFormControlLabel-label": {
+                fontSize: "15px"
+              }
+            }
+          },
+          ["@media (max-width: 810px)"]: {
+            "& .answer-radiogroup": {
+              width: "calc(100% - 250px)",
+              ".MuiRadio-root": {
+                margin: "0px 10px"
+              }
+            },
+            "& .answer-label-group": {
+              width: "100% !important",
+              margin: "10px 0px 10px 180px !important",
+              ".MuiFormControlLabel-root": {
+                marginInline: "15px !important",
+                width: "40px"
+              },
+              ".MuiFormControlLabel-label": {
+                fontSize: "15px"
+              }
+            }
+          }
+        }}>
+          <FormControl sx={{
+            width: "100%"
+          }} >
             <RadioGroup row >
-              <Box style={{ margin: "0px 0px 0px 220px" }}>
+              <Box className="answer-label-group" style={{
+                width: "calc(100% - 220px)",
+                margin: "0px 0px 0px 220px",
+                display: "flex",
+                justifyContent: "center"
+              }}>
                 <FormControlLabel
                   style={{ marginInline: "40px" }}
                   value=""
@@ -282,7 +324,7 @@ const PersonalInfo = props => {
               </Box>
             </RadioGroup>
           </FormControl>
-          <FormControl sx={{ m: "0px 0px 0px 0px" }}>
+          <FormControl sx={{ width: "100%", m: "0px 0px 0px 0px" }}>
             {listOfItems0.map((name, idx) => (
               <>
              <hr />
@@ -298,15 +340,20 @@ const PersonalInfo = props => {
                     aria-labelledby="demo-row-radio-buttons-group-label1"
                     name="row-radio-buttons-group1"
                   >
-                     <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
+                    <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
                       <div>{name}</div>
                     </Box>
-                
+                    <Box className="answer-radiogroup" sx={{
+                      width: "calc(100% - 220px)",
+                      display: "flex",
+                      justifyContent: "center"
+                    }}>
                       <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
                       <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
                       <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
                       <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
                       <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
+                    </Box>
                    
                   </RadioGroup>
                   
@@ -316,15 +363,22 @@ const PersonalInfo = props => {
               </>
             ))}
           </FormControl>
-          <FormControl sx={{ m: "0px 0px 0px 0px" }}>
-            <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-              <Box style={{ margin: "10px 10px 10px 200px" }}>
+          <FormControl sx={{
+            width: "100%"
+          }} >
+            <RadioGroup row >
+              <Box className="answer-label-group" style={{
+                width: "calc(100% - 220px)",
+                margin: "20px 0px 0px 220px",
+                display: "flex",
+                justifyContent: "center"
+              }}>
                 <FormControlLabel
                   style={{ marginInline: "40px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div >
                       Disagree <br />
                       Strongly
                     </div>
@@ -352,7 +406,7 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "40px" }}
+                  style={{ marginInline: "45px" }}
                   value=""
                   control={<></>}
                   label={
@@ -362,11 +416,11 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "60px" }}
+                  style={{ marginInline: "39px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div style={{ fontSize: 15 }}>
                       Agree <br />
                       strongly
                     </div>
@@ -375,7 +429,7 @@ const PersonalInfo = props => {
               </Box>
             </RadioGroup>
           </FormControl>
-          <FormControl sx={{ m: "0px 0px 20px 5px" }}>
+          <FormControl sx={{ width: "100%", m: "0px 0px 20px 5px" }}>
             {listOfItems1.map((name,idx) => (
                <>
                <hr />
@@ -394,12 +448,18 @@ const PersonalInfo = props => {
                        <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
                         <div>{name}</div>
                       </Box>
-                  
+
+                      <Box className="answer-radiogroup" sx={{
+                        width: "calc(100% - 240px)",
+                        display: "flex",
+                        justifyContent: "center"
+                      }}>
                         <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
                         <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
                         <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
                         <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
                         <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
+                      </Box>
                      
                     </RadioGroup>
                     
@@ -409,15 +469,22 @@ const PersonalInfo = props => {
                 </>
             ))}
           </FormControl>
-          <FormControl sx={{ m: "20px 20px 20px 20px" }}>
-            <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name="row-radio-buttons-group">
-              <Box style={{ margin: "10px 10px 10px 200px" }}>
+          <FormControl sx={{
+            width: "100%"
+          }} >
+            <RadioGroup row >
+              <Box className="answer-label-group" style={{
+                width: "calc(100% - 220px)",
+                margin: "20px 0px 0px 220px",
+                display: "flex",
+                justifyContent: "center"
+              }}>
                 <FormControlLabel
                   style={{ marginInline: "40px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div >
                       Disagree <br />
                       Strongly
                     </div>
@@ -445,7 +512,7 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "40px" }}
+                  style={{ marginInline: "45px" }}
                   value=""
                   control={<></>}
                   label={
@@ -455,11 +522,11 @@ const PersonalInfo = props => {
                   }
                 />
                 <FormControlLabel
-                  style={{ marginInline: "40px" }}
+                  style={{ marginInline: "39px" }}
                   value=""
                   control={<></>}
                   label={
-                    <div>
+                    <div style={{ fontSize: 15 }}>
                       Agree <br />
                       strongly
                     </div>
@@ -468,7 +535,7 @@ const PersonalInfo = props => {
               </Box>
             </RadioGroup>
           </FormControl>
-          <FormControl sx={{ m: "0px 0px 200px 5px" }}>
+          <FormControl sx={{ width: "100%", m: "0px 0px 52px 5px" }}>
             {listOfItems2.map((name,idx) => (
                 <>
              <hr />
@@ -487,13 +554,18 @@ const PersonalInfo = props => {
                      <Box style={{ marginLeft:"15px"  ,marginRight: "0px",marginTop:"2px" ,width:"200px",display: 'inline'}}>
                       <div>{name}</div>
                     </Box>
-                
+
+                    <Box className="answer-radiogroup" sx={{
+                      width: "calc(100% - 240px)",
+                      display: "flex",
+                      justifyContent: "center"
+                    }}>
                       <Radio sx={{ marginInline: "50px" }} value="1" label="Disagree Strongly" />
                       <Radio sx={{ marginInline: "50px" }} value="2" label="Disagree a little" />
                       <Radio sx={{ marginInline: "52px" }} value="3" label="Neither agree nor disagree" />
                       <Radio sx={{ marginInline: "50px" }} value="4" label="Agree a little" />
                       <Radio sx={{ marginInline: "50px" }} value="5" label="Agree strongly" />
-                   
+                    </Box>
                   </RadioGroup>
                   
                 }
