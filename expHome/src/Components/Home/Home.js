@@ -1,3 +1,5 @@
+import AnimatediconLoop from "../../assets/AnimatediconLoop.gif";
+import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -26,12 +28,20 @@ import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { useRive } from "rive-react/dist";
 
+
+const HEADER_HEIGTH = 70
+
 const artboards = [
-  { name: "animation1", durationMs: 8000 },
-  { name: "animation2", durationMs: 22000 },
-  { name: "animation3", durationMs: 5000 },
-  { name: "animation4", durationMs: 8500 },
-  { name: "animation5", durationMs: 2000 },
+  { name: "animation1", durationMs: 2000, getHeight: (vh) => vh - HEADER_HEIGTH },
+  { name: "animation2", durationMs: 1000, getHeight: (vh) => vh },
+  { name: "animation3", durationMs: 8000, getHeight: (vh) => vh },
+  { name: "animation4", durationMs: 22000, getHeight: (vh) => vh },
+
+  // { name: "animation1", durationMs: 8000 },
+  // { name: "animation2", durationMs: 22000 },
+  // { name: "animation3", durationMs: 5000 },
+  // { name: "animation4", durationMs: 8500 },
+  // { name: "animation5", durationMs: 2000 },
   // { name: "animation6", durationMs: 3000 }
 ]
 
@@ -146,13 +156,13 @@ function Index() {
       if (idxSection < 0) return
 
       const animationsHeight = getAnimationsPositions()
-      const sectionHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
+      // const sectionHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
 
       const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce((acu, cur, idx) => {
         // console.log({ ...acu, cur, currentScrollPosition })
         if (acu.maxAnimation > currentScrollPosition) return acu
         return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx }
-      }, { maxAnimation: min + sectionHeight, minAnimation: min + sectionHeight, idxAnimation: -1 })
+      }, { maxAnimation: min, minAnimation: min, idxAnimation: -1 })
 
       const sectionSelected = sections[idxSection]
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
@@ -248,25 +258,26 @@ function Index() {
 
     const animation0Height = 0 + sectionAnimationControllerRef.current.getSectionHeaderHeight()
     const animation1Height = sectionAnimationControllerRef.current.getAnimation0Height()
-    const animation2Height = sectionAnimationControllerRef.current.getAnimation1Height()
-    const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
-    const animation4Height = sectionAnimationControllerRef.current.getAnimation3Height()
-    const animation5Height = sectionAnimationControllerRef.current.getAnimation4Height()
+    // const animation2Height = sectionAnimationControllerRef.current.getAnimation1Height()
+    // const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
+    // const animation4Height = sectionAnimationControllerRef.current.getAnimation3Height()
+    // const animation5Height = sectionAnimationControllerRef.current.getAnimation4Height()
     // const animation6Height = sectionAnimationControllerRef.current.getAnimation5Height()
-    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height]
+    return [animation0Height, animation1Height/* , animation2Height, animation3Height, animation4Height, animation5Height */]
   }, [])
 
   const getAnimationsPositions = useCallback(() => {
     if (!sectionAnimationControllerRef.current) return null
 
+    const animationHeaderHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
     const animation0Height = sectionAnimationControllerRef.current.getAnimation0Height()
-    const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
-    const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
-    const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
-    const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
-    const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
+    // const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
+    // const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
+    // const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
+    // const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
+    // const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
     // const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-    return [animation0Height, animation1Height, animation2Height, animation3Height, animation4Height, animation5Height]
+    return [animationHeaderHeight, animation0Height/*, animation1Height , animation2Height, animation3Height, animation4Height, animation5Height */]
   }, [])
 
   const switchSection = (newValue, animationIndex = 0) => {
@@ -430,8 +441,8 @@ function Index() {
       /> */}
 
       <Box component={'header'} sx={{ position: "sticky", width: "100%", top: "0px", zIndex: 12, display: "flex", justifyContent: "center" }}>
-        <Box sx={{ height: "70px", width: "100%", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
-        <Box sx={{ width: "100%", maxWidth: "980px", height: "70px", px: isDesktop ? "0px" : "10px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Box sx={{ height: HEADER_HEIGTH, width: "100%", background: "rgba(0,0,0,.72)", backdropFilter: "saturate(180%) blur(20px)", filter: 'blur(1px)', }} />
+        <Box sx={{ width: "100%", maxWidth: "980px", height: HEADER_HEIGTH, px: isDesktop ? "0px" : "10px", position: "absolute", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Stack spacing={"20px"} alignItems={"center"} justifyContent={"space-between"} direction={"row"} sx={{ color: "#f8f8f8" }}>
             <img src={LogoDarkMode} alt="logo" width="52px" />
 
@@ -511,9 +522,9 @@ function Index() {
 
       </Box>
 
-      <Box id={sectionsOrder[0].id} ref={section1Ref}>
+      {/* <Box id={sectionsOrder[0].id} ref={section1Ref}>
         <Landing />
-      </Box>
+      </Box> */}
 
       <Box sx={{ position: "relative" }}>
 
@@ -531,9 +542,45 @@ function Index() {
           </Box>
         </Box>
 
+        <Stack
+          spacing="10px"
+          direction={"column"}
+          alignItems={"center"}
+          justifyContent="flex-end"
+          sx={{
+            height: 'calc(100vh - 70px)', width: '100%', position: "absolute", top: 0, padding: "20px",
+            backgroundImage: `url(${backgroundImage})`,
+            // display: "flex",
+            // flexDirection: "column",
+            // alignItems: "center",
+            // justifyContent: "flex-end",
+            // border: "solid 10px red"
+          }}>
+          {/* Increase the network loading priority of the background image. */}
+          {/* <img
+            style={{ display: "none" }}
+            src={backgroundImage}
+            alt="increase priority"
+          />
+          <img src={AnimatediconLoop} alt="Animated Logo" width="190px" /> */}
+          <Typography color="white" variant="h5" sx={{ textAlign: "center" }}>
+            We Break Down Learning & Research Content and Build Learning Pathways.
+          </Typography>
+          <Button
+            color="secondary"
+            variant="contained"
+            size="large"
+            component="a"
+            href="#JoinUsSection"
+            sx={{ minWidth: 200, color: "common.white" }}
+          >
+            Apply to Join Us!
+          </Button>
+        </Stack>
+
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto", }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
-            <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} />
+            <HowItWorks section={section} riveComponent={RiveComponentMemo} ref={sectionAnimationControllerRef} artboards={artboards} />
           </Box>
           <Box id={sectionsOrder[2].id} ref={section3Ref}>
             <Values /> {/* why */}
