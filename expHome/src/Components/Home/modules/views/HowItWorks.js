@@ -56,11 +56,11 @@ const HowItWorks = props => {
   const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0);
   console.log({ res: getHeightSection() });
 
-  const processedArtboard=useMemo(()=>props.artboards.reduce((acu,cur)=>{
-    const newHeight=cur.getHeight(height);
-    return [...acu,{...cur, top:acu.length ? acu[acu.length-1].top + acu[acu.length-1].height : 0  ,height:newHeight}]
-  },[]),[props.artboards,height])
-  console.log("processedArtboard",processedArtboard)
+  const processedArtboard = useMemo(() => props.artboards.reduce((acu, cur) => {
+    const newHeight = cur.getHeight(height);
+    return [...acu, { ...cur, top: acu.length ? acu[acu.length - 1].top + acu[acu.length - 1].height : 0, height: newHeight }]
+  }, []), [props.artboards, height])
+  console.log("processedArtboard", processedArtboard)
   return (
     <Box
       id="HowItWorksSection"
@@ -81,15 +81,15 @@ const HowItWorks = props => {
     >
       {processedArtboard.map(artboard => (
         <Box
-        key={artboard.name}
+          key={artboard.name}
           sx={{
             position: "absolute",
-            top:  artboard.top,
+            top: artboard.top,
             width: "100%",
-            height:artboard.height,
+            height: artboard.height,
             borderRight: `dashed 6px ${artboard.color}`,
             color: "white"
-            
+
           }}
         >
           {height - 70}px
@@ -120,7 +120,8 @@ const HowItWorks = props => {
           border: "solid 2px pink"
         }}
       >
-        {props.riveComponent}
+        {props.children}
+        {/* {props.riveComponent} */}
       </div>
 
       {/* <div ref={sectionHeaderRef} style={{
