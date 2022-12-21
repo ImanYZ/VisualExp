@@ -222,11 +222,14 @@ function Index() {
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
+        console.log({ percentageFrame })
         if (percentageFrame < 50) { // show loop logo
+          console.log('<')
           rive.scrub("Timeline 1", 0)
           rive.play()
           setIdxRiveComponent(0)
         } else {// translate logo to left bottom
+          console.log('>=')
           // if (rive.src !== "3-summarizing.riv") {
           //   rive.load({
           //     src: "3-summarizing.riv",
@@ -242,9 +245,11 @@ function Index() {
           const newPercentageFrame = newPositionFrame * 100 / (rangeFrames / 2)
 
           const timeInSeconds = artboards[1].durationMs / 1000 * 2 * newPercentageFrame / 100
+          console.log('>>>>>>1')
           // rive.reset({ artboard: 'summarize' })
           rive3.scrub("Timeline 1", timeInSeconds)
-          console.log("percentageFrame", percentageFrame, timeInSeconds)
+          // console.log("percentageFrame", percentageFrame, timeInSeconds)
+          console.log('>>>>>>2')
           setIdxRiveComponent(1)
         }
       }
@@ -606,6 +611,7 @@ function Index() {
 
         <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px", }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
+            <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
             <TableOfContent
               menuItems={sections}
               viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
@@ -643,7 +649,9 @@ function Index() {
           />
           <img src={AnimatediconLoop} alt="Animated Logo" width="190px" /> */}
           <Typography color="white" variant="h5" sx={{ textAlign: "center" }}>
-            Where we take notes <b>together</b>.
+            {/* Where we take notes <b>together</b>. */}
+            WHERE WE TAKE NOTES <b>TOGETHER</b>.
+            {/* {'Where we take notes '.toUpperCase() <b>'together'.toUpperCase()</b>.} */}
             {/* We Break Down Learning & Research Content and Build Learning Pathways. */}
           </Typography>
           <Button
@@ -665,8 +673,22 @@ function Index() {
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto", }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref} >
             <HowItWorks section={section} ref={sectionAnimationControllerRef} artboards={artboards} >
-              {RiveComponentMemo}
-              {/* RiveComponentMemo3 */}
+
+              <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
+
+                <RiveComponent
+                  // onMouseEnter={() => rive && rive.play()}
+                  // onMouseLeave={() => rive && rive.pause()}
+                  className={`rive-canvas ${idxRiveComponent === 0 ? 'rive-canvas-hidden' : ''}`}
+                />
+                <RiveComponent3
+                  // onMouseEnter={() => rive && rive.play()}
+                  // onMouseLeave={() => rive && rive.pause()}
+                  className={`rive-canvas ${idxRiveComponent === 1 ? 'rive-canvas-hidden' : ''}`}
+                />
+                {/* {RiveComponentMemo} */}
+                {/* RiveComponentMemo3 */}
+              </Box>
             </HowItWorks>
           </Box>
           <Box id={sectionsOrder[2].id} ref={section3Ref}>

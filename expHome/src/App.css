@@ -159,8 +159,14 @@ button.Button.Red {
 .rive-canvas {
   width: inherit;
   height: inherit;
+  position:absolute
 }
 
+.rive-canvas-hidden{
+  opacity: 0;
+  /* display: none; */
+  /* transition: 1s; */
+}
 .page-wrapper{
   max-width: 980px;
   margin: auto;
