@@ -14,6 +14,7 @@ const PostQuestionsPage = (props) => {
         explanations={props.explanations}
         setExplanations={props.setExplanations}
         step={props.step}
+        showSubmit={false}
       />
     </div>
   );
