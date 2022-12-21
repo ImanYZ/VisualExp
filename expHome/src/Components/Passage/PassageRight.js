@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import Button from "@mui/material/Button";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
-import { phaseState, stepState, startedSessionState } from "../../store/ExperimentAtoms";
+import { phaseState, stepState, startedSessionState, personalInfoProcessChoicesState } from "../../store/ExperimentAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import MCQuestion from "../MCQuestion/MCQuestion";
@@ -30,6 +30,7 @@ const PassageRight = props => {
   const step = useRecoilValue(stepState);
   const startedSession = useRecoilValue(startedSessionState);
   const projectSpecs = useRecoilValue(projectSpecsState);
+  const [personalInfoProcessChoices, setPersonalInfoProcessChoices] = useRecoilState(personalInfoProcessChoicesState)
 
   const [nextSessionDate, setNextSessionDate] = useState("");
 
@@ -211,6 +212,15 @@ const PassageRight = props => {
             are someone who likes to spend time with others? Please indicate the extent to which you agree or disagree
             with each statement.
           </p>
+          <Button       
+            id="QuestionNextBtn"
+            onClick={() => setPersonalInfoProcessChoices({...personalInfoProcessChoices, submit: true})}
+            disabled={!personalInfoProcessChoices.submitEnabled}
+            className={!personalInfoProcessChoices.submitEnabled ? "Button Disabled" : "Button"}
+            variant="contained"
+          >
+            NEXT!
+          </Button> 
         </>
       ) : [10, 20].includes(step) ? (
         <>

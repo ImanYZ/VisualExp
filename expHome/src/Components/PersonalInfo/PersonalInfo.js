@@ -25,6 +25,8 @@ import { ETHNICITY_VALUES, EDUCATION_VALUES } from "./DemographicConstants";
 
 import "./PersonalInfo.css";
 import { Paper } from "@mui/material";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { personalInfoProcessChoicesState } from "../../store/ExperimentAtoms";
 
 const sameThing = value => value;
 const arrayToString = value => value.join(", ");
@@ -47,7 +49,9 @@ const PersonalInfo = props => {
   const [majors, setMajors] = useState([]);
  
 
-  const [category, setCategory] = useState({});
+  // const [category, setCategory] = useState({});
+  const [personalInfoChoices, setPersonalInfoChoices] = useState({});
+  const [personalInfoProcessChoices, setPersonalInfoProcessChoices] = useRecoilState(personalInfoProcessChoicesState);
 
   const populateLanguages = useCallback(async () => {
     if (sortedLanguages.length >= 1) {
@@ -143,113 +147,82 @@ const PersonalInfo = props => {
     },
     [props.ethnicity]
   );
-  const reversedScore = questionNumber => {
-    if (category[listOfItems[questionNumber]] === "1") {
-      category[listOfItems[questionNumber]] = "5";
-    } else if (category[listOfItems[questionNumber]] === "2") {
-      category[listOfItems[questionNumber]] = "4";
-    } else if (category[listOfItems[questionNumber]] === "5") {
-      category[listOfItems[questionNumber]] = "1";
-    } else if (category[listOfItems[questionNumber]] === "4") {
-      category[listOfItems[questionNumber]] = "2";
+  const reversedScore = (answer) => {
+    let _answer = answer;
+    if (answer === "1") {
+      _answer = "5";
+    } else if (answer === "2") {
+      _answer = "4";
+    } else if (answer === "5") {
+      _answer = "1";
+    } else if (answer === "4") {
+      _answer = "2";
     }
-    setCategory(category);
+    return _answer;
   };
   const handleNext = () => {
-    reversedScore(5);
-    reversedScore(20);
-    reversedScore(30);
+    const reversedQuestions = [
+      5, 20, 30,
+      1, 11, 26, 36,
+      7, 17, 22, 42,
+      8, 23, 33,
+      34, 40
+    ];
 
-    reversedScore(1);
-    reversedScore(11);
-    reversedScore(26);
-    reversedScore(36);
+    const _personalInfoChoices = {...personalInfoChoices};
+    for(const listItemIdx of reversedQuestions) {
+      _personalInfoChoices[listOfItems[listItemIdx]] = reversedScore(_personalInfoChoices[listOfItems[listItemIdx]]);
+    }
 
-    reversedScore(7);
-    reversedScore(17);
-    reversedScore(22);
-    reversedScore(42);
+    const extraVersionQuestionIndexes = [0, 5, 10, 15, 20, 24, 30, 35];
+    const agreeablenessQuestionIndexes = [1, 6, 11, 16, 21, 26, 31, 36, 41];
+    const conscientiousnessQuestionIndexes = [2, 7, 12, 17, 21, 26, 32, 37, 42];
+    const emotionalStabilityQuestionIndexes = [3, 8, 13, 18, 23, 28, 33, 38];
+    const opennessQuestionIndexes = [4, 9, 14, 19, 24, 29, 34, 39, 40, 43];
 
-    reversedScore(8);
-    reversedScore(23);
-    reversedScore(33);
+    let extraversion = extraVersionQuestionIndexes.reduce((c, qIdx) => c + Number(_personalInfoChoices[listOfItems[qIdx]]), 0);
+    let agreeableness = agreeablenessQuestionIndexes.reduce((c, qIdx) => c + Number(_personalInfoChoices[listOfItems[qIdx]]), 0);
+    let conscientiousness = conscientiousnessQuestionIndexes.reduce((c, qIdx) => c + Number(_personalInfoChoices[listOfItems[qIdx]]), 0);
+    let EmotionalStability = emotionalStabilityQuestionIndexes.reduce((c, qIdx) => c + Number(_personalInfoChoices[listOfItems[qIdx]]), 0);
+    let openness = opennessQuestionIndexes.reduce((c, qIdx) => c + Number(_personalInfoChoices[listOfItems[qIdx]]), 0);
 
-    reversedScore(34);
-    reversedScore(40);
-
-    let extraversion =
-      Number(category[listOfItems[0]]) +
-      Number(category[listOfItems[5]]) +
-      Number(category[listOfItems[10]]) +
-      Number(category[listOfItems[15]]) +
-      Number(category[listOfItems[20]]) +
-      Number(category[listOfItems[24]]) +
-      Number(category[listOfItems[30]]) +
-      Number(category[listOfItems[35]]);
-    let agreeableness =
-      Number(category[listOfItems[1]]) +
-      Number(category[listOfItems[6]]) +
-      Number(category[listOfItems[11]]) +
-      Number(category[listOfItems[16]]) +
-      Number(category[listOfItems[21]]) +
-      Number(category[listOfItems[26]]) +
-      Number(category[listOfItems[31]]) +
-      Number(category[listOfItems[36]]) +
-      Number(category[listOfItems[41]]);
-    let conscientiousness =
-      Number(category[listOfItems[2]]) +
-      Number(category[listOfItems[7]]) +
-      Number(category[listOfItems[12]]) +
-      Number(category[listOfItems[17]]) +
-      Number(category[listOfItems[21]]) +
-      Number(category[listOfItems[26]]) +
-      Number(category[listOfItems[32]]) +
-      Number(category[listOfItems[37]]) +
-      Number(category[listOfItems[42]]);
-    let EmotionalStability =
-      Number(category[listOfItems[3]]) +
-      Number(category[listOfItems[8]]) +
-      Number(category[listOfItems[13]]) +
-      Number(category[listOfItems[18]]) +
-      Number(category[listOfItems[23]]) +
-      Number(category[listOfItems[28]]) +
-      Number(category[listOfItems[33]]) +
-      Number(category[listOfItems[38]]);
-    let openness =
-      Number(category[listOfItems[4]]) +
-      Number(category[listOfItems[9]]) +
-      Number(category[listOfItems[14]]) +
-      Number(category[listOfItems[19]]) +
-      Number(category[listOfItems[24]]) +
-      Number(category[listOfItems[29]]) +
-      Number(category[listOfItems[34]]) +
-      Number(category[listOfItems[39]]) +
-      Number(category[listOfItems[40]]) +
-      Number(category[listOfItems[43]]);
     props.setAnsweredPersonalTrait(true);
-    props.setPersonalityTraits({"extraversion":extraversion,"agreeableness":agreeableness,"conscientiousness": conscientiousness,"EmotionalStability": EmotionalStability,"openness": openness});
+    props.setPersonalityTraits({
+      extraversion,
+      agreeableness,
+      conscientiousness,
+      EmotionalStability,
+      openness
+    });
   };
+
+  useEffect(() => {
+    setPersonalInfoProcessChoices({
+      ...personalInfoProcessChoices,
+      submitEnabled: Object.keys(personalInfoChoices).length === 44
+    })
+  }, [personalInfoChoices])
+
+  useEffect(() => {
+    if(personalInfoProcessChoices?.submit) {
+      setPersonalInfoProcessChoices({
+        ...personalInfoProcessChoices,
+        submit: false
+      })
+      handleNext();
+    }
+  }, [personalInfoProcessChoices])
 
   return (
     <div>        
-      <Box style={{margin:"10px 10px 10px 10px",width:"900", overflow: "auto" }}>  
+      <Box style={{margin:"10px 10px 10px 10px", overflow: "auto" }}>  
       {!props.answeredPersonalTrait && (
         <>
               <Box style={{margin:"10px 0px 100px 0px"}}>
-              <Button
-                   
-                   id="QuestionNextBtn"
-                   onClick={handleNext}
-                   disabled={Object.keys(category).length !== 44}
-                   className={(Object.keys(category).length !== 44) ? "Button Disabled" : "Button"}
-                   variant="contained"
-                 >
-                   NEXT!
-                 </Button> 
               <h4  >I am someone who:</h4>
                 
               </Box>
-        <Box sx={{ height: "600px",width:"1000px", overflow: "auto" }}>
+        <Box sx={{ width: "100%", height: "calc(100vh - 80px)", overflow: "auto" }}>
           <FormControl >
             <RadioGroup row >
               <Box style={{ margin: "0px 0px 0px 220px" }}>
@@ -319,8 +292,8 @@ const PersonalInfo = props => {
                   <RadioGroup
                     row
                     onChange={e => {
-                      category[name] = e.target.value;
-                      setCategory(category);
+                      personalInfoChoices[name] = e.target.value;
+                      setPersonalInfoChoices({...personalInfoChoices});
                     }}
                     aria-labelledby="demo-row-radio-buttons-group-label1"
                     name="row-radio-buttons-group1"
@@ -412,8 +385,8 @@ const PersonalInfo = props => {
                     <RadioGroup
                       row
                       onChange={e => {
-                        category[name] = e.target.value;
-                        setCategory(category);
+                        personalInfoChoices[name] = e.target.value;
+                        setPersonalInfoChoices({...personalInfoChoices});
                       }}
                       aria-labelledby="demo-row-radio-buttons-group-label1"
                       name="row-radio-buttons-group1"
@@ -505,8 +478,8 @@ const PersonalInfo = props => {
                   <RadioGroup
                     row
                     onChange={e => {
-                      category[name] = e.target.value;
-                      setCategory(category);
+                      personalInfoChoices[name] = e.target.value;
+                      setPersonalInfoChoices({...personalInfoChoices});
                     }}
                     aria-labelledby="demo-row-radio-buttons-group-label1"
                     name="row-radio-buttons-group1"
