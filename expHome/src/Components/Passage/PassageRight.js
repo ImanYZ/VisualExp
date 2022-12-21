@@ -357,6 +357,7 @@ const PassageRight = props => {
               questions={props.questions}
               setOrderQuestions={props.setOrderQuestions}
               nextStep={props.nextStep}
+              showSubmit={true}
             />
           )}
           {step !== 2 && (
