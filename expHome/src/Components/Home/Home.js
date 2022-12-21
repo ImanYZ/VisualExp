@@ -27,15 +27,16 @@ import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { useRive } from "rive-react/dist";
+import { useWindowSize } from "./hooks/useWindowSize";
 
 
 const HEADER_HEIGTH = 70
 
 const artboards = [
-  { name: "animation1", durationMs: 2000, getHeight: (vh) => vh - HEADER_HEIGTH },
-  { name: "animation2", durationMs: 1000, getHeight: (vh) => vh },
-  { name: "animation3", durationMs: 8000, getHeight: (vh) => vh },
-  { name: "animation4", durationMs: 22000, getHeight: (vh) => vh },
+  { name: "animation1", durationMs: 2000, getHeight: (vh) => vh - HEADER_HEIGTH,color:"red" },
+  { name: "animation2", durationMs: 1000, getHeight: (vh) => vh ,color:"yellow"},
+  { name: "animation3", durationMs: 8000, getHeight: (vh) => vh ,color:"pink"},
+  { name: "animation4", durationMs: 22000, getHeight: (vh) => vh ,color:"purple"},
 
   // { name: "animation1", durationMs: 8000 },
   // { name: "animation2", durationMs: 22000 },
@@ -86,17 +87,21 @@ function Index() {
   const isDesktop = useMediaQuery('(min-width:1200px)');
   const isMovil = useMediaQuery('(max-width:600px)');
 
+  const { height, width } = useWindowSize();
+
   const { rive, RiveComponent } = useRive({
     src: "gg.riv",
     stateMachines: artboards[0].name,
     autoplay: false,
-    onLoad: () => console.log('load-finish')
+    onLoad: () => console.log('load-finish'),
+    
   });
 
   useEffect(() => {
     if (!rive) return
     rive.reset({ artboard: artboards[0].name })
     rive.scrub("Timeline 1", 0)
+    rive.play()
   }, [rive])
 
   // const step0Ref = useRef(null);
@@ -143,11 +148,12 @@ function Index() {
 
   const detectScrollPosition = (event) => {
     if (!rive) return
-    if (!sectionAnimationControllerRef?.current) return
+    // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop
 
       const sectionsHeight = getSectionPositions()
+      console.log("sectionsHeight",sectionsHeight)
       const { min, idx: idxSection } = sectionsHeight.reduce((acu, cur, idx) => {
         if (acu.max > currentScrollPosition) return acu
         return { max: acu.max + cur.height, min: acu.max, idx }
@@ -178,31 +184,57 @@ function Index() {
       }))
 
       if (idxAnimation < 0) return
-
-      if (idxSection < SECTION_WITH_ANIMATION) {
-        // show first artboard and first frame
-        rive.reset({ artboard: artboards[0].name })
-        rive.scrub("Timeline 1", 0)
-      }
-      if (idxSection > SECTION_WITH_ANIMATION) {
-        // show last artboard and last frame
-        rive.reset({ artboard: artboards[artboards.length - 1].name })
-        rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
-      }
-      if (idxSection === SECTION_WITH_ANIMATION) {
-        // check local percentage
+      
+      if(idxSection===0) {
         const lowerAnimationLimit = minAnimation
         const upperAnimationLimit = maxAnimation
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
-        setAP(percentageFrame)
-        // console.log('xx:--->', { percentageFrame })
+        if(percentageFrame<50){
+          if(!rive.isPlaying){
+            rive.reset({ artboard: artboards[0].name })
+            rive.scrub("Timeline 1", 0)
+            rive.play()
+          }
+          
+        }else{
+          const newLowerAnimationLimit=lowerAnimationLimit+rangeFrames/2;
+          const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
+          const newPercentageFrame = newPositionFrame * 100 / (rangeFrames/2)
 
-        rive.reset({ artboard: artboards[idxAnimation].name })
-        const timeInSeconds = artboards[idxAnimation].durationMs / 1000 * percentageFrame / 100
-        rive.scrub("Timeline 1", timeInSeconds)
+          const timeInSeconds = artboards[1].durationMs / 1000 * 2*newPercentageFrame / 100
+          rive.reset({ artboard: artboards[1].name })
+          rive.scrub("Timeline 1", timeInSeconds)
+        console.log("percentageFrame",percentageFrame,timeInSeconds)
+
+        }
       }
+
+      // if (idxSection < SECTION_WITH_ANIMATION) {
+      //   // show first artboard and first frame
+      //   rive.reset({ artboard: artboards[0].name })
+      //   rive.scrub("Timeline 1", 0)
+      // }
+      // if (idxSection > SECTION_WITH_ANIMATION) {
+      //   // show last artboard and last frame
+      //   rive.reset({ artboard: artboards[artboards.length - 1].name })
+      //   rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
+      // }
+      // if (idxSection === SECTION_WITH_ANIMATION) {
+      //   // check local percentage
+      //   const lowerAnimationLimit = minAnimation
+      //   const upperAnimationLimit = maxAnimation
+      //   const rangeFrames = upperAnimationLimit - lowerAnimationLimit
+      //   const positionFrame = currentScrollPosition - lowerAnimationLimit
+      //   const percentageFrame = positionFrame * 100 / rangeFrames
+      //   setAP(percentageFrame)
+      //   // console.log('xx:--->', { percentageFrame })
+
+      //   rive.reset({ artboard: artboards[idxAnimation].name })
+      //   const timeInSeconds = artboards[idxAnimation].durationMs / 1000 * percentageFrame / 100
+      //   rive.scrub("Timeline 1", timeInSeconds)
+      // }
     }
   };
 
@@ -224,7 +256,7 @@ function Index() {
 
     return [
       { id: section1Ref.current.id, height: 0 },
-      { id: section2Ref.current.id, height: section1Ref.current.clientHeight },
+      { id: section2Ref.current.id, height: section1Ref.current.clientHeight},
       { id: section3Ref.current.id, height: section2Ref.current.clientHeight },
       { id: section4Ref.current.id, height: section3Ref.current.clientHeight },
       { id: section5Ref.current.id, height: section4Ref.current.clientHeight },
@@ -244,7 +276,7 @@ function Index() {
 
     return [
       { id: section1Ref.current.id, height: section1Ref.current.clientHeight },
-      { id: section2Ref.current.id, height: section2Ref.current.clientHeight },
+      { id: section2Ref.current.id, height: section2Ref.current.clientHeight-section1Ref.current.clientHeight },
       { id: section3Ref.current.id, height: section3Ref.current.clientHeight },
       { id: section4Ref.current.id, height: section4Ref.current.clientHeight },
       { id: section5Ref.current.id, height: section5Ref.current.clientHeight },
@@ -267,18 +299,19 @@ function Index() {
   }, [])
 
   const getAnimationsPositions = useCallback(() => {
-    if (!sectionAnimationControllerRef.current) return null
+    // if (!sectionAnimationControllerRef.current) return null
 
-    const animationHeaderHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
-    const animation0Height = sectionAnimationControllerRef.current.getAnimation0Height()
+    // const animationHeaderHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
+    // const animation0Height = sectionAnimationControllerRef.current.getAnimation0Height()
     // const animation1Height = sectionAnimationControllerRef.current.getAnimation1Height()
     // const animation2Height = sectionAnimationControllerRef.current.getAnimation2Height()
     // const animation3Height = sectionAnimationControllerRef.current.getAnimation3Height()
     // const animation4Height = sectionAnimationControllerRef.current.getAnimation4Height()
     // const animation5Height = sectionAnimationControllerRef.current.getAnimation5Height()
     // const animation6Height = sectionAnimationControllerRef.current.getAnimation6Height()
-    return [animationHeaderHeight, animation0Height/*, animation1Height , animation2Height, animation3Height, animation4Height, animation5Height */]
-  }, [])
+    // return [animationHeaderHeight, animation0Height/*, animation1Height , animation2Height, animation3Height, animation4Height, animation5Height */]
+    return artboards.map(artboard=>artboard.getHeight(height))
+  }, [height])
 
   const switchSection = (newValue, animationIndex = 0) => {
 
@@ -526,7 +559,7 @@ function Index() {
         <Landing />
       </Box> */}
 
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "relative" }} >
 
         <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px", }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
@@ -543,6 +576,7 @@ function Index() {
         </Box>
 
         <Stack
+          ref={section1Ref}
           spacing="10px"
           direction={"column"}
           alignItems={"center"}
@@ -555,7 +589,9 @@ function Index() {
             // alignItems: "center",
             // justifyContent: "flex-end",
             // border: "solid 10px red"
-          }}>
+          }}
+        
+          >
           {/* Increase the network loading priority of the background image. */}
           {/* <img
             style={{ display: "none" }}
