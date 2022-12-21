@@ -16,15 +16,11 @@ import YoutubeEmbed from "../components/YoutubeEmbed/YoutubeEmbed";
 
 import sectionsOrder from "./sectionsOrder";
 import { useWindowSize } from "../../hooks/useWindowSize";
-const sectionIdx = sectionsOrder.findIndex(
-  (sect) => sect.id === "HowItWorksSection"
-);
+const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "HowItWorksSection");
 
-
-const HowItWorks = (props) => {
-
-  const sectionHeaderRef = useRef(null)
-  const animation0Ref = useRef(null)
+const HowItWorks = props => {
+  // const sectionHeaderRef = useRef(null);
+  // const animation0Ref = useRef(null);
   // const animation1Ref = useRef(null)
   // const animation2Ref = useRef(null)
   // const animation3Ref = useRef(null)
@@ -33,29 +29,38 @@ const HowItWorks = (props) => {
   // const animation6Ref = useRef(null)
   const { height, width } = useWindowSize();
 
-  useImperativeHandle(props.innerRef, () => {
-    return {
-      getSectionHeaderHeight: () => sectionHeaderRef?.current?.clientHeight ?? 0,
-      getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0,
-      // getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
-      // getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
-      // getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
-      // getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
-      // getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
-      // getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
-    };
-  }, []);
+  // useImperativeHandle(
+  //   props.innerRef,
+  //   () => {
+  //     return {
+  //       getSectionHeaderHeight: () => sectionHeaderRef?.current?.clientHeight ?? 0,
+  //       getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0
+  //       // getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
+  //       // getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
+  //       // getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
+  //       // getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
+  //       // getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
+  //       // getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
+  //     };
+  //   },
+  //   []
+  // );
 
   const boxLarge = useMemo(() => {
-    if (height < width) return height - 100
-    return width - 100
-  }, [height, width])
+    if (height < width) return height - 100;
+    return width - 100;
+  }, [height, width]);
 
-  const topCenteredPosition = height / 2 - boxLarge / 2 + 35
+  const topCenteredPosition = height / 2 - boxLarge / 2 + 35;
 
-  const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0)
-  console.log({ res: getHeightSection() })
+  const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0);
+  console.log({ res: getHeightSection() });
 
+  const processedArtboard=useMemo(()=>props.artboards.reduce((acu,cur)=>{
+    const newHeight=cur.getHeight(height);
+    return [...acu,{...cur, top:acu.length ? acu[acu.length-1].top + acu[acu.length-1].height : 0  ,height:newHeight}]
+  },[]),[props.artboards,height])
+  console.log("processedArtboard",processedArtboard)
   return (
     <Box
       id="HowItWorksSection"
@@ -68,16 +73,32 @@ const HowItWorks = (props) => {
         position: "relative",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "center"
         // backgroundColor: "#28282a"
         // bgcolor: "secondary.light",
         // border: 'dashed 6px orange'
       }}
     >
-      <Box sx={{ position: "absolute", top: "0px", width: width, height: height - 70, borderRight: "dashed 6px red", color: "white" }}>{height - 70}px</Box>
+      {processedArtboard.map(artboard => (
+        <Box
+        key={artboard.name}
+          sx={{
+            position: "absolute",
+            top:  artboard.top,
+            width: "100%",
+            height:artboard.height,
+            borderRight: `dashed 6px ${artboard.color}`,
+            color: "white"
+            
+          }}
+        >
+          {height - 70}px
+        </Box>
+      ))}
+      {/* <Box sx={{ position: "absolute", top: "0px", width: width, height: height - 70, borderRight: "dashed 6px red", color: "white" }}>{height - 70}px</Box>
       <Box sx={{ position: "absolute", top: height - 70, width: width, height: height, borderRight: "dashed 6px #ff5e00", color: "white" }}>{height}px</Box>
       <Box sx={{ position: "absolute", top: height - 70 + height, width: width, height: height, borderRight: "dashed 6px #ffae00", color: "white" }}>{height}px</Box>
-      <Box sx={{ position: "absolute", top: height - 70 + height + height, width: width, height: height, borderRight: "dashed 6px #88ff00", color: "white" }}>{height}px</Box>
+      <Box sx={{ position: "absolute", top: height - 70 + height + height, width: width, height: height, borderRight: "dashed 6px #88ff00", color: "white" }}>{height}px</Box> */}
 
       {/* <div style={{
           height: height - 70, width: '100%', position: "absolute", top: 0, padding: "20px",
@@ -86,9 +107,19 @@ const HowItWorks = (props) => {
 
       </div>*/}
 
-
       {/* --- animations start */}
-      <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10, border: "solid 2px pink" }}>
+      <div
+        style={{
+          position: "sticky",
+          top: topCenteredPosition,
+          width: boxLarge,
+          height: boxLarge,
+          display: "flex",
+          flexDirection: "column",
+          zIndex: 10,
+          border: "solid 2px pink"
+        }}
+      >
         {props.riveComponent}
       </div>
 
@@ -119,7 +150,6 @@ const HowItWorks = (props) => {
 
         </div> */}
 
-
       {/* --- animation ends */}
       {/* <Button
           color="secondary"
@@ -137,12 +167,10 @@ const HowItWorks = (props) => {
             <YoutubeEmbed embedId="vkNx-QUmbNI" />
           </Box>
         </Box> */}
-    </Box >
+    </Box>
   );
 };
 
-
-const HowItWorksForwarded = React.forwardRef((props, ref) => (<HowItWorks  {...props} innerRef={ref} />));
-
+const HowItWorksForwarded = React.forwardRef((props, ref) => <HowItWorks {...props} innerRef={ref} />);
 
 export default HowItWorksForwarded;
