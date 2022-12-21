@@ -90,13 +90,13 @@ function Index() {
   const { height, width } = useWindowSize();
 
   const { rive, RiveComponent } = useRive({
-    src: "gg.riv",
+    src: "1-logo-animation.riv",
     stateMachines: artboards[0].name,
     autoplay: false,
     onLoad: () => console.log('load-finish'),
     
   });
-
+  
   useEffect(() => {
     if (!rive) return
     rive.reset({ artboard: artboards[0].name })
