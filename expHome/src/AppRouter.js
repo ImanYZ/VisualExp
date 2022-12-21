@@ -152,9 +152,6 @@ const AppRouter = props => {
       }, 3600000);
     }
     if (firebase && email && fullname) {
-      // setDuringAnExperiment(true)
-      // setStartedByResearcher(true)
-      // setStartedSession(3)
       areTheyDuringAnExperimentSession();
     }
   }, [firebase, email, fullname]);
