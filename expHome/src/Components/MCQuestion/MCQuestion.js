@@ -24,6 +24,7 @@ import { choicesState } from "../../store/ExperimentAtoms";
 import "./MCQuestion.css";
 import { firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { projectState } from "../../store/ProjectAtoms";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const MCQuestion = props => {
   const [choices, setChoices] = useRecoilState(choicesState);
@@ -38,6 +39,8 @@ const MCQuestion = props => {
   const [codeChoice1, setCodeChoice1] = useState([]);
   const [selectCodes, setSelectCodes] = useState(false);
   const [choiceQuestion, setChoiceQuestion] = useState(false);
+  const [processingSubmit, setProcessingSubmit] = useState(false);
+
   const choice = choices[props.currentQIdx];
   const curQuestion = props.currentQIdx + 1;
   const size = props.questions.length;
@@ -63,10 +66,9 @@ const MCQuestion = props => {
   };
 
   useEffect(() => {
-    if (props.currentQIdx === props.questions.length - 1) {
-      setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
-      props.setCurrentQIdx(0);
-    }
+    setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
+    props.setCurrentQIdx(0);
+    setAllAnswered(false);
   }, [random]);
 
   useEffect(() => {
@@ -223,8 +225,10 @@ const MCQuestion = props => {
     });
   };
 
-  const submitAndContinue = () => {
-    props.nextStep();
+  const submitAndContinue = async () => {
+    setProcessingSubmit(true);
+    await props.nextStep();
+    setProcessingSubmit(false);
     setRandom(!random);
   };
   return (
@@ -375,6 +379,9 @@ const MCQuestion = props => {
               disabled={!nextAvailable}
               className={!nextAvailable ? "Button Disabled" : "Button"}
               variant="contained"
+              sx={{
+                display: nextAvailable || !allAnswered ? "flex" : "none"
+              }}
             >
               Next
             </Button>
@@ -385,6 +392,9 @@ const MCQuestion = props => {
               disabled={!nextAvailable || (allowNextForQC && selectCodes)}
               className={!nextAvailable || (allowNextForQC && selectCodes) ? "Button Disabled" : "Button"}
               variant="contained"
+              sx={{
+                display: !selectCodes && !props.showSubmit && (!nextAvailable || (allowNextForQC && selectCodes)) ? "none" : "flex"
+              }}
             >
               {selectCodes ? "Next" : "Submit"}
             </Button>
@@ -406,15 +416,16 @@ const MCQuestion = props => {
         <p>
           {questionsLeft !== 0 && questionsLeft + " question" + (questionsLeft > 1 ? "s" : "") + " left to submit!"}
         </p>
-        <Button
+        <LoadingButton
           id="QuestionSubmitBtn"
           onClick={submitAndContinue}
           disabled={!allAnswered}
           className={allAnswered ? "Button" : "Button Disabled"}
           variant="contained"
+          loading={processingSubmit}
         >
-          Submit &amp; Continue!
-        </Button>
+          {"Submit & Continue!"}
+        </LoadingButton>
       </div>
       <div></div>
     </div>
