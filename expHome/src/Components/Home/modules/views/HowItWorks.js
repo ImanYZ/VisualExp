@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 
+import backgroundImage from "../../../../assets/darkModeLibraryBackground.jpg";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
@@ -24,24 +25,24 @@ const HowItWorks = (props) => {
 
   const sectionHeaderRef = useRef(null)
   const animation0Ref = useRef(null)
-  const animation1Ref = useRef(null)
-  const animation2Ref = useRef(null)
-  const animation3Ref = useRef(null)
-  const animation4Ref = useRef(null)
-  const animation5Ref = useRef(null)
-  const animation6Ref = useRef(null)
+  // const animation1Ref = useRef(null)
+  // const animation2Ref = useRef(null)
+  // const animation3Ref = useRef(null)
+  // const animation4Ref = useRef(null)
+  // const animation5Ref = useRef(null)
+  // const animation6Ref = useRef(null)
   const { height, width } = useWindowSize();
 
   useImperativeHandle(props.innerRef, () => {
     return {
       getSectionHeaderHeight: () => sectionHeaderRef?.current?.clientHeight ?? 0,
       getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0,
-      getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
-      getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
-      getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
-      getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
-      getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
-      getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
+      // getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
+      // getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
+      // getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
+      // getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
+      // getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
+      // getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
     };
   }, []);
 
@@ -52,54 +53,75 @@ const HowItWorks = (props) => {
 
   const topCenteredPosition = height / 2 - boxLarge / 2 + 35
 
+  const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0)
+  console.log({ res: getHeightSection() })
+
   return (
-    <>
+    <Box
+      id="HowItWorksSection"
+      component="section"
+      sx={{
+        // pt: 7,
+        // pb: 10,
+        // minHeight: height - 70 + height + height + height,
+        height: getHeightSection(),
+        position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        // backgroundColor: "#28282a"
+        // bgcolor: "secondary.light",
+        // border: 'dashed 6px orange'
+      }}
+    >
+      <Box sx={{ position: "absolute", top: "0px", width: width, height: height - 70, borderRight: "dashed 6px red", color: "white" }}>{height - 70}px</Box>
+      <Box sx={{ position: "absolute", top: height - 70, width: width, height: height, borderRight: "dashed 6px #ff5e00", color: "white" }}>{height}px</Box>
+      <Box sx={{ position: "absolute", top: height - 70 + height, width: width, height: height, borderRight: "dashed 6px #ffae00", color: "white" }}>{height}px</Box>
+      <Box sx={{ position: "absolute", top: height - 70 + height + height, width: width, height: height, borderRight: "dashed 6px #88ff00", color: "white" }}>{height}px</Box>
 
-      <Box
-        id="HowItWorksSection"
-        component="section"
-        sx={{
-          // pt: 7,
-          // pb: 10,
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          backgroundColor: "#28282a"
-          // bgcolor: "secondary.light",
-          // border: 'dashed 6px orange'
-        }}
-      >
-        <div ref={sectionHeaderRef} style={{ width: boxLarge, /* background: "#9cd82c27", */ top: "0px", padding: "20px" }}>
-          <Typography variant="h4" marked="center" sx={{ /* mb: 7, */ color: "#f8f8f8", textAlign: "center", paddingTop: "56px" }}>
-            {sectionsOrder[sectionIdx].title}
-          </Typography>
+      {/* <div style={{
+          height: height - 70, width: '100%', position: "absolute", top: 0, padding: "20px",
+          backgroundImage: `url(${backgroundImage})`,
+        }}> 
+
+      </div>*/}
+
+
+      {/* --- animations start */}
+      <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10, border: "solid 2px pink" }}>
+        {props.riveComponent}
+      </div>
+
+      {/* <div ref={sectionHeaderRef} style={{
+          position: "absolute", height: boxLarge / 3, width: boxLarge,
+          border: 'dashed 2px #48ff00',
+          top: "0px", padding: "20px"
+        }}>
+
         </div>
+        <div ref={animation0Ref} style={{
+          height: boxLarge / 3 * 2, width: boxLarge, position: "absolute", top: boxLarge / 3, padding: "20px",
+          border: 'dashed 2px red'
+        }}>
 
-        {/* --- animations start */}
-        <div style={{ position: 'sticky', top: topCenteredPosition, width: boxLarge, height: boxLarge, display: 'flex', flexDirection: 'column', zIndex: 10/* , border: "solid 2px pink" */ }}>
-          {props.riveComponent}
-        </div>
-        <div ref={animation0Ref} style={{ height: boxLarge, width: boxLarge, position: "absolute", /* background: "#ff00ea83", */ top: sectionHeaderRef?.current?.clientHeight ?? 0, padding: "20px" }}>
+        </div> */}
 
-        </div>
+      {/* <div ref={animation1Ref} style={{ height: "1000vh", width: "100%", borderRight: "solid 20px #8031a5" }}>
 
-        <div ref={animation1Ref} style={{ height: "1000vh", width: "100%"/* , borderRight: "solid 20px #8031a5" */ }}>
-
-        </div>
-        <div ref={animation2Ref} style={{ height: "500vh", width: "100%"/* , borderRight: "solid 20px #2769aa" */ }}>
+        </div> */}
+      {/* <div ref={animation2Ref} style={{ height: "500vh", width: "100%", borderRight: "solid 20px #2769aa" }}>
 
         </div>
-        <div ref={animation3Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #3696f7" */ }}>
+        <div ref={animation3Ref} style={{ height: "300vh", width: "100%", borderRight: "solid 20px #3696f7" }}>
 
         </div>
-        <div ref={animation4Ref} style={{ height: "300vh", width: "100%"/* , borderRight: "solid 20px #26c2ff" */ }}>
+        <div ref={animation4Ref} style={{ height: "300vh", width: "100%", borderRight: "solid 20px #26c2ff" }}>
 
-        </div>
+        </div> */}
 
 
-        {/* --- animation ends */}
-        <Button
+      {/* --- animation ends */}
+      {/* <Button
           color="secondary"
           variant="contained"
           size="large"
@@ -110,63 +132,12 @@ const HowItWorks = (props) => {
           Apply to Join Us!
         </Button>
         <Box sx={{ zIndex: 1, mx: "auto" }}>
-          {/* <Grid container spacing={2.5} align="center">
-            {howElements.map((elem, idx) => {
-              return (
-                <Grid key={elem + idx} item xs={12} sm={6} md={4} lg={3}>
-                  <Card sx={{ ...item, maxWidth: 355 }}>
-                    <Box sx={number}>{idx + 1}.</Box>
-                    <Box
-                      alignItems="center"
-                      sx={{
-                        display: "flex",
-                        justify: "center",
-                        alignItems: "center",
-                        height: "190px",
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        src={"/static/" + elem.id + ".svg"}
-                        alt={elem.id}
-                        height="100%"
-                        width="100%"
-                        sx={{ px: "10px" }}
-                      />
-                    </Box>
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {elem.title}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ textAlign: "left" }}
-                      >
-                        {elem.content}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid> */}
+          
           <Box sx={{ mt: "19px" }}>
             <YoutubeEmbed embedId="vkNx-QUmbNI" />
           </Box>
-        </Box>
-        {/* <Button
-        color="secondary"
-        size="large"
-        variant="contained"
-        component="a"
-        href="#JoinUsSection"
-        sx={{ mt: 10, color: "common.white" }}
-      >
-        Get started
-      </Button> */}
-      </Box >
-    </>
+        </Box> */}
+    </Box >
   );
 };
 
