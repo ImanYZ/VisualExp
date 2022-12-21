@@ -50,3 +50,11 @@ export const choicesState = atom({
   key: "choicesState",
   default: [],
 });
+
+export const personalInfoProcessChoicesState = atom({
+  key: "personalInfoProcessChoicesState",
+  default: {
+    submit: false,
+    submitEnabled: false
+  }
+})
