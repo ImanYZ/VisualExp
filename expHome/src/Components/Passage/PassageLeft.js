@@ -9,6 +9,7 @@ import {
 } from "../../store/ExperimentAtoms";
 
 import thankYouImg from "../../assets/ThankYou.jpg";
+import YoutubeAutoplayIframe from "../YoutubeAutoplayIframe";
 
 const PassageLeft = (props) => {
   const step = useRecoilValue(stepState);
@@ -85,21 +86,11 @@ const PassageLeft = (props) => {
   ) : (
     <div id="PassageContainer">
       {[0, 4, 7, 14].includes(step) ? (
-        <iframe
-          width="100%"
-          height="100%"
-          src={
-            step === 0
-              ? "https://www.youtube.com/embed/uHKfrz65KSU?start=22&amp;autoplay=1"
-              : step == 4
-                ? "https://www.youtube.com/embed/C6RUp21s6BQ?start=4&amp;autoplay=1"
-                : "https://www.youtube.com/embed/5ojcqpaO_Jo?autoplay=1"
-          }
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        <YoutubeAutoplayIframe url={step === 0
+          ? "https://www.youtube.com/embed/uHKfrz65KSU?start=22&autoplay=1"
+          : step === 4
+            ? "https://www.youtube.com/embed/C6RUp21s6BQ?start=4&autoplay=1"
+            : "https://www.youtube.com/embed/5ojcqpaO_Jo?autoplay=1"} />
       ) : (
         <iframe id="PassageFrame" frameBorder="0" src={props.pConURL}></iframe>
       )}
