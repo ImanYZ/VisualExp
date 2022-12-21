@@ -25,75 +25,6 @@ import { tokenize, textCosineSimilarity } from "./utils";
 
 import "./App.css";
 
-// eslint-disable-next-line no-lone-blocks
-{
-  // const changeQuestions = async () => {
-  //   const passagesDocs = await firebase.db.collection("passages").get();
-  //   for (let passageDoc of passagesDocs.docs) {
-  //     const passageData = passageDoc.data();
-  //     const passageRef = firebase.db.collection("passages").doc(passageDoc.id);
-  //     if ("question" in passageData) {
-  //       await passageRef.update({
-  //         questions: passageData.question,
-  //         question: firebase.firestore.FieldValue.delete(),
-  //       });
-  //     }
-  //   }
-  // };
-  // const recalculateFreeRecall = async () => {
-  //   const usersDocs = await firebase.db.collection("users").get();
-  //   for (let userDoc of usersDocs.docs) {
-  //     const userData = userDoc.data();
-  //     const pConditions = userData.pConditions;
-  //     for (let pCondIdx = 0; pCondIdx < pConditions.length; pCondIdx++) {
-  //       const pCond = pConditions[pCondIdx];
-  //       const reText = pCond.recallreText;
-  //       const passage = pCond.passage;
-  //       const passageDoc = await firebase.db
-  //         .collection("passages")
-  //         .doc(passage)
-  //         .get();
-  //       const passageData = passageDoc.data();
-  //       const text = passageData.text;
-  //       let score = 0;
-  //       const mainText = tokenize(text.toLowerCase());
-  //       const recalledText = tokenize(reText.toLowerCase());
-  //       for (let t1 of mainText) {
-  //         if (recalledText.includes(t1)) {
-  //           score += 1;
-  //         }
-  //       }
-  //       pConditions[pCondIdx] = {
-  //         ...pConditions[pCondIdx],
-  //         recallScore: score,
-  //         recallScoreRatio: score / mainText.length,
-  //       };
-  //       const userRef = firebase.db.collection("users").doc(userDoc.id);
-  //       await userRef.update({
-  //         pConditions,
-  //       });
-  //     }
-  //   }
-  // };
-  // const arraysEqual = (arr1, arr2) => {
-  //   if (arr1.length !== arr2.length) {
-  //     return false;
-  //   }
-  //   for (let idx = 0; idx < arr1.length; idx++) {
-  //     if (arr1[idx] !== arr2[idx]) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
-  // const initialCMap = [
-  //   { from: "Sea", link: "is", to: "A body of water" },
-  //   { from: "Different fishes", link: "swim in", to: "Sea" },
-  //   { from: "Different fishes", link: "live in", to: "A body of water" },
-  //   { from: "", link: "", to: "" },
-  // ];
-}
-
 const postQuestions = [
   {
     stem: "Comparing the two knowledge representation formats you went through, which one do you think was easier to read?",
@@ -137,10 +68,7 @@ const App = () => {
   const [questions, setQuestions] = useState([]);
   const [timer, setTimer] = useState(5 * 60);
   const [reText, setReText] = useState("");
-  // const [cMap, setCMap] = useState(initialCMap);
-  // const [fromOptions, setFromOptions] = useState([]);
-  // const [linkOptions, setLinkOptions] = useState([]);
-  // const [toOptions, setToOptions] = useState([]);
+  
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
     { explanation: "", codes: [] },
@@ -259,44 +187,6 @@ const App = () => {
     }
     await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
   };
-
-  // eslint-disable-next-line no-lone-blocks
-  {
-    // const submitCMap = async (currentTime, timeSpent, userRef, userData) => {
-    //   const passageDoc = await firebase.db
-    //     .collection("passages")
-    //     .doc(passage)
-    //     .get();
-    //   const passageData = passageDoc.data();
-    //   const conMap = passageData.cMap;
-    //   const pConditions = userData.pConditions;
-    //   let score = 0;
-    //   for (let cRow of cMap) {
-    //     for (let conRow of conMap) {
-    //       const tCFrom = tokenize(cRow.from);
-    //       const tConFrom = tokenize(conRow.from);
-    //       if (arraysEqual(tCFrom, tConFrom)) {
-    //         const tCTo = tokenize(cRow.to);
-    //         const tConTo = tokenize(conRow.to);
-    //         if (arraysEqual(tCTo, tConTo)) {
-    //           score += 1;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   pConditions[phase] = {
-    //     ...pConditions[phase],
-    //     cMap,
-    //     cMapScore: score,
-    //     cMapScoreRatio: score / conMap.length,
-    //     cMapEnded: currentTime,
-    //     cMapTime: timeSpent,
-    //   };
-    //   await userRef.update({
-    //     pConditions,
-    //   });
-    // };
-  }
 
   const submitFreeRecall = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
     let passageDoc = await firebase.db.collection("passages").doc(passage).get();

@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { useRive } from "rive-react/dist";
+import { showSignInorUpState } from "../../store/GlobalAtoms";
 
 const artboards = [
   { name: "animation1", durationMs: 8000 },
@@ -65,6 +66,7 @@ function Index() {
   const [section, setSection] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
   const [fullname, setFullname] = useRecoilState(fullnameState);
+  const showSignInorUp = useRecoilValue(showSignInorUpState);
   const [email, setEmail] = useRecoilState(emailState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -495,6 +497,7 @@ function Index() {
                   onClick={signUpHandler}
                   size={isMovil ? "small" : "medium"}
                   sx={{
+                    display: showSignInorUp ? "inline-flex" : "none",
                     fontSize: 16,
                     color: "common.white",
                     ml: 2.5,
