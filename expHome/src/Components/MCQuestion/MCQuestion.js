@@ -66,10 +66,9 @@ const MCQuestion = props => {
   };
 
   useEffect(() => {
-    if (props.currentQIdx === props.questions.length - 1) {
-      setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
-      props.setCurrentQIdx(0);
-    }
+    setOrderOfQuestions([props.questions[Math.floor(Math.random() * props.questions.length)]]);
+    props.setCurrentQIdx(0);
+    setAllAnswered(false);
   }, [random]);
 
   useEffect(() => {
