@@ -14,3 +14,19 @@
     filter: blur(0px);
   }
 }
+
+.slide-left-to-right {
+  animation-name: slideLeftToTight;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+@keyframes slideLeftToTight {
+  0% {
+    opacity: 0;
+    transform: translateX(-100);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
