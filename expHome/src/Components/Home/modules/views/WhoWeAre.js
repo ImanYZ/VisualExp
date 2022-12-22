@@ -312,6 +312,41 @@ const WhoWeAre = (props) => {
                 alignItems="flex-start"
                 component="a"
                 target="_blank"
+                href="https://www.si.umich.edu/people/iman-yeckehzaare"
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    alt="Iman YeckehZaare Picture"
+                    src="/static/Iman_YeckehZaare.jpg"
+                    sx={{ width: 100, height: 130, mr: 2.5 }}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary="1Cademy Architect"
+                  secondary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{ display: "inline", color: "#f8f8f8" }}
+                        component="span"
+                        variant="body2"
+                        color="text.primary"
+                      >
+                        Iman YeckehZaare
+                      </Typography>
+                      <Box sx={{ color: gray03 }}>
+                        {
+                          " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
+                        }
+                      </Box>
+                    </React.Fragment>
+                  }
+                />
+              </ListItemButton>
+              <Divider variant="inset" component="li" />
+              <ListItemButton
+                alignItems="flex-start"
+                component="a"
+                target="_blank"
                 href="https://www.si.umich.edu/people/paul-resnick"
               >
                 <ListItemAvatar>
@@ -341,41 +376,6 @@ const WhoWeAre = (props) => {
                     </React.Fragment>
                   }
 
-                />
-              </ListItemButton>
-              <Divider variant="inset" component="li" />
-              <ListItemButton
-                alignItems="flex-start"
-                component="a"
-                target="_blank"
-                href="https://www.si.umich.edu/people/iman-yeckehzaare"
-              >
-                <ListItemAvatar>
-                  <Avatar
-                    alt="Iman YeckehZaare Picture"
-                    src="/static/Iman_YeckehZaare.jpg"
-                    sx={{ width: 100, height: 130, mr: 2.5 }}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary="1Cademy Architect"
-                  secondary={
-                    <React.Fragment>
-                      <Typography
-                        sx={{ display: "inline", color: "#f8f8f8" }}
-                        component="span"
-                        variant="body2"
-                        color="text.primary"
-                      >
-                        Iman YeckehZaare
-                      </Typography>
-                      <Box sx={{ color: gray03 }}>
-                        {
-                          " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
-                        }
-                      </Box>
-                    </React.Fragment>
-                  }
                 />
               </ListItemButton>
               <Divider variant="inset" component="li" />
