@@ -47,20 +47,21 @@ const HowItWorks = props => {
   // );
 
   const boxLarge = useMemo(() => {
-    if (height < width) return height - 100;
-    return width - 100;
+    const offset = width < 600 ? 0 : width < 900 ? 70 : 100
+    if (height < width) return height - offset;
+    return width - offset;
   }, [height, width]);
 
   const topCenteredPosition = height / 2 - boxLarge / 2 + 35;
 
   const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0);
-  console.log({ res: getHeightSection() });
+  // console.log({ res: getHeightSection() });
 
   const processedArtboard = useMemo(() => props.artboards.reduce((acu, cur) => {
     const newHeight = cur.getHeight(height);
     return [...acu, { ...cur, top: acu.length ? acu[acu.length - 1].top + acu[acu.length - 1].height : 0, height: newHeight }]
   }, []), [props.artboards, height])
-  console.log("processedArtboard", processedArtboard)
+  // console.log("processedArtboard", processedArtboard)
   return (
     <Box
       id="HowItWorksSection"

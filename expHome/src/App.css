@@ -1,3 +1,4 @@
+@import url(./animations.css);
 #UMICH_Logo {
   margin-right: 10px;
 }
@@ -133,9 +134,8 @@ button.NavLink:hover {
 }
 
 textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   font-size: 16px;
   padding: 10px;
 }
@@ -145,8 +145,7 @@ button.Button {
   font-size: 16px;
   margin: 19px;
   padding: 10px 19px 10px 19px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px,
-    rgba(0, 0, 0, 0.1) 0px 2px 4px 0px,
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 28px 0px, rgba(0, 0, 0, 0.1) 0px 2px 4px 0px,
     rgba(255, 255, 255, 0.05) 0px 0px 0px 1px inset;
 }
 button.Button.Green {
@@ -159,16 +158,16 @@ button.Button.Red {
 .rive-canvas {
   width: inherit;
   height: inherit;
-  position:absolute
+  position: absolute;
 }
 
-.rive-canvas-hidden{
+.rive-canvas-hidden {
   opacity: 0;
   /* display: none; */
   /* transition: 1s; */
 }
-.page-wrapper{
+.page-wrapper {
   max-width: 980px;
   margin: auto;
-  border:"solid 2px pink"
+  border: "solid 2px pink";
 }
