@@ -34,11 +34,11 @@ const HEADER_HEIGTH = 70;
 
 const artboards = [
   { name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#f33636" },
-  { name: "artboard-2", durationMs: 1000, getHeight: vh => vh, color: "#f35c36" },
+  { name: "artboard-2", durationMs: 1000, getHeight: vh => vh, color: "#f33636" },
   { name: "artboard-3", durationMs: 7000, getHeight: vh => vh, color: "#f38b36" },
-  { name: "artboard-4", durationMs: 22000, getHeight: vh => vh, color: "#f3c136" },
-  { name: "artboard-5", durationMs: 5000, getHeight: vh => vh, color: "#e0f336" },
-  { name: "artboard-6", durationMs: 8500, getHeight: vh => vh, color: "#82f336" },
+  { name: "artboard-4", durationMs: 22000, getHeight: vh => vh, color: "#e6f336" },
+  { name: "artboard-5", durationMs: 5000, getHeight: vh => vh, color: "#62f336" },
+  { name: "artboard-6", durationMs: 8500, getHeight: vh => vh, color: "#36f3ca" },
 
   // { name: "animation1", durationMs: 8000 },
   // { name: "animation2", durationMs: 22000 },
@@ -269,12 +269,10 @@ function Index() {
         if (percentageFrame < 50) {
           // show loop logo
           // console.log("<");
-          rive1.scrub("Timeline 1", 0);
-          rive1.play();
+          // rive1.scrub("Timeline 1", 0);
+          // rive1.play();
           setIdxRiveComponent(0);
         } else {
-
-
           const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
           const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
           const newPercentageFrame = (newPositionFrame * 100) / (rangeFrames / 2);
@@ -601,7 +599,7 @@ function Index() {
             width: "100%",
             background: "rgba(0,0,0,.72)",
             backdropFilter: "saturate(180%) blur(20px)",
-            filter: "blur(1px)"
+            // filter: "blur(1px)"
           }}
         />
         <Box
@@ -808,7 +806,7 @@ function Index() {
               </Box>
             </HowItWorks>
           </Box>
-          <Box id={sectionsOrder[2].id} ref={section3Ref}>
+          <Box id={sectionsOrder[2].id} ref={section3Ref} className={section === 2 ? "slide-left-to-right" : ""}>
             <Values /> {/* why */}
           </Box>
           <Box id={sectionsOrder[3].id} ref={section4Ref} >
