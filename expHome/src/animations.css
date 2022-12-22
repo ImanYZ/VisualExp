@@ -1,0 +1,16 @@
+.show-blurred-text {
+  animation-name: showBlurredText;
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+@keyframes showBlurredText {
+  0% {
+    letter-spacing: -0.5;
+    opacity: 0;
+    filter: blur(12px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+}
