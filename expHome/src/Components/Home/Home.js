@@ -6,7 +6,7 @@ import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import LogoDarkMode from "../../assets/DarkModeLogo.svg";
+import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
 
 import What from "./modules/views/What";
@@ -33,7 +33,7 @@ import { useWindowSize } from "./hooks/useWindowSize";
 const HEADER_HEIGTH = 70;
 
 const artboards = [
-  { name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#f33636" },
+  { name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" },
   { name: "artboard-2", durationMs: 1000, getHeight: vh => vh, color: "#f33636" },
   { name: "artboard-3", durationMs: 7000, getHeight: vh => vh, color: "#f38b36" },
   { name: "artboard-4", durationMs: 22000, getHeight: vh => vh, color: "#e6f336" },
@@ -730,7 +730,7 @@ function Index() {
 
       <Box sx={{ position: "relative" }}>
         <Box sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}>
-          <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
+          <Box sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
             <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
             <h2 style={{ color: "white" }}>{ap.toFixed(1)}%</h2>
 
@@ -824,7 +824,7 @@ function Index() {
         </Box>
       </Box>
       <AppFooter />
-      <link rel="preload" href="3-summarizing.riv" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="artboard-1.riv" as="fetch" crossOrigin="anonymous" />
     </Box >
     // </ThemeProvider>
   );
