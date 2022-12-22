@@ -5,22 +5,22 @@ import { useRecoilValue } from "recoil";
 import Container from "@mui/material/Container";
 import Typography from "../../components/Typography";
 
-import { firebaseOneState } from "../../../../../store/OneCademyAtoms";
-
 import "./UniversitiesMap.css";
 import { Box } from "@mui/material";
+import { firebaseOne } from "../../../../firebase/firebase";
 
 const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 
 const UniversitiesMap = (props) => {
-  const firebase = useRecoilValue(firebaseOneState);
+  const { db } = firebaseOne;
   const [institutions, setInstitutions] = useState([]);
   const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const fetchInstitutions = async () => {
-      const institutionsCollection = await firebase.db
+      const institutionsCollection = await db
         .collection("institutions")
+        .where("hasLogo", "==", true)
         .get();
       let institutionsDataList = [];
       institutionsCollection.docs.map((institution) => {
@@ -29,10 +29,10 @@ const UniversitiesMap = (props) => {
       });
       setInstitutions(institutionsDataList);
     };
-    if (firebase) {
+    if (firebaseOne) {
       fetchInstitutions();
     }
-  }, [firebase]);
+  }, [firebaseOne]);
 
   useEffect(() => {
     setTimeout(() => {
