@@ -136,10 +136,10 @@ function Index() {
     autoplay: false,
     onLoad: () => console.log("load-finish")
   });
- console.log("rives",{rive1,rive2,rive3,rive4,rive5,rive6,rive7})
+
   useEffect(() => {
     if (!rive1) return;
-    rive1.reset({ artboard: "artboard-1"});
+    rive1.reset({ artboard: "artboard-1" });
     rive1.scrub("Timeline 1", 0);
     rive1.play();
   }, [rive1]);
@@ -192,7 +192,7 @@ function Index() {
     return null;
   }, [idxRiveComponent]);
 
-  console.log({ idxRiveComponent, RiveComponentMemo });
+
 
   const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
     const res = childrenPosistions.reduce(
@@ -208,14 +208,15 @@ function Index() {
   };
 
   const detectScrollPosition = event => {
-    console.log({ rive1 });
+    console.log('detectScrollPosition')
+    // console.log({ rive1 });
     if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6 || !rive7) return;
     // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
       const currentScrollPosition = event.target.scrollTop;
 
       const sectionsHeight = getSectionPositions();
-      console.log("sectionsHeight", sectionsHeight);
+      // console.log("sectionsHeight", sectionsHeight);
       const { min, idx: idxSection } = sectionsHeight.reduce(
         (acu, cur, idx) => {
           if (acu.max > currentScrollPosition) return acu;
@@ -254,7 +255,7 @@ function Index() {
           return { ...cur, active: true, children: childrenFixed };
         })
       );
-      console.log({ idxSection, idxAnimation });
+      // console.log({ idxSection, idxAnimation });
 
       if (idxAnimation < 0) return;
 
@@ -264,62 +265,62 @@ function Index() {
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
         const positionFrame = currentScrollPosition - lowerAnimationLimit;
         const percentageFrame = (positionFrame * 100) / rangeFrames;
-        console.log({ percentageFrame });
+        // console.log({ percentageFrame });
         if (percentageFrame < 50) {
           // show loop logo
-          console.log("<");
+          // console.log("<");
           rive1.scrub("Timeline 1", 0);
           rive1.play();
           setIdxRiveComponent(0);
         } else {
-         
+
 
           const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
           const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
           const newPercentageFrame = (newPositionFrame * 100) / (rangeFrames / 2);
           const timeInSeconds = ((artboards[1].durationMs / 1000) * 2 * newPercentageFrame) / 100;
           rive2.scrub("Timeline 1", timeInSeconds);
-          console.log(">>>>>>2");
+          // console.log(">>>>>>2");
           setIdxRiveComponent(1);
         }
       }
 
       if (idxSection === SECTION_WITH_ANIMATION) {
         // replace canvas
-        setIdxRiveComponent(idxAnimation+2);
+        setIdxRiveComponent(idxAnimation + 2);
         // check local percentage
         const lowerAnimationLimit = minAnimation
         const upperAnimationLimit = maxAnimation
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
-        console.log("minAnimation",{minAnimation,maxAnimation,percentageFrame})
+        // console.log("minAnimation", { minAnimation, maxAnimation, percentageFrame })
         setAP(percentageFrame)
         // console.log('xx:--->', { percentageFrame })
         const timeInSeconds = 7 * percentageFrame / 100
 
-        if(idxAnimation===0){
+        if (idxAnimation === 0) {
           rive3.reset({ artboard: "artboard-3" })
           rive3.scrub("Timeline 1", timeInSeconds)
         }
-        if(idxAnimation===1){
+        if (idxAnimation === 1) {
           rive4.reset({ artboard: "artboard-4" })
           rive4.scrub("Timeline 1", timeInSeconds)
         }
-        if(idxAnimation===2){
+        if (idxAnimation === 2) {
           rive5.reset({ artboard: "artboard-5" })
           rive5.scrub("Timeline 1", timeInSeconds)
         }
-        if(idxAnimation===3){
+        if (idxAnimation === 3) {
           rive6.reset({ artboard: "artboard-6" })
           rive6.scrub("Timeline 1", timeInSeconds)
         }
-        if(idxAnimation===4){
+        if (idxAnimation === 4) {
           rive7.reset({ artboard: "artboard-7" })
           rive7.scrub("Timeline 1", timeInSeconds)
         }
       }
-          
+
 
 
 
@@ -368,7 +369,7 @@ function Index() {
     return [
       { id: section1Ref.current.id, height: 0 },
       { id: section2Ref.current.id, height: section1Ref.current.clientHeight },
-      { id: section3Ref.current.id, height: section2Ref.current.clientHeight },
+      { id: section3Ref.current.id, height: section2Ref.current.clientHeight - section1Ref.current.clientHeight },
       { id: section4Ref.current.id, height: section3Ref.current.clientHeight },
       { id: section5Ref.current.id, height: section4Ref.current.clientHeight },
       { id: section6Ref.current.id, height: section5Ref.current.clientHeight },
@@ -397,20 +398,22 @@ function Index() {
   }, []);
 
   const getAnimationsHeight = useCallback(() => {
-    if (!sectionAnimationControllerRef.current) return null;
+    // if (!sectionAnimationControllerRef.current) return null;
 
-    const animation0Height = 0 + sectionAnimationControllerRef.current.getSectionHeaderHeight();
-    const animation1Height = sectionAnimationControllerRef.current.getAnimation0Height();
+    // const animation0Height = 0 + sectionAnimationControllerRef.current.getSectionHeaderHeight();
+    // const animation1Height = sectionAnimationControllerRef.current.getAnimation0Height();
     // const animation2Height = sectionAnimationControllerRef.current.getAnimation1Height()
     // const animation3Height = sectionAnimationControllerRef.current.getAnimation2Height()
     // const animation4Height = sectionAnimationControllerRef.current.getAnimation3Height()
     // const animation5Height = sectionAnimationControllerRef.current.getAnimation4Height()
     // const animation6Height = sectionAnimationControllerRef.current.getAnimation5Height()
-    return [
-      animation0Height,
-      animation1Height /* , animation2Height, animation3Height, animation4Height, animation5Height */
-    ];
-  }, []);
+    // return [
+    //   animation0Height,
+    //   animation1Height /* , animation2Height, animation3Height, animation4Height, animation5Height */
+    // ];
+    const res = artboards.map(artboard => artboard.getHeight(height))
+    return [0, ...res.splice(0, res.length - 1)]
+  }, [height]);
 
   const getAnimationsPositions = useCallback(() => {
     // if (!sectionAnimationControllerRef.current) return null
@@ -427,12 +430,13 @@ function Index() {
     return artboards.map(artboard => artboard.getHeight(height));
   }, [height]);
 
-  const switchSection = (newValue, animationIndex = 0) => {
+  const switchSection = (sectionIdx, animationIndex = 0) => {
+    // console.log({ sectionIdx, animationIndex })
     setNotSectionSwitching(false);
     const sectionsHeight = getSectionHeights();
     if (!sectionsHeight) return;
 
-    const previousSections = sectionsHeight.slice(0, newValue + 1);
+    const previousSections = sectionsHeight.slice(0, sectionIdx + 1);
     const sectionResult = previousSections.reduce((a, c) => ({ id: c.id, height: a.height + c.height }));
 
     let cumulativeAnimationHeight = 0;
@@ -443,27 +447,34 @@ function Index() {
       cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c);
     }
     const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight;
-    scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[newValue] });
+    // console.log({ cumulativeHeight, sectionIdx, animationIndex, sectionsHeight, animationsHeight })
+    scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[sectionIdx] });
 
-    setSection(newValue);
+    setSection(sectionIdx);
     // set animation and  frame
     // if (newValue < SECTION_WITH_ANIMATION) {
     //   rive.reset({ artboard: artboards[0].name })
     //   rive.scrub("Timeline 1", 0)
     // }
-    if (newValue > SECTION_WITH_ANIMATION) {
-      rive7.reset({ artboard: artboards[artboards.length - 1].name });
-      rive7.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000);
+    if (sectionIdx === 0) {
+      // rive1.reset({ artboard: artboards[0].name });
+      // rive7.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000);
+      setIdxRiveComponent(animationIndex);
     }
-    if (newValue === SECTION_WITH_ANIMATION) {
-      rive3.reset({ artboard: artboards[animationIndex].name });
-      rive3.scrub("Timeline 1", 0);
+    // if (sectionIdx > SECTION_WITH_ANIMATION) {
+    //   rive7.reset({ artboard: artboards[artboards.length - 1].name });
+    //   rive7.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000);
+    // }
+    if (sectionIdx === SECTION_WITH_ANIMATION) {
+      setIdxRiveComponent(animationIndex + 2);
+      // rive3.reset({ artboard: artboards[animationIndex].name });
+      // rive3.scrub("Timeline 1", 0);
     }
 
     // change selected item in TOC
     setSections(prev =>
       prev.map((cur, idx) => {
-        if (newValue !== idx)
+        if (sectionIdx !== idx)
           return { ...cur, children: cur.children.map(c => ({ ...c, active: false })), active: false };
         const childrenFixed = cur.children.map((c, i) => {
           if (animationIndex !== i) return { ...c, active: false };
@@ -505,7 +516,7 @@ function Index() {
   };
 
   const signOut = async event => {
-    console.log("Signing out!");
+    // console.log("Signing out!");
     setEmail("");
     setFullname("");
     await firebase.logout();
@@ -720,7 +731,7 @@ function Index() {
       </Box> */}
 
       <Box sx={{ position: "relative" }}>
-        <Box sx={{ position: "absolute", top: "0px", bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}>
+        <Box sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 10 }}>
             <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
             <h2 style={{ color: "white" }}>{ap.toFixed(1)}%</h2>
@@ -729,7 +740,7 @@ function Index() {
               menuItems={sections}
               viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
               onChangeContent={(idx, idxAnimation) => {
-                console.log("called switchSection", idx, idxAnimation);
+                // console.log("called switchSection", idx, idxAnimation);
                 switchSection(idx, idxAnimation);
               }}
               customSx={{}}
@@ -739,7 +750,7 @@ function Index() {
 
         <Stack
           ref={section1Ref}
-          spacing="20px"
+          spacing={width < 900 ? "10px" : "20px"}
           direction={"column"}
           alignItems={"center"}
           justifyContent="flex-end"
@@ -748,13 +759,13 @@ function Index() {
             width: "100%",
             position: "absolute",
             top: 0,
-            padding: "20px",
-            backgroundImage: `url(${backgroundImage})`
-            // display: "flex",
-            // flexDirection: "column",
-            // alignItems: "center",
-            // justifyContent: "flex-end",
-            // border: "solid 10px red"
+            padding: width < 900 ? "10px" : "20px",
+            backgroundColor: "#1d1102",
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+
           }}
         >
           {/* Increase the network loading priority of the background image. */}
@@ -764,16 +775,13 @@ function Index() {
             alt="increase priority"
           />
           <img src={AnimatediconLoop} alt="Animated Logo" width="190px" /> */}
-          <Typography color="white" variant="h5" sx={{ textAlign: "center" }}>
-            {/* Where we take notes <b>together</b>. */}
+          <Typography color="white" variant="h5" sx={{ textAlign: "center" }} className="show-blurred-text">
             WHERE WE TAKE NOTES <b>TOGETHER</b>.
-            {/* {'Where we take notes '.toUpperCase() <b>'together'.toUpperCase()</b>.} */}
-            {/* We Break Down Learning & Research Content and Build Learning Pathways. */}
           </Typography>
           <Button
             color="secondary"
             variant="contained"
-            size="large"
+            size={width < 900 ? "small" : "large"}
             component="a"
             href="#JoinUsSection"
             sx={{ minWidth: 200, color: "common.white" }}
@@ -781,8 +789,8 @@ function Index() {
             Apply to Join Us!
           </Button>
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}>
-            Scroll
-            <KeyboardDoubleArrowDownIcon />
+            {height > 500 && "Scroll"}
+            <KeyboardDoubleArrowDownIcon fontSize={width < 900 ? "small" : "medium"} />
           </Box>
         </Stack>
 
@@ -803,7 +811,7 @@ function Index() {
           <Box id={sectionsOrder[2].id} ref={section3Ref}>
             <Values /> {/* why */}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={section4Ref}>
+          <Box id={sectionsOrder[3].id} ref={section4Ref} >
             <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
@@ -819,7 +827,7 @@ function Index() {
       </Box>
       <AppFooter />
       <link rel="preload" href="3-summarizing.riv" as="fetch" crossOrigin="anonymous" />
-    </Box>
+    </Box >
     // </ThemeProvider>
   );
 }
