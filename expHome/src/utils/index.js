@@ -1,5 +1,5 @@
-export { isToday, getISODateString } from './DateFunctions';
-export {
+const { isToday, getISODateString } = require('./DateFunctions');
+const {
     uuidv4,
     isEmail,
     sortedIndex,
@@ -7,9 +7,23 @@ export {
     formatPoints,
     isValidHttpUrl,
     shuffleArray
-} from './helpers';
-export {
+} = require('./helpers');
+const {
     tokenize,
     cosineSimilarity,
     textCosineSimilarity,
-} from './CosineSimilarity';
+} = require('./CosineSimilarity');
+
+module.exports = {
+    isToday, getISODateString,
+    uuidv4,
+    isEmail,
+    sortedIndex,
+    getFullname,
+    formatPoints,
+    isValidHttpUrl,
+    shuffleArray,
+    tokenize,
+    cosineSimilarity,
+    textCosineSimilarity
+}
