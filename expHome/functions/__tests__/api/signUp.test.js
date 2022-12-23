@@ -3,7 +3,7 @@ const http = require("http");
 const chaiHttp = require('chai-http');
 const app = require("../../app");
 const { MockData, deleteAllUsers, mockProjectSpecs, mockPassages, mockConditions } = require("../../testUtils");
-const { db } = require("../../admin_Knowledge");
+const { db } = require("../../admin");
 const {expect, describe, beforeAll, afterAll} = require('@jest/globals');
 // const { getAuth } = require('firebase-admin/auth');
 
@@ -48,6 +48,18 @@ describe("POST /api/signUp", () => {
     expect(response.status).toEqual(201)
     const userDoc = await db.collection("users").doc("mock name").get()
     expect(userDoc.exists).toBeTruthy();
+  })
+
+  it("should return error if email already exists", async () => {
+    const response = await chai.request(server).post("/api/signUp").send({
+      email,
+      password,
+      firstName: "mock",
+      lastName: "name",
+      institutionName: "University of Michigan - Ann Arbor",
+      projectName: "H1L2"
+    });
+    expect(response.status).toEqual(500)
   })
 
   it("should be able to register as survey student", async () => {

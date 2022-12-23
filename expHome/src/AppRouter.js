@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import {
   firebaseState,
@@ -50,6 +50,8 @@ import { showSignInorUpState } from "./store/GlobalAtoms";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
+  const navigateTo = useNavigate();
+
   // selected theme for authenticated user (dark mode/light mode)
   const [theme, setTheme] = useRecoilState(themeState);
   const [themeOS, setThemeOS] = useRecoilState(themeOSState);
@@ -116,6 +118,11 @@ const AppRouter = props => {
 
     if(!isResearcher) {
       setProject(userData.project)
+    }
+
+    // if redirects required
+    if(String(window.location.pathname).startsWith("/auth")) {
+      navigateTo("/")
     }
   }
 

@@ -1,5 +1,5 @@
 const { getAuth } = require("firebase-admin/auth");
-const { admin } = require("../admin_Knowledge");
+const { admin } = require("../admin");
 const isTestEnv = require("./isTestEnv");
 
 const deleteAllUsers = async () => {
