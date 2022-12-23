@@ -19,32 +19,8 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "HowItWorksSection");
 
 const HowItWorks = props => {
-  // const sectionHeaderRef = useRef(null);
-  // const animation0Ref = useRef(null);
-  // const animation1Ref = useRef(null)
-  // const animation2Ref = useRef(null)
-  // const animation3Ref = useRef(null)
-  // const animation4Ref = useRef(null)
-  // const animation5Ref = useRef(null)
-  // const animation6Ref = useRef(null)
-  const { height, width } = useWindowSize();
 
-  // useImperativeHandle(
-  //   props.innerRef,
-  //   () => {
-  //     return {
-  //       getSectionHeaderHeight: () => sectionHeaderRef?.current?.clientHeight ?? 0,
-  //       getAnimation0Height: () => animation0Ref?.current?.clientHeight ?? 0
-  //       // getAnimation1Height: () => animation1Ref?.current?.clientHeight ?? 0,
-  //       // getAnimation2Height: () => animation2Ref?.current?.clientHeight ?? 0,
-  //       // getAnimation3Height: () => animation3Ref?.current?.clientHeight ?? 0,
-  //       // getAnimation4Height: () => animation4Ref?.current?.clientHeight ?? 0,
-  //       // getAnimation5Height: () => animation5Ref?.current?.clientHeight ?? 0,
-  //       // getAnimation6Height: () => animation6Ref?.current?.clientHeight ?? 0,
-  //     };
-  //   },
-  //   []
-  // );
+  const { height, width } = useWindowSize();
 
   const boxLarge = useMemo(() => {
     const offset = width < 600 ? 0 : width < 900 ? 70 : 100
@@ -55,31 +31,38 @@ const HowItWorks = props => {
   const topCenteredPosition = height / 2 - boxLarge / 2 + 35;
 
   const getHeightSection = () => props.artboards.reduce((a, c) => a + c.getHeight(height), 0);
-  // console.log({ res: getHeightSection() });
 
   const processedArtboard = useMemo(() => props.artboards.reduce((acu, cur) => {
     const newHeight = cur.getHeight(height);
     return [...acu, { ...cur, top: acu.length ? acu[acu.length - 1].top + acu[acu.length - 1].height : 0, height: newHeight }]
   }, []), [props.artboards, height])
-  // console.log("processedArtboard", processedArtboard)
+
   return (
     <Box
       id="HowItWorksSection"
       component="section"
       sx={{
-        // pt: 7,
-        // pb: 10,
-        // minHeight: height - 70 + height + height + height,
         height: getHeightSection(),
         position: "relative",
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
-        // backgroundColor: "#28282a"
-        // bgcolor: "secondary.light",
-        // border: 'dashed 6px orange'
       }}
     >
+      <Box
+        key={'artboard-1'}
+        sx={{
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          height: height - 70,
+          borderRight: `dashed 6px #ff28c9`,
+          color: "white"
+
+        }}
+      >
+        {height - 70}px
+      </Box>
       {processedArtboard.map(artboard => (
         <Box
           key={artboard.name}
@@ -96,19 +79,7 @@ const HowItWorks = props => {
           {height - 70}px
         </Box>
       ))}
-      {/* <Box sx={{ position: "absolute", top: "0px", width: width, height: height - 70, borderRight: "dashed 6px red", color: "white" }}>{height - 70}px</Box>
-      <Box sx={{ position: "absolute", top: height - 70, width: width, height: height, borderRight: "dashed 6px #ff5e00", color: "white" }}>{height}px</Box>
-      <Box sx={{ position: "absolute", top: height - 70 + height, width: width, height: height, borderRight: "dashed 6px #ffae00", color: "white" }}>{height}px</Box>
-      <Box sx={{ position: "absolute", top: height - 70 + height + height, width: width, height: height, borderRight: "dashed 6px #88ff00", color: "white" }}>{height}px</Box> */}
 
-      {/* <div style={{
-          height: height - 70, width: '100%', position: "absolute", top: 0, padding: "20px",
-          backgroundImage: `url(${backgroundImage})`,
-        }}> 
-
-      </div>*/}
-
-      {/* --- animations start */}
       <div
         style={{
           position: "sticky",
@@ -122,53 +93,7 @@ const HowItWorks = props => {
         }}
       >
         {props.children}
-        {/* {props.riveComponent} */}
       </div>
-
-      {/* <div ref={sectionHeaderRef} style={{
-          position: "absolute", height: boxLarge / 3, width: boxLarge,
-          border: 'dashed 2px #48ff00',
-          top: "0px", padding: "20px"
-        }}>
-
-        </div>
-        <div ref={animation0Ref} style={{
-          height: boxLarge / 3 * 2, width: boxLarge, position: "absolute", top: boxLarge / 3, padding: "20px",
-          border: 'dashed 2px red'
-        }}>
-
-        </div> */}
-
-      {/* <div ref={animation1Ref} style={{ height: "1000vh", width: "100%", borderRight: "solid 20px #8031a5" }}>
-
-        </div> */}
-      {/* <div ref={animation2Ref} style={{ height: "500vh", width: "100%", borderRight: "solid 20px #2769aa" }}>
-
-        </div>
-        <div ref={animation3Ref} style={{ height: "300vh", width: "100%", borderRight: "solid 20px #3696f7" }}>
-
-        </div>
-        <div ref={animation4Ref} style={{ height: "300vh", width: "100%", borderRight: "solid 20px #26c2ff" }}>
-
-        </div> */}
-
-      {/* --- animation ends */}
-      {/* <Button
-          color="secondary"
-          variant="contained"
-          size="large"
-          component="a"
-          href="#JoinUsSection"
-          sx={{ minWidth: 200, color: "common.white", zIndex: "10" }}
-        >
-          Apply to Join Us!
-        </Button>
-        <Box sx={{ zIndex: 1, mx: "auto" }}>
-          
-          <Box sx={{ mt: "19px" }}>
-            <YoutubeEmbed embedId="vkNx-QUmbNI" />
-          </Box>
-        </Box> */}
     </Box>
   );
 };
