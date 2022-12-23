@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState } from "recoil";
-import { Routes, Route } from "react-router-dom";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import { Routes, Route, useNavigate } from "react-router-dom";
 
 import {
   firebaseState,
@@ -9,9 +9,10 @@ import {
   fullnameState,
   themeState,
   themeOSState,
-  leadingState
+  leadingState,
+  institutionsState
 } from "./store/AuthAtoms";
-import { startedSessionState } from "./store/ExperimentAtoms";
+import { choicesState, conditionState, nullPassageState, passageState, phaseState, startedSessionState, stepState } from "./store/ExperimentAtoms";
 
 import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
@@ -45,13 +46,15 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
+import { projectState } from "./store/ProjectAtoms";
+import { showSignInorUpState } from "./store/GlobalAtoms";
+import { firebaseOne } from "./Components/firebase/firebase";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
-  const email = useRecoilValue(emailState);
-  const emailVerified = useRecoilValue(emailVerifiedState);
-  const fullname = useRecoilValue(fullnameState);
-  const leading = useRecoilValue(leadingState);
+  const { db: dbOne } = firebaseOne;
+  const navigateTo = useNavigate();
+
   // selected theme for authenticated user (dark mode/light mode)
   const [theme, setTheme] = useRecoilState(themeState);
   const [themeOS, setThemeOS] = useRecoilState(themeOSState);
@@ -59,6 +62,137 @@ const AppRouter = props => {
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
   const [startedByResearcher, setStartedByResearcher] = useState(false);
+
+  const [showSignInorUp, setShowSignInorUp] = useRecoilState(showSignInorUpState);
+  const [leading, setLeading] = useRecoilState(leadingState);
+  const [email, setEmail] = useRecoilState(emailState);
+  const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
+  const [fullname, setFullname] = useRecoilState(fullnameState);
+  const [phase, setPhase] = useRecoilState(phaseState);
+  const [step, setStep] = useRecoilState(stepState);
+  const [passage, setPassage] = useRecoilState(passageState);
+  const [condition, setCondition] = useRecoilState(conditionState);
+  const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
+  const [choices, setChoices] = useRecoilState(choicesState);
+  const [project, setProject] = useRecoilState(projectState);
+  const [institutions, setInstitutions] = useRecoilState(institutionsState);
+
+  const processAuth = async (user) => {
+    const { db } = firebase;
+    // const uid = user.uid;
+    const uEmail = user.email.toLowerCase();
+    const users = await db.collection("users").where("email", "==", uEmail).get();
+    let isSurvey = false;
+
+    let userData = null;
+    let fullName = null;
+
+    if(!users.docs.length) {
+      const usersStudentSurvey = await db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get()
+      if(usersStudentSurvey.docs.length) {
+        isSurvey = true;
+        fullName = usersStudentSurvey.docs[0].id;
+        userData = usersStudentSurvey.docs[0].data()
+      }
+    } else {
+      fullName = users.docs[0].id;
+      userData = users.docs[0].data()
+    }
+
+    if(!userData) return; // if user document doesn't exists
+    const researcherDoc = await firebase.db.collection("researchers").doc(fullName).get();
+    let isResearcher = researcherDoc.exists
+
+    if(!isSurvey) {
+      setPhase(userData.phase);
+      setStep(userData.step);
+      setPassage(userData.currentPCon.passage);
+      setCondition(userData.currentPCon.condition);
+      setNullPassage(userData.nullPassage);
+      setChoices(userData.choices);
+    }
+
+    if (userData.leading && userData.leading.length > 0) {
+      setLeading(userData.leading);
+    }
+
+    setFullname(fullName)
+    setEmailVerified("Verified")
+    setEmail(uEmail)
+
+    if(!isResearcher) {
+      setProject(userData.project)
+    }
+
+    // if redirects required
+    const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];
+    for(const nonAuthUrl of nonAuthUrls) {
+      if(String(window.location.pathname).startsWith(nonAuthUrl)) {
+        navigateTo("/")
+        break;
+      }
+    }
+  }
+
+  useEffect(() => {
+    firebase.auth.onAuthStateChanged(async (user) => {
+      if(user) {
+        // sign in logic
+        if(!user.emailVerified) {
+          setEmailVerified("Sent")
+          await user.sendEmailVerification();
+          const intvl = setInterval(() => {
+            if(!firebase.auth.currentUser) {
+              clearInterval(intvl);
+              return;
+            }
+            firebase.auth.currentUser.reload();
+            if (firebase.auth.currentUser.emailVerified) {
+              processAuth(user);
+              clearInterval(intvl);
+            }
+          }, 1000)
+        } else {
+          processAuth(user);
+        }
+      } else {
+        setShowSignInorUp(true);
+        setEmailVerified("NotSent");
+        setFullname("");
+        setPhase(0);
+        setStep(0);
+        setPassage("");
+        setCondition("");
+        setNullPassage("");
+        setChoices([]);
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      dbOne.collection("institutions").where("usersNum", ">=", 1).onSnapshot((snapshot) => {
+        setInstitutions((insitutions) => {
+          let _insitutions = [...insitutions];
+          const docChanges = snapshot.docChanges();
+          for(const docChange of docChanges) {
+            const institutionData = docChange.doc.data();
+            if(docChange.type === "added") {
+              _insitutions.push(institutionData);
+              continue;
+            }
+            const idx = _insitutions.findIndex((insitution) => insitution.name === institutionData.name)
+            if(docChange.type === "modified") {
+              _insitutions[idx] = institutionData;
+            } else {
+              _insitutions.splice(idx, 1)
+            }
+          }
+          return _insitutions;
+        })
+      });
+    })()
+  }, [])
 
   useEffect(() => {
     let schedulUnsubscribe;
