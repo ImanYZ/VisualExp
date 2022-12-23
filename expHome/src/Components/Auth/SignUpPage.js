@@ -8,19 +8,10 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
 import axios from "axios";
-import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
+import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState, institutionsState } from "../../store/AuthAtoms";
 import { Autocomplete, Paper, TextField, Checkbox, Backdrop, CircularProgress, Link } from "@mui/material";
 import backgroundImage from "../../assets/HomeBackGroundDarkMode.png";
 import { styled } from "@mui/material/styles";
-import {
-  currentProjectState,
-  phaseState,
-  stepState,
-  passageState,
-  conditionState,
-  nullPassageState,
-  choicesState
-} from "../../store/ExperimentAtoms";
 
 import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 
@@ -48,7 +39,6 @@ const SignUpPage = props => {
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [project, setProject] = useRecoilState(projectState);
-  const [institutions, setInstitutions] = useState([]);
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -80,6 +70,8 @@ const SignUpPage = props => {
   const [openTermOfUse, setOpenTermsOfUse] = useState(false);
   const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
   const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
+
+  const institutions = useRecoilValue(institutionsState);
 
   const [projectSpecs, setProjectSpecs] = useRecoilState(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
@@ -153,14 +145,6 @@ const SignUpPage = props => {
   useEffect(() => {
     setValidPasswordResetEmail(isEmail(resetPasswordEmail));
   }, [resetPasswordEmail]);
-
-  useEffect(() => {
-    const getInstitutions = async () => {
-      const institutionsRequest = await axios.get("/getInstitutions");
-      setInstitutions(institutionsRequest.data);
-    };
-    getInstitutions();
-  }, []);
 
   useEffect(() => {
     const getNameFromInstitutionSelected = async () => {
@@ -569,4 +553,4 @@ const SignUpPage = props => {
   );
 };
 
-export default SignUpPage;
+export default React.memo(SignUpPage);
