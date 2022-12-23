@@ -333,24 +333,36 @@ function Index() {
         console.log({ timeInSeconds, idxAnimation })
 
         if (idxAnimation === 0) {
-          rive3.reset({ artboard: "artboard-3" })
-          rive3.scrub("Timeline 1", timeInSeconds)
+          const Animator = rive3.animator.animations[0];
+          // rive2.scrub("Timeline 1", timeInSeconds);
+          Animator.instance.time = 0
+          Animator.instance.advance(timeInSeconds)
+          Animator.instance.apply(1)
+          Animator.artboard.time = 0
+          Animator.artboard.advance(timeInSeconds)
+          rive3.renderer.save()
+          Animator.artboard.draw(rive3.renderer)
+          rive3.renderer.restore()
+          rive3.startRendering()
+          // console.log("animator",{rive3,timef:rive3.frameTime,time:Animator,timeInSeconds})
+          // rive3.reset({ artboard: "artboard-3" })
+          // rive3.scrub("Timeline 1", timeInSeconds)
         }
         if (idxAnimation === 1) {
-          rive4.reset({ artboard: "artboard-4" })
-          rive4.scrub("Timeline 1", timeInSeconds)
+          // rive4.reset({ artboard: "artboard-4" })
+          // rive4.scrub("Timeline 1", timeInSeconds)
         }
         if (idxAnimation === 2) {
-          rive5.reset({ artboard: "artboard-5" })
-          rive5.scrub("Timeline 1", timeInSeconds)
+          // rive5.reset({ artboard: "artboard-5" })
+          // rive5.scrub("Timeline 1", timeInSeconds)
         }
         if (idxAnimation === 3) {
-          rive6.reset({ artboard: "artboard-6" })
-          rive6.scrub("Timeline 1", timeInSeconds)
+          // rive6.reset({ artboard: "artboard-6" })
+          // rive6.scrub("Timeline 1", timeInSeconds)
         }
         if (idxAnimation === 4) {
-          rive7.reset({ artboard: "artboard-7" })
-          rive7.scrub("Timeline 1", timeInSeconds)
+          // rive7.reset({ artboard: "artboard-7" })
+          // rive7.scrub("Timeline 1", timeInSeconds)
         }
       }
 
