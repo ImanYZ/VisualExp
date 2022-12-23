@@ -209,8 +209,8 @@ function Index() {
     return res.idx;
   };
 
-  const advanceAnimationTo=(rive,timeInSeconds)=>{    
-    if(!rive?.animator?.animations[0]) return
+  const advanceAnimationTo = (rive, timeInSeconds) => {
+    if (!rive?.animator?.animations[0]) return
 
     const Animator = rive.animator.animations[0];
     Animator.instance.time = 0
@@ -225,9 +225,9 @@ function Index() {
     if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6 || !rive7) return;
     // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
-      
+
       const currentScrollPosition = event.target.scrollTop;
-      console.log("currentScrollPosition",currentScrollPosition)
+      console.log("currentScrollPosition", currentScrollPosition)
       const sectionsHeight = getSectionPositions();
       // console.log("sectionsHeight", sectionsHeight);
       const { min, idx: idxSection } = sectionsHeight.reduce(
@@ -298,9 +298,9 @@ function Index() {
           const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
           const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
           const newPercentageFrame = (newPositionFrame * 100) / (rangeFrames);
-          const timeInSeconds = ((1000 / 1000)  * newPercentageFrame) / 100;
-          advanceAnimationTo(rive2,timeInSeconds)
-          
+          const timeInSeconds = ((1000 / 1000) * newPercentageFrame) / 100;
+          advanceAnimationTo(rive2, timeInSeconds)
+
           setIdxRiveComponent(1);
         }
       }
@@ -317,24 +317,24 @@ function Index() {
         // console.log("minAnimation", { minAnimation, maxAnimation, percentageFrame })
         setAP(percentageFrame)
         // console.log({ idxAnimation })
-        const timeInSeconds = artboards[idxAnimation].durationMs*percentageFrame / (1000*100)
+        const timeInSeconds = artboards[idxAnimation].durationMs * percentageFrame / (1000 * 100)
 
         console.log({ timeInSeconds, idxAnimation })
 
         if (idxAnimation === 0) {
-          advanceAnimationTo(rive3,timeInSeconds)
+          advanceAnimationTo(rive3, timeInSeconds)
         }
         if (idxAnimation === 1) {
-          advanceAnimationTo(rive4,timeInSeconds)
+          advanceAnimationTo(rive4, timeInSeconds)
         }
         if (idxAnimation === 2) {
-          advanceAnimationTo(rive5,timeInSeconds)
+          advanceAnimationTo(rive5, timeInSeconds)
         }
         if (idxAnimation === 3) {
-          advanceAnimationTo(rive6,timeInSeconds)
+          advanceAnimationTo(rive6, timeInSeconds)
         }
         if (idxAnimation === 4) {
-          advanceAnimationTo(rive7,timeInSeconds)
+          advanceAnimationTo(rive7, timeInSeconds)
         }
       }
 
@@ -424,7 +424,6 @@ function Index() {
   }, [height]);
 
   const switchSection = (sectionIdx, animationIndex = 0) => {
-    // console.log({ sectionIdx, animationIndex })
     setNotSectionSwitching(false);
     const sectionsHeight = getSectionHeights();
     if (!sectionsHeight) return;
@@ -440,28 +439,20 @@ function Index() {
       cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c);
     }
     const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight;
-    // console.log({ cumulativeHeight, sectionIdx, animationIndex, sectionsHeight, animationsHeight })
     scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[sectionIdx] });
 
     setSection(sectionIdx);
-    // set animation and  frame
-    // if (newValue < SECTION_WITH_ANIMATION) {
-    //   rive.reset({ artboard: artboards[0].name })
-    //   rive.scrub("Timeline 1", 0)
-    // }
     if (sectionIdx === 0) {
-      // rive1.reset({ artboard: artboards[0].name });
-      // rive7.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000);
       setIdxRiveComponent(animationIndex);
     }
-    // if (sectionIdx > SECTION_WITH_ANIMATION) {
-    //   rive7.reset({ artboard: artboards[artboards.length - 1].name });
-    //   rive7.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000);
-    // }
     if (sectionIdx === SECTION_WITH_ANIMATION) {
       setIdxRiveComponent(animationIndex + 2);
-      // rive3.reset({ artboard: artboards[animationIndex].name });
-      // rive3.scrub("Timeline 1", 0);
+      // reset animation when jump through sections
+      if (animationIndex === 0) { rive3.scrub("Timeline 1", 0) }
+      if (animationIndex === 1) { rive4.scrub("Timeline 1", 0) }
+      if (animationIndex === 2) { rive5.scrub("Timeline 1", 0) }
+      if (animationIndex === 3) { rive6.scrub("Timeline 1", 0) }
+      if (animationIndex === 4) { rive7.scrub("Timeline 1", 0) }
     }
 
     // change selected item in TOC
@@ -801,7 +792,7 @@ function Index() {
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
             {/* <UniversitiesMap theme={"Dark"} />
              */}
-             as'dkajs;dlas;ldkjas;lkdj
+            as'dkajs;dlas;ldkjas;lkdj
 
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
