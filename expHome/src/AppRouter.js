@@ -9,7 +9,8 @@ import {
   fullnameState,
   themeState,
   themeOSState,
-  leadingState
+  leadingState,
+  institutionsState
 } from "./store/AuthAtoms";
 import { choicesState, conditionState, nullPassageState, passageState, phaseState, startedSessionState, stepState } from "./store/ExperimentAtoms";
 
@@ -47,9 +48,11 @@ import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
 import { projectState } from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
+import { firebaseOne } from "./Components/firebase/firebase";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
+  const { db: dbOne } = firebaseOne;
   const navigateTo = useNavigate();
 
   // selected theme for authenticated user (dark mode/light mode)
@@ -72,6 +75,7 @@ const AppRouter = props => {
   const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
   const [project, setProject] = useRecoilState(projectState);
+  const [institutions, setInstitutions] = useRecoilState(institutionsState);
 
   const processAuth = async (user) => {
     const { db } = firebase;
@@ -121,8 +125,12 @@ const AppRouter = props => {
     }
 
     // if redirects required
-    if(String(window.location.pathname).startsWith("/auth")) {
-      navigateTo("/")
+    const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];
+    for(const nonAuthUrl of nonAuthUrls) {
+      if(String(window.location.pathname).startsWith(nonAuthUrl)) {
+        navigateTo("/")
+        break;
+      }
     }
   }
 
@@ -159,6 +167,31 @@ const AppRouter = props => {
         setChoices([]);
       }
     })
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      dbOne.collection("institutions").where("usersNum", ">=", 1).onSnapshot((snapshot) => {
+        setInstitutions((insitutions) => {
+          let _insitutions = [...insitutions];
+          const docChanges = snapshot.docChanges();
+          for(const docChange of docChanges) {
+            const institutionData = docChange.doc.data();
+            if(docChange.type === "added") {
+              _insitutions.push(institutionData);
+              continue;
+            }
+            const idx = _insitutions.findIndex((insitution) => insitution.name === institutionData.name)
+            if(docChange.type === "modified") {
+              _insitutions[idx] = institutionData;
+            } else {
+              _insitutions.splice(idx, 1)
+            }
+          }
+          return _insitutions;
+        })
+      });
+    })()
   }, [])
 
   useEffect(() => {
