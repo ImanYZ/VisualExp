@@ -1,4 +1,4 @@
-export const isEmail = (email) => {
+exports.isEmail = (email) => {
   const regEx =
   // eslint-disable-next-line
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -6,9 +6,9 @@ export const isEmail = (email) => {
   else return false;
 };
 
-export const formatPoints = (point = 0) => point.toFixed(2).replace(/\.0+$/, '');
+exports.formatPoints = (point = 0) => point.toFixed(2).replace(/\.0+$/, '');
 
-export const isValidHttpUrl = (string) => {
+exports.isValidHttpUrl = (string) => {
   let url;
   try {
     url = new URL(string);
@@ -21,7 +21,7 @@ export const isValidHttpUrl = (string) => {
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
-export const uuidv4 = () => {
+exports.uuidv4 = () => {
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
     (
       c ^
@@ -30,14 +30,14 @@ export const uuidv4 = () => {
   );
 };
 
-export const getFullname = (firstname, lastname) => {
+exports.getFullname = (firstname, lastname) => {
   return (firstname + " " + lastname)
     .replace(".", "")
     .replace("__", " ")
     .replace("/", " ");
 };
 
-export const sortedIndex = (array, value) => {
+exports.sortedIndex = (array, value) => {
   let low = 0,
     high = array.length;
 
@@ -49,7 +49,7 @@ export const sortedIndex = (array, value) => {
   return low;
 };
 
-export const shuffleArray = (array) => {
+exports.shuffleArray = (array) => {
   for (var i = array.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var temp = array[i];
