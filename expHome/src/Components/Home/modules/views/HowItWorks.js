@@ -56,12 +56,12 @@ const HowItWorks = props => {
           top: 0,
           width: "100%",
           height: height - 70,
-          borderRight: `dashed 6px #ff28c9`,
+          // borderRight: `dashed 6px #ff28c9`,
           color: "white"
 
         }}
       >
-        {height - 70}px
+        {/* {height - 70}px */}
       </Box>
       {processedArtboard.map(artboard => (
         <Box
@@ -71,7 +71,7 @@ const HowItWorks = props => {
             top: artboard.top,
             width: "100%",
             height: artboard.height,
-            borderRight: `dashed 6px ${artboard.color}`,
+            // borderRight: `dashed 6px ${artboard.color}`,
             color: "white"
 
           }}
@@ -89,7 +89,7 @@ const HowItWorks = props => {
           display: "flex",
           flexDirection: "column",
           zIndex: 10,
-          border: "solid 2px pink"
+          // border: "solid 2px pink"
         }}
       >
         {props.children}

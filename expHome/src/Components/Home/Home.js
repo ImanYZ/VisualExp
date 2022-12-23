@@ -209,14 +209,25 @@ function Index() {
     return res.idx;
   };
 
+  const advanceAnimationTo=(rive,timeInSeconds)=>{    
+    if(!rive?.animator?.animations[0]) return
+
+    const Animator = rive.animator.animations[0];
+    Animator.instance.time = 0
+    Animator.instance.advance(timeInSeconds)
+    Animator.instance.apply(1)
+    rive.startRendering()
+  }
+
   const detectScrollPosition = event => {
     console.log('detectScrollPosition')
     // console.log({ rive1 });
     if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6 || !rive7) return;
     // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
+      
       const currentScrollPosition = event.target.scrollTop;
-
+      console.log("currentScrollPosition",currentScrollPosition)
       const sectionsHeight = getSectionPositions();
       // console.log("sectionsHeight", sectionsHeight);
       const { min, idx: idxSection } = sectionsHeight.reduce(
@@ -286,32 +297,10 @@ function Index() {
         } else {
           const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
           const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
-          const newPercentageFrame = (newPositionFrame * 100) / (rangeFrames / 2);
-          const timeInSeconds = ((1000 / 1000) * 2 * newPercentageFrame) / 100;
-
-          // ------------------------ >>>  This code interpolate positions with scrub
-          // const pp = previousScrubValue.current
-          const range = previousScrubValue.current - timeInSeconds
-          const offsetRange = range / 4
-          const interpolateValue1 = previousScrubValue.current - offsetRange * 1
-          const interpolateValue2 = previousScrubValue.current - offsetRange * 2
-          const interpolateValue3 = previousScrubValue.current - offsetRange * 3
-          rive2.scrub("Timeline 1", interpolateValue1);
-          setTimeout(() => { rive2.scrub("Timeline 1", interpolateValue2); }, 60)
-          setTimeout(() => { rive2.scrub("Timeline 1", interpolateValue3); }, 120)
-          setTimeout(() => { rive2.scrub("Timeline 1", timeInSeconds); }, 180)
-          console.log({
-            previousScrubValue: previousScrubValue.current.toFixed(3),
-            interpolateValue1: interpolateValue1.toFixed(3),
-            interpolateValue2: interpolateValue2.toFixed(3),
-            interpolateValue3: interpolateValue3.toFixed(3),
-            timeInSeconds: timeInSeconds.toFixed(3)
-          })
-          previousScrubValue.current = timeInSeconds
-          // ------------------------ <<<
-
-          // console.log(">>>>>>", { previousScrubValue: pp, interpolateValue1, timeInSeconds });
-          // rive2.scrub("Timeline 1", timeInSeconds);
+          const newPercentageFrame = (newPositionFrame * 100) / (rangeFrames);
+          const timeInSeconds = ((1000 / 1000)  * newPercentageFrame) / 100;
+          advanceAnimationTo(rive2,timeInSeconds)
+          
           setIdxRiveComponent(1);
         }
       }
@@ -328,41 +317,24 @@ function Index() {
         // console.log("minAnimation", { minAnimation, maxAnimation, percentageFrame })
         setAP(percentageFrame)
         // console.log({ idxAnimation })
-        const timeInSeconds = artboards[idxAnimation].durationMs / 1000 * percentageFrame / 100
+        const timeInSeconds = artboards[idxAnimation].durationMs*percentageFrame / (1000*100)
 
         console.log({ timeInSeconds, idxAnimation })
 
         if (idxAnimation === 0) {
-          const Animator = rive3.animator.animations[0];
-          // rive2.scrub("Timeline 1", timeInSeconds);
-          Animator.instance.time = 0
-          Animator.instance.advance(timeInSeconds)
-          Animator.instance.apply(1)
-          Animator.artboard.time = 0
-          Animator.artboard.advance(timeInSeconds)
-          rive3.renderer.save()
-          Animator.artboard.draw(rive3.renderer)
-          rive3.renderer.restore()
-          rive3.startRendering()
-          // console.log("animator",{rive3,timef:rive3.frameTime,time:Animator,timeInSeconds})
-          // rive3.reset({ artboard: "artboard-3" })
-          // rive3.scrub("Timeline 1", timeInSeconds)
+          advanceAnimationTo(rive3,timeInSeconds)
         }
         if (idxAnimation === 1) {
-          // rive4.reset({ artboard: "artboard-4" })
-          // rive4.scrub("Timeline 1", timeInSeconds)
+          advanceAnimationTo(rive4,timeInSeconds)
         }
         if (idxAnimation === 2) {
-          // rive5.reset({ artboard: "artboard-5" })
-          // rive5.scrub("Timeline 1", timeInSeconds)
+          advanceAnimationTo(rive5,timeInSeconds)
         }
         if (idxAnimation === 3) {
-          // rive6.reset({ artboard: "artboard-6" })
-          // rive6.scrub("Timeline 1", timeInSeconds)
+          advanceAnimationTo(rive6,timeInSeconds)
         }
         if (idxAnimation === 4) {
-          // rive7.reset({ artboard: "artboard-7" })
-          // rive7.scrub("Timeline 1", timeInSeconds)
+          advanceAnimationTo(rive7,timeInSeconds)
         }
       }
 
@@ -745,8 +717,8 @@ function Index() {
       <Box sx={{ position: "relative" }}>
         <Box sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}>
           <Box sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
-            <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
-            <h2 style={{ color: "white" }}>{ap.toFixed(1)}%</h2>
+            {/* <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
+            <h2 style={{ color: "white" }}>{ap.toFixed(1)}%</h2> */}
 
             <TableOfContent
               menuItems={sections}
@@ -827,7 +799,10 @@ function Index() {
             <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            <UniversitiesMap theme={"Dark"} />
+            {/* <UniversitiesMap theme={"Dark"} />
+             */}
+             as'dkajs;dlas;ldkjas;lkdj
+
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
