@@ -56,9 +56,11 @@ const magnitude = (vec) => {
   return Math.sqrt(sum);
 };
 
-exports.cosineSimilarity = (vecA, vecB) => {
+const cosineSimilarity = (vecA, vecB) => {
   return dotProduct(vecA, vecB) / (magnitude(vecA) * magnitude(vecB));
 };
+
+exports.cosineSimilarity = cosineSimilarity;
 
 exports.textCosineSimilarity = (tokensA, tokensB) => {
   const wordCountA = wordCountMap(tokensA);

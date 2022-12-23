@@ -1,4 +1,4 @@
-const { db } = require("../admin_Knowledge");
+const { db } = require("../admin");
 const isTestEnv = require("./isTestEnv");
 
 const dropCollection = async (path) => {
