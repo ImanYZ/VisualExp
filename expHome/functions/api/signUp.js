@@ -1,4 +1,4 @@
-const { db, admin } = require("../admin_Knowledge");
+const { db, admin } = require("../admin");
 const { getAuth } = require('firebase-admin/auth');
 const { Timestamp } = require("firebase-admin/firestore");
 const { shuffleArray } = require("../../src/utils/index");
@@ -51,6 +51,14 @@ module.exports = async (req, res) => {
     }
     
     const auth = getAuth(admin);
+
+    try {
+      await auth.getUserByEmail(email);
+      return res.status(500).json({
+        message: "Email already exists."
+      });
+    } catch(e) {}
+
     const user = await auth.createUser({
       email,
       password,
