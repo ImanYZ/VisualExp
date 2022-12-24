@@ -1,3 +1,9 @@
+## Description
+
+Please include a summary of the change and which issue is fixed.
+
+Ref # (issue)
+
 ## Checklist
 
 - [ ] Was the latest code pulled and merged before requesting this PR?
