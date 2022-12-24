@@ -7,16 +7,15 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
+import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState } from "../../store/AuthAtoms";
-
-import { currentProjectState } from "../../store/ExperimentAtoms";
 
 import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import { isEmail, getFullname, shuffleArray } from "../../utils";
+import { isEmail } from "../../utils";
 
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
@@ -28,9 +27,7 @@ const AuthStudentCoNoteSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
-  const [currentProject, setCurrentProject] = useRecoilState(currentProjectState);
   const [project, setProject] = useRecoilState(projectState);
-  const [fullname, setFullname] = useRecoilState(fullnameState);
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -63,119 +60,6 @@ const AuthStudentCoNoteSurvey = props => {
     setInvalidAuth(false);
     setDatabaseAccountNotCreatedYet(false);
   }, [firstname, lastname, email]);
-
-  const authChangedVerified = async user => {
-    setEmailVerified("Verified");
-    const uid = user.uid;
-    const uEmail = user.email.toLowerCase();
-    let userNotExists = false;
-    let lName = lastname;
-    let userData, userRef, fuName;
-    const userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
-    if (userDocs.docs.length > 0) {
-      // Sign in and signed up:
-      userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(userDocs.docs[0].id);
-      userData = userDocs.docs[0].data();
-      const fName = !userData.firstname ? firstname : userData.firstname;
-      lName = !userData.lastname ? lastname : userData.lastname;
-      if (!fName || !lName) {
-        console.log({ fName, lName });
-      }
-      fuName = getFullname(fName, lName);
-
-      if (!userNotExists && !userData.uid) {
-        const userDataLog = {
-          uid,
-          project: AppConfig.defaultSurveyProject
-        };
-        if (userData.firstname && userData.lastname) {
-          await userRef.update(userDataLog);
-        } else if (firstname && lastname) {
-          userDataLog.firstname = firstname;
-          userDataLog.lastname = lastname;
-          await userRef.update(userDataLog);
-        } else {
-          console.log({ firstname, lastname });
-        }
-        const userLogRef = firebase.db.collection("userLogs").doc();
-        await userLogRef.set({
-          ...userDataLog,
-          id: userRef.id,
-          updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-        });
-      }
-    } else {
-      userNotExists = true;
-      // Only signed up:
-      if (isSignUp === 1) {
-        fuName = getFullname(firstname, lName);
-        let userD = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName).get();
-        while (userD.exists) {
-          lName = " " + lName;
-          fuName = getFullname(firstname, lName);
-          userD = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName).get();
-        }
-        userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fuName);
-        userData = {
-          uid,
-          email: uEmail,
-          firstname,
-          lastname: lName,
-          project: AppConfig.defaultSurveyProject
-        };
-      }
-    }
-    if (userNotExists) {
-      userData = {
-        ...userData,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-      };
-      await firebase.batchSet(userRef, userData, { merge: true });
-      const userLogRef = firebase.db.collection("userLogs").doc();
-      await firebase.batchSet(userLogRef, {
-        ...userData,
-        id: userRef.id
-      });
-      console.log("Committing batch!");
-      await firebase.commitBatch();
-    }
-    setLastname(lName);
-    setFullname(fuName);
-    setEmail(uEmail.toLowerCase());
-    setCurrentProject(userData.project);
-    setProject(userData.project);
-    navigate("/");
-  };
-
-  useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async user => {
-      if (user && haveProjectSpecs) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        if (!user.emailVerified) {
-          setEmailVerified("Sent");
-          await user.sendEmailVerification();
-          const emailVerificationInterval = setInterval(() => {
-            console.log({
-              emailVerified: firebase.auth.currentUser.emailVerified
-            });
-            firebase.auth.currentUser.reload();
-            if (firebase.auth.currentUser.emailVerified) {
-              authChangedVerified(user);
-              clearInterval(emailVerificationInterval);
-            }
-          }, 1000);
-        } else {
-          authChangedVerified(user);
-        }
-      } else {
-        // User is signed out
-        console.log("Signing out!");
-        setEmailVerified("NotSent");
-        setFullname("");
-      }
-    });
-  }, [firebase, firstname, lastname, currentProject, isSignUp, haveProjectSpecs]);
 
   useEffect(() => {
     setValidEmail(isEmail(email));
@@ -262,7 +146,7 @@ const AuthStudentCoNoteSurvey = props => {
     setForgotPassword(oldValue => !oldValue);
   };
 
-  const signUp = async event => {
+  const signUp = async () => {
     setIsSubmitting(true);
     const loweredEmail = email.toLowerCase();
     try {
@@ -279,8 +163,16 @@ const AuthStudentCoNoteSurvey = props => {
         // );
         setIsSignUp(1);
         if (signUpSubmitable) {
-          const fname = getFullname(firstname, lastname);
-          await firebase.register(loweredEmail, password, fname);
+          await axios.post("/signUp", {
+            email,
+            password,
+            firstName: firstname,
+            lastName: lastname,
+            institutionName: "",
+            projectName: project,
+            surveyType: "student"
+          })
+          await firebase.login(loweredEmail, password);
         }
       }
     }

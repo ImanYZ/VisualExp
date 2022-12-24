@@ -29,6 +29,7 @@ import { notAResearcherState } from "../../store/ProjectAtoms";
 import { TableOfContent } from "./modules/components/TableOfContent";
 import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
+import { showSignInorUpState } from "../../store/GlobalAtoms";
 
 const HEADER_HEIGTH = 70;
 
@@ -78,6 +79,7 @@ function Index() {
   const [animation, setAnimation] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
   const [fullname, setFullname] = useRecoilState(fullnameState);
+  const showSignInorUp = useRecoilValue(showSignInorUpState);
   const [email, setEmail] = useRecoilState(emailState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
@@ -631,6 +633,7 @@ function Index() {
                   onClick={signUpHandler}
                   size={isMovil ? "small" : "medium"}
                   sx={{
+                    display: showSignInorUp ? "inline-flex" : "none",
                     fontSize: 16,
                     color: "common.white",
                     ml: 2.5,

@@ -9,8 +9,7 @@ import {
   conditionState,
   nullPassageState,
   choicesState,
-  secondSessionState,
-  thirdSessionState
+  startedSessionState
 } from "./store/ExperimentAtoms";
 
 import PassageLeft from "./Components/Passage/PassageLeft";
@@ -25,75 +24,6 @@ import PersonalInfo from "./Components/PersonalInfo/PersonalInfo";
 import { tokenize, textCosineSimilarity } from "./utils";
 
 import "./App.css";
-
-// eslint-disable-next-line no-lone-blocks
-{
-  // const changeQuestions = async () => {
-  //   const passagesDocs = await firebase.db.collection("passages").get();
-  //   for (let passageDoc of passagesDocs.docs) {
-  //     const passageData = passageDoc.data();
-  //     const passageRef = firebase.db.collection("passages").doc(passageDoc.id);
-  //     if ("question" in passageData) {
-  //       await passageRef.update({
-  //         questions: passageData.question,
-  //         question: firebase.firestore.FieldValue.delete(),
-  //       });
-  //     }
-  //   }
-  // };
-  // const recalculateFreeRecall = async () => {
-  //   const usersDocs = await firebase.db.collection("users").get();
-  //   for (let userDoc of usersDocs.docs) {
-  //     const userData = userDoc.data();
-  //     const pConditions = userData.pConditions;
-  //     for (let pCondIdx = 0; pCondIdx < pConditions.length; pCondIdx++) {
-  //       const pCond = pConditions[pCondIdx];
-  //       const reText = pCond.recallreText;
-  //       const passage = pCond.passage;
-  //       const passageDoc = await firebase.db
-  //         .collection("passages")
-  //         .doc(passage)
-  //         .get();
-  //       const passageData = passageDoc.data();
-  //       const text = passageData.text;
-  //       let score = 0;
-  //       const mainText = tokenize(text.toLowerCase());
-  //       const recalledText = tokenize(reText.toLowerCase());
-  //       for (let t1 of mainText) {
-  //         if (recalledText.includes(t1)) {
-  //           score += 1;
-  //         }
-  //       }
-  //       pConditions[pCondIdx] = {
-  //         ...pConditions[pCondIdx],
-  //         recallScore: score,
-  //         recallScoreRatio: score / mainText.length,
-  //       };
-  //       const userRef = firebase.db.collection("users").doc(userDoc.id);
-  //       await userRef.update({
-  //         pConditions,
-  //       });
-  //     }
-  //   }
-  // };
-  // const arraysEqual = (arr1, arr2) => {
-  //   if (arr1.length !== arr2.length) {
-  //     return false;
-  //   }
-  //   for (let idx = 0; idx < arr1.length; idx++) {
-  //     if (arr1[idx] !== arr2[idx]) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // };
-  // const initialCMap = [
-  //   { from: "Sea", link: "is", to: "A body of water" },
-  //   { from: "Different fishes", link: "swim in", to: "Sea" },
-  //   { from: "Different fishes", link: "live in", to: "A body of water" },
-  //   { from: "", link: "", to: "" },
-  // ];
-}
 
 const postQuestions = [
   {
@@ -129,9 +59,7 @@ const App = () => {
   const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
   // eslint-disable-next-line no-unused-vars
-  const [secondSession, setSecondSession] = useRecoilState(secondSessionState);
-  // eslint-disable-next-line no-unused-vars
-  const [thirdSession, setThirdSession] = useRecoilState(thirdSessionState);
+  const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
 
   const [passageTitle, setPassageTitle] = useState("");
   const [pConURL, setPConURL] = useState("");
@@ -140,10 +68,7 @@ const App = () => {
   const [questions, setQuestions] = useState([]);
   const [timer, setTimer] = useState(5 * 60);
   const [reText, setReText] = useState("");
-  // const [cMap, setCMap] = useState(initialCMap);
-  // const [fromOptions, setFromOptions] = useState([]);
-  // const [linkOptions, setLinkOptions] = useState([]);
-  // const [toOptions, setToOptions] = useState([]);
+  
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
     { explanation: "", codes: [] },
@@ -236,9 +161,9 @@ const App = () => {
       if (step === 3) {
         testName = "test";
       } else if (step === 13 || step === 16) {
-        if (secondSession) {
+        if (startedSession === 2) {
           testName = "test3Days";
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           testName = "test1Week";
         }
       }
@@ -263,44 +188,6 @@ const App = () => {
     await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
   };
 
-  // eslint-disable-next-line no-lone-blocks
-  {
-    // const submitCMap = async (currentTime, timeSpent, userRef, userData) => {
-    //   const passageDoc = await firebase.db
-    //     .collection("passages")
-    //     .doc(passage)
-    //     .get();
-    //   const passageData = passageDoc.data();
-    //   const conMap = passageData.cMap;
-    //   const pConditions = userData.pConditions;
-    //   let score = 0;
-    //   for (let cRow of cMap) {
-    //     for (let conRow of conMap) {
-    //       const tCFrom = tokenize(cRow.from);
-    //       const tConFrom = tokenize(conRow.from);
-    //       if (arraysEqual(tCFrom, tConFrom)) {
-    //         const tCTo = tokenize(cRow.to);
-    //         const tConTo = tokenize(conRow.to);
-    //         if (arraysEqual(tCTo, tConTo)) {
-    //           score += 1;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   pConditions[phase] = {
-    //     ...pConditions[phase],
-    //     cMap,
-    //     cMapScore: score,
-    //     cMapScoreRatio: score / conMap.length,
-    //     cMapEnded: currentTime,
-    //     cMapTime: timeSpent,
-    //   };
-    //   await userRef.update({
-    //     pConditions,
-    //   });
-    // };
-  }
-
   const submitFreeRecall = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
     let passageDoc = await firebase.db.collection("passages").doc(passage).get();
     let passageData = passageDoc.data();
@@ -318,9 +205,9 @@ const App = () => {
     }
     let prefieldName = "recall";
     if (step > 10) {
-      if (secondSession) {
+      if (startedSession === 2) {
         prefieldName = "recall3Days";
-      } else if (thirdSession) {
+      } else if (startedSession === 3) {
         prefieldName = "recall1Week";
       }
     }
@@ -337,7 +224,7 @@ const App = () => {
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
     // user
-    if (thirdSession) {
+    if (startedSession === 3) {
       userData = {
         ...userData,
         ...userUpdates,
@@ -457,12 +344,8 @@ const App = () => {
                   choice = "post1WeekQ2Choice";
                 }
               }
-              if (userData[explan][index].explanation) {
-                response = userData[explan][index].explanation;
-              } else {
-                response = userData[explan][index];
-              }
-              const filtered = (response || "").split(" ").filter(w => w.trim());
+              response = userData[explan][index].explanation || "";
+              const filtered = (response).split(" ").filter(w => w.trim());
               if (filtered.length > 4) {
                 const newFeedbackDdoc = {
                   approved: false,
@@ -710,12 +593,12 @@ const App = () => {
         }
         break;
       case 11:
-        if (secondSession) {
+        if (startedSession === 2) {
           pConditions[0] = {
             ...pConditions[0],
             recall3DaysStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           pConditions[0] = {
             ...pConditions[0],
             recall1WeekStart: currentTime
@@ -755,12 +638,12 @@ const App = () => {
         setReText("");
         break;
       case 14:
-        if (secondSession) {
+        if (startedSession === 2) {
           pConditions[1] = {
             ...pConditions[1],
             recall3DaysStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           pConditions[1] = {
             ...pConditions[1],
             recall1WeekStart: currentTime
@@ -792,7 +675,7 @@ const App = () => {
               condition: pConditions[0].condition
             }
           },
-          secondSession ? 19 : 17
+          startedSession === 2 ? 19 : 17
         );
         setTimer(30 * 60);
         setPhase(0);
@@ -818,11 +701,11 @@ const App = () => {
         break;
       case 18:
         userUpdates = {};
-        if (secondSession) {
+        if (startedSession === 2) {
           userUpdates = {
             post3DaysQsStart: currentTime
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           userUpdates = {
             post1WeekQsStart: currentTime
           };
@@ -845,14 +728,14 @@ const App = () => {
       case 19:
         ({ choice1, choice2 } = convertChoices(pConditions));
         userUpdates = {};
-        if (secondSession) {
+        if (startedSession === 2) {
           userUpdates = {
             post3DaysQsEnded: currentTime,
             post3DaysQ1Choice: choice1,
             post3DaysQ2Choice: choice2,
             explanations3Days: explanations
           };
-        } else if (thirdSession) {
+        } else if (startedSession === 3) {
           userUpdates = {
             post1WeekQsEnded: currentTime,
             post1WeekQ1Choice: choice1,
@@ -869,14 +752,14 @@ const App = () => {
 
   useEffect(() => {
     const setUserStatus = () => {
-      if (secondSession || thirdSession) {
+      if (startedSession === 2 || startedSession === 3) {
         setTimeout(async () => {
           const userDoc = await firebase.db.collection("users").doc(fullname).get();
           if (userDoc.exists) {
             const userData = userDoc.data();
             if (
               (userData.gender && userData.step < 11) ||
-              (thirdSession && userData.step === 20 && !userData.projectDone)
+              (startedSession === 3 && userData.step === 20 && !userData.projectDone)
             ) {
               setPhase(0);
               setStep(11);
@@ -893,7 +776,7 @@ const App = () => {
       setUserStatus();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fullname, secondSession, thirdSession]);
+  }, [fullname, startedSession]);
 
   useEffect(() => {
     if (![0, 5, 19].includes(step)) {
