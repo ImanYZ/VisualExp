@@ -91,6 +91,8 @@ function Index() {
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isMovil = useMediaQuery("(max-width:600px)");
+  const [showLandingOptions, setShowLandingOptions] = useState(true)
+  const [showAnimationOptions, setShowAnimationOptions] = useState(false)
   const previousScrubValue = useRef(0)
 
   const { height, width } = useWindowSize();
@@ -227,6 +229,7 @@ function Index() {
     if (notSectionSwitching) {
 
       const currentScrollPosition = event.target.scrollTop;
+
       console.log("currentScrollPosition", currentScrollPosition)
       const sectionsHeight = getSectionPositions();
       // console.log("sectionsHeight", sectionsHeight);
@@ -247,12 +250,8 @@ function Index() {
         animationsHeight = getAnimationsPositions();
       }
 
-
-      // const sectionHeight = sectionAnimationControllerRef.current.getSectionHeaderHeight()
-
       const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce(
         (acu, cur, idx) => {
-          // console.log({ ...acu, cur, currentScrollPosition })
           if (acu.maxAnimation > currentScrollPosition) return acu;
           return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx };
         },
@@ -279,6 +278,9 @@ function Index() {
       );
       // console.log({ idxSection, idxAnimation });
 
+      let showLandingOptions = false
+      let showEndAnimationOptions = false
+
       if (idxAnimation < 0) return;
 
       if (idxSection === 0) {
@@ -303,6 +305,8 @@ function Index() {
 
           setIdxRiveComponent(1);
         }
+
+        if (percentageFrame < 18) { showLandingOptions = true }
       }
 
       if (idxSection === SECTION_WITH_ANIMATION) {
@@ -335,36 +339,13 @@ function Index() {
         }
         if (idxAnimation === 4) {
           advanceAnimationTo(rive7, timeInSeconds)
+          if (percentageFrame > 50) { showEndAnimationOptions = true }
         }
       }
 
-
-
-
-      // if (idxSection < SECTION_WITH_ANIMATION) {
-      //   // show first artboard and first frame
-      //   rive.reset({ artboard: artboards[0].name })
-      //   rive.scrub("Timeline 1", 0)
-      // }
-      // if (idxSection > SECTION_WITH_ANIMATION) {
-      //   // show last artboard and last frame
-      //   rive.reset({ artboard: artboards[artboards.length - 1].name })
-      //   rive.scrub("Timeline 1", artboards[artboards.length - 1].durationMs / 1000)
-      // }
-      // if (idxSection === SECTION_WITH_ANIMATION) {
-      //   // check local percentage
-      //   const lowerAnimationLimit = minAnimation
-      //   const upperAnimationLimit = maxAnimation
-      //   const rangeFrames = upperAnimationLimit - lowerAnimationLimit
-      //   const positionFrame = currentScrollPosition - lowerAnimationLimit
-      //   const percentageFrame = positionFrame * 100 / rangeFrames
-      //   setAP(percentageFrame)
-      //   // console.log('xx:--->', { percentageFrame })
-
-      //   rive.reset({ artboard: artboards[idxAnimation].name })
-      //   const timeInSeconds = artboards[idxAnimation].durationMs / 1000 * percentageFrame / 100
-      //   rive.scrub("Timeline 1", timeInSeconds)
-      // }
+      // update options display
+      setShowLandingOptions(showLandingOptions)
+      setShowAnimationOptions(showEndAnimationOptions)
     }
   };
 
@@ -740,17 +721,9 @@ function Index() {
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-
           }}
         >
-          {/* Increase the network loading priority of the background image. */}
-          {/* <img
-            style={{ display: "none" }}
-            src={backgroundImage}
-            alt="increase priority"
-          />
-          <img src={AnimatediconLoop} alt="Animated Logo" width="190px" /> */}
-          <Typography color="white" variant="h5" sx={{ textAlign: "center" }} className="show-blurred-text">
+          <Typography color="white" variant="h5" sx={{ textAlign: "center", }} className={showLandingOptions ? 'show-blurred-text' : 'hide-content'}>
             WHERE WE TAKE NOTES <b>TOGETHER</b>.
           </Typography>
           <Button
@@ -759,11 +732,14 @@ function Index() {
             size={width < 900 ? "small" : "large"}
             component="a"
             href="#JoinUsSection"
-            sx={{ minWidth: 200, color: "common.white" }}
+            sx={{ minWidth: 200, color: "common.white", }}
+            className={showLandingOptions ? 'show-blurred-text' : 'hide-content'}
           >
             Apply to Join Us!
           </Button>
-          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}
+            className={showLandingOptions ? 'show-blurred-text' : 'hide-content'}
+          >
             {height > 500 && "Scroll"}
             <KeyboardDoubleArrowDownIcon fontSize={width < 900 ? "small" : "medium"} />
           </Box>
@@ -771,7 +747,21 @@ function Index() {
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref}>
-            <HowItWorks section={section} ref={sectionAnimationControllerRef} artboards={[...section1ArtBoards, ...artboards]}>
+            <HowItWorks
+              section={section}
+              ref={sectionAnimationControllerRef}
+              artboards={[...section1ArtBoards, ...artboards]}
+              animationOptions={<Button
+                color="secondary"
+                variant="contained"
+                size={width < 900 ? "small" : "large"}
+                component="a"
+                href="#JoinUsSection"
+                sx={{ minWidth: 200, color: "common.white" }}
+                className={showAnimationOptions ? 'show-blurred-text' : 'hide-content'}
+              >
+                Apply to Join Us!
+              </Button>}>
               <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
                 <RiveComponent1 className={`rive-canvas ${idxRiveComponent !== 0 ? "rive-canvas-hidden" : ""}`} />
                 <RiveComponent2 className={`rive-canvas ${idxRiveComponent !== 1 ? "rive-canvas-hidden" : ""}`} />
@@ -792,8 +782,6 @@ function Index() {
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
             {/* <UniversitiesMap theme={"Dark"} />
              */}
-            as'dkajs;dlas;ldkjas;lkdj
-
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
