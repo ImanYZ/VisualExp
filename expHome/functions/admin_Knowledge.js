@@ -9,10 +9,19 @@ let admin = require("firebase-admin");
 
 const serviceAccount = require("./onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json");
 
+let initializationConfigs = {
+  credential: admin.credential.cert(serviceAccount),
+}
+
+if (process.env.NODE_ENV === "test") {
+  initializationConfigs = {
+    projectId: "test",
+    credential: admin.credential.applicationDefault(),
+  };
+}
+
 admin = admin.initializeApp(
-  {
-    credential: admin.credential.cert(serviceAccount),
-  },
+  initializationConfigs,
   "onecademy"
 );
 

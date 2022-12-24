@@ -1,10 +1,10 @@
-import stem from "wink-porter2-stemmer";
-import tokenizer from "wink-tokenizer";
-import stopword from "stopword";
+const stem = require("wink-porter2-stemmer");
+const tokenizer = require("wink-tokenizer");
+const stopword = require("stopword");
 
 const myTokenizer = tokenizer();
 
-export const tokenize = (str) => {
+exports.tokenize = (str) => {
   let tokens = [];
   if (str) {
     let tokenized = myTokenizer.tokenize(str);
@@ -56,11 +56,13 @@ const magnitude = (vec) => {
   return Math.sqrt(sum);
 };
 
-export const cosineSimilarity = (vecA, vecB) => {
+const cosineSimilarity = (vecA, vecB) => {
   return dotProduct(vecA, vecB) / (magnitude(vecA) * magnitude(vecB));
 };
 
-export const textCosineSimilarity = (tokensA, tokensB) => {
+exports.cosineSimilarity = cosineSimilarity;
+
+exports.textCosineSimilarity = (tokensA, tokensB) => {
   const wordCountA = wordCountMap(tokensA);
   const wordCountB = wordCountMap(tokensB);
   let dict = {};

@@ -48,9 +48,6 @@ const ScheduleInstructorPage = props => {
   const [schedule, setSchedule] = useState([]);
   const [scheduleLoaded, setScheduleLoaded] = useState(false);
   const [selectedSession, setSelectedSession] = useState([]);
-  const [firstSession, setFirstSession] = useState(null);
-  const [secondSession, setSecondSession] = useState(null);
-  const [thirdSession, setThirdSession] = useState(null);
   const [submitable, setSubmitable] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);

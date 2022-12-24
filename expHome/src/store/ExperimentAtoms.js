@@ -21,14 +21,9 @@ export const phaseState = atom({
   default: 0,
 });
 
-export const secondSessionState = atom({
-  key: "secondSessionState",
-  default: false,
-});
-
-export const thirdSessionState = atom({
-  key: "thirdSessionState",
-  default: false,
+export const startedSessionState = atom({
+  key: "startedSession",
+  default: 0,
 });
 
 export const stepState = atom({
@@ -55,3 +50,11 @@ export const choicesState = atom({
   key: "choicesState",
   default: [],
 });
+
+export const personalInfoProcessChoicesState = atom({
+  key: "personalInfoProcessChoicesState",
+  default: {
+    submit: false,
+    submitEnabled: false
+  }
+})
