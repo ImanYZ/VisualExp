@@ -76,7 +76,7 @@ const HowItWorks = props => {
 
           }}
         >
-          {height - 70}px
+          {/* {height - 70}px */}
         </Box>
       ))}
 
