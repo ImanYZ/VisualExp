@@ -32,14 +32,13 @@ import { useWindowSize } from "./hooks/useWindowSize";
 
 const HEADER_HEIGTH = 70;
 
-const section1ArtBoards = [{ name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }]
+const section1ArtBoards = [{ name: "artboard-1", durationMs: 1000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }]
 const artboards = [
   // { name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" },
   { name: "artboard-2", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
-  { name: "artboard-3", durationMs: 22000, getHeight: vh => 8 * vh, color: "#f38b36" },
-  { name: "artboard-4", durationMs: 5000, getHeight: vh => 5 * vh, color: "#e6f336" },
-  { name: "artboard-5", durationMs: 8300, getHeight: vh => 8 * vh, color: "#62f336" },
-  { name: "artboard-6", durationMs: 2000, getHeight: vh => 2 * vh, color: "#36f3ca" },
+  { name: "artboard-3", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
+  { name: "artboard-4", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
+  { name: "artboard-5", durationMs: 11000, getHeight: vh => 8 * vh, color: "#62f336" },
 
   // { name: "animation1", durationMs: 8000 },
   // { name: "animation2", durationMs: 22000 },
@@ -59,13 +58,12 @@ const sectionsTmp = [
     title: "How We Work?",
     simpleTitle: "How?",
     children: [
-      // { id: "animation1", title: "Problem", simpleTitle: "Problem", },
-      // { id: "animation2", title: "Searching", simpleTitle: "Searching", },
+    
       { id: "animation1", title: "Summarizing", simpleTitle: "Summarizing" },
       { id: "animation2", title: "Linking", simpleTitle: "Linking" },
       { id: "animation3", title: "Evaluating", simpleTitle: "Evaluating" },
       { id: "animation4", title: "Improving", simpleTitle: "Improving" },
-      { id: "animation5", title: "Join us", simpleTitle: "Join us" }
+   
     ]
   },
   { id: "ValuesSection", active: false, title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
@@ -134,12 +132,7 @@ function Index() {
     autoplay: false,
     onLoad: () => console.log("load-finish")
   });
-  const { rive: rive7, RiveComponent: RiveComponent7 } = useRive({
-    src: "artboard-7.riv",
-    artboard: "artboard-7",
-    autoplay: false,
-    onLoad: () => console.log("load-finish")
-  });
+
 
   useEffect(() => {
     if (!rive1) return;
@@ -157,7 +150,6 @@ function Index() {
   const section5Ref = useRef(null);
   const section6Ref = useRef(null);
   const section7Ref = useRef(null);
-
   useEffect(() => {
     const checkResearcher = async () => {
       const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
@@ -170,31 +162,6 @@ function Index() {
     }
   }, [firebase, fullname]);
 
-  const RiveComponentMemo = useMemo(() => {
-    if (idxRiveComponent === 0) {
-      return <RiveComponent1 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 1) {
-      return <RiveComponent2 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 2) {
-      return <RiveComponent3 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 3) {
-      return <RiveComponent4 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 4) {
-      return <RiveComponent5 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 5) {
-      return <RiveComponent6 className="rive-canvas" />;
-    }
-    if (idxRiveComponent === 6) {
-      return <RiveComponent7 className="rive-canvas" />;
-    }
-
-    return null;
-  }, [idxRiveComponent]);
 
 
 
@@ -224,7 +191,7 @@ function Index() {
   const detectScrollPosition = event => {
     console.log('detectScrollPosition')
     // console.log({ rive1 });
-    if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6 || !rive7) return;
+    if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6) return;
     // if (!sectionAnimationControllerRef?.current) return
     if (notSectionSwitching) {
 
@@ -336,11 +303,9 @@ function Index() {
         }
         if (idxAnimation === 3) {
           advanceAnimationTo(rive6, timeInSeconds)
-        }
-        if (idxAnimation === 4) {
-          advanceAnimationTo(rive7, timeInSeconds)
           if (percentageFrame > 50) { showEndAnimationOptions = true }
         }
+      
       }
 
       // update options display
@@ -433,7 +398,6 @@ function Index() {
       if (animationIndex === 1) { rive4.scrub("Timeline 1", 0) }
       if (animationIndex === 2) { rive5.scrub("Timeline 1", 0) }
       if (animationIndex === 3) { rive6.scrub("Timeline 1", 0) }
-      if (animationIndex === 4) { rive7.scrub("Timeline 1", 0) }
     }
 
     // change selected item in TOC
@@ -769,19 +733,17 @@ function Index() {
                 <RiveComponent4 className={`rive-canvas ${idxRiveComponent !== 3 ? "rive-canvas-hidden" : ""}`} />
                 <RiveComponent5 className={`rive-canvas ${idxRiveComponent !== 4 ? "rive-canvas-hidden" : ""}`} />
                 <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent7 className={`rive-canvas ${idxRiveComponent !== 6 ? "rive-canvas-hidden" : ""}`} />
               </Box>
             </HowItWorks>
           </Box>
-          <Box id={sectionsOrder[2].id} ref={section3Ref} className={section === 2 ? "slide-left-to-right" : ""}>
+          <Box id={sectionsOrder[2].id} ref={section3Ref} >
             <Values /> {/* why */}
           </Box>
           <Box id={sectionsOrder[3].id} ref={section4Ref} >
             <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            {/* <UniversitiesMap theme={"Dark"} />
-             */}
+            <UniversitiesMap theme={"Dark"} />   
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
