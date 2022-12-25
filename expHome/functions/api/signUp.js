@@ -1,7 +1,7 @@
 const { db, admin } = require("../admin");
 const { getAuth } = require('firebase-admin/auth');
 const { Timestamp } = require("firebase-admin/firestore");
-const { shuffleArray } = require("../../src/utils/index");
+const { shuffleArray } = require("../helpers");
 
 const getAvailableFullname = async (fullname) => {
   const userCollections = ["users", "usersStudentCoNoteSurvey", "usersInstructorCoNoteSurvey"];

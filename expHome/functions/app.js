@@ -3,7 +3,6 @@ const cors = require("cors");
 require("dotenv").config();
 
 const {
-  deleteUser,
   retrieveData,
   questionsData,
   feedbackCodeData,
@@ -21,8 +20,6 @@ const {
   voteInstructorReset,
   voteAdministratorEndpoint,
   voteAdministratorReset,
-  assignExperimentSessionsPoints,
-  remindCalendarInvitations,
   // updateNotTakenSessions,
   bulkGradeFreeRecall,
   markPaidEndpoint,
@@ -44,7 +41,6 @@ const {
   instructorYes,
   instructorNo,
   instructorLater,
-  sendPersonalInvitations,
   trackStudentInvite,
   trackStudentEmailTemplateCopy
 } = require("./emailing");
@@ -55,12 +51,10 @@ const {
   deleteEvent,
   scheduleLifeLog,
   getOngoingResearcherEvent,
-  lifeLoggerScheduler,
   ongoingEvents
 } = require("./scheduling");
 const {
   assignNodeContributorsInstitutionsStats,
-  updateInstitutions,
   checkEmailInstitution,
   getInstitutions
 } = require("./knowledge");
