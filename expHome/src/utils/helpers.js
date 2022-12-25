@@ -59,7 +59,7 @@ const shuffleArray = (array) => {
   return array;
 }
 
-module.exports = {
+export {
   isEmail,
   formatPoints,
   isValidHttpUrl,

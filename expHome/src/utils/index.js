@@ -14,7 +14,7 @@ const {
     textCosineSimilarity,
 } = require('./CosineSimilarity');
 
-module.exports = {
+export {
     isToday, getISODateString,
     uuidv4,
     isEmail,

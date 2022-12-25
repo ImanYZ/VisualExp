@@ -1,4 +1,4 @@
-exports.isToday = (theDate) => {
+const isToday = (theDate) => {
   const now = new Date();
   return (
     theDate.getFullYear() === now.getFullYear() &&
@@ -7,7 +7,7 @@ exports.isToday = (theDate) => {
   );
 };
 
-exports.getISODateString = (dateObj) => {
+const getISODateString = (dateObj) => {
   const theDay = dateObj.getDate();
   const theMonth = dateObj.getMonth() + 1;
   return (
@@ -18,3 +18,8 @@ exports.getISODateString = (dateObj) => {
     (theDay < 10 ? "0" + theDay : theDay)
   );
 };
+
+export {
+  isToday,
+  getISODateString
+}

@@ -621,9 +621,11 @@ function Index() {
                   aria-label={`${fullname}'s Account`}
                   aria-expanded={isProfileMenuOpen ? "true" : undefined}
                   onClick={handleProfileMenuOpen}
-                  color="common.white"
+                  sx={{
+                    color: "common.white"
+                  }}
                 >
-                  <AccountCircle />
+                  <AccountCircle color="inherit" />
                 </IconButton>
               </Tooltip>
             ) : (
