@@ -4,7 +4,7 @@ const stopword = require("stopword");
 
 const myTokenizer = tokenizer();
 
-exports.tokenize = (str) => {
+const tokenize = (str) => {
   let tokens = [];
   if (str) {
     let tokenized = myTokenizer.tokenize(str);
@@ -60,9 +60,7 @@ const cosineSimilarity = (vecA, vecB) => {
   return dotProduct(vecA, vecB) / (magnitude(vecA) * magnitude(vecB));
 };
 
-exports.cosineSimilarity = cosineSimilarity;
-
-exports.textCosineSimilarity = (tokensA, tokensB) => {
+const textCosineSimilarity = (tokensA, tokensB) => {
   const wordCountA = wordCountMap(tokensA);
   const wordCountB = wordCountMap(tokensB);
   let dict = {};
@@ -72,3 +70,9 @@ exports.textCosineSimilarity = (tokensA, tokensB) => {
   const vectorB = wordMapToVector(wordCountB, dict);
   return cosineSimilarity(vectorA, vectorB);
 };
+
+export {
+  textCosineSimilarity,
+  tokenize,
+  cosineSimilarity
+}
