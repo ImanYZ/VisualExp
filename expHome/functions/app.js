@@ -53,13 +53,10 @@ const {
   getOngoingResearcherEvent,
   ongoingEvents
 } = require("./scheduling");
-const {
-  assignNodeContributorsInstitutionsStats,
-  checkEmailInstitution,
-  getInstitutions
-} = require("./knowledge");
+const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
 const signUp = require("./api/signUp");
+const scheduleRes = require("./api/scheduleRes");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -129,6 +126,7 @@ app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
 
 app.post("/signUp", signUp);
+app.post("/scheduleRes", scheduleRes);
 
 // Knowledge endpoints
 
