@@ -59,12 +59,12 @@ const sectionsTmp = [
     title: "How We Work?",
     simpleTitle: "How?",
     children: [
-    
+
       { id: "animation1", title: "Summarizing", simpleTitle: "Summarizing" },
       { id: "animation2", title: "Linking", simpleTitle: "Linking" },
       { id: "animation3", title: "Evaluating", simpleTitle: "Evaluating" },
       { id: "animation4", title: "Improving", simpleTitle: "Improving" },
-   
+
     ]
   },
   { id: "ValuesSection", active: false, title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
@@ -275,7 +275,7 @@ function Index() {
           setIdxRiveComponent(1);
         }
 
-        if (percentageFrame < 18) { showLandingOptions = true }
+        if (percentageFrame < 5) { showLandingOptions = true }
       }
 
       if (idxSection === SECTION_WITH_ANIMATION) {
@@ -307,7 +307,7 @@ function Index() {
           advanceAnimationTo(rive6, timeInSeconds)
           if (percentageFrame > 50) { showEndAnimationOptions = true }
         }
-      
+
       }
 
       // update options display
@@ -748,7 +748,7 @@ function Index() {
             <What />
           </Box>
           <Box id={sectionsOrder[4].id} ref={section5Ref}>
-            <UniversitiesMap theme={"Dark"} />   
+            <UniversitiesMap theme={"Dark"} />
           </Box>
           <Box id={sectionsOrder[5].id} ref={section6Ref}>
             <WhoWeAre />
