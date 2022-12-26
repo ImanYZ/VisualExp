@@ -34,18 +34,10 @@ const HEADER_HEIGTH = 70;
 
 const section1ArtBoards = [{ name: "artboard-1", durationMs: 1000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }]
 const artboards = [
-  // { name: "artboard-1", durationMs: 2000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" },
   { name: "artboard-2", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
   { name: "artboard-3", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
   { name: "artboard-4", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
   { name: "artboard-5", durationMs: 11000, getHeight: vh => 8 * vh, color: "#62f336" },
-
-  // { name: "animation1", durationMs: 8000 },
-  // { name: "animation2", durationMs: 22000 },
-  // { name: "animation3", durationMs: 5000 },
-  // { name: "animation4", durationMs: 8500 },
-  // { name: "animation5", durationMs: 2000 },
-  // { name: "animation6", durationMs: 3000 }
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -269,18 +261,6 @@ function Index() {
       window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
       setSelectedSection(idxSection);
       setSelectedAnimation(idxAnimation)
-      // setAnimation(idxAnimation);
-
-      // setSections(prev =>
-      //   prev.map((cur, idx) => {
-      //     if (idxSection !== idx) {
-      //       const childrenFixed = cur.children.map(c => ({ ...c, active: false }))
-      //       return { ...cur, children: childrenFixed, active: false }
-      //     }
-      //     const childrenFixed = cur.children.map((c, i) => ({ ...c, active: idxAnimation === i ? true : false }));
-      //     return { ...cur, active: true, children: childrenFixed };
-      //   })
-      // );
 
       let showLandingOptions = false
       let showEndAnimationOptions = false
@@ -293,7 +273,6 @@ function Index() {
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
         const positionFrame = currentScrollPosition - lowerAnimationLimit;
         const percentageFrame = (positionFrame * 100) / rangeFrames;
-        // console.log({ percentageFrame });
         if (percentageFrame < 50) {
           setIdxRiveComponent(0);
         } else {
@@ -310,20 +289,14 @@ function Index() {
       }
 
       if (idxSection === SECTION_WITH_ANIMATION) {
-        // replace canvas
         setIdxRiveComponent(idxAnimation + 2);
-        // check local percentage
         const lowerAnimationLimit = minAnimation
         const upperAnimationLimit = maxAnimation
         const rangeFrames = upperAnimationLimit - lowerAnimationLimit
         const positionFrame = currentScrollPosition - lowerAnimationLimit
         const percentageFrame = positionFrame * 100 / rangeFrames
-        // console.log("minAnimation", { minAnimation, maxAnimation, percentageFrame })
-        // setAP(percentageFrame)
-        // console.log({ idxAnimation })
-        const timeInSeconds = artboards[idxAnimation].durationMs * percentageFrame / (1000 * 100)
 
-        // console.log({ timeInSeconds, idxAnimation })
+        const timeInSeconds = artboards[idxAnimation].durationMs * percentageFrame / (1000 * 100)
 
         if (idxAnimation === 0) {
           advanceAnimationTo(rive3, timeInSeconds)
@@ -376,19 +349,6 @@ function Index() {
       if (animationIndex === 2) { rive5.scrub("Timeline 1", 0) }
       if (animationIndex === 3) { rive6.scrub("Timeline 1", 0) }
     }
-
-    // change selected item in TOC
-    // setSections(prev =>
-    //   prev.map((cur, idx) => {
-    //     if (sectionIdx !== idx)
-    //       return { ...cur, children: cur.children.map(c => ({ ...c, active: false })), active: false };
-    //     const childrenFixed = cur.children.map((c, i) => {
-    //       if (animationIndex !== i) return { ...c, active: false };
-    //       return { ...c, active: true };
-    //     });
-    //     return { ...cur, active: true, children: childrenFixed };
-    //   })
-    // );
 
     setSelectedSection(sectionIdx)
     setSelectedAnimation(animationIndex)
