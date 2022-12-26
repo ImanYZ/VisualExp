@@ -1,5 +1,6 @@
 import { Box, Tooltip, Typography } from "@mui/material";
 import React from 'react'
+import { SECTION_WITH_ANIMATION } from "../../Home";
 
 const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectionSelected, animationSelected }) => {
 
@@ -105,8 +106,8 @@ const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectio
                             position: "absolute",
                             left: viewType === "SIMPLE" ? "-3px" : "-21px",
                             top: "16px",
-                            background: animationSelected === idx ? "#f1f1f1" : "#9c9c9c",
-                            outline: animationSelected === idx ? "solid 3px #8d8d8d7a" : undefined
+                            background: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "#f1f1f1" : "#9c9c9c",
+                            outline: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "solid 3px #8d8d8d7a" : undefined
                           },
                           ":hover": {
                             color: "#ff8a33",
@@ -117,7 +118,7 @@ const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectio
                         }}>
                         <Typography
                           sx={{
-                            color: animationSelected === idx ? "#f1f1f1" : "#9c9c9c",
+                            color: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "#f1f1f1" : "#9c9c9c",
                             fontSize: "14px",
                             cursor: "pointer",
                             py: "5px",
