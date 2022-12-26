@@ -35,4 +35,4 @@ jobs:
           cd expHome/functions
           npm install --legacy-peer-deps
           npm i -g firebase-tools
-          NODE_OPTIONS="--max_old_space_size=4096" firebase emulators:exec  --project test --only auth,firestore 'jest --ci --runInBand'
+          NODE_OPTIONS="--max_old_space_size=4096" firebase emulators:exec  --project test --only auth,firestore 'npx jest --ci --runInBand'
