@@ -9,8 +9,7 @@
     "build:prod": "env-cmd -f .env.production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "emulator": "firebase emulators:start --project test --only auth,firestore,functions,hosting",
-    "test:ci": "firebase emulators:exec  --project test --only auth,firestore 'jest --ci --runInBand'"
+    "emulator": "firebase emulators:start --project test --only auth,firestore,functions,hosting"
   },
   "dependencies": {
     "@date-io/date-fns": "^2.11.0",
