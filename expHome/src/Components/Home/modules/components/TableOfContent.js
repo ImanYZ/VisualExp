@@ -1,7 +1,7 @@
 import { Box, Tooltip, Typography } from "@mui/material";
 import React from 'react'
 
-export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx }) => {
+const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectionSelected, animationSelected }) => {
 
   return (
     <Box component={"nav"} sx={{ position: "sticky", top: "200px", ...customSx }} style={{ mixBlendMode: "difference" }}>
@@ -18,6 +18,7 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
       >
         {menuItems.map((item, idx) => (
           <Box component={"li"}
+            key={item.id}
             sx={{
               display: "flex",
               flexDirection: "column",
@@ -25,11 +26,11 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
               justifyContent: "center",
             }}
           >
-            <Tooltip key={item.id} title={item.title} placement="right" arrow disableInteractive>
+            <Tooltip title={item.title} placement="right" arrow disableInteractive>
               <Box onClick={() => onChangeContent(idx)}
                 sx={{
                   height: "56px",
-                  color: item.active ? "#f1f1f1" : "#9c9c9c",
+                  color: idx === sectionSelected ? "#f1f1f1" : "#9c9c9c",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "flex-start",
@@ -45,8 +46,8 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                     position: "absolute",
                     left: "-4px",
                     top: "22px",
-                    background: item.active ? "#f1f1f1" : "#9c9c9c",
-                    outline: item.active ? "solid 4px #8d8d8d7a" : undefined
+                    background: idx === sectionSelected ? "#f1f1f1" : "#9c9c9c",
+                    outline: idx === sectionSelected ? "solid 4px #8d8d8d7a" : undefined
                   },
                   ":hover": {
                     color: "#ff8a33",
@@ -104,8 +105,8 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                             position: "absolute",
                             left: viewType === "SIMPLE" ? "-3px" : "-21px",
                             top: "16px",
-                            background: child.active ? "#f1f1f1" : "#9c9c9c",
-                            outline: child.active ? "solid 3px #8d8d8d7a" : undefined
+                            background: animationSelected === idx ? "#f1f1f1" : "#9c9c9c",
+                            outline: animationSelected === idx ? "solid 3px #8d8d8d7a" : undefined
                           },
                           ":hover": {
                             color: "#ff8a33",
@@ -116,7 +117,7 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
                         }}>
                         <Typography
                           sx={{
-                            color: child.active ? "#f1f1f1" : "#9c9c9c",
+                            color: animationSelected === idx ? "#f1f1f1" : "#9c9c9c",
                             fontSize: "14px",
                             cursor: "pointer",
                             py: "5px",
@@ -142,3 +143,5 @@ export const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx 
     </Box >
   )
 }
+
+export const MemoizedTableOfContent = React.memo(TableOfContent);
