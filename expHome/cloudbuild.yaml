@@ -1,0 +1,34 @@
+steps:
+  # running build for frontend app
+  - name: "gcr.io/visualexp-a7d2c/firebase:latest"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        'source /root/.bashrc && cd expHome && npm install --legacy-peer-deps && npm run build:prod'
+      ]
+  # running install for backend
+  - name: "gcr.io/visualexp-a7d2c/firebase:latest"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        'source /root/.bashrc && cd expHome/functions && npm install --legacy-peer-deps'
+      ]
+  # running firebase deploy
+  - name: "gcr.io/visualexp-a7d2c/firebase:latest"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        'echo $$VISUALEXP_PROD | base64 -d > expHome/functions/onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json && source /root/.bashrc && cd expHome && firebase --debug deploy'
+      ]
+    secretEnv: ['VISUALEXP_PROD']
+availableSecrets:
+  secretManager:
+  - versionName: projects/visualexp-a7d2c/secrets/VISUALEXP_PROD/versions/latest
+    env: 'VISUALEXP_PROD'
+options:
+  logging: CLOUD_LOGGING_ONLY
+serviceAccount: 'projects/visualexp-a7d2c/serviceAccounts/114329020973802572254'
+timeout: 2000s
