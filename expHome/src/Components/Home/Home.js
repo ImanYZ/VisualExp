@@ -1,5 +1,4 @@
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import AnimatediconLoop from "../../assets/AnimatediconLoop.gif";
 import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
@@ -11,7 +10,7 @@ import Box from "@mui/material/Box";
 
 import What from "./modules/views/What";
 import AppFooter from "./modules/views/AppFooter";
-import Landing from "./modules/views/Landing";
+// import Landing from "./modules/views/Landing";
 import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
@@ -49,7 +48,7 @@ const artboards = [
   // { name: "animation6", durationMs: 3000 }
 ];
 
-const SECTION_WITH_ANIMATION = 1;
+export const SECTION_WITH_ANIMATION = 1;
 
 const sectionsTmp = [
   { id: "LandingSection", title: "Home", simpleTitle: "Home", children: [] },
@@ -371,11 +370,11 @@ function Index() {
     }
     if (sectionIdx === SECTION_WITH_ANIMATION) {
       setIdxRiveComponent(animationIndex + 2);
-      // // reset animation when jump through sections
-      // if (animationIndex === 0) { rive3.scrub("Timeline 1", 0) }
-      // if (animationIndex === 1) { rive4.scrub("Timeline 1", 0) }
-      // if (animationIndex === 2) { rive5.scrub("Timeline 1", 0) }
-      // if (animationIndex === 3) { rive6.scrub("Timeline 1", 0) }
+      // reset animation when jump through sections
+      if (animationIndex === 0) { rive3.scrub("Timeline 1", 0) }
+      if (animationIndex === 1) { rive4.scrub("Timeline 1", 0) }
+      if (animationIndex === 2) { rive5.scrub("Timeline 1", 0) }
+      if (animationIndex === 3) { rive6.scrub("Timeline 1", 0) }
     }
 
     // change selected item in TOC
