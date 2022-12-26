@@ -396,7 +396,7 @@ function Index() {
     setTimeout(() => {
       setNotSectionSwitching(true);
     }, 1000);
-  }, [getAnimationsHeight, getSectionHeights])
+  }, [getAnimationsHeight, getSectionHeights, rive3, rive4, rive5, rive6])
 
   const homeClick = event => {
     event.preventDefault();
