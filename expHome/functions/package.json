@@ -7,7 +7,8 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "test": "jest --watch --runInBand"
+    "test": "jest --watch --runInBand",
+    "test:ci": "firebase emulators:exec --project test --only auth,functions,firestore 'npx jest --ci --runInBand'"
   },
   "engines": {
     "node": "14"
