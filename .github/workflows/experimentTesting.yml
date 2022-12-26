@@ -1,0 +1,36 @@
+name: Knowledge Testing
+# on:
+#   pull_request:
+#     branches:
+#       - develop
+
+env:
+  CI_TEST: true
+
+defaults:
+  run:
+    working-directory: .
+
+jobs:
+  tests:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: npm install and build
+        run: |
+          cd expHome
+          npm install --legacy-peer-deps
+          npm run build:prod
+      - name: Unit tests
+        run: |
+          cd expHome/functions
+          npm install --legacy-peer-deps
+          NODE_OPTIONS="--max_old_space_size=4096" npm run test:ci
