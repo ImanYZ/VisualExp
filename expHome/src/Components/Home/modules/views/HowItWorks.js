@@ -23,7 +23,7 @@ const HowItWorks = props => {
   const { height, width } = useWindowSize();
 
   const boxLarge = useMemo(() => {
-    const offset = width < 600 ? 0 : width < 900 ? 70 : 100
+    const offset = width < 600 ? 16 : width < 900 ? 70 : 100
     if (height < width) return height - offset;
     return width - offset;
   }, [height, width]);
@@ -73,7 +73,6 @@ const HowItWorks = props => {
             height: artboard.height,
             // borderRight: `dashed 6px ${artboard.color}`,
             color: "white",
-            p: "10px"
           }}
         >
           {/* {height - 70}px */}
