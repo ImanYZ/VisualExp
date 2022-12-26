@@ -26,6 +26,7 @@ import { getISODateString } from "../../../utils/DateFunctions";
 
 import "./ExperimentPoints.css";
 import AppConfig from "../../../AppConfig";
+import { element } from "prop-types";
 
 // Call this for sessions that the participant has not accepted the Google
 // Calendar invite yet, or should have been in the session but they have not
@@ -176,32 +177,46 @@ const ExperimentPoints = props => {
       };
     }
   }, [project, fullname]);
+  function getFirstDayOfMonth(year, month) {
+    return new Date(year, month, 1);
+  }
+
+  const date = new Date();
 
   useEffect(() => {
     console.log("resScheduleresSchedule");
     const loadSchedule = async () => {
       setScheduleLoaded(false);
-      const scheduleDocs = await firebase.db.collection("resSchedule").where("session", ">=", tomorrow).get();
+      const scheduleDocs = await firebase.db.collection("resSchedule").get();
       const sch = [];
-      let lastSession = new Date();
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
-        const session = scheduleData.session.toDate();
-        if (scheduleData.project === project && scheduleData.fullname === fullname) {
-          sch.push(session);
-          if (session > lastSession) {
-            lastSession = session;
-          }
+        if (
+          scheduleData.hasOwnProperty("researchers") &&
+          scheduleData.researchers.includes(fullname) &&
+          scheduleData.month <= getFirstDayOfMonth(date.getFullYear(), date.getMonth())
+        ) {
+          setSchedule(scheduleData.avaiableSchedules[fullname]);
+          console.log(" :::::: ::: scheduleData ::: ::: ", scheduleData.month);
         }
+
+        // const scheduleData = scheduleDoc.data();
+        // const session = scheduleData.session.toDate();
+        // if (scheduleData.project === project && scheduleData.fullname === fullname) {
+        //   sch.push(session);
+        //   if (session > lastSession) {
+        //     lastSession = session;
+        //   }
+        // }
       }
-      if (sch.length > 0) {
-        setSchedule(sch);
-        let eightDaysLater = new Date();
-        eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
-        if (lastSession.getTime() < eightDaysLater.getTime()) {
-          setScheduleError(true);
-        }
-      }
+      // if (sch.length > 0) {
+      //   setSchedule(sch);
+      //   let eightDaysLater = new Date();
+      //   eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
+      //   if (lastSession.getTime() < eightDaysLater.getTime()) {
+      //     setScheduleError(true);
+      //   }
+      // }
       setTimeout(() => {
         setScheduleLoaded(true);
       }, 400);
@@ -212,41 +227,32 @@ const ExperimentPoints = props => {
   }, [project, fullname]);
 
   const submitData = async () => {
-    setIsSubmitting(true);
-    const scheduleDocs = await firebase.db
-      .collection("resSchedule")
-      .where("fullname", "==", fullname)
-      .where("project", "==", project)
-      .get();
-    for (let scheduleDoc of scheduleDocs.docs) {
-      const scheduleRef = firebase.db.collection("resSchedule").doc(scheduleDoc.id);
-      await firebase.batchDelete(scheduleRef);
-    }
-    let lastSession = new Date();
-    for (let session of schedule) {
-      if (session > lastSession) {
-        lastSession = session;
+    try {
+      setIsSubmitting(true);
+      let lastSession = new Date();
+      for (let session of schedule) {
+        if (session > lastSession) {
+          lastSession = session;
+        }
       }
-      const scheduleRef = firebase.db.collection("resSchedule").doc();
-      const theSession = {
+      setIsSubmitting(false);
+      let eightDaysLater = new Date();
+      eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
+      if (lastSession.getTime() < eightDaysLater.getTime()) {
+        setScheduleError(true);
+        setSnackbarMessage(
+          "Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their 3rd session!"
+        );
+      } else {
+        setScheduleError(false);
+        setSnackbarMessage("Your availability is successfully saved in the database!");
+      }
+      await axios.post("/scheduleRes", {
         fullname,
-        project,
-        session: firebase.firestore.Timestamp.fromDate(session)
-      };
-      await firebase.batchSet(scheduleRef, theSession);
-    }
-    await firebase.commitBatch();
-    setIsSubmitting(false);
-    let eightDaysLater = new Date();
-    eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
-    if (lastSession.getTime() < eightDaysLater.getTime()) {
-      setScheduleError(true);
-      setSnackbarMessage(
-        "Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their 3rd session!"
-      );
-    } else {
-      setScheduleError(false);
-      setSnackbarMessage("Your availability is successfully saved in the database!");
+        schedule
+      });
+    } catch (error) {
+      console.log(error);
     }
   };
 
