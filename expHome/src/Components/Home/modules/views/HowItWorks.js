@@ -72,8 +72,8 @@ const HowItWorks = props => {
             width: "100%",
             height: artboard.height,
             // borderRight: `dashed 6px ${artboard.color}`,
-            color: "white"
-
+            color: "white",
+            p: "10px"
           }}
         >
           {/* {height - 70}px */}
