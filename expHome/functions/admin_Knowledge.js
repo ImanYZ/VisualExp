@@ -7,11 +7,14 @@ const storage = new Storage();
 // The Firebase Admin SDK to access Firestore.
 let admin = require("firebase-admin");
 
-const serviceAccount = require("./onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json");
+const fs = require("fs");
 
-let initializationConfigs = {
+const ONECADEMEY_SERVICEACCOUNT = "./onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json";
+const serviceAccount = fs.existsSync(ONECADEMEY_SERVICEACCOUNT) ? require(ONECADEMEY_SERVICEACCOUNT) : undefined;
+
+let initializationConfigs = serviceAccount ? {
   credential: admin.credential.cert(serviceAccount),
-}
+} : undefined;
 
 if (process.env.NODE_ENV === "test") {
   initializationConfigs = {
