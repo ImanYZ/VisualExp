@@ -29,7 +29,7 @@ jobs:
         run: |
           cd expHome
           npm install --legacy-peer-deps
-          npm run build:prod
+          CI=false npm run build:prod
       - name: Unit tests
         run: |
           cd expHome/functions
