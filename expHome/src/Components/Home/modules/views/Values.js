@@ -57,9 +57,9 @@ const Values = (props) => {
             opacity: 0.7,
           }}
         /> */}
-      <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+      {/* <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
         {sectionsOrder[sectionIdx].title}
-      </Typography>
+      </Typography> */}
       <Grid container spacing={2.5} align="center">
         {valuesItems.map((value, idx) => {
           return (
