@@ -62,6 +62,9 @@ const HowItWorks = props => {
       >
         {/* Landing section */}
       </Box>
+      <Typography variant="h4" marked="center" align="center" sx={{ color: "#f8f8f8", position: "absolute", top: height - 30 }}>
+        {sectionsOrder[1].title}
+      </Typography>
       {processedArtboard.map((artboard, idx) => (
         <Box
           key={artboard.name}
@@ -70,11 +73,11 @@ const HowItWorks = props => {
             top: artboard.top,
             width: "100%",
             height: artboard.height,
-            borderRight: `dashed 6px ${artboard.color}`,
+            // borderRight: `dashed 6px ${artboard.color}`,
             color: "white",
           }}
         >
-          {idx > 0 && <Typography variant="h4" component="h3" sx={{ position: "sticky", top: "90px", color: "white", textTransform: "none" }}>
+          {idx > 0 && <Typography variant="h5" component="h3" sx={{ mt: "100px", ml: "10px", color: "white", textTransform: "none" }}>
             {artboard.name}
           </Typography>}
         </Box>
