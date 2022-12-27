@@ -12,7 +12,7 @@ import Box from "@mui/material/Box";
 import AppFooter from "./modules/views/AppFooter";
 // import Landing from "./modules/views/Landing";
 // import Values from "./modules/views/Values";
-// import HowItWorks from "./modules/views/HowItWorks";
+import HowItWorks from "./modules/views/HowItWorks";
 // import WhoWeAre from "./modules/views/WhoWeAre";
 // import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
@@ -30,7 +30,7 @@ import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 
-const HowItWorks = React.lazy(() => import('./modules/views/HowItWorks'));
+// const HowItWorks = React.lazy(() => import('./modules/views/HowItWorks'));
 const Values = React.lazy(() => import('./modules/views/Values'));
 const What = React.lazy(() => import('./modules/views/What'));
 const UniversitiesMap = React.lazy(() => import('./modules/views/UniversitiesMap/UniversitiesMap'));
@@ -669,42 +669,37 @@ function Index() {
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
           <Box id={sectionsOrder[1].id} ref={section2Ref}>
-            <Suspense fallback={<div>Loading...</div>}>
-              <HowItWorks
-                section={sectionSelected}
-                ref={sectionAnimationControllerRef}
-                artboards={[...section1ArtBoards, ...artboards]}
-                animationOptions={<Button
-                  color="secondary"
-                  variant="contained"
-                  size={width < 900 ? "small" : "large"}
-                  component="a"
-                  href="#JoinUsSection"
-                  sx={{ minWidth: 200, color: "common.white" }}
-                  className={showAnimationOptions ? 'show-blurred-text' : 'hide-content'}
-                >
-                  Apply to Join Us!
-                </Button>}>
-                <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
-                  <RiveComponent1 className={`rive-canvas ${idxRiveComponent !== 0 ? "rive-canvas-hidden" : ""}`} />
-                  <RiveComponent2 className={`rive-canvas ${idxRiveComponent !== 1 ? "rive-canvas-hidden" : ""}`} />
-                  <RiveComponent3 className={`rive-canvas ${idxRiveComponent !== 2 ? "rive-canvas-hidden" : ""}`} />
-                  <RiveComponent4 className={`rive-canvas ${idxRiveComponent !== 3 ? "rive-canvas-hidden" : ""}`} />
-                  <RiveComponent5 className={`rive-canvas ${idxRiveComponent !== 4 ? "rive-canvas-hidden" : ""}`} />
-                  <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
-                </Box>
-              </HowItWorks>
-            </Suspense>
+            {/* <Suspense fallback={<div>Loading...</div>}> */}
+            <HowItWorks
+              section={sectionSelected}
+              ref={sectionAnimationControllerRef}
+              artboards={[...section1ArtBoards, ...artboards]}
+              animationOptions={<Button
+                color="secondary"
+                variant="contained"
+                size={width < 900 ? "small" : "large"}
+                component="a"
+                href="#JoinUsSection"
+                sx={{ minWidth: 200, color: "common.white" }}
+                className={showAnimationOptions ? 'show-blurred-text' : 'hide-content'}
+              >
+                Apply to Join Us!
+              </Button>}>
+              <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
+                <RiveComponent1 className={`rive-canvas ${idxRiveComponent !== 0 ? "rive-canvas-hidden" : ""}`} />
+                <RiveComponent2 className={`rive-canvas ${idxRiveComponent !== 1 ? "rive-canvas-hidden" : ""}`} />
+                <RiveComponent3 className={`rive-canvas ${idxRiveComponent !== 2 ? "rive-canvas-hidden" : ""}`} />
+                <RiveComponent4 className={`rive-canvas ${idxRiveComponent !== 3 ? "rive-canvas-hidden" : ""}`} />
+                <RiveComponent5 className={`rive-canvas ${idxRiveComponent !== 4 ? "rive-canvas-hidden" : ""}`} />
+                <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
+              </Box>
+            </HowItWorks>
+            {/* </Suspense> */}
           </Box>
           <Box id={sectionsOrder[2].id} ref={section3Ref} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
-            {/* <Grid container spacing={2.5} align="center">
-              {new Array(8).fill(0).map((a, i) => <Grid key={i} item xs={12} sm={6} md={4} lg={3} >
-                <Skeleton variant="rounded" height={210} animation="wave" sx={{ background: "#72727263", maxWidth: 340 }} />
-              </Grid>)}
-            </Grid> */}
             {maxSelectedSection < 2 && <div style={{ height, background: "red" }}></div>}
             {maxSelectedSection >= 2 && <Suspense fallback={<Grid container spacing={2.5} align="center">
               {new Array(8).fill(0).map((a, i) => <Grid key={i} item xs={12} sm={6} md={4} lg={3} >
