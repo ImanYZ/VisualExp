@@ -58,12 +58,11 @@ const HowItWorks = props => {
           height: height - 70,
           // borderRight: `dashed 6px #ff28c9`,
           color: "white"
-
         }}
       >
-        {/* {height - 70}px */}
+        {/* Landing section */}
       </Box>
-      {processedArtboard.map(artboard => (
+      {processedArtboard.map((artboard, idx) => (
         <Box
           key={artboard.name}
           sx={{
@@ -71,11 +70,13 @@ const HowItWorks = props => {
             top: artboard.top,
             width: "100%",
             height: artboard.height,
-            // borderRight: `dashed 6px ${artboard.color}`,
+            borderRight: `dashed 6px ${artboard.color}`,
             color: "white",
           }}
         >
-          {/* {height - 70}px */}
+          {idx > 0 && <Typography variant="h4" component="h3" sx={{ position: "sticky", top: "90px", color: "white", textTransform: "none" }}>
+            {artboard.name}
+          </Typography>}
         </Box>
       ))}
 

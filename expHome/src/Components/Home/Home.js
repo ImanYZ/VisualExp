@@ -3,7 +3,7 @@ import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
@@ -14,8 +14,7 @@ import AppFooter from "./modules/views/AppFooter";
 import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
 import WhoWeAre from "./modules/views/WhoWeAre";
-
-import JoinUs from "./modules/views/JoinUs";
+// import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
@@ -30,14 +29,17 @@ import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 
+const JoinUsLazy = React.lazy(() => import('./modules/views/JoinUs'));
+// const JoinUs await import("./modules/views/JoinUs")
+
 const HEADER_HEIGTH = 70;
 
 const section1ArtBoards = [{ name: "artboard-1", durationMs: 1000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }]
 const artboards = [
-  { name: "artboard-2", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
-  { name: "artboard-3", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
-  { name: "artboard-4", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
-  { name: "artboard-5", durationMs: 11000, getHeight: vh => 8 * vh, color: "#62f336" },
+  { name: "Summarizing", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
+  { name: "Linking", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
+  { name: "Evaluating", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
+  { name: "Improving", durationMs: 11000, getHeight: vh => 8 * vh, color: "#62f336" },
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -690,7 +692,9 @@ function Index() {
             <WhoWeAre />
           </Box>
           <Box id={sectionsOrder[6].id} ref={section7Ref}>
-            <JoinUs />
+            <Suspense fallback={<div>Loading...</div>}>
+              <JoinUsLazy />
+            </Suspense>
           </Box>
         </Box>
       </Box>
