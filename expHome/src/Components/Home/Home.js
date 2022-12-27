@@ -152,21 +152,7 @@ function Index() {
   const section5Ref = useRef(null);
   const section6Ref = useRef(null);
   const section7Ref = useRef(null);
-  useEffect(() => {
-    const checkResearcher = async () => {
-      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      if (researcherDoc.exists) {
-        setNotAResearcher(false);
-      }
-    };
-    if (firebase && fullname) {
-      checkResearcher();
-    }
-  }, [firebase, fullname]);
-
-
-
-
+  
   const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
     const res = childrenPosistions.reduce(
       (acu, cur, idx) => {

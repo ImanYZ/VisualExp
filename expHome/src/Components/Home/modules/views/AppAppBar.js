@@ -145,17 +145,7 @@ const AppAppBar = (props) => {
       }
     });
   }, [firebase]);
-  useEffect(() => {
-    const checkResearcher = async () => {
-      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      if (researcherDoc.exists) {
-        setNotAResearcher(false);
-      }
-    };
-    if (firebase && fullname) {
-      checkResearcher();
-    }
-  }, [firebase, fullname]);
+  
   const signOut = async (event) => {
     console.log("Signing out!");
     setEmail("");
