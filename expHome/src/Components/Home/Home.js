@@ -42,6 +42,7 @@ import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { gray02 } from "./modules/views/WhoWeAre";
+import { useInView } from "./modules/hooks/useObserver";
 
 // const HowItWorks = React.lazy(() => import('./modules/views/HowItWorks'));
 const Values = React.lazy(() => import("./modules/views/Values"));
@@ -108,6 +109,8 @@ function Index() {
   // const [sectionSelected, setSectionSelected] = useState(0)
   const [animationSelected, setSelectedAnimation] = useState(0);
   // const previousScrubValue = useRef(0)
+
+  const { entry, inView, ref } = useInView({})
 
   const { height, width } = useWindowSize();
 
@@ -443,16 +446,15 @@ function Index() {
         </MenuItem>
       )}
       {fullname && email && (
-        <>
-          {
-            <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
-              <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
-            </MenuItem>
-          }
-          <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
-            <LogoutIcon /> <span id="LogoutText">Logout</span>
-          </MenuItem>
-        </>
+        <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
+          <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
+        </MenuItem>
+
+      )}
+      {fullname && email && (
+        <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
+          <LogoutIcon /> <span id="LogoutText">Logout</span>
+        </MenuItem>
       )}
     </Menu>
   );
@@ -850,6 +852,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
+          <Box ref={ref}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Officia quod facilis perferendis ipsam? Soluta obcaecati consequuntur excepturi accusamus sed modi beatae dolorem, corrupti saepe nemo ratione error quod atque labore!</Box>
         </Box>
       </Box>
       <AppFooter />
