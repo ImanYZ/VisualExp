@@ -46,7 +46,7 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
-import { projectState } from "./store/ProjectAtoms";
+import { notAResearcherState, projectState } from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 
@@ -63,6 +63,7 @@ const AppRouter = props => {
   const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
   const [startedByResearcher, setStartedByResearcher] = useState(false);
 
+  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const [showSignInorUp, setShowSignInorUp] = useRecoilState(showSignInorUpState);
   const [leading, setLeading] = useRecoilState(leadingState);
   const [email, setEmail] = useRecoilState(emailState);
@@ -123,6 +124,8 @@ const AppRouter = props => {
     if(!isResearcher) {
       setProject(userData.project)
     }
+
+    setNotAResearcher(!isResearcher)
 
     // if redirects required
     const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];

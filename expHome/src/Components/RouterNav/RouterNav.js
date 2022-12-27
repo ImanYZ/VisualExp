@@ -128,35 +128,6 @@ const RouterNav = props => {
   const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
-    const checkResearcher = async () => {
-      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      if (researcherDoc.exists) {
-        const myProjects = [];
-        const researcherData = researcherDoc.data();
-        for (let pr in researcherData.projects) {
-          myProjects.push(pr);
-        }
-        setProjects(myProjects);
-        const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
-        if (myProjects.includes(prevProj)) {
-          setProject(prevProj);
-        } else {
-          setProject(myProjects[0]);
-        }
-        if (researcherData.isAdmin) {
-          setIsAdmin(true);
-        }
-        setNotAResearcher(false);
-      } else {
-        setNotAResearcher(true);
-      }
-    };
-    if (firebase && fullname) {
-      checkResearcher();
-    }
-  }, [firebase, fullname]);
-
-  useEffect(() => {
     const getProjectSpecs = async () => {
       const pSpec = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs({ ...pSpec.data() });

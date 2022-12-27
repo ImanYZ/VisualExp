@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
+import moment from "moment";
 
 import axios from "axios";
 
@@ -115,6 +116,9 @@ const ExperimentPoints = props => {
   const [expSessions, setExpSessions] = useState([]);
   const [dailyPoints, setDailyPoints] = useState([]);
   const [expSessionsLoaded, setExpSessionsLoaded] = useState(false);
+  // const [scheduleSlots, setScheduleSlots] = useState([]);
+  // const [availableScheduleSlots, setAvailableScheduleSlots] = useState([]);
+
   const projectSpecs = useRecoilValue(projectSpecsState);
 
   useEffect(() => {
@@ -177,53 +181,60 @@ const ExperimentPoints = props => {
       };
     }
   }, [project, fullname]);
-  function getFirstDayOfMonth(year, month) {
-    return new Date(year, month, 1);
-  }
-
-  const date = new Date();
 
   useEffect(() => {
-    console.log("resScheduleresSchedule");
-    const loadSchedule = async () => {
-      setScheduleLoaded(false);
-      const scheduleDocs = await firebase.db.collection("resSchedule").get();
-      const sch = [];
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        if (
-          scheduleData.hasOwnProperty("researchers") &&
-          scheduleData.researchers.includes(fullname) &&
-          scheduleData.month <= getFirstDayOfMonth(date.getFullYear(), date.getMonth())
-        ) {
-          setSchedule(scheduleData.avaiableSchedules[fullname]);
-          console.log(" :::::: ::: scheduleData ::: ::: ", scheduleData.month);
-        }
+    if (!(project && fullname)) {
+      return;
+    }
 
-        // const scheduleData = scheduleDoc.data();
-        // const session = scheduleData.session.toDate();
-        // if (scheduleData.project === project && scheduleData.fullname === fullname) {
-        //   sch.push(session);
-        //   if (session > lastSession) {
-        //     lastSession = session;
-        //   }
-        // }
+    const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
+    const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
+    if(!scheduleMonths.includes(scheduleEnd)) {
+      scheduleMonths.push(scheduleEnd);
+    }
+
+    return firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).onSnapshot(async (snapshot) => {
+      if(snapshot.docs.length === 0) {
+        setScheduleError(true);
+        setSchedule([])
+        setScheduleLoaded(true)
+        return;
       }
-      // if (sch.length > 0) {
-      //   setSchedule(sch);
-      //   let eightDaysLater = new Date();
-      //   eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
-      //   if (lastSession.getTime() < eightDaysLater.getTime()) {
-      //     setScheduleError(true);
+
+      let schedules = [];
+      for(const resSchedule of snapshot.docs) {
+        const resScheduleData = resSchedule.data();
+        // scheduled
+        const { schedules: resSchedules } = resScheduleData;
+        const _schedules = resSchedules[fullname] || [];
+        schedules = schedules.concat(_schedules)
+      }
+
+      // const _scheduled = scheduled[fullname] || {};
+      // const scheduledFullnames = Object.keys(_scheduled);
+      // const scheduledSlots = [];
+      // for(const scheduledFullname of scheduledFullnames) {
+      //   const sessionIndexes = Object.keys(_scheduled[scheduledFullname])
+      //   for(const sessionIndex of sessionIndexes) {
+      //     scheduledSlots.push(..._scheduled[scheduledFullname][sessionIndex])
       //   }
       // }
-      setTimeout(() => {
-        setScheduleLoaded(true);
-      }, 400);
-    };
-    if (project && fullname) {
-      loadSchedule();
-    }
+      // const availableSchedules = _schedules.filter((scheduleSlot) => !!~scheduledSlots.indexOf(scheduleSlot));
+
+      const schedule = schedules.map((_schedule) => moment(_schedule).utcOffset(-4, true).toDate());
+      setSchedule(schedule)
+      setScheduleLoaded(true)
+
+      let lastSession = new Date();
+      for (let session of schedule) {
+        if (session > lastSession) {
+          lastSession = session;
+        }
+      }
+      if(moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
+        setScheduleError(true);
+      }
+    });
   }, [project, fullname]);
 
   const submitData = async () => {
@@ -236,9 +247,7 @@ const ExperimentPoints = props => {
         }
       }
       setIsSubmitting(false);
-      let eightDaysLater = new Date();
-      eightDaysLater = new Date(eightDaysLater.getTime() + 8 * 24 * 60 * 60 * 1000);
-      if (lastSession.getTime() < eightDaysLater.getTime()) {
+      if(moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
         setScheduleError(true);
         setSnackbarMessage(
           "Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their 3rd session!"
@@ -247,7 +256,7 @@ const ExperimentPoints = props => {
         setScheduleError(false);
         setSnackbarMessage("Your availability is successfully saved in the database!");
       }
-      await axios.post("/scheduleRes", {
+      await axios.post("/researchers/schedule", {
         fullname,
         schedule
       });
