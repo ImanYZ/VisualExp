@@ -125,7 +125,7 @@ const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectio
                             height: "13px",
                             borderRadius: "50%",
                             position: "absolute",
-                            left: "-7px",
+                            left: viewType === "SIMPLE" ? "-7px" : "-25px",
                             top: "12px",
                             background: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "#8d8d8d7a" : "transparent",
                           },
