@@ -48,7 +48,17 @@ const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectio
                     left: "-4px",
                     top: "22px",
                     background: idx === sectionSelected ? "#f1f1f1" : "#9c9c9c",
-                    outline: idx === sectionSelected ? "solid 4px #8d8d8d7a" : undefined
+                    // outline: idx === sectionSelected ? "solid 4px #8d8d8d7a" : undefined
+                  },
+                  "&::after": {
+                    content: '""',
+                    width: "15px",
+                    height: "15px",
+                    borderRadius: "50%",
+                    position: "absolute",
+                    left: "-8px",
+                    top: "18px",
+                    background: idx === sectionSelected ? "#8d8d8d7a" : "transparent",
                   },
                   ":hover": {
                     color: "#ff8a33",
@@ -107,7 +117,17 @@ const TableOfContent = ({ menuItems, onChangeContent, viewType, customSx, sectio
                             left: viewType === "SIMPLE" ? "-3px" : "-21px",
                             top: "16px",
                             background: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "#f1f1f1" : "#9c9c9c",
-                            outline: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "solid 3px #8d8d8d7a" : undefined
+                            // outline: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "solid 3px #8d8d8d7a" : undefined
+                          },
+                          "&::after": {
+                            content: '""',
+                            width: "13px",
+                            height: "13px",
+                            borderRadius: "50%",
+                            position: "absolute",
+                            left: "-7px",
+                            top: "12px",
+                            background: animationSelected === idx && sectionSelected === SECTION_WITH_ANIMATION ? "#8d8d8d7a" : "transparent",
                           },
                           ":hover": {
                             color: "#ff8a33",
