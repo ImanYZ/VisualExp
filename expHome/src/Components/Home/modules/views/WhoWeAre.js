@@ -24,7 +24,7 @@ import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
 
 const gray01 = "#28282a"
-const gray02 = "#202020"
+export const gray02 = "#202020"
 const gray03 = "#AAAAAA"
 
 const WhoWeAre = (props) => {
@@ -42,9 +42,9 @@ const WhoWeAre = (props) => {
         // bgcolor: "secondary.light",
       }}
     >
-      <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8", textAlign: "center" }}>
+      {/* <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8", textAlign: "center" }}>
         Who Is Behind 1Cademy?
-      </Typography>
+      </Typography> */}
       <Grid container spacing={2.5} align="center">
         <Grid item xs={12} sm={6} md={4}>
           <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
