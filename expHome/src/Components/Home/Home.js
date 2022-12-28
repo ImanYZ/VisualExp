@@ -41,7 +41,7 @@ import { useInView } from "./modules/hooks/useObserver";
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
 const UniversitiesMap = React.lazy(() => import("./modules/views/UniversitiesMap/UniversitiesMap"));
-const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAre"));
+const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
 const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
 const HEADER_HEIGTH = 70;
