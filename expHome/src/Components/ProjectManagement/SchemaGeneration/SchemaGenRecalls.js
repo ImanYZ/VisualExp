@@ -211,11 +211,6 @@ export const SchemaGenRecalls = props => {
       };
 
       await schemaGenerationRef.update(schemaGenerationUpdate);
-      console.log(
-        ":::: ::: researcherData.projects[calulatedProject].gradingPoints ::: ::: ",
-        researcherData.projects[calulatedProject].gradingPoints
-      );
-      console.log(":::: :::: researcherUpdate ::: ::: ===", _newGradingPoints);
       const researcherUpdate = {
         projects: {
           ...researcherData.projects,
@@ -522,6 +517,10 @@ export const SchemaGenRecalls = props => {
     <div className="schema-generation">
       <div className="section">
         <div className="blocks search-box">
+          <Alert severity="warning">
+            For every upvote you receives from others on your proposed Boolean expressions, you should receive a point.
+            For every downvote, you will lose a point towards free-recall grading activity points.
+          </Alert>
           <div>
             <Box
               sx={{
