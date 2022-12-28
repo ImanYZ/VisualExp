@@ -727,7 +727,7 @@ function Index() {
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
-            {!whyInViewOnce && <div style={{ height: 2 * height, background: "red" }}></div>}
+            {!whyInViewOnce && <div style={{ height: 2 * height, /* background: "red" */ }}></div>}
             {whyInViewOnce && (
               <Suspense
                 fallback={
@@ -754,7 +754,7 @@ function Index() {
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
-              <div style={{ height: 2 * height, background: "yellow" }}></div>
+              <div style={{ height: 2 * height,/*  background: "yellow" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -781,7 +781,7 @@ function Index() {
               {sectionsOrder[4].title}
             </CustomTypography>
             {!whereInViewOnce ? (
-              <div style={{ height: 2 * height, background: "green" }}></div>
+              <div style={{ height: 2 * height, /* background: "green" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
@@ -795,7 +795,7 @@ function Index() {
               {sectionsOrder[5].title}
             </CustomTypography>
             {!whoInViewOnce ? (
-              <div style={{ height: 2 * height, background: "pink" }}></div>
+              <div style={{ height: 2 * height, /* background: "pink" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -832,7 +832,7 @@ function Index() {
               {sectionsOrder[6].title}
             </CustomTypography>
             {!joinInViewOnce ? (
-              <div style={{ height: 2 * height, background: "#b4f5ea" }}></div>
+              <div style={{ height: 2 * height, /* background: "#b4f5ea" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
