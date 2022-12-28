@@ -281,7 +281,11 @@ function Index() {
         );
 
         const sectionSelected = sectionsTmp[idxSection];
-        window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
+       
+        if(window.location.hash!== `#${sectionSelected.id}`){
+          console.log("repeeat")
+          window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
+        }
         setSelectedSection(idxSection);
         setSelectedAnimation(idxAnimation);
 
@@ -499,8 +503,10 @@ function Index() {
             width: "100%",
             background: "rgba(0,0,0,.72)",
             backdropFilter: "saturate(180%) blur(20px)"
+            
             // filter: "blur(1px)"
           }}
+          // style={{willChange:"filter"}}
         />
         <Box
           sx={{
