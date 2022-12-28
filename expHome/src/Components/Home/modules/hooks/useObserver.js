@@ -1,10 +1,12 @@
 import * as React from 'react';
 
-export function useInView(props = {
+const useInViewInitialValue = {
     root: null,
     rootMargin: '0px',
     threshold: 1.0
-}) {
+}
+
+export function useInView({ options } = { options: useInViewInitialValue }) {
     const [ref, setRef] = React.useState(null);
     // const callback = React.useRef < IntersectionOptions['onChange'] > ();
     const [state, setState] = React.useState({
@@ -41,7 +43,7 @@ export function useInView(props = {
 
                     setState(prev => ({ inView, entry, inViewOnce: prev.inViewOnce || inView }))
                 });
-            }, props.options);
+            }, options);
 
             observe.observe(ref)
 
@@ -52,7 +54,7 @@ export function useInView(props = {
                 }
             };
         },
-        [props.options, ref],
+        [options, ref],
     );
 
     const tt = React.useCallback((e) => {
