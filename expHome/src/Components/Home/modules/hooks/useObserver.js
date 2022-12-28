@@ -23,9 +23,7 @@ export function useInView({ options } = { options: useInViewInitialValue }) {
         () => {
             if (!ref) return;
 
-            console.log('useEffect')
             const observe = new IntersectionObserver((entries) => {
-                console.log('useObserve:', { entries })
                 entries.forEach((entry) => {
                     // While it would be nice if you could just look at isIntersecting to determine if the component is inside the viewport, browsers can't agree on how to use it.
                     // -Firefox ignores `threshold` when considering `isIntersecting`, so it will never be false again if `threshold` is > 0
@@ -57,11 +55,5 @@ export function useInView({ options } = { options: useInViewInitialValue }) {
         [options, ref],
     );
 
-    const tt = React.useCallback((e) => {
-        console.log('tt', e)
-        setRef(e)
-    }, [])
-
-
-    return { ref: tt, inView: state.inView, inViewOnce: state.inViewOnce, entry: state.entry }
+    return { ref: setRef, inView: state.inView, inViewOnce: state.inViewOnce, entry: state.entry }
 }

@@ -108,38 +108,38 @@ function Index() {
     src: "artboard-1.riv",
     artboard: "artboard-1",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
 
   const { rive: rive2, RiveComponent: RiveComponent2 } = useRive({
     src: "artboard-2.riv",
     artboard: "artboard-2",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
   const { rive: rive3, RiveComponent: RiveComponent3 } = useRive({
     src: "artboard-3.riv",
     artboard: "artboard-3",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
   const { rive: rive4, RiveComponent: RiveComponent4 } = useRive({
     src: "artboard-4.riv",
     artboard: "artboard-4",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
   const { rive: rive5, RiveComponent: RiveComponent5 } = useRive({
     src: "artboard-5.riv",
     artboard: "artboard-5",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
   const { rive: rive6, RiveComponent: RiveComponent6 } = useRive({
     src: "artboard-6.riv",
     artboard: "artboard-6",
     autoplay: false,
-    onLoad: () => console.log("load-finish")
+    // onLoad: () => console.log("load-finish")
   });
 
   useEffect(() => {
@@ -153,21 +153,21 @@ function Index() {
   const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
 
-  useEffect(() => {
-    if (!whyEntry) return
-    if (!whatEntry) return
-    if (!whereEntry) return
-    if (!whoEntry) return
-    if (!joinEntry) return
+  // useEffect(() => {
+  //   if (!whyEntry) return
+  //   if (!whatEntry) return
+  //   if (!whereEntry) return
+  //   if (!whoEntry) return
+  //   if (!joinEntry) return
 
-    console.log({
-      whyEntry: whyEntry.target.clientHeight,
-      whatEntry: whatEntry.target.clientHeight,
-      whereEntry: whereEntry.target.clientHeight,
-      whoEntry: whoEntry.target.clientHeight,
-      joinEntry: joinEntry.target.clientHeight,
-    })
-  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
+  //   console.log({
+  //     whyEntry: whyEntry.target.clientHeight,
+  //     whatEntry: whatEntry.target.clientHeight,
+  //     whereEntry: whereEntry.target.clientHeight,
+  //     whoEntry: whoEntry.target.clientHeight,
+  //     joinEntry: joinEntry.target.clientHeight,
+  //   })
+  // }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
 
   useEffect(() => {
     const checkResearcher = async () => {
