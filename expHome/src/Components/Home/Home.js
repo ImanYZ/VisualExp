@@ -521,7 +521,7 @@ function Index() {
             direction={"row"}
             sx={{ color: "#f8f8f8" }}
           >
-            <img src={LogoDarkMode} alt="logo" width="52px" />
+            <img src={LogoDarkMode} alt="logo" width="52px" height={"59px"} />
 
             {!isMovil && (
               <>
