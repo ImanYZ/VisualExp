@@ -1,18 +1,10 @@
-import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 
-import backgroundImage from "../../../../assets/darkModeLibraryBackground.jpg";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Container from "@mui/material/Container";
 // import Collapse from "@mui/material/Collapse";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 // import { CardActionArea } from "@mui/material";
 
-import Button from "../components/Button";
 import Typography from "../components/Typography";
-import YoutubeEmbed from "../components/YoutubeEmbed/YoutubeEmbed";
 
 import sectionsOrder from "./sectionsOrder";
 import { useWindowSize } from "../../hooks/useWindowSize";
@@ -103,6 +95,6 @@ const HowItWorks = props => {
   );
 };
 
-const HowItWorksForwarded = React.forwardRef((props, ref) => <HowItWorks {...props} innerRef={ref} />);
+// const HowItWorksForwarded = React.forwardRef((props, ref) => <HowItWorks {...props} innerRef={ref} />);
 
-export default HowItWorksForwarded;
+export default HowItWorks;

@@ -8,17 +8,11 @@ import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } fr
 import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
 
-// import What from "./modules/views/What";
 import AppFooter from "./modules/views/AppFooter";
-// import Landing from "./modules/views/Landing";
-// import Values from "./modules/views/Values";
 import HowItWorks from "./modules/views/HowItWorks";
-// import WhoWeAre from "./modules/views/WhoWeAre";
-// import JoinUs from "./modules/views/JoinUs";
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
-// import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import {
   Button,
   Grid,
@@ -44,14 +38,11 @@ import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { gray02 } from "./modules/views/WhoWeAre";
 import { useInView } from "./modules/hooks/useObserver";
 
-// const HowItWorks = React.lazy(() => import('./modules/views/HowItWorks'));
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
 const UniversitiesMap = React.lazy(() => import("./modules/views/UniversitiesMap/UniversitiesMap"));
 const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAre"));
 const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
-// const JoinUs = React.lazy(() => import('./modules/views/JoinUs'));
-// const JoinUs await import("./modules/views/JoinUs")
 
 const HEADER_HEIGTH = 70;
 
@@ -89,8 +80,6 @@ const sectionsTmp = [
 function Index() {
   const firebase = useRecoilValue(firebaseState);
   const [sectionSelected, setSelectedSection] = useState(0);
-  const [maxSelectedSection, setMaxSelectedSection] = useState(0);
-  // const [animation, setAnimation] = useState(0);
   const [notSectionSwitching, setNotSectionSwitching] = useState(true);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const showSignInorUp = useRecoilValue(showSignInorUpState);
@@ -98,7 +87,6 @@ function Index() {
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
-  // const [sections, setSections] = useState(sectionsTmp);
   const navigateTo = useNavigate();
   const [idxRiveComponent, setIdxRiveComponent] = useState(0);
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
@@ -106,9 +94,7 @@ function Index() {
   const isMovil = useMediaQuery("(max-width:600px)");
   const [showLandingOptions, setShowLandingOptions] = useState(true);
   const [showAnimationOptions, setShowAnimationOptions] = useState(false);
-  // const [sectionSelected, setSectionSelected] = useState(0)
   const [animationSelected, setSelectedAnimation] = useState(0);
-  // const previousScrubValue = useRef(0)
 
   const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
   const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
@@ -163,15 +149,9 @@ function Index() {
     rive1.play();
   }, [rive1]);
 
-  // const step0Ref = useRef(null);
-  const sectionAnimationControllerRef = useRef(null);
+  // const sectionAnimationControllerRef = useRef(null);
   const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
-  // const section3Ref = useRef(null);
-  // const section4Ref = useRef(null);
-  // const section5Ref = useRef(null);
-  // const section6Ref = useRef(null);
-  // const section7Ref = useRef(null);
 
   useEffect(() => {
     if (!whyEntry) return
@@ -304,9 +284,6 @@ function Index() {
         window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
         setSelectedSection(idxSection);
         setSelectedAnimation(idxAnimation);
-        if (idxSection > maxSelectedSection) {
-          setMaxSelectedSection(idxSection);
-        }
 
         let showLandingOptions = false;
         let showEndAnimationOptions = false;
@@ -368,7 +345,7 @@ function Index() {
         setShowAnimationOptions(showEndAnimationOptions);
       }
     },
-    [getAnimationsPositions, getSectionPositions, height, maxSelectedSection, notSectionSwitching]
+    [getAnimationsPositions, getSectionPositions, height, setSelectedSection, notSectionSwitching]
   );
 
   const switchSection = useCallback(
@@ -414,15 +391,11 @@ function Index() {
       setSelectedSection(sectionIdx);
       setSelectedAnimation(animationIndex);
 
-      if (sectionIdx > maxSelectedSection) {
-        setMaxSelectedSection(sectionIdx);
-      }
-
       setTimeout(() => {
         setNotSectionSwitching(true);
       }, 1000);
     },
-    [getAnimationsHeight, getSectionHeights, maxSelectedSection, rive3, rive4, rive5, rive6]
+    [getAnimationsHeight, getSectionHeights, rive3, rive4, rive5, rive6]
   );
 
   const homeClick = event => {
@@ -663,9 +636,6 @@ function Index() {
           sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}
         >
           <Box sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
-            {/* <h2 style={{ color: "white" }}>{idxRiveComponent}</h2>
-            <h2 style={{ color: "white" }}>{ap.toFixed(1)}%</h2> */}
-
             <MemoizedTableOfContent
               menuItems={sectionsTmp}
               viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
@@ -725,10 +695,9 @@ function Index() {
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
           <Box id={sectionsOrder[1].id} ref={howSectionRef}>
-            {/* <Suspense fallback={<div>Loading...</div>}> */}
             <HowItWorks
               section={sectionSelected}
-              ref={sectionAnimationControllerRef}
+              // ref={sectionAnimationControllerRef}
               artboards={[...section1ArtBoards, ...artboards]}
               animationOptions={
                 <Button
@@ -753,7 +722,6 @@ function Index() {
                 <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
               </Box>
             </HowItWorks>
-            {/* </Suspense> */}
           </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
@@ -882,7 +850,6 @@ function Index() {
 }
 
 export default withRoot(Index);
-// export default Index;
 
 const advanceAnimationTo = (rive, timeInSeconds) => {
   if (!rive?.animator?.animations[0]) return;
