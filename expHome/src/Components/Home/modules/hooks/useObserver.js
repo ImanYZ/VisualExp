@@ -9,6 +9,7 @@ export function useInView(props = {
     // const callback = React.useRef < IntersectionOptions['onChange'] > ();
     const [state, setState] = React.useState({
         inView: false,
+        inViewOnce: false,
         entry: undefined,
     });
 
@@ -38,7 +39,7 @@ export function useInView(props = {
                     //     entry.isVisible = inView;
                     // }
 
-                    setState({ inView, entry })
+                    setState(prev => ({ inView, entry, inViewOnce: prev.inViewOnce || inView }))
                 });
             }, props.options);
 
@@ -59,7 +60,6 @@ export function useInView(props = {
         setRef(e)
     }, [])
 
-    const entryTarget = state.entry?.target;
 
-    return { ref: tt, inView: state.inView, entry: state.inView, entryTarget }
+    return { ref: tt, inView: state.inView, inViewOnce: state.inViewOnce, entry: state.entry }
 }

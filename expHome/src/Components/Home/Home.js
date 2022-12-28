@@ -110,7 +110,11 @@ function Index() {
   const [animationSelected, setSelectedAnimation] = useState(0);
   // const previousScrubValue = useRef(0)
 
-  const { entry, inView, ref } = useInView({})
+  const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
+  const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
+  const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
+  const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
+  const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
 
   const { height, width } = useWindowSize();
 
@@ -161,13 +165,30 @@ function Index() {
 
   // const step0Ref = useRef(null);
   const sectionAnimationControllerRef = useRef(null);
-  const section1Ref = useRef(null);
-  const section2Ref = useRef(null);
-  const section3Ref = useRef(null);
-  const section4Ref = useRef(null);
-  const section5Ref = useRef(null);
-  const section6Ref = useRef(null);
-  const section7Ref = useRef(null);
+  const HomeSectionRef = useRef(null);
+  const howSectionRef = useRef(null);
+  // const section3Ref = useRef(null);
+  // const section4Ref = useRef(null);
+  // const section5Ref = useRef(null);
+  // const section6Ref = useRef(null);
+  // const section7Ref = useRef(null);
+
+  useEffect(() => {
+    if (!whyEntry) return
+    if (!whatEntry) return
+    if (!whereEntry) return
+    if (!whoEntry) return
+    if (!joinEntry) return
+
+    console.log({
+      whyEntry: whyEntry.target.clientHeight,
+      whatEntry: whatEntry.target.clientHeight,
+      whereEntry: whereEntry.target.clientHeight,
+      whoEntry: whoEntry.target.clientHeight,
+      joinEntry: joinEntry.target.clientHeight,
+    })
+  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
+
   useEffect(() => {
     const checkResearcher = async () => {
       const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
@@ -200,44 +221,44 @@ function Index() {
   };
 
   const getSectionHeights = useCallback(() => {
-    if (!section1Ref?.current) return null;
-    if (!section2Ref?.current) return null;
-    if (!section3Ref?.current) return null;
-    if (!section4Ref?.current) return null;
-    if (!section5Ref?.current) return null;
-    if (!section6Ref?.current) return null;
-    if (!section7Ref?.current) return null;
+    if (!HomeSectionRef?.current) return null;
+    if (!howSectionRef?.current) return null;
+    if (!whyEntry) return null;
+    if (!whatEntry) return null;
+    if (!whereEntry) return null;
+    if (!whoEntry) return null;
+    if (!joinEntry) return null;
 
     return [
-      { id: section1Ref.current.id, height: 0 },
-      { id: section2Ref.current.id, height: section1Ref.current.clientHeight },
-      { id: section3Ref.current.id, height: section2Ref.current.clientHeight - section1Ref.current.clientHeight },
-      { id: section4Ref.current.id, height: section3Ref.current.clientHeight },
-      { id: section5Ref.current.id, height: section4Ref.current.clientHeight },
-      { id: section6Ref.current.id, height: section5Ref.current.clientHeight },
-      { id: section7Ref.current.id, height: section6Ref.current.clientHeight }
+      { id: HomeSectionRef.current.id, height: 0 },
+      { id: howSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
+      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: whatEntry.target.id, height: whyEntry.target.clientHeight },
+      { id: whereEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whoEntry.target.id, height: whereEntry.target.clientHeight },
+      { id: joinEntry.target.id, height: whoEntry.target.clientHeight }
     ];
-  }, []);
+  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
 
   const getSectionPositions = useCallback(() => {
-    if (!section1Ref?.current) return null;
-    if (!section2Ref?.current) return null;
-    if (!section3Ref?.current) return null;
-    if (!section4Ref?.current) return null;
-    if (!section5Ref?.current) return null;
-    if (!section6Ref?.current) return null;
-    if (!section7Ref?.current) return null;
+    if (!HomeSectionRef?.current) return null;
+    if (!howSectionRef?.current) return null;
+    if (!whyEntry) return null;
+    if (!whatEntry) return null;
+    if (!whereEntry) return null;
+    if (!whoEntry) return null;
+    if (!joinEntry) return null;
 
     return [
-      { id: section1Ref.current.id, height: section1Ref.current.clientHeight },
-      { id: section2Ref.current.id, height: section2Ref.current.clientHeight - section1Ref.current.clientHeight },
-      { id: section3Ref.current.id, height: section3Ref.current.clientHeight },
-      { id: section4Ref.current.id, height: section4Ref.current.clientHeight },
-      { id: section5Ref.current.id, height: section5Ref.current.clientHeight },
-      { id: section6Ref.current.id, height: section6Ref.current.clientHeight },
-      { id: section7Ref.current.id, height: section7Ref.current.clientHeight }
+      { id: HomeSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
+      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
+      { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whereEntry.target.id, height: whereEntry.target.clientHeight },
+      { id: whoEntry.target.id, height: whoEntry.target.clientHeight },
+      { id: joinEntry.target.id, height: joinEntry.target.clientHeight }
     ];
-  }, []);
+  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
 
   const getAnimationsHeight = useCallback(() => {
     const res = artboards.map(artboard => artboard.getHeight(height));
@@ -656,7 +677,7 @@ function Index() {
         </Box>
 
         <Stack
-          ref={section1Ref}
+          ref={HomeSectionRef}
           spacing={width < 900 ? "10px" : "20px"}
           direction={"column"}
           alignItems={"center"}
@@ -703,7 +724,7 @@ function Index() {
         </Stack>
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
-          <Box id={sectionsOrder[1].id} ref={section2Ref}>
+          <Box id={sectionsOrder[1].id} ref={howSectionRef}>
             {/* <Suspense fallback={<div>Loading...</div>}> */}
             <HowItWorks
               section={sectionSelected}
@@ -734,12 +755,12 @@ function Index() {
             </HowItWorks>
             {/* </Suspense> */}
           </Box>
-          <Box id={sectionsOrder[2].id} ref={section3Ref}>
+          <Box id={sectionsOrder[2].id} ref={whySectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
-            {maxSelectedSection < 2 && <div style={{ height, background: "red" }}></div>}
-            {maxSelectedSection >= 2 && (
+            {!whyInViewOnce && <div style={{ height, background: "red" }}></div>}
+            {whyInViewOnce && (
               <Suspense
                 fallback={
                   <Grid container spacing={2.5} align="center">
@@ -760,11 +781,11 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={section4Ref}>
+          <Box id={sectionsOrder[3].id} ref={whatSectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[3].title}
             </CustomTypography>
-            {maxSelectedSection < 3 ? (
+            {!whatInViewOnce ? (
               <div style={{ height, background: "yellow" }}></div>
             ) : (
               <Suspense
@@ -787,11 +808,11 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={section5Ref}>
+          <Box id={sectionsOrder[4].id} ref={whereSectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[4].title}
             </CustomTypography>
-            {maxSelectedSection < 4 ? (
+            {!whereInViewOnce ? (
               <div style={{ height, background: "green" }}></div>
             ) : (
               <Suspense
@@ -801,11 +822,11 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={section6Ref}>
+          <Box id={sectionsOrder[5].id} ref={whoSectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[5].title}
             </CustomTypography>
-            {maxSelectedSection < 5 ? (
+            {!whoInViewOnce ? (
               <div style={{ height, background: "pink" }}></div>
             ) : (
               <Suspense
@@ -838,11 +859,11 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={section7Ref}>
+          <Box id={sectionsOrder[6].id} ref={JoinSectionRef}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[6].title}
             </CustomTypography>
-            {maxSelectedSection < 6 ? (
+            {!joinInViewOnce ? (
               <div style={{ height, background: "#b4f5ea" }}></div>
             ) : (
               <Suspense
@@ -852,7 +873,6 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box ref={ref}>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Officia quod facilis perferendis ipsam? Soluta obcaecati consequuntur excepturi accusamus sed modi beatae dolorem, corrupti saepe nemo ratione error quod atque labore!</Box>
         </Box>
       </Box>
       <AppFooter />
