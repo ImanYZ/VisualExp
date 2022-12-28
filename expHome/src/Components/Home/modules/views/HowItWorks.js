@@ -1,18 +1,10 @@
-import React, { useCallback, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 
-import backgroundImage from "../../../../assets/darkModeLibraryBackground.jpg";
 import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Container from "@mui/material/Container";
 // import Collapse from "@mui/material/Collapse";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 // import { CardActionArea } from "@mui/material";
 
-import Button from "../components/Button";
 import Typography from "../components/Typography";
-import YoutubeEmbed from "../components/YoutubeEmbed/YoutubeEmbed";
 
 import sectionsOrder from "./sectionsOrder";
 import { useWindowSize } from "../../hooks/useWindowSize";
@@ -23,7 +15,7 @@ const HowItWorks = props => {
   const { height, width } = useWindowSize();
 
   const boxLarge = useMemo(() => {
-    const offset = width < 600 ? 0 : width < 900 ? 70 : 100
+    const offset = width < 600 ? 16 : width < 900 ? 70 : 100
     if (height < width) return height - offset;
     return width - offset;
   }, [height, width]);
@@ -58,12 +50,14 @@ const HowItWorks = props => {
           height: height - 70,
           // borderRight: `dashed 6px #ff28c9`,
           color: "white"
-
         }}
       >
-        {/* {height - 70}px */}
+        {/* Landing section */}
       </Box>
-      {processedArtboard.map(artboard => (
+      <Typography variant="h4" marked="center" align="center" sx={{ color: "#f8f8f8", position: "absolute", top: height - 30 }}>
+        {sectionsOrder[1].title}
+      </Typography>
+      {processedArtboard.map((artboard, idx) => (
         <Box
           key={artboard.name}
           sx={{
@@ -72,11 +66,12 @@ const HowItWorks = props => {
             width: "100%",
             height: artboard.height,
             // borderRight: `dashed 6px ${artboard.color}`,
-            color: "white"
-
+            color: "white",
           }}
         >
-          {/* {height - 70}px */}
+          {idx > 0 && <Typography variant="h5" component="h3" sx={{ mt: "100px", ml: "10px", color: "white", textTransform: "none" }}>
+            {artboard.name}
+          </Typography>}
         </Box>
       ))}
 
@@ -100,6 +95,6 @@ const HowItWorks = props => {
   );
 };
 
-const HowItWorksForwarded = React.forwardRef((props, ref) => <HowItWorks {...props} innerRef={ref} />);
+// const HowItWorksForwarded = React.forwardRef((props, ref) => <HowItWorks {...props} innerRef={ref} />);
 
-export default HowItWorksForwarded;
+export default HowItWorks;
