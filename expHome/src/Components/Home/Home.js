@@ -96,49 +96,49 @@ function Index() {
   const [showAnimationOptions, setShowAnimationOptions] = useState(false);
   const [animationSelected, setSelectedAnimation] = useState(0);
 
-  const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({});
-  const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({});
-  const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({});
-  const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({});
-  const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({});
+  const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
+  const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
+  const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
+  const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
+  const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
 
   const { height, width } = useWindowSize();
 
   const { rive: rive1, RiveComponent: RiveComponent1 } = useRive({
     src: "artboard-1.riv",
     artboard: "artboard-1",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
 
   const { rive: rive2, RiveComponent: RiveComponent2 } = useRive({
     src: "artboard-2.riv",
     artboard: "artboard-2",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
   const { rive: rive3, RiveComponent: RiveComponent3 } = useRive({
     src: "artboard-3.riv",
     artboard: "artboard-3",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
   const { rive: rive4, RiveComponent: RiveComponent4 } = useRive({
     src: "artboard-4.riv",
     artboard: "artboard-4",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
   const { rive: rive5, RiveComponent: RiveComponent5 } = useRive({
     src: "artboard-5.riv",
     artboard: "artboard-5",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
   const { rive: rive6, RiveComponent: RiveComponent6 } = useRive({
     src: "artboard-6.riv",
     artboard: "artboard-6",
-    autoplay: false
+    autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
 
@@ -231,10 +231,7 @@ function Index() {
 
     return [
       { id: HomeSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
-      {
-        id: howSectionRef.current.id,
-        height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight
-      },
+      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
       { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
       { id: whereEntry.target.id, height: whereEntry.target.clientHeight },
@@ -255,7 +252,6 @@ function Index() {
   const detectScrollPosition = useCallback(
     (event, { rive1, rive2, rive3, rive4, rive5, rive6 }) => {
       if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6) return;
-      console.log("first");
       if (notSectionSwitching) {
         const currentScrollPosition = event.target.scrollTop;
         const sectionsHeight = getSectionPositions();
@@ -268,14 +264,14 @@ function Index() {
         );
 
         if (idxSection < 0) return;
-        console.log("second");
+
         let animationsHeight = [];
         if (idxSection === 0) {
           animationsHeight = [section1ArtBoards[0].getHeight(height)];
         } else {
           animationsHeight = getAnimationsPositions();
         }
-console.log("animationsHeight;;;;",animationsHeight);
+
         const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce(
           (acu, cur, idx) => {
             if (acu.maxAnimation > currentScrollPosition) return acu;
@@ -293,7 +289,7 @@ console.log("animationsHeight;;;;",animationsHeight);
         let showEndAnimationOptions = false;
 
         if (idxAnimation < 0) return;
-        console.log("third");
+
         if (idxSection === 0) {
           const lowerAnimationLimit = minAnimation;
           const upperAnimationLimit = maxAnimation;
@@ -326,7 +322,7 @@ console.log("animationsHeight;;;;",animationsHeight);
           const percentageFrame = (positionFrame * 100) / rangeFrames;
 
           const timeInSeconds = (artboards[idxAnimation].durationMs * percentageFrame) / (1000 * 100);
-          console.log({ timeInSeconds: timeInSeconds.toFixed(2), idxAnimation });
+
           if (idxAnimation === 0) {
             advanceAnimationTo(rive3, timeInSeconds);
           }
@@ -447,6 +443,7 @@ console.log("animationsHeight;;;;",animationsHeight);
         <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
           <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
         </MenuItem>
+
       )}
       {fullname && email && (
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
@@ -730,7 +727,7 @@ console.log("animationsHeight;;;;",animationsHeight);
             <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
-            {!whyInViewOnce && <div style={{ height: 2 * height /* background: "red" */ }}></div>}
+            {!whyInViewOnce && <div style={{ height: 2 * height, /* background: "red" */ }}></div>}
             {whyInViewOnce && (
               <Suspense
                 fallback={
@@ -757,7 +754,7 @@ console.log("animationsHeight;;;;",animationsHeight);
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
-              <div style={{ height: 2 * height /*  background: "yellow" */ }}></div>
+              <div style={{ height: 2 * height,/*  background: "yellow" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -784,7 +781,7 @@ console.log("animationsHeight;;;;",animationsHeight);
               {sectionsOrder[4].title}
             </CustomTypography>
             {!whereInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "green" */ }}></div>
+              <div style={{ height: 2 * height, /* background: "green" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
@@ -798,7 +795,7 @@ console.log("animationsHeight;;;;",animationsHeight);
               {sectionsOrder[5].title}
             </CustomTypography>
             {!whoInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
+              <div style={{ height: 2 * height, /* background: "pink" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -835,7 +832,7 @@ console.log("animationsHeight;;;;",animationsHeight);
               {sectionsOrder[6].title}
             </CustomTypography>
             {!joinInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "#b4f5ea" */ }}></div>
+              <div style={{ height: 2 * height, /* background: "#b4f5ea" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
