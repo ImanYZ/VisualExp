@@ -335,7 +335,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
+                          "Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                         }
                       </Box>
                     </React.Fragment>
@@ -370,7 +370,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
+                          "Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
                         }
                       </Box>
                     </React.Fragment>
@@ -469,7 +469,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — awarded research credits to host 1Cademy on GCP services, under award number 205607640."
+                          "awarded research credits to host 1Cademy on GCP services, under award number 205607640."
                         }
                       </Box>
                     </React.Fragment>
