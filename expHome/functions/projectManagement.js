@@ -1,9 +1,7 @@
-const fs = require("fs");
-const csv = require("fast-csv");
 
-const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
+const { admin, db, commitBatch, batchUpdate} = require("./admin");
 const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
-const { isToday, strToBoolean, getActivityTimeStamps, getIn30Minutes, getDateString } = require("./utils");
+const { isToday} = require("./utils");
 const {
   reschEventNotificationEmail,
   researcherEventNotificationEmail,
@@ -1734,6 +1732,7 @@ exports.assignExperimentSessionsPoints = async context => {
     const surveyInstructors = await db.collection("instructors").get();
     for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...usersDocs.docs]) {
       const userData = userDoc.data();
+      if(!userData.email) continue;
       usersInfo.push({
         fullname: userDoc.id,
         email: userData.email,
@@ -1743,7 +1742,7 @@ exports.assignExperimentSessionsPoints = async context => {
     const pastEvents = await allPastEvents();
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
-        if (pastEvent.attendees) {
+        if(!pastEvent.attendees) continue;
           let researcherObjs = [];
           let userObj = null;
           const attendees = [];
@@ -1772,14 +1771,13 @@ exports.assignExperimentSessionsPoints = async context => {
             const project = userObj.project;
             for (let researcherObj of researcherObjs) {
               if (researcherObj.projects.includes(project)) {
-                const sTime = new Date(pastEvent.start.dateTime);
-                const eTime = new Date(pastEvent.end.dateTime);
-                const { sTimestamp, eTimestamp } = getActivityTimeStamps(sTime, sTime, eTime);
-                const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+                const sTimestamp = new Date(pastEvent.start.dateTime);
+                const eTimestamp = new Date(pastEvent.end.dateTime);
+                const currentTime = new Date();
                 const expSessionDocs = await db
                   .collection("expSessions")
                   .where("attendees", "==", attendees)
-                  .where("sTime", "==", sTime)
+                  .where("sTime", "==", sTimestamp)
                   .where("project", "==", project)
                   .get();
 
@@ -1792,7 +1790,7 @@ exports.assignExperimentSessionsPoints = async context => {
 
                 if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
                   let points = 7;
-                  if (eTime.getTime() > sTime.getTime() + 40 * 60 * 1000) {
+                  if (eTimestamp.getTime() > sTimestamp.getTime() + 40 * 60 * 1000) {
                     points = 16;
                   }
                   // this is temporary until the survey is over.
@@ -1845,7 +1843,6 @@ exports.assignExperimentSessionsPoints = async context => {
               }
             }
           }
-        }
       }
     }
     return null;
@@ -1858,65 +1855,66 @@ exports.assignExperimentSessionsPoints = async context => {
 // This is called in a pubsub every 25 hours.
 // Email reminders to researchers that they have not added/voted any instructors
 // over the past week and ask them to add/vote instructors and administrators.
-exports.remindAddingInstructorsAdministrators = async context => {
-  try {
-    // We don't want to send many emails at once, because it may drive Gmail crazy.
-    // waitTime keeps increasing for every email that should be sent and in a setTimeout
-    // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
-    // Retrieve all the researchers to check daily contributions per researcher,
-    // per project, only if the researcher is active in that project.
-    const researchersDocs = await db.collection("researchers").get();
-    for (let researcherDoc of researchersDocs.docs) {
-      const researcherData = researcherDoc.data();
-      if ("projects" in researcherData) {
-        for (let project in researcherData.projects) {
-          if (researcherData.projects[project].active) {
-            // A sorted array of days where the researcher
-            // got the point for adding new instrutors/administrators.
-            const dayInstructors = [];
-            const resScheduleDocs = await db
-              .collection("dayInstructors")
-              .where("project", "==", project)
-              .where("fullname", "==", researcherDoc.id)
-              .get();
-            let lastAvailability;
-            for (let resScheduleDoc of resScheduleDocs.docs) {
-              const resScheduleData = resScheduleDoc.data();
-              const theSession = resScheduleData.session.toDate();
-              if (!lastAvailability || theSession.getTime() > lastAvailability.getTime()) {
-                lastAvailability = theSession;
-              }
-            }
-            let tenDaysLater = new Date();
-            tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
-            if (lastAvailability.getTime() < tenDaysLater.getTime()) {
-              // Send a reminder email to a researcher that they have not accepted
-              // or even declined the Google Calendar invitation and asks them to
-              // accept it or ask someone else to take it.
-              setTimeout(() => {
-                researcherEventNotificationEmail(
-                  attendee.email,
-                  researchers[attendee.email],
-                  participant.email,
-                  hoursLeft,
-                  order,
-                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
-                );
-              }, waitTime);
-              // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
-            }
-          }
-        }
-      }
-    }
-    return null;
-  } catch (err) {
-    console.log({ err });
-    return null;
-  }
-};
+// exports.remindAddingInstructorsAdministrators = async context => {
+//   try {
+//     // We don't want to send many emails at once, because it may drive Gmail crazy.
+//     // waitTime keeps increasing for every email that should be sent and in a setTimeout
+//     // postpones sending the next email until the next waitTime.
+//     let waitTime = 0;
+//     // Retrieve all the researchers to check daily contributions per researcher,
+//     // per project, only if the researcher is active in that project.
+//     const researchersDocs = await db.collection("researchers").get();
+//     for (let researcherDoc of researchersDocs.docs) {
+//       const researcherData = researcherDoc.data();
+//       if ("projects" in researcherData) {
+//         for (let project in researcherData.projects) {
+//           if (researcherData.projects[project].active) {
+//             // A sorted array of days where the researcher
+//             // got the point for adding new instrutors/administrators.
+//             const dayInstructors = [];
+//             const resScheduleDocs = await db
+//               .collection("dayInstructors")
+//               .where("project", "==", project)
+//               .where("fullname", "==", researcherDoc.id)
+//               .get();
+//             let lastAvailability;
+//             for (let resScheduleDoc of resScheduleDocs.docs) {
+//               const resScheduleData = resScheduleDoc.data();
+//               const theSession = resScheduleData.session.toDate();
+//               if (!lastAvailability || theSession.getTime() > lastAvailability.getTime()) {
+//                 lastAvailability = theSession;
+//               }
+//             }
+//             let tenDaysLater = new Date();
+//             tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
+//             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+//               // Send a reminder email to a researcher that they have not accepted
+//               // or even declined the Google Calendar invitation and asks them to
+//               // accept it or ask someone else to take it.
+//               // eslint-disable-next-line no-loop-func
+//               setTimeout(() => {
+//                 researcherEventNotificationEmail(
+//                   attendee.email,
+//                   researchers[attendee.email],
+//                   participant.email,
+//                   hoursLeft,
+//                   order,
+//                   attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
+//                 );
+//               }, waitTime);
+//               // Increase waitTime by a random integer between 1 to 4 seconds.
+//               waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+//             }
+//           }
+//         }
+//       }
+//     }
+//     return null;
+//   } catch (err) {
+//     console.log({ err });
+//     return null;
+//   }
+// };
 
 const getUserDocsfromEmail = async email => {
   let userDocs = await db.collection("users").where("email", "==", email.toLowerCase()).get();
