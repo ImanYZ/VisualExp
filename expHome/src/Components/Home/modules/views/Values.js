@@ -37,9 +37,7 @@ const Values = (props) => {
       id="ValuesSection"
       component="section"
       sx={{
-        pt: 7,
-        pb: 10,
-        // bgcolor: "secondary.light",
+       
         position: "relative",
         display: "flex",
         flexDirection: "column",
