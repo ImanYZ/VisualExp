@@ -272,8 +272,8 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: !props.community ? 7 : 1,
-        pb: 10,
+        pt: !props.community ? 0 : 1,
+        pb:  !props.community ? 0 : 10,
       }}
     >
       {props.community &&(
