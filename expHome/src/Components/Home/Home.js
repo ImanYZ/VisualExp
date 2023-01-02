@@ -53,7 +53,7 @@ const artboards = [
   { name: "Summarizing", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
   { name: "Linking", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
   { name: "Evaluating", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
-  { name: "Improving", durationMs: 11000, getHeight: vh => 8 * vh, color: "#62f336" }
+  { name: "Improving", durationMs: 14000, getHeight: vh => 8 * vh, color: "#62f336" }
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -95,6 +95,7 @@ function Index() {
   const [showLandingOptions, setShowLandingOptions] = useState(true);
   const [showAnimationOptions, setShowAnimationOptions] = useState(false);
   const [animationSelected, setSelectedAnimation] = useState(0);
+
 
   const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
   const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
@@ -143,6 +144,7 @@ function Index() {
   const { rive: rive6, RiveComponent: RiveComponent6 } = useRive({
     src: "artboard-6.riv",
     artboard: "artboard-6",
+    animations: "Timeline 1",
     autoplay: false,
     // onLoad: () => console.log("load-finish")
   });
@@ -153,7 +155,7 @@ function Index() {
     rive1.scrub("Timeline 1", 0);
     rive1.play();
   }, [rive1]);
-
+ 
   // const sectionAnimationControllerRef = useRef(null);
   const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
@@ -359,6 +361,8 @@ function Index() {
 
   const switchSection = useCallback(
     (sectionIdx, animationIndex = 0) => {
+      if (!rive3 || !rive4 || !rive5 || !rive6) return;
+
       setNotSectionSwitching(false);
       const sectionsHeight = getSectionHeights();
       if (!sectionsHeight) return;
@@ -407,6 +411,7 @@ function Index() {
     },
     [getAnimationsHeight, getSectionHeights, rive3, rive4, rive5, rive6]
   );
+
 
   const homeClick = event => {
     event.preventDefault();
@@ -735,8 +740,8 @@ function Index() {
               </Box>
             </HowItWorks>
           </Box>
-          <Box id={sectionsOrder[2].id} ref={whySectionRef}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[2].id} ref={whySectionRef }  sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
             {!whyInViewOnce && <div style={{ height: 2 * height, /* background: "red" */ }}></div>}
@@ -761,8 +766,8 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={whatSectionRef}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
@@ -788,8 +793,8 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={whereSectionRef}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[4].id} ref={whereSectionRef}  sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[4].title}
             </CustomTypography>
             {!whereInViewOnce ? (
@@ -802,8 +807,8 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={whoSectionRef}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[5].id} ref={whoSectionRef}  sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[5].title}
             </CustomTypography>
             {!whoInViewOnce ? (
@@ -839,8 +844,8 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={JoinSectionRef}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[6].id} ref={JoinSectionRef} sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[6].title}
             </CustomTypography>
             {!joinInViewOnce ? (
