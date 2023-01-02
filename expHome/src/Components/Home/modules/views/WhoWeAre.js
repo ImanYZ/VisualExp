@@ -33,8 +33,7 @@ const WhoWeAre = (props) => {
       id="WhoWeAreSection"
       component="section"
       sx={{
-        pt: 7,
-        pb: 10,
+       
         position: "relative",
         display: "flex",
         flexDirection: "column",
