@@ -281,8 +281,8 @@ function Index() {
         );
 
         const sectionSelected = sectionsTmp[idxSection];
-       
-        if(window.location.hash!== `#${sectionSelected.id}`){
+
+        if (window.location.hash !== `#${sectionSelected.id}`) {
           console.log("repeeat")
           window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
         }
@@ -373,6 +373,7 @@ function Index() {
 
       // setSelectedSection(sectionIdx);
       if (sectionIdx === 0) {
+        setShowLandingOptions(true);
         setIdxRiveComponent(animationIndex);
       }
       if (sectionIdx === SECTION_WITH_ANIMATION) {
@@ -503,10 +504,10 @@ function Index() {
             width: "100%",
             background: "rgba(0,0,0,.72)",
             backdropFilter: "saturate(180%) blur(20px)"
-            
+
             // filter: "blur(1px)"
           }}
-          // style={{willChange:"filter"}}
+        // style={{willChange:"filter"}}
         />
         <Box
           sx={{
