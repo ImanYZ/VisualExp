@@ -26,6 +26,7 @@ describe("POST /api/researchers/schedule", () => {
   const fullname = "Sam Ouhra";
   const email = "ouhrac@gmail.com";
   const password = "sam2022";
+  const project = "H1L2";
   let accessToken = "";
 
   beforeAll(async () => {
@@ -62,6 +63,7 @@ describe("POST /api/researchers/schedule", () => {
       .set("Authorization", "Bearer " + accessToken)
       .send({
       fullname,
+      project,
       schedule: schedules
     });
     expect(response.status).toEqual(200)
@@ -79,5 +81,9 @@ describe("POST /api/researchers/schedule", () => {
 
   it("schedule slot should be present in created/updated document", async () => {
     expect(resScheduleData.schedules[fullname].includes(schedules[0])).toBeTruthy()
+  })
+
+  it("schedule slot should be present in created/updated document", async () => {
+    expect(resScheduleData.project).toEqual(project)
   })
 })
