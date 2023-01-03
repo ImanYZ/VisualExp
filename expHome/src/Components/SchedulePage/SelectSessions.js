@@ -1,3 +1,4 @@
+import moment from "moment";
 import React, { useState, useEffect } from "react";
 
 import ScheduleSelector from "react-schedule-selector";
@@ -39,7 +40,7 @@ if (end > 23) {
   count: number of consecutive slots that we want to check for
   slotDifference: minutes of a slot, ususally 30 mins.
 */
-const consecutiveTimeSlotsExists = (slots = [], count = 1, slotDifference = 30) => {
+const consecutiveTimeSlotsExists = (availableSessions = {}, slots = [], count = 1, slotDifference = 30) => {
   // loop through all the slots
   for (let i = 0; i < slots.length; ++i) {
     // have a variable to know in the end of the below loop
@@ -54,6 +55,22 @@ const consecutiveTimeSlotsExists = (slots = [], count = 1, slotDifference = 30) 
       // convert slotDifference minutes into timestamp seconds and multiply with j
       // if we add this to the current time slot this should be equal to the next jth element
       if (!slots[i + j] || slots[i].getTime() + slotDifference * j * 60000 !== slots[i + j].getTime()) {
+        exists = false;
+        break;
+      }
+
+      // TODO: this logic only works with 2 consecutive time slots
+      // should choose same researcher for each session
+      const researchersOfSlot1 = availableSessions[new Date(slots[i]).toLocaleString()] || [];
+      const researchersOfSlot2 = availableSessions[new Date(slots[i + j]).toLocaleString()] || [];
+      let hasSameResearcher = false;
+      for(const researcherFullname of researchersOfSlot2) {
+        hasSameResearcher = researchersOfSlot1.includes(researcherFullname);
+        if(hasSameResearcher) {
+          break;
+        }
+      }
+      if(!hasSameResearcher) {
         exists = false;
         break;
       }
@@ -101,10 +118,10 @@ const SelectSessions = props => {
         let session = null;
         if (i === 0) {
           // checking the first session
-          session = consecutiveTimeSlotsExists(orderedSch, props.sessionDuration[0], slotDuration);
+          session = consecutiveTimeSlotsExists(props.availableSessions, orderedSch, props.sessionDuration[0], slotDuration);
         } else {
           const scheduleForNextDay = orderedSch.filter(s => daysLater(sessions[0], s, props.daysLater[i - 1]));
-          session = consecutiveTimeSlotsExists(scheduleForNextDay, props.sessionDuration[i], slotDuration);
+          session = consecutiveTimeSlotsExists(props.availableSessions, scheduleForNextDay, props.sessionDuration[i], slotDuration);
         }
 
         if (!session) {
@@ -153,10 +170,44 @@ const SelectSessions = props => {
       }
     }
 
+    let isSelectable = false;
+    if(!selected && availableSess) {
+      let dtFirstSchedule = null;
+      for(const dt of props.schedule) {
+        if(moment(dt).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
+          dtFirstSchedule = moment(dt).toDate();
+          break;
+        }
+      }
+      if(dtFirstSchedule) {
+        let availableResearchers = props.availableSessions[dtFirstSchedule.toLocaleString()];
+        for(const availableSession in props.availableSessions) {
+          if(moment(availableSession).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
+            if(moment(dtFirstSchedule).add(30, "minutes").toDate().toLocaleString() === moment(availableSession).toDate().toLocaleString()) {
+              for(const researcher of props.availableSessions[availableSession]) {
+                if(availableResearchers.includes(researcher)) {
+                  isSelectable = true;
+                  break;
+                }
+                if(isSelectable) {
+                  break;
+                }
+              }
+              break;
+            }
+          }
+        }
+      }
+    }
+    
+    if(isSelectable) {
+      console.log("isSelectable");
+    }
+
     return (
       <div
         className={
-          "ScheduleCell " + (!availableSess ? "UnavailableCell" : selected ? "SelectedCell" : "UnselectedCell")
+          "ScheduleCell " + (!availableSess ? "UnavailableCell" : selected ? "SelectedCell" : (isSelectable ? "SelectableCell" : "UnselectedCell"))
         }
         ref={refSetter}
       >

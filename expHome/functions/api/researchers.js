@@ -8,7 +8,7 @@ researchersRouter.post("/schedule", async (req, res) => {
   try {
     const scheduleIds = [];
     const batch = db.batch();
-    let { fullname, schedule: scheduleSlots } = req.body;
+    let { fullname, project, schedule: scheduleSlots } = req.body;
 
     scheduleSlots.sort((s1, s2) => moment(s1).isBefore(s2) ? -1 : 1)
     const monthlyEntries = {};
@@ -23,23 +23,22 @@ researchersRouter.post("/schedule", async (req, res) => {
     }
 
     for(const month in monthlyEntries) {
-      const resSchedules = await db.collection("resSchedule").where("month", "==", month).get();
+      const resSchedules = await db.collection("resSchedule").where("project", "==", project).where("month", "==", month).get();
       const resScheduleExist = resSchedules.docs.length > 0;
       const resScheduleRef = resScheduleExist ? db.collection("resSchedule").doc(resSchedules.docs[0].id) : db.collection("resSchedule").doc();
       scheduleIds.push(resScheduleRef.id)
 
       let scheduleData = resScheduleExist ? resSchedules.docs[0].data() : {
         researchers: [],
+        project,
         month,
         schedules: {},
         scheduled: {}
       };
       
-      const monthlySlots = monthlyEntries[month];
-      let schedules = scheduleData.schedules[fullname] || [];
-      for(const monthlySlot of monthlySlots) {
-        schedules.push(monthlySlot)
-      }
+      const schedules = monthlyEntries[month];
+
+      scheduleData.project = project;
 
       if(!~scheduleData.researchers.indexOf(fullname)) {
         scheduleData.researchers.push(fullname)

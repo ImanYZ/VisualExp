@@ -193,7 +193,10 @@ const ExperimentPoints = props => {
       scheduleMonths.push(scheduleEnd);
     }
 
-    return firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).onSnapshot(async (snapshot) => {
+    return firebase.db.collection("resSchedule")
+      .where("project", "==", project)
+      .where("month", "in", scheduleMonths)
+      .onSnapshot(async (snapshot) => {
       if(snapshot.docs.length === 0) {
         setScheduleError(true);
         setSchedule([])
@@ -258,7 +261,8 @@ const ExperimentPoints = props => {
       }
       await axios.post("/researchers/schedule", {
         fullname,
-        schedule
+        project,
+        schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD hh:mm"))
       });
     } catch (error) {
       console.log(error);
