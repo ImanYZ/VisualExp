@@ -31,7 +31,8 @@ import {
   instructorsTodayState,
   upvotedInstructorsTodayState,
   administratorsTodayState,
-  upvotedAdministratorsTodayState
+  upvotedAdministratorsTodayState,
+  CURRENT_PROJ_LOCAL_S_KEY
 } from "../../store/ProjectAtoms";
 
 import LineDiagram from "./LineDiagram";
@@ -42,8 +43,6 @@ import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
 import HonorEducation from "../../assets/Honor_Education_Logo.jpeg";
-
-const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY";
 
 const goToLink = theLink => event => {
   window.open(theLink, "_blank");
