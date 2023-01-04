@@ -31,7 +31,8 @@ import {
   instructorsTodayState,
   upvotedInstructorsTodayState,
   administratorsTodayState,
-  upvotedAdministratorsTodayState
+  upvotedAdministratorsTodayState,
+  CURRENT_PROJ_LOCAL_S_KEY
 } from "../../store/ProjectAtoms";
 
 import LineDiagram from "./LineDiagram";
@@ -42,8 +43,6 @@ import UMSI_Logo_Dark from "../../assets/u-m_logo-hex-withoutline.png";
 import GCloud_Logo from "../../assets/GCloud_Logo.png";
 import favicon from "../../assets/favicon.png";
 import HonorEducation from "../../assets/Honor_Education_Logo.jpeg";
-
-const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY";
 
 const goToLink = theLink => event => {
   window.open(theLink, "_blank");
@@ -126,35 +125,6 @@ const RouterNav = props => {
   const [userNodes, setUserNodes] = useState([]);
 
   const projectPoints = projectSpecs?.points || {};
-
-  useEffect(() => {
-    const checkResearcher = async () => {
-      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      if (researcherDoc.exists) {
-        const myProjects = [];
-        const researcherData = researcherDoc.data();
-        for (let pr in researcherData.projects) {
-          myProjects.push(pr);
-        }
-        setProjects(myProjects);
-        const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
-        if (myProjects.includes(prevProj)) {
-          setProject(prevProj);
-        } else {
-          setProject(myProjects[0]);
-        }
-        if (researcherData.isAdmin) {
-          setIsAdmin(true);
-        }
-        setNotAResearcher(false);
-      } else {
-        setNotAResearcher(true);
-      }
-    };
-    if (firebase && fullname) {
-      checkResearcher();
-    }
-  }, [firebase, fullname]);
 
   useEffect(() => {
     const getProjectSpecs = async () => {
