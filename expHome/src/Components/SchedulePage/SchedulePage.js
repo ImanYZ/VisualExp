@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import moment from "moment";
 
 import axios from "axios";
 
@@ -17,7 +18,6 @@ import { firebaseState, emailState, fullnameState } from "../../store/AuthAtoms"
 import { projectSpecsState } from "../../store/ProjectAtoms";
 import { toWords, toOrdinal } from "number-to-words";
 import { projectState } from "../../store/ProjectAtoms";
-import { currentProjectState } from "../../store/ExperimentAtoms";
 import RouterNav from "../../../src/Components/RouterNav/RouterNav";
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
@@ -88,7 +88,7 @@ const SchedulePage = props => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [globalProject, setGlobalProject] = useRecoilState(projectState);
-  const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(currentProjectState);
+  const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(projectState);
   const navigate = useNavigate();
   const projectSpecs = useRecoilValue(projectSpecsState);
 
@@ -132,24 +132,70 @@ const SchedulePage = props => {
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
       // Each kay indicates a session timestamp and the corresponding value is an array of researcher emails
       // that may include 0 to many researchers who are available at that session.
-      const availSessions = {};
+      let availSessions = {};
+
+      const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
+      const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
+      if(!scheduleMonths.includes(scheduleEnd)) {
+        scheduleMonths.push(scheduleEnd);
+      }
 
       // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db.collection("resSchedule").where("project", "==", project).get();
+      const resScheduleDocs = await firebase.db.collection("resSchedule")
+        .where("month", "in", scheduleMonths)
+        .where("project", "==", project).get();
+
+      let schedules = {};
+      let scheduledByResearchers = {};
 
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
-        const resSession = resScheduleData.session.toDate();
-        const resSessionStr = resSession.toLocaleString();
-        // Only if the researcher is active in this project AND their availability is in the future:
-        if (resScheduleData.fullname in researchers && resSession.getTime() > new Date().getTime()) {
-          // Add the available slots for the researcher's email.
-          if (resSessionStr in availSessions) {
-            availSessions[resSessionStr].push(researchers[resScheduleData.fullname]);
-          } else {
-            availSessions[resSessionStr] = [researchers[resScheduleData.fullname]];
+
+        // date time flagged by researchers as available by them
+        let _schedules = resScheduleData.schedules || {};
+        for (const researcherFullname in _schedules) {
+          for(const scheduleSlot of _schedules[researcherFullname]) {
+            const slotDT = moment(scheduleSlot).utcOffset(-4, true).toDate();
+            // if availability is expired already
+            if(slotDT.getTime() < new Date().getTime()) {
+              continue;
+            }
+            const _scheduleSlot = slotDT.toLocaleString();
+            if(!schedules[_scheduleSlot]) {
+              schedules[_scheduleSlot] = [];
+            }
+            schedules[_scheduleSlot].push(researcherFullname)
           }
         }
+
+        // date time already booked by participants
+        const _scheduled = resScheduleData.scheduled || {};
+        const scheduledResearchers = Object.keys(_scheduled);
+
+        for(const scheduledResearcher of scheduledResearchers) {
+          if(!scheduledByResearchers[scheduledResearcher]) {
+            scheduledByResearchers[scheduledResearcher] = [];
+          }
+          let __scheduled = scheduledByResearchers[scheduledResearcher];
+
+          const scheduledSlotsByParticipants = Object.entries(_scheduled[scheduledResearcher])
+          for(const scheduledSlotsByParticipant of scheduledSlotsByParticipants) {
+            __scheduled = __scheduled.concat(scheduledSlotsByParticipant)
+          }
+          __scheduled.sort((s1, s2) => s1 < s2 ? -1 : 1)
+          scheduledByResearchers[scheduledResearcher] = Array.from(new Set(__scheduled));
+        }
+
+        // calculating available schedules by each researchers
+        let availableSchedules = {...schedules};
+        for(const researcherFullname in scheduledByResearchers) {
+          for(const scheduledSlot of scheduledByResearchers[researcherFullname]) {
+            if(!availableSchedules[scheduledSlot] || !availableSchedules[scheduledSlot].includes(researcherFullname)) continue;
+            const researcherIdx = availableSchedules[scheduledSlot].indexOf(researcherFullname)
+            availableSchedules[scheduledSlot].splice(researcherIdx, 1)
+          }
+        }
+        availSessions = availableSchedules;
       }
       // We need to retrieve all the currently scheduled events to figure
       // out which sessions are already taken and exclude them from availSessions.

@@ -100,3 +100,5 @@ export const upvotedAdministratorsTodayState = atom({
   key: "upvotedAdministratorsTodayState",
   default: 0
 });
+
+export const CURRENT_PROJ_LOCAL_S_KEY = "CURRENT_PROJ_LOCAL_S_KEY";

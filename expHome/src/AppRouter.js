@@ -10,7 +10,8 @@ import {
   themeState,
   themeOSState,
   leadingState,
-  institutionsState
+  institutionsState,
+  isAdminState
 } from "./store/AuthAtoms";
 import { choicesState, conditionState, nullPassageState, passageState, phaseState, startedSessionState, stepState } from "./store/ExperimentAtoms";
 
@@ -46,7 +47,7 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
-import { projectState } from "./store/ProjectAtoms";
+import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 
@@ -62,6 +63,10 @@ const AppRouter = props => {
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
   const [startedByResearcher, setStartedByResearcher] = useState(false);
+
+  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
+  const [projects, setProjects] = useRecoilState(projectsState);
 
   const [showSignInorUp, setShowSignInorUp] = useRecoilState(showSignInorUpState);
   const [leading, setLeading] = useRecoilState(leadingState);
@@ -122,7 +127,27 @@ const AppRouter = props => {
 
     if(!isResearcher) {
       setProject(userData.project)
+    } else {
+      // if current user a researcher
+      const researcherData = researcherDoc.data();
+      if(researcherData.isAdmin) {
+        setIsAdmin(true)
+      }
+
+      const myProjects = [];
+      for (let pr in researcherData.projects) {
+        myProjects.push(pr);
+      }
+      setProjects(myProjects);
+      const prevProj = localStorage.getItem(CURRENT_PROJ_LOCAL_S_KEY);
+      if (myProjects.includes(prevProj)) {
+        setProject(prevProj);
+      } else {
+        setProject(myProjects[0]);
+      }
     }
+
+    setNotAResearcher(!isResearcher)
 
     // if redirects required
     const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];
