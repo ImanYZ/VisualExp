@@ -24,7 +24,7 @@ import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
 
 const gray01 = "#28282a"
-const gray02 = "#202020"
+export const gray02 = "#202020"
 const gray03 = "#AAAAAA"
 
 const WhoWeAre = (props) => {
@@ -33,8 +33,7 @@ const WhoWeAre = (props) => {
       id="WhoWeAreSection"
       component="section"
       sx={{
-        pt: 7,
-        pb: 10,
+       
         position: "relative",
         display: "flex",
         flexDirection: "column",
@@ -42,9 +41,9 @@ const WhoWeAre = (props) => {
         // bgcolor: "secondary.light",
       }}
     >
-      <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8", textAlign: "center" }}>
+      {/* <Typography variant="h4" marked="center" sx={{ mb: 7, color: "#f8f8f8", textAlign: "center" }}>
         Who Is Behind 1Cademy?
-      </Typography>
+      </Typography> */}
       <Grid container spacing={2.5} align="center">
         <Grid item xs={12} sm={6} md={4}>
           <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
@@ -335,7 +334,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
+                          "Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information"
                         }
                       </Box>
                     </React.Fragment>
@@ -370,7 +369,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
+                          "Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information"
                         }
                       </Box>
                     </React.Fragment>
@@ -469,7 +468,7 @@ const WhoWeAre = (props) => {
                       </Typography>
                       <Box sx={{ color: gray03 }}>
                         {
-                          " — awarded research credits to host 1Cademy on GCP services, under award number 205607640."
+                          "awarded research credits to host 1Cademy on GCP services, under award number 205607640."
                         }
                       </Box>
                     </React.Fragment>
