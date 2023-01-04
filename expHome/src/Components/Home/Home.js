@@ -176,18 +176,8 @@ function Index() {
   //   })
   // }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
 
-  useEffect(() => {
-    const checkResearcher = async () => {
-      const researcherDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      if (researcherDoc.exists) {
-        setNotAResearcher(false);
-      }
-    };
-    if (firebase && fullname) {
-      checkResearcher();
-    }
-  }, [firebase, fullname]);
-
+  // const step0Ref = useRef(null);
+  
   const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
     const res = childrenPosistions.reduce(
       (acu, cur, idx) => {

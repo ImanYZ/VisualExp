@@ -65,6 +65,10 @@
   background-color: rgba(89, 154, 242, 1);
 }
 
+.SelectableCell {
+  background-color: #dbffeb;
+}
+
 .UnselectedCell {
   background-color: #dbedff;
 }
