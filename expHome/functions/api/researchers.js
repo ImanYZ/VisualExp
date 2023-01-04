@@ -1,14 +1,20 @@
 const express = require("express");
 const moment = require("moment");
 const { db } = require("../admin");
+const firebaseAuth = require("../middlewares/firebaseAuth");
+const isResearcher = require("../middlewares/isResearcher");
 const researchersRouter = express.Router();
+
+researchersRouter.use(firebaseAuth);
+researchersRouter.use(isResearcher)
 
 // POST /api/researchers/schedule
 researchersRouter.post("/schedule", async (req, res) => {
   try {
     const scheduleIds = [];
     const batch = db.batch();
-    let { fullname, project, schedule: scheduleSlots } = req.body;
+    let { project, schedule: scheduleSlots } = req.body;
+    const fullname = String(req?.userData?.fullname);
 
     scheduleSlots.sort((s1, s2) => moment(s1).isBefore(s2) ? -1 : 1)
     const monthlyEntries = {};

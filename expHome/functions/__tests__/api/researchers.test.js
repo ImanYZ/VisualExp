@@ -3,7 +3,7 @@ const http = require("http");
 const moment = require("moment");
 const chaiHttp = require('chai-http');
 const app = require("../../app");
-const { MockData, deleteAllUsers, mockProjectSpecs, mockPassages, mockConditions, mockUsers } = require("../../testUtils");
+const { MockData, deleteAllUsers, mockProjectSpecs, mockPassages, mockConditions, mockUsers, mockResearchers } = require("../../testUtils");
 const { auth: frontAuth } = require("../../testUtils/firestore");
 const { db, admin } = require("../../admin");
 const {expect, describe, beforeAll, afterAll} = require('@jest/globals');
@@ -20,7 +20,8 @@ describe("POST /api/researchers/schedule", () => {
     new MockData([], "resSchedule"),
     mockProjectSpecs,
     mockPassages,
-    mockConditions
+    mockConditions,
+    mockResearchers
   ];
 
   const fullname = "Sam Ouhra";
@@ -62,7 +63,6 @@ describe("POST /api/researchers/schedule", () => {
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer " + accessToken)
       .send({
-      fullname,
       project,
       schedule: schedules
     });
