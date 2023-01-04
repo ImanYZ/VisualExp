@@ -14,7 +14,7 @@ const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 const UniversitiesMap = (props) => {
   const { db } = firebaseOne;
   const [institutions, setInstitutions] = useState([]);
-  const [showMap, setShowMap] = useState(false);
+
 
   useEffect(() => {
     const fetchInstitutions = async () => {
@@ -34,11 +34,7 @@ const UniversitiesMap = (props) => {
     }
   }, [firebaseOne]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setShowMap(true);
-    }, 4000)
-  }, [])
+
 
   // console.log(institutions);
   // // API KEY: AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE
@@ -80,18 +76,10 @@ const UniversitiesMap = (props) => {
   //   </GoogleMap>
   // ));
 
-  return showMap ? (
-    // <div
-    //   id="SchoolsSection"
-    //   className={
-    //     props.theme === "Light"
-    //       ? "UniversitiesMapDiv LightModeUniversitiesMapDiv"
-    //       : "UniversitiesMapDiv"
-    //   }
-    // >
-    <Box id="SchoolsSection" component="section" sx={{ mt: 8, mb: 4 }}>
+  return (
+    <Box id="SchoolsSection" component="section" sx={{ minHeight:400 }}>
       <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
-        <Typography
+        {/* <Typography
           variant="h4"
           marked="center"
           align="center"
@@ -99,7 +87,7 @@ const UniversitiesMap = (props) => {
           sx={{ mb: 7, color: "#f8f8f8" }}
         >
           Our Researchers Are From
-        </Typography>
+        </Typography> */}
         <div id="googleMapDiv">
           {institutions.length > 0 ? (
             <Suspense fallback={<div></div>}>
@@ -109,8 +97,7 @@ const UniversitiesMap = (props) => {
         </div>
       </div>
     </Box>
-    // </div>
-  ) : <div />;
+  )
 };
 
 export default React.memo(UniversitiesMap);
