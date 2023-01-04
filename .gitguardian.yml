@@ -1,0 +1,14 @@
+version: 2
+exit-zero: false
+verbose: false
+instance: https://dashboard.gitguardian.com
+max-commits-for-hook: 50
+allow-self-signed: false
+secret:
+  ignored-paths:
+    - '**/README.md'
+    - 'expHome/functions/testUtils/*'
+    - 'LICENSE'
+  ignored-matches: []
+  show-secrets: false
+  ignored-detectors: []
