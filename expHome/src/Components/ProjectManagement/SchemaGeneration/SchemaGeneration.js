@@ -233,6 +233,18 @@ export const SchemaGeneration = ({}) => {
 
   const upVote = async schema => {
     try {
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      let calulatedProject = project;
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+
+      let _newGradingPoints = 0;
       const _upVoters = [...schema.upVoters];
       const _downVoters = [...schema.downVoters];
       let _upVotes = schema.upVotes;
@@ -240,6 +252,7 @@ export const SchemaGeneration = ({}) => {
       if (_upVoters.includes(fullname)) {
         _upVoters.splice(_upVoters.indexOf(fullname), 1);
         _upVotes = _upVotes - 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) - 1;
       } else {
         _upVoters.push(fullname);
         _upVotes = _upVotes + 1;
@@ -247,6 +260,7 @@ export const SchemaGeneration = ({}) => {
           _downVoters.splice(_downVoters.indexOf(fullname), 1);
           _downVotes = _downVotes - 1;
         }
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) + 1;
       }
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
@@ -264,33 +278,38 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
+
       await schemaGenerationRef.update(schemaGenerationUpdate);
-      let calulatedProject = project;
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
-      if (!(project in researcherData.projects)) {
-        calulatedProject = Object.keys(researcherData.projects)[0];
-      }
       const researcherUpdate = {
         projects: {
           ...researcherData.projects,
           [calulatedProject]: {
             ...researcherData.projects[calulatedProject],
-            positiveBooleanExpPionts: _upVotes - _downVotes,
-            negativeBooleanExpPionts: _downVotes
+            gradingPoints: _newGradingPoints
           }
         }
       };
+
       await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
 
   const downVote = async schema => {
     try {
+      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
+      const schemaGenerationDoc = await schemaGenerationRef.get();
+      const schemaGenerationData = schemaGenerationDoc.data();
+      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+
+      let calulatedProject = project;
+      if (!(project in researcherData.projects)) {
+        calulatedProject = Object.keys(researcherData.projects)[0];
+      }
+      let _newGradingPoints = 0;
+      let _newNegativeGradingPoints = 0;
+
       const _downVoters = [...schema.downVoters];
       let _downVotes = schema.downVotes;
       const _upVoters = [...schema.upVoters];
@@ -298,6 +317,8 @@ export const SchemaGeneration = ({}) => {
       if (_downVoters.includes(fullname)) {
         _downVoters.splice(_downVoters.indexOf(fullname), 1);
         _downVotes = _downVotes - 1;
+        _newNegativeGradingPoints = (researcherData.projects[calulatedProject].negativeGradingPoints || 0) + 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) - 1;
       } else {
         _downVoters.push(fullname);
         _downVotes = _downVotes + 1;
@@ -305,6 +326,8 @@ export const SchemaGeneration = ({}) => {
           _upVoters.splice(_upVoters.indexOf(fullname), 1);
           _upVotes = _upVotes - 1;
         }
+        _newNegativeGradingPoints = (researcherData.projects[calulatedProject].negativeGradingPoints || 0) - 1;
+        _newGradingPoints = (researcherData.projects[calulatedProject].gradingPoints || 0) + 1;
       }
       const index = schemasBoolean.findIndex(elt => elt.id === schema.id);
       const _schemasBoolean = [...schemasBoolean];
@@ -322,25 +345,16 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
-      const schemaGenerationRef = firebase.db.collection("booleanScratch").doc(schema.id);
-      const schemaGenerationDoc = await schemaGenerationRef.get();
-      const schemaGenerationData = schemaGenerationDoc.data();
-      const researcherRef = firebase.db.collection("researchers").doc(schemaGenerationData.fullname);
-      const researcherDoc = await researcherRef.get();
-      const researcherData = researcherDoc.data();
+
       await schemaGenerationRef.update(schemaGenerationUpdate);
 
-      let calulatedProject = project;
-      if (!(project in researcherData.projects)) {
-        calulatedProject = Object.keys(researcherData.projects)[0];
-      }
       const researcherUpdate = {
         projects: {
           ...researcherData.projects,
           [calulatedProject]: {
             ...researcherData.projects[calulatedProject],
-            positiveBooleanExpPionts: _upVotes - _downVotes,
-            negativeBooleanExpPionts: _downVotes
+            gradingPoints: _newGradingPoints,
+            negativeGradingPoints: _newNegativeGradingPoints
           }
         }
       };

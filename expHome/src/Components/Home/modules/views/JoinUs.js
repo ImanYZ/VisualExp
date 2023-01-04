@@ -272,15 +272,11 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: !props.community ? 7 : 1,
-        pb: 10,
+        pt: !props.community ? 0 : 1,
+        pb:  !props.community ? 0 : 10,
       }}
     >
-      {!props.community ? (
-        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
-          {sectionsOrder[sectionIdx].title}
-        </Typography>
-      ) : (
+      {props.community &&(
         <Alert severity="warning">
           <strong>Note: </strong> Participation is unpaid, solely for the purpose of improving research and education,
           and this position meets{" "}

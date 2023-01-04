@@ -1,8 +1,8 @@
 import React from "react";
 import { Equation } from "react-equation";
 
-export default {
-  ["Cognitive_Psychology"]: {
+const communitiesPapers = {
+  Cognitive_Psychology: {
     Hybrid_Map_Visualizing_Relations_Between_Paragraphs_Improves_Readability_Reading_Comprehension_and_Learning: {
       title:
         "Hybrid Map: Visualizing Relations Between Paragraphs Improves Readability, Reading Comprehension, and Learning Compared to Novakian Concept Maps",
@@ -108,7 +108,7 @@ export default {
           stem: (
             <div>
               <p>10. What does the following diagram tell us?</p>
-              <img src="/static/CommunityQuizzes/EstimatedMarginalMeans.png" width="100%" />
+              <img alt="" src="/static/CommunityQuizzes/EstimatedMarginalMeans.png" width="100%" />
             </div>
           ),
           answers: ["b", "d", "f", "g"],
@@ -239,13 +239,13 @@ export default {
             <div>
               <p>22. Which of the following is a string map?</p>
               <p>
-                a) <img src="/static/CommunityQuizzes/Concept_Map_Tree.png" width="100%" />
+                a) <img alt="" src="/static/CommunityQuizzes/Concept_Map_Tree.png" width="100%" />
               </p>
               <p>
-                b) <img src="/static/CommunityQuizzes/Concept_Map_String.png" width="100%" />
+                b) <img alt="" src="/static/CommunityQuizzes/Concept_Map_String.png" width="100%" />
               </p>
               <p>
-                c) <img src="/static/CommunityQuizzes/Concept_Map_Network.png" width="100%" />
+                c) <img alt="" src="/static/CommunityQuizzes/Concept_Map_Network.png" width="100%" />
               </p>
             </div>
           ),
@@ -292,7 +292,7 @@ export default {
       }
     }
   },
-  ["Educational_Organizational_Psychology"]: {
+  Educational_Organizational_Psychology: {
     The_psychology_of_task_management_The_smaller_tasks_trap: {
       title: "The Psychology of Task Management: The Smaller Tasks Trap",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
@@ -355,7 +355,7 @@ export default {
       }
     }
   },
-  ["Clinical_Psychology"]: {
+  Clinical_Psychology: {
     Clinical_Psychology_Reading_Test: {
       title: "Definition and Training of Clinical Psychology",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FClinical%20Psychology%20Reading.pdf?alt=media&token=fbf1103d-d716-40f2-a95f-5e70178a5e09",
@@ -438,7 +438,7 @@ export default {
       }
     }
   },
-  ["Mindfulness"]: {
+  Mindfulness: {
     Mindfulness_Based_Eating_Awareness_Training: {
       title: "MB-EAT for Binge Eating: A Randomized Clinical Trial",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FKristellerWoleverSheets_BED_In_Mindfulness2013.pdf?alt=media&token=ee440abf-b8ef-459d-92de-3e32475b8cf8",
@@ -504,7 +504,7 @@ export default {
       }
     }
   },
-  ["Health_Psychology"]: {
+  Health_Psychology: {
     Health_Psychology_Chapter_1: {
       title: "Health Psychology: An Introduction",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FHealth%20Psychology.%20Fifth%20Edition%20Chapter%201.pdf?alt=media&token=484f630b-18b6-467a-a65a-faec2257e39c",
@@ -592,7 +592,7 @@ export default {
       }
     }
   },
-  ["Neuroscience"]: {
+  Neuroscience: {
     Fundamentals_of_Neuroscience: {
       title: "Fundamentals of Neuroscience",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FFundamentals_of_Neuroscience.pdf?alt=media&token=ede5917c-2278-4143-89b1-60797ad530ca",
@@ -730,7 +730,7 @@ export default {
       }
     }
   },
-  ["Disability_Studies"]: {
+  Disability_Studies: {
     What_is_Disability_Studies_UMInDS: {
       title: "UM Initiative on Disability Studies: What is Disability Studies?",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat_is_Disability_Studies_UMInDS.pdf?alt=media&token=3e16f0ee-e8b5-492e-a776-8b8025b18559",
@@ -818,7 +818,7 @@ export default {
       }
     }
   },
-  ["Social_Psychology"]: {
+  Social_Psychology: {
     Effects_of_Ownership_Text_Message_Wording_and_Reminders_on_Receipt_of_an_Influenza_Vaccination: {
       title: "Effects of Ownership Text Message Wording and Reminders on Receipt of an Influenza Vaccination",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2Fbuttenheim_2022_oi_211203_1644504654.86367.pdf?alt=media&token=5b13c45b-6552-4766-8c94-fb4cb03d69d1",
@@ -1024,7 +1024,7 @@ export default {
       }
     }
   },
-  ["Social_Political_Psychology"]: {
+  Social_Political_Psychology: {
     When_Fake_News_feels_true: {
       title: "When (Fake) News Feels True",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen_Fake_News_feels_true.pdf?alt=media&token=f7d6bfa1-5937-409e-ace8-3ad4d087a3cb",
@@ -1232,7 +1232,7 @@ export default {
       }
     }
   },
-  ["Cryptoeconomics"]: {
+  Cryptoeconomics: {
     Bitcoin_whitepaper: {
       title: "Bitcoin: A Peer-to-Peer Electronic Cash System",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FBitcoin_whitepaper.pdf?alt=media&token=372bf6cc-642b-4541-9407-d51527fd83a5",
@@ -1323,7 +1323,7 @@ export default {
       }
     }
   },
-  ["Deep_Learning"]: {
+  Deep_Learning: {
     NLP_Chapter13: {
       title: "Natural Language Processing",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FNLP_Chapter.pdf?alt=media&token=b49e9a3d-cf77-49ec-a17e-81757c1ca72b",
@@ -1461,7 +1461,7 @@ export default {
       }
     }
   },
-  ["Graphic_Design"]: {
+  Graphic_Design: {
     Graphic_Design_Reading_Chapter_1: {
       title: "A Design Process for Digital Products",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGraphic_Design_Reading.pdf?alt=media&token=ad7bd3fc-6541-4a3b-978a-b412b43f260c",
@@ -1522,7 +1522,7 @@ export default {
       }
     }
   },
-  ["UI_Design"]: {
+  UI_Design: {
     UI_Design: {
       title: "UI Test",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FMUI_Accessibility.pdf?alt=media&token=53fe5836-45fc-4ffa-abca-cf7059b88f65",
@@ -1531,7 +1531,7 @@ export default {
           stem: (
             <>
               1. Please skim through this web page:
-              <a href="https://mui.com/material-ui/customization/color/" target="_blank">
+              <a href="https://mui.com/material-ui/customization/color/" target="_blank" rel="noreferrer">
                 https://mui.com/material-ui/customization/color/
               </a>{" "}
               and answer this question: what is the name of #616161? (select one)
@@ -1549,7 +1549,11 @@ export default {
           stem: (
             <>
               2. Read this web page:{" "}
-              <a href="https://m3.material.io/foundations/accessible-design/accessibility-basics" target="_blank">
+              <a
+                href="https://m3.material.io/foundations/accessible-design/accessibility-basics"
+                target="_blank"
+                rel="noreferrer"
+              >
                 https://m3.material.io/foundations/accessible-design/accessibility-basics
               </a>{" "}
               and answer: Why should we avoid using non-standard elements? (select one)
@@ -1567,7 +1571,7 @@ export default {
           stem: (
             <>
               3. Read this article on chips:{" "}
-              <a href="https://m3.material.io/components/chips/guidelines" target="_blank">
+              <a href="https://m3.material.io/components/chips/guidelines" target="_blank" rel="noreferrer">
                 https://m3.material.io/components/chips/guidelines
               </a>{" "}
               and answer: what are chips used for? (select multiple)
@@ -1585,7 +1589,11 @@ export default {
           stem: (
             <>
               4. If you are not familiar with Figma components, please watch this video:{" "}
-              <a href="https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma" target="_blank">
+              <a
+                href="https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma"
+                target="_blank"
+                rel="noreferrer"
+              >
                 https://www.youtube.com/watch?list=PLXDU_eVOJTx5LSjOmeBYMuvaa4UayfMe4&v=k74IrUNaJVk&feature=emb_imp_woyt&ab_channel=Figma
               </a>
               . Then answer the question: How do you break the link between the instance and its main component? (select
@@ -1604,7 +1612,7 @@ export default {
           stem: (
             <>
               5. Duplicate and finish the Figma playground file:
-              <a href="https://www.figma.com/community/file/1033456279024883078" target="_blank">
+              <a href="https://www.figma.com/community/file/1033456279024883078" target="_blank" rel="noreferrer">
                 https://www.figma.com/community/file/1033456279024883078
               </a>{" "}
               (keep pressing N to view the frames like a ppt). Then answer: How to create an interactive toggle button
@@ -1623,7 +1631,11 @@ export default {
           stem: (
             <>
               6. Read this article on Figma’s Auto Layout:{" "}
-              <a href="https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties" target="_blank">
+              <a
+                href="https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties"
+                target="_blank"
+                rel="noreferrer"
+              >
                 https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties
               </a>{" "}
               and answer: What is the auto layout used for? (select one)
@@ -1641,13 +1653,16 @@ export default {
           stem: (
             <>
               7. Duplicate and finish the Figma file:
-              <a href="https://www.figma.com/community/file/784448220678228461" target="_blank">
+              <a href="https://www.figma.com/community/file/784448220678228461" target="_blank" rel="noreferrer">
                 https://www.figma.com/community/file/784448220678228461.
               </a>
               "Then answer: What is the best practice to make the blue-filled box occupy the entire width of the
               red-bordered frame (with auto-layout)?(select one)
               <br />
-              <img src="https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FUI_Design%2FQ7_What_is_the_best_practice_to_make_the_blue_filled_box_occupy_the_entire_width_of_the_red_bordered_frame.png?alt=media&token=60e34b53-e31e-4905-a09b-01957909b0d3" />{" "}
+              <img
+                alt=""
+                src="https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FUI_Design%2FQ7_What_is_the_best_practice_to_make_the_blue_filled_box_occupy_the_entire_width_of_the_red_bordered_frame.png?alt=media&token=60e34b53-e31e-4905-a09b-01957909b0d3"
+              />{" "}
             </>
           ),
           answers: ["c"],
@@ -1663,12 +1678,15 @@ export default {
             stem: (
               <>
                 8. Duplicate and finish the Figma playground file:
-                <a href="https://www.figma.com/community/file/1100581138025393004" target="_blank">
+                <a href="https://www.figma.com/community/file/1100581138025393004" target="_blank" rel="noreferrer">
                   https://www.figma.com/community/file/1100581138025393004
                 </a>{" "}
                 and answer: _____ to toggle between showing and hiding the text in a component; _____ to change the icon
                 in a button with an instance swap property. (select one){" "}
-                <img src="https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FUI_Design%2FQ8_Duplicate_and%20finish_the_Figma%20playground%20file.png?alt=media&token=d1d21c71-373d-4bcd-9193-febf22d6a396" />
+                <img
+                  alt=""
+                  src="https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FUI_Design%2FQ8_Duplicate_and%20finish_the_Figma%20playground%20file.png?alt=media&token=d1d21c71-373d-4bcd-9193-febf22d6a396"
+                />
               </>
             ),
             answers: ["b"],
@@ -1682,7 +1700,7 @@ export default {
       }
     }
   },
-  ["UX_Research"]: {
+  UX_Research: {
     When_to_Use_Which_User_Experience_Research_Methods: {
       title: "When to Use Which User-Experience Research Methods",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhen%20to%20Use%20Which%20User-Experience%20Research%20Methods.pdf?alt=media&token=948c0113-1abb-452b-83e2-6c7a9c6e1189",
@@ -1704,7 +1722,7 @@ export default {
             a: "Behavioral, qualitative",
             b: "Behavioral, quantitative",
             c: "Attitudinal, qualitative",
-            c: "Attitudinal, quantitative"
+            d: "Attitudinal, quantitative"
           }
         },
         What_are_ethnographic_field_studies: {
@@ -1741,7 +1759,7 @@ export default {
       }
     }
   },
-  ["Graph_Neural_Network"]: {
+  Graph_Neural_Network: {
     Heterogeneous_Graph_Attention_Network: {
       title: "Heterogeneous Graph Attention Network",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FGNNsub-quiz-TianYan.pdf?alt=media&token=7a7b8064-02fe-474d-a3bf-69311a58f7da",
@@ -1803,7 +1821,7 @@ export default {
       }
     }
   },
-  ["Financial_Technology"]: {
+  Financial_Technology: {
     A_brief_survey_of_Cryptocurrency_systems: {
       title: "A brief survey of Cryptocurrency systems",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FA_brief_survey_of_Cryptocurrency_systems.pdf?alt=media&token=048e3faf-e0dd-4f31-bdf3-cf8d4c3778cb",
@@ -1915,7 +1933,7 @@ export default {
       }
     }
   },
-  ["Responsible_AI"]: {
+  Responsible_AI: {
     The_role_of_artificial_intelligence_in_mitigating_bias_to_enhance_diversity_and_inclusion: {
       title: "The role of artificial intelligence in mitigating bias to enhance diversity and inclusion",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20role%20of%20artificial%20intelligence%20in%20mitigating%20bias%20to%20enhance%20diversity%20and%20inclusion.pdf?alt=media&token=6a1e5b50-baa0-4e9a-b64f-63d1e28f96c5",
@@ -2024,7 +2042,7 @@ export default {
       }
     }
   },
-  ["Computer_Vision"]: {
+  Computer_Vision: {
     Computer_Vision_excerpt: {
       title: "Computer Vision excerpt",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FComputer%20Vision%20excerpt.pdf?alt=media&token=4f5865c0-8488-4920-918e-75d696a2befa",
@@ -2072,7 +2090,8 @@ export default {
               <p>5. In the expected risk function, </p>
               <Equation value="E_Risk(w)=1/N L(y_i,f(x_i,w))" />
               <p></p>
-              <Equation value="what is denoted by f(x_i,w)"/><>?</>
+              <Equation value="what is denoted by f(x_i,w)" />
+              <>?</>
             </>
           ),
           answers: ["c"],
@@ -2095,5 +2114,6 @@ export default {
       }
     }
   },
-  ["Liaison_Librarians"]: {}
+  Liaison_Librarians: {}
 };
+export default communitiesPapers;

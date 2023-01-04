@@ -109,12 +109,12 @@ const AppRouter = props => {
     let isResearcher = researcherDoc.exists
 
     if(!isSurvey) {
-      setPhase(userData.phase);
-      setStep(userData.step);
-      setPassage(userData.currentPCon?.passage);
-      setCondition(userData.currentPCon?.condition);
-      setNullPassage(userData.nullPassage);
-      setChoices(userData.choices);
+      setPhase(userData?.phase || 0);
+      setStep(userData?.step || 0);
+      setPassage(userData?.currentPCon?.passage || "");
+      setCondition(userData?.currentPCon?.condition || "");
+      setNullPassage(userData?.nullPassage || "");
+      setChoices(userData?.choices || []);
     }
 
     if (userData.leading && userData.leading.length > 0) {
