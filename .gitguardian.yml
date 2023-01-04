@@ -7,7 +7,8 @@ allow-self-signed: false
 secret:
   ignored-paths:
     - '**/README.md'
-    - 'expHome/functions/testUtils/*'
+    - 'expHome/functions/testUtils/**'
+    - 'expHome/src/Components/Home/modules/views/UniversitiesMap/UniversitiesMap.js'
     - 'LICENSE'
   ignored-matches: []
   show-secrets: false
