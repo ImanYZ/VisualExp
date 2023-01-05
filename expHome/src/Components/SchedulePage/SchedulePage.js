@@ -320,8 +320,6 @@ const SchedulePage = props => {
       });
       errorAlert(responseObj.data);
 
-      await firebase.commitBatch();
-
       setSubmitted(true);
     }
     setIsSubmitting(false);
