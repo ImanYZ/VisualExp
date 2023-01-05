@@ -7,6 +7,11 @@ const scheduleAvailabilities = [
   moment().utcOffset(-4).add(1, "hour").startOf("hour").add(30, "minutes").format("YYYY-MM-DD HH:mm"),
   moment().utcOffset(-4).add(3, "day").startOf("hour").add(1, "hour").format("YYYY-MM-DD HH:mm"),
   moment().utcOffset(-4).add(7, "day").startOf("hour").add(1, "hour").format("YYYY-MM-DD HH:mm"),
+
+  moment().utcOffset(-4).add(3, "hour").startOf("hour").format("YYYY-MM-DD HH:mm"),
+  moment().utcOffset(-4).add(3, "hour").startOf("hour").add(30, "minutes").format("YYYY-MM-DD HH:mm"),
+  moment().utcOffset(-4).add(3, "day").startOf("hour").add(3, "hour").format("YYYY-MM-DD HH:mm"),
+  moment().utcOffset(-4).add(7, "day").startOf("hour").add(3, "hour").format("YYYY-MM-DD HH:mm"),
 ];
 
 const scheduleByMonth = {};

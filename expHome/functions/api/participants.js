@@ -6,6 +6,7 @@ const { Timestamp } = require("firebase-admin/firestore");
 const firebaseAuth = require("../middlewares/firebaseAuth");
 const isParticipant = require("../middlewares/isParticipant");
 const { createExperimentEvent } = require("../scheduling");
+const { deleteEvent } = require("../GoogleCalendar");
 const participantsRouter = express.Router();
 
 participantsRouter.use(firebaseAuth);
@@ -85,8 +86,24 @@ participantsRouter.post("/schedule", async (req, res) => {
       }
     }
 
-    let schedules = Object.keys(availableScheduleByResearchers);
-    schedules.sort((a, b) => moment(a).isSameOrBefore(b) ? -1 : 1)
+    const previousSchedules = await db.collection("schedule").where("email", "==", email.toLowerCase()).get();
+    for (let scheduleDoc of previousSchedules.docs) {
+      const scheduleData = scheduleDoc.data();
+      if (scheduleData?.id) {
+        await deleteEvent(scheduleData.id)
+      }
+      const month = moment(scheduleData.session).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
+      const resScheduleData = resScheduleDataByMonth[month];
+
+      for(const researcher in resScheduleData.scheduled) {
+        if(resScheduleData.scheduled?.[researcher]?.[fullname]) {
+          resScheduleData.scheduled[researcher][fullname] = {};
+        }
+      }
+
+      const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
+      batch.delete(scheduleRef);
+    }
 
     let availableResearchers = availableScheduleByResearchers[sessions[0]] || [];
 

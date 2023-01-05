@@ -127,6 +127,9 @@ exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
 
 // Delete an event with eventID
 exports.deleteEvent = async eventId => {
+  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    return true;
+  }
   try {
     let response = await calendar.events.delete({
       calendarId: calendarId,
