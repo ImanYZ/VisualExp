@@ -322,18 +322,11 @@ const SchedulePage = props => {
       }
 
       const sessions = selectedSession.map(s => {
-        return {
-          startDate: s,
-          researcher:
-            availableSessions[s.toLocaleString()][
-              // We randomly pick one of the available researchers in each session and assign them to run this session.
-              Math.floor(Math.random() * availableSessions[s.toLocaleString()].length)
-            ]
-        };
+        return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
       });
 
-      responseObj = await axios.post("/schedule", {
-        email: email.toLowerCase(),
+      await firebase.idToken()
+      responseObj = await axios.post("/participants/schedule", {
         sessions,
         project: userData.project
       });

@@ -24,7 +24,7 @@ researchersRouter.post("/schedule", async (req, res) => {
         monthlyEntries[month] = [];
       }
       monthlyEntries[month].push(
-        moment(scheduleSlot).utcOffset(-4, true).format("YYYY-MM-DD hh:mm")
+        moment(scheduleSlot).utcOffset(-4, true).format("YYYY-MM-DD HH:mm")
       )
     }
 

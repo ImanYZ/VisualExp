@@ -52,10 +52,10 @@ describe("POST /api/researchers/schedule", () => {
 
   let scheduleIds = [];
   const schedules = [
-    moment().utcOffset(-4).startOf("day").format("YYYY-MM-DD hh:mm"),
-    moment().utcOffset(-4).startOf("day").add(1, "day").format("YYYY-MM-DD hh:mm"),
-    moment().utcOffset(-4).startOf("day").add(4, "days").format("YYYY-MM-DD hh:mm"),
-    moment().utcOffset(-4).startOf("day").add(8, "days").format("YYYY-MM-DD hh:mm")
+    moment().utcOffset(-4).startOf("day").format("YYYY-MM-DD HH:mm"),
+    moment().utcOffset(-4).startOf("day").add(1, "day").format("YYYY-MM-DD HH:mm"),
+    moment().utcOffset(-4).startOf("day").add(4, "days").format("YYYY-MM-DD HH:mm"),
+    moment().utcOffset(-4).startOf("day").add(8, "days").format("YYYY-MM-DD HH:mm")
   ]
 
   it("should be able to update researcher's schedule", async () => {
