@@ -250,7 +250,7 @@ const CommunityApplications = props => {
         ) {
           communiIds.push(props.communiIds[communiIdx]);
           const comm = communitiesOrder.find(elm => elm.id === props.communiIds[communiIdx]);
-          if (comm?.portfolio) {
+          if (comm.portfolio) {
             showPortfolio = true;
           }
         }
