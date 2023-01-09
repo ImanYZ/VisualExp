@@ -118,7 +118,7 @@ const AppRouter = props => {
     }
 
     if (userData.leading && userData.leading.length > 0) {
-      setLeading(userData.leading);
+      setLeading(userData.leading.filter((id) => !!communitiesOrder.find((com) => com.id === id)));
     }
 
     setFullname(fullName)
