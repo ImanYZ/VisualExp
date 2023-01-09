@@ -1,0 +1,20 @@
+{
+  "folders": [
+      {
+          "name": "exp home",
+          "path": "./expHome"
+      },
+      {
+          "name": "cloud functions",
+          "path": "./expHome/functions"
+      },
+      {
+          "name": "local functions",
+          "path": "./localFunctions"
+      },
+      {
+          "name": "visual experiment",
+          "path": "."
+      },
+  ]
+}

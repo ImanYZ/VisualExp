@@ -1,0 +1,8 @@
+.dataGridTable {
+  height: 700px;
+  margin: 10px 10px 10px 10px;
+}
+
+button.NotificationBtn {
+  margin-right: -10px;
+}
