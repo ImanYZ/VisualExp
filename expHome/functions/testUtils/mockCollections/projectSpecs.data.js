@@ -6,6 +6,7 @@ module.exports = new MockData([
     "sessionName": "UX Research Experiment session",
     "sessionDuration": [
       2,
+      1,
       1
     ],
     "points": {

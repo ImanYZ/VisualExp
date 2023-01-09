@@ -308,52 +308,17 @@ const SchedulePage = props => {
         setParticipatedBefore(true);
         return;
       }
-      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
-      for (let scheduleDoc of scheduleDocs.docs) {
-        const scheduleData = scheduleDoc.data();
-        if (scheduleData.id) {
-          responseObj = await axios.post("/deleteEvent", {
-            eventId: scheduleData.id
-          });
-          errorAlert(responseObj.data);
-        }
-        const scheduleRef = firebase.db.collection("schedule").doc(scheduleDoc.id);
-        await firebase.batchDelete(scheduleRef);
-      }
-
+      
       const sessions = selectedSession.map(s => {
-        return {
-          startDate: s,
-          researcher:
-            availableSessions[s.toLocaleString()][
-              // We randomly pick one of the available researchers in each session and assign them to run this session.
-              Math.floor(Math.random() * availableSessions[s.toLocaleString()].length)
-            ]
-        };
+        return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
       });
 
-      responseObj = await axios.post("/schedule", {
-        email: email.toLowerCase(),
+      await firebase.idToken()
+      responseObj = await axios.post("/participants/schedule", {
         sessions,
         project: userData.project
       });
       errorAlert(responseObj.data);
-
-      for (let session of schedule) {
-        const scheduleRef = firebase.db.collection("schedule").doc();
-        const theSession = {
-          email: email.toLowerCase(),
-          session: firebase.firestore.Timestamp.fromDate(session)
-        };
-
-        const sessionIndex = selectedSession.findIndex(s => s.getTime() === session.getTime());
-        if (sessionIndex > -1) {
-          theSession.order = toOrdinal(sessionIndex + 1);
-          theSession.id = responseObj.data.events[sessionIndex].data.id;
-        }
-        await firebase.batchSet(scheduleRef, theSession);
-      }
-      await firebase.commitBatch();
 
       setSubmitted(true);
     }

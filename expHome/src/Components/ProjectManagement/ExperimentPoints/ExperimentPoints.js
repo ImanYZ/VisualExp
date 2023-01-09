@@ -259,10 +259,11 @@ const ExperimentPoints = props => {
         setScheduleError(false);
         setSnackbarMessage("Your availability is successfully saved in the database!");
       }
+      await firebase.idToken()
       await axios.post("/researchers/schedule", {
         fullname,
         project,
-        schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD hh:mm"))
+        schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD HH:mm"))
       });
     } catch (error) {
       console.log(error);
