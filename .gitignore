@@ -75,7 +75,6 @@ jspm_packages
 
 next.config.js
 
-# Cloud Run and Firebase stuff
-service.yaml
+# Firebase stuff
 onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json
 onecademy-1-firebase-adminsdk-x7tpw-442a7d8605.json

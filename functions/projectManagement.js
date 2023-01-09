@@ -1238,15 +1238,12 @@ exports.remindCalendarInvitations = async (context) => {
     // is a corresponding Google Calendar event with the specified id.
     const scheduleDocs = await db.collection("schedule").orderBy("id").get();
     // Collect all the data for these documents in an array.
-    const schedule = {};
+    const schedule = [];
     for (let scheduleDoc of scheduleDocs.docs) {
-      const scheduleData = scheduleDoc.data();
-      const scheduleEventId = scheduleData.id;
-      delete scheduleData.id;
-      schedule[scheduleEventId] = {
-        ...scheduleData,
+      schedule.push({
+        ...scheduleDoc.data(),
         schId: scheduleDoc.id,
-      };
+      });
     }
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
@@ -1262,16 +1259,17 @@ exports.remindCalendarInvitations = async (context) => {
       const startTime = new Date(ev.start.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       // Find the scheduled session corresponding to this event.
+      const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
-        ev.id in schedule &&
+        scheduleIdx !== -1 &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
       ) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase(),
+          email: schedule[scheduleIdx].email.toLowerCase(),
         };
-        const order = schedule[ev.id].order;
+        const order = schedule[scheduleIdx].order;
         for (let attendee of ev.attendees) {
           if (attendee.responseStatus !== "accepted") {
             // If the attendee is a researcher:
@@ -1395,7 +1393,7 @@ exports.remindCalendarInvitations = async (context) => {
                     // Also, remove the Calendar event id and order from their schedule doc.
                     const scheduleRef = db
                       .collection("schedule")
-                      .doc(schedule[ev.id].schId);
+                      .doc(schedule[scheduleIdx].schId);
                     await scheduleRef.update({
                       id: admin.firestore.FieldValue.delete(),
                       order: admin.firestore.FieldValue.delete(),
@@ -1433,18 +1431,19 @@ exports.remindCalendarInvitations = async (context) => {
       const startTime = new Date(ev.start.dateTime);
       const endTimeStamp = new Date(ev.end.dateTime).getTime() + 60 * 60 * 1000;
       const hoursLeft = (currentTime - startTime.getTime()) / (60 * 60 * 1000);
+      // Find the scheduled session corresponding to this event.
+      const scheduleIdx = schedule.findIndex((sch) => sch.id === ev.id);
       if (
         endTimeStamp < currentTime &&
-        // Find the scheduled session corresponding to this event.
-        ev.id in scheduleIdx &&
+        scheduleIdx !== -1 &&
         "attendees" in ev &&
         Array.isArray(ev.attendees)
       ) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase(),
+          email: schedule[scheduleIdx].email.toLowerCase(),
         };
-        const order = schedule[ev.id].order;
+        const order = schedule[scheduleIdx].order;
         for (let attendee of ev.attendees) {
           // We only need to check the past events for the participants.
           if (attendee.email.toLowerCase() === participant.email) {
@@ -1504,7 +1503,7 @@ exports.remindCalendarInvitations = async (context) => {
                 // Also, remove the Calendar event id and order from their schedule doc.
                 const scheduleRef = db
                   .collection("schedule")
-                  .doc(schedule[ev.id].schId);
+                  .doc(schedule[scheduleIdx].schId);
                 await scheduleRef.update({
                   id: admin.firestore.FieldValue.delete(),
                   order: admin.firestore.FieldValue.delete(),

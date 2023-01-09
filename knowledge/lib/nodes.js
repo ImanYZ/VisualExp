@@ -35,11 +35,6 @@ export async function getNodeData(id) {
   const processedContent = await remark().use(html).process(nodeData.content);
   const contentHtml = processedContent.toString();
 
-  // nodeData.institutions
-  // const institutionsCollection = await firebase.db
-  // .collection("institutions")
-  // .get();
-
   // Combine the data with the id and contentHtml
   return {
     id,

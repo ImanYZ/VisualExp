@@ -64,9 +64,6 @@ const JoinUs = (props) => {
     if (
       applicationsSubmitted &&
       Object.keys(applicationsSubmitted).length > 0 &&
-      "community" in props &&
-      props.community &&
-      props.community.id &&
       applicationsSubmitted[props.community.id]
     ) {
       setActiveStep(3);
