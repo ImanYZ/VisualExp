@@ -39,6 +39,7 @@ const createExperimentEvent = async (email, researcher, order, start, end, proje
   const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
   return eventCreated;
 };
+exports.createExperimentEvent = createExperimentEvent;
 
 // Schedule the 3 experiment sessions
 exports.schedule = async (req, res) => {
