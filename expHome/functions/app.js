@@ -57,6 +57,7 @@ const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInsti
 
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
+const participantsRouter = require("./api/participants");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -127,6 +128,7 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 
 app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
+app.use("/participants", participantsRouter);
 
 // Knowledge endpoints
 

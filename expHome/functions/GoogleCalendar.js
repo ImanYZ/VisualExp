@@ -1,4 +1,6 @@
 const { google } = require("googleapis");
+const moment = require("moment");
+
 require("dotenv").config();
 
 const { generateUID } = require("./utils");
@@ -17,9 +19,17 @@ oAuth2Client.setCredentials({
 
 // Create a new calender instance.
 const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
+exports.calendar = calendar;
 
 // Insert new event to UX Google Calendar
 exports.insertEvent = async (start, end, summary, description, attendees, colorId) => {
+  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    return {
+      data: {
+        id: generateUID()
+      }      
+    };
+  }
   const event = {
     summary,
     description,
@@ -27,12 +37,12 @@ exports.insertEvent = async (start, end, summary, description, attendees, colorI
     //   "If we cannot find anyone, based on your specified availability in the following days, " +
     //   "we'll schedule another session for you and send you the corresponding Google Calendar invite.",
     start: {
-      dateTime: start,
-      timeZone: new Intl.DateTimeFormat().resolvedOptions(start).timeZone
+      dateTime: moment(start).utcOffset(0).toISOString(),
+      timeZone: "UTC"
     },
     end: {
-      dateTime: end,
-      timeZone: new Intl.DateTimeFormat().resolvedOptions(end).timeZone
+      dateTime: moment(end).utcOffset(0).toISOString(),
+      timeZone: "UTC"
     },
     // attendees: [{ email: "oneweb@umich.edu" }],
     attendees,
@@ -58,7 +68,7 @@ exports.insertEvent = async (start, end, summary, description, attendees, colorI
       calendarId: calendarId,
       conferenceDataVersion: 1,
       resource: event,
-      sendUpdates: "all"
+      sendUpdates: process.env.NODE_ENV === "test" ? "none" : "all"
     });
 
     if (response["status"] == 200 && response["statusText"] === "OK") {
@@ -117,6 +127,9 @@ exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
 
 // Delete an event with eventID
 exports.deleteEvent = async eventId => {
+  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    return true;
+  }
   try {
     let response = await calendar.events.delete({
       calendarId: calendarId,
