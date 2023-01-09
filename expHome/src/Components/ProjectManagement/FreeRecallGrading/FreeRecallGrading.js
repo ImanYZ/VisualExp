@@ -20,6 +20,7 @@ import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
+import { toOrdinal } from "number-to-words";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -53,6 +54,10 @@ const FreeRecallGrading = props => {
   const [submitting, setSubmitting] = useState(true);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [firstBatchOfRecallGrades, setFirstBatchOfRecallGrades] = useState([]);
+  const [recallGrades, setRecallGrades] = useState([]);
+  const [recallGradeIdx, setRecallGradeIdx] = useState(0);
+  const [passages, setPassages] = useState({});
+
   const [notSatisfiedRecallGrades, setNotSatisfiedRecallGrades] = useState([]);
   const [retrieveNext, setRetrieveNext] = useState(0);
 
@@ -156,105 +161,42 @@ const FreeRecallGrading = props => {
   // researchers yet.
 
   const loadedRecallGrades = async () => {
-    let lastVisibleRecallGradesDoc;
-    let lastVisibleRecallGradesDocAutoGrading;
-    let recallGradeDocs;
-    let collName = "recallGrades";
-    if (project !== "H2K2" && project !== "Autograding") {
-      collName += project;
-    }
-
-    if (!lastRetreivedDocument || !allowNextBatch) {
-      let recallGradeDocsInitial = await firebase.db
-        .collection(collName)
+    const recallGrades = await firebase.db
+        .collection("recallGradesV2")
+        .where("project", "==", project)
         .where("done", "==", false)
-        .orderBy("passage")
-        .orderBy("user")
-        .orderBy("session")
-        .limit(1)
         .get();
-      lastVisibleRecallGradesDoc = recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
-      setLastRetreivedDocument(lastVisibleRecallGradesDoc);
-    } else {
-      lastVisibleRecallGradesDoc = lastRetreivedDocument;
-    }
-    if (lastVisibleRecallGradesDoc) {
-      recallGradeDocs = await firebase.db
-        .collection(collName)
-        .where("done", "==", false)
-        .orderBy("passage")
-        .orderBy("user")
-        .orderBy("session")
-        .startAfter(lastVisibleRecallGradesDoc)
-        .limit(4000)
-        .get();
-      if (allowNextBatch) {
-        lastVisibleRecallGradesDoc = recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
-        setLastRetreivedDocument(lastVisibleRecallGradesDoc);
-        setAllowNextBatch(false);
-      }
-    } else {
-      if (project === "Autograding") {
-        if (lastRetreivedDocumentAutoGrading === "" || !allowNextBatch) {
-          let recallGradeDocsInitial = await firebase.db
-            .collection("recallGradesH1L2")
-            .where("done", "==", false)
-            .orderBy("passage")
-            .orderBy("user")
-            .orderBy("session")
-            .limit(1)
-            .get();
-          lastVisibleRecallGradesDocAutoGrading = recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
-          setRetreivedDocumentAutoGrading(lastVisibleRecallGradesDoc);
-        } else {
-          lastVisibleRecallGradesDocAutoGrading = lastRetreivedDocumentAutoGrading;
-        }
+    
+    const _recallGrades = [];
 
-        if (lastVisibleRecallGradesDocAutoGrading) {
-          recallGradeDocs = await firebase.db
-            .collection("recallGradesH1L2")
-            .where("done", "==", false)
-            .orderBy("passage")
-            .orderBy("user")
-            .orderBy("session")
-            .startAfter(lastVisibleRecallGradesDocAutoGrading)
-            .limit(4000)
-            .get();
-          if (allowNextBatch) {
-            lastVisibleRecallGradesDocAutoGrading = recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
-            setRetreivedDocumentAutoGrading(lastVisibleRecallGradesDocAutoGrading);
-            setAllowNextBatch(false);
+    for (const recallGradeDoc of recallGrades.docs) {
+      const recallGradeData = recallGradeDoc.data();
+
+      let sessionNums = Object.keys(recallGradeData.sessions)
+        .map((sessionKey) => parseInt(sessionKey.replace(/[^0-9]+/g, "")));
+      sessionNums.sort((a, b) => a < b ? -1 : 1);
+
+      for(const sessionNum of sessionNums) {
+        for(const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
+          const filtered = (conditionItem.response || "").replace(/[\.,]/g, " ").split(" ").filter(w => w.trim());
+          if (
+            recallGradeData.user !== fullname &&
+            !conditionItem.researchers.includes(fullname) &&
+            !conditionItem.viewers.includes(fullname) &&
+            filtered.length > 2
+          ) {
+            _recallGrades.push({
+              docId: recallGradeDoc.id,
+              session: toOrdinal(sessionNum),
+              ...conditionItem
+            }); 
           }
         }
       }
-    }
 
-    const firstBatch = [];
-    const lastVisibleRecallGradesData = lastVisibleRecallGradesDoc.data();
-
-    if (lastVisibleRecallGradesData.user !== fullname && !lastVisibleRecallGradesData.researchers.includes(fullname)) {
-      firstBatch.push({ data: lastVisibleRecallGradesData, grade: false });
+      setRecallGrades(_recallGrades);
+      setRecallGradeIdx(0);
     }
-    for (let recallGradeDoc of recallGradeDocs.docs) {
-      const recallGradeData = recallGradeDoc.data();
-      const filtered = (recallGradeData.response || "").split(" ").filter(w => w.trim());
-      if (
-        recallGradeData.user !== fullname &&
-        !recallGradeData.researchers.includes(fullname) &&
-        !recallGradeData.viewers.includes(fullname) &&
-        filtered.length > 2
-      ) {
-        if (firstBatch.length > 0 && recallGradeData.response !== firstBatch[0].data.response) {
-          break;
-        }
-        firstBatch.push({ data: recallGradeData, grade: false });
-      }
-    }
-
-    if (firstBatch.length === 0) {
-      setAllowNextBatch(true);
-    }
-    return firstBatch;
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,6 +213,22 @@ const FreeRecallGrading = props => {
   }, []);
 
   useEffect(() => {
+    loadedRecallGrades();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const passageId = recallGrades[recallGradeIdx].passage;
+      if(!passages[passageId]) {
+        const passageDoc = await firebase.db.collection("passages").doc(passageId).get();
+        setPassages((passages) => {
+          return {...passages, [passageId]: passageDoc.data() }
+        })
+      }
+    })()
+  }, [passages, recallGrades, recallGradeIdx]);
+
+  useEffect(() => {
     let firstBatch = [];
 
     const retrieveFreeRecallResponse = async () => {
@@ -282,9 +240,9 @@ const FreeRecallGrading = props => {
       // solution, we separated the collections per project, other than the
       // H2K2 project that we have already populated the data in and it's very
       // costly to rename.
-      while (firstBatch.length === 0) {
+      /* while (firstBatch.length === 0) {
         firstBatch = await loadedRecallGrades();
-      }
+      } */
 
       const passageDoc = await firebase.db.collection("passages").doc(firstBatch[0].data.passage).get();
 
