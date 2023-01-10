@@ -29,6 +29,9 @@ const temp_schema = [
 
 // eslint-disable-next-line no-empty-pattern
 export const SchemaGenRecalls = props => {
+
+  const {notSatisfiedPhrases, recallGrade, gradeIt} = props;
+
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const [selectedPhrase, setSelectedPhrase] = useState(null);
@@ -43,7 +46,7 @@ export const SchemaGenRecalls = props => {
   const [searching, setSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [wrongRecallVotes, setWrongRecallVotes] = useState([]);
-  const [selectedGrade, setSelectedGrade] = useState();
+  const [selectedRecall, setSelectedRecall] = useState();
 
   const [selectedPassageId, setSelectedPassageId] = useState("");
   const [satisfiedRecalls, setSatisfiedRecalls] = useState([]);
@@ -294,14 +297,14 @@ export const SchemaGenRecalls = props => {
   };
 
   useEffect(() => {
-    if (!props.firstBatchOfRecallGrades.length) return;
-    setSelectedPhrase(props.firstBatchOfRecallGrades[0].data.phrase);
-  }, [props.firstBatchOfRecallGrades]);
+    if (!recallGrade?.phrases?.length) return;
+    setSelectedPhrase(recallGrade?.phrases?.[0]?.phrase);
+  }, [recallGrade]);
 
-  const renderResponses = reponse => {
-    const highlightedWords = reponse.highlightedWords;
+  const renderResponses = response => {
+    const highlightedWords = response.highlightedWords;
 
-    const sentences = reponse.text.split(".");
+    const sentences = response.text.split(".");
     const sentenceArray = [];
     const margin = {
       marginRight: "3px"
@@ -453,57 +456,72 @@ export const SchemaGenRecalls = props => {
   }, [currentPage, searchResules]);
 
   useEffect(() => {
-    if (!props.notSatisfiedRecallGrades.length) return;
-    if (!props.firstBatchOfRecallGrades.length) return;
+    if (!notSatisfiedPhrases.length) return;
+    if (!recallGrade.length) return;
     const notSatisfiedRecalls = [];
     const satisfiedRecalls = [];
-    for (let recallGrade of props.firstBatchOfRecallGrades) {
-      if (recallGrade.grade && props.notSatisfiedRecallGrades.includes(recallGrade)) {
-        notSatisfiedRecalls.push(recallGrade);
+    const phrases = recallGrade?.phrases || [];
+    for (let phrase of phrases) {
+
+      const researchers = [...(phrase.researchers || [])];
+      let researcherIdx = researchers.indexOf(fullname);
+      if(researcherIdx === -1) {
+        researchers.push(fullname);
+        researcherIdx = researchers.length - 1;
+      }
+
+      const grades = [...(phrase.grades || [])];
+      const grade = !grades[researcherIdx];
+      phrase.grade = grade; // tmp saving researcher's grade
+
+      if (grade && notSatisfiedPhrases.includes(phrase.phrase)) {
+        notSatisfiedRecalls.push(phrase);
       } else {
-        satisfiedRecalls.push(recallGrade);
+        satisfiedRecalls.push(phrase);
       }
     }
     if (notSatisfiedRecalls.length) {
-      const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
+      // TODO: need to rewrite it according new structure
+      /* const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
       recallGradesLogsRef.set({
         wrongRecallGrades: notSatisfiedRecalls,
         firstBatchOfRecallGrades: props.firstBatchOfRecallGrades
-      });
+      }); */
 
       setSatisfiedRecalls(satisfiedRecalls);
       setWrongRecallVotes(notSatisfiedRecalls);
-      setSelectedPhrase(notSatisfiedRecalls[0].data.phrase);
-      setSelectedGrade(notSatisfiedRecalls[0]);
+      // setSelectedPhrase(notSatisfiedRecalls[0].data.phrase);
+      setSelectedRecall(notSatisfiedRecalls[0]);
     }
-  }, [props.firstBatchOfRecallGrades, props.notSatisfiedRecallGrades]);
+  }, [recallGrade, notSatisfiedPhrases]);
 
   const changeTheVote = () => {
     const _wrongRecallVotes = wrongRecallVotes.slice();
     const _index = wrongRecallVotes.findIndex(object => {
-      return selectedGrade.data.phrase === object.data.phrase;
+      return selectedRecall.phrase === object.phrase;
     });
     const _checked = _wrongRecallVotes[_index].grade;
     if (_index !== -1) {
       _wrongRecallVotes[_index].grade = !_checked;
       setWrongRecallVotes(_wrongRecallVotes);
-      setSelectedPhrase(wrongRecallVotes[_index].data.phrase);
-      setSelectedGrade(_wrongRecallVotes[_index]);
+      //setSelectedPhrase(wrongRecallVotes[_index].data.phrase);
+      setSelectedRecall(_wrongRecallVotes[_index]);
     }
   };
 
   const handleNext = () => {
     const indexOFthis = wrongRecallVotes.findIndex(object => {
-      return selectedGrade.data.phrase === object.data.phrase;
+      return selectedRecall.phrase === object.phrase;
     });
     if (indexOFthis + 1 === wrongRecallVotes.length) {
       setSubmitButtonLoader(true);
+      // TODO: require some changes here
       const requestAnswers = satisfiedRecalls.concat(wrongRecallVotes);
-      props.gradeIt(requestAnswers);
+      gradeIt(requestAnswers);
       setSubmitButtonLoader(true);
     } else {
-      setSelectedPhrase(wrongRecallVotes[indexOFthis + 1].data.phrase);
-      setSelectedGrade(wrongRecallVotes[indexOFthis + 1]);
+      // setSelectedPhrase(wrongRecallVotes[indexOFthis + 1].data.phrase);
+      setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
     }
     const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
     recallGradesLogsRef.set({
@@ -512,7 +530,7 @@ export const SchemaGenRecalls = props => {
     });
   };
 
-  if (!selectedGrade) return <></>;
+  if (!selectedRecall) return <></>;
   return (
     <div className="schema-generation">
       <div className="section">
@@ -531,7 +549,7 @@ export const SchemaGenRecalls = props => {
                 paddingLeft: "10px"
               }}
             >
-              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>{selectedGrade.data.response}</Paper>
+              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>{recallGrade.response}</Paper>
               <Alert severity="warning">
                 You checked this phrase as "YES" and that belongs to the participant response above ; but according to
                 the Boolean schema the phrase does not satify the response . Do you want to change your vote or propose
@@ -541,7 +559,7 @@ export const SchemaGenRecalls = props => {
                 <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
                   <Box sx={{ display: "inline", mr: "19px" }}>
                     NO
-                    <Switch checked={selectedGrade.grade} onChange={changeTheVote} color="secondary" />
+                    <Switch checked={selectedRecall.grade} onChange={changeTheVote} color="secondary" />
                     YES
                   </Box>
                   <Box sx={{ display: "inline" }}>{selectedPhrase}</Box>
@@ -554,7 +572,7 @@ export const SchemaGenRecalls = props => {
               {submitButtonLoader ? (
                 <CircularProgress color="warning" size="15px" />
               ) : wrongRecallVotes.findIndex(object => {
-                  return selectedGrade.data.phrase === object.data.phrase;
+                  return selectedRecall.phrase === object.phrase;
                 }) +
                   1 ===
                 wrongRecallVotes.length ? (
@@ -564,7 +582,7 @@ export const SchemaGenRecalls = props => {
               )}
             </Button>
             {wrongRecallVotes.findIndex(object => {
-              return selectedGrade.data.phrase === object.data.phrase;
+              return selectedRecall.phrase === object.phrase;
             }) + 1}{" "}
             / {wrongRecallVotes.length}
           </Box>
