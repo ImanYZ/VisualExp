@@ -457,36 +457,25 @@ export const SchemaGenRecalls = props => {
 
   useEffect(() => {
     if (!notSatisfiedPhrases.length) return;
-    if (!recallGrade.length) return;
+    if (!recallGrade) return;
     const notSatisfiedRecalls = [];
     const satisfiedRecalls = [];
     const phrases = recallGrade?.phrases || [];
-    for (let phrase of phrases) {
-
-      const researchers = [...(phrase.researchers || [])];
-      let researcherIdx = researchers.indexOf(fullname);
-      if(researcherIdx === -1) {
-        researchers.push(fullname);
-        researcherIdx = researchers.length - 1;
-      }
-
-      const grades = [...(phrase.grades || [])];
-      const grade = !grades[researcherIdx];
-      phrase.grade = grade; // tmp saving researcher's grade
-
-      if (grade && notSatisfiedPhrases.includes(phrase.phrase)) {
+    for (const phrase of phrases) {
+      if (notSatisfiedPhrases.includes(phrase.phrase)) {
         notSatisfiedRecalls.push(phrase);
       } else {
         satisfiedRecalls.push(phrase);
       }
     }
+    
     if (notSatisfiedRecalls.length) {
       // TODO: need to rewrite it according new structure
-      /* const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
+      const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
       recallGradesLogsRef.set({
         wrongRecallGrades: notSatisfiedRecalls,
-        firstBatchOfRecallGrades: props.firstBatchOfRecallGrades
-      }); */
+        recallGrade: recallGrade
+      });
 
       setSatisfiedRecalls(satisfiedRecalls);
       setWrongRecallVotes(notSatisfiedRecalls);
@@ -502,6 +491,11 @@ export const SchemaGenRecalls = props => {
     });
     const _checked = _wrongRecallVotes[_index].grade;
     if (_index !== -1) {
+      const researchers = [...(_wrongRecallVotes[_index].researchers || [])];
+      const researcherIdx = researchers.indexOf(fullname);
+      if(researcherIdx !== -1) {
+        _wrongRecallVotes[_index].grades[researcherIdx] = !_checked;
+      }
       _wrongRecallVotes[_index].grade = !_checked;
       setWrongRecallVotes(_wrongRecallVotes);
       //setSelectedPhrase(wrongRecallVotes[_index].data.phrase);
@@ -515,7 +509,6 @@ export const SchemaGenRecalls = props => {
     });
     if (indexOFthis + 1 === wrongRecallVotes.length) {
       setSubmitButtonLoader(true);
-      // TODO: require some changes here
       const requestAnswers = satisfiedRecalls.concat(wrongRecallVotes);
       gradeIt(requestAnswers);
       setSubmitButtonLoader(true);
@@ -526,7 +519,7 @@ export const SchemaGenRecalls = props => {
     const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
     recallGradesLogsRef.set({
       wrongRecallGrades: wrongRecallVotes,
-      firstBatchOfRecallGrades: props.firstBatchOfRecallGrades
+      recallGrade
     });
   };
 

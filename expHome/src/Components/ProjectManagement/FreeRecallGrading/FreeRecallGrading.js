@@ -55,10 +55,12 @@ const FreeRecallGrading = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [firstBatchOfRecallGrades, setFirstBatchOfRecallGrades] = useState([]);
   const [recallGrades, setRecallGrades] = useState([]);
+  const [oRecallGrades, setORecallGrades] = useState([]);
   const [recallGradeIdx, setRecallGradeIdx] = useState(0);
   const [passages, setPassages] = useState({});
 
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
+  const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
   const [randomizedPhrases, setRandomizedPhrases] = useState([]);
   const [retrieveNext, setRetrieveNext] = useState(0);
 
@@ -73,7 +75,7 @@ const FreeRecallGrading = props => {
   const [viewedRecalllDocument, setViewedRecalllDocument] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
-  
+
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
     if (!text) return;
@@ -106,7 +108,6 @@ const FreeRecallGrading = props => {
       }
     }
     if (!notContainsWord && containsWord) {
-      console.log(schemaEp, "schemaEp");
       return true;
     } else {
       return false;
@@ -202,16 +203,17 @@ const FreeRecallGrading = props => {
             _recallGrades.push({
               docId: recallGradeDoc.id,
               session: toOrdinal(sessionNum),
+              user: recallGradeData.user,
               ...conditionItem
             }); 
           }
         }
       }
-
-      setRecallGrades(_recallGrades);
-      setRecallGradeIdx(0);
     }
 
+    setRecallGrades(_recallGrades);
+    setORecallGrades(_recallGrades);
+    setRecallGradeIdx(0);
     setSubmitting(false);
   };
 
@@ -248,35 +250,33 @@ const FreeRecallGrading = props => {
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = async newBatch => {
-    console.log("gradeIt")
-    return;
-    let firstBatch;
-    if (newBatch.length) {
-      firstBatch = newBatch;
+    let phrases;
+    const recallGrade = recallGrades?.[recallGradeIdx];
+    const oRecallGrade = oRecallGrades?.[recallGradeIdx];
+    if (newBatch?.length) {
+      phrases = [...newBatch];
     } else {
-      firstBatch = firstBatchOfRecallGrades;
+      phrases = [...(recallGrades?.[recallGradeIdx]?.phrases || [])];
     }
+
+    phrases = phrases.map((phrases) => {
+      delete phrases.grade;
+      return phrases;
+    });
+
     setSubmitting(true);
     try {
-      const phrasesWithGrades = firstBatch.map(recall => ({
-        phrase: recall.data.phrase,
-        grade: recall.grade
-      }));
-      const userData = (await firebase.db.collection("users").doc(`${firstBatch[0].data.user}`).get()).data();
-      let passageIdx = userData.pConditions.findIndex(pCon => pCon.passage === firstBatch[0].data.passage);
       const freeRecallGradeBulkData = {
         fullname,
-        project: firstBatch[0].data.project,
-        phraseNum: passageData?.phrases?.length,
-        user: firstBatch[0].data.user,
-        passageId: firstBatch[0].data.passage,
-        passageIdx,
-        condition: firstBatch[0].data.condition,
-        phrasesWithGrades,
-        session: firstBatch[0].data.session,
-        response: firstBatch[0].data.response,
+        project: recallGrade?.project,
+        user: recallGrade?.user,
+        passageId: recallGrade?.passage,
+        condition: recallGrade?.condition,
+        phrases,
+        session: recallGrade?.session,
+        response: recallGrade?.response,
         voterProject: project,
-        viewedRecalllDocument
+        oRecallGrade
       };
 
       await firebase.idToken();
@@ -307,6 +307,7 @@ const FreeRecallGrading = props => {
 
     _recallGrades[recallGradeIdx].phrases[index].researchers = researchers;
     _recallGrades[recallGradeIdx].phrases[index].grades = grades;
+    _recallGrades[recallGradeIdx].phrases[index].grade = grades[researcherIdx];
 
     setRecallGrades(_recallGrades);
   };
@@ -314,7 +315,9 @@ const FreeRecallGrading = props => {
   const handleSubmit = () => {
     let hasNotSatisfiedPhrases = false;
     const recallGrade = recallGrades?.[recallGradeIdx];
-    const phrases = recallGrade?.phrases || [];
+    const phrases = [...(recallGrade?.phrases || [])];
+
+    const notSatisfiedSelections = [];
 
     for (const _phrase of phrases) {
       const researchers = _phrase.researchers || [];
@@ -325,9 +328,11 @@ const FreeRecallGrading = props => {
 
       if (grade && notSatisfiedPhrases.includes(_phrase.phrase)) {
         hasNotSatisfiedPhrases = true;
-        break;
+        notSatisfiedSelections.push(_phrase.phrase);
       }
     }
+
+    setNotSatisfiedSelections(notSatisfiedSelections);
 
     if (hasNotSatisfiedPhrases) {
       setShowTheSchemaGen(true);
@@ -340,7 +345,7 @@ const FreeRecallGrading = props => {
     return (
       <SchemaGenRecalls
         recallGrade={recallGrades?.[recallGradeIdx]}
-        notSatisfiedPhrases={notSatisfiedPhrases}
+        notSatisfiedPhrases={notSatisfiedSelections}
         gradeIt={gradeIt}
       />
     );
