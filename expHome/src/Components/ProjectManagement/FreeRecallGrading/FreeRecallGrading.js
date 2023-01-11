@@ -21,6 +21,7 @@ import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
 import { toOrdinal } from "number-to-words";
+import { set } from "lodash";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -75,6 +76,8 @@ const FreeRecallGrading = props => {
   const [viewedRecalllDocument, setViewedRecalllDocument] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
+
+  const [currentRecallGrade, setCurrentRecallGrade] = useState(null);
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
@@ -131,11 +134,11 @@ const FreeRecallGrading = props => {
         booleanHashMap[booleanData.phrase] = [booleanData];
       }
     }
-    
+
     const nonSatisfiedPhrases = [];
 
     const phrases = recallGrade.phrases || [];
-    
+
     for (let phrase of phrases) {
       if (booleanHashMap.hasOwnProperty(phrase.phrase)) {
         const schemaE = booleanHashMap[phrase.phrase][0].schema;
@@ -144,7 +147,6 @@ const FreeRecallGrading = props => {
         }
       } else {
         nonSatisfiedPhrases.push(phrase.phrase);
-        console.log(phrase.phrase, "----- not boolean expression");
       }
     }
 
@@ -157,18 +159,18 @@ const FreeRecallGrading = props => {
     (async () => {
       const recallGrade = recallGrades?.[recallGradeIdx];
       const passageData = passages?.[recallGrade?.passage];
-      if(passageData?.title) {
+      if (passageData?.title) {
         const notSatisfiedPhrases = await searchAnyBooleanExpression();
-        let phrases = [...recallGrade.phrases].map((phrase, idx) => ({...phrase, index: idx}))
+        let phrases = [...recallGrade.phrases].map((phrase, idx) => ({ ...phrase, index: idx }));
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
-        console.log(notSatisfiedPhrases.length, phrases.length)
+        console.log(notSatisfiedPhrases.length, phrases.length);
         // pick only 4 wrong phrases
-        phrases = phrases.filter((phrase) => notSatisfiedPhrases.includes(phrase.phrase) ? (wrongNum++ < 4) : true)
+        phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
         setRandomizedPhrases(phrases);
       }
-    })()
-  }, [recallGradeIdx, passages])
+    })();
+  }, [recallGradeIdx, passages]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -177,23 +179,28 @@ const FreeRecallGrading = props => {
 
   const loadedRecallGrades = async () => {
     const recallGrades = await firebase.db
-        .collection("recallGradesV2")
-        .where("project", "==", project)
-        .where("done", "==", false)
-        .get();
-    
+      .collection("recallGradesV2")
+      .where("project", "==", project)
+      .where("done", "==", false)
+      .get();
+
     const _recallGrades = [];
 
     for (const recallGradeDoc of recallGrades.docs) {
       const recallGradeData = recallGradeDoc.data();
+      if (recallGradeData.researchers.includes(fullname)) continue;
+      let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
+        parseInt(sessionKey.replace(/[^0-9]+/g, ""))
+      );
+      sessionNums.sort((a, b) => (a < b ? -1 : 1));
 
-      let sessionNums = Object.keys(recallGradeData.sessions)
-        .map((sessionKey) => parseInt(sessionKey.replace(/[^0-9]+/g, "")));
-      sessionNums.sort((a, b) => a < b ? -1 : 1);
-
-      for(const sessionNum of sessionNums) {
-        for(const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
-          const filtered = (conditionItem.response || "").replace(/[\.,]/g, " ").split(" ").filter(w => w.trim());
+      for (const sessionNum of sessionNums) {
+        if (!sessionNum) continue;
+        for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
+          const filtered = (conditionItem.response || "")
+            .replace(/[\.,]/g, " ")
+            .split(" ")
+            .filter(w => w.trim());
           if (
             recallGradeData.user !== fullname &&
             !conditionItem.researchers.includes(fullname) &&
@@ -205,7 +212,7 @@ const FreeRecallGrading = props => {
               session: toOrdinal(sessionNum),
               user: recallGradeData.user,
               ...conditionItem
-            }); 
+            });
           }
         }
       }
@@ -217,70 +224,58 @@ const FreeRecallGrading = props => {
     setSubmitting(false);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
-    if (recallGradesLogsDoc.exists) {
-      const recallGradesLogsData = recallGradesLogsDoc.data();
-      if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
-        // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
-        // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
-        // setShowTheSchemaGen(true);
-      }
-    }
-  }, []);
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // useEffect(async () => {
+  //   const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
+  //   if (recallGradesLogsDoc.exists) {
+  //     const recallGradesLogsData = recallGradesLogsDoc.data();
+  //     if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
+  //       // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
+  //       // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
+  //       // setShowTheSchemaGen(true);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
-    loadedRecallGrades();
-  }, []);
+    if (firebase) {
+      loadedRecallGrades();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase]);
 
   useEffect(() => {
     (async () => {
       const passageId = recallGrades?.[recallGradeIdx]?.passage;
-      if(!passages[passageId]) {
+      if (!passages[passageId]) {
         const passageDoc = await firebase.db.collection("passages").doc(passageId).get();
-        setPassages((passages) => {
-          return {...passages, [passageId]: passageDoc.data() }
-        })
+        setPassages(passages => {
+          return { ...passages, [passageId]: passageDoc.data() };
+        });
       }
-    })()
+    })();
   }, [passages, recallGrades, recallGradeIdx]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = async newBatch => {
-    let phrases;
+    console.log("randomizedPhrases",randomizedPhrases);
     const recallGrade = recallGrades?.[recallGradeIdx];
-    const oRecallGrade = oRecallGrades?.[recallGradeIdx];
-    if (newBatch?.length) {
-      phrases = [...newBatch];
-    } else {
-      phrases = [...(recallGrades?.[recallGradeIdx]?.phrases || [])];
-    }
-
-    phrases = phrases.map((phrases) => {
-      delete phrases.grade;
-      return phrases;
-    });
-
+    console.log("before recallGrade ::: ",recallGrade);
     setSubmitting(true);
+    console.log("after recallGrade ::: ",recallGrade);
     try {
-      const freeRecallGradeBulkData = {
+      const requestData = {
         fullname,
-        project: recallGrade?.project,
-        user: recallGrade?.user,
-        passageId: recallGrade?.passage,
-        condition: recallGrade?.condition,
-        phrases,
-        session: recallGrade?.session,
-        response: recallGrade?.response,
+        recallGrade,
         voterProject: project,
-        oRecallGrade
+        randomizedPhrases,
+        notSatisfiedPhrases,
       };
-
       await firebase.idToken();
-      await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
+      console.log({requestData});
+      // await axios.post("/GradeFreeRecall", requestData);
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
       setRetrieveNext(oldValue => oldValue + 1);
@@ -293,11 +288,14 @@ const FreeRecallGrading = props => {
     }
   };
 
-  const handleGradeChange = (index) => {
+  const handleGradeChange = (index,key) => {
+    console.log(key);
+    console.log("randomizedPhrases",randomizedPhrases);
+    const _randomizedPhrases = [...randomizedPhrases];
     const _recallGrades = [...recallGrades];
     const researchers = [...(_recallGrades[recallGradeIdx].phrases[index].researchers || [])];
     let researcherIdx = researchers.indexOf(fullname);
-    if(researcherIdx === -1) {
+    if (researcherIdx === -1) {
       researchers.push(fullname);
       researcherIdx = researchers.length - 1;
     }
@@ -306,9 +304,13 @@ const FreeRecallGrading = props => {
     grades[researcherIdx] = !grades[researcherIdx];
 
     _recallGrades[recallGradeIdx].phrases[index].researchers = researchers;
+    _randomizedPhrases[key].researchers = researchers;
+    _randomizedPhrases[key].grades = grades;
     _recallGrades[recallGradeIdx].phrases[index].grades = grades;
     _recallGrades[recallGradeIdx].phrases[index].grade = grades[researcherIdx];
-
+    setRandomizedPhrases(_randomizedPhrases);
+    // console.log(_randomizedPhrases)
+    console.log("recallGrades", _recallGrades);
     setRecallGrades(_recallGrades);
   };
 
@@ -389,17 +391,17 @@ const FreeRecallGrading = props => {
           their free-recall response, and then submit your answers:
         </p>
 
-        {(randomizedPhrases || []).map((row, index) => {
+        {(randomizedPhrases || []).map((row, key) => {
           const phrase = recallGrades[recallGradeIdx].phrases[row.index];
 
           const researcherIdx = (phrase.researchers || []).indexOf(fullname);
           const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
           return (
-            <div key={index}>
+            <div key={key}>
               <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
                 <Box sx={{ display: "inline", mr: "19px" }}>
                   NO
-                  <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
+                  <Switch checked={grade} onChange={() => handleGradeChange(row.index,key)} color="secondary" />
                   YES
                 </Box>
                 <Box sx={{ display: "inline" }}>{phrase.phrase}</Box>

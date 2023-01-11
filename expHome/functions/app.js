@@ -21,7 +21,7 @@ const {
   voteAdministratorEndpoint,
   voteAdministratorReset,
   // updateNotTakenSessions,
-  bulkGradeFreeRecall,
+  GradeFreeRecall,
   markPaidEndpoint,
   passagesNumberCorrection,
   handleSubmitFeebackCode,
@@ -109,7 +109,7 @@ app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
-app.post("/bulkGradeFreeRecall", bulkGradeFreeRecall);
+app.post("/GradeFreeRecall", GradeFreeRecall);
 app.post("/handleSubmitFeebackCode", handleSubmitFeebackCode);
 app.post("/createTemporaryFeedbacodeCollection", createTemporaryFeedbacodeCollection);
 app.post("/checkEmailInstitution", checkEmailInstitution);

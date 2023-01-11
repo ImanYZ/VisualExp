@@ -449,11 +449,6 @@ export const SchemaGenRecalls = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schema, selectedPhrase, recallResponses, searching]);
 
-  const currentTableData = useMemo(() => {
-    const firstPageIndex = (currentPage - 1) * PageSize;
-    const lastPageIndex = firstPageIndex + PageSize;
-    return searchResules.slice(firstPageIndex, lastPageIndex);
-  }, [currentPage, searchResules]);
 
   useEffect(() => {
     if (!notSatisfiedPhrases.length) return;
@@ -658,8 +653,8 @@ export const SchemaGenRecalls = props => {
             }}
           >
             <Box>
-              {currentTableData.length > 0 ? (
-                currentTableData.map((respon, index) => {
+              {searchResules.length > 0 ? (
+                searchResules.map((respon, index) => {
                   return (
                     <Paper
                       key={index}
@@ -684,13 +679,6 @@ export const SchemaGenRecalls = props => {
               )}
             </Box>
           </div>
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={searchResules.length}
-            pageSize={PageSize}
-            onPageChange={page => setCurrentPage(page)}
-          />
         </div>
       </div>
     </div>
