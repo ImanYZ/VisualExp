@@ -428,7 +428,7 @@ export default [
     allTime: [],
     weekly: [],
     url: "/static/Communities/Social_Political_Psychology.jpg",
-    title: "Social & Political Psychology",
+    title: "Social Psychology",
     width: "33%",
     leaders: [
       {
@@ -455,13 +455,15 @@ export default [
       }
     ],
     YouTube: "cFqStnIHVS4",
-    description: `The Social & Political Psychology community explores past research that investigates how misinformation is spread, why it is accepted, and how it can be reduced. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
+    description: `The Social Psychology community explores published research in the field and conducts relevant studies. Interns are responsible for aiding in the ideation and completion of studies. They also summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.
+    Topics that the community will explore in a research setting include the effects of achievement/effort on performance, ways to increase motivation, and ways to diminish misinformation. While some initial work has been made, interns are welcome to join as soon as possible to receive the necessary training and begin collaborating with us.
+    `,
     accomplishments: "",
     gains: [
       `Work remotely with an interdisciplinary community of talented students and researchers from different schools.`,
-      `Gain experience using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
-      `Get involved in all aspects of conducting an online controlled experiment.`,
-      `Learn about conducting a controlled online experiment to prepare for future Ph.D. programs in related disciplines.`,
+      `Gain experience in using crucial skills in research including paper analysis, summarization, and making connections between disciplines.`,
+      `Get involved in all aspects of conducting online controlled experiments.`,
+      `Learn about conducting controlled online experiments to prepare for future Ph.D. programs in related disciplines.`,
       `Work towards publishing research on social/political psychology in reputable venues.`,
       `Have opportunities to take on leadership roles within the community.`
     ],
@@ -474,7 +476,7 @@ export default [
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
-      `Dedicate 25 hours a week over the Summer to engage in all aspects of the research project.`,
+      `Dedicate approximately 10-15+ hours a week to engage in all aspects of the research projects.`,
       `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,
       `Regularly study textbooks and research papers, summarize them, and share the essence of what you learn with our large research team.`,
       `Present the essence of what you learn from the related papers and book chapters in weekly meetings for further discussion.`,
