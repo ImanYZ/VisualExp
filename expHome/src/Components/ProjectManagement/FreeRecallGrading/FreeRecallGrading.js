@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
 import axios from "axios";
+import moment from "moment";
 
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
@@ -15,13 +16,12 @@ import withRoot from "../../Home/modules/withRoot";
 
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 
-import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
+import { projectState } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
 import { toOrdinal } from "number-to-words";
-import { set } from "lodash";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -60,6 +60,7 @@ const FreeRecallGrading = props => {
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
   const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
   const [randomizedPhrases, setRandomizedPhrases] = useState([]);
+  const [recentParticipants, setRecentParticipants] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
 
@@ -172,13 +173,28 @@ const FreeRecallGrading = props => {
   const loadedRecallGrades = async () => {
     setProcessing(true);
 
+    // logic to fetch recently participants names by current researcher
+    const recentParticipants = [];
+    const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
+    const month2WeeksAgo = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
+    if(!scheduleMonths.includes(month2WeeksAgo)) {
+      scheduleMonths.push(month2WeeksAgo);
+    }
+    const resSchedules = await firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).get();
+    for(const resSchedule of resSchedules.docs) {
+      const resScheduleData = resSchedule.data();
+      const scheduled = resScheduleData?.scheduled?.[fullname] || {};
+      recentParticipants.push(...Object.keys(scheduled));
+    }
+    setRecentParticipants(recentParticipants);
+
     const recallGrades = await firebase.db
       .collection("recallGradesV2")
       .where("project", "==", project)
       .where("done", "==", false)
       .get();
 
-    const _recallGrades = [];
+    let _recallGrades = [];
 
     for (const recallGradeDoc of recallGrades.docs) {
       const recallGradeData = recallGradeDoc.data();
@@ -211,6 +227,14 @@ const FreeRecallGrading = props => {
         }
       }
     }
+
+    // sorting researcher's related participants first
+    _recallGrades.sort((g1, g2) => {
+        const p1 = recentParticipants.includes(g1.user);
+        const p2 = recentParticipants.includes(g2.user);
+        if(p1 && p2) return 0;
+        return p1 && !p2 ? -1 : 1;
+    })
 
     setRecallGrades(_recallGrades);
     setRecallGradeIdx(0);
@@ -287,7 +311,7 @@ const FreeRecallGrading = props => {
       
       await firebase.idToken();
       await axios.post("/researchers/gradeRecalls", requestData);
-      
+
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
       if(recallGrades.length !== recallGradeIdx + 1) {
@@ -401,6 +425,14 @@ const FreeRecallGrading = props => {
         </ul>
       </Alert>
       <Paper style={{ paddingBottom: "19px" }}>
+        {
+          recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
+            <p>
+              <b>Participant: </b> {recallGrades[recallGradeIdx].user}
+            </p>
+          ) : <span />
+        }
+
         <p>1- Carefully read this free-recall response:</p>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {recallGrades[recallGradeIdx]?.response}
@@ -412,10 +444,6 @@ const FreeRecallGrading = props => {
 
         {(randomizedPhrases || []).map((row, index) => {
           const phrase = recallGrades[recallGradeIdx].phrases[row.index];
-
-          if(!phrase) {
-            console.log(row.index, recallGrades[recallGradeIdx].phrases, row)
-          }
 
           const researcherIdx = (phrase.researchers || []).indexOf(fullname);
           const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
