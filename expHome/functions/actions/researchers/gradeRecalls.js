@@ -232,6 +232,11 @@ module.exports = async (req, res) => {
         conditionUpdates.researchers.push(fullname);
       }
 
+      // flagging phrase for future analysis (based on phrase's boolean expression with response)
+      for(const phrase of conditionUpdates.phrases) {
+        phrase.satisfied = nonSatisfiedPhrases.includes(phrase.phrase) ? false : true;
+      }
+
       // if all conditions in all sessions are done then flag recall grade document as done
       let isAllDone = true;
       for(const session in recallGradeData.sessions) {
