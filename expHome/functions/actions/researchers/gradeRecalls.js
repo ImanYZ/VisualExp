@@ -80,12 +80,12 @@ module.exports = async (req, res) => {
         docGrades = docGrades || [];
         docResearchers = docResearchers || [];
 
-        /* const previousGrades = {
+        const previousGrades = {
           // sum of previous up votes from all researchers
-          upVotes: grades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
+          upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
           // sum of previous up votes from all researchers
-          downVotes: grades.reduce((c, g) => c + (g === false ? 1 : 0), 0)
-        }; */
+          downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), 0)
+        };
         
         // removing current researcher's vote from phrase if already exist by chance
         const _researcherIdx = (docResearchers || []).indexOf(fullname);
@@ -118,7 +118,8 @@ module.exports = async (req, res) => {
             downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), wasPresented ? (!grade ? 1 : 0) : 0),
             // list of all researchers that voted on this phrase
             researchers: phrase.researchers,
-            grades: phrase.grades
+            grades: phrase.grades,
+            previousResearcher: previousGrades.upVotes + previousGrades.downVotes
           }
         };
       }, {});
@@ -135,17 +136,17 @@ module.exports = async (req, res) => {
 
       const _phrases = Object.keys(votesByPhrases);
       // phrases considered as approved
-      const phrasesApproval = _phrases.map((phrase) => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3)
+      const phrasesApproval = _phrases.filter((phrase) => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3)
 
       // distribute points to participants
       if(phrasesApproval.length) {
         for(let i = 0; i < phrasesApproval.length; i++) {
           const phraseApproval = phrasesApproval[i];
-          const votesOfPhrase = votesByPhrases[i];
+          const votesOfPhrase = votesByPhrases[phraseApproval];
           if(!phraseApproval) continue;
 
           // we are only processing points when we have 4 researchers voted on phrase
-          if(!votesOfPhrase?.researchers || votesOfPhrase.researchers.length !== 4) continue;
+          if(!votesOfPhrase?.researchers || votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
 
           let recallResponse = "";
           switch (session) {
@@ -162,34 +163,36 @@ module.exports = async (req, res) => {
               throw new Error("Unknown value for session")
           }
 
+          const passageIdx = (userUpdates.pConditions || []).findIndex((conditionItem) => conditionItem.passage === sessionRecallGrade.passage);
+          if(passageIdx === -1) {
+            throw new Error("Unknown value for passage");
+          }
+
           userUpdated = true;
           // The only piece of the user data that should be modified is
           // pCondition based on the point received.
           let grades = 1;
-          if (recallResponse && userUpdates.pConditions?.[sessionRecallGrade.passage]?.[recallResponse]) {
+          if (recallResponse && userUpdates.pConditions?.[passageIdx]?.[recallResponse]) {
             // We should add up points here because each free recall response
             // may get multiple points from each of the key phrases identified
             // in it.
-            grades += userUpdates.pConditions[sessionRecallGrade.passage][recallResponse];
+            grades += userUpdates.pConditions[passageIdx][recallResponse];
           }
 
-          if(!userUpdates.pConditions[sessionRecallGrade.passage]) {
-            userUpdates.pConditions[sessionRecallGrade.passage] = {};
-          }
-          userUpdates.pConditions[sessionRecallGrade.passage][recallResponse] = grades;
+          userUpdates.pConditions[passageIdx][recallResponse] = grades;
 
           // Depending on how many key phrases were in the passage, we should
           // calculate the free-recall response ratio.
-          userUpdates.pConditions[sessionRecallGrade.passage][`${recallResponse}Ratio`] =
-            grades / sessionRecallGrade.phrases.length;
+          userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] =
+            parseFloat((grades / conditionUpdates.phrases.length).toFixed(2));
           
           const upVoteResearchers = [];
           const downVoteResearchers = [];
           for(let r = 0; r < votesOfPhrase.grades.length; r++) {
-            if(votesOfPhrase.grades[i]) {
-              upVoteResearchers.push(votesOfPhrase.researchers[i]);
+            if(votesOfPhrase.grades[r]) {
+              upVoteResearchers.push(votesOfPhrase.researchers[r]);
             } else {
-              downVoteResearchers.push(votesOfPhrase.researchers[i]);
+              downVoteResearchers.push(votesOfPhrase.researchers[r]);
             }
           }
 
