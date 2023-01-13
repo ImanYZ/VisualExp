@@ -177,10 +177,50 @@ describe("POST /api/researchers/gradeRecalls", () => {
       .set("Content-Type", "application/json")
       .set("Authorization", "Bearer " + accessToken)
       .send(payload);
-
+    
     const recallGrade = await recallGradeRef.get();
     recallGradeData = recallGrade.data();
 
     expect(recallGradeData.sessions["1st"][conditionIdx].done).toBeTruthy()
+
+  })
+
+  it("check if all the researchers whon voted on a phrase reseved points", async () => {
+    const recallGradeRef = db.collection("recallGradesV2").doc(mockRecallGradesV2.data[0].documentId);
+    const recallGradeUpdates = {...recallGradeData};
+    const { sessions } = recallGradeUpdates;
+    const session = sessions["1st"] || [];
+    const conditionIdx = session.findIndex((conditionItem) => conditionItem.condition === "H1");
+    const conditionItem = session[conditionIdx];
+    const phrase = conditionItem.phrases.find((phrase) => phrase.phrase === "Barn owl's life depends on hearing");
+    phrase.researchers = [...otherResearchers];
+    console.log(phrase.researchers);
+    phrase.grades = [true, true, false]; // keeping last as false to validate disagreement points
+
+    await recallGradeRef.update(recallGradeUpdates);
+
+    await chai.request(server).post("/api/researchers/gradeRecalls")
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer " + accessToken)
+      .send(payload);
+    
+      const researcherRef = db.collection("researchers").doc("Haroon Waheed");
+      const researcherDoc = await researcherRef.get();
+      const researcherData = researcherDoc.data();
+
+      expect(researcherData.points).toEqual(1);
+      
+      for(let researcher of otherResearchers) {
+        const researcherRef = db.collection("researchers").doc(researcher);
+
+
+      }
+    const recallGrade = await recallGradeRef.get();
+    recallGradeData = recallGrade.data();
+
+
+
+    expect(recallGradeData.sessions["1st"][conditionIdx].done).toBeTruthy()
+
   })
 })
