@@ -267,11 +267,9 @@ const FreeRecallGrading = props => {
     console.log("after recallGrade ::: ",recallGrade);
     try {
       const requestData = {
-        fullname,
         recallGrade,
         voterProject: project,
-        randomizedPhrases,
-        notSatisfiedPhrases,
+        viewedPhrases: randomizedPhrases.map((phrase) => phrase.phrase)
       };
       await firebase.idToken();
       console.log({requestData});
