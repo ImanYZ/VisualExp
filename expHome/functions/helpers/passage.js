@@ -52,6 +52,15 @@ exports.getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, ph
     }
   }
 
+  // sorting boolean expressions based on votes
+  for(const phrase in booleanHashMap) {
+    booleanHashMap[phrase].sort((e1, e2) => {
+      const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
+      const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
+      return e1Vote < e2Vote ? 1 : -1; // desc order
+    })
+  }
+
   const nonSatisfiedPhrases = [];
   const _phrases  = phrases || [];
 
