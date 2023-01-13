@@ -37,7 +37,6 @@ import { set } from "lodash";
 //   the phrase, the former researcher gets a ❌ negative point.
 const FreeRecallGrading = props => {
   const firebase = useRecoilValue(firebaseState);
-  const notAResearcher = useRecoilValue(notAResearcherState);
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
 
@@ -50,34 +49,19 @@ const FreeRecallGrading = props => {
   // assign these values to the corresponding recallGrades document when
   // submitting the researcher's evaluation of this phrase in this free-recall
   // response.
-  const [passageData, setPassageData] = useState({});
-  // const [response, setResponse] = useState(null);
   const [submitting, setSubmitting] = useState(true);
+  const [processing, setProcessing] = useState(false);
+
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [firstBatchOfRecallGrades, setFirstBatchOfRecallGrades] = useState([]);
   const [recallGrades, setRecallGrades] = useState([]);
-  const [oRecallGrades, setORecallGrades] = useState([]);
   const [recallGradeIdx, setRecallGradeIdx] = useState(0);
   const [passages, setPassages] = useState({});
 
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
   const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
   const [randomizedPhrases, setRandomizedPhrases] = useState([]);
-  const [retrieveNext, setRetrieveNext] = useState(0);
-
-  const [lastRetreivedDocument, setLastRetreivedDocument] = useState(null);
-  const [lastRetreivedDocumentAutoGrading, setRetreivedDocumentAutoGrading] = useState("");
-  const [allowNextBatch, setAllowNextBatch] = useState(false);
-
-  const [originalBatchOf, setOriginalBatchOf] = useState([]);
-
-  const [response, setResponse] = useState("");
-
-  const [viewedRecalllDocument, setViewedRecalllDocument] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
-
-  const [currentRecallGrade, setCurrentRecallGrade] = useState(null);
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
@@ -135,8 +119,16 @@ const FreeRecallGrading = props => {
       }
     }
 
-    const nonSatisfiedPhrases = [];
+    // sorting boolean expressions based on votes
+    for(const phrase in booleanHashMap) {
+      booleanHashMap[phrase].sort((e1, e2) => {
+        const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
+        const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
+        return e1Vote < e2Vote ? 1 : -1; // desc order
+      })
+    }
 
+    const nonSatisfiedPhrases = [];
     const phrases = recallGrade.phrases || [];
 
     for (let phrase of phrases) {
@@ -164,10 +156,10 @@ const FreeRecallGrading = props => {
         let phrases = [...recallGrade.phrases].map((phrase, idx) => ({ ...phrase, index: idx }));
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
-        console.log(notSatisfiedPhrases.length, phrases.length);
         // pick only 4 wrong phrases
         phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
         setRandomizedPhrases(phrases);
+        setProcessing(false);
       }
     })();
   }, [recallGradeIdx, passages]);
@@ -178,6 +170,8 @@ const FreeRecallGrading = props => {
   // researchers yet.
 
   const loadedRecallGrades = async () => {
+    setProcessing(true);
+
     const recallGrades = await firebase.db
       .collection("recallGradesV2")
       .where("project", "==", project)
@@ -204,13 +198,13 @@ const FreeRecallGrading = props => {
           if (
             recallGradeData.user !== fullname &&
             !conditionItem.researchers.includes(fullname) &&
-            !conditionItem.viewers.includes(fullname) &&
             filtered.length > 2
           ) {
             _recallGrades.push({
               docId: recallGradeDoc.id,
               session: toOrdinal(sessionNum),
               user: recallGradeData.user,
+              project: recallGradeData.project,
               ...conditionItem
             });
           }
@@ -219,7 +213,6 @@ const FreeRecallGrading = props => {
     }
 
     setRecallGrades(_recallGrades);
-    setORecallGrades(_recallGrades);
     setRecallGradeIdx(0);
     setSubmitting(false);
   };
@@ -260,25 +253,49 @@ const FreeRecallGrading = props => {
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = async newBatch => {
-    console.log("randomizedPhrases",randomizedPhrases);
+    let phrases = [];
     const recallGrade = recallGrades?.[recallGradeIdx];
-    console.log("before recallGrade ::: ",recallGrade);
+
+    if (newBatch?.length) {
+      const phraseStatements = [];
+      phrases = [...newBatch];
+      // need to add missing grades due schema gen recalls
+      for(const phrase of phrases) {
+        phraseStatements.push(phrase.phrase);
+      }
+      const recallPhrases = (recallGrades?.[recallGradeIdx]?.phrases || []);
+      for(const recallPhrase of recallPhrases) {
+        if(phraseStatements.includes(recallPhrase.phrase)) {
+          continue;
+        }
+        phrases.push(recallPhrase);
+      }
+    } else {
+      phrases = [...(recallGrades?.[recallGradeIdx]?.phrases || [])];
+    }
+
     setSubmitting(true);
-    console.log("after recallGrade ::: ",recallGrade);
     try {
       const requestData = {
-        recallGrade,
+        recallGrade: {
+          ...recallGrade,
+          phrases
+        },
         voterProject: project,
         viewedPhrases: randomizedPhrases.map((phrase) => phrase.phrase)
       };
+      
       await firebase.idToken();
-      console.log({requestData});
-      // await axios.post("/GradeFreeRecall", requestData);
+      await axios.post("/researchers/gradeRecalls", requestData);
+      
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
-      setRetrieveNext(oldValue => oldValue + 1);
+      if(recallGrades.length !== recallGradeIdx + 1) {
+        setProcessing(true);
+      }
+      setRandomizedPhrases([]);
+      setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
-      setFirstBatchOfRecallGrades([]);
       setShowTheSchemaGen(false);
     } catch (err) {
       console.error(err);
@@ -286,10 +303,7 @@ const FreeRecallGrading = props => {
     }
   };
 
-  const handleGradeChange = (index,key) => {
-    console.log(key);
-    console.log("randomizedPhrases",randomizedPhrases);
-    const _randomizedPhrases = [...randomizedPhrases];
+  const handleGradeChange = (index) => {
     const _recallGrades = [...recallGrades];
     const researchers = [...(_recallGrades[recallGradeIdx].phrases[index].researchers || [])];
     let researcherIdx = researchers.indexOf(fullname);
@@ -302,13 +316,9 @@ const FreeRecallGrading = props => {
     grades[researcherIdx] = !grades[researcherIdx];
 
     _recallGrades[recallGradeIdx].phrases[index].researchers = researchers;
-    _randomizedPhrases[key].researchers = researchers;
-    _randomizedPhrases[key].grades = grades;
     _recallGrades[recallGradeIdx].phrases[index].grades = grades;
     _recallGrades[recallGradeIdx].phrases[index].grade = grades[researcherIdx];
-    setRandomizedPhrases(_randomizedPhrases);
-    // console.log(_randomizedPhrases)
-    console.log("recallGrades", _recallGrades);
+    
     setRecallGrades(_recallGrades);
   };
 
@@ -349,8 +359,19 @@ const FreeRecallGrading = props => {
         gradeIt={gradeIt}
       />
     );
-
-  return !recallGrades || !recallGrades.length ? (
+  
+  if(processing) {
+    return (
+      <Box sx={{
+        display: "flex",
+        width: "100%",
+        justifyContent: "center"
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  return !recallGrades || !recallGrades.length || recallGrades.length <= recallGradeIdx ? (
     <Alert severity="info" size="large">
       <AlertTitle>Info</AlertTitle>
       You've graded all the recalls from participants
@@ -389,17 +410,21 @@ const FreeRecallGrading = props => {
           their free-recall response, and then submit your answers:
         </p>
 
-        {(randomizedPhrases || []).map((row, key) => {
+        {(randomizedPhrases || []).map((row, index) => {
           const phrase = recallGrades[recallGradeIdx].phrases[row.index];
+
+          if(!phrase) {
+            console.log(row.index, recallGrades[recallGradeIdx].phrases, row)
+          }
 
           const researcherIdx = (phrase.researchers || []).indexOf(fullname);
           const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
           return (
-            <div key={key}>
+            <div key={index}>
               <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
                 <Box sx={{ display: "inline", mr: "19px" }}>
                   NO
-                  <Switch checked={grade} onChange={() => handleGradeChange(row.index,key)} color="secondary" />
+                  <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
                   YES
                 </Box>
                 <Box sx={{ display: "inline" }}>{phrase.phrase}</Box>
