@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
       let updatedResearcers = [];
       for(const researcher of researchers.docs) {
         const researcherData = researcher.data();
-        if(!researcherData.projects.hasOwnProperty(recallGradeData.project) || !researcherData.projects[recallGradeData.project].active) {
+        if(!(researcherData.projects || {}).hasOwnProperty(recallGradeData.project) || !researcherData.projects[recallGradeData.project].active) {
           continue;
         }
         researchersUpdates[researcher.id] = researcherData;
