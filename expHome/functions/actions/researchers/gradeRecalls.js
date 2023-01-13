@@ -128,12 +128,6 @@ module.exports = async (req, res) => {
       const isDone = satisfiedPhrases.reduce((c, phrase) => c && phrase.researchers.length >= 4, true)
       conditionUpdates.done = isDone;
 
-      transactionWrites.push({
-        type: "update",
-        refObj: recallGradeRef,
-        updateObj: recallGradeData
-      });
-
       const _phrases = Object.keys(votesByPhrases);
       // phrases considered as approved
       const phrasesApproval = _phrases.filter((phrase) => votesByPhrases[phrase].upVotes >= 3 || votesByPhrases[phrase].downVotes >= 3)
@@ -233,8 +227,33 @@ module.exports = async (req, res) => {
         }
       }
 
-      //
-      // satisfiedPhrases
+      // pushing researcher to condition so, that it doesn't show up to him again
+      if(!conditionUpdates.researchers.includes(fullname)) {
+        conditionUpdates.researchers.push(fullname);
+      }
+
+      // if all conditions in all sessions are done then flag recall grade document as done
+      let isAllDone = true;
+      for(const session in recallGradeData.sessions) {
+        for(const condition of recallGradeData.sessions[session]) {
+          if(!condition.done) {
+            isAllDone = false;
+            break;
+          }
+        }
+        if(!isAllDone) {
+          break;
+        }
+      }
+      if(isAllDone) {
+        recallGradeData.done = true;
+      }
+
+      transactionWrites.push({
+        type: "update",
+        refObj: recallGradeRef,
+        updateObj: recallGradeData
+      });
 
       // updating points for researchers if required
       for (const researcherId in researchersUpdates) {

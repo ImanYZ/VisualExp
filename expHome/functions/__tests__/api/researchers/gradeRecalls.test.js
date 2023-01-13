@@ -138,6 +138,8 @@ describe("POST /api/researchers/gradeRecalls", () => {
 
     expect(phrase.researchers.includes(fullname)).toBeTruthy();
     expect(phrase.grades[researcherIdx]).toBeTruthy();
+
+    expect(condition.researchers.includes(fullname)).toBeTruthy();
   })
 
   it("updated document should automatically have false value for other phrases that where viewed", async () => {
