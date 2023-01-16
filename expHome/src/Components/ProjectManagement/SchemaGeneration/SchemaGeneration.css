@@ -3,7 +3,7 @@
   position: fixed;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% - 105px);
 }
 
 .section {
@@ -22,7 +22,7 @@
 
 .section .blocks.search-box {
   width: 60%;
-  height: calc(99%);
+  height: 99%;
 }
 
 .section .blocks.result-box {
@@ -30,7 +30,7 @@
   margin-right: 10px;
   display: flex;
   flex-direction: column;
-  height: calc(100% - 15%);
+  height: 100%;
 }
 
 .phrases-box {
@@ -57,6 +57,5 @@
 
 .query-block {
   overflow: auto;
-  margin-bottom: 200px;
   padding: 0 10px;
 }
