@@ -2,6 +2,7 @@
 
 *.env
 .env
+.env*.local
 .firebase/*
 .firebase/
 .firebase
