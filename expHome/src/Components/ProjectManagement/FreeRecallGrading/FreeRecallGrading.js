@@ -383,7 +383,7 @@ const FreeRecallGrading = props => {
         gradeIt={gradeIt}
       />
     );
-  
+
   if(processing) {
     return (
       <Box sx={{
@@ -424,15 +424,25 @@ const FreeRecallGrading = props => {
           </li>
         </ul>
       </Alert>
+      {
+        recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
+          <Alert severity="error" sx={{
+            color: "rgb(95, 33, 32)",
+            background: "rgb(253, 237, 237)",
+            marginTop: "10px"
+          }}>
+            <ul>
+              <li>
+                <b>{recallGrades[recallGradeIdx].user}</b> is the last participant in one of your experiement sessions.
+              </li>
+              <li>
+              you will not receive points for running that session until you grade this participant's responses.
+              </li>
+            </ul>
+          </Alert>
+        ) : <span />
+      }
       <Paper style={{ paddingBottom: "19px" }}>
-        {
-          recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
-            <p>
-              <b>Participant: </b> {recallGrades[recallGradeIdx].user}
-            </p>
-          ) : <span />
-        }
-
         <p>1- Carefully read this free-recall response:</p>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {recallGrades[recallGradeIdx]?.response}
