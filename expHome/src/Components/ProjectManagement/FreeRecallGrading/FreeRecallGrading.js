@@ -198,7 +198,7 @@ const FreeRecallGrading = props => {
 
     for (const recallGradeDoc of recallGrades.docs) {
       const recallGradeData = recallGradeDoc.data();
-      if (recallGradeData.researchers.includes(fullname)) continue;
+      
       let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
         parseInt(sessionKey.replace(/[^0-9]+/g, ""))
       );
