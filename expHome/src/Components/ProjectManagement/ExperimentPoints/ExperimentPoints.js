@@ -166,7 +166,6 @@ const ExperimentPoints = props => {
   }, [email, expSessions, dailyPoints, expSessionsChanges]);
 
   useEffect(() => {
-    console.log("expSessions");
     if (project && fullname) {
       const expSessionsQuery = firebase.db.collection("expSessions").where("project", "==", project);
       const expSessionsSnapshot = expSessionsQuery.onSnapshot(snapshot => {

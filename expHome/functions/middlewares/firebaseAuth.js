@@ -23,6 +23,7 @@ const firebaseAuth = async (req, res, next) => {
     const researchers = await db.collection("researchers").where("email", "==", req.user.email).get();
     if(researchers.docs.length) {
       req.researcher = researchers.docs[0].data();
+      req.researcher.docId = researchers.docs[0].id;
     }
 
     return next();

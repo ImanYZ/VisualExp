@@ -24,6 +24,7 @@ import PersonalInfo from "./Components/PersonalInfo/PersonalInfo";
 import { tokenize, textCosineSimilarity } from "./utils";
 
 import "./App.css";
+import { toOrdinal } from "number-to-words";
 
 const postQuestions = [
   {
@@ -220,158 +221,184 @@ const App = () => {
       [prefieldName + "Ended"]: currentTime,
       [prefieldName + "Time"]: timeSpent
     };
+
+    userData = {
+      ...userData,
+      ...userUpdates,
+      pConditions
+    };
+    userUpdates = {
+      ...userUpdates,
+      pConditions
+    };
+    
+    let allResponsesReady = true;
+    for (let pCond of userData.pConditions) {
+      if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
+        allResponsesReady = false;
+      }
+    }
+
+    const session = toOrdinal(startedSession); // 1st, 2nd, 3rd
+    // new logic create recall grades v2 document
+    const recallGrades = await firebase.db.collection("recallGradesV2")
+      .where("user", "==", fullname)
+      .where("project", "==", userData.project).get();
+    let recallGradeRef = firebase.db.collection("recallGradesV2").doc();
+    let recallGradeData = {
+      sessions: {
+        [session]: []
+      },
+      done: false,
+      createdAt: new Date(),
+      project: userData.project,
+      user: fullname
+    };
+    if(recallGrades.docs.length) {
+      recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
+      recallGradeData = recallGrades.docs[0].data();
+    }
+
+    for (let index = 0; index < userData.pConditions.length; ++index) {
+      const pCond = userData.pConditions[index];
+      passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
+      passageData = passageDoc.data();
+
+      let responseName = "recallreText";
+      if (session === "2nd") {
+        responseName = "recall3DaysreText";
+      } else if (session === "3rd") {
+        responseName = "recall1WeekreText";
+      }
+
+      const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
+      if (filtered.length <= 2) {
+        let recallResponse;
+        switch (session) {
+          case "1st":
+            recallResponse = "recallreGrade";
+            break;
+          case "2nd":
+            recallResponse = "recall3DaysreGrade";
+            break;
+          case "3rd":
+            recallResponse = "recall1WeekreGrade";
+            break;
+          default:
+          // code block
+        }
+        userUpdates.pConditions[index][recallResponse] = 0;
+        continue;
+      }
+
+      // finding pCondition item if exists
+      recallGradeData.sessions[session] = recallGradeData.sessions[session] || [];
+      let conditionIdx = recallGradeData.sessions[session].findIndex((conditionItem) => conditionItem.condition === pCond.condition);
+      if(conditionIdx === -1) {
+        conditionIdx = recallGradeData.sessions[session].length;
+        recallGradeData.sessions[session].push({
+          phrases: [],
+          passage: pCond.passage,
+          condition: pCond.condition,
+          response: pCond[responseName],
+          researchers: [],
+          viewers: [],
+          done: false
+        });
+      }
+      const conditionItem = recallGradeData.sessions[session][conditionIdx];
+      const existingPhrases = conditionItem.phrases.map((phrase) => phrase.phrase)
+      for (let phrase of passageData.phrases) {
+        if(existingPhrases.includes(phrase)) continue; // we will not replace or duplicate phrase for each passage
+        conditionItem.phrases.push({
+          phrase,
+          grades: [],
+          researchers: []
+        })
+      }
+
+      // marking as not done when new session/condition added
+      if(recallGradeData.done) {
+        recallGradeData.done = false;
+      }
+    }
+
+    await firebase.batchSet(recallGradeRef, recallGradeData);
+
     // Only in the third session, after making sure that the user has submitted
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
     // user
-    if (startedSession === 3) {
-      userData = {
-        ...userData,
-        ...userUpdates,
-        pConditions
-      };
-      userUpdates = {
-        ...userUpdates,
-        pConditions
-      };
-      // recallGrades collection is huge and it's extremely inefficient to
-      // search through it if all the docs for all projects are in the same
-      // collection. Also, when querying them to find the appropriate doc to
-      // show the authenticated researcher to grade, we cannot combine the
-      // where clause on the project and the researchersNum < 4. As a
-      // solution, we separated the collections per project, other than the
-      // H2K2 project that we have already populated the data in and it's very
-      // costly to rename.
-      let collName = "recallGrades";
-      if (userData.project !== "H2K2") {
-        collName += userData.project;
-      }
-      let allResponsesReady = true;
-      for (let pCond of userData.pConditions) {
-        if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
-          allResponsesReady = false;
+    if (startedSession === 3 && allResponsesReady) {
+      const feedbackCodeBooksdocs = await firebase.db
+        .collection("feedbackCodeBooks")
+        .where("approved", "==", true)
+        .get();
+      const approvedCodes = new Set();
+      let codesVotes = {};
+      for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
+        const data = feedbackCodeBooksDoc.data();
+        if (!approvedCodes.has(data.code)) {
+          codesVotes[data.code] = [];
+          approvedCodes.add(data.code);
         }
       }
-      if (allResponsesReady) {
-        for (let index = 0; index < userData.pConditions.length; ++index) {
-          const pCond = userData.pConditions[index];
-          passageDoc = await firebase.db.collection("passages").doc(pCond.passage).get();
-          passageData = passageDoc.data();
-          for (let session of ["1st", "2nd", "3rd"]) {
-            let responseName = "recallreText";
-            if (session === "2nd") {
-              responseName = "recall3DaysreText";
-            } else if (session === "3rd") {
-              responseName = "recall1WeekreText";
+      for (let explan of ["explanations", "explanations3Days", "explanations1Week"]) {
+        for (let index of [0, 1]) {
+          if (userData[explan] && userData[explan][index] !== "") {
+            let choice;
+            let session;
+            let response;
+            if (explan === "explanations") {
+              session = "1st";
+              if (index === 0) {
+                choice = "postQ1Choice";
+              } else {
+                choice = "postQ2Choice";
+              }
+            } else if (explan === "explanations3Days") {
+              session = "2nd";
+              if (index === 0) {
+                choice = "post3DaysQ1Choice";
+              } else {
+                choice = "post3DaysQ2Choice";
+              }
+            } else if (explan === "explanations1Week") {
+              session = "3rd";
+              if (index === 0) {
+                choice = "post1WeekQ1Choice";
+              } else {
+                choice = "post1WeekQ2Choice";
+              }
             }
-            const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
-            if (filtered.length > 2) {
-              const recallGradeData = {
-                done: false,
-                condition: pCond.condition,
-                createdAt: currentTime,
-                passage: pCond.passage,
+            response = userData[explan][index].explanation || "";
+            const filtered = (response).split(" ").filter(w => w.trim());
+            if (filtered.length > 4) {
+              const newFeedbackDdoc = {
+                approved: false,
+                codersChoices: {},
+                coders: [],
+                choice: userData[choice],
                 project: userData.project,
-                grades: [],
-                researchers: [],
-                researchersNum: 0,
-                session,
-                user: fullname,
-                response: pCond[responseName]
+                fullname: fullname,
+                session: session,
+                explanation: response,
+                createdAt: new Date(),
+                expIdx: index,
+                codesVotes,
+                updatedAt: new Date()
               };
-              for (let phras of passageData.phrases) {
-                recallGradeData.phrase = phras;
-                const recallGradeRef = firebase.db.collection(collName).doc();
-                await firebase.batchSet(recallGradeRef, recallGradeData);
-              }
-            } else {
-              let recallResponse;
-              switch (session) {
-                case "1st":
-                  recallResponse = "recallreGrade";
-                  break;
-                case "2nd":
-                  recallResponse = "recall3DaysreGrade";
-                  break;
-                case "3rd":
-                  recallResponse = "recall1WeekreGrade";
-                  break;
-                default:
-                // code block
-              }
-              userUpdates.pConditions[index][recallResponse] = 0;
+              const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
+
+              await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
             }
           }
         }
-        const feedbackCodeBooksdocs = await firebase.db
-          .collection("feedbackCodeBooks")
-          .where("approved", "==", true)
-          .get();
-        const approvedCodes = new Set();
-        let codesVotes = {};
-        for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
-          const data = feedbackCodeBooksDoc.data();
-          if (!approvedCodes.has(data.code)) {
-            codesVotes[data.code] = [];
-            approvedCodes.add(data.code);
-          }
-        }
-        for (let explan of ["explanations", "explanations3Days", "explanations1Week"]) {
-          for (let index of [0, 1]) {
-            if (userData[explan] && userData[explan][index] !== "") {
-              let choice;
-              let session;
-              let response;
-              if (explan === "explanations") {
-                session = "1st";
-                if (index === 0) {
-                  choice = "postQ1Choice";
-                } else {
-                  choice = "postQ2Choice";
-                }
-              } else if (explan === "explanations3Days") {
-                session = "2nd";
-                if (index === 0) {
-                  choice = "post3DaysQ1Choice";
-                } else {
-                  choice = "post3DaysQ2Choice";
-                }
-              } else if (explan === "explanations1Week") {
-                session = "3rd";
-                if (index === 0) {
-                  choice = "post1WeekQ1Choice";
-                } else {
-                  choice = "post1WeekQ2Choice";
-                }
-              }
-              response = userData[explan][index].explanation || "";
-              const filtered = (response).split(" ").filter(w => w.trim());
-              if (filtered.length > 4) {
-                const newFeedbackDdoc = {
-                  approved: false,
-                  codersChoices: {},
-                  coders: [],
-                  choice: userData[choice],
-                  project: userData.project,
-                  fullname: fullname,
-                  session: session,
-                  explanation: response,
-                  createdAt: new Date(),
-                  expIdx: index,
-                  codesVotes,
-                  updatedAt: new Date()
-                };
-                const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
-
-                await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
-              }
-            }
-          }
-        }
-
-        await firebase.commitBatch();
       }
     }
+
+    await firebase.commitBatch();
+
     await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
   };
 
