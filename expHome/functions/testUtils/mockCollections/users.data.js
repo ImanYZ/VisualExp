@@ -69,10 +69,10 @@ module.exports = new MockData([
     "lastLoad": Timestamp.fromDate(new Date()),
     "lastname": "Hamza",
     "currentPCon": {
-      "condition": "H2",
-      "passage": "xuNQUYbAEFfTD1PHuLGV"
+      "condition": "H1",
+      "passage": "6rc4k1su3txN6ZK4CJ0h"
     },
-    "nullPassage": "97D6P4unPYqzkpVeUY2c",
+    "nullPassage": "6rc4k1su3txN6ZK4CJ0h",
     "uid": "ameer",
     "Transcript": "https://firebasestorage.googleapis.com/v0/b/visualexp-5d2c6.appspot.com/o/Transcripts%2FSam%20Ouhra%2FTue%2C%2020%20Dec%202022%2014%3A35%3A45%20GMT.pdf?alt=media&token=566531b5-8385-4621-9535-dab6651fb572",
     "email": "r3alst@gmail.com",
@@ -96,7 +96,7 @@ module.exports = new MockData([
     "updatedAt": Timestamp.fromDate(new Date()),
     "pConditions": [
       {
-        "passage": "s1oo3G4n3jeE8fJQRs3g",
+        "passage": "6rc4k1su3txN6ZK4CJ0h",
         "pretestScore": 0,
         "pretest": [
           "",
@@ -111,11 +111,11 @@ module.exports = new MockData([
           ""
         ],
         "pretestScoreRatio": 0,
-        "condition": "H2"
+        "condition": "H1"
       },
       {
-        "condition": "K2",
-        "passage": "lmGQvzSit4LBTj1Zptot"
+        "condition": "L2",
+        "passage": "UowdqbVHYMJ9Hhh5zNY3"
       }
     ],
     "createdAt": Timestamp.fromDate(new Date())

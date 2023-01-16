@@ -50,6 +50,7 @@ import WaitingForSessionStart from "./Components/WaitingForSessionStart";
 import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
+import AppConfig from "./AppConfig";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -189,6 +190,7 @@ const AppRouter = props => {
         setPassage("");
         setCondition("");
         setNullPassage("");
+        setProject(AppConfig.defaultProject);
         setChoices([]);
       }
     })
