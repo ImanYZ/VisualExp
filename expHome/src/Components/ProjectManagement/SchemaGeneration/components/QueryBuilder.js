@@ -52,10 +52,10 @@ const QueryBuilder = ({ ...props }) => {
     props.onQueryChange(schemaE);
   };
 
-  const handleEditValue = (event, id) => {
+  const handleEditValue = (value, id) => {
     const schemaE = [...schema];
     const index = schemaE.findIndex(elm => elm.id === id);
-    schemaE[index].keyword = event.currentTarget.value;
+    schemaE[index].keyword = value;
     props.onQueryChange(schemaE);
   };
 
@@ -72,7 +72,6 @@ const QueryBuilder = ({ ...props }) => {
     const schemaE = [...schema];
     const index = schemaE.findIndex(elm => elm.id === id);
     schemaE[index].alternatives = items;
-    console.log(items);
     props.onQueryChange(schemaE);
   };
 
