@@ -1,5 +1,5 @@
 #ActivitiesContainer {
-  margin: 19px;
+  margin: 19px auto;
   height: 91vh;
   overflow-y: auto;
   overflow-x: auto;
