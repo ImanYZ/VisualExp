@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import ChipInput from "./ChipInput";
 import "./QueryBox.css";
+import SchemaInput from "./QueryBox/SchemaInput";
 
 
 
@@ -21,88 +22,40 @@ const QueryBox = ({
   handleDeleteKeyword,
   handleSelectedTags,
   ...props
-}) => (
-  <Paper className={className} elevation={3}>
-    <div>
+}) => {
+  return (
+    <Paper className={className} elevation={3}>
       <div>
-        <span className="title">{title}</span>
-        <br />
-        <span className="subtitle">{subTitle}</span>
+        <div>
+          <span className="title">{title}</span>
+          <br />
+          <span className="subtitle">{subTitle}</span>
+        </div>
+        {schema.map((element, index) => (
+          <SchemaInput
+            key={index}
+            element={element}
+            index={index}
+            readOnly={props.readOnly}
+            handleDeleteKeyword={handleDeleteKeyword}
+            handleSelectedTags={handleSelectedTags}
+            handleEditValue={handleEditValue}
+          />
+        ))}
+        {!props.readOnly && (
+          <Button
+            sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
+            variant="contained"
+            disabled={props.readOnly}
+            onClick={handleKeyword}
+          >
+            {buttonText}
+          </Button>
+        )}
       </div>
-      {schema.map((element, index) => (
-        <React.Fragment key={index}>
-          <div className="keyword">
-            {props.readOnly ? (
-              <span>
-                Keyword {index + 1} : <strong>{element.keyword}</strong>
-              </span>
-            ) : (
-              <TextField
-                label={`Keyword ${index + 1}`}
-                onChange={event => {
-                  handleEditValue(event, element.id);
-                }}
-                value={element.keyword}
-                style={{ fontSize: "19px" }}
-              />
-            )}
-            {!props.readOnly && (
-              <IconButton size="small">
-                <DeleteIcon
-                  className="keyword-delete"
-                  onClick={() => {
-                    handleDeleteKeyword(element.id);
-                  }}
-                />
-              </IconButton>
-            )}
-          </div>
-          {element.keyword && element.keyword !== "" && (
-            <div>
-              {props.readOnly ? (
-                <>
-                  <ChipInput
-                    tags={element.alternatives}
-                    selectedTags={handleSelectedTags}
-                    fullWidth
-                    readOnly={props.readOnly}
-                    variant="outlined"
-                    id={`Keyword ${index + 1} Alternatives`}
-                    name={`Keyword${index + 1}Alternatives`}
-                    label={`Keyword ${index + 1} Alternatives`}
-                  />
-                </>
-              ) : (
-                <ChipInput
-                  tags={element.alternatives}
-                  selectedTags={items => handleSelectedTags(items, element.id)}
-                  fullWidth
-                  disabled={props.readOnly}
-                  itemId={element.id}
-                  variant="outlined"
-                  id={`Keyword ${index + 1} Alternatives`}
-                  name={`Keyword${index + 1}Alternatives`}
-                  placeholder={`Keyword ${index + 1} Alternatives`}
-                  label={`Keyword ${index + 1} Alternatives`}
-                />
-              )}
-            </div>
-          )}
-        </React.Fragment>
-      ))}
-      {!props.readOnly && (
-        <Button
-          sx={{ mt: 1, mr: 1, backgroundColor: "black", color: "common.white" }}
-          variant="contained"
-          disabled={props.readOnly}
-          onClick={handleKeyword}
-        >
-          {buttonText}
-        </Button>
-      )}
-    </div>
-  </Paper>
-);
+    </Paper>
+  )
+};
 
 export default React.memo(QueryBox);
 
