@@ -10,6 +10,9 @@ const {
   remindResearcherToSpecifyAvailability
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
+const { assignExpPoints } = require("./helpers/assignExpPoints");
+const moment = require("moment");
+const { delay } = require("lodash");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -1648,173 +1651,193 @@ exports.voteAdministratorReset = async (req, res) => {
 //   return res.status(500).json({ done: true });
 // };
 
-// Clicking the Yes or No buttons in FreeRecallGrading.js under
-// ProjectManagement would trigger this function. grade can be either true,
-// meaning the researcher responded Yes, or false if they responded No.
-
-exports.assignExperimentSessionsPoints = async context => {
+exports.remindResearchersForAvailability = async context => {
   try {
+
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
-    const researchersInfo = [];
+    // let waitTime = 0;
+    // const researchersInfo = [];
+
     // Retrieve all the researchers to check availabilities per researcher,
     // per project, only if the researcher is active in that project.
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
       if ("projects" in researcherData) {
-        for (let project in researcherData.projects) {
+        for (const project in researcherData.projects) {
           if (researcherData.projects[project].active && researcherData.projects[project].scheduleSessions) {
-            const resScheduleDocs = await db
+            // month for next 10 days
+            const month = moment().utcOffset(-4).add(10, "day").format("YYYY-MM-DD");
+            const resSchedules = await db
               .collection("resSchedule")
               .where("project", "==", project)
-              .where("fullname", "==", researcherDoc.id)
+              .where("researchers", "array-contains", researcherDoc.id)
+              .where("month", "==", month)
               .get();
+            
             let lastAvailability = new Date();
-            for (let resScheduleDoc of resScheduleDocs.docs) {
-              const resScheduleData = resScheduleDoc.data();
-              const theSession = resScheduleData.session.toDate();
-              if (theSession.getTime() > lastAvailability.getTime()) {
-                lastAvailability = theSession;
+            if(resSchedules.docs.length) {
+              const resSchedule = resSchedules.docs[0];
+              const resScheduleData = resSchedule.data();
+              const availabilities = resScheduleData[researcherDoc.id]?.schedules || [];
+              for(const availability of availabilities) {
+                const _availability = moment(availability).utcOffset(-4, true).toDate();
+                if (_availability.getTime() > lastAvailability.getTime()) {
+                  lastAvailability = _availability;
+                }
               }
             }
+
             let tenDaysLater = new Date();
             tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+              // Increase waitTime by a random integer between 1 to 4 seconds.
+              const waitTime = 1000 * (1 + Math.floor(Math.random() * 4));
               // Send a reminder email to a researcher that they have not specified
               // their availability for the next ten days and ask them to specify it.
-              setTimeout(() => {
-                remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
-              }, waitTime);
-              // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+              await remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
+              await delay(waitTime);
             }
           }
         }
-        researchersInfo.push({
+        /* researchersInfo.push({
           fullname: researcherDoc.id,
           email: researcherData.email,
           projects: Object.keys(researcherData.projects)
-        });
+        }); */
       }
     }
-    const oneWebIdx = researchersInfo.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu");
-    const usersInfo = [];
-    const usersDocs = await db.collection("users").get();
+
+    console.log({ err });
+    return null;
+  } catch(e) {}
+}
+
+// Clicking the Yes or No buttons in FreeRecallGrading.js under
+// ProjectManagement would trigger this function. grade can be either true,
+// meaning the researcher responded Yes, or false if they responded No.
+
+exports.assignExperimentSessionsPoints = async context => {
+  try {
+    const researchers = await db.collection("researchers").get();
+    const researchersInfo = {};
+    for(const researcher of researchers.docs) {
+      const researcherData = researcher.data();
+      researchersInfo[researcherData.email.toLowerCase()] = {
+        fullname: researcher.id,
+        email: researcherData.email.toLowerCase(),
+        projects: Object.keys(researcherData.projects)
+      };
+    }
+    
+    const usersInfo = {};
     const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
     const surveyInstructors = await db.collection("instructors").get();
-    for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...usersDocs.docs]) {
+    for (const userDoc of [...surveyInstructors.docs, ...surveyUsers.docs]) {
       const userData = userDoc.data();
       if(!userData.email) continue;
-      usersInfo.push({
+      usersInfo[userData.email.toLowerCase()] = {
         fullname: userDoc.id,
         email: userData.email,
         project: userData.project
-      });
+      };
     }
+
     const pastEvents = await allPastEvents();
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
         if(!pastEvent.attendees) continue;
-        let researcherObjs = [];
+        
+        const researcherObjs = [];
         let userObj = null;
         const attendees = [];
         for (let attendee of pastEvent.attendees) {
           attendees.push(attendee.email);
-          const rIdx = researchersInfo.findIndex(
-            researcher => researcher.email.toLowerCase() === attendee.email.toLowerCase()
-          );
-          if (rIdx !== -1) {
-            researcherObjs.push(researchersInfo[rIdx]);
-          }
-          const uIdx = usersInfo.findIndex(user => {
-            return (
-              user.email.toLowerCase() === attendee.email.toLowerCase() &&
-              !researcherObjs.some(r => r.email.toLowerCase() === attendee.email.toLowerCase())
-            );
-          });
-          if (uIdx !== -1) {
-            userObj = usersInfo[uIdx];
+          const attendeeEmail = attendee.email.toLowerCase();
+          if (researchersInfo[attendeeEmail]) {
+            researcherObjs.push(researchersInfo[attendeeEmail]);
+          } else if(usersInfo[attendeeEmail]) {
+            userObj = usersInfo[attendeeEmail];
           }
         }
-        if (researcherObjs.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu") === -1) {
-          researcherObjs.push(researchersInfo[oneWebIdx]);
+
+        const onewebEmail = "oneweb@umich.edu";
+        if (researcherObjs.findIndex(researcher => researcher.email.toLowerCase() === onewebEmail) === -1) {
+          researcherObjs.push({
+            email: onewebEmail,
+            fullname: researchersInfo[onewebEmail].fullname,
+            projects: researchersInfo[onewebEmail].projects
+          });
         }
         if (userObj && researcherObjs.length > 0) {
           const project = userObj.project;
           for (let researcherObj of researcherObjs) {
-            if (researcherObj.projects.includes(project)) {
-              const sTimestamp = new Date(pastEvent.start.dateTime);
-              const eTimestamp = new Date(pastEvent.end.dateTime);
-              const currentTime = new Date();
-              const expSessionDocs = await db
-                .collection("expSessions")
-                .where("attendees", "==", attendees)
-                .where("sTime", "==", sTimestamp)
-                .where("project", "==", project)
-                .get();
-
-              // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
-              const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
-              let didResearcherAttend = false;
-              if (schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
-                didResearcherAttend = true;
-              }
-
-              if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
-                let points = 7;
-                if (eTimestamp.getTime() > sTimestamp.getTime() + 40 * 60 * 1000) {
-                  points = 16;
-                }
-                // this is temporary until the survey is over.
-                // as this survey will have only one session
-                if (project === "Annotating") {
-                  points = 10;
-                }
-
-                try {
-                  await db.runTransaction(async t => {
-                    const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
-                    const researcherDoc = await t.get(researcherRef);
-                    const researcherData = researcherDoc.data();
-                    let researcherExpPoints = 0;
-                    if (researcherData.projects[project].expPoints) {
-                      researcherExpPoints = researcherData.projects[project].expPoints;
-                    }
-                    const researcherProjectUpdates = {
-                      projects: {
-                        ...researcherData.projects,
-                        [project]: {
-                          ...researcherData.projects[project],
-                          expPoints: researcherExpPoints + points
-                        }
-                      }
-                    };
-                    t.update(researcherRef, researcherProjectUpdates);
-                    const researcherLogRef = db.collection("researcherLogs").doc();
-                    t.set(researcherLogRef, {
-                      ...researcherProjectUpdates,
-                      id: researcherRef.id,
-                      updatedAt: currentTime
-                    });
-                    const expSessionRef = db.collection("expSessions").doc();
-                    t.set(expSessionRef, {
-                      attendees,
-                      project,
-                      points,
-                      sTime: sTimestamp,
-                      eTime: eTimestamp,
-                      createdAt: currentTime
-                    });
-                  });
-                } catch (e) {
-                  console.log("Transaction failure:", e);
-                }
-              }
-            } else {
+            if (!researcherObj.projects.includes(project)) {
               console.log({ project, projects: researcherObj.projects });
+              continue;
+            }
+
+            // sending 1st explicitly because, there is only one session for survey students and instructors 
+            await assignExpPoints(researcherObj.fullname, userObj.fullname, "1st", userObj.project, false, pastEvent.id);
+
+            // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
+            const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
+            let didResearcherAttend = false;
+            if (schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
+              didResearcherAttend = true;
+            }
+
+            if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
+              let points = 10;
+              if (eTimestamp.getTime() > sTimestamp.getTime() + 40 * 60 * 1000) {
+                points = 16;
+              }
+              // this is temporary until the survey is over.
+              // as this survey will have only one session
+              if (project === "Annotating") {
+                points = 10;
+              }
+
+              try {
+                await db.runTransaction(async t => {
+                  const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
+                  const researcherDoc = await t.get(researcherRef);
+                  const researcherData = researcherDoc.data();
+                  let researcherExpPoints = 0;
+                  if (researcherData.projects[project].expPoints) {
+                    researcherExpPoints = researcherData.projects[project].expPoints;
+                  }
+                  const researcherProjectUpdates = {
+                    projects: {
+                      ...researcherData.projects,
+                      [project]: {
+                        ...researcherData.projects[project],
+                        expPoints: researcherExpPoints + points
+                      }
+                    }
+                  };
+                  t.update(researcherRef, researcherProjectUpdates);
+                  const researcherLogRef = db.collection("researcherLogs").doc();
+                  t.set(researcherLogRef, {
+                    ...researcherProjectUpdates,
+                    id: researcherRef.id,
+                    updatedAt: currentTime
+                  });
+                  const expSessionRef = db.collection("expSessions").doc();
+                  t.set(expSessionRef, {
+                    attendees,
+                    project,
+                    points,
+                    sTime: sTimestamp,
+                    eTime: eTimestamp,
+                    createdAt: currentTime
+                  });
+                });
+              } catch (e) {
+                console.log("Transaction failure:", e);
+              }
             }
           }
         }
@@ -2473,10 +2496,16 @@ exports.handleSubmitFeebackCode = async (req, res) => {
 
         tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
         tWriteOperations.push({ docRef: feedbackOrderRef, data: feedOrderData });
+
         for (let operation of tWriteOperations) {
           t.update(operation.docRef, operation.data);
         }
       });
+
+      const { fullname: participant, project: _project, session } = feedbackCodeData;
+      // to assign points to researcher for session if feedback coding and recall grading is done
+      await assignExpPoints(fullname, participant, session, _project);
+
       return res
         .status(200)
         .json({ success: true, endpoint: "FeedBack upload", successData: req.body.quotesSelectedForCodes });
