@@ -31,9 +31,12 @@ describe("assignExpPoints", () => {
     const _mockFeedbackCodes = [...mockFeedbackCodes.data];
     _mockFeedbackCodes[0].coders.push("Sam Ouhra");
 
+    let _mockSchedules = [...mockSchedules.data];
+    _mockSchedules = _mockSchedules.map((schedule) => ({...schedule, hasStarted: true}))
+
     const collects = [
       mockUsers,
-      mockSchedules,
+      new MockData(_mockSchedules, "schedule"),
       new MockData([], "expSessions"),
       new MockData([], "researcherLogs"),
       new MockData(_mockRecallGrades, "recallGradesV2"),

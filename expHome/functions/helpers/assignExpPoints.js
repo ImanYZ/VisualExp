@@ -36,10 +36,13 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
 
     const schedule = schedules.docs[0];
     scheduleData = schedule.data();
-  }
 
-  // if google calender event does not exists
-  if(!scheduleData?.id && checkRecallsAndFeedback) return;
+    // if google calender event does not exists
+    if(!scheduleData?.id) return;
+
+    // if schedule wasn't started
+    if(!scheduleData?.hasStarted) return;
+  }
 
   const _eventId = checkRecallsAndFeedback ? scheduleData?.id : eventId;
 
