@@ -295,7 +295,7 @@ module.exports = async (req, res) => {
           t.delete(transactionWrite.refObj);
         }
       }
-      assignExpPoints(fullname, recallGradeData.user, session, voterProject, t);
+      await assignExpPoints(fullname, recallGradeData.user, session, voterProject);
     });
 
     return res.status(200).json({
