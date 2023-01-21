@@ -8,7 +8,7 @@ const {
   mockFeedbackCodes
 } = require("../../testUtils");
 const { db } = require("../../admin");
-const { expect, describe, beforeAll, afterAll, beforeEach, afterEach } = require('@jest/globals');
+const { expect, describe, beforeEach, afterEach } = require('@jest/globals');
 const { gtDeleteAllEvents } = require("../../testUtils/gtCalendar");
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
 describe("assignExpPoints", () => {
