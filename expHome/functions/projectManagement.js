@@ -1,6 +1,6 @@
 
 const { admin, db, commitBatch, batchUpdate} = require("./admin");
-const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
+const { allPastEvents, futureEvents, pastEvents, last30DayEvents } = require("./scheduling");
 const { isToday} = require("./utils");
 const {
   reschEventNotificationEmail,
@@ -1745,7 +1745,7 @@ exports.assignExperimentSessionsPoints = async context => {
       };
     }
 
-    const pastEvents = await allPastEvents();
+    const pastEvents = await last30DayEvents(); // last 30 day events to minimize processing
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
         if(!pastEvent.attendees) continue;
