@@ -1,6 +1,7 @@
 const { db } = require("../admin");
 const moment = require("moment-timezone");
 const { Timestamp } = require("firebase-admin/firestore");
+const { getEvent } = require("../GoogleCalendar");
 
 exports.assignExpPoints = async (researcher, participant, session, project, checkRecallsAndFeedback = true, eventId) => {
   // TODO: need to write its tests
@@ -8,16 +9,10 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
 
   const batch = db.batch();
 
-  const user = await db.collection("users").doc(participant).get();
-  // if user document not exists
-  if(!user.exists()) {
-    return;
-  }
-
   const researcherRef = db.collection("researchers").doc(researcher);
   const researcherDoc = await researcherRef.get();
   // if researcher document not exists
-  if(!researcherDoc.exists()) {
+  if(!researcherDoc.exists) {
     return;
   }
   const researcherData = researcherDoc.data();
@@ -25,20 +20,28 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
   let scheduleData = {};
 
   if(checkRecallsAndFeedback) {
+
+    const user = await db.collection("users").doc(participant).get();
+    // if user document not exists
+    if(!user.exists) {
+      return;
+    }
+
     const schedules = await db.collection("schedule")
     .where("email", "==", user.data()?.email || "")
     .where("order", "==", session).get();
+
     // schedule is not available
     if(!schedules.docs.length) return;
 
     const schedule = schedules.docs[0];
     scheduleData = schedule.data();
   }
-  
-  // if google calender event does not exists
-  if(!scheduleData?.id && !checkRecallsAndFeedback) return;
 
-  const _eventId = !checkRecallsAndFeedback ? scheduleData?.id : eventId;
+  // if google calender event does not exists
+  if(!scheduleData?.id && checkRecallsAndFeedback) return;
+
+  const _eventId = checkRecallsAndFeedback ? scheduleData?.id : eventId;
 
   const event = await getEvent(_eventId);
   const attendees = (event.attendees || []).map((attendee) => attendee.email);
@@ -48,7 +51,7 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
 
   const expSessions = await db.collection("expSessions")
     .where("attendees", "==", attendees)
-    .where("sTime", "==", Timestamp.from(startTime))
+    .where("sTime", "==", Timestamp.fromDate(startTime))
     .where("project", "==", project).get();
 
   // if points already distributed for this session we are not going to run this logic
@@ -69,7 +72,7 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
 
   if(checkRecallsAndFeedback) {
     let ready = true;
-    
+
     const userRecallGrades = await db
     .collection("recallGradesV2")
     .where("user", "==", participant)
@@ -119,7 +122,7 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
   }
   
   let researcherExpPoints = 0;
-  if (researcherData.projects[project].expPoints) {
+  if (researcherData.projects[project]?.expPoints) {
     researcherExpPoints = researcherData.projects[project].expPoints;
   }
   const researcherProjectUpdates = {
@@ -145,7 +148,7 @@ exports.assignExpPoints = async (researcher, participant, session, project, chec
     user: participant,
     researcher,
     session,
-    eventId: scheduleData.id
+    eventId: _eventId
   })
 
   // creating researcher log
