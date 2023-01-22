@@ -1,6 +1,6 @@
 
 const { admin, db, commitBatch, batchUpdate} = require("./admin");
-const { allPastEvents, futureEvents, pastEvents } = require("./scheduling");
+const { allPastEvents, futureEvents, pastEvents, last30DayEvents } = require("./scheduling");
 const { isToday} = require("./utils");
 const {
   reschEventNotificationEmail,
@@ -10,6 +10,9 @@ const {
   remindResearcherToSpecifyAvailability
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
+const { assignExpPoints } = require("./helpers/assignExpPoints");
+const moment = require("moment");
+const { delay } = require("lodash");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -167,66 +170,36 @@ const voteFn = async (voter, activity, vote) => {
 // This Function is used to vote the phrases in bulk
 // helps to give the points accordingly to every researcher
 // It updates researcher, reCallGrade and user data accordingly.
-exports.bulkGradeFreeRecall = async (req, res) => {
+exports.GradeFreeRecall = async (req, res) => {
   if (
-    "phrasesWithGrades" in req.body &&
+    "recallGrade" in req.body &&
     "fullname" in req.body &&
-    "project" in req.body &&
-    "user" in req.body &&
-    "passageId" in req.body &&
-    "passageIdx" in req.body &&
-    "condition" in req.body &&
-    "session" in req.body &&
-    "phraseNum" in req.body &&
-    "response" in req.body &&
-    "voterProject" in req.body && 
-    "viewedRecalllDocument" in req.body
+    "voterProject" in req.body &&
+    "randomizedPhrases" in req.body
   ) {
-    const phrasesWithGrades = req.body.phrasesWithGrades || [];
+    const recallGrade = req.body.recallGrade;
     const fullname = req.body.fullname;
-    const project = req.body.project;
-    const user = req.body.user;
-    const condition = req.body.condition;
-    const passageId = req.body.passageId;
-    const passageIdx = req.body.passageIdx;
-    const session = req.body.session;
-    const phraseNum = req.body.phraseNum;
-    const voterProject = req.body.voterProject; 
-    const viewedRecalllDocument = req.body.viewedRecalllDocument;
+    const voterProject = req.body.voterProject;
+    const randomizedPhrases = req.body.randomizedPhrases;
+
+    // const phrasesWithGrades = req.body.phrasesWithGrades || [];
+    // const project = req.body.project;
+    // const user = req.body.user;
+    // const condition = req.body.condition;
+    // const passageId = req.body.passageId;
+    // const passageIdx = req.body.passageIdx;
+    // const session = req.body.session;
+    // const phraseNum = req.body.phraseNum;
+
     db.runTransaction(async t => {
-      // Accumulate all the transaction writes in an array to commit all of them
-      // after all the reads to abide by the Firestore transaction law
-      // https://firebase.google.com/docs/firestore/manage-data/transactions#transactions.
       const transactionWrites = [];
-      // Because there will be multiple places to update this researcher data,
-      // we should accumulate all the updates for this researcher to commit them
-      // at the end of the transaction.
       const currentResearcherRef = db.collection("researchers").doc(`${fullname}`);
       const currentResearcherDoc = await t.get(currentResearcherRef);
       const currentResearcherData = currentResearcherDoc.data();
       const currentResearcherUpdates = currentResearcherData.projects[voterProject];
-      // The very first update we need to apply is to increment the number of
-      // times they have graded a free-recall response.
       currentResearcherUpdates.gradingNum = currentResearcherUpdates.gradingNum
-        ? currentResearcherUpdates.gradingNum + phrasesWithGrades.length
-        : phrasesWithGrades.length;
-      // recallGrades collection is huge and it's extremely inefficient to
-      // search through it if all the docs for all projects are in the same
-      // collection. Also, when querying them to find the appropriate doc to
-      // show the authenticated researcher to grade, we cannot combine the
-      // where clause on the project and the researchersNum < 4. As a
-      // solution, we separated the collections per project, other than the
-      // H2K2 project that we have already populated the data in and it's very
-      // costly to rename.
-      let collName = "recallGrades";
-      if (project !== "H2K2") {
-        collName += project;
-      }
-      // user references
-      const userRef = db.collection("users").doc(`${user}`);
-      const userDoc = await t.get(userRef);
-      const userData = userDoc.data();
-      const userUpdates = userData;
+        ? currentResearcherUpdates.gradingNum + randomizedPhrases.length
+        : randomizedPhrases.length;
 
       // researcher references
       const researchersDocs = await db.collection("researchers").get();
@@ -236,181 +209,186 @@ exports.bulkGradeFreeRecall = async (req, res) => {
       }
 
       //getting data from recallGrades
-      const recallGradeQuery = db
-        .collection(collName)
-        .where("user", "==", user)
-        .where("session", "==", session)
-        .where("condition", "==", condition)
-        .where("passage", "==", passageId);
-      const recallGradeDocs = await t.get(recallGradeQuery);
-      const recallGradesData = {};
-      for (let recallDoc of recallGradeDocs.docs) {
-        const recallData = recallDoc.data();
-        recallGradesData[recallData.phrase] = { id: recallDoc.id, ...recallData };
+      const recallGradeQuery = db.collection("recallGradesV2").doc(recallGrade.docId);
+      const recallGradeDoc = await t.get(recallGradeQuery);
+      const recallGradesData = recallGradeDoc.data();
+      const recallGradesUpdate = { ...recallGradesData };
+      const indexOfResponse = recallGradesUpdate.sessions[recallGrade.session].findIndex(
+        responseRecall => responseRecall.response === recallGrade.response
+      );
+      for (let randomPhraseGrade of randomizedPhrases) {
+        const indexOfthePhrase = recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases.findIndex(
+          phraseObj => phraseObj.phrase === randomPhraseGrade.phrase
+        );
+        recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[indexOfthePhrase] =randomPhraseGrade;
       }
+      for (let phraseIdx in recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases) {
+        const _viewers = recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[phraseIdx].viewers;
 
-      for (let viewedGrade of viewedRecalllDocument) {
-        const recallGradeData = recallGradesData[viewedGrade.data.phrase];
-        const recallGradeRef = db.collection(collName).doc(`${recallGradeData.id}`);
-        const _viewers = recallGradeData.viewers || [];
-        _viewers.push(fullname);
-        transactionWrites.push({
-          type: "update",
-          refObj: recallGradeRef,
-          updateObj: {
-           viewers :_viewers,
-          }
-        });
+        if (!_viewers) {
+          recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[phraseIdx].viewers = [fullname];
+        } else if (!_viewers.includes(fullname)) {
+          recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[phraseIdx].viewers.push(fullname);
+        }
       }
+      if (!recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].viewers) {
+        recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].viewers = [fullname];
+      } else if (!recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].viewers.includes(fullname)) {
+        recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].viewers.push(fullname);
+      }
+      recallGradesData.updatedAt = new Date();
+      transactionWrites.push({
+        type: "update",
+        refObj: recallGradeQuery,
+        updateObj: recallGradesUpdate
+      });
+
+      console.log("::: ::: recallGrade.docId ::: ::: ", recallGrade.docId);
+      // user references
+      const userRef = db.collection("users").doc(`${recallGradesData.user}`);
+      const userDoc = await t.get(userRef);
+      const userData = userDoc.data();
+      const userUpdates = userData;
+
       // phraseGrade loop
 
-      for (let phraseGrade of phrasesWithGrades) {
-        console.log("phrase & grade::::", phraseGrade);
-        const recallGradeData = recallGradesData[phraseGrade.phrase];
-        console.log("Getting data from recallGrade Doc Id", `${recallGradeData.id}`);
-        const recallGradeRef = db.collection(collName).doc(`${recallGradeData.id}`);
+      for (let randomPhraseGrade of randomizedPhrases) {
+        const authenReseaGrade = randomPhraseGrade.grades[randomPhraseGrade.researchers.indexOf(fullname)];
 
-        if (!recallGradeData.researchers.includes(fullname)) {
-          const recallGradeUpdates = {};
-          // Only if all the 4 researchers (this one and 3 others) have graded
-          // this case, then check whether it should be approved and assign the
-          // points to the researchers and the participants.
-          let approved = false;
-          if (recallGradeData.researchersNum === 3) {
-            // We need to figure out whether at least 3 out of 4 researchers marked it
-            // as: (Yes), then it should be approved and we should give points to the
-            // reseachers and the user; (No), then it should be approved and we should
-            // give points to the researchers, but not the user.
-            let identified = 0;
-            let notIdentified = 0;
-            for (let thisGrade of recallGradeData.grades) {
-              identified += thisGrade;
-              notIdentified += !thisGrade;
-            }
-            identified += phraseGrade.grade;
-            notIdentified += !phraseGrade.grade;
-            // It should be approved if more than or equal to 3 researchers have
-            // unanimously identified/not identified this phrase in this free-recall
-            // response.
-            approved = identified >= 3 || notIdentified >= 3;
-            if (approved) {
-              // If identified >= 3, we should give the participant their free-recall
-              // point.
-              if (identified >= 3) {
-                // Because the participant answers the free-recall questions for each
-                // passage 3 time, in the 1st, 2nd, and 3rd sessions, we should
-                // differentiate them when assigning their grades.
-                let recallResponse;
-                switch (session) {
-                  case "1st":
-                    recallResponse = "recallreGrade";
-                    break;
-                  case "2nd":
-                    recallResponse = "recall3DaysreGrade";
-                    break;
-                  case "3rd":
-                    recallResponse = "recall1WeekreGrade";
-                    break;
-                  default:
-                  // code block
-                }
-                // The only piece of the user data that should be modified is
-                // pCondition based on the point received.
-                let theGrade = 1;
-                if (recallResponse && userUpdates.pConditions[passageIdx][recallResponse]) {
-                  // We should add up points here because each free recall response
-                  // may get multiple points from each of the key phrases identified
-                  // in it.
-                  theGrade += userUpdates.pConditions[passageIdx][recallResponse];
-                }
-                userUpdates.pConditions[passageIdx][recallResponse] = theGrade;
-                // Depending on how many key phrases were in the passage, we should
-                // calculate the free-recall response ratio.
-                userUpdates.pConditions[passageIdx][`${recallResponse}Ratio`] = theGrade / phraseNum;
-              }
-              // For both identified >= 3 AND notIdentified >= 3 cases, we should give
-              // a point to each of the researchers who unanimously
-              // identified/notIdentified this phrase in this free recall response.
-              for (let fResearcherIdx = 0; fResearcherIdx < recallGradeData.researchers.length; fResearcherIdx++) {
-                otherResearchersData[recallGradeData.researchers[fResearcherIdx]].isOther = true;
+        if (randomPhraseGrade.researchers.includes(fullname)) continue;
 
-                // fetch all the researcher projects and
-                // check if it has in payload or not.
+        const recallGradeUpdates = {};
+        //we need 4 researchers to vote on a phrase
+        let approveThePhrase = false;
+        if (!randomPhraseGrade.researchers.length === 4) continue;
+        // We need to figure out whether at least 3 out of 4 researchers marked it as: (Yes),
+        // apporve the phrase
+        // give points to the reseachers  and the user
+        // ; (No), then it should be approved and we should
+        // give points to the researchers, but not the user.
+        let identifiedThePhrase = 0;
+        let notIdentifiedThePhrase = 0;
+        for (let thisGrade of randomPhraseGrade.grades) {
+          identifiedThePhrase += thisGrade;
+          notIdentifiedThePhrase += !thisGrade;
+        }
 
-                const researcherObj = otherResearchersData[recallGradeData.researchers[fResearcherIdx]];
-                const researcherHasProjectFromPayloadProject = project in researcherObj.data.projects;
-                if (
-                  (identified >= 3 && recallGradeData.grades[fResearcherIdx]) ||
-                  (notIdentified >= 3 && !recallGradeData.grades[fResearcherIdx])
-                ) {
-                  // Approve the recallGrade for all the researchers who
-                  // unanimously identified/notIdentified this phrase in this free
-                  // recall response.
-                  recallGradeUpdates.approved = approved;
-                  if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project]
-                      .gradingPoints
-                      ? researcherObj.data.projects[project].gradingPoints + 0.5
-                      : 0.5;
-                  }
-                }
-                // If there are exactly 3 researchers who graded the same, but only
-                // this researcher's grade (Yes/No) is different from the majority of
-                // grades; we should give the opposing researcher a negative point.
-                else if (
-                  (identified === 3 && !recallGradeData.grades[fResearcherIdx]) ||
-                  (notIdentified === 3 && recallGradeData.grades[fResearcherIdx])
-                ) {
-                  if (researcherHasProjectFromPayloadProject) {
-                    researcherObj.data.projects[project].gradingPoints = researcherObj.data.projects[project]
-                      .gradingPoints
-                      ? researcherObj.data.projects[project].gradingPoints - 0.5
-                      : -0.5;
-                    researcherObj.data.projects[project].negativeGradingPoints = researcherObj.data.projects[project]
-                      .negativeGradingPoints
-                      ? researcherObj.data.projects[project].negativeGradingPoints + 0.5
-                      : 0.5;
-                  }
-                }
-              }
-              // If the authenticated researcher has graded the same as the majority
-              // of grades:
-              if ((identified >= 3 && phraseGrade.grade) || (notIdentified >= 3 && !phraseGrade.grade)) {
-                // Because it's approved, we should also give the authenticated
-                // researcher a point. We should update thisResearcherUpdates and
-                // commit all the updates at the end to their document.
-                currentResearcherUpdates.gradingPoints = currentResearcherUpdates.gradingPoints
-                  ? currentResearcherUpdates.gradingPoints + 0.5
-                  : 0.5;
-              }
-              // If there are exactly 3 researchers who graded the same, but only the
-              // authenticated researcher's grade (Yes/No) is different from the
-              // majority of grades; we should give the the authenticated researcher a
-              // negative point.
-              else if ((identified === 3 && !phraseGrade.grade) || (notIdentified === 3 && phraseGrade.grade)) {
-                currentResearcherUpdates.gradingPoints = currentResearcherUpdates.gradingPoints
-                  ? currentResearcherUpdates.gradingPoints - 0.5
-                  : -0.5;
-                currentResearcherUpdates.negativeGradingPoints = currentResearcherUpdates.negativeGradingPoints
-                  ? currentResearcherUpdates.negativeGradingPoints + 0.5
-                  : 0.5;
-              }
+        // It should be approved if more than or equal to 3 researchers have
+        // unanimously identified/not identified this phrase in this free-recall
+        // response.
+        approveThePhrase = identifiedThePhrase >= 3 || notIdentifiedThePhrase >= 3;
+        if (!approveThePhrase) continue;
+        // If identified >= 3, we should give the participant their free-recall
+        // point.
+        if (identifiedThePhrase >= 3) {
+          // Because the participant answers the free-recall questions for each
+          // passage 3 time, in the 1st, 2nd, and 3rd sessions, we should
+          // differentiate them when assigning their grades.
+          let recallResponse;
+          switch (recallGrade.session) {
+            case "1st":
+              recallResponse = "recallreGrade";
+              break;
+            case "2nd":
+              recallResponse = "recall3DaysreGrade";
+              break;
+            case "3rd":
+              recallResponse = "recall1WeekreGrade";
+              break;
+            default:
+            // code block
+          }
+          // The only piece of the user data that should be modified is
+          // pCondition based on the point received.
+          let theGrade = 1;
+          if (recallResponse && userUpdates.pConditions[recallGrade.passage][recallResponse]) {
+            // We should add up points here because each free recall response
+            // may get multiple points from each of the key phrases identified
+            // in it.
+            theGrade += userUpdates.pConditions[recallGrade.passage][recallResponse];
+          }
+          userUpdates.pConditions[recallGrade.passage][recallResponse] = theGrade;
+          // Depending on how many key phrases were in the passage, we should
+          // calculate the free-recall response ratio.
+          userUpdates.pConditions[recallGrade.passage][`${recallResponse}Ratio`] =
+            theGrade / recallGrade.phrases.length;
+        }
+        // For both identified >= 3 AND notIdentified >= 3 cases, we should give
+        // a point to each of the researchers who unanimously
+        // identified/notIdentified this phrase in this free recall response.
+        for (let fResearcherIdx = 0; fResearcherIdx < randomPhraseGrade.researchers.length; fResearcherIdx++) {
+          otherResearchersData[randomPhraseGrade.researchers[fResearcherIdx]].isOther = true;
+
+          // fetch all the researcher projects and
+          // check if it has in payload or not.
+
+          const researcherObj = otherResearchersData[randomPhraseGrade.researchers[fResearcherIdx]];
+          const researcherHasProjectFromPayloadProject = recallGrade in researcherObj.data.projects;
+          if (
+            (identifiedThePhrase >= 3 && randomPhraseGrade.grades[fResearcherIdx]) ||
+            (notIdentifiedThePhrase >= 3 && !randomPhraseGrade.grades[fResearcherIdx])
+          ) {
+            // Approve the recallGrade for all the researchers who
+            // unanimously identified/notIdentified this phrase in this free
+            // recall response.
+            recallGradeUpdates.approved = approveThePhrase;
+            if (researcherHasProjectFromPayloadProject) {
+              researcherObj.data.projects[recallGradesData.project].gradingPoints = researcherObj.data.projects[
+                recallGradesData.project
+              ].gradingPoints
+                ? researcherObj.data.projects[recallGradesData.project].gradingPoints + 0.5
+                : 0.5;
             }
           }
-          // Finally, we should create RecallGrade doc for this new grade.
-          // this done variable if for testing if 4 researchers have voted on this
-          transactionWrites.push({
-            type: "update",
-            refObj: recallGradeRef,
-            updateObj: {
-              done: recallGradeData.researchersNum >= 3,
-              researchers: [...recallGradeData.researchers, fullname],
-              grades: [...recallGradeData.grades, phraseGrade.grade],
-              researchersNum: recallGradeData.researchersNum + 1,
-              updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          // If there are exactly 3 researchers who graded the same, but only
+          // this researcher's grade (Yes/No) is different from the majority of
+          // grades; we should give the opposing researcher a negative point.
+          else if (
+            (identifiedThePhrase === 3 && !randomPhraseGrade.grades[fResearcherIdx]) ||
+            (notIdentifiedThePhrase === 3 && randomPhraseGrade.grades[fResearcherIdx])
+          ) {
+            if (researcherHasProjectFromPayloadProject) {
+              researcherObj.data.projects[recallGradesData.project].gradingPoints = researcherObj.data.projects[
+                recallGradesData.project
+              ].gradingPoints
+                ? researcherObj.data.projects[recallGradesData.project].gradingPoints - 0.5
+                : -0.5;
+              researcherObj.data.projects[recallGradesData.project].negativeGradingPoints = researcherObj.data.projects[
+                recallGradesData.project
+              ].negativeGradingPoints
+                ? researcherObj.data.projects[recallGradesData.project].negativeGradingPoints + 0.5
+                : 0.5;
             }
-          });
+          }
         }
+        // If the authenticated researcher has graded the same as the majority
+        // of grades:
+        if ((identifiedThePhrase >= 3 && authenReseaGrade) || (notIdentifiedThePhrase >= 3 && !authenReseaGrade)) {
+          // Because it's approved, we should also give the authenticated
+          // researcher a point. We should update thisResearcherUpdates and
+          // commit all the updates at the end to their document.
+          currentResearcherUpdates.gradingPoints = currentResearcherUpdates.gradingPoints
+            ? currentResearcherUpdates.gradingPoints + 0.5
+            : 0.5;
+        }
+        // If there are exactly 3 researchers who graded the same, but only the
+        // authenticated researcher's grade (Yes/No) is different from the
+        // majority of grades; we should give the the authenticated researcher a
+        // negative point.
+        else if (
+          (identifiedThePhrase === 3 && !authenReseaGrade) ||
+          (notIdentifiedThePhrase === 3 && authenReseaGrade)
+        ) {
+          currentResearcherUpdates.gradingPoints = currentResearcherUpdates.gradingPoints
+            ? currentResearcherUpdates.gradingPoints - 0.5
+            : -0.5;
+          currentResearcherUpdates.negativeGradingPoints = currentResearcherUpdates.negativeGradingPoints
+            ? currentResearcherUpdates.negativeGradingPoints + 0.5
+            : 0.5;
+        }
+
+        // Finally, we should create RecallGrade doc for this new grade.
+        // this done variable if for testing if 4 researchers have voted on this
       }
       // for phrase grades loop ends above
 
@@ -440,7 +418,7 @@ exports.bulkGradeFreeRecall = async (req, res) => {
         updateObj: {
           projects: {
             ...currentResearcherData.projects,
-            [project]: currentResearcherUpdates
+            [voterProject]: currentResearcherUpdates
           }
         }
       });
@@ -1673,176 +1651,196 @@ exports.voteAdministratorReset = async (req, res) => {
 //   return res.status(500).json({ done: true });
 // };
 
-// Clicking the Yes or No buttons in FreeRecallGrading.js under
-// ProjectManagement would trigger this function. grade can be either true,
-// meaning the researcher responded Yes, or false if they responded No.
-
-exports.assignExperimentSessionsPoints = async context => {
+exports.remindResearchersForAvailability = async context => {
   try {
+
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
-    const researchersInfo = [];
+    // let waitTime = 0;
+    // const researchersInfo = [];
+
     // Retrieve all the researchers to check availabilities per researcher,
     // per project, only if the researcher is active in that project.
     const researchersDocs = await db.collection("researchers").get();
     for (let researcherDoc of researchersDocs.docs) {
       const researcherData = researcherDoc.data();
       if ("projects" in researcherData) {
-        for (let project in researcherData.projects) {
+        for (const project in researcherData.projects) {
           if (researcherData.projects[project].active && researcherData.projects[project].scheduleSessions) {
-            const resScheduleDocs = await db
+            // month for next 10 days
+            const month = moment().utcOffset(-4).add(10, "day").format("YYYY-MM-DD");
+            const resSchedules = await db
               .collection("resSchedule")
               .where("project", "==", project)
-              .where("fullname", "==", researcherDoc.id)
+              .where("researchers", "array-contains", researcherDoc.id)
+              .where("month", "==", month)
               .get();
+            
             let lastAvailability = new Date();
-            for (let resScheduleDoc of resScheduleDocs.docs) {
-              const resScheduleData = resScheduleDoc.data();
-              const theSession = resScheduleData.session.toDate();
-              if (theSession.getTime() > lastAvailability.getTime()) {
-                lastAvailability = theSession;
+            if(resSchedules.docs.length) {
+              const resSchedule = resSchedules.docs[0];
+              const resScheduleData = resSchedule.data();
+              const availabilities = resScheduleData[researcherDoc.id]?.schedules || [];
+              for(const availability of availabilities) {
+                const _availability = moment(availability).utcOffset(-4, true).toDate();
+                if (_availability.getTime() > lastAvailability.getTime()) {
+                  lastAvailability = _availability;
+                }
               }
             }
+
             let tenDaysLater = new Date();
             tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+              // Increase waitTime by a random integer between 1 to 4 seconds.
+              const waitTime = 1000 * (1 + Math.floor(Math.random() * 4));
               // Send a reminder email to a researcher that they have not specified
               // their availability for the next ten days and ask them to specify it.
-              setTimeout(() => {
-                remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
-              }, waitTime);
-              // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+              await remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
+              await delay(waitTime);
             }
           }
         }
-        researchersInfo.push({
+        /* researchersInfo.push({
           fullname: researcherDoc.id,
           email: researcherData.email,
           projects: Object.keys(researcherData.projects)
-        });
+        }); */
       }
     }
-    const oneWebIdx = researchersInfo.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu");
-    const usersInfo = [];
-    const usersDocs = await db.collection("users").get();
+
+    console.log({ err });
+    return null;
+  } catch(e) {}
+}
+
+// Clicking the Yes or No buttons in FreeRecallGrading.js under
+// ProjectManagement would trigger this function. grade can be either true,
+// meaning the researcher responded Yes, or false if they responded No.
+
+exports.assignExperimentSessionsPoints = async context => {
+  try {
+    const researchers = await db.collection("researchers").get();
+    const researchersInfo = {};
+    for(const researcher of researchers.docs) {
+      const researcherData = researcher.data();
+      researchersInfo[researcherData.email.toLowerCase()] = {
+        fullname: researcher.id,
+        email: researcherData.email.toLowerCase(),
+        projects: Object.keys(researcherData.projects)
+      };
+    }
+    
+    const usersInfo = {};
     const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
     const surveyInstructors = await db.collection("instructors").get();
-    for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...usersDocs.docs]) {
+    for (const userDoc of [...surveyInstructors.docs, ...surveyUsers.docs]) {
       const userData = userDoc.data();
       if(!userData.email) continue;
-      usersInfo.push({
+      usersInfo[userData.email.toLowerCase()] = {
         fullname: userDoc.id,
         email: userData.email,
         project: userData.project
-      });
+      };
     }
-    const pastEvents = await allPastEvents();
+
+    const pastEvents = await last30DayEvents(); // last 30 day events to minimize processing
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
         if(!pastEvent.attendees) continue;
-          let researcherObjs = [];
-          let userObj = null;
-          const attendees = [];
-          for (let attendee of pastEvent.attendees) {
-            attendees.push(attendee.email);
-            const rIdx = researchersInfo.findIndex(
-              researcher => researcher.email.toLowerCase() === attendee.email.toLowerCase()
-            );
-            if (rIdx !== -1) {
-              researcherObjs.push(researchersInfo[rIdx]);
-            }
-            const uIdx = usersInfo.findIndex(user => {
-              return (
-                user.email.toLowerCase() === attendee.email.toLowerCase() &&
-                !researcherObjs.some(r => r.email.toLowerCase() === attendee.email.toLowerCase())
-              );
-            });
-            if (uIdx !== -1) {
-              userObj = usersInfo[uIdx];
-            }
+        
+        const researcherObjs = [];
+        let userObj = null;
+        const attendees = [];
+        for (let attendee of pastEvent.attendees) {
+          attendees.push(attendee.email);
+          const attendeeEmail = attendee.email.toLowerCase();
+          if (researchersInfo[attendeeEmail]) {
+            researcherObjs.push(researchersInfo[attendeeEmail]);
+          } else if(usersInfo[attendeeEmail]) {
+            userObj = usersInfo[attendeeEmail];
           }
-          if (researcherObjs.findIndex(researcher => researcher.email.toLowerCase() === "oneweb@umich.edu") === -1) {
-            researcherObjs.push(researchersInfo[oneWebIdx]);
-          }
-          if (userObj && researcherObjs.length > 0) {
-            const project = userObj.project;
-            for (let researcherObj of researcherObjs) {
-              if (researcherObj.projects.includes(project)) {
-                const sTimestamp = new Date(pastEvent.start.dateTime);
-                const eTimestamp = new Date(pastEvent.end.dateTime);
-                const currentTime = new Date();
-                const expSessionDocs = await db
-                  .collection("expSessions")
-                  .where("attendees", "==", attendees)
-                  .where("sTime", "==", sTimestamp)
-                  .where("project", "==", project)
-                  .get();
+        }
 
-                // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
-                const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
-                let didResearcherAttend = false;
-                if (schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
-                  didResearcherAttend = true;
-                }
+        const onewebEmail = "oneweb@umich.edu";
+        if (researcherObjs.findIndex(researcher => researcher.email.toLowerCase() === onewebEmail) === -1) {
+          researcherObjs.push({
+            email: onewebEmail,
+            fullname: researchersInfo[onewebEmail].fullname,
+            projects: researchersInfo[onewebEmail].projects
+          });
+        }
+        if (userObj && researcherObjs.length > 0) {
+          const project = userObj.project;
+          for (let researcherObj of researcherObjs) {
+            if (!researcherObj.projects.includes(project)) {
+              console.log({ project, projects: researcherObj.projects });
+              continue;
+            }
 
-                if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
-                  let points = 7;
-                  if (eTimestamp.getTime() > sTimestamp.getTime() + 40 * 60 * 1000) {
-                    points = 16;
+            // sending 1st explicitly because, there is only one session for survey students and instructors 
+            await assignExpPoints(researcherObj.fullname, userObj.fullname, "1st", userObj.project, false, pastEvent.id);
+
+            // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
+            const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
+            let didResearcherAttend = false;
+            if (schedule.docs.length > 0 && schedule.docs[0].data().hasStarted) {
+              didResearcherAttend = true;
+            }
+
+            if (expSessionDocs.docs.length === 0 && didResearcherAttend) {
+              let points = 10;
+              if (eTimestamp.getTime() > sTimestamp.getTime() + 40 * 60 * 1000) {
+                points = 16;
+              }
+              // this is temporary until the survey is over.
+              // as this survey will have only one session
+              if (project === "Annotating") {
+                points = 10;
+              }
+
+              try {
+                await db.runTransaction(async t => {
+                  const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
+                  const researcherDoc = await t.get(researcherRef);
+                  const researcherData = researcherDoc.data();
+                  let researcherExpPoints = 0;
+                  if (researcherData.projects[project].expPoints) {
+                    researcherExpPoints = researcherData.projects[project].expPoints;
                   }
-                  // this is temporary until the survey is over.
-                  // as this survey will have only one session
-                  if (project === "Annotating") {
-                    points = 10;
-                  }
-
-                  try {
-                    await db.runTransaction(async t => {
-                      const researcherRef = db.collection("researchers").doc(researcherObj.fullname);
-                      const researcherDoc = await t.get(researcherRef);
-                      const researcherData = researcherDoc.data();
-                      let researcherExpPoints = 0;
-                      if (researcherData.projects[project].expPoints) {
-                        researcherExpPoints = researcherData.projects[project].expPoints;
+                  const researcherProjectUpdates = {
+                    projects: {
+                      ...researcherData.projects,
+                      [project]: {
+                        ...researcherData.projects[project],
+                        expPoints: researcherExpPoints + points
                       }
-                      const researcherProjectUpdates = {
-                        projects: {
-                          ...researcherData.projects,
-                          [project]: {
-                            ...researcherData.projects[project],
-                            expPoints: researcherExpPoints + points
-                          }
-                        }
-                      };
-                      t.update(researcherRef, researcherProjectUpdates);
-                      const researcherLogRef = db.collection("researcherLogs").doc();
-                      t.set(researcherLogRef, {
-                        ...researcherProjectUpdates,
-                        id: researcherRef.id,
-                        updatedAt: currentTime
-                      });
-                      const expSessionRef = db.collection("expSessions").doc();
-                      t.set(expSessionRef, {
-                        attendees,
-                        project,
-                        points,
-                        sTime: sTimestamp,
-                        eTime: eTimestamp,
-                        createdAt: currentTime
-                      });
-                    });
-                  } catch (e) {
-                    console.log("Transaction failure:", e);
-                  }
-                }
-              } else {
-                console.log({ project, projects: researcherObj.projects });
+                    }
+                  };
+                  t.update(researcherRef, researcherProjectUpdates);
+                  const researcherLogRef = db.collection("researcherLogs").doc();
+                  t.set(researcherLogRef, {
+                    ...researcherProjectUpdates,
+                    id: researcherRef.id,
+                    updatedAt: currentTime
+                  });
+                  const expSessionRef = db.collection("expSessions").doc();
+                  t.set(expSessionRef, {
+                    attendees,
+                    project,
+                    points,
+                    sTime: sTimestamp,
+                    eTime: eTimestamp,
+                    createdAt: currentTime
+                  });
+                });
+              } catch (e) {
+                console.log("Transaction failure:", e);
               }
             }
           }
+        }
       }
     }
     return null;
@@ -2498,10 +2496,16 @@ exports.handleSubmitFeebackCode = async (req, res) => {
 
         tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
         tWriteOperations.push({ docRef: feedbackOrderRef, data: feedOrderData });
+
         for (let operation of tWriteOperations) {
           t.update(operation.docRef, operation.data);
         }
       });
+
+      const { fullname: participant, project: _project, session } = feedbackCodeData;
+      // to assign points to researcher for session if feedback coding and recall grading is done
+      await assignExpPoints(fullname, participant, session, _project);
+
       return res
         .status(200)
         .json({ success: true, endpoint: "FeedBack upload", successData: req.body.quotesSelectedForCodes });

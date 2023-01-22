@@ -595,11 +595,11 @@ const PersonalInfo = props => {
             <FormControl className="select" variant="outlined">
               <InputLabel>The Language You Use the Most</InputLabel>
               <Select
-                label="Language"
                 name="language"
                 onChange={props.languageChange}
                 value={props.language}
                 renderValue={sameThing}
+                label="The-Language-You-Use-the-Most"
               >
                 {sortedLanguages.map(languageItems)}
               </Select>
