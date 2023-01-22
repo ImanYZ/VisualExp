@@ -1,4 +1,5 @@
 const { admin, db } = require("./admin");
+const moment = require("moment");
 
 require("dotenv").config();
 
@@ -140,6 +141,16 @@ exports.allEvents = async (req, res) => {
 exports.allPastEvents = async () => {
   try {
     const start = new Date(2021, 1, 1);
+    let end = new Date();
+    return await getEvents(start, end, "America/Detroit");
+  } catch (err) {
+    console.log({ err });
+  }
+};
+
+exports.last30DayEvents = async () => {
+  try {
+    const start = moment().subtract(30, "days").toDate();
     let end = new Date();
     return await getEvents(start, end, "America/Detroit");
   } catch (err) {
