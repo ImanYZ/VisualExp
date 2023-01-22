@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
 import axios from "axios";
+import moment from "moment";
 
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
@@ -15,11 +16,12 @@ import withRoot from "../../Home/modules/withRoot";
 
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 
-import { projectState, notAResearcherState } from "../../../store/ProjectAtoms";
+import { projectState } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
+import { toOrdinal } from "number-to-words";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -35,7 +37,6 @@ import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
 //   the phrase, the former researcher gets a ❌ negative point.
 const FreeRecallGrading = props => {
   const firebase = useRecoilValue(firebaseState);
-  const notAResearcher = useRecoilValue(notAResearcherState);
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
 
@@ -48,27 +49,23 @@ const FreeRecallGrading = props => {
   // assign these values to the corresponding recallGrades document when
   // submitting the researcher's evaluation of this phrase in this free-recall
   // response.
-  const [passageData, setPassageData] = useState({});
-  // const [response, setResponse] = useState(null);
   const [submitting, setSubmitting] = useState(true);
+  const [processing, setProcessing] = useState(false);
+
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [firstBatchOfRecallGrades, setFirstBatchOfRecallGrades] = useState([]);
-  const [notSatisfiedRecallGrades, setNotSatisfiedRecallGrades] = useState([]);
-  const [retrieveNext, setRetrieveNext] = useState(0);
+  const [recallGrades, setRecallGrades] = useState([]);
+  const [recallGradeIdx, setRecallGradeIdx] = useState(0);
+  const [passages, setPassages] = useState({});
 
-  const [lastRetreivedDocument, setLastRetreivedDocument] = useState(null);
-  const [lastRetreivedDocumentAutoGrading, setRetreivedDocumentAutoGrading] = useState("");
-  const [allowNextBatch, setAllowNextBatch] = useState(false);
-
-  const [originalBatchOf, setOriginalBatchOf] = useState([]);
-
-  const [response, setResponse] = useState("");
-
-  const [viewedRecalllDocument, setViewedRecalllDocument] = useState([]);
+  const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
+  const [notSatisfiedSelections, setNotSatisfiedSelections] = useState([]);
+  const [randomizedPhrases, setRandomizedPhrases] = useState([]);
+  const [recentParticipants, setRecentParticipants] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
+
   const QuerySearching = schemaEp => {
-    const text = firstBatchOfRecallGrades[0]?.data.response;
+    const text = recallGrades?.[recallGradeIdx]?.response;
     if (!text) return;
     let keys = {};
     let notKeywords = [];
@@ -106,6 +103,8 @@ const FreeRecallGrading = props => {
   };
 
   const searchAnyBooleanExpression = async () => {
+    const recallGrade = recallGrades?.[recallGradeIdx];
+    const passageData = passages?.[recallGrade?.passage];
     if (!passageData.title) return;
     const booleanScratchDoc = await firebase.db
       .collection("booleanScratch")
@@ -120,35 +119,51 @@ const FreeRecallGrading = props => {
         booleanHashMap[booleanData.phrase] = [booleanData];
       }
     }
-    const _newBatchRecallGrades = [];
-    const _notSatisfiedRecallGrades = [];
-    for (let recallGrade of originalBatchOf) {
-      if (booleanHashMap.hasOwnProperty(recallGrade.data.phrase)) {
-        const schemaE = booleanHashMap[recallGrade.data.phrase][0].schema;
-        if (QuerySearching(schemaE)) {
-          _newBatchRecallGrades.push(recallGrade);
-        } else {
-          _notSatisfiedRecallGrades.push(recallGrade);
+
+    // sorting boolean expressions based on votes
+    for(const phrase in booleanHashMap) {
+      booleanHashMap[phrase].sort((e1, e2) => {
+        const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
+        const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
+        return e1Vote < e2Vote ? 1 : -1; // desc order
+      })
+    }
+
+    const nonSatisfiedPhrases = [];
+    const phrases = recallGrade.phrases || [];
+
+    for (let phrase of phrases) {
+      if (booleanHashMap.hasOwnProperty(phrase.phrase)) {
+        const schemaE = booleanHashMap[phrase.phrase][0].schema;
+        if (!QuerySearching(schemaE)) {
+          nonSatisfiedPhrases.push(phrase.phrase);
         }
+      } else {
+        nonSatisfiedPhrases.push(phrase.phrase);
       }
     }
 
-    if (firstBatchOfRecallGrades[0]?.data.response !== response) {
-      setResponse(firstBatchOfRecallGrades[0]?.data.response);
-      const shuffledRecallGrades = _notSatisfiedRecallGrades.sort(() => 0.5 - Math.random());
-      const randomRecallGrades = shuffledRecallGrades.slice(0, 4);
-      const newBatchRecallGrades = _newBatchRecallGrades.concat(randomRecallGrades);
-      setNotSatisfiedRecallGrades(_notSatisfiedRecallGrades);
-      setFirstBatchOfRecallGrades(newBatchRecallGrades.sort(() => 0.5 - Math.random()));
-    }
+    setNotSatisfiedPhrases(nonSatisfiedPhrases);
+
+    return nonSatisfiedPhrases;
   };
 
   useEffect(() => {
-    if (!passageData.title) return;
-    if (!firstBatchOfRecallGrades) return;
-    searchAnyBooleanExpression();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passageData, firstBatchOfRecallGrades]);
+    (async () => {
+      const recallGrade = recallGrades?.[recallGradeIdx];
+      const passageData = passages?.[recallGrade?.passage];
+      if (passageData?.title) {
+        const notSatisfiedPhrases = await searchAnyBooleanExpression();
+        let phrases = [...recallGrade.phrases].map((phrase, idx) => ({ ...phrase, index: idx }));
+        phrases.sort(() => 0.5 - Math.random());
+        let wrongNum = 0;
+        // pick only 4 wrong phrases
+        phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
+        setRandomizedPhrases(phrases);
+        setProcessing(false);
+      }
+    })();
+  }, [recallGradeIdx, passages]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -156,199 +171,155 @@ const FreeRecallGrading = props => {
   // researchers yet.
 
   const loadedRecallGrades = async () => {
-    let lastVisibleRecallGradesDoc;
-    let lastVisibleRecallGradesDocAutoGrading;
-    let recallGradeDocs;
-    let collName = "recallGrades";
-    if (project !== "H2K2" && project !== "Autograding") {
-      collName += project;
-    }
+    setProcessing(true);
 
-    if (!lastRetreivedDocument || !allowNextBatch) {
-      let recallGradeDocsInitial = await firebase.db
-        .collection(collName)
-        .where("done", "==", false)
-        .orderBy("passage")
-        .orderBy("user")
-        .orderBy("session")
-        .limit(1)
-        .get();
-      lastVisibleRecallGradesDoc = recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
-      setLastRetreivedDocument(lastVisibleRecallGradesDoc);
-    } else {
-      lastVisibleRecallGradesDoc = lastRetreivedDocument;
+    // logic to fetch recently participants names by current researcher
+    const recentParticipants = [];
+    const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
+    const month2WeeksAgo = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
+    if(!scheduleMonths.includes(month2WeeksAgo)) {
+      scheduleMonths.push(month2WeeksAgo);
     }
-    if (lastVisibleRecallGradesDoc) {
-      recallGradeDocs = await firebase.db
-        .collection(collName)
-        .where("done", "==", false)
-        .orderBy("passage")
-        .orderBy("user")
-        .orderBy("session")
-        .startAfter(lastVisibleRecallGradesDoc)
-        .limit(4000)
-        .get();
-      if (allowNextBatch) {
-        lastVisibleRecallGradesDoc = recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
-        setLastRetreivedDocument(lastVisibleRecallGradesDoc);
-        setAllowNextBatch(false);
-      }
-    } else {
-      if (project === "Autograding") {
-        if (lastRetreivedDocumentAutoGrading === "" || !allowNextBatch) {
-          let recallGradeDocsInitial = await firebase.db
-            .collection("recallGradesH1L2")
-            .where("done", "==", false)
-            .orderBy("passage")
-            .orderBy("user")
-            .orderBy("session")
-            .limit(1)
-            .get();
-          lastVisibleRecallGradesDocAutoGrading = recallGradeDocsInitial.docs[recallGradeDocsInitial.docs.length - 1];
-          setRetreivedDocumentAutoGrading(lastVisibleRecallGradesDoc);
-        } else {
-          lastVisibleRecallGradesDocAutoGrading = lastRetreivedDocumentAutoGrading;
-        }
+    const resSchedules = await firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).get();
+    for(const resSchedule of resSchedules.docs) {
+      const resScheduleData = resSchedule.data();
+      const scheduled = resScheduleData?.scheduled?.[fullname] || {};
+      recentParticipants.push(...Object.keys(scheduled));
+    }
+    setRecentParticipants(recentParticipants);
 
-        if (lastVisibleRecallGradesDocAutoGrading) {
-          recallGradeDocs = await firebase.db
-            .collection("recallGradesH1L2")
-            .where("done", "==", false)
-            .orderBy("passage")
-            .orderBy("user")
-            .orderBy("session")
-            .startAfter(lastVisibleRecallGradesDocAutoGrading)
-            .limit(4000)
-            .get();
-          if (allowNextBatch) {
-            lastVisibleRecallGradesDocAutoGrading = recallGradeDocs.docs[recallGradeDocs.docs.length - 1];
-            setRetreivedDocumentAutoGrading(lastVisibleRecallGradesDocAutoGrading);
-            setAllowNextBatch(false);
+    const recallGrades = await firebase.db
+      .collection("recallGradesV2")
+      .where("project", "==", project)
+      .where("done", "==", false)
+      .get();
+
+    let _recallGrades = [];
+
+    for (const recallGradeDoc of recallGrades.docs) {
+      const recallGradeData = recallGradeDoc.data();
+      
+      let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
+        parseInt(sessionKey.replace(/[^0-9]+/g, ""))
+      );
+      sessionNums.sort((a, b) => (a < b ? -1 : 1));
+
+      for (const sessionNum of sessionNums) {
+        if (!sessionNum) continue;
+        for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
+          const filtered = (conditionItem.response || "")
+            .replace(/[\.,]/g, " ")
+            .split(" ")
+            .filter(w => w.trim());
+          if (
+            recallGradeData.user !== fullname &&
+            !conditionItem.researchers.includes(fullname) &&
+            filtered.length > 2
+          ) {
+            _recallGrades.push({
+              docId: recallGradeDoc.id,
+              session: toOrdinal(sessionNum),
+              user: recallGradeData.user,
+              project: recallGradeData.project,
+              ...conditionItem
+            });
           }
         }
       }
     }
 
-    const firstBatch = [];
-    const lastVisibleRecallGradesData = lastVisibleRecallGradesDoc.data();
+    // sorting researcher's related participants first
+    _recallGrades.sort((g1, g2) => {
+        const p1 = recentParticipants.includes(g1.user);
+        const p2 = recentParticipants.includes(g2.user);
+        if(p1 && p2) return 0;
+        return p1 && !p2 ? -1 : 1;
+    })
 
-    if (lastVisibleRecallGradesData.user !== fullname && !lastVisibleRecallGradesData.researchers.includes(fullname)) {
-      firstBatch.push({ data: lastVisibleRecallGradesData, grade: false });
-    }
-    for (let recallGradeDoc of recallGradeDocs.docs) {
-      const recallGradeData = recallGradeDoc.data();
-      const filtered = (recallGradeData.response || "").split(" ").filter(w => w.trim());
-      if (
-        recallGradeData.user !== fullname &&
-        !recallGradeData.researchers.includes(fullname) &&
-        !recallGradeData.viewers.includes(fullname) &&
-        filtered.length > 2
-      ) {
-        if (firstBatch.length > 0 && recallGradeData.response !== firstBatch[0].data.response) {
-          break;
-        }
-        firstBatch.push({ data: recallGradeData, grade: false });
-      }
-    }
-
-    if (firstBatch.length === 0) {
-      setAllowNextBatch(true);
-    }
-    return firstBatch;
+    setRecallGrades(_recallGrades);
+    setRecallGradeIdx(0);
+    setSubmitting(false);
   };
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
-    if (recallGradesLogsDoc.exists) {
-      const recallGradesLogsData = recallGradesLogsDoc.data();
-      if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
-        // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
-        // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
-        // setShowTheSchemaGen(true);
-      }
-    }
-  }, []);
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // useEffect(async () => {
+  //   const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
+  //   if (recallGradesLogsDoc.exists) {
+  //     const recallGradesLogsData = recallGradesLogsDoc.data();
+  //     if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
+  //       // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
+  //       // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
+  //       // setShowTheSchemaGen(true);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
-    let firstBatch = [];
-
-    const retrieveFreeRecallResponse = async () => {
-      // recallGrades collection is huge and it's extremely inefficient to
-      // search through it if all the docs for all projects are in the same
-      // collection. Also, when querying them to find the appropriate doc to
-      // show the authenticated researcher to grade, we cannot combine the
-      // where clause on the project and the researchersNum < 4. As a
-      // solution, we separated the collections per project, other than the
-      // H2K2 project that we have already populated the data in and it's very
-      // costly to rename.
-      while (firstBatch.length === 0) {
-        firstBatch = await loadedRecallGrades();
-      }
-
-      const passageDoc = await firebase.db.collection("passages").doc(firstBatch[0].data.passage).get();
-
-      setPassageData(passageDoc.data());
-      setOriginalBatchOf(firstBatch);
-      setFirstBatchOfRecallGrades(firstBatch);
-      setViewedRecalllDocument(firstBatch);
-      setSubmitting(false);
-      // ASA we find five free-recall phrases for a particular response
-      // we set this flag to true to stop searching.
-      return null;
-    };
-    if (firebase && !notAResearcher && project) {
-      retrieveFreeRecallResponse();
-      searchAnyBooleanExpression();
+    if (firebase) {
+      loadedRecallGrades();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase]);
 
-    // cleanup function
-    return () => retrieveFreeRecallResponse();
-    // Every time the value of retrieveNext changes, retrieveFreeRecallResponse
-    // should be called regardless of its value.
-  }, [firebase, fullname, notAResearcher, project, retrieveNext]);
+  useEffect(() => {
+    (async () => {
+      const passageId = recallGrades?.[recallGradeIdx]?.passage;
+      if (!passages[passageId]) {
+        const passageDoc = await firebase.db.collection("passages").doc(passageId).get();
+        setPassages(passages => {
+          return { ...passages, [passageId]: passageDoc.data() };
+        });
+      }
+    })();
+  }, [passages, recallGrades, recallGradeIdx]);
 
   // Clicking the Yes or No buttons would trigger this function. grade can be
   // either true, meaning the researcher responded Yes, or false if they
   // responded No.
   const gradeIt = async newBatch => {
-    let firstBatch;
-    if (newBatch.length) {
-      firstBatch = newBatch;
+    let phrases = [];
+    const recallGrade = recallGrades?.[recallGradeIdx];
+
+    if (newBatch?.length) {
+      const phraseStatements = [];
+      phrases = [...newBatch];
+      // need to add missing grades due schema gen recalls
+      for(const phrase of phrases) {
+        phraseStatements.push(phrase.phrase);
+      }
+      const recallPhrases = (recallGrades?.[recallGradeIdx]?.phrases || []);
+      for(const recallPhrase of recallPhrases) {
+        if(phraseStatements.includes(recallPhrase.phrase)) {
+          continue;
+        }
+        phrases.push(recallPhrase);
+      }
     } else {
-      firstBatch = firstBatchOfRecallGrades;
+      phrases = [...(recallGrades?.[recallGradeIdx]?.phrases || [])];
     }
+
     setSubmitting(true);
     try {
-      const phrasesWithGrades = firstBatch.map(recall => ({
-        phrase: recall.data.phrase,
-        grade: recall.grade
-      }));
-      const userData = (await firebase.db.collection("users").doc(`${firstBatch[0].data.user}`).get()).data();
-      let passageIdx = userData.pConditions.findIndex(pCon => pCon.passage === firstBatch[0].data.passage);
-      const freeRecallGradeBulkData = {
-        fullname,
-        project: firstBatch[0].data.project,
-        phraseNum: passageData?.phrases?.length,
-        user: firstBatch[0].data.user,
-        passageId: firstBatch[0].data.passage,
-        passageIdx,
-        condition: firstBatch[0].data.condition,
-        phrasesWithGrades,
-        session: firstBatch[0].data.session,
-        response: firstBatch[0].data.response,
+      const requestData = {
+        recallGrade: {
+          ...recallGrade,
+          phrases
+        },
         voterProject: project,
-        viewedRecalllDocument
+        viewedPhrases: randomizedPhrases.map((phrase) => phrase.phrase)
       };
-
+      
       await firebase.idToken();
-      await axios.post("/bulkGradeFreeRecall", freeRecallGradeBulkData);
+      await axios.post("/researchers/gradeRecalls", requestData);
+
       setSubmitting(false);
       // Increment retrieveNext to get the next free-recall response to grade.
-      setRetrieveNext(oldValue => oldValue + 1);
+      if(recallGrades.length !== recallGradeIdx + 1) {
+        setProcessing(true);
+      }
+      setRandomizedPhrases([]);
+      setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
-      setOriginalBatchOf([]);
-      setFirstBatchOfRecallGrades([]);
       setShowTheSchemaGen(false);
     } catch (err) {
       console.error(err);
@@ -356,21 +327,48 @@ const FreeRecallGrading = props => {
     }
   };
 
-  const handleGradeChange = index => {
-    const grades = [...firstBatchOfRecallGrades];
-    grades[index].grade = !firstBatchOfRecallGrades[index].grade;
-    setFirstBatchOfRecallGrades(grades);
+  const handleGradeChange = (index) => {
+    const _recallGrades = [...recallGrades];
+    const researchers = [...(_recallGrades[recallGradeIdx].phrases[index].researchers || [])];
+    let researcherIdx = researchers.indexOf(fullname);
+    if (researcherIdx === -1) {
+      researchers.push(fullname);
+      researcherIdx = researchers.length - 1;
+    }
+
+    const grades = [...(_recallGrades[recallGradeIdx].phrases[index].grades || [])];
+    grades[researcherIdx] = !grades[researcherIdx];
+
+    _recallGrades[recallGradeIdx].phrases[index].researchers = researchers;
+    _recallGrades[recallGradeIdx].phrases[index].grades = grades;
+    _recallGrades[recallGradeIdx].phrases[index].grade = grades[researcherIdx];
+    
+    setRecallGrades(_recallGrades);
   };
 
   const handleSubmit = () => {
-    const notSatisfiedRecalls = [];
-    for (let recallGrade of firstBatchOfRecallGrades) {
-      if (recallGrade.grade && notSatisfiedRecallGrades.includes(recallGrade)) {
-        notSatisfiedRecalls.push(recallGrade);
+    let hasNotSatisfiedPhrases = false;
+    const recallGrade = recallGrades?.[recallGradeIdx];
+    const phrases = [...(recallGrade?.phrases || [])];
+
+    const notSatisfiedSelections = [];
+
+    for (const _phrase of phrases) {
+      const researchers = _phrase.researchers || [];
+      const researcherIdx = researchers.indexOf(fullname);
+
+      const grades = _phrase.grades || [];
+      const grade = !!grades[researcherIdx];
+
+      if (grade && notSatisfiedPhrases.includes(_phrase.phrase)) {
+        hasNotSatisfiedPhrases = true;
+        notSatisfiedSelections.push(_phrase.phrase);
       }
     }
 
-    if (notSatisfiedRecalls.length) {
+    setNotSatisfiedSelections(notSatisfiedSelections);
+
+    if (hasNotSatisfiedPhrases) {
       setShowTheSchemaGen(true);
     } else {
       gradeIt([]);
@@ -380,13 +378,24 @@ const FreeRecallGrading = props => {
   if (showTheSchemaGen)
     return (
       <SchemaGenRecalls
-        firstBatchOfRecallGrades={firstBatchOfRecallGrades}
-        notSatisfiedRecallGrades={notSatisfiedRecallGrades}
+        recallGrade={recallGrades?.[recallGradeIdx]}
+        notSatisfiedPhrases={notSatisfiedSelections}
         gradeIt={gradeIt}
       />
     );
 
-  return !firstBatchOfRecallGrades || !firstBatchOfRecallGrades.length ? (
+  if(processing) {
+    return (
+      <Box sx={{
+        display: "flex",
+        width: "100%",
+        justifyContent: "center"
+      }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  return !recallGrades || !recallGrades.length || recallGrades.length <= recallGradeIdx ? (
     <Alert severity="info" size="large">
       <AlertTitle>Info</AlertTitle>
       You've graded all the recalls from participants
@@ -415,28 +424,52 @@ const FreeRecallGrading = props => {
           </li>
         </ul>
       </Alert>
+      {
+        recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
+          <Alert severity="error" sx={{
+            color: "rgb(95, 33, 32)",
+            background: "rgb(253, 237, 237)",
+            marginTop: "10px"
+          }}>
+            <ul>
+              <li>
+                <b>{recallGrades[recallGradeIdx].user}</b> is the last participant in one of your experiement sessions.
+              </li>
+              <li>
+              you will not receive points for running that session until you grade this participant's responses.
+              </li>
+            </ul>
+          </Alert>
+        ) : <span />
+      }
       <Paper style={{ paddingBottom: "19px" }}>
         <p>1- Carefully read this free-recall response:</p>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {firstBatchOfRecallGrades[0]?.data.response}
+          {recallGrades[recallGradeIdx]?.response}
         </Paper>
         <p>
           2- Identify whether this participant has mentioned the following key phrases from the original passage in
           their free-recall response, and then submit your answers:
         </p>
 
-        {firstBatchOfRecallGrades?.map((row, index) => (
-          <div key={index}>
-            <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
-              <Box sx={{ display: "inline", mr: "19px" }}>
-                NO
-                <Switch checked={row.grade} onChange={() => handleGradeChange(index)} color="secondary" />
-                YES
-              </Box>
-              <Box sx={{ display: "inline" }}>{row.data.phrase}</Box>
-            </Paper>
-          </div>
-        ))}
+        {(randomizedPhrases || []).map((row, index) => {
+          const phrase = recallGrades[recallGradeIdx].phrases[row.index];
+
+          const researcherIdx = (phrase.researchers || []).indexOf(fullname);
+          const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
+          return (
+            <div key={index}>
+              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+                <Box sx={{ display: "inline", mr: "19px" }}>
+                  NO
+                  <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
+                  YES
+                </Box>
+                <Box sx={{ display: "inline" }}>{phrase.phrase}</Box>
+              </Paper>
+            </div>
+          );
+        })}
         <Button onClick={handleSubmit} className="Button" variant="contained" color="success" disabled={submitting}>
           {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
         </Button>
@@ -457,7 +490,7 @@ const FreeRecallGrading = props => {
             margin: "19px 19px 70px 19px"
           }}
         >
-          {passageData.text}
+          {passages?.[recallGrades?.[recallGradeIdx]?.passage]?.text || ""}
         </Paper>
       </Paper>
       <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />

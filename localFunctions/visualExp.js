@@ -1836,7 +1836,7 @@ exports.generatedBooleanExpressionData = async (req, res) => {
             const _tempSchema = {
               id: `r-${uuidv4()}`,
               keyword: extractKeyWords[keys][0],
-              not:false,
+              not: false,
             };
             let _alternatives = [];
             if (extractKeyWords[keys].length > 1) {
@@ -1873,5 +1873,38 @@ exports.generatedBooleanExpressionData = async (req, res) => {
   } catch (error) {
     console.log("error:::::", error);
     res.status(400).json({ success: false, data: [], process: "end" });
+  }
+};
+
+exports.convertRsearchersProject = async (req, res) => {
+  try {
+    const revertResearchers = [
+      "Rehana Naik Olson",
+      "Ethan Hiew",
+      "Benjamin Brown",
+      "Louwis Truong",
+      "Jennifer Mitchell",
+    ];
+    for (let revertResearcher of revertResearchers) {
+      const revertResearcherDocs = await db
+        .collection("activities")
+        .where("fullname", "==", revertResearcher)
+        .where("project", "==", "H1L2")
+        .get();
+      for (let revertResearcherDoc of revertResearcherDocs.docs) {
+        const revertResearcherData = revertResearcherDoc.data();
+        const newDocument = {
+          ...revertResearcherData,
+        };
+        newDocument.project = "H2K2";
+        console.log({ newDocument });
+        const newDocumentRef = db.collection("activities").doc();
+        await batchSet(newDocumentRef, newDocument);
+      }
+    }
+    await commitBatch();
+    console.log("Done");
+  } catch (error) {
+    console.log(error);
   }
 };

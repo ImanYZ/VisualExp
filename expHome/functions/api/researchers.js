@@ -1,5 +1,6 @@
 const express = require("express");
 const moment = require("moment");
+const gradeRecalls = require("../actions/researchers/gradeRecalls");
 const { db } = require("../admin");
 const firebaseAuth = require("../middlewares/firebaseAuth");
 const isResearcher = require("../middlewares/isResearcher");
@@ -70,5 +71,8 @@ researchersRouter.post("/schedule", async (req, res) => {
     })
   }
 })
+
+// POST /api/researchers/gradeRecalls
+researchersRouter.post("/gradeRecalls", gradeRecalls);
 
 module.exports = researchersRouter;

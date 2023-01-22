@@ -13,9 +13,66 @@ module.exports = new MockData([
         "positiveBooleanExpPionts": 0,
         "onePoints": 0,
         "positiveCodingPoints": 0
+      },
+      "Annotating": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
       }
     },
     "participants": [],
     "email": "ouhrac@gmail.com"
-  }  
+  },
+  {
+    "documentId": "Haroon Waheed",
+    "projects": {
+      "H1L2": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
+      }
+    },
+    "participants": [],
+    "email": "haroon.waheed21@gmail.com"
+  },
+  {
+    "documentId": "Ukasha Tariq",
+    "projects": {
+      "H1L2": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
+      }
+    },
+    "participants": [],
+    "email": "ukasha@nowhere.com"
+  },
+  {
+    "documentId": "Iman",
+    "projects": {
+      "H1L2": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
+      }
+    },
+    "participants": [],
+    "email": "oneweb@umich.edu"
+  }
 ], "researchers")
