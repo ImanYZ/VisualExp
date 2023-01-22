@@ -6,6 +6,8 @@ const mockUsers = require("./mockCollections/users.data");
 const mockResSchedule = require("./mockCollections/resSchedule.data");
 const mockRecallGradesV2 = require("./mockCollections/recallGradesV2.data");
 const mockBooleanScratch = require("./mockCollections/booleanScratch.data");
+const mockSchedules = require("./mockCollections/schedule.data");
+const mockFeedbackCodes = require("./mockCollections/feedbackCode.data");
 const MockData = require("./MockData")
 const deleteAllUsers = require("./deleteAllUsers")
 
@@ -19,5 +21,7 @@ module.exports = {
   mockResSchedule,
   mockRecallGradesV2,
   mockBooleanScratch,
+  mockSchedules,
+  mockFeedbackCodes,
   deleteAllUsers
 }

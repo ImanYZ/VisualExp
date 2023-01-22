@@ -1,6 +1,8 @@
 const { db } = require("../../admin");
 const { getNonSatisfiedPhrasesByPassageTitle } = require("../../helpers/passage");
 
+const {assignExpPoints} = require("../../helpers/assignExpPoints");
+
 module.exports = async (req, res) => {
   try {
     const {
@@ -293,6 +295,7 @@ module.exports = async (req, res) => {
           t.delete(transactionWrite.refObj);
         }
       }
+      await assignExpPoints(fullname, recallGradeData.user, session, voterProject);
     });
 
     return res.status(200).json({
