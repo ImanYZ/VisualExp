@@ -498,7 +498,7 @@ const PaperTest = (props) => {
           <Typography variant="h3" gutterBottom marked="center" align="center">
             Community Specific Test
           </Typography>
-          <Box sx={{ mb: "10px" }}>
+          {(!papers.length) ?  <div>we are sorry ,The test will be available soon.</div> : ( <Box sx={{ mb: "10px" }}>
             <Box>
               Please carefully read the document before answering any of the
               questions, and <strong>select all the choices that apply</strong>.
@@ -507,7 +507,7 @@ const PaperTest = (props) => {
               The community leaders will decide about your application based on{" "}
               <strong>your total WRONG attempts.</strong>
             </Box>
-          </Box>
+          </Box>)}
         </div>
         {papers.map((paper, idx) => (
           <Accordion
