@@ -358,31 +358,31 @@ export default [
     title: "Disability Studies",
     width: "33%",
     leaders: [
-      // {
-      //   name: "Keltie O'Malley",
-      //   image: "Keltie_O_Malley.jpg",
-      //   about: `Keltie O'Malley is a current undergraduate student at Michigan State University studying towards a BA in Political Science Pre-Law with a minor in Peace and Justice Studies. Before becoming a Co-Leader in the Disability Studies Community, she worked as an intern who focused on policy and law regarding disabilities. She has an interest in how legislation impacts individuals with disabilities and how it has evolved over time. Beyond 1Cademy, Keltie enjoys reading books, going on runs, and baking pastries.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/keltie-o-b4036522a/",
-      //     },
-      //   ],
-      // },
       {
-        name: "Rishabh Singh Verma",
-        image: "Rishabh_Singh_Verma.jpg",
-        about: `I am a sophomore currently pursuing a major in Informatics at the School of Information in the University of Michigan Ann Arbor, as well as a possible minor in Entrepreneurship and Computer Science. I am very interested in learning about technology and programming, and am planning to self teach myself certifications during this upcoming summer. I have always been interested in exploring different facets about the disability movement, including its roots, legislation that helped give more political and social representation, as well as becoming more well taught in the many different disabilities that are not discussed as often as the highly known ones. Personally, I have one of these conditions called “Hyperhidrosis”, which results in an individual sweating excessively when exposed to stress, temperatures warmer than room temperature, or any sort of physical movement. Through the Disability Studies group, I have been able to collaborate and deepen my understanding about hyperhidrosis and other aspects in Disability Studies.`,
+        name: "Katherine Wells",
+        image: "Katherine_Wells.jpeg",
+        about: `I am currently an undergraduate student at the University of Virginia pursuing a Bachelor of Arts in Psychology and Sociology`,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/rishabh-verma-3782691b7/"
+            url: "https://www.linkedin.com/in/katherine-wells-b0621021a/",
+          },
+        ],
+      },
+      {
+        name: "Renee Kessler",
+        image: "Renee_Kessler.jpeg",
+        about: `I graduated with a bachelors of science in psychology with a minor in sociology in the spring of 2022.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/renee-kessler-71a247262/"
           }
         ]
       }
     ],
-    YouTube: "otW11GyQ4dY",
-    description: `The Disability Studies community explores past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
+    YouTube: "pWYt3vtPm6U",
+    description: `The Disability Studies community explores current and past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings weekly with the rest of the group. By using 1Cademy, interns learn how to break down articles into smaller ideas, connect them to broader concepts, extrapolate the research for deeper analysis, and communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
     accomplishments: `We have created a strong foundation of knowledge about a wide variety of topics and how they relate to disability.
     Some of the topics we have explored include:
     different models of disability,
@@ -394,8 +394,8 @@ export default [
     and ableism.
     We have summarized information from numerous research articles and other scholarly sources and we allow interns to find specific topics that interest them, accomplishing a flexible and personally rewarding environment.`,
     gains: [
-      `Gain valuable research skills and experience, such as paper analysis, summarization, and making connections between disciplines.`,
-      `Work towards publishing research on topics related to disability.`,
+      `Gain valuable research skills and experience, such as analyzing scientific journals and articles, summarization, and making connections between disciplines.`,
+      `Publish research on topics on the 1Cademy platform related to disability`,
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`
     ],
@@ -405,16 +405,19 @@ export default [
       `Interest and enthusiasm for topics related to Disability Studies.`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
       `Willingness to present work at weekly meetings.`,
-      `Able to commit to approximately 5-10 hours of work each week.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`
+      `Fluency in writing and reading in English (will have to summarize research articles). `
+      
     ],
     responsibilities: [
-      `Read and summarize textbook chapters and scientific journal articles.`,
-      `Make connections between different ideas and concepts.`,
-      `Contribute concise summaries of information to the online 1Cademy platform.`,
-      `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work and engaging in discussions.`,
-      `All interactions, task fulfillment, and communications will be remote.`
+      `Read and condense different modalities of research that relate to disabilities`,
+      `Actively contribute information to 1Cademy’s platform `,
+      `Frequently revise and improve personal work `,
+      `Attend weekly meetings to present weekly findings and partake in discussions`,
+      `Engage with other members within the community`,
+      `Provide feedback`,
+      `Collaborate on ideas`,
+      `Participate in peer review`
+      
     ]
   },
   {
