@@ -358,31 +358,31 @@ export default [
     title: "Disability Studies",
     width: "33%",
     leaders: [
-      // {
-      //   name: "Keltie O'Malley",
-      //   image: "Keltie_O_Malley.jpg",
-      //   about: `Keltie O'Malley is a current undergraduate student at Michigan State University studying towards a BA in Political Science Pre-Law with a minor in Peace and Justice Studies. Before becoming a Co-Leader in the Disability Studies Community, she worked as an intern who focused on policy and law regarding disabilities. She has an interest in how legislation impacts individuals with disabilities and how it has evolved over time. Beyond 1Cademy, Keltie enjoys reading books, going on runs, and baking pastries.`,
-      //   websites: [
-      //     {
-      //       name: "LinkedIn",
-      //       url: "https://www.linkedin.com/in/keltie-o-b4036522a/",
-      //     },
-      //   ],
-      // },
       {
-        name: "Rishabh Singh Verma",
-        image: "Rishabh_Singh_Verma.jpg",
-        about: `I am a sophomore currently pursuing a major in Informatics at the School of Information in the University of Michigan Ann Arbor, as well as a possible minor in Entrepreneurship and Computer Science. I am very interested in learning about technology and programming, and am planning to self teach myself certifications during this upcoming summer. I have always been interested in exploring different facets about the disability movement, including its roots, legislation that helped give more political and social representation, as well as becoming more well taught in the many different disabilities that are not discussed as often as the highly known ones. Personally, I have one of these conditions called “Hyperhidrosis”, which results in an individual sweating excessively when exposed to stress, temperatures warmer than room temperature, or any sort of physical movement. Through the Disability Studies group, I have been able to collaborate and deepen my understanding about hyperhidrosis and other aspects in Disability Studies.`,
+        name: "Katherine Wells",
+        image: "Katherine_Wells.jpeg",
+        about: `I am currently an undergraduate student at the University of Virginia pursuing a Bachelor of Arts in Psychology and Sociology`,
         websites: [
           {
             name: "LinkedIn",
-            url: "https://www.linkedin.com/in/rishabh-verma-3782691b7/"
+            url: "https://www.linkedin.com/in/katherine-wells-b0621021a/",
+          },
+        ],
+      },
+      {
+        name: "Renee Kessler",
+        image: "Renee_Kessler.jpeg",
+        about: `I graduated with a bachelors of science in psychology with a minor in sociology in the spring of 2022.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/renee-kessler-71a247262/"
           }
         ]
       }
     ],
-    YouTube: "otW11GyQ4dY",
-    description: `The Disability Studies community explores past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings with the rest of the group. By using 1Cademy, interns learn how to break down articles into granular and connected concepts to best communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
+    YouTube: "pWYt3vtPm6U",
+    description: `The Disability Studies community explores current and past research related to disability. We investigate a wide range of topics related to disability including, disability legislation, disability culture, the psychosocial impact of disability, the economics of disability, and more. Interns summarize research articles and present their findings weekly with the rest of the group. By using 1Cademy, interns learn how to break down articles into smaller ideas, connect them to broader concepts, extrapolate the research for deeper analysis, and communicate their findings to other community members. We value collaborative learning and expect interns to participate in group discussions to dive deeper into the content.`,
     accomplishments: `We have created a strong foundation of knowledge about a wide variety of topics and how they relate to disability.
     Some of the topics we have explored include:
     different models of disability,
@@ -394,8 +394,8 @@ export default [
     and ableism.
     We have summarized information from numerous research articles and other scholarly sources and we allow interns to find specific topics that interest them, accomplishing a flexible and personally rewarding environment.`,
     gains: [
-      `Gain valuable research skills and experience, such as paper analysis, summarization, and making connections between disciplines.`,
-      `Work towards publishing research on topics related to disability.`,
+      `Gain valuable research skills and experience, such as analyzing scientific journals and articles, summarization, and making connections between disciplines.`,
+      `Publish research on topics on the 1Cademy platform related to disability`,
       `Collaborate with others to review and summarize existing research and identify topics for further study.`,
       `Work remotely with all interactions, task fulfillment, and communications (about 5-10 hours per week)`
     ],
@@ -405,16 +405,19 @@ export default [
       `Interest and enthusiasm for topics related to Disability Studies.`,
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
       `Willingness to present work at weekly meetings.`,
-      `Able to commit to approximately 5-10 hours of work each week.`,
-      `Fluency in writing and reading in English (will have to summarize research articles).`
+      `Fluency in writing and reading in English (will have to summarize research articles). `
+      
     ],
     responsibilities: [
-      `Read and summarize textbook chapters and scientific journal articles.`,
-      `Make connections between different ideas and concepts.`,
-      `Contribute concise summaries of information to the online 1Cademy platform.`,
-      `Attend weekly online meetings.`,
-      `Contribute in meetings by presenting work and engaging in discussions.`,
-      `All interactions, task fulfillment, and communications will be remote.`
+      `Read and condense different modalities of research that relate to disabilities`,
+      `Actively contribute information to 1Cademy’s platform `,
+      `Frequently revise and improve personal work `,
+      `Attend weekly meetings to present weekly findings and partake in discussions`,
+      `Engage with other members within the community`,
+      `Provide feedback`,
+      `Collaborate on ideas`,
+      `Participate in peer review`
+      
     ]
   },
   {
@@ -567,7 +570,7 @@ export default [
     weekly: [],
     url: "/static/Communities/Deep_Learning.jpg",
     title: "Natural Language Processing",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Ge Zhang",
@@ -655,6 +658,90 @@ export default [
       `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
       `All interactions, task fulfillment, and communications will be remote.`,
       `Enthusiastically participate in the research assignments if needed.`
+    ]
+  },
+  {
+    id: "UX_Research_in_Online_Communities",
+    tags: [
+      {
+        title: "Online Communities",
+        node: "ZyVgzAZOlOXx7d7tWEDx"
+      }
+    ],
+    allTime: [],
+    weekly: [],
+    url: "/static/Communities/Online_Communities.jpg",
+    title: "UX Research in Online Communities",
+    width: "33%",
+    leaders: [
+      {
+        name: "Iman YeckehZaare",
+        image: "Iman_YeckehZaare.jpg",
+        about: `I am a Ph.D. Candidate at the University of Michigan School of Information.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/oneweb/"
+          }
+        ]
+      },
+      {
+        name: "Ben Brown",
+        image: "Ben_Brown.jpeg",
+        about: `I am in my second year studying library and information science at SJSU and I serve as a content editor for my school's Student Research Journal. I have excellent communication skills which include written and verbal communication. I enjoy learning about information searching, organization, and retrieval, and look forward to more opportunities to apply what I have learned so far.`,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/benjamin-brown-b8b5611a7/"
+          }
+        ]
+      },
+      {
+        name: "Lily DiBartolomeo",
+        image: "Lily_DiBartolomeo.jpeg",
+        about: ``,
+        websites: [
+          {
+            name: "LinkedIn",
+            url: "https://www.linkedin.com/in/lily-dibartolomeo/"
+          }
+        ]
+      }
+    ],
+    YouTube: "i_W_7j9n3aA",
+    description: `1Cademy is a collaborative community that supports interdisciplinary research and learning through content generation, mapping, and evaluation. We have multiple successful communities from various fields collaborating regularly by summarizing and organizing content on the platform. This community is focused on learning how to make healthier, more engaged online communities in order to improve our users’ learning, contributions, and experience.
+    The UX Research in Online Communities team is dedicated to uncovering, presenting, and compiling the latest literature and research on creating and maintaining engaging and beneficial online communities. Our goal is to understand how to foster online communities where users actively contribute their ideas and value the perspectives of their peers. We are seeking a team of dedicated students to conduct thorough research in various disciplines including psychology, social science, cognitive science, information science, and economics. Utilizing the 1Cademy platform, we will take notes, organize ideas, and map concepts from the literature we find. Ultimately, our aim is to apply our findings to make meaningful improvements to the 1Cademy platform and enhance the user experience of our online communities.
+    `,
+    // accomplishments: <></>,
+    gains: [
+      `Learn how to use the 1Cademy platform for information management, organization, and dissemination purposes `,
+      "Collaborate with a team of motivated and invested research interns from around the world",
+      "Gain experience evaluating, paraphrasing, and presenting research",
+      "Gain experience working in a remote setting and collaborating with a team on academic research",
+      "Work toward reviewing and synthesizing literature into original research",
+      "Have opportunities to take on leadership roles "
+    ],
+    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in psychology, education, or a related field, and answer our quiz questions to evaluate their domain knowledge.`,
+    // coursera: "https://www.coursera.org/learn/academicinfoseek",
+    hasTest: true,
+    qualifications: [
+      "Motivation to read new and upcoming research papers",
+      "Enthusiasm for topics related to social sciences, information sciences, or economics",
+      "Fluency in writing and reading in English",
+      "Ability to verbally communicate effectively and facilitate team meetings",
+      "Experience and willingness to work in collaborative environments ",
+      "Ability to engage in group discourse and resolve complex issues",
+      "Ability to work asynchronously and independently",
+      "Strong presentation and summarization skills ",
+    ],
+    responsibilities: [
+      "Work asynchronously and attend online meetings once per week. ",
+      "Contribute 15-20 hours/week of your time to developing the 1Cademy platform",
+      "Use the 1Cademy platform to organize knowledge ",
+      "Work with a team to develop and improve the Online Communities area of 1Cademy ",
+      "Support research projects by summarizing background literature",
+      "Work remotely for all interactions, task fulfillment, and communications ",
+      "Translate research into ideas to improve the experience of 1Cademy communities"
     ]
   },
   // {
@@ -877,7 +964,7 @@ export default [
     weekly: [],
     url: "/static/LibraryBackground.jpg",
     title: "Liaison Librarians",
-    width: "50%",
+    width: "33%",
     leaders: [
       {
         name: "Ben Brown",

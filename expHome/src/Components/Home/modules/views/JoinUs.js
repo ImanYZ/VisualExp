@@ -18,10 +18,13 @@ import {
   resumeUrlState,
   transcriptUrlState,
   communiTestsEndedState,
-  // emailVerifiedState,
-  applicationsSubmittedState
+  applicationsSubmittedState,
+  emailState,
 } from "../../../../store/AuthAtoms";
-import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
+import {
+  hasScheduledState,
+  completedExperimentState,
+} from "../../../../store/ExperimentAtoms";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -37,11 +40,11 @@ const JoinUs = props => {
   const fullname = useRecoilValue(fullnameState);
   const hasScheduled = useRecoilValue(hasScheduledState);
   const completedExperiment = useRecoilValue(completedExperimentState);
+  const email = useRecoilValue(emailState);
   const [communiTestsEnded, setCommuniTestsEnded] = useRecoilState(communiTestsEndedState);
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
-  // const emailVerified = useRecoilValue(emailVerifiedState);
   const [activeStep, setActiveStep] = useState(0);
   const [checkedInnerStep, setCheckedInnerStep] = useState(0);
   const [activeInnerStep, setActiveInnerStep] = useState(0);
@@ -61,37 +64,49 @@ const JoinUs = props => {
       props.community.id &&
       applicationsSubmitted[props.community.id]
     ) {
+      setActiveStep(3);
+    } else if (completedExperiment) {
+      setActiveStep(2);
+    } else if (hasScheduled) {
       setActiveStep(1);
     } else {
       setActiveStep(0);
     }
-  }, [hasScheduled, completedExperiment, applicationsSubmitted, props.community]);
+  }, [hasScheduled, completedExperiment, applicationsSubmitted, props.community, props]);
 
   useEffect(() => {
     if (needsUpdate) {
-      let stepsIdx = 1;
-      const commTestEnded = props.community.id in communiTestsEnded && communiTestsEnded[props.community.id];
+      if(!props.community) return;
+      let stepsIdx = 0;
+      const commTestEnded =
+        props.community.id in communiTestsEnded &&
+        communiTestsEnded[props.community.id];
       if (courseraUrl && portfolioUrl && commTestEnded) {
-        stepsIdx = 7;
-      } else if ((courseraUrl && portfolioUrl) || (courseraUrl && commTestEnded) || (portfolioUrl && commTestEnded)) {
         stepsIdx = 6;
-      } else if (courseraUrl || commTestEnded || portfolioUrl) {
+      } else if (
+        (courseraUrl && portfolioUrl) ||
+        (courseraUrl && commTestEnded) ||
+        (portfolioUrl && commTestEnded)
+      ) {
         stepsIdx = 5;
-      } else if (explanation) {
+      } else if (courseraUrl || commTestEnded || portfolioUrl) {
         stepsIdx = 4;
-      } else if (transcriptUrl) {
+      } else if (explanation) {
         stepsIdx = 3;
-      } else if (resumeUrl) {
+      } else if (transcriptUrl) {
         stepsIdx = 2;
+      } else if (resumeUrl) {
+        stepsIdx = 1;
       }
       setCheckedInnerStep(stepsIdx);
       setActiveInnerStep(stepsIdx);
       setNeedsUpdate(false);
     }
-  }, [needsUpdate, resumeUrl, transcriptUrl, explanation, courseraUrl, portfolioUrl, communiTestsEnded]);
+  }, [needsUpdate, resumeUrl, transcriptUrl, explanation, courseraUrl, portfolioUrl, communiTestsEnded, props.community]);
 
   useEffect(() => {
     const loadExistingApplication = async () => {
+      if(!props.community) return;
       const applDoc = await firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id)
@@ -144,7 +159,8 @@ const JoinUs = props => {
     if (firebase && fullname && props.community) {
       loadExistingApplication();
     }
-  }, [firebase, fullname, props.community]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase, fullname, props.community, props.community]);
 
   const changeExplanation = event => {
     setExplanation(event.target.value);
@@ -232,6 +248,7 @@ const JoinUs = props => {
       } else {
         await applRef.set({
           fullname,
+          email,
           communiId: props.community.id,
           portfolioUrl,
           createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -268,19 +285,26 @@ const JoinUs = props => {
   };
 
   return (
-    <Box
+    <Container
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: !props.community ? 0 : 1,
-        pb:  !props.community ? 0 : 10,
+        pt: !props.community ? 7 : 1,
+        pb: 10,
       }}
     >
-      {props.community &&(
+      {!props.community ? (
+        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
+          {sectionsOrder[sectionIdx].title}
+        </Typography>
+      ) : (
         <Alert severity="warning">
-          <strong>Note: </strong> Participation is unpaid, solely for the purpose of improving research and education,
-          and this position meets{" "}
-          <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank" rel="noreferrer">
+          <strong>Note: </strong> Participation is unpaid, solely for the
+          purpose of improving research and education, and this position meets{" "}
+          <a
+            href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm"
+            target="_blank" rel="noreferrer"
+          >
             US Department of Labor Federal Internship Guidelines
           </a>
           . We DO NOT sponsor CPT or OPT for international students. If you have any questions regarding this community,
@@ -324,7 +348,7 @@ const JoinUs = props => {
           }
         }}
       >
-        {/* <Step>
+        <Step>
           <StepLabel>
             Create an account and Schedule for our knowledge representation
             test.
@@ -355,7 +379,7 @@ const JoinUs = props => {
                 <Button
                   variant="contained"
                   component="a"
-                  href="/"
+                  href="/Activities/experiment"
                   target="_blank"
                   sx={{ mt: 1, mr: 1, color: "common.white" }}
                 >
@@ -364,8 +388,8 @@ const JoinUs = props => {
               </div>
             </Box>
           </StepContent>
-        </Step> */}
-        {/* <Step>
+        </Step>
+        <Step>
           <StepLabel>Complete our knowledge representation test.</StepLabel>
           <StepContent>
             <Typography>
@@ -378,13 +402,13 @@ const JoinUs = props => {
               your application.
             </Typography>
           </StepContent>
-        </Step> */}
+        </Step>
         <Step>
-          {/* {props.community && (
-            <StepLabel optional={<Typography variant="caption">Last step</Typography>}>
-              Complete the community-specific application requirements.
-            </StepLabel>
-          )} */}
+          <StepLabel
+            optional={<Typography variant="caption">Last step</Typography>}
+          >
+            Complete the community-specific application requirements.
+          </StepLabel>
           <StepContent>
             {props.community ? (
               <Stepper
@@ -393,44 +417,28 @@ const JoinUs = props => {
                 sx={{
                   mt: "19px",
                   "& .MuiStepIcon-root": {
-                    color: "warning.dark"
+                    color: "warning.dark",
                   },
                   "& .MuiStepIcon-root.Mui-active": {
-                    color: "secondary.main"
+                    color: "secondary.main",
                   },
                   "& .MuiStepIcon-root.Mui-completed": {
-                    color: "success.main"
+                    color: "success.main",
                   },
                   "& .MuiButton-root": {
-                    backgroundColor: "secondary.main"
+                    backgroundColor: "secondary.main",
                   },
                   "& .MuiButton-root:hover": {
-                    backgroundColor: "secondary.dark"
+                    backgroundColor: "secondary.dark",
                   },
                   "& .MuiButton-root.Mui-disabled": {
-                    backgroundColor: "secondary.light"
-                  }
+                    backgroundColor: "secondary.light",
+                  },
                 }}
               >
-                <Step onClick={changeInnerStep(0)}>
-                  <StepLabel>
-                    Create an account
-                  </StepLabel>
-                  <StepContent>
-                    <Button
-                      variant="contained"
-                      component="a"
-                      href={"/community/" + props.community.id + "/auth"}
-                      disabled={fullname}
-                      sx={{ mt: 1, mr: 1, color: "common.white" }}
-                    >
-                      Create My Account
-                    </Button>
-                  </StepContent>
-                </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(1)}
+                    onClick={changeInnerStep(0)}
                     sx={
                       0 <= checkedInnerStep
                         ? {
@@ -461,7 +469,7 @@ const JoinUs = props => {
                 </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(2)}
+                    onClick={changeInnerStep(1)}
                     sx={
                       1 <= checkedInnerStep
                         ? {
@@ -492,7 +500,7 @@ const JoinUs = props => {
                 </Step>
                 <Step>
                   <StepLabel
-                    onClick={changeInnerStep(3)}
+                    onClick={changeInnerStep(2)}
                     sx={
                       2 <= checkedInnerStep
                         ? {
@@ -536,7 +544,7 @@ const JoinUs = props => {
                 {props.community.coursera && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(4)}
+                      onClick={changeInnerStep(3)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
@@ -612,7 +620,7 @@ const JoinUs = props => {
                 {props.community.portfolio && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(4)}
+                      onClick={changeInnerStep(3)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
@@ -655,7 +663,7 @@ const JoinUs = props => {
                 {props.community.hasTest && (
                   <Step>
                     <StepLabel
-                      onClick={changeInnerStep(4)}
+                      onClick={changeInnerStep(3)}
                       sx={
                         3 <= checkedInnerStep
                           ? {
@@ -721,7 +729,8 @@ const JoinUs = props => {
                     <Button
                       variant="contained"
                       component="a"
-                      href={"/tutorial"}
+                      href="/tutorial"
+                      target="_blank"
                       sx={{ mt: 1, mr: 1, color: "common.white" }}
                     >
                       1Cademy Tutorial
@@ -758,7 +767,7 @@ const JoinUs = props => {
           </StepContent>
         </Step> */}
       </Stepper>
-      {activeStep === 1 && (
+      {activeStep === 3 && (
         <Paper square elevation={0} sx={{ p: 3 }}>
           <Typography>
             All steps completed. After reviewing your application, our community leaders will email you regarding their
@@ -766,7 +775,7 @@ const JoinUs = props => {
           </Typography>
         </Paper>
       )}
-    </Box>
+    </Container>
   );
 };
 
