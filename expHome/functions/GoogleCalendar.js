@@ -1,5 +1,6 @@
 const { google } = require("googleapis");
 const moment = require("moment");
+const { mockConditions, mockSchedules } = require("./testUtils");
 
 require("dotenv").config();
 
@@ -84,6 +85,31 @@ exports.insertEvent = async (start, end, summary, description, attendees, colorI
 
 // Get a specific event
 exports.getEvent = async eventId => {
+  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    const schedule = mockSchedules.data.find(schedule => schedule.id === eventId);
+    const startTime = moment(schedule ? schedule.session.toDate() : undefined);
+    const endTime = moment(startTime).add(schedule ? (schedule.order === "1st" ? 60 : 30) : 60, "minutes");
+    const timeZone = new Intl.DateTimeFormat().resolvedOptions(new Date()).timeZone;
+    return {
+      id: eventId,
+      attendees: [
+        {
+          email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
+        },
+        {
+          email: "ouhrac@gmail.com" // mock researcher
+        }
+      ],
+      start: {
+        dateTime: startTime.format("YYYY-MM-DD HH:mm"),
+        timeZone
+      },
+      end: {
+        dateTime: endTime.format("YYYY-MM-DD HH:mm"),
+        timeZone
+      }
+    };
+  }
   try {
     const response = await calendar.events.get({
       calendarId,
@@ -99,6 +125,56 @@ exports.getEvent = async eventId => {
 
 // Get all the events between two dates
 exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
+  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    mockSchedules.data.map((schedule) => {
+      const startTime = moment(schedule ? schedule.session.toDate() : undefined);
+      const endTime = moment(startTime).add(schedule ? (schedule.order === "1st" ? 60 : 30) : 60, "minutes");
+      const timeZone = new Intl.DateTimeFormat().resolvedOptions(new Date()).timeZone;
+      return {
+        data: {
+          id: schedule.id || generateUID(),
+          attendees: [
+            {
+              email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
+            },
+            {
+              email: "ouhrac@gmail.com" // mock researcher
+            }
+          ],
+          start: {
+            dateTime: startTime.format("YYYY-MM-DD HH:mm"),
+            timeZone
+          },
+          end: {
+            dateTime: endTime.format("YYYY-MM-DD HH:mm"),
+            timeZone
+          }
+        }      
+      };
+    });
+    
+    return {
+      data: {
+        id: eventId,
+        attendees: [
+          {
+            email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
+          },
+          {
+            email: "ouhrac@gmail.com" // mock researcher
+          }
+        ],
+        start: {
+          dateTime: startTime.format("YYYY-MM-DD HH:mm"),
+          timeZone
+        },
+        end: {
+          dateTime: endTime.format("YYYY-MM-DD HH:mm"),
+          timeZone
+        }
+      }      
+    };
+  }
   try {
     let items = [];
     if (dateTimeEnd > dateTimeStart) {

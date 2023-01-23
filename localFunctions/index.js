@@ -28,7 +28,8 @@ const {
   appendPointsFieldForEmptyRecalls,
   addTheInstitutionFeildForUsers,
   addH2K2toQuotes,
-  generatedBooleanExpressionData
+  generatedBooleanExpressionData,
+  convertRsearchersProject,
 } = require("./visualExp");
 
 const app = express();
@@ -79,6 +80,8 @@ app.get("/appendPointsFieldForEmptyRecalls", appendPointsFieldForEmptyRecalls);
 app.get("/addTheInstitutionFeildForUsers", addTheInstitutionFeildForUsers);
 app.get("/addH2K2toQuotes", addH2K2toQuotes);
 app.get("/generatedBooleanExpressionData", generatedBooleanExpressionData);
+
+app.get("/convertRsearchersProject",convertRsearchersProject);
 
 const port = 8080;
 app.listen(port, () => {
