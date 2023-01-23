@@ -207,6 +207,27 @@ const CommunityApplications = props => {
   const [applicationsLoaded, setApplicationsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [usersHashMap, setUsersHashMap] = useState({});
+  const [tutorialHashMap, setTutorialHashMap] = useState({});
+  useEffect(() => {
+    const getUsers = async () => {
+      const userDocs = await firebase.db.collection("users").get();
+      const users = {};
+      userDocs.docs.forEach(doc => {
+        users[doc.id] = doc.data();
+      });
+      setUsersHashMap(users);
+      const tutorialDocs = await firebase.db.collection("tutorial").get();
+      const tutorials = {};
+      tutorialDocs.docs.forEach(doc => {
+        tutorials[doc.id] = doc.data();
+      });
+      setTutorialHashMap(tutorials);
+    };
+    if (firebase) {
+      getUsers();
+    }
+  }, [firebase]);
 
   useEffect(() => {
     if (fullname === "Iman YeckehZaare") {
@@ -282,10 +303,11 @@ const CommunityApplications = props => {
 
   useEffect(() => {
     const loadApplications = async () => {
+      if (!Object.keys(usersHashMap).length || !Object.keys(tutorialHashMap).length) return;
       const tempApplicationsChanges = [...applicationsChanges];
       setApplicationsChanges([]);
       let applics = [...applications];
-      for (let change of tempApplicationsChanges) {
+      tempApplicationsChanges.forEach(change => {
         if (change.type === "removed") {
           applics = applics.filter(applic => applic.id !== change.doc.id);
         } else {
@@ -332,8 +354,7 @@ const CommunityApplications = props => {
             if ("invited" in applicData && applicData.invited) {
               newApplic.invited = "✉️";
             }
-            const userDoc = await firebase.db.collection("users").doc(applicData.fullname).get();
-            const userData = userDoc.data();
+            const userData = usersHashMap[applicData.fullname];
             if ("email" in userData && userData.email) {
               newApplic.email = userData.email;
             }
@@ -364,9 +385,8 @@ const CommunityApplications = props => {
               newApplic.reading3Days = newApplic.reading3Days / 2;
               newApplic.reading1Week = newApplic.reading1Week / 2;
             }
-            const tutorialDoc = await firebase.db.collection("tutorial").doc(applicData.fullname).get();
-            if (tutorialDoc.exists) {
-              const tutorialData = tutorialDoc.data();
+            if (tutorialHashMap.hasOwnProperty(applicData.fullname)) {
+              const tutorialData = tutorialHashMap[applicData.fullname];
               if ("wrongs" in tutorialData && tutorialData.wrongs) {
                 newApplic.tutorialWrongs = tutorialData.wrongs;
               }
@@ -385,7 +405,8 @@ const CommunityApplications = props => {
             }
           }
         }
-      }
+      });
+
       setApplications(applics);
       setSubmitting(false);
       setApplicationsLoaded(true);
@@ -393,7 +414,7 @@ const CommunityApplications = props => {
     if (firebase && applicationsRetrieved && applicationsChanges.length > 0) {
       loadApplications();
     }
-  }, [firebase, applications, applicationsRetrieved, applicationsChanges]);
+  }, [firebase, applications, applicationsRetrieved, applicationsChanges, tutorialHashMap, usersHashMap]);
 
   useEffect(() => {
     let theApplicant;

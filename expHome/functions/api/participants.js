@@ -113,7 +113,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       const start = moment(sessions[i]).utcOffset(-4, true);
       const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
       for(let j = 0; j < sessionDuration; j++) {
-        availableSlot = moment(start).add(j * 30, "minutes").format("YYYY-MM-DD HH:mm");
+       const  availableSlot = moment(start).add(j * 30, "minutes").format("YYYY-MM-DD HH:mm");
         bookedSlots.push(availableSlot);
         availableResearchers = availableResearchers.filter((availableResearcher) => (availableScheduleByResearchers[availableSlot] || []).includes(availableResearcher))
       }
