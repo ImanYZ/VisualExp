@@ -13,6 +13,15 @@ module.exports = new MockData([
         "positiveBooleanExpPionts": 0,
         "onePoints": 0,
         "positiveCodingPoints": 0
+      },
+      "Annotating": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
       }
     },
     "participants": [],
