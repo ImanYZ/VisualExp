@@ -4,7 +4,8 @@ const functions = require("firebase-functions");
 const {
   assignExperimentSessionsPoints,
   remindCalendarInvitations,
-  passagesNumberCorrection
+  passagesNumberCorrection,
+  remindResearchersForAvailability
 } = require("./projectManagement");
 
 const {
