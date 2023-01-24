@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import { firebaseState, fullnameState } from "./store/AuthAtoms";
@@ -325,6 +326,33 @@ const App = () => {
 
     await firebase.batchSet(recallGradeRef, recallGradeData);
 
+    const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
+    let researcher = "";
+    const resSchedules = await firebase.db.collection("resSchedule")
+      .where("month", "==", scheduleMonth)
+      .where("project", "==", userData.project).get();
+    // detecting researcher's name
+    if(resSchedules.docs.length) {
+      const resSchedule = resSchedules.docs[0];
+      const resScheduleData = resSchedule.data();
+      const scheduled = resScheduleData.scheduled || {};
+      for(const _researcher in scheduled) {
+        const participants = Object.keys(scheduled[_researcher] || {});
+        if(participants.includes(fullname)) {
+          // this will help us during testing App.js flow
+          if(!researcher) {
+            researcher = _researcher;
+          }
+          const currentDate = moment().utcOffset(-4).format("YYYY-MM-DD");
+          const scheduledDate = moment(scheduled[_researcher][fullname][0]).utcOffset(-4, true).format("YYYY-MM-DD");
+          if(currentDate === scheduledDate) {
+            researcher = _researcher;
+            break;
+          }
+        }
+      }
+    }
+
     // Only in the third session, after making sure that the user has submitted
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
@@ -389,6 +417,30 @@ const App = () => {
                 updatedAt: new Date()
               };
               const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
+
+              // updating feedback code order
+              if(researcher) {
+                const codeIds = [];
+                const feedbackCodeOrders = await firebase.db.collection("feedbackCodeOrderV2")
+                  .where("project", "==", userData.project)
+                  .where("researcher", "==", researcher).get();
+                if(feedbackCodeOrders.docs.length) {
+                  const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
+                  codeIds.push(feedbackCodeRef.id, ..._codeIds);
+                  const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+                  await firebase.batchUpdate(feedbackOrderRef, {
+                    codeIds
+                  })
+                } else {
+                  await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
+                    project: userData.project,
+                    researcher,
+                    codeIds: [
+                      feedbackCodeRef.id
+                    ]
+                  })
+                }
+              }
 
               await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
             }
