@@ -22,6 +22,7 @@ import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
 import { toOrdinal } from "number-to-words";
+import { fetchRecentParticipants } from "../../../utils/researcher";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -173,19 +174,7 @@ const FreeRecallGrading = props => {
   const loadedRecallGrades = async () => {
     setProcessing(true);
 
-    // logic to fetch recently participants names by current researcher
-    const recentParticipants = [];
-    const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-    const month2WeeksAgo = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
-    if(!scheduleMonths.includes(month2WeeksAgo)) {
-      scheduleMonths.push(month2WeeksAgo);
-    }
-    const resSchedules = await firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).get();
-    for(const resSchedule of resSchedules.docs) {
-      const resScheduleData = resSchedule.data();
-      const scheduled = resScheduleData?.scheduled?.[fullname] || {};
-      recentParticipants.push(...Object.keys(scheduled));
-    }
+    const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
     const recallGrades = await firebase.db
