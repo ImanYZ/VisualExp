@@ -2370,10 +2370,19 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         let recievePositivePoints = [];
         let recieveNegativePoints = [];
         const feedbackCodesRef = db.collection("feedbackCode").doc(docId);
-        const feedbackOrderRef = db.collection("feedbackCodeOrder").doc(project);
+        const feedbackCodeOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).where("researcher", "==", fullname).get();
+        const feedbackOrderRef = feedbackCodeOrders.docs.length ? db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id) : db.collection("feedbackCodeOrderV2").doc();
+        if(!feedbackCodeOrders.docs.length) {
+          // creating empty doc if not exists
+          await feedbackOrderRef.set({
+            researcher: fullname,
+            project,
+            codeIds: []
+          });
+        }
         const feedOrderDoc = await t.get(feedbackOrderRef);
         const feedOrderData = feedOrderDoc.data();
-        feedOrderData[fullname].splice(feedOrderData[fullname].indexOf(docId), 1);
+        feedOrderData.codeIds.splice(feedOrderData.codeIds.indexOf(docId), 1);
         const feedbackCodesDoc = await t.get(feedbackCodesRef);
         const feedbackCodeData = feedbackCodesDoc.data();
         let codesVotes = {};
@@ -2502,6 +2511,8 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         }
       });
 
+      const feedbackCode = await db.collection("feedbackCode").doc(docId).get();
+      const feedbackCodeData = feedbackCode.data();
       const { fullname: participant, project: _project, session } = feedbackCodeData;
       // to assign points to researcher for session if feedback coding and recall grading is done
       await assignExpPoints(fullname, participant, session, _project);
@@ -2521,6 +2532,8 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
     if ("fullname" in req.body && "approvedCodes" in req.body && "project" in req.body) {
       const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
 
+      const batch = db.batch();
+
       const approvedCodes = new Set();
       for (let codeDoc of feedbackCodesBooksDocs.docs) {
         const codeData = codeDoc.data();
@@ -2531,7 +2544,13 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
       const fullname = req.body.fullname;
       const project = req.body.project;
 
-      const passagesInH2K2 = [
+      const passages = await db.collection("passages").where("projects", "array-contains", project).get();
+      const passagesMap = {};
+      for(const passage of passages.docs) {
+        passagesMap[passage.id] = passage.data();
+      }
+
+      /* const passagesInH2K2 = [
         "zlS4Gh2AXaLZV7HM2oXd",
         "lmGQvzSit4LBTj1Zptot",
         "97D6P4unPYqzkpVeUY2c",
@@ -2541,67 +2560,105 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         "6rc4k1su3txN6ZK4CJ0h",
         "xuNQUYbAEFfTD1PHuLGV",
         "s1oo3G4n3jeE8fJQRs3g"
-      ];
+      ]; */
 
-      const feedbackCodesDocs = await db.collection("feedbackCode").orderBy("session").get();
-      let foundResponse = false;
-      const feedbackRef = db.collection("feedbackCodeOrder").doc(project.trim());
-      const feedDoc = await feedbackRef.get();
-      const feedData = feedDoc.data();
-      let allIds = new Set();
-      for (let resea of Object.keys(feedData)) {
-        for (let id of feedData[resea]) {
-          allIds.add(id);
+      const feedbackCodes = await db.collection("feedbackCode").where("project", "==", project).get();
+      const feedbackCodesByParticipant = {};
+
+      for(const feedbackCode of feedbackCodes.docs) {
+        const feedbackCodeData = feedbackCode.data();
+        // skipping approved feedback codes
+        if(feedbackCodeData.approved) {
+          continue;
         }
+        if(!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
+          feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
+        }
+        feedbackCodesByParticipant[feedbackCodeData.fullname].push({
+          docId: feedbackCode.id,
+          session: feedbackCodeData.session,
+          explanation: feedbackCodeData.explanation || ""
+        });
       }
-      let feedBackCodeIds = [];
-      if (!feedData[fullname] || feedData[fullname].length <= 5) {
-        console.log("IF");
-        for (let feedbackDoc of feedbackCodesDocs.docs) {
-          const feedbackData = feedbackDoc.data();
-          const filtered = (feedbackData.explanation || "").split(" ").filter(w => w.trim());
-          if (
-            !allIds.has(feedbackDoc.id) &&
-            filtered.length > 4 &&
-            feedbackData.project.trim() === project.trim() &&
-            !feedbackData.approved
-          ) {
-            // const chosenCondition =feedbackData.choice; // will have to get that from the front-end
-            const userDoc = await db.collection("users").doc(feedbackData.fullname).get();
-            const userData = userDoc.data();
-            if (
-              userData.pConditions.length > 1 &&
-              passagesInH2K2.includes(userData.pConditions[0].passage) &&
-              passagesInH2K2.includes(userData.pConditions[1].passage)
-            ) {
-              //we check if the authenticated reserchers have aleardy casted his vote
-              //if so we get all his recorded past choices
-              if (!feedbackData.coders.includes(fullname)) {
-                feedBackCodeIds.push(feedbackDoc.id);
-                if (feedBackCodeIds.length === 5) {
-                  foundResponse = true;
-                }
-              }
-              if (foundResponse) {
-                break;
-              }
-            }
+
+      for(const fullname in feedbackCodesByParticipant) {
+        feedbackCodesByParticipant[fullname].sort((a, b) => {
+          const _a = parseInt(String(a.session).replace(/[^0-9]/g, ""));
+          const _b = parseInt(String(b.session).replace(/[^0-9]/g, ""));
+          return _a < _b ? -1 : 1;
+        })
+      }
+
+      // recent participants
+      const months = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
+      const monthOfPast16Days = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
+      if(!months.includes(monthOfPast16Days)) {
+        months.push(monthOfPast16Days);
+      }
+      const resSchedules = await db.collection("resSchedule")
+        .where("project", "==", project)
+        .where("month", "in", months).get();
+      
+      const recentParticipants = [];
+      for(const resSchedule of resSchedules.docs) {
+        const resScheduleData = resSchedule.data();
+        const scheduled = resScheduleData?.scheduled?.[fullname] || {};
+        recentParticipants.push(...Object.keys(scheduled));
+      }
+
+      const feedbackCodeIds = [];
+      for(const participant in feedbackCodesByParticipant) {
+        for(const feedbackItem of feedbackCodesByParticipant[participant]) {
+          // if participant present in 
+          if(recentParticipants.includes(participant)) {
+            feedbackCodeIds.push(feedbackItem.docId);
           }
         }
-
-        let updates = {};
-        if (feedData[fullname]) {
-          updates = {
-            [fullname]: [...feedData[fullname], ...feedBackCodeIds]
-          };
-        } else {
-          updates = {
-            [fullname]: feedBackCodeIds
-          };
-        }
-        await batchUpdate(feedbackRef, updates);
       }
-      await commitBatch();
+
+      // const feedbackRef = db.collection("feedbackCodeOrderV2").doc(project.trim());
+      const feedbackCodeOrders = await db.collection("feedbackCodeOrderV2")
+        .where("project", project.trim())
+        .where("researcher", fullname)
+        .get();
+      const feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(
+        feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].id : undefined
+      );
+      const feedbackCodeData = feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].data() : {
+        project: project.trim(),
+        researcher: fullname,
+        codeIds: []
+      };
+      const codeIds = Array.from(new Set([...feedbackCodeIds,...feedbackCodeData.codeIds]));
+
+      if (codeIds.length <= 5) {
+        for (let participant in feedbackCodesByParticipant) {
+          for(const feedbackCode of feedbackCodesByParticipant[participant]) {
+            const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
+            if(explanationWords.length > 4 || codeIds.includes(feedbackCode.docId)) {
+              continue;
+            }
+            codeIds.push(feedbackCode.docId)
+            if(codeIds.length > 5) {
+              break;
+            }
+          }
+
+          if(codeIds.length > 5) {
+            break;
+          }
+        }
+      }
+
+      feedbackCodeData.codeIds = codeIds;
+
+      if(feedbackCodeOrders.docs.length) {
+        batch.update(feedbackCodeOrderRef, feedbackCodeData);
+      } else {
+        batch.set(feedbackCodeOrderRef, feedbackCodeData);
+      }
+
+      await batch.commit();
     }
   } catch (error) {
     console.log({ error });
