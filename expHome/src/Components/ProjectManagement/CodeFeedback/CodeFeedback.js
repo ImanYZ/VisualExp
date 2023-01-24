@@ -1073,7 +1073,7 @@ const CodeFeedback = props => {
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
   };
-  if (!choiceConditions[selectedSentence?.trim()]) return null;
+  if (!choiceConditions[selectedSentence]) return null;
   return (
     <>
       {unApprovedCodes.length > 0 && (
