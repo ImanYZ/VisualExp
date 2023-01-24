@@ -33,6 +33,7 @@ import SnackbarComp from "../../SnackbarComp";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import arrayToChunks from "../../../utils/arrayToChunks";
+import { fetchRecentParticipants } from "../../../utils/researcher";
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -88,6 +89,9 @@ const CodeFeedback = props => {
 
   const [openAdminEditModal, setOpenEditAdminModal] = useState(false);
   const [openAdminAddModal, setOpenAddAdminModal] = useState(false);
+
+  const [recentParticipants, setRecentParticipants] = useState([]);
+  const [feedbackCode, setFeedbackCode] = useState({});
 
   const [switchState, setSwitchState] = useState({});
   const [choiceConditions, setChoiceConditions] = useState({});
@@ -287,6 +291,16 @@ const CodeFeedback = props => {
   }, [firebase]);
 
   useEffect(() => {
+    if (firebase && fullname) {
+      (async () => {
+        const recentParticipants = await fetchRecentParticipants(fullname);
+        setRecentParticipants(recentParticipants);
+      })();
+    }
+  }, [firebase, fullname]);
+
+  
+  useEffect(() => {
     const func = async () => {
       const allCodes = [...allExperimentCodes];
 
@@ -381,7 +395,7 @@ const CodeFeedback = props => {
 
   useEffect(() => {
     const func = async () => {
-      const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrder").get();
+      const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
       const orderData = feedbackCodesOrderDocs.docs[0].data();
       if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 5)) {
         await axios.post("/createTemporaryFeedbacodeCollection", {
@@ -399,17 +413,21 @@ const CodeFeedback = props => {
     const retriveNextResponse = async () => {
       setFromTheCell(false);
       let docID;
-      const feedbackCodesOrderDoc = await firebase.db.collection("feedbackCodeOrder").doc(project).get();
-      const orderData = feedbackCodesOrderDoc.data();
-      if (orderData[fullname] && orderData[fullname].length === 0) {
+      const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2")
+        .where("researcher", "==", fullname)
+        .where("project", "==", project)  
+        .get();
+      const orderData = feedbackCodesOrderDocs.docs.length ? feedbackCodesOrderDocs.docs[0].data() : {};
+      if (orderData?.codeIds && orderData?.codeIds.length === 0) {
         setAllResponsesGraded(true);
       } else {
         setAllResponsesGraded(false);
       }
-      docID = orderData[fullname][0];
+      docID = orderData.codeIds[0];
       if (docID) {
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
         const feedbackData = feedbackCodesDoc.data();
+        setFeedbackCode(feedbackData);
 
         setChosenCondition(feedbackData.choice);
         const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
@@ -982,6 +1000,7 @@ const CodeFeedback = props => {
     let docID = clickedCell.id;
     const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
     const feedbackData = feedbackCodesDoc.data();
+    setFeedbackCode(feedbackData);
     const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
     const userData = userDoc.data();
     const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
@@ -1153,6 +1172,25 @@ const CodeFeedback = props => {
               participant favors based on this specific code.
             </h2>
           </Alert>
+
+          {
+            recentParticipants.includes(feedbackCode?.fullname) ? (
+              <Alert severity="error" sx={{
+                color: "rgb(95, 33, 32)",
+                background: "rgb(253, 237, 237)",
+                marginTop: "10px"
+              }}>
+                <ul>
+                  <li>
+                    <b>{feedbackCode?.fullname}</b> is the last participant in one of your experiement sessions.
+                  </li>
+                  <li>
+                  you will not receive points for running that session until you code this participant's feedback.
+                  </li>
+                </ul>
+              </Alert>
+            ) : <span />
+          }
 
           <Paper elevation={3} sx={{ width: "100%", ml: "5px" }}>
             <Box
