@@ -93,7 +93,6 @@ const CodeFeedback = props => {
   const [recentParticipants, setRecentParticipants] = useState([]);
   const [feedbackCode, setFeedbackCode] = useState({});
 
-  const [switchState, setSwitchState] = useState({});
   const [choiceConditions, setChoiceConditions] = useState({});
   const handleOpenEditModal = () => setOpenEditModal(true);
   const handleCloseEditModal = () => setOpenEditModal(false);
@@ -299,7 +298,6 @@ const CodeFeedback = props => {
     }
   }, [firebase, fullname]);
 
-  
   useEffect(() => {
     const func = async () => {
       const allCodes = [...allExperimentCodes];
@@ -349,8 +347,6 @@ const CodeFeedback = props => {
     if (!approvedCodes.length) return;
     if (fromTheCell) return;
     if (approvedCodes.length > 0) {
-      const _choiceConditions = {};
-      const _switchState = {};
       let quotesSelectedForCode = {};
       let sentencesSelecting = {};
       for (let sentence of sentences) {
@@ -359,16 +355,38 @@ const CodeFeedback = props => {
       }
       sentencesSelecting[sentences[0]] = true;
       setSelectedSentence(sentences[0]);
-      for (let codeData of approvedCodes) {
-        _choiceConditions[codeData.code] = project === "H2K2" ? "H2" : "H1";
-        _switchState[codeData.code] = false;
-      }
-      setSwitchState(_switchState);
-      setChoiceConditions(_choiceConditions);
       setQuotesSelectedForCodes(quotesSelectedForCode);
       setSelectedSentences(sentencesSelecting);
     }
   }, [approvedCodes, retrieveNext, project, sentences]);
+
+  useEffect(() => {
+    if (!sentences.length) return;
+    let _choiceConditions = {};
+    for (let sentence of sentences) {
+      console.log(sentence);
+      for (let codeData of approvedCodes) {
+        if (_choiceConditions.hasOwnProperty(sentence)) {
+          if (_choiceConditions[sentence].hasOwnProperty(codeData.code)) {
+            _choiceConditions[sentence][codeData.code] = project === "H2K2" ? "H2" : "H1";
+          } else {
+            _choiceConditions[sentence] = {
+              ..._choiceConditions[sentence],
+              [codeData.code]: project === "H2K2" ? "H2" : "H1"
+            };
+          }
+        } else {
+          _choiceConditions = {
+            ..._choiceConditions,
+            [sentence]: {
+              [codeData.code]: project === "H2K2" ? "H2" : "H1"
+            }
+          };
+        }
+      }
+    }
+    setChoiceConditions(_choiceConditions);
+  }, [sentences]);
 
   const adminCodes = useMemo(() => {
     const mapped = allExperimentCodes.map(c => {
@@ -413,9 +431,10 @@ const CodeFeedback = props => {
     const retriveNextResponse = async () => {
       setFromTheCell(false);
       let docID;
-      const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2")
+      const feedbackCodesOrderDocs = await firebase.db
+        .collection("feedbackCodeOrderV2")
         .where("researcher", "==", fullname)
-        .where("project", "==", project)  
+        .where("project", "==", project)
         .get();
       const orderData = feedbackCodesOrderDocs.docs.length ? feedbackCodesOrderDocs.docs[0].data() : {};
       if (orderData?.codeIds && orderData?.codeIds.length === 0) {
@@ -982,19 +1001,23 @@ const CodeFeedback = props => {
   };
 
   const changeChoices = (event, codeChoice) => {
-    const _switchState = { ...switchState };
     const _choiceConditions = { ...choiceConditions };
-    _switchState[codeChoice] = event.target.checked;
-    _choiceConditions[codeChoice] = event.target.checked
-      ? project === "H2K2"
-        ? "K2"
-        : "L2"
-      : project === "H2K2"
-      ? "H2"
-      : "H1";
+    if (_choiceConditions[selectedSentence].hasOwnProperty(codeChoice)) {
+      _choiceConditions[selectedSentence][codeChoice] = event.target.checked
+        ? project === "H2K2"
+          ? "K2"
+          : "L2"
+        : project === "H2K2"
+        ? "H2"
+        : "H1";
+    } else {
+      _choiceConditions[selectedSentence] = {
+        [codeChoice]: event.target.checked ? (project === "H2K2" ? "K2" : "L2") : project === "H2K2" ? "H2" : "H1"
+      };
+    }
     setChoiceConditions(_choiceConditions);
-    setSwitchState(_switchState);
   };
+
   const handleCellClickFeedBackCode = async clickedCell => {
     setFromTheCell(true);
     let docID = clickedCell.id;
@@ -1047,22 +1070,10 @@ const CodeFeedback = props => {
     setSelectedSentence(sentences[0]);
     setSelectedSentence(Object.keys(_quotesSelectedForCodes)[0]);
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
-
-    const _choiceConditions = {};
-    const _switchState = {};
-
-    for (let code in feedbackData.codersChoiceConditions[fullname]) {
-      const choiceCode = feedbackData.codersChoiceConditions[fullname][code];
-
-      _choiceConditions[code] = choiceCode;
-      _switchState[code] =
-        project === "H2K2" ? (choiceCode === "H2" ? false : true) : choiceCode === "H1" ? false : true;
-    }
-    setSwitchState(_switchState);
-    setChoiceConditions(_choiceConditions);
+    setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
   };
-
+  if (!choiceConditions[selectedSentence?.trim()]) return null;
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1173,24 +1184,27 @@ const CodeFeedback = props => {
             </h2>
           </Alert>
 
-          {
-            recentParticipants.includes(feedbackCode?.fullname) ? (
-              <Alert severity="error" sx={{
+          {recentParticipants.includes(feedbackCode?.fullname) ? (
+            <Alert
+              severity="error"
+              sx={{
                 color: "rgb(95, 33, 32)",
                 background: "rgb(253, 237, 237)",
                 marginTop: "10px"
-              }}>
-                <ul>
-                  <li>
-                    <b>{feedbackCode?.fullname}</b> is the last participant in one of your experiement sessions.
-                  </li>
-                  <li>
+              }}
+            >
+              <ul>
+                <li>
+                  <b>{feedbackCode?.fullname}</b> is the last participant in one of your experiement sessions.
+                </li>
+                <li>
                   you will not receive points for running that session until you code this participant's feedback.
-                  </li>
-                </ul>
-              </Alert>
-            ) : <span />
-          }
+                </li>
+              </ul>
+            </Alert>
+          ) : (
+            <span />
+          )}
 
           <Paper elevation={3} sx={{ width: "100%", ml: "5px" }}>
             <Box
@@ -1282,7 +1296,7 @@ const CodeFeedback = props => {
                         </ListItemButton>
 
                         {project === "H2K2" ? "H2" : "H1"}
-                        {switchState[codeData.code] ? (
+                        {["K2" ,"L2"].includes(choiceConditions[selectedSentence][codeData.code])? (
                           <Switch
                             checked={true}
                             onChange={event => changeChoices(event, codeData.code)}

@@ -1,7 +1,7 @@
 const { app } = require("firebase-admin");
 const fs = require("fs");
 const csv = require("fast-csv");
-const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require("uuid");
 
 const {
   admin,
@@ -245,14 +245,14 @@ exports.checkRepeatedRecallGrades = async (req, res) => {
         ) {
           const previousRecallGrade =
             recallGrades[
-            [
-              recallGradeData.user,
-              recallGradeData.session,
-              recallGradeData.project,
-              recallGradeData.condition,
-              recallGradeData.passage,
-              recallGradeData.phrase,
-            ]
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
             ];
           console.log(recallGradeDoc.id, previousRecallGrade.id);
           duplicate.push(recallGradeDoc.id);
@@ -483,14 +483,14 @@ exports.deleteDuplicatesWithVotes = async (req, res) => {
         ) {
           const previousRecallGrade =
             recallGrades[
-            [
-              recallGradeData.user,
-              recallGradeData.session,
-              recallGradeData.project,
-              recallGradeData.condition,
-              recallGradeData.passage,
-              recallGradeData.phrase,
-            ]
+              [
+                recallGradeData.user,
+                recallGradeData.session,
+                recallGradeData.project,
+                recallGradeData.condition,
+                recallGradeData.passage,
+                recallGradeData.phrase,
+              ]
             ];
           let previousRecallGradeRef = db
             .collection("recallGrades")
@@ -1380,7 +1380,7 @@ exports.deleteTheKeyPhrasesForPassage = async (req, res) => {
 
     let lastVisibleRecallGradesH1L2Doc =
       recallGradeH1L2DocsInitial.docs[
-      recallGradeH1L2DocsInitial.docs.length - 1
+        recallGradeH1L2DocsInitial.docs.length - 1
       ];
 
     const lastVisibleRecallGradesH1L2Data =
@@ -1901,6 +1901,69 @@ exports.convertRsearchersProject = async (req, res) => {
         const newDocumentRef = db.collection("activities").doc();
         await batchSet(newDocumentRef, newDocument);
       }
+    }
+    await commitBatch();
+    console.log("Done");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.convertRsearchersProject = async (req, res) => {
+  try {
+    const CodeBookscodesDocs = await db
+      .collection("feedbackCodeBooks")
+      .where("approved", "==", true)
+      .get();
+    const approvedCodes = [];
+    CodeBookscodesDocs.forEach((doc) => {
+      const codeData = doc.data();
+      approvedCodes.push(codeData.code);
+    });
+
+    const feedBackCodeDocs = await db.collection("feedbackCode").get();
+    for (let feedBackCodeDoc of feedBackCodeDocs.docs) {
+      const feedBackCodeData = feedBackCodeDoc.data();
+      if (!feedBackCodeData.coders.length) continue;
+      const sentences = (feedBackCodeData.explanation || "")
+        .split(".")
+        .filter((w) => w.trim());
+      const project = feedBackCodeData.project;
+      let _choiceConditions = {};
+      for (let sentence of sentences) {
+        for (let code of approvedCodes) {
+          if (_choiceConditions.hasOwnProperty(sentence)) {
+            if (_choiceConditions[sentence].hasOwnProperty(code)) {
+              _choiceConditions[sentence][code] =
+                project === "H2K2" ? "H2" : "H1";
+            } else {
+              _choiceConditions[sentence] = {
+                ..._choiceConditions[sentence],
+                [code]: project === "H2K2" ? "H2" : "H1",
+              };
+            }
+          } else {
+            _choiceConditions = {
+              ..._choiceConditions,
+              [sentence]: {
+                [code]: project === "H2K2" ? "H2" : "H1",
+              },
+            };
+          }
+        }
+      }
+      let researcherChoices = {};
+      feedBackCodeData.coders.map(
+        (coder) => (researcherChoices[coder] = _choiceConditions)
+      );
+      console.log(researcherChoices);
+      const updateDocument = {
+        codersChoiceConditions: researcherChoices,
+      };
+      const feedbackcodeRef = db
+        .collection("feedbackCode")
+        .doc(feedBackCodeDoc.id);
+      await batchUpdate(feedbackcodeRef, updateDocument);
     }
     await commitBatch();
     console.log("Done");
