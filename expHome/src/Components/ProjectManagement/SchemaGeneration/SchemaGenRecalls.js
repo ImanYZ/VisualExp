@@ -552,8 +552,8 @@ export const SchemaGenRecalls = props => {
       gradeIt(requestAnswers);
       setSubmitButtonLoader(true);
     } else {
-      // setSelectedPhrase(wrongRecallVotes[indexOFthis + 1].data.phrase);
       setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
+      setSelectedPhrase(wrongRecallVotes[indexOFthis + 1]?.phrase)
     }
     const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
     recallGradesLogsRef.set({
