@@ -67,8 +67,11 @@ const FreeRecallGrading = props => {
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
+    
     if (!text) return;
     let keys = {};
+
+    // building list for included and excluded keywords
     let notKeywords = [];
     for (let schemaE of schemaEp) {
       if (!schemaE.not) {
@@ -85,8 +88,8 @@ const FreeRecallGrading = props => {
         notKeywords = [...notKeywords, ...noKeywords];
       }
     }
-
     notKeywords = notKeywords.filter(x => x && x !== "");
+
     let containsWord = true;
     const notContainsWord = notKeywords.some(element => text.toLowerCase().includes(element.toLowerCase()));
     for (let key in keys) {
