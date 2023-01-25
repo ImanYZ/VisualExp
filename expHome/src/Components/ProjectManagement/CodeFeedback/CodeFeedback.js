@@ -537,7 +537,9 @@ const CodeFeedback = props => {
     setSelectedSentence(sentence);
   };
   const handleCodesSelected = value => () => {
-    const currentIndex = quotesSelectedForCodes[selectedSentence].indexOf(value);
+    quotesSelectedForCodes[selectedSentence] = quotesSelectedForCodes[selectedSentence] || [];
+
+    const currentIndex = (quotesSelectedForCodes[selectedSentence]).indexOf(value);
     const newChecked = quotesSelectedForCodes[selectedSentence];
 
     if (currentIndex === -1) {
@@ -1067,8 +1069,7 @@ const CodeFeedback = props => {
       }
     }
     setSelectedSentences(sentencesSelecting);
-    setSelectedSentence(sentences[0]);
-    setSelectedSentence(Object.keys(_quotesSelectedForCodes)[0]);
+    setSelectedSentence(response[0] || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
