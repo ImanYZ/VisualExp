@@ -844,7 +844,7 @@ function Index() {
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
               >
-                <JoinUs />
+                <JoinUs themeName={"dark"} />
               </Suspense>
             )}
           </Box>
