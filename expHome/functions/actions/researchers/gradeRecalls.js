@@ -47,12 +47,11 @@ module.exports = async (req, res) => {
       let updatedResearcers = [];
       for(const researcher of researchers.docs) {
         const researcherData = researcher.data();
-        if(!(researcherData.projects || {}).hasOwnProperty(recallGradeData.project) || !researcherData.projects[recallGradeData.project].active) {
+        if(!(researcherData.projects || {}).hasOwnProperty(recallGradeData.project)) {
           continue;
         }
         researchersUpdates[researcher.id] = researcherData;
       }
-
       // adding gradingNum
       researchersUpdates[researcher.docId].projects = researcher.projects;
       updatedResearcers.push(researcher.docId);

@@ -36,6 +36,7 @@ import sectionsOrder from "./sectionsOrder";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "JoinUsSection");
 
 const JoinUs = props => {
+  const { themeName } = props || {};
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
   const hasScheduled = useRecoilValue(hasScheduledState);
@@ -289,14 +290,12 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: !props.community ? 7 : 1,
+        pt: 1,
         pb: 10,
       }}
     >
       {!props.community ? (
-        <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
-          {sectionsOrder[sectionIdx].title}
-        </Typography>
+        <span />
       ) : (
         <Alert severity="warning">
           <strong>Note: </strong> Participation is unpaid, solely for the
@@ -337,6 +336,12 @@ const JoinUs = props => {
           "& .MuiStepIcon-root.Mui-completed": {
             color: "success.main"
           },
+          "& .MuiStepLabel-label": {
+            color: themeName === "dark" ? "rgba(255, 255, 255, 0.6)" : undefined
+          },
+          "& .MuiStepLabel-label.Mui-active": {
+            color: themeName === "dark" ? "common.white" : undefined
+          },
           "& .MuiButton-root": {
             backgroundColor: "secondary.main"
           },
@@ -354,7 +359,9 @@ const JoinUs = props => {
             test.
           </StepLabel>
           <StepContent>
-            <Typography>
+            <Typography sx={{
+              color: themeName === "dark" ? "common.white" : undefined
+            }}>
               One of the most important aspects of 1Cademy is its unique
               knowledge representation format. To become a researcher on
               1Cademy, you should first engage in one of our ongoing research
@@ -392,7 +399,9 @@ const JoinUs = props => {
         <Step>
           <StepLabel>Complete our knowledge representation test.</StepLabel>
           <StepContent>
-            <Typography>
+            <Typography sx={{
+              color: themeName === "dark" ? "common.white" : undefined
+            }}>
               Please check your Google Calendar. You're invited to three UX
               Experiment sessions. Please attend all the experiment sessions
               on-time and carefully answer the questions. Your answers will
@@ -405,7 +414,9 @@ const JoinUs = props => {
         </Step>
         <Step>
           <StepLabel
-            optional={<Typography variant="caption">Last step</Typography>}
+            optional={<Typography variant="caption" sx={{
+              color: themeName === "dark" ? "common.white" : undefined
+            }}>Last step</Typography>}
           >
             Complete the community-specific application requirements.
           </StepLabel>
@@ -563,7 +574,9 @@ const JoinUs = props => {
                       and enter the certificate URL.
                     </StepLabel>
                     <StepContent>
-                      <Typography>
+                      <Typography sx={{
+                        color: themeName === "dark" ? "common.white" : undefined
+                      }}>
                         As a requirement to apply to this community, you should complete{" "}
                         <a href={props.community.coursera} target="_blank" rel="noreferrer">
                           this Coursera MOOC
@@ -678,7 +691,9 @@ const JoinUs = props => {
                       Complete your domain-specific knowledge test.
                     </StepLabel>
                     <StepContent>
-                      <Typography>
+                      <Typography sx={{
+                        color: themeName === "dark" ? "common.white" : undefined
+                      }}>
                         The last step to apply to this community is a test of your domain-specific knowledge. If you are
                         interested in joining this community but don't have the background knowledge, no worries.
                         Similar to the second phase, we have provided you with a document about the topic and ask you

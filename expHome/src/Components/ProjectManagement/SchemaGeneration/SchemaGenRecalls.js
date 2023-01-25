@@ -391,6 +391,15 @@ export const SchemaGenRecalls = props => {
         if (schemaE.keyword !== "") {
           keywords.push(schemaE.keyword);
         }
+
+        if(keywords.length) {
+          // and operation
+          responses = responses.filter((str) => {
+            const _str = str.toLowerCase();
+            return keywords.some(element => _str.includes(element.toLowerCase()));
+          })
+        }
+
         keys.push(...keywords);
       }
     }
@@ -412,6 +421,8 @@ export const SchemaGenRecalls = props => {
       return;
     }
 
+    // The format of text messaging was originally invented by two German men in the nineties. Texts were originally held to a 160 character maximum and were intended for quick communication. The text has been a major force in American culture in novels, film, and advertising. Digital messaging allows for a record of communication and historians view texts much like letters. This passage used the Revolutionary War as an example of a time when speedy communication was vital and letters have provided a record for our understanding of the events. Although texting is criticized for diminishing clarity of communication and the human experience, it allows people to connect in many more ways than their ancestors were able. Overall, it is an integral part of our culture today.
+
     // building list of highlights
     for (let text of responses) {
       let highlightedWords = [];
@@ -420,14 +431,16 @@ export const SchemaGenRecalls = props => {
         .filter(w => w && w !== "")
         .map(x => x.trim());
       const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-      if (containsWord) {
-        const sentences = [];
-        for (let sentence of filtered) {
-          const sentenceContainsWord = keys.some(element => sentence.toLowerCase().includes(element.toLowerCase()));
-          if (sentenceContainsWord) {
-            sentences.push(sentence);
-          }
+      /* const sentences = [];
+      for (let sentence of filtered) {
+        const sentenceContainsWord = keys.some(element => sentence.toLowerCase().includes(element.toLowerCase()));
+        if (sentenceContainsWord) {
+          sentences.push(sentence);
         }
+      }
+      console.log(sentences, "sentences")
+      */
+      if (containsWord) {
         if (keys.length > 0) {
           const textSplit = text.split(" ");
           textSplit.forEach(str => {
@@ -454,7 +467,7 @@ export const SchemaGenRecalls = props => {
             }
           });
         }
-        searchRes.push({ text, sentences, highlightedWords });
+        searchRes.push({ text, sentences: filtered, highlightedWords });
       }
       //else {
       //   const sentences = [];
@@ -539,8 +552,8 @@ export const SchemaGenRecalls = props => {
       gradeIt(requestAnswers);
       setSubmitButtonLoader(true);
     } else {
-      // setSelectedPhrase(wrongRecallVotes[indexOFthis + 1].data.phrase);
       setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
+      setSelectedPhrase(wrongRecallVotes[indexOFthis + 1]?.phrase)
     }
     const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
     recallGradesLogsRef.set({
