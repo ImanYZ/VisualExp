@@ -92,7 +92,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       if (scheduleData?.id) {
         await deleteEvent(scheduleData.id)
       }
-      const month = moment(scheduleData.session).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
+      const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
       const resScheduleData = resScheduleDataByMonth[month];
 
       for(const researcher in resScheduleData.scheduled) {
