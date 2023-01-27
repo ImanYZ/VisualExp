@@ -23,7 +23,7 @@ const statsInit = {
 export const RE_DETECT_NUMBERS_WITH_COMMAS = /(\[)(0|([1-9](\d*|\d{0,2}(,\d{3})*)))?(\.\d*[1-9])?(\])/;
 
 const HowItWorks = (props, ref)  => {
-  // const isMobile = useMediaQuery("(max-width:600px)");
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const [canvasDimension, setCanvasDimension] = useState({ width: 0, height: 0 });
   // const [stats, setStats] = useState({});
@@ -48,18 +48,20 @@ const HowItWorks = (props, ref)  => {
   // useEffect(() => {
   //   fetch("https:/1cademy.com/api/stats")
   //     .then(res => res.json())
-  //     .then(data => {console.log(data);setStats(data)});
+  //     .then(data => setStats(data));
+      
   // }, []);
 
+  // const memoStats=useMemo(()=>stats,[stats])
 
 
-  // const getDescription = useCallback(artboard => {
+  const getDescription = useCallback(artboard => {
 
-  //   if (!artboard.getDescription) return artboard.description;
-  //   if (!stats) return artboard.description;
-
-  //   return artboard.getDescription(stats);
-  // }, [stats]);
+    // if (!artboard.getDescription) return artboard.description;
+    // if (!stats) return artboard.description;
+    return artboard.description;
+    // return artboard.getDescription(stats);
+  }, []);
 
   useEffect(() => {
     let newWidth = width / 2;
@@ -129,11 +131,11 @@ const HowItWorks = (props, ref)  => {
             pb: idx < src.length - 1 ? "100px" : "0px"
           }}
         >
-          {/* <Typography
+          <Typography
             gutterBottom
             variant="h3"
             component="h3"
-            sx={{ fontSize: "32px", textAlign: isMobile ? "center" : "start" }}
+            sx={{ fontSize: "32px", textAlign: isMobile ? "center" : "start" ,color:"common.white"}}
           >
             {artboard.name}
           </Typography>
@@ -152,11 +154,11 @@ const HowItWorks = (props, ref)  => {
               >
                 {wrapStringWithBoldTag(paragraph, RE_DETECT_NUMBERS_WITH_COMMAS)}
               </Typography>
-            ))} */}
+            ))}
         </Box>
       </Stack>
     ));
-  }, [canvasDimension.height, canvasDimension.width, props.artboards, refs, width]);
+  }, [canvasDimension.height, canvasDimension.width, getDescription, isMobile, props.artboards, refs, width]);
 
   return (
     <Box
