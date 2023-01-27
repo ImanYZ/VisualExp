@@ -46,15 +46,50 @@ const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
 const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
 const HEADER_HEIGTH = 70;
+export const gray03 = "#AAAAAA";
 
 const section1ArtBoards = [
   { name: "artboard-1", durationMs: 1000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }
 ];
 const artboards = [
-  { name: "Summarizing", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
-  { name: "Linking", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
-  { name: "Evaluating", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
-  { name: "Improving", durationMs: 14000, getHeight: vh => 8 * vh, color: "#62f336" }
+  {
+    name: "Summarizing",
+    artoboard: "artboard-3",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#f33636",
+    description: `We gather valuable information from various sources such as books, articles, and videos, and divide it into granular pieces. We then combine these pieces into concise notes that focus on a single concept. \nTraditional note-taking methods often only benefit the individual for a short period of time, typically for a semester or two. 1Cademy's collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics. \nThrough this process, we aim to improve the notes semester by semester, making the learning experience more efficient for all. This way, students can spend less time on note-taking and gain the most benefit from the notes.`,
+  },
+  {
+    name: "Linking",
+    artoboard: "artboard-4",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#f38b36",
+    description: `Our notes, which are organized in granular pieces, can be transformed into a knowledge graph that visually illustrates the hierarchical relationships between concepts. The linking of concepts is beneficial as it helps us understand how concepts relate to one another and their place in broader topics, fields, or disciplines. All concepts are linked in a logical and ordered manner, starting with the broadest concepts and progressing to the most specific. \nThis step-by-step approach allows us to take a concept we don't understand and trace it back to its prerequisite concepts until we have the necessary knowledge to comprehend it. Additionally, once we understand a concept, we can follow links to more specific concepts to deepen our understanding. These step-by-step learning pathways provide the necessary context when we don't understand something and allow us to delve deeper if we want to learn more.
+    `,
+  },
+  {
+    name: "Voting",
+    artoboard: "artboard-5",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#e6f336",
+    description: `To ensure the quality of the knowledge graph on 1Cademy, we have implemented a peer-review process. Each individual concept, represented as a node, can be voted on by members of the community, and the score of the node will determine its level of modification or the possibility of deletion. \nNodes that receive a significant number of negative votes will be removed as unhelpful. Additionally, 1Cademy uses a reputation system to incentivize high-quality contributions and discourage unhelpful or idle behavior. Users who contribute helpful content and whose nodes receive positive votes will see their reputation increase. \nConversely, users who post unhelpful content or are inactive will see their reputation decrease. This system encourages the development of a high-quality knowledge graph that can benefit a large number of learners and researchers.`,
+  },
+  {
+    name: "Improving",
+    artoboard: "artboard-6",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#62f336",
+    description: `We work together to improve the knowledge presented by continually updating and refining concepts. For each node, there are multiple versions proposed by different people. \nThe community can then vote on each proposed version. Voting allows the community to disapprove of changes that are unhelpful or to approve of changes that would improve the existing version of the node. \nUsers can upvote or downvote the proposed version of a node, which is then compared to the votes received by the existing version of the node. If a proposal receives enough positive votes in comparison to the votes of the existing node, it will be accepted and the node will be updated. In this way, the community collaborates and perpetually improves the knowledge available.`,
+  },
+  {
+    name: "Magnitude",
+    artoboard: "artboard-7",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#36f3c4",
+    description: `Over the past two years, [1,529] students and researchers from [183] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [44,665] nodes and [235,674] prerequisite links between them, which have been proposed through [88,167] proposals. \nAs a result of this collaboration, [49] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
+    getDescription: ({ users, institutions, nodes, links, proposals, communities }) =>
+      `Over the past two years, [${users}] students and researchers from [${institutions}] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [${nodes}] nodes and [${links}] prerequisite links between them, which have been proposed through [${proposals}] proposals. \nAs a result of this collaboration, [${communities}] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
+  },
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -103,6 +138,10 @@ function Index() {
   const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
   const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
   const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
+
+
+  const animationRefs = useRef(null);
+
 
   const { height, width } = useWindowSize();
 
@@ -658,36 +697,35 @@ function Index() {
           <HeroMemoized />
         </Box>
 
-          
-        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
-          <Box id={sectionsOrder[1].id} ref={howSectionRef}>
+
+        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",}}>
+          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }}>
+          <CustomTypography
+              component={"h2"}
+              variant="h1"
+              marked="center"
+              align="center"
+              sx={{ pb: 10, pt: "20px", fontWeight: 700 ,color:"common.white"}}
+            >
+              {sectionsOrder[1].title}
+            </CustomTypography>
             <HowItWorks
+              ref={animationRefs}
               section={sectionSelected}
-              // ref={sectionAnimationControllerRef}
-              artboards={[...section1ArtBoards, ...artboards]}
+              artboards={artboards}
               animationOptions={
                 <Button
-                  color="secondary"
                   variant="contained"
                   size={width < 900 ? "small" : "large"}
                   component="a"
-                  href="#JoinUsSection"
-                  sx={{ minWidth: 200, color: "common.white" }}
-                  className={showAnimationOptions ? "show-blurred-text" : "hide-content"}
+                  href="https://1cademy.us/#JoinUsSection"
+                  target="_blank"
+                  sx={{ minWidth: 200, textTransform: "uppercase" }}
                 >
                   Apply to Join Us!
                 </Button>
               }
-            >
-              <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
-                <RiveComponent1 className={`rive-canvas ${idxRiveComponent !== 0 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent2 className={`rive-canvas ${idxRiveComponent !== 1 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent3 className={`rive-canvas ${idxRiveComponent !== 2 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent4 className={`rive-canvas ${idxRiveComponent !== 3 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent5 className={`rive-canvas ${idxRiveComponent !== 4 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
-              </Box>
-            </HowItWorks>
+            />
           </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef }  sx={{ py: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
