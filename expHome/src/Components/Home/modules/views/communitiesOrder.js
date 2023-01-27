@@ -584,8 +584,8 @@ export default [
         ]
       }
     ],
-    YouTube: "sOWCWObstrs",
-    description: `Welcome to the Natural Language Processing(NLP) Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different nlp topics by going through selected survey papers selected from A Survey of Surveys project(https://github.com/NiuTrans/ABigSurvey). Our team members will dive into these survey papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
+    YouTube: "W07nvZ2wcX0",
+    description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different deep learning topics , mainly NLP topics, by going through selected papers every week. Our team members will dive into these papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. We also encourage our interns to work on a specific topic together as a team so that they may write a survey paper together before finishing the internship. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
     accomplishments: (
       <div>
         We have recently published:{" "}
@@ -635,29 +635,32 @@ export default [
       </div>
     ),
     gains: [
-      `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required.`,
-      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines).`,
-      `Top contributors to our community would have the opportunity to co-author research papers in the field.`,
-      `All interactions, task fulfillment, and communications will be online.`,
-      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program.`
+      `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required. `,
+      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines). `,
+      `Top contributors to our community would have the opportunity to co-author research papers in the field. `,
+      `All interactions, task fulfillment, and communications will be online. `,
+      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `,
+       
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
     hasTest: true,
     qualifications: [
-      `Knowledge and enthusiasm for topics related to machine learning and deep learning.`,
-      `Proficiency in Python (or R) and linear algebra.`,
-      `Displayed interest in machine learning through university-level coursework.`,
-      `(Preferred) Previous research experience, or other relevant involvement.`,
-      `(Preferred) Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning.`,
-      `(Preferred) Background in Natural Language Processing (NLP)`,
-      `(Preferred) Background in Linguistics`
+      `Knowledge and enthusiasm for topics related to machine learning and deep learning. `,
+      `Proficiency in Python and linear algebra. `,
+      `Displayed interest in machine learning through university-level coursework. `,
+      `Basic Knowledge of coding in Pytorch.`,
+      `(Preferred)Familiar with Huggingface/Fairseq.`,
+      `(Preferred)Previous research experience, or other relevant involvement. `,
+      `(Preferred)Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning. `,
+      `(Preferred) Background in Natural Language Processing (NLP) `,
+      `(Preferred) Background in Linguistics `,
     ],
     responsibilities: [
-      `Constantly study the reading assignments, summarize chapters and sections, and share the essence of what you learn with our large research team in a hierarchically organized fashion.`,
-      `Attend two-hour weekly team meetings to discuss the research and present your efforts throughout the week.`,
-      `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians.`,
-      `All interactions, task fulfillment, and communications will be remote.`,
-      `Enthusiastically participate in the research assignments if needed.`
+      `Constantly study a specific Natural Language Processing/Computational Social Science/AI for Science topic. `,
+      `Attend weekly team meetings to discuss the research and present your efforts throughout the week.(Both Reading Assignment and Optional Research Project) `,
+      `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians. `,
+      `All interactions, task fulfillment, and communications will be remote. `,
+      `Enthusiastically participate in the research assignments if needed. `,
     ]
   },
   {
