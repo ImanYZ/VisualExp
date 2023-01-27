@@ -1,3 +1,4 @@
+const mockApplications = require("./mockCollections/applications.data");
 const mockProjectSpecs = require("./mockCollections/projectSpecs.data");
 const mockPassages = require("./mockCollections/passages.data");
 const mockConditions = require("./mockCollections/conditions.data");
@@ -13,6 +14,7 @@ const deleteAllUsers = require("./deleteAllUsers")
 
 module.exports = {
   MockData,
+  mockApplications,
   mockProjectSpecs,
   mockPassages,
   mockConditions,
