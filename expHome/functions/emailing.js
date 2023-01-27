@@ -1,5 +1,7 @@
 const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
 
+const { Timestamp } = require("firebase-admin/firestore");
+
 const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
@@ -78,8 +80,8 @@ const loadUmichLogo = res => {
 const emailOpenedIndividual = async fullname => {
   const contactRef = db.collection("contacts").doc(fullname);
   await contactRef.update({
-    openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
-    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+    openedEmail: Timestamp.fromDate(new Date()),
+    updatedAt: Timestamp.fromDate(new Date())
   });
 };
 
@@ -96,8 +98,8 @@ exports.loadImageIndividual = (req, res) => {
 const emailOpenedInstructor = async instructorId => {
   const contactRef = db.collection("instructors").doc(instructorId);
   await contactRef.update({
-    openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
-    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+    openedEmail: Timestamp.fromDate(new Date()),
+    updatedAt: Timestamp.fromDate(new Date())
   });
 };
 
@@ -113,8 +115,8 @@ exports.loadImageProfessor = (req, res) => {
 const emailOpenedAdministrator = async administratorId => {
   const contactRef = db.collection("administrators").doc(administratorId);
   await contactRef.update({
-    openedEmail: admin.firestore.Timestamp.fromDate(new Date()),
-    updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+    openedEmail: Timestamp.fromDate(new Date()),
+    updatedAt: Timestamp.fromDate(new Date())
   });
 };
 
@@ -194,12 +196,12 @@ exports.sendPersonalInvitations = async (req, res) => {
                 const contactRef = db.collection("contacts").doc(contactDoc.id);
                 if (!reminders) {
                   await contactRef.update({
-                    emailSent: admin.firestore.Timestamp.fromDate(new Date()),
+                    emailSent: Timestamp.fromDate(new Date()),
                     reminders: 0
                   });
                 } else {
                   await contactRef.update({
-                    emailSent: admin.firestore.Timestamp.fromDate(new Date()),
+                    emailSent: Timestamp.fromDate(new Date()),
                     reminders: reminders + 1
                   });
                 }
@@ -360,11 +362,11 @@ exports.inviteAdministrators = async context => {
               const administratorRef = db.collection("administrators").doc(administratorDoc.id);
               await administratorRef.update({
                 // condition: minCondition,
-                emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
+                emailedAt: Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
                 // The next reminder should be sent one week later.
-                nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
-                updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+                nextReminder: Timestamp.fromDate(nextWeek()),
+                updatedAt: Timestamp.fromDate(new Date())
               });
             }
           });
@@ -392,7 +394,7 @@ exports.administratorYes = async (req, res) => {
         yes: true,
         no: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -415,7 +417,7 @@ exports.administratorNo = async (req, res) => {
         no: true,
         yes: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -447,8 +449,8 @@ exports.administratorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          nextReminder: admin.firestore.Timestamp.fromDate(reminder),
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          nextReminder: Timestamp.fromDate(reminder),
+          updatedAt: Timestamp.fromDate(new Date())
         });
       } else {
         // If reminder does not exist, we should still log that the administrator
@@ -457,7 +459,7 @@ exports.administratorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          updatedAt: Timestamp.fromDate(new Date())
         });
       }
       return res.status(200).json({ done: true });
@@ -602,11 +604,11 @@ exports.inviteInstructors = async context => {
               const instructorRef = db.collection("instructors").doc(instructorDoc.id);
               await instructorRef.update({
                 // condition: minCondition,
-                emailedAt: admin.firestore.Timestamp.fromDate(new Date()),
+                emailedAt: Timestamp.fromDate(new Date()),
                 reminders: admin.firestore.FieldValue.increment(1),
                 // The next reminder should be sent one week later.
-                nextReminder: admin.firestore.Timestamp.fromDate(nextWeek()),
-                updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+                nextReminder: Timestamp.fromDate(nextWeek()),
+                updatedAt: Timestamp.fromDate(new Date())
               });
             }
           });
@@ -634,7 +636,7 @@ exports.instructorYes = async (req, res) => {
         yes: true,
         no: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -657,7 +659,7 @@ exports.instructorNo = async (req, res) => {
         no: true,
         yes: false,
         later: false,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
   } catch (err) {
@@ -689,8 +691,8 @@ exports.instructorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          nextReminder: admin.firestore.Timestamp.fromDate(reminder),
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          nextReminder: Timestamp.fromDate(reminder),
+          updatedAt: Timestamp.fromDate(new Date())
         });
       } else {
         // If reminder does not exist, we should still log that the instructor
@@ -699,7 +701,7 @@ exports.instructorLater = async (req, res) => {
           later: true,
           no: false,
           yes: false,
-          updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+          updatedAt: Timestamp.fromDate(new Date())
         });
       }
     }
@@ -718,7 +720,7 @@ exports.trackStudentInvite = async (req, res) => {
       const instructorDoc = db.collection(collection).doc(instructorId);
       await instructorDoc.update({
         inviteStudents: true,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
     res.send("OK");
@@ -737,7 +739,7 @@ exports.trackStudentEmailTemplateCopy = async (req, res) => {
       const instructorDoc = db.collection(collection).doc(instructorId);
       await instructorDoc.update({
         copiedStudentsEmail: true,
-        updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+        updatedAt: Timestamp.fromDate(new Date())
       });
     }
     res.send("OK");
@@ -1222,7 +1224,7 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
       const userDoc = await userRef.get();
       await userRef.update({
         reminders: reminders + 1,
-        reminder: admin.firestore.Timestamp.fromDate(nWeek)
+        reminder: Timestamp.fromDate(nWeek)
       });
     });
   } catch (err) {
