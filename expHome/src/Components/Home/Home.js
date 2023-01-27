@@ -749,7 +749,7 @@ function Index() {
             )}
           </Box>
           <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ py: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
