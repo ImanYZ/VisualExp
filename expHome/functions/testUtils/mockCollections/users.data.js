@@ -81,6 +81,9 @@ module.exports = new MockData([
     "Resume": "https://firebasestorage.googleapis.com/v0/b/visualexp-5d2c6.appspot.com/o/Resumes%2FSam%20Ouhra%2FThu%2C%2001%20Dec%202022%2016%3A36%3A19%20GMT.pdf?alt=media&token=60a584d6-2a5d-4c92-b1d3-bbf863253f91",
     "project": "H1L2",
     "tutorialEnded": true,
+    "applicationSubmitted": {
+      "Clinical_Psychology": true
+    },
     "choices": [
       "",
       "",
