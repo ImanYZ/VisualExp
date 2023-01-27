@@ -415,11 +415,10 @@ const CodeFeedback = props => {
     const func = async () => {
       const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
       const orderData = feedbackCodesOrderDocs.docs[0].data();
-      if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 5)) {
+      if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
         await axios.post("/createTemporaryFeedbacodeCollection", {
           fullname,
-          project,
-          approvedCodes
+          project
         });
       }
     };
@@ -640,7 +639,7 @@ const CodeFeedback = props => {
           };
         }
 
-        const codeRef = await firebase.db.collection("feedbackCodeBooks").doc(id);
+        const codeRef = firebase.db.collection("feedbackCodeBooks").doc(id);
         await codeRef.update(codeUpdate);
 
         const msg = !isRejected ? "Code rejected" : "Code approved";
