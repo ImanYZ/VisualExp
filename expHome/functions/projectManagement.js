@@ -2618,8 +2618,8 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
 
       // const feedbackRef = db.collection("feedbackCodeOrderV2").doc(project.trim());
       const feedbackCodeOrders = await db.collection("feedbackCodeOrderV2")
-        .where("project", project.trim())
-        .where("researcher", fullname)
+        .where("project", "==", project.trim())
+        .where("researcher", "==", fullname)
         .get();
       const feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(
         feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].id : undefined
@@ -2661,6 +2661,6 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
       await batch.commit();
     }
   } catch (error) {
-    console.log({ error });
+    console.log({ error }, "error----------");
   }
 };
