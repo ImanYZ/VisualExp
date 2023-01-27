@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const { admin, db, commitBatch, batchSet, batchUpdate, batchDelete } = require("./admin");
 const { getFullname, getDateString, getDateTimeString } = require("./utils");
+const { delay } = require("./helpers/common");
 const { emailApplicationStatus, emailCommunityLeader, emailImanToInviteApplicants } = require("./emailing");
 
 exports.deleteUser = async (snap, context) => {
@@ -1283,7 +1284,7 @@ exports.applicationReminder = async context => {
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
     // Retrieve all the applicants who have completed the 3 experiment sessions.
-    const usersDocs = await db.collection("users").get();
+    const usersDocs = await db.collection("users").where("projectDone", "==", true).get();
     const applicationDocs = await db.collection("applications").get();
     // Array of information to be emailed to every applicant whose application
     // is incomplete.
@@ -1333,10 +1334,7 @@ exports.applicationReminder = async context => {
       }
       if (
         (!userData.hasOwnProperty("withdrew") || !userData.withdrew) &&
-        (!("applicationSubmitted" in userData) ||
-          !userData.applicationSubmitted ||
-          !("applicationsSubmitted" in userData) ||
-          Object.keys(userData.applicationsSubmitted).length === 0) &&
+        Object.keys(userData?.applicationSubmitted || {}).length === 0 &&
         (!("reminder" in userData) || userData.reminder.toDate() <= new Date()) &&
         "createdAt" in userData &&
         userData.createdAt.toDate() > new Date("1-14-2022")
@@ -1409,43 +1407,40 @@ exports.applicationReminder = async context => {
           const communityLeaderData = communityLeaderDoc.data();
           // Because I am considered a leader in all communities.
           // if (communityLeaderData.email !== "oneweb@umich.edu") {
-          setTimeout(() => {
-            emailCommunityLeader(
-              communityLeaderData.email,
-              communityLeaderData.firstname,
-              communiId,
-              needReview[communiId]
-            );
-          }, waitTime);
+          await emailCommunityLeader(
+            communityLeaderData.email,
+            communityLeaderData.firstname,
+            communiId,
+            needReview[communiId]
+          );
+          await delay(waitTime);
           // Increase waitTime by a random integer between 1 to 4 seconds.
-          waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+          waitTime = 1000 * (1 + Math.floor(Math.random() * 3));
           // }
         }
       }
     }
-    // Send reminder emails to to Iman to invite the confirmed applicants to
+    // Send reminder emails to Iman to invite the confirmed applicants to
     // Microsoft Teams.
     if (needInvite.length > 0) {
-      setTimeout(() => {
-        emailImanToInviteApplicants(needInvite);
-      }, waitTime);
+      await emailImanToInviteApplicants(needInvite);
+      await delay(waitTime);
       // Increase waitTime by a random integer between 1 to 4 seconds.
-      waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+      waitTime = 1000 * (1 + Math.floor(Math.random() * 3));
     }
     for (let reminder of reminders) {
-      setTimeout(() => {
-        emailApplicationStatus(
-          reminder.email,
-          reminder.firstname,
-          reminder.fullname,
-          reminder.reminders,
-          reminder.subject,
-          reminder.content,
-          reminder.hyperlink
-        );
-      }, waitTime);
+      await emailApplicationStatus(
+        reminder.email,
+        reminder.firstname,
+        reminder.fullname,
+        reminder.reminders,
+        reminder.subject,
+        reminder.content,
+        reminder.hyperlink
+      );
+      await delay(waitTime);
       // Increase waitTime by a random integer between 1 to 4 seconds.
-      waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+      waitTime = 1000 * (1 + Math.floor(Math.random() * 3));
     }
   } catch (err) {
     console.log({ err });
