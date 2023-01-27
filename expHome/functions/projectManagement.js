@@ -2598,7 +2598,6 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         });
       }
       const feedbackCodeIds = [];
-      console.log("project", project);
       const feedbackCodeOrders = await db
         .collection("feedbackCodeOrderV2")
         .where("project", "==", project)
@@ -2646,6 +2645,6 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
       await batch.commit();
     }
   } catch (error) {
-    console.log({ error });
+    console.log({ error }, "error----------");
   }
 };
