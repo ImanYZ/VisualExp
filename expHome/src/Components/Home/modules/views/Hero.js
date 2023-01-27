@@ -28,7 +28,7 @@ const Hero = () => {
         width: "100%",
         padding: width < 900 ? "10px" : "20px",
         backgroundColor: "#1d1102",
-        backgroundImage: `url(${backgroundImageDarkMode.src})`,
+        backgroundImage: `url(${backgroundImageDarkMode})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
@@ -37,8 +37,8 @@ const Hero = () => {
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", pb: "20px" }}>
         <Box sx={{ width: heroCanvasDimensions, height: heroCanvasDimensions }}>
           <RiveComponentMemoized
-            src="rive/artboard-1.riv"
-            animations={["Timeline 1", "dark", "light"]}
+            src="artboard-1.riv"
+            animations="Timeline 1"
             artboard={"artboard-1"}
             autoplay={true}
           />
@@ -56,7 +56,8 @@ const Hero = () => {
           component="a"
           target="_blank"
           href="https://1cademy.us/#JoinUsSection"
-          sx={{ minWidth: 200, zIndex: 13, textTransform: "uppercase" }}
+          sx={{ minWidth: 200, zIndex: 13, textTransform: "uppercase",color:"common.white" }}
+          color="secondary"
         >
           Apply to Join Us!
         </Button>

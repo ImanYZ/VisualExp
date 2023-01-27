@@ -37,6 +37,7 @@ import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { gray02 } from "./modules/views/WhoWeAre";
 import { useInView } from "./modules/hooks/useObserver";
+import { HeroMemoized } from "./modules/views/Hero";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -653,53 +654,11 @@ function Index() {
           </Box>
         </Box>
 
-        <Stack
-          ref={HomeSectionRef}
-          spacing={width < 900 ? "10px" : "20px"}
-          direction={"column"}
-          alignItems={"center"}
-          justifyContent="flex-end"
-          sx={{
-            height: "calc(100vh - 70px)",
-            width: "100%",
-            position: "absolute",
-            top: 0,
-            padding: width < 900 ? "10px" : "20px",
-            backgroundColor: "#1d1102",
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
-          }}
-        >
-          <Typography
-            color="white"
-            variant="h5"
-            sx={{ textAlign: "center" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            WHERE WE TAKE NOTES <b>TOGETHER</b>.
-          </Typography>
-          <Button
-            color="secondary"
-            variant="contained"
-            size={width < 900 ? "small" : "large"}
-            component="a"
-            href="#JoinUsSection"
-            sx={{ minWidth: 200, color: "common.white" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            Apply to Join Us!
-          </Button>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            {height > 500 && "Scroll"}
-            <KeyboardDoubleArrowDownIcon fontSize={width < 900 ? "small" : "medium"} />
-          </Box>
-        </Stack>
+        <Box ref={HomeSectionRef} component="section">
+          <HeroMemoized />
+        </Box>
 
+          
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
           <Box id={sectionsOrder[1].id} ref={howSectionRef}>
             <HowItWorks
