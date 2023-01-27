@@ -436,8 +436,9 @@ const CodeFeedback = props => {
         .where("project", "==", project)
         .get();
       const orderData = feedbackCodesOrderDocs.docs.length ? feedbackCodesOrderDocs.docs[0].data() : {};
-      if (orderData?.codeIds && orderData?.codeIds.length === 0) {
+      if (orderData?.codeIds && !orderData?.codeIds.length) {
         setAllResponsesGraded(true);
+        return;
       } else {
         setAllResponsesGraded(false);
       }
@@ -1073,7 +1074,7 @@ const CodeFeedback = props => {
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
   };
-  if (!choiceConditions[selectedSentence]) return null;
+  if (!choiceConditions[selectedSentence] && sentences.length) return null;
   return (
     <>
       {unApprovedCodes.length > 0 && (
@@ -1139,7 +1140,7 @@ const CodeFeedback = props => {
           </Alert>
         </div>
       )} */}
-      {sentences.length !== 0 ? (
+      {sentences.length ? (
         <>
           <Alert severity="warning" sx={{ mt: "15px", mb: "15px" }}>
             <h2>
