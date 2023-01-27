@@ -43,31 +43,31 @@ export const Magnitude = ({ stats, width }) => {
         <img src="DarkModeLogo_o.svg" alt="" />
       </Box>
 
-      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-one" : ""}>
-        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700}>
+      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-one" : "" } sx={{color:"common.white"}}>
+        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700} sx={{color:"common.white"}}>
           {stats.nodes}{" "}
         </Typography>
         nodes and{" "}
-        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700}>
+        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700} sx={{color:"common.white"}}>
           {stats.links}{" "}
         </Typography>{" "}
         links have been
       </Typography>
 
-      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-two" : ""}>
+      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-two" : "" } sx={{color:"common.white"}}>
         contributed through{" "}
-        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700}>
+        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700} sx={{color:"common.white"}}>
           {stats.proposals}
         </Typography>{" "}
         proposals from{" "}
       </Typography>
 
-      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-three" : ""}>
-        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700}>
+      <Typography fontSize={fontSize} className={MagnitueInViewOnce ? "magnitude-text-three" : "" } sx={{color:"common.white"}}>
+        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700} sx={{color:"common.white"}}>
           {stats.users}{" "}
         </Typography>
         users in{" "}
-        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700}>
+        <Typography fontSize={fontSize} component={"span"} color={"primary"} fontWeight={700} sx={{color:"common.white"}}>
           {stats.institutions}
         </Typography>{" "}
         institutions
