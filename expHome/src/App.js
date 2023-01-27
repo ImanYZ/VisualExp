@@ -70,7 +70,7 @@ const App = () => {
   const [questions, setQuestions] = useState([]);
   const [timer, setTimer] = useState(5 * 60);
   const [reText, setReText] = useState("");
-  
+
   const [explanations, setExplanations] = useState([
     { explanation: "", codes: [] },
     { explanation: "", codes: [] },
@@ -232,7 +232,7 @@ const App = () => {
       ...userUpdates,
       pConditions
     };
-    
+
     let allResponsesReady = true;
     for (let pCond of userData.pConditions) {
       if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
@@ -242,9 +242,11 @@ const App = () => {
 
     const session = toOrdinal(startedSession); // 1st, 2nd, 3rd
     // new logic create recall grades v2 document
-    const recallGrades = await firebase.db.collection("recallGradesV2")
+    const recallGrades = await firebase.db
+      .collection("recallGradesV2")
       .where("user", "==", fullname)
-      .where("project", "==", userData.project).get();
+      .where("project", "==", userData.project)
+      .get();
     let recallGradeRef = firebase.db.collection("recallGradesV2").doc();
     let recallGradeData = {
       sessions: {
@@ -255,7 +257,7 @@ const App = () => {
       project: userData.project,
       user: fullname
     };
-    if(recallGrades.docs.length) {
+    if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
       recallGradeData = recallGrades.docs[0].data();
     }
@@ -294,8 +296,10 @@ const App = () => {
 
       // finding pCondition item if exists
       recallGradeData.sessions[session] = recallGradeData.sessions[session] || [];
-      let conditionIdx = recallGradeData.sessions[session].findIndex((conditionItem) => conditionItem.condition === pCond.condition);
-      if(conditionIdx === -1) {
+      let conditionIdx = recallGradeData.sessions[session].findIndex(
+        conditionItem => conditionItem.condition === pCond.condition
+      );
+      if (conditionIdx === -1) {
         conditionIdx = recallGradeData.sessions[session].length;
         recallGradeData.sessions[session].push({
           phrases: [],
@@ -308,18 +312,18 @@ const App = () => {
         });
       }
       const conditionItem = recallGradeData.sessions[session][conditionIdx];
-      const existingPhrases = conditionItem.phrases.map((phrase) => phrase.phrase)
+      const existingPhrases = conditionItem.phrases.map(phrase => phrase.phrase);
       for (let phrase of passageData.phrases) {
-        if(existingPhrases.includes(phrase)) continue; // we will not replace or duplicate phrase for each passage
+        if (existingPhrases.includes(phrase)) continue; // we will not replace or duplicate phrase for each passage
         conditionItem.phrases.push({
           phrase,
           grades: [],
           researchers: []
-        })
+        });
       }
 
       // marking as not done when new session/condition added
-      if(recallGradeData.done) {
+      if (recallGradeData.done) {
         recallGradeData.done = false;
       }
     }
@@ -328,24 +332,26 @@ const App = () => {
 
     const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
     let researcher = "";
-    const resSchedules = await firebase.db.collection("resSchedule")
+    const resSchedules = await firebase.db
+      .collection("resSchedule")
       .where("month", "==", scheduleMonth)
-      .where("project", "==", userData.project).get();
+      .where("project", "==", userData.project)
+      .get();
     // detecting researcher's name
-    if(resSchedules.docs.length) {
+    if (resSchedules.docs.length) {
       const resSchedule = resSchedules.docs[0];
       const resScheduleData = resSchedule.data();
       const scheduled = resScheduleData.scheduled || {};
-      for(const _researcher in scheduled) {
+      for (const _researcher in scheduled) {
         const participants = Object.keys(scheduled[_researcher] || {});
-        if(participants.includes(fullname)) {
+        if (participants.includes(fullname)) {
           // this will help us during testing App.js flow
-          if(!researcher) {
+          if (!researcher) {
             researcher = _researcher;
           }
           const currentDate = moment().utcOffset(-4).format("YYYY-MM-DD");
           const scheduledDate = moment(scheduled[_researcher][fullname][0]).utcOffset(-4, true).format("YYYY-MM-DD");
-          if(currentDate === scheduledDate) {
+          if (currentDate === scheduledDate) {
             researcher = _researcher;
             break;
           }
@@ -357,94 +363,103 @@ const App = () => {
     // all the recall responses for all their passages in all the three
     // sessions, we create all the corresponding recallGrades documents for this
     // user
-    if (startedSession === 3 && allResponsesReady) {
-      const feedbackCodeBooksdocs = await firebase.db
-        .collection("feedbackCodeBooks")
-        .where("approved", "==", true)
-        .get();
-      const approvedCodes = new Set();
-      let codesVotes = {};
-      for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
-        const data = feedbackCodeBooksDoc.data();
-        if (!approvedCodes.has(data.code)) {
-          codesVotes[data.code] = [];
-          approvedCodes.add(data.code);
-        }
+
+    const feedbackCodeBooksdocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
+    const approvedCodes = new Set();
+    let codesVotes = {};
+    for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
+      const data = feedbackCodeBooksDoc.data();
+      if (!approvedCodes.has(data.code)) {
+        codesVotes[data.code] = [];
+        approvedCodes.add(data.code);
       }
-      for (let explan of ["explanations", "explanations3Days", "explanations1Week"]) {
-        for (let index of [0, 1]) {
-          if (userData[explan] && userData[explan][index] !== "") {
-            let choice;
-            let session;
-            let response;
-            if (explan === "explanations") {
-              session = "1st";
-              if (index === 0) {
-                choice = "postQ1Choice";
-              } else {
-                choice = "postQ2Choice";
-              }
-            } else if (explan === "explanations3Days") {
-              session = "2nd";
-              if (index === 0) {
-                choice = "post3DaysQ1Choice";
-              } else {
-                choice = "post3DaysQ2Choice";
-              }
-            } else if (explan === "explanations1Week") {
-              session = "3rd";
-              if (index === 0) {
-                choice = "post1WeekQ1Choice";
-              } else {
-                choice = "post1WeekQ2Choice";
-              }
-            }
-            response = userData[explan][index].explanation || "";
-            const filtered = (response).split(" ").filter(w => w.trim());
-            if (filtered.length > 4) {
-              const newFeedbackDdoc = {
-                approved: false,
-                codersChoices: {},
-                coders: [],
-                choice: userData[choice],
+    }
+    let explan;
+    switch (session) {
+      case "1st":
+        explan = "explanations";
+        break;
+      case "2nd":
+        explan = "explanations3Days";
+        break;
+      case "3rd":
+        explan = "explanations1Week";
+        break;
+      default:
+      // code block
+    }
+
+    for (let index of [0, 1]) {
+      if (userData[explan] && userData[explan][index] !== "") {
+        let choice;
+        let session;
+        let response;
+        if (explan === "explanations") {
+          session = "1st";
+          if (index === 0) {
+            choice = "postQ1Choice";
+          } else {
+            choice = "postQ2Choice";
+          }
+        } else if (explan === "explanations3Days") {
+          session = "2nd";
+          if (index === 0) {
+            choice = "post3DaysQ1Choice";
+          } else {
+            choice = "post3DaysQ2Choice";
+          }
+        } else if (explan === "explanations1Week") {
+          session = "3rd";
+          if (index === 0) {
+            choice = "post1WeekQ1Choice";
+          } else {
+            choice = "post1WeekQ2Choice";
+          }
+        }
+        response = userData[explan][index].explanation || "";
+        const filtered = response.split(" ").filter(w => w.trim());
+        if (filtered.length > 4) {
+          const newFeedbackDdoc = {
+            approved: false,
+            codersChoices: {},
+            coders: [],
+            choice: userData[choice],
+            project: userData.project,
+            fullname: fullname,
+            session: session,
+            explanation: response,
+            createdAt: new Date(),
+            expIdx: index,
+            codesVotes,
+            updatedAt: new Date()
+          };
+          const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
+
+          // updating feedback code order
+          if (researcher) {
+            const codeIds = [];
+            const feedbackCodeOrders = await firebase.db
+              .collection("feedbackCodeOrderV2")
+              .where("project", "==", userData.project)
+              .where("researcher", "==", researcher)
+              .get();
+            if (feedbackCodeOrders.docs.length) {
+              const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
+              codeIds.push(feedbackCodeRef.id, ..._codeIds);
+              const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+              await firebase.batchUpdate(feedbackOrderRef, {
+                codeIds
+              });
+            } else {
+              await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
                 project: userData.project,
-                fullname: fullname,
-                session: session,
-                explanation: response,
-                createdAt: new Date(),
-                expIdx: index,
-                codesVotes,
-                updatedAt: new Date()
-              };
-              const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
-
-              // updating feedback code order
-              if(researcher) {
-                const codeIds = [];
-                const feedbackCodeOrders = await firebase.db.collection("feedbackCodeOrderV2")
-                  .where("project", "==", userData.project)
-                  .where("researcher", "==", researcher).get();
-                if(feedbackCodeOrders.docs.length) {
-                  const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
-                  codeIds.push(feedbackCodeRef.id, ..._codeIds);
-                  const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-                  await firebase.batchUpdate(feedbackOrderRef, {
-                    codeIds
-                  })
-                } else {
-                  await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
-                    project: userData.project,
-                    researcher,
-                    codeIds: [
-                      feedbackCodeRef.id
-                    ]
-                  })
-                }
-              }
-
-              await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
+                researcher,
+                codeIds: [feedbackCodeRef.id]
+              });
             }
           }
+
+          await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
         }
       }
     }

@@ -1,7 +1,6 @@
-
-const { admin, db, commitBatch, batchUpdate} = require("./admin");
+const { admin, db, commitBatch, batchUpdate } = require("./admin");
 const { allPastEvents, futureEvents, pastEvents, last30DayEvents } = require("./scheduling");
-const { isToday} = require("./utils");
+const { isToday } = require("./utils");
 const {
   reschEventNotificationEmail,
   researcherEventNotificationEmail,
@@ -220,7 +219,7 @@ exports.GradeFreeRecall = async (req, res) => {
         const indexOfthePhrase = recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases.findIndex(
           phraseObj => phraseObj.phrase === randomPhraseGrade.phrase
         );
-        recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[indexOfthePhrase] =randomPhraseGrade;
+        recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[indexOfthePhrase] = randomPhraseGrade;
       }
       for (let phraseIdx in recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases) {
         const _viewers = recallGradesUpdate.sessions[recallGrade.session][indexOfResponse].phrases[phraseIdx].viewers;
@@ -1653,7 +1652,6 @@ exports.voteAdministratorReset = async (req, res) => {
 
 exports.remindResearchersForAvailability = async context => {
   try {
-
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
@@ -1676,13 +1674,13 @@ exports.remindResearchersForAvailability = async context => {
               .where("researchers", "array-contains", researcherDoc.id)
               .where("month", "==", month)
               .get();
-            
+
             let lastAvailability = new Date();
-            if(resSchedules.docs.length) {
+            if (resSchedules.docs.length) {
               const resSchedule = resSchedules.docs[0];
               const resScheduleData = resSchedule.data();
               const availabilities = resScheduleData[researcherDoc.id]?.schedules || [];
-              for(const availability of availabilities) {
+              for (const availability of availabilities) {
                 const _availability = moment(availability).utcOffset(-4, true).toDate();
                 if (_availability.getTime() > lastAvailability.getTime()) {
                   lastAvailability = _availability;
@@ -1712,8 +1710,8 @@ exports.remindResearchersForAvailability = async context => {
 
     console.log({ err });
     return null;
-  } catch(e) {}
-}
+  } catch (e) {}
+};
 
 // Clicking the Yes or No buttons in FreeRecallGrading.js under
 // ProjectManagement would trigger this function. grade can be either true,
@@ -1723,7 +1721,7 @@ exports.assignExperimentSessionsPoints = async context => {
   try {
     const researchers = await db.collection("researchers").get();
     const researchersInfo = {};
-    for(const researcher of researchers.docs) {
+    for (const researcher of researchers.docs) {
       const researcherData = researcher.data();
       researchersInfo[researcherData.email.toLowerCase()] = {
         fullname: researcher.id,
@@ -1731,13 +1729,13 @@ exports.assignExperimentSessionsPoints = async context => {
         projects: Object.keys(researcherData.projects)
       };
     }
-    
+
     const usersInfo = {};
     const surveyUsers = await db.collection("usersStudentCoNoteSurvey").get();
     const surveyInstructors = await db.collection("instructors").get();
     for (const userDoc of [...surveyInstructors.docs, ...surveyUsers.docs]) {
       const userData = userDoc.data();
-      if(!userData.email) continue;
+      if (!userData.email) continue;
       usersInfo[userData.email.toLowerCase()] = {
         fullname: userDoc.id,
         email: userData.email,
@@ -1748,8 +1746,8 @@ exports.assignExperimentSessionsPoints = async context => {
     const pastEvents = await last30DayEvents(); // last 30 day events to minimize processing
     if (pastEvents) {
       for (let pastEvent of pastEvents) {
-        if(!pastEvent.attendees) continue;
-        
+        if (!pastEvent.attendees) continue;
+
         const researcherObjs = [];
         let userObj = null;
         const attendees = [];
@@ -1758,7 +1756,7 @@ exports.assignExperimentSessionsPoints = async context => {
           const attendeeEmail = attendee.email.toLowerCase();
           if (researchersInfo[attendeeEmail]) {
             researcherObjs.push(researchersInfo[attendeeEmail]);
-          } else if(usersInfo[attendeeEmail]) {
+          } else if (usersInfo[attendeeEmail]) {
             userObj = usersInfo[attendeeEmail];
           }
         }
@@ -1779,8 +1777,15 @@ exports.assignExperimentSessionsPoints = async context => {
               continue;
             }
 
-            // sending 1st explicitly because, there is only one session for survey students and instructors 
-            await assignExpPoints(researcherObj.fullname, userObj.fullname, "1st", userObj.project, false, pastEvent.id);
+            // sending 1st explicitly because, there is only one session for survey students and instructors
+            await assignExpPoints(
+              researcherObj.fullname,
+              userObj.fullname,
+              "1st",
+              userObj.project,
+              false,
+              pastEvent.id
+            );
 
             // schedule document will have `hasStarted` field to be true if the researcher had attended the meeting.
             const schedule = await db.collection("schedule").where("id", "==", pastEvent.id).get();
@@ -2370,9 +2375,15 @@ exports.handleSubmitFeebackCode = async (req, res) => {
         let recievePositivePoints = [];
         let recieveNegativePoints = [];
         const feedbackCodesRef = db.collection("feedbackCode").doc(docId);
-        const feedbackCodeOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).where("researcher", "==", fullname).get();
-        const feedbackOrderRef = feedbackCodeOrders.docs.length ? db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id) : db.collection("feedbackCodeOrderV2").doc();
-        if(!feedbackCodeOrders.docs.length) {
+        const feedbackCodeOrders = await db
+          .collection("feedbackCodeOrderV2")
+          .where("project", "==", project)
+          .where("researcher", "==", fullname)
+          .get();
+        const feedbackOrderRef = feedbackCodeOrders.docs.length
+          ? db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id)
+          : db.collection("feedbackCodeOrderV2").doc();
+        if (!feedbackCodeOrders.docs.length) {
           // creating empty doc if not exists
           await feedbackOrderRef.set({
             researcher: fullname,
@@ -2529,8 +2540,17 @@ exports.handleSubmitFeebackCode = async (req, res) => {
 
 exports.createTemporaryFeedbacodeCollection = async (req, res) => {
   try {
-    if ("fullname" in req.body && "approvedCodes" in req.body && "project" in req.body) {
+    if ("fullname" in req.body && "project" in req.body) {
+      console.log(":: ::: createTemporaryFeedbacodeCollection  called :: :: ");
+      const { fullname, project } = req.body;
       const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
+
+      const previousIds = [];
+      const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get();
+      for (let feedbackCodeOrder of feedbackCodesOrders.docs) {
+        const feedbackCodeOrderData = feedbackCodeOrder.data();
+        previousIds.concat(feedbackCodeOrderData.codeIds);
+      }
 
       const batch = db.batch();
 
@@ -2541,15 +2561,11 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
           approvedCodes.add(codeData.code);
         }
       }
-      const fullname = req.body.fullname;
-      const project = req.body.project;
-
       const passages = await db.collection("passages").where("projects", "array-contains", project).get();
       const passagesMap = {};
-      for(const passage of passages.docs) {
+      for (const passage of passages.docs) {
         passagesMap[passage.id] = passage.data();
       }
-
       /* const passagesInH2K2 = [
         "zlS4Gh2AXaLZV7HM2oXd",
         "lmGQvzSit4LBTj1Zptot",
@@ -2562,16 +2578,17 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         "s1oo3G4n3jeE8fJQRs3g"
       ]; */
 
-      const feedbackCodes = await db.collection("feedbackCode").where("project", "==", project).get();
+      const feedbackCodes = await db
+        .collection("feedbackCode")
+        .where("project", "==", project)
+        .where("approved", "==", false)
+        .get();
       const feedbackCodesByParticipant = {};
 
-      for(const feedbackCode of feedbackCodes.docs) {
+      for (const feedbackCode of feedbackCodes.docs) {
+        if (previousIds.includes(feedbackCode.id)) continue;
         const feedbackCodeData = feedbackCode.data();
-        // skipping approved feedback codes
-        if(feedbackCodeData.approved) {
-          continue;
-        }
-        if(!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
+        if (!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
           feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
         }
         feedbackCodesByParticipant[feedbackCodeData.fullname].push({
@@ -2580,79 +2597,46 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
           explanation: feedbackCodeData.explanation || ""
         });
       }
-
-      for(const fullname in feedbackCodesByParticipant) {
-        feedbackCodesByParticipant[fullname].sort((a, b) => {
-          const _a = parseInt(String(a.session).replace(/[^0-9]/g, ""));
-          const _b = parseInt(String(b.session).replace(/[^0-9]/g, ""));
-          return _a < _b ? -1 : 1;
-        })
-      }
-
-      // recent participants
-      const months = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-      const monthOfPast16Days = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
-      if(!months.includes(monthOfPast16Days)) {
-        months.push(monthOfPast16Days);
-      }
-      const resSchedules = await db.collection("resSchedule")
-        .where("project", "==", project)
-        .where("month", "in", months).get();
-      
-      const recentParticipants = [];
-      for(const resSchedule of resSchedules.docs) {
-        const resScheduleData = resSchedule.data();
-        const scheduled = resScheduleData?.scheduled?.[fullname] || {};
-        recentParticipants.push(...Object.keys(scheduled));
-      }
-
       const feedbackCodeIds = [];
-      for(const participant in feedbackCodesByParticipant) {
-        for(const feedbackItem of feedbackCodesByParticipant[participant]) {
-          // if participant present in 
-          if(recentParticipants.includes(participant)) {
-            feedbackCodeIds.push(feedbackItem.docId);
-          }
-        }
-      }
-
-      // const feedbackRef = db.collection("feedbackCodeOrderV2").doc(project.trim());
-      const feedbackCodeOrders = await db.collection("feedbackCodeOrderV2")
-        .where("project", "==", project.trim())
+      const feedbackCodeOrders = await db
+        .collection("feedbackCodeOrderV2")
+        .where("project", "==", project)
         .where("researcher", "==", fullname)
         .get();
-      const feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(
-        feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].id : undefined
-      );
-      const feedbackCodeData = feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].data() : {
-        project: project.trim(),
-        researcher: fullname,
-        codeIds: []
-      };
-      const codeIds = Array.from(new Set([...feedbackCodeIds,...feedbackCodeData.codeIds]));
+      const feedbackCodeOrderRef = db
+        .collection("feedbackCodeOrderV2")
+        .doc(feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].id : undefined);
+      const feedbackCodeData = feedbackCodeOrders.docs.length
+        ? feedbackCodeOrders.docs[0].data()
+        : {
+            project: project.trim(),
+            researcher: fullname,
+            codeIds: []
+          };
+      console.log("feedbackCodeIds", feedbackCodeIds);
+      const codeIds = Array.from(new Set([...feedbackCodeIds, ...feedbackCodeData.codeIds]));
 
-      if (codeIds.length <= 5) {
+      if (codeIds.length <= 2) {
         for (let participant in feedbackCodesByParticipant) {
-          for(const feedbackCode of feedbackCodesByParticipant[participant]) {
+          for (const feedbackCode of feedbackCodesByParticipant[participant]) {
             const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
-            if(explanationWords.length > 4 || codeIds.includes(feedbackCode.docId)) {
+            console.log(explanationWords);
+            if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {
               continue;
             }
-            codeIds.push(feedbackCode.docId)
-            if(codeIds.length > 5) {
+            codeIds.push(feedbackCode.docId);
+            if (codeIds.length > 5) {
               break;
             }
           }
-
-          if(codeIds.length > 5) {
+          if (codeIds.length > 5) {
             break;
           }
         }
       }
-
       feedbackCodeData.codeIds = codeIds;
 
-      if(feedbackCodeOrders.docs.length) {
+      if (feedbackCodeOrders.docs.length) {
         batch.update(feedbackCodeOrderRef, feedbackCodeData);
       } else {
         batch.set(feedbackCodeOrderRef, feedbackCodeData);
