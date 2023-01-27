@@ -698,15 +698,10 @@ function Index() {
         </Box>
 
 
-        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",}}>
+        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",pt:"32px"}}>
           <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }}>
-          <CustomTypography
-              component={"h2"}
-              variant="h1"
-              marked="center"
-              align="center"
-              sx={{ pb: 10, pt: "20px", fontWeight: 700 ,color:"common.white"}}
-            >
+          
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[1].title}
             </CustomTypography>
             <HowItWorks
