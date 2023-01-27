@@ -2114,6 +2114,168 @@ const communitiesPapers = {
       }
     }
   },
+  UX_Research_in_Online_Communities: {
+    what_motivates_online_community_contributors_to_contribute_consistently_A_case_study_on_Stackoverflow_netizens: {
+      title: "What motivates online community contributors to contribute consistently? A case study on Stackoverflow netizens?",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat-motivates-online-%20community-contributors-to-%20contribute-consistently.pdf?alt=media&token=c1b7fbc4-f9c6-4f23-942f-0107c3961ece",
+      questions: {
+        what_is_the_main_problem_trying_to_be_solved_tested: {
+          stem: `1. What is the main problem trying to be solved/tested?`,
+          answers: ["b"],
+          choices: {
+            a: "A lack of members in Q&A communities limits useful knowledge sharing ",
+            b: "People do not participate enough to provide sought knowledge ",
+            c: "There are not good ways to vet and evaluate the quality of information shared ",
+            d: "There are not good methods to keep questions within a community’s scope of interest "
+          }
+        },
+        which_of_the_following_are_results_of_their_study: {
+          stem: `2. Which of the following are results of their study?`,
+          answers: ["a", "b", "d"],
+          choices: {
+            a: "There was a positive interaction between social interaction and knowledge contribution .",
+            b: "There was a negative interaction between knowledge seeking and knowledge contribution .",
+            c: "There was a positive interaction between knowledge seeking and knowledge contribution .",
+            d: "There was a positive interaction between reciprocation of knowledge and knowledge contribution ."
+          }
+        },
+        what_is_graph_1_depicting_about_Stackoverflows_community: {
+          stem: `3.What is graph 1 depicting about Stackoverflow’s community?`,
+          answers: ["b"],
+          choices: {
+            a: "How active users are contributing overtime ",
+            b: "The number of questions asked relative to how many answers are being given ",
+            c: "Average contributions relative to the size of the community ",
+            d: "The number of blue dots vs. number of orange dots used in the community overtime "
+          }
+        },
+        What_is_their_main_research_question: {
+          stem: `4.What is their main research question?`,
+          answers: ["a"],
+          choices: {
+            a: "What motivates online community users to contribute consistently?",
+            b: "How do Q&A communities get people to join and contribute? ",
+            c: "How can Q&A communities evaluate the quality of the contributions? ",
+            d: "What are the theoretical factors that correspond to StackOverflow features? "
+          }
+        },
+        What_are_the_theories_they_use_to_understand_contribution_in_online_communities: {
+          stem: `5. What are the theories they use to understand contribution in online communities?`,
+          answers: ["b", "c"],
+          choices: {
+            a: "Information Search Process (ISP) ",
+            b: "Social Cognitive Theory ",
+            c: "Social Exchange Theory",
+            d: "Kuhlthau Model "
+          }
+        },
+        What_is_fig1_depicting: {
+          stem: `6. What is fig.1 depicting?`,
+          answers: ["a"],
+          choices: {
+            a: "Framework of variables and their corresponding systems that will be measured against knowledge contribution and compared in the study",
+            b: "The systems used to increase the utility of knowledge contributions on StackOverflow ",
+            c: "Different methods and their corresponding systems used for knowledge contribution on StackOverflow ",
+            d: "Diagram of features used in all Q&A communities"
+          }
+        },
+        In_the_Commenting_effect_on_knowledge_contribution_section_which_of_the_studies_cited_support_the_notion_that_peer_comments_will_increase_users_knowledge_contribution:
+          {
+            stem: `7. In the Commenting effect on knowledge contribution section, which of the studies cited support the notion that peer comments will increase users’ knowledge contribution?`,
+            answers: ["a", "b", "c", "d"],
+            choices: {
+              a: "Chen, 2019 ",
+              b: "Guan et al, 2018 ",
+              c: "Chang & Chuang, 2011 ",
+              d: "Tajfel & Turner, 1986 "
+            }
+          },
+        In_H2_they_hypothesize_that_knowledge_seeking_has_what_type_of_effect_on_knowledge_contribution: {
+          stem: `8. In H2 they hypothesize that knowledge-seeking has what type of effect on knowledge contribution?`,
+          answers: ["c"],
+          choices: {
+            a: "Negative",
+            b: "Positive",
+            c: "Does not specify"
+          }
+        },
+        In_the_subsection_Answer_received_effect_on_knowledge_contribution_which_cited_study_disagrees_with_hypothesis_7_H7:
+          {
+            stem: `9. In the subsection Answer received effect on knowledge contribution, which cited study disagrees with hypothesis 7 (H7)?`,
+            answers: ["c"],
+            choices: {
+              a: "Negative",
+              b: "Positive",
+              c: "Does not specify"
+            }
+          },
+
+        How_many_users_data_were_used_in_the_study: {
+          stem: `10. How many users’ data were used in the study?`,
+          answers: ["d"],
+          choices: {
+            a: "Entire population of users on StackOverflow ",
+            b: "13,376 ",
+            c: "199,190 ",
+            d: "304"
+          }
+        },
+        what_was_the_criteria_for_an_active_user: {
+          stem: `11. What was the criteria for an active user?`,
+          answers: ["c"],
+          choices: {
+            a: "Asked one question and provided two answers at least once a month ",
+            b: "Accessed the website at least once every three months ",
+            c: "Asked a question, provided an answer, or wrote a comment at least once in three months ",
+            d: "Generated at least 10 up-votes per month "
+          }
+        },
+        Which_of_the_following_explanatory_variables_had_a_statistically_significant_negative_effect_on_knowledge_contribution:
+          {
+            stem: `12. Which of the following explanatory variables had a statistically significant negative effect on knowledge contribution?`,
+            answers: ["a", "d"],
+            choices: {
+              a: "Upvotes ",
+              b: "Bronze badge",
+              c: "Favorite votes",
+              d: "Peeve votes "
+            }
+          },
+        What_hypotheses_are_supported: {
+          stem: `13. What hypotheses are supported?`,
+          answers: ["c"],
+          choices: {
+            a: "Only H1,2,3, and 5 ",
+            b: "Only 1, 2, 4,6 and 7 ",
+            c: "All of the hypotheses were supported",
+            d: "None of them were supported"
+          }
+        },
+        Which_of_the_following_voting_features_have_a_positive_effect_on_knowledge_contribution_Increases_contribution:
+          {
+            stem: `14. Which of the following voting features have a positive effect on knowledge contribution(i.e. Increases contribution)?`,
+            answers: ["b", "c"],
+            choices: {
+              a: "Upvotes",
+              b: "Favorite votes",
+              c: "Downvotes",
+              d: "Peeve votes"
+            }
+          },
+        What_do_the_authors_speculate_is_the_reason_behind_the_relationship_between_upvotes_and_knowledge_contribution:
+          {
+            stem: `15. What do the authors speculate is the reason behind the relationship between upvotes and knowledge contribution?`,
+            answers: ["d"],
+            choices: {
+              a: "Users begin to feel competitive with other high point earners ",
+              b: "Users begin to feel that they have adequately served their community as they obtain more upvotes ",
+              c: "Users become increasingly confident in their knowledge and ability to answer questions ",
+              d: "Users that receive many upvotes become conscious and protective of their reputation "
+            }
+          },
+      }
+    }
+  },
   Liaison_Librarians: {}
 };
 export default communitiesPapers;
