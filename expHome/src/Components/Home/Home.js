@@ -1,9 +1,7 @@
-import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useRef, useState } from "react";
 
 import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
@@ -21,7 +19,6 @@ import {
   MenuItem,
   Skeleton,
   Stack,
-  Tab,
   Tooltip,
   Typography,
   useMediaQuery
@@ -32,11 +29,12 @@ import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms"
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { MemoizedTableOfContent } from "./modules/components/TableOfContent";
-import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { gray02 } from "./modules/views/WhoWeAre";
 import { useInView } from "./modules/hooks/useObserver";
+import { HeroMemoized } from "./modules/views/Hero";
+import Which from "./modules/views/Which";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -45,15 +43,50 @@ const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
 const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
 const HEADER_HEIGTH = 70;
+export const gray03 = "#AAAAAA";
 
 const section1ArtBoards = [
   { name: "artboard-1", durationMs: 1000, getHeight: vh => vh - HEADER_HEIGTH, color: "#ff28c9" }
 ];
 const artboards = [
-  { name: "Summarizing", durationMs: 7000, getHeight: vh => 6 * vh, color: "#f33636" },
-  { name: "Linking", durationMs: 24000, getHeight: vh => 8 * vh, color: "#f38b36" },
-  { name: "Evaluating", durationMs: 4000, getHeight: vh => 5 * vh, color: "#e6f336" },
-  { name: "Improving", durationMs: 14000, getHeight: vh => 8 * vh, color: "#62f336" }
+  {
+    name: "Summarizing",
+    artoboard: "artboard-3",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#f33636",
+    description: `We gather valuable information from various sources such as books, articles, and videos, and divide it into granular pieces. We then combine these pieces into concise notes that focus on a single concept. \nTraditional note-taking methods often only benefit the individual for a short period of time, typically for a semester or two. 1Cademy's collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics. \nThrough this process, we aim to improve the notes semester by semester, making the learning experience more efficient for all. This way, students can spend less time on note-taking and gain the most benefit from the notes.`,
+  },
+  {
+    name: "Linking",
+    artoboard: "artboard-4",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#f38b36",
+    description: `Our notes, which are organized in granular pieces, can be transformed into a knowledge graph that visually illustrates the hierarchical relationships between concepts. The linking of concepts is beneficial as it helps us understand how concepts relate to one another and their place in broader topics, fields, or disciplines. All concepts are linked in a logical and ordered manner, starting with the broadest concepts and progressing to the most specific. \nThis step-by-step approach allows us to take a concept we don't understand and trace it back to its prerequisite concepts until we have the necessary knowledge to comprehend it. Additionally, once we understand a concept, we can follow links to more specific concepts to deepen our understanding. These step-by-step learning pathways provide the necessary context when we don't understand something and allow us to delve deeper if we want to learn more.
+    `,
+  },
+  {
+    name: "Voting",
+    artoboard: "artboard-5",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#e6f336",
+    description: `To ensure the quality of the knowledge graph on 1Cademy, we have implemented a peer-review process. Each individual concept, represented as a node, can be voted on by members of the community, and the score of the node will determine its level of modification or the possibility of deletion. \nNodes that receive a significant number of negative votes will be removed as unhelpful. Additionally, 1Cademy uses a reputation system to incentivize high-quality contributions and discourage unhelpful or idle behavior. Users who contribute helpful content and whose nodes receive positive votes will see their reputation increase. \nConversely, users who post unhelpful content or are inactive will see their reputation decrease. This system encourages the development of a high-quality knowledge graph that can benefit a large number of learners and researchers.`,
+  },
+  {
+    name: "Improving",
+    artoboard: "artboard-6",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#62f336",
+    description: `We work together to improve the knowledge presented by continually updating and refining concepts. For each node, there are multiple versions proposed by different people. \nThe community can then vote on each proposed version. Voting allows the community to disapprove of changes that are unhelpful or to approve of changes that would improve the existing version of the node. \nUsers can upvote or downvote the proposed version of a node, which is then compared to the votes received by the existing version of the node. If a proposal receives enough positive votes in comparison to the votes of the existing node, it will be accepted and the node will be updated. In this way, the community collaborates and perpetually improves the knowledge available.`,
+  },
+  {
+    name: "Magnitude",
+    artoboard: "artboard-7",
+    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    color: "#36f3c4",
+    description: `Over the past two years, [1,529] students and researchers from [183] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [44,665] nodes and [235,674] prerequisite links between them, which have been proposed through [88,167] proposals. \nAs a result of this collaboration, [49] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
+    getDescription: ({ users, institutions, nodes, links, proposals, communities }) =>
+      `Over the past two years, [${users}] students and researchers from [${institutions}] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [${nodes}] nodes and [${links}] prerequisite links between them, which have been proposed through [${proposals}] proposals. \nAs a result of this collaboration, [${communities}] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
+  },
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -67,12 +100,14 @@ const sectionsTmp = [
     children: [
       { id: "animation1", title: "Summarizing", simpleTitle: "Summarizing" },
       { id: "animation2", title: "Linking", simpleTitle: "Linking" },
-      { id: "animation3", title: "Evaluating", simpleTitle: "Evaluating" },
-      { id: "animation4", title: "Improving", simpleTitle: "Improving" }
-    ]
+      { id: "animation3", title: "Voting", simpleTitle: "Voting" },
+      { id: "animation4", title: "Improving", simpleTitle: "Improving" },
+      { id: "animation5", title: "Magnitude", simpleTitle: "Magnitude" },
+    ],
   },
   { id: "ValuesSection", title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
   { id: "CommunitiesSection", title: "What we study?", simpleTitle: "What?", children: [] },
+  { id: "WhichSection", title: "Which systems?", simpleTitle: "Which?", children: [] },
   { id: "SchoolsSection", title: "Where Are We?", simpleTitle: "Where?", children: [] },
   { id: "WhoWeAreSection", title: "Who Is Behind 1Cademy?", simpleTitle: "Who?", children: [] },
   { id: "JoinUsSection", title: "Apply to Join Us!", simpleTitle: "Apply", children: [] }
@@ -86,110 +121,26 @@ function Index() {
   const [email, setEmail] = useRecoilState(emailState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
-  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const [notAResearcher, /* setNotAResearcher */] = useRecoilState(notAResearcherState);
   const navigateTo = useNavigate();
-  const [idxRiveComponent, setIdxRiveComponent] = useState(0);
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isMovil = useMediaQuery("(max-width:600px)");
-  const [showLandingOptions, setShowLandingOptions] = useState(true);
-  const [showAnimationOptions, setShowAnimationOptions] = useState(false);
   const [animationSelected, setSelectedAnimation] = useState(0);
 
-
+  const { entry: homeEntry, inView: homeInView, ref: HomeSectionRef } = useInView();
   const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
   const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
   const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
   const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
+  const { entry: whichEntry, inViewOnce: whichInViewOnce, ref: whichSectionRef } = useInView({})
   const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
+  const { inViewOnce: tableOfContentInViewOnce, ref: TableOfContentRef } = useInView();
 
+
+  const animationRefs = useRef(null);
   const { height, width } = useWindowSize();
-
-  const { rive: rive1, RiveComponent: RiveComponent1 } = useRive({
-    src: "artboard-1.riv",
-    artboard: "artboard-1",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-
-  const { rive: rive2, RiveComponent: RiveComponent2 } = useRive({
-    src: "artboard-2.riv",
-    artboard: "artboard-2",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive3, RiveComponent: RiveComponent3 } = useRive({
-    src: "artboard-3.riv",
-    artboard: "artboard-3",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive4, RiveComponent: RiveComponent4 } = useRive({
-    src: "artboard-4.riv",
-    artboard: "artboard-4",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive5, RiveComponent: RiveComponent5 } = useRive({
-    src: "artboard-5.riv",
-    artboard: "artboard-5",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive6, RiveComponent: RiveComponent6 } = useRive({
-    src: "artboard-6.riv",
-    artboard: "artboard-6",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-
-  useEffect(() => {
-    if (!rive1) return;
-    rive1.reset({ artboard: "artboard-1" });
-    rive1.scrub("Timeline 1", 0);
-    rive1.play();
-  }, [rive1]);
- 
-  // const sectionAnimationControllerRef = useRef(null);
-  const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
-
-  // useEffect(() => {
-  //   if (!whyEntry) return
-  //   if (!whatEntry) return
-  //   if (!whereEntry) return
-  //   if (!whoEntry) return
-  //   if (!joinEntry) return
-
-  //   console.log({
-  //     whyEntry: whyEntry.target.clientHeight,
-  //     whatEntry: whatEntry.target.clientHeight,
-  //     whereEntry: whereEntry.target.clientHeight,
-  //     whoEntry: whoEntry.target.clientHeight,
-  //     joinEntry: joinEntry.target.clientHeight,
-  //   })
-  // }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
-
-  // const step0Ref = useRef(null);
-  
-  const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
-    const res = childrenPosistions.reduce(
-      (acu, cur, idx) => {
-        const initialAnimationHeight = acu.height + cur.height;
-        if (initialAnimationHeight > scrollPosition) return acu;
-        return { height: initialAnimationHeight, idx };
-      },
-      { height: initialSectionHeight, idx: -1 }
-    );
-
-    return res.idx;
-  };
 
   const scrollToSection = ({ height, sectionSelected }) => {
     window.document.getElementById("ScrollableContainer").scroll({ top: height, left: 0, behavior: "smooth" });
@@ -198,44 +149,48 @@ function Index() {
   };
 
   const getSectionHeights = useCallback(() => {
-    if (!HomeSectionRef?.current) return null;
+    if (!homeEntry) return null;
     if (!howSectionRef?.current) return null;
     if (!whyEntry) return null;
     if (!whatEntry) return null;
     if (!whereEntry) return null;
+    if (!whichEntry) return null;
     if (!whoEntry) return null;
     if (!joinEntry) return null;
 
     return [
-      { id: HomeSectionRef.current.id, height: 0 },
-      { id: howSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
-      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: homeEntry.target.id, height: 0 },
+      { id: howSectionRef.current.id, height:homeEntry.target.clientHeight },
+      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight  },
       { id: whatEntry.target.id, height: whyEntry.target.clientHeight },
-      { id: whereEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whichEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whereEntry.target.id, height: whichEntry.target.clientHeight },
       { id: whoEntry.target.id, height: whereEntry.target.clientHeight },
       { id: joinEntry.target.id, height: whoEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
+  }, [homeEntry, joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getSectionPositions = useCallback(() => {
-    if (!HomeSectionRef?.current) return null;
+    if (!homeEntry?.current) return null;
     if (!howSectionRef?.current) return null;
     if (!whyEntry) return null;
     if (!whatEntry) return null;
+    if (!whichEntry) return null;
     if (!whereEntry) return null;
     if (!whoEntry) return null;
     if (!joinEntry) return null;
 
     return [
-      { id: HomeSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
-      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: homeEntry.target.id, height: homeEntry.target.clientHeight },
+      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight},
       { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whichEntry.target.id, height: whichEntry.target.clientHeight },
       { id: whereEntry.target.id, height: whereEntry.target.clientHeight },
       { id: whoEntry.target.id, height: whoEntry.target.clientHeight },
       { id: joinEntry.target.id, height: joinEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
+  }, [homeEntry, joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getAnimationsHeight = useCallback(() => {
     const res = artboards.map(artboard => artboard.getHeight(height));
@@ -247,11 +202,13 @@ function Index() {
   }, [height]);
 
   const detectScrollPosition = useCallback(
-    (event, { rive1, rive2, rive3, rive4, rive5, rive6 }) => {
-      if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6) return;
+    (event) => {
+      if (!animationRefs.current) return;
       if (notSectionSwitching) {
         const currentScrollPosition = event.target.scrollTop;
         const sectionsHeight = getSectionPositions();
+        if (!sectionsHeight) return;
+
         const { min, idx: idxSection } = sectionsHeight.reduce(
           (acu, cur, idx) => {
             if (acu.max > currentScrollPosition) return acu;
@@ -266,10 +223,17 @@ function Index() {
         if (idxSection === 0) {
           animationsHeight = [section1ArtBoards[0].getHeight(height)];
         } else {
-          animationsHeight = getAnimationsPositions();
+          const animationsHeightsArray = [
+            animationRefs.current.getHeight1(),
+            animationRefs.current.getHeight2(),
+            animationRefs.current.getHeight3(),
+            animationRefs.current.getHeight4(),
+            animationRefs.current.getHeight5(),
+          ];
+          animationsHeight = getAnimationsPositions(animationsHeightsArray);
         }
 
-        const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce(
+        const { /* maxAnimation, minAnimation, */ idxAnimation } = animationsHeight.reduce(
           (acu, cur, idx) => {
             if (acu.maxAnimation > currentScrollPosition) return acu;
             return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx };
@@ -280,78 +244,18 @@ function Index() {
         const sectionSelected = sectionsTmp[idxSection];
 
         if (window.location.hash !== `#${sectionSelected.id}`) {
-          console.log("repeeat")
           window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
         }
         setSelectedSection(idxSection);
         setSelectedAnimation(idxAnimation);
-
-        let showLandingOptions = false;
-        let showEndAnimationOptions = false;
-
-        if (idxAnimation < 0) return;
-
-        if (idxSection === 0) {
-          const lowerAnimationLimit = minAnimation;
-          const upperAnimationLimit = maxAnimation;
-          const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
-          const positionFrame = currentScrollPosition - lowerAnimationLimit;
-          const percentageFrame = (positionFrame * 100) / rangeFrames;
-          if (percentageFrame < 50) {
-            setIdxRiveComponent(0);
-          } else {
-            const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
-            const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
-            const newPercentageFrame = (newPositionFrame * 100) / rangeFrames;
-            const timeInSeconds = ((1000 / 1000) * newPercentageFrame) / 100;
-            advanceAnimationTo(rive2, timeInSeconds);
-
-            setIdxRiveComponent(1);
-          }
-
-          if (percentageFrame < 5) {
-            showLandingOptions = true;
-          }
-        }
-
-        if (idxSection === SECTION_WITH_ANIMATION) {
-          setIdxRiveComponent(idxAnimation + 2);
-          const lowerAnimationLimit = minAnimation;
-          const upperAnimationLimit = maxAnimation;
-          const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
-          const positionFrame = currentScrollPosition - lowerAnimationLimit;
-          const percentageFrame = (positionFrame * 100) / rangeFrames;
-
-          const timeInSeconds = (artboards[idxAnimation].durationMs * percentageFrame) / (1000 * 100);
-
-          if (idxAnimation === 0) {
-            advanceAnimationTo(rive3, timeInSeconds);
-          }
-          if (idxAnimation === 1) {
-            advanceAnimationTo(rive4, timeInSeconds);
-          }
-          if (idxAnimation === 2) {
-            advanceAnimationTo(rive5, timeInSeconds);
-          }
-          if (idxAnimation === 3) {
-            advanceAnimationTo(rive6, timeInSeconds);
-            if (percentageFrame > 50) {
-              showEndAnimationOptions = true;
-            }
-          }
-        }
-
-        // update options display
-        setShowLandingOptions(showLandingOptions);
-        setShowAnimationOptions(showEndAnimationOptions);
       }
     },
-    [getAnimationsPositions, getSectionPositions, height, setSelectedSection, notSectionSwitching]
+    [getAnimationsPositions, getSectionPositions, height, notSectionSwitching]
   );
-
+ 
   const switchSection = useCallback(
-    (sectionIdx, animationIndex = 0) => {
-      if (!rive3 || !rive4 || !rive5 || !rive6) return;
+    (sectionIdx, animationIndex = -1) => {
+      if (!animationRefs.current) return;
 
       setNotSectionSwitching(false);
       const sectionsHeight = getSectionHeights();
@@ -362,35 +266,24 @@ function Index() {
 
       let cumulativeAnimationHeight = 0;
 
-      const animationsHeight = getAnimationsHeight();
+      const animationsHeights = [
+        animationRefs.current.getHeight1(),
+        animationRefs.current.getHeight2(),
+        animationRefs.current.getHeight3(),
+        animationRefs.current.getHeight4(),
+        animationRefs.current.getHeight5(),
+      ];
+      const animationsHeight = getAnimationsHeight(animationsHeights);
+
       if (animationsHeight) {
-        const previousAnimationHeight = animationsHeight.slice(0, animationIndex + 1);
-        cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c);
+        if (animationIndex >= 0) {
+          const animationSectionTitleHeight = 121;
+          const previousAnimationHeight = animationsHeight.slice(0, animationIndex + 1);
+          cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c, animationSectionTitleHeight);
+        }
       }
       const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight;
       scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[sectionIdx] });
-
-      // setSelectedSection(sectionIdx);
-      if (sectionIdx === 0) {
-        setShowLandingOptions(true);
-        setIdxRiveComponent(animationIndex);
-      }
-      if (sectionIdx === SECTION_WITH_ANIMATION) {
-        setIdxRiveComponent(animationIndex + 2);
-        // reset animation when jump through sections
-        if (animationIndex === 0) {
-          rive3.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 1) {
-          rive4.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 2) {
-          rive5.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 3) {
-          rive6.scrub("Timeline 1", 0);
-        }
-      }
 
       setSelectedSection(sectionIdx);
       setSelectedAnimation(animationIndex);
@@ -399,14 +292,9 @@ function Index() {
         setNotSectionSwitching(true);
       }, 1000);
     },
-    [getAnimationsHeight, getSectionHeights, rive3, rive4, rive5, rive6]
+    [getAnimationsHeight, getSectionHeights]
   );
 
-
-  const homeClick = event => {
-    event.preventDefault();
-    switchSection(-1);
-  };
 
   const joinUsClick = event => {
     event.preventDefault();
@@ -462,29 +350,10 @@ function Index() {
     navigateTo("/auth");
   };
 
-  const LinkTab = props => {
-    return (
-      <Tooltip title={props.titl}>
-        <Tab
-          onClick={event => {
-            event.preventDefault();
-            props.onClick(event);
-          }}
-          color="inherit"
-          {...props}
-        />
-      </Tooltip>
-    );
-  };
-
-  const thisPage = useMemo(() => {
-    return sectionSelected === sectionsOrder.length - 2 ? "Apply!" : undefined;
-  }, [sectionSelected]);
-
   return (
     <Box
       id="ScrollableContainer"
-      onScroll={e => detectScrollPosition(e, { rive1, rive2, rive3, rive4, rive5, rive6 })}
+      onScroll={e => detectScrollPosition(e)}
       sx={{
         height: "100vh",
         overflowY: "auto",
@@ -642,7 +511,7 @@ function Index() {
         <Box
           sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}
         >
-          <Box sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
+          <Box  ref={TableOfContentRef}  className={tableOfContentInViewOnce ? "slide-left-to-right" : "hide"} sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
             <MemoizedTableOfContent
               menuItems={sectionsTmp}
               viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
@@ -653,84 +522,36 @@ function Index() {
           </Box>
         </Box>
 
-        <Stack
-          ref={HomeSectionRef}
-          spacing={width < 900 ? "10px" : "20px"}
-          direction={"column"}
-          alignItems={"center"}
-          justifyContent="flex-end"
-          sx={{
-            height: "calc(100vh - 70px)",
-            width: "100%",
-            position: "absolute",
-            top: 0,
-            padding: width < 900 ? "10px" : "20px",
-            backgroundColor: "#1d1102",
-            backgroundImage: `url(${backgroundImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
-          }}
-        >
-          <Typography
-            color="white"
-            variant="h5"
-            sx={{ textAlign: "center" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            WHERE WE TAKE NOTES <b>TOGETHER</b>.
-          </Typography>
-          <Button
-            color="secondary"
-            variant="contained"
-            size={width < 900 ? "small" : "large"}
-            component="a"
-            href="#JoinUsSection"
-            sx={{ minWidth: 200, color: "common.white" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            Apply to Join Us!
-          </Button>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", alignItems: "center", color: "common.white" }}
-            className={showLandingOptions ? "show-blurred-text" : "hide-content"}
-          >
-            {height > 500 && "Scroll"}
-            <KeyboardDoubleArrowDownIcon fontSize={width < 900 ? "small" : "medium"} />
-          </Box>
-        </Stack>
+        <Box ref={HomeSectionRef} component="section">
+          <HeroMemoized />
+        </Box>
 
-        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" }}>
-          <Box id={sectionsOrder[1].id} ref={howSectionRef}>
+
+        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",pt:"32px"}}>
+          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }} >
+          
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+              {sectionsOrder[1].title}
+            </CustomTypography>
             <HowItWorks
+              ref={animationRefs}
               section={sectionSelected}
-              // ref={sectionAnimationControllerRef}
-              artboards={[...section1ArtBoards, ...artboards]}
+              artboards={artboards}
               animationOptions={
                 <Button
-                  color="secondary"
                   variant="contained"
                   size={width < 900 ? "small" : "large"}
                   component="a"
-                  href="#JoinUsSection"
-                  sx={{ minWidth: 200, color: "common.white" }}
-                  className={showAnimationOptions ? "show-blurred-text" : "hide-content"}
+                  href="https://1cademy.us/#JoinUsSection"
+                  target="_blank"
+                  sx={{ minWidth: 200, textTransform: "uppercase" }}
                 >
                   Apply to Join Us!
                 </Button>
               }
-            >
-              <Box sx={{ position: "relative", width: "inherit", height: "inherit" }}>
-                <RiveComponent1 className={`rive-canvas ${idxRiveComponent !== 0 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent2 className={`rive-canvas ${idxRiveComponent !== 1 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent3 className={`rive-canvas ${idxRiveComponent !== 2 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent4 className={`rive-canvas ${idxRiveComponent !== 3 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent5 className={`rive-canvas ${idxRiveComponent !== 4 ? "rive-canvas-hidden" : ""}`} />
-                <RiveComponent6 className={`rive-canvas ${idxRiveComponent !== 5 ? "rive-canvas-hidden" : ""}`} />
-              </Box>
-            </HowItWorks>
+            />
           </Box>
-          <Box id={sectionsOrder[2].id} ref={whySectionRef }  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[2].id} ref={whySectionRef }   sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
@@ -756,8 +577,8 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ py: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ pb: 10 }} >
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
@@ -783,9 +604,46 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={whereSectionRef}  sx={{ py: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ pb: 10 }} >
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
               {sectionsOrder[4].title}
+            </CustomTypography>
+            {!whichInViewOnce ? (
+              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
+            ) : (
+              <Suspense
+                fallback={
+                  <Box
+                    sx={{
+                      pt: 7,
+                      pb: 10,
+                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Grid container spacing={2.5}>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                }
+              >
+                <Which />
+              </Suspense>
+            )}
+          </Box>
+          <Box id={sectionsOrder[5].id} ref={whereSectionRef} sx={{ pb: 10 }} >
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+              {sectionsOrder[5].title}
             </CustomTypography>
             {!whereInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "green" */ }}></div>
@@ -797,9 +655,9 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={whoSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[6].id} ref={whoSectionRef}  sx={{ pb: 10 }} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[5].title}
+              {sectionsOrder[6].title}
             </CustomTypography>
             {!whoInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "pink" */ }}></div>
@@ -834,9 +692,9 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={JoinSectionRef} sx={{ py: 10 }}>
+          <Box id={sectionsOrder[7].id} ref={JoinSectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[6].title}
+              {sectionsOrder[7].title}
             </CustomTypography>
             {!joinInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "#b4f5ea" */ }}></div>
@@ -858,12 +716,12 @@ function Index() {
 
 export default withRoot(Index);
 
-const advanceAnimationTo = (rive, timeInSeconds) => {
-  if (!rive?.animator?.animations[0]) return;
+// const advanceAnimationTo = (rive, timeInSeconds) => {
+//   if (!rive?.animator?.animations[0]) return;
 
-  const Animator = rive.animator.animations[0];
-  Animator.instance.time = 0;
-  Animator.instance.advance(timeInSeconds);
-  Animator.instance.apply(1);
-  rive.startRendering();
-};
+//   const Animator = rive.animator.animations[0];
+//   Animator.instance.time = 0;
+//   Animator.instance.advance(timeInSeconds);
+//   Animator.instance.apply(1);
+//   rive.startRendering();
+// };

@@ -10,6 +10,7 @@ import Typography from "../components/Typography";
 import communities from "./communitiesOrder";
 
 import sectionsOrder from "./sectionsOrder";
+import { useInView } from "../hooks/useObserver";
 const sectionIdx = sectionsOrder.findIndex(
   (sect) => sect.id === "CommunitiesSection"
 );
@@ -65,24 +66,69 @@ const ImageIconButton = styled(ButtonBase)(({ theme }) => ({
 const goToCommPage = (commId) => (event) => {
   window.open("/community/" + commId, "_blank");
 };
+const observerOption = { options: { root: null, rootMargin: "0px", threshold: 0.3 } };
 
 const What = (props) => {
+
+  const { inViewOnce: whatItem01InViewOnce, ref: whatItem01Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem02InViewOnce, ref: whatItem02Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem03InViewOnce, ref: whatItem03Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem04InViewOnce, ref: whatItem04Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem05InViewOnce, ref: whatItem05Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem06InViewOnce, ref: whatItem06Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem07InViewOnce, ref: whatItem07Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem08InViewOnce, ref: whatItem08Ref } = useInView(observerOption);
+  const { inViewOnce: whatItem09InViewOnce, ref: whatItem09Ref } = useInView(observerOption);
+
+
+  const refs = [
+    whatItem01Ref,
+    whatItem02Ref,
+    whatItem03Ref,
+    whatItem04Ref,
+    whatItem05Ref,
+    whatItem06Ref,
+    whatItem07Ref,
+    whatItem08Ref,
+    whatItem09Ref,
+
+  ];
+
+  const inViewOnces = [
+    whatItem01InViewOnce,
+    whatItem02InViewOnce,
+    whatItem03InViewOnce,
+    whatItem04InViewOnce,
+    whatItem05InViewOnce,
+    whatItem06InViewOnce,
+    whatItem07InViewOnce,
+    whatItem08InViewOnce,
+    whatItem09InViewOnce,
+
+  ];
+
   return (
     <Box
-      id="CommunitiesSection"
+      // id="CommunitiesSection"
       component="section"
-     
     >
-      {/* <Typography variant="h4" marked="center" align="center" sx={{ mb: 7, color: "#f8f8f8" }}>
+      {/* <Typography variant="h4" marked="center" align="center" sx={{ mb: 7 }}>
         {sectionsOrder[sectionIdx].title}
       </Typography> */}
-      <Box sx={{  display: "flex", flexWrap: "wrap" }}>
-        {communities.map((communi, idx) => (
+      <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+        {communities.map((community, idx) => (
+          // <Box >
           <ImageIconButton
-            key={communi.id}
-            onClick={goToCommPage(communi.id)}
+            key={community.id}
+            ref={refs[idx]}
+            className={
+              inViewOnces[idx]
+                ? `slide-bottom-top ${idx % 3 === 1 ? "delay-300ms" : idx % 3 === 2 ? "delay-600ms" : ""}`
+                : "hide"
+            }
+            onClick={() => goToCommPage(community.id)}
             style={{
-              width: communi.width,
+              width: community.width,
             }}
           >
             <Box
@@ -94,7 +140,7 @@ const What = (props) => {
                 bottom: 0,
                 backgroundSize: "cover",
                 backgroundPosition: "center 40%",
-                backgroundImage: `url(${communi.url})`,
+                backgroundImage: `url(${community.url})`,
               }}
             />
             <ImageBackdrop className="imageBackdrop" />
@@ -106,34 +152,21 @@ const What = (props) => {
                 top: 0,
                 bottom: 0,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 color: "common.white",
               }}
             >
-              <Typography
-                component="h3"
-                variant="h6"
-                color="inherit"
-                className="imageTitle"
-              >
-                {communi.title}
-                {/* Adding the number of members, nodes, and links to the community buttons in the homepage.
-                <br />
-                {nodesLoaded && (
-                  <Typography
-                    variant="body2"
-                    color="inherit"
-                    sx={{ textTransform: "none" }}
-                  >
-                    220 Members - {teams[communi.id].nodes} Nodes -{" "}
-                    {teams[communi.id].links} Links
-                  </Typography>
-                )} */}
-                <div className="imageMarked" />
-              </Typography>
+              <Box className="imagepTitle">
+                <Typography component="h3" variant="h6" sx={{ color: "inherit" }}>
+                  {community.title}
+                </Typography>
+              </Box>
+              <div className="imageMarked"></div>
             </Box>
           </ImageIconButton>
+          // </Box>
         ))}
       </Box>
     </Box>

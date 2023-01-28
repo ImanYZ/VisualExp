@@ -1,29 +1,24 @@
 import React, { useState, useEffect, Suspense } from "react";
 
-import { useRecoilValue } from "recoil";
 
-import Container from "@mui/material/Container";
-import Typography from "../../components/Typography";
 
 import "./UniversitiesMap.css";
 import { Box } from "@mui/material";
 import { firebaseOne } from "../../../../firebase/firebase";
+import { useInView } from "../../hooks/useObserver";
 
 const GoogleMapCom = React.lazy(() => import("./GoogleMapCom"));
 
-const UniversitiesMap = (props) => {
+const UniversitiesMap = props => {
   const { db } = firebaseOne;
   const [institutions, setInstitutions] = useState([]);
-
+  const { inViewOnce: universityMapInViewOnce, ref: universityMapRef } = useInView();
 
   useEffect(() => {
     const fetchInstitutions = async () => {
-      const institutionsCollection = await db
-        .collection("institutions")
-        .where("hasLogo", "==", true)
-        .get();
+      const institutionsCollection = await db.collection("institutions").where("hasLogo", "==", true).get();
       let institutionsDataList = [];
-      institutionsCollection.docs.map((institution) => {
+      institutionsCollection.docs.forEach(institution => {
         const institutionInfo = institution.data();
         institutionsDataList.push(institutionInfo);
       });
@@ -32,9 +27,7 @@ const UniversitiesMap = (props) => {
     if (firebaseOne) {
       fetchInstitutions();
     }
-  }, [firebaseOne]);
-
-
+  }, [db]);
 
   // console.log(institutions);
   // // API KEY: AIzaSyAl1Lfmndsmvax6PZVH48nwV0kEaBOVgDE
@@ -77,7 +70,13 @@ const UniversitiesMap = (props) => {
   // ));
 
   return (
-    <Box id="SchoolsSection" component="section" sx={{ minHeight:400 }}>
+    <Box
+      id="SchoolsSection"
+      ref={universityMapRef}
+      className={universityMapInViewOnce ? "slide-bottom-top" : "hide"}
+      component="section"
+      sx={{ minHeight: 400 }}
+    >
       <div className="UniversitiesAndColleges" ref={props.schoolsRef}>
         {/* <Typography
           variant="h4"
@@ -97,7 +96,7 @@ const UniversitiesMap = (props) => {
         </div>
       </div>
     </Box>
-  )
+  );
 };
 
 export default React.memo(UniversitiesMap);

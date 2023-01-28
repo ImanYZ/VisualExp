@@ -22,12 +22,17 @@ import EditIcon from "@mui/icons-material/Edit";
 import UMLogo from "../../../../assets/umsi-logo-vert-u.png";
 import GoogleCloud from "../../../../assets/GoogleCloud.svg";
 import HonorEducation from "../../../../assets/Honor_Education_Logo.jpeg";
+import { useInView } from "../hooks/useObserver";
 
-const gray01 = "#28282a"
 export const gray02 = "#202020"
 const gray03 = "#AAAAAA"
 
 const WhoWeAre = (props) => {
+
+  const { inViewOnce: paper1ViewOnce, ref: paper1Ref } = useInView();
+  const { inViewOnce: paper2ViewOnce, ref: paper2Ref } = useInView();
+  const { inViewOnce: paper3ViewOnce, ref: paper3Ref } = useInView();
+
   return (
     <Box
       id="WhoWeAreSection"
@@ -46,7 +51,8 @@ const WhoWeAre = (props) => {
       </Typography> */}
       <Grid container spacing={2.5} align="center">
         <Grid item xs={12} sm={6} md={4}>
-          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
+          <Paper   ref={paper1Ref}
+            className={paper1ViewOnce ? "slide-bottom-top" : "hide"} sx={{ backgroundColor: gray02, color: "#f8f8f8" }} >
             <Typography
               variant="h5"
               component="div"
@@ -191,7 +197,8 @@ const WhoWeAre = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
+          <Paper   ref={paper2Ref}
+            className={paper2ViewOnce ? "slide-bottom-top" : "hide"}sx={{ backgroundColor: gray02, color: "#f8f8f8" }} >
             <Typography
               variant="h5"
               component="div"
@@ -305,7 +312,8 @@ const WhoWeAre = (props) => {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={6} md={4}>
-          <Paper sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
+          <Paper  ref={paper3Ref}
+            className={paper3ViewOnce ? "slide-bottom-top" : "hide"} sx={{ backgroundColor: gray02, color: "#f8f8f8" }}>
             <List sx={{ width: "100%", }}>
               <ListItemButton
                 alignItems="flex-start"
