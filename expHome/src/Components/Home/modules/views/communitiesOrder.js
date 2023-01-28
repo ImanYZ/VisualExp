@@ -406,7 +406,7 @@ export default [
       `Strong desire and willingness to collaborate with others and engage in group discussions.`,
       `Willingness to present work at weekly meetings.`,
       `Fluency in writing and reading in English (will have to summarize research articles). `
-      
+
     ],
     responsibilities: [
       `Read and condense different modalities of research that relate to disabilities`,
@@ -417,7 +417,7 @@ export default [
       `Provide feedback`,
       `Collaborate on ideas`,
       `Participate in peer review`
-      
+
     ]
   },
   {
@@ -640,7 +640,7 @@ export default [
       `Top contributors to our community would have the opportunity to co-author research papers in the field. `,
       `All interactions, task fulfillment, and communications will be online. `,
       `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `,
-       
+
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
     hasTest: true,
