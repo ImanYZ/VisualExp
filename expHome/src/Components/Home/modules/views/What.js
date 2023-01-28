@@ -126,7 +126,7 @@ const What = (props) => {
                 ? `slide-bottom-top ${idx % 3 === 1 ? "delay-300ms" : idx % 3 === 2 ? "delay-600ms" : ""}`
                 : "hide"
             }
-            onClick={() => goToCommPage(community.id)}
+            onClick={goToCommPage(community.id)}
             style={{
               width: community.width,
             }}
