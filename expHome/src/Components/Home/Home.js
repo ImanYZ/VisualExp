@@ -1,9 +1,7 @@
-import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import backgroundImage from "../../assets/darkModeLibraryBackground.jpg";
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, useCallback, useRef, useState } from "react";
 
 import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
@@ -102,12 +100,14 @@ const sectionsTmp = [
     children: [
       { id: "animation1", title: "Summarizing", simpleTitle: "Summarizing" },
       { id: "animation2", title: "Linking", simpleTitle: "Linking" },
-      { id: "animation3", title: "Evaluating", simpleTitle: "Evaluating" },
-      { id: "animation4", title: "Improving", simpleTitle: "Improving" }
-    ]
+      { id: "animation3", title: "Voting", simpleTitle: "Voting" },
+      { id: "animation4", title: "Improving", simpleTitle: "Improving" },
+      { id: "animation5", title: "Magnitude", simpleTitle: "Magnitude" },
+    ],
   },
   { id: "ValuesSection", title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
   { id: "CommunitiesSection", title: "What we study?", simpleTitle: "What?", children: [] },
+  { id: "WhichSection", title: "Which systems?", simpleTitle: "Which?", children: [] },
   { id: "SchoolsSection", title: "Where Are We?", simpleTitle: "Where?", children: [] },
   { id: "WhoWeAreSection", title: "Who Is Behind 1Cademy?", simpleTitle: "Who?", children: [] },
   { id: "JoinUsSection", title: "Apply to Join Us!", simpleTitle: "Apply", children: [] }
@@ -121,25 +121,25 @@ function Index() {
   const [email, setEmail] = useRecoilState(emailState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
-  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const [notAResearcher, /* setNotAResearcher */] = useRecoilState(notAResearcherState);
   const navigateTo = useNavigate();
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isMovil = useMediaQuery("(max-width:600px)");
   const [animationSelected, setSelectedAnimation] = useState(0);
 
-
+  const { entry: homeEntry, inView: homeInView, ref: HomeSectionRef } = useInView();
   const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
   const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
   const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
   const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
   const { entry: whichEntry, inViewOnce: whichInViewOnce, ref: whichSectionRef } = useInView({})
   const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
+  const { inViewOnce: tableOfContentInViewOnce, ref: TableOfContentRef } = useInView();
 
 
   const animationRefs = useRef(null);
   const { height, width } = useWindowSize();
-  const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
 
   const scrollToSection = ({ height, sectionSelected }) => {
@@ -149,7 +149,7 @@ function Index() {
   };
 
   const getSectionHeights = useCallback(() => {
-    if (!HomeSectionRef?.current) return null;
+    if (!homeEntry) return null;
     if (!howSectionRef?.current) return null;
     if (!whyEntry) return null;
     if (!whatEntry) return null;
@@ -159,19 +159,19 @@ function Index() {
     if (!joinEntry) return null;
 
     return [
-      { id: HomeSectionRef.current.id, height: 0 },
-      { id: howSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
-      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: homeEntry.target.id, height: 0 },
+      { id: howSectionRef.current.id, height:homeEntry.target.clientHeight },
+      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight  },
       { id: whatEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whichEntry.target.id, height: whatEntry.target.clientHeight },
       { id: whereEntry.target.id, height: whichEntry.target.clientHeight },
       { id: whoEntry.target.id, height: whereEntry.target.clientHeight },
       { id: joinEntry.target.id, height: whoEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
+  }, [homeEntry, joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getSectionPositions = useCallback(() => {
-    if (!HomeSectionRef?.current) return null;
+    if (!homeEntry?.current) return null;
     if (!howSectionRef?.current) return null;
     if (!whyEntry) return null;
     if (!whatEntry) return null;
@@ -181,8 +181,8 @@ function Index() {
     if (!joinEntry) return null;
 
     return [
-      { id: HomeSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
-      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
+      { id: homeEntry.target.id, height: homeEntry.target.clientHeight },
+      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight},
       { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
       { id: whichEntry.target.id, height: whichEntry.target.clientHeight },
@@ -190,7 +190,7 @@ function Index() {
       { id: whoEntry.target.id, height: whoEntry.target.clientHeight },
       { id: joinEntry.target.id, height: joinEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
+  }, [homeEntry, joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getAnimationsHeight = useCallback(() => {
     const res = artboards.map(artboard => artboard.getHeight(height));
@@ -266,7 +266,6 @@ function Index() {
 
       let cumulativeAnimationHeight = 0;
 
-      // const animationsHeights = [animationRefs.current.getHeight1()];
       const animationsHeights = [
         animationRefs.current.getHeight1(),
         animationRefs.current.getHeight2(),
@@ -512,7 +511,7 @@ function Index() {
         <Box
           sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}
         >
-          <Box sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
+          <Box  ref={TableOfContentRef}  className={tableOfContentInViewOnce ? "slide-left-to-right" : "hide"} sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
             <MemoizedTableOfContent
               menuItems={sectionsTmp}
               viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
@@ -529,7 +528,7 @@ function Index() {
 
 
         <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",pt:"32px"}}>
-          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }}>
+          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }} >
           
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[1].title}
@@ -552,7 +551,7 @@ function Index() {
               }
             />
           </Box>
-          <Box id={sectionsOrder[2].id} ref={whySectionRef }  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[2].id} ref={whySectionRef }   sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
@@ -578,7 +577,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ pb: 10 }} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
               {sectionsOrder[3].title}
             </CustomTypography>
@@ -605,7 +604,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ py: 10 }}>
+          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ pb: 10 }} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
               {sectionsOrder[4].title}
             </CustomTypography>
@@ -642,7 +641,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={whereSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[5].id} ref={whereSectionRef} sx={{ pb: 10 }} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[5].title}
             </CustomTypography>
@@ -656,7 +655,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={whoSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[6].id} ref={whoSectionRef}  sx={{ pb: 10 }} >
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[6].title}
             </CustomTypography>
@@ -693,7 +692,7 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[7].id} ref={JoinSectionRef} sx={{ py: 10 }}>
+          <Box id={sectionsOrder[7].id} ref={JoinSectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[7].title}
             </CustomTypography>
