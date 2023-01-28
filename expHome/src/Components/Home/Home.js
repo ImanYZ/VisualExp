@@ -21,7 +21,6 @@ import {
   MenuItem,
   Skeleton,
   Stack,
-  Tab,
   Tooltip,
   Typography,
   useMediaQuery
@@ -32,12 +31,12 @@ import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms"
 import { useNavigate } from "react-router-dom";
 import { notAResearcherState } from "../../store/ProjectAtoms";
 import { MemoizedTableOfContent } from "./modules/components/TableOfContent";
-import { useRive } from "rive-react/dist";
 import { useWindowSize } from "./hooks/useWindowSize";
 import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { gray02 } from "./modules/views/WhoWeAre";
 import { useInView } from "./modules/hooks/useObserver";
 import { HeroMemoized } from "./modules/views/Hero";
+import Which from "./modules/views/Which";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -124,12 +123,9 @@ function Index() {
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
   const navigateTo = useNavigate();
-  const [idxRiveComponent, setIdxRiveComponent] = useState(0);
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isMovil = useMediaQuery("(max-width:600px)");
-  const [showLandingOptions, setShowLandingOptions] = useState(true);
-  const [showAnimationOptions, setShowAnimationOptions] = useState(false);
   const [animationSelected, setSelectedAnimation] = useState(0);
 
 
@@ -137,99 +133,14 @@ function Index() {
   const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
   const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
   const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
+  const { entry: whichEntry, inViewOnce: whichInViewOnce, ref: whichSectionRef } = useInView({})
   const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
 
 
   const animationRefs = useRef(null);
-
-
   const { height, width } = useWindowSize();
-
-  const { rive: rive1, RiveComponent: RiveComponent1 } = useRive({
-    src: "artboard-1.riv",
-    artboard: "artboard-1",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-
-  const { rive: rive2, RiveComponent: RiveComponent2 } = useRive({
-    src: "artboard-2.riv",
-    artboard: "artboard-2",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive3, RiveComponent: RiveComponent3 } = useRive({
-    src: "artboard-3.riv",
-    artboard: "artboard-3",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive4, RiveComponent: RiveComponent4 } = useRive({
-    src: "artboard-4.riv",
-    artboard: "artboard-4",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive5, RiveComponent: RiveComponent5 } = useRive({
-    src: "artboard-5.riv",
-    artboard: "artboard-5",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-  const { rive: rive6, RiveComponent: RiveComponent6 } = useRive({
-    src: "artboard-6.riv",
-    artboard: "artboard-6",
-    animations: "Timeline 1",
-    autoplay: false,
-    // onLoad: () => console.log("load-finish")
-  });
-
-  useEffect(() => {
-    if (!rive1) return;
-    rive1.reset({ artboard: "artboard-1" });
-    rive1.scrub("Timeline 1", 0);
-    rive1.play();
-  }, [rive1]);
- 
-  // const sectionAnimationControllerRef = useRef(null);
   const HomeSectionRef = useRef(null);
   const howSectionRef = useRef(null);
-
-  // useEffect(() => {
-  //   if (!whyEntry) return
-  //   if (!whatEntry) return
-  //   if (!whereEntry) return
-  //   if (!whoEntry) return
-  //   if (!joinEntry) return
-
-  //   console.log({
-  //     whyEntry: whyEntry.target.clientHeight,
-  //     whatEntry: whatEntry.target.clientHeight,
-  //     whereEntry: whereEntry.target.clientHeight,
-  //     whoEntry: whoEntry.target.clientHeight,
-  //     joinEntry: joinEntry.target.clientHeight,
-  //   })
-  // }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry])
-
-  // const step0Ref = useRef(null);
-  
-  const getChildrenIndexSelected = (initialSectionHeight, childrenPosistions, scrollPosition) => {
-    const res = childrenPosistions.reduce(
-      (acu, cur, idx) => {
-        const initialAnimationHeight = acu.height + cur.height;
-        if (initialAnimationHeight > scrollPosition) return acu;
-        return { height: initialAnimationHeight, idx };
-      },
-      { height: initialSectionHeight, idx: -1 }
-    );
-
-    return res.idx;
-  };
 
   const scrollToSection = ({ height, sectionSelected }) => {
     window.document.getElementById("ScrollableContainer").scroll({ top: height, left: 0, behavior: "smooth" });
@@ -243,6 +154,7 @@ function Index() {
     if (!whyEntry) return null;
     if (!whatEntry) return null;
     if (!whereEntry) return null;
+    if (!whichEntry) return null;
     if (!whoEntry) return null;
     if (!joinEntry) return null;
 
@@ -251,17 +163,19 @@ function Index() {
       { id: howSectionRef.current.id, height: HomeSectionRef.current.clientHeight },
       { id: whyEntry.target.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
       { id: whatEntry.target.id, height: whyEntry.target.clientHeight },
-      { id: whereEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whichEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whereEntry.target.id, height: whichEntry.target.clientHeight },
       { id: whoEntry.target.id, height: whereEntry.target.clientHeight },
       { id: joinEntry.target.id, height: whoEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
+  }, [joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getSectionPositions = useCallback(() => {
     if (!HomeSectionRef?.current) return null;
     if (!howSectionRef?.current) return null;
     if (!whyEntry) return null;
     if (!whatEntry) return null;
+    if (!whichEntry) return null;
     if (!whereEntry) return null;
     if (!whoEntry) return null;
     if (!joinEntry) return null;
@@ -271,11 +185,12 @@ function Index() {
       { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight - HomeSectionRef.current.clientHeight },
       { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
+      { id: whichEntry.target.id, height: whichEntry.target.clientHeight },
       { id: whereEntry.target.id, height: whereEntry.target.clientHeight },
       { id: whoEntry.target.id, height: whoEntry.target.clientHeight },
       { id: joinEntry.target.id, height: joinEntry.target.clientHeight }
     ];
-  }, [joinEntry, whatEntry, whereEntry, whoEntry, whyEntry]);
+  }, [joinEntry, whatEntry, whereEntry, whichEntry, whoEntry, whyEntry]);
 
   const getAnimationsHeight = useCallback(() => {
     const res = artboards.map(artboard => artboard.getHeight(height));
@@ -287,11 +202,13 @@ function Index() {
   }, [height]);
 
   const detectScrollPosition = useCallback(
-    (event, { rive1, rive2, rive3, rive4, rive5, rive6 }) => {
-      if (!rive1 || !rive2 || !rive3 || !rive4 || !rive5 || !rive6) return;
+    (event) => {
+      if (!animationRefs.current) return;
       if (notSectionSwitching) {
         const currentScrollPosition = event.target.scrollTop;
         const sectionsHeight = getSectionPositions();
+        if (!sectionsHeight) return;
+
         const { min, idx: idxSection } = sectionsHeight.reduce(
           (acu, cur, idx) => {
             if (acu.max > currentScrollPosition) return acu;
@@ -306,10 +223,17 @@ function Index() {
         if (idxSection === 0) {
           animationsHeight = [section1ArtBoards[0].getHeight(height)];
         } else {
-          animationsHeight = getAnimationsPositions();
+          const animationsHeightsArray = [
+            animationRefs.current.getHeight1(),
+            animationRefs.current.getHeight2(),
+            animationRefs.current.getHeight3(),
+            animationRefs.current.getHeight4(),
+            animationRefs.current.getHeight5(),
+          ];
+          animationsHeight = getAnimationsPositions(animationsHeightsArray);
         }
 
-        const { maxAnimation, minAnimation, idxAnimation } = animationsHeight.reduce(
+        const { /* maxAnimation, minAnimation, */ idxAnimation } = animationsHeight.reduce(
           (acu, cur, idx) => {
             if (acu.maxAnimation > currentScrollPosition) return acu;
             return { maxAnimation: acu.maxAnimation + cur, minAnimation: acu.maxAnimation, idxAnimation: idx };
@@ -320,78 +244,18 @@ function Index() {
         const sectionSelected = sectionsTmp[idxSection];
 
         if (window.location.hash !== `#${sectionSelected.id}`) {
-          console.log("repeeat")
           window.history.replaceState(null, sectionSelected.title, "#" + sectionSelected.id);
         }
         setSelectedSection(idxSection);
         setSelectedAnimation(idxAnimation);
-
-        let showLandingOptions = false;
-        let showEndAnimationOptions = false;
-
-        if (idxAnimation < 0) return;
-
-        if (idxSection === 0) {
-          const lowerAnimationLimit = minAnimation;
-          const upperAnimationLimit = maxAnimation;
-          const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
-          const positionFrame = currentScrollPosition - lowerAnimationLimit;
-          const percentageFrame = (positionFrame * 100) / rangeFrames;
-          if (percentageFrame < 50) {
-            setIdxRiveComponent(0);
-          } else {
-            const newLowerAnimationLimit = lowerAnimationLimit + rangeFrames / 2;
-            const newPositionFrame = currentScrollPosition - newLowerAnimationLimit;
-            const newPercentageFrame = (newPositionFrame * 100) / rangeFrames;
-            const timeInSeconds = ((1000 / 1000) * newPercentageFrame) / 100;
-            advanceAnimationTo(rive2, timeInSeconds);
-
-            setIdxRiveComponent(1);
-          }
-
-          if (percentageFrame < 5) {
-            showLandingOptions = true;
-          }
-        }
-
-        if (idxSection === SECTION_WITH_ANIMATION) {
-          setIdxRiveComponent(idxAnimation + 2);
-          const lowerAnimationLimit = minAnimation;
-          const upperAnimationLimit = maxAnimation;
-          const rangeFrames = upperAnimationLimit - lowerAnimationLimit;
-          const positionFrame = currentScrollPosition - lowerAnimationLimit;
-          const percentageFrame = (positionFrame * 100) / rangeFrames;
-
-          const timeInSeconds = (artboards[idxAnimation].durationMs * percentageFrame) / (1000 * 100);
-
-          if (idxAnimation === 0) {
-            advanceAnimationTo(rive3, timeInSeconds);
-          }
-          if (idxAnimation === 1) {
-            advanceAnimationTo(rive4, timeInSeconds);
-          }
-          if (idxAnimation === 2) {
-            advanceAnimationTo(rive5, timeInSeconds);
-          }
-          if (idxAnimation === 3) {
-            advanceAnimationTo(rive6, timeInSeconds);
-            if (percentageFrame > 50) {
-              showEndAnimationOptions = true;
-            }
-          }
-        }
-
-        // update options display
-        setShowLandingOptions(showLandingOptions);
-        setShowAnimationOptions(showEndAnimationOptions);
       }
     },
-    [getAnimationsPositions, getSectionPositions, height, setSelectedSection, notSectionSwitching]
+    [getAnimationsPositions, getSectionPositions, height, notSectionSwitching]
   );
-
+ 
   const switchSection = useCallback(
-    (sectionIdx, animationIndex = 0) => {
-      if (!rive3 || !rive4 || !rive5 || !rive6) return;
+    (sectionIdx, animationIndex = -1) => {
+      if (!animationRefs.current) return;
 
       setNotSectionSwitching(false);
       const sectionsHeight = getSectionHeights();
@@ -402,35 +266,25 @@ function Index() {
 
       let cumulativeAnimationHeight = 0;
 
-      const animationsHeight = getAnimationsHeight();
+      // const animationsHeights = [animationRefs.current.getHeight1()];
+      const animationsHeights = [
+        animationRefs.current.getHeight1(),
+        animationRefs.current.getHeight2(),
+        animationRefs.current.getHeight3(),
+        animationRefs.current.getHeight4(),
+        animationRefs.current.getHeight5(),
+      ];
+      const animationsHeight = getAnimationsHeight(animationsHeights);
+
       if (animationsHeight) {
-        const previousAnimationHeight = animationsHeight.slice(0, animationIndex + 1);
-        cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c);
+        if (animationIndex >= 0) {
+          const animationSectionTitleHeight = 121;
+          const previousAnimationHeight = animationsHeight.slice(0, animationIndex + 1);
+          cumulativeAnimationHeight = previousAnimationHeight.reduce((a, c) => a + c, animationSectionTitleHeight);
+        }
       }
       const cumulativeHeight = sectionResult.height + cumulativeAnimationHeight;
       scrollToSection({ height: cumulativeHeight, sectionSelected: sectionsOrder[sectionIdx] });
-
-      // setSelectedSection(sectionIdx);
-      if (sectionIdx === 0) {
-        setShowLandingOptions(true);
-        setIdxRiveComponent(animationIndex);
-      }
-      if (sectionIdx === SECTION_WITH_ANIMATION) {
-        setIdxRiveComponent(animationIndex + 2);
-        // reset animation when jump through sections
-        if (animationIndex === 0) {
-          rive3.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 1) {
-          rive4.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 2) {
-          rive5.scrub("Timeline 1", 0);
-        }
-        if (animationIndex === 3) {
-          rive6.scrub("Timeline 1", 0);
-        }
-      }
 
       setSelectedSection(sectionIdx);
       setSelectedAnimation(animationIndex);
@@ -439,14 +293,9 @@ function Index() {
         setNotSectionSwitching(true);
       }, 1000);
     },
-    [getAnimationsHeight, getSectionHeights, rive3, rive4, rive5, rive6]
+    [getAnimationsHeight, getSectionHeights]
   );
 
-
-  const homeClick = event => {
-    event.preventDefault();
-    switchSection(-1);
-  };
 
   const joinUsClick = event => {
     event.preventDefault();
@@ -502,29 +351,10 @@ function Index() {
     navigateTo("/auth");
   };
 
-  const LinkTab = props => {
-    return (
-      <Tooltip title={props.titl}>
-        <Tab
-          onClick={event => {
-            event.preventDefault();
-            props.onClick(event);
-          }}
-          color="inherit"
-          {...props}
-        />
-      </Tooltip>
-    );
-  };
-
-  const thisPage = useMemo(() => {
-    return sectionSelected === sectionsOrder.length - 2 ? "Apply!" : undefined;
-  }, [sectionSelected]);
-
   return (
     <Box
       id="ScrollableContainer"
-      onScroll={e => detectScrollPosition(e, { rive1, rive2, rive3, rive4, rive5, rive6 })}
+      onScroll={e => detectScrollPosition(e)}
       sx={{
         height: "100vh",
         overflowY: "auto",
@@ -775,9 +605,45 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={whereSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ py: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
+            </CustomTypography>
+            {!whichInViewOnce ? (
+              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
+            ) : (
+              <Suspense
+                fallback={
+                  <Box
+                    sx={{
+                      pt: 7,
+                      pb: 10,
+                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Grid container spacing={2.5}>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                      <Grid item xs={12} sm={6} md={4}>
+                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                }
+              >
+                <Which />
+              </Suspense>
+            )}
+          </Box>
+          <Box id={sectionsOrder[5].id} ref={whereSectionRef}  sx={{ py: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[4].title}
+              {sectionsOrder[5].title}
             </CustomTypography>
             {!whereInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "green" */ }}></div>
@@ -789,9 +655,9 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={whoSectionRef}  sx={{ py: 10 }}>
+          <Box id={sectionsOrder[6].id} ref={whoSectionRef}  sx={{ py: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[5].title}
+              {sectionsOrder[6].title}
             </CustomTypography>
             {!whoInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "pink" */ }}></div>
@@ -826,9 +692,9 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={JoinSectionRef} sx={{ py: 10 }}>
+          <Box id={sectionsOrder[7].id} ref={JoinSectionRef} sx={{ py: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[6].title}
+              {sectionsOrder[7].title}
             </CustomTypography>
             {!joinInViewOnce ? (
               <div style={{ height: 2 * height, /* background: "#b4f5ea" */ }}></div>
@@ -850,12 +716,12 @@ function Index() {
 
 export default withRoot(Index);
 
-const advanceAnimationTo = (rive, timeInSeconds) => {
-  if (!rive?.animator?.animations[0]) return;
+// const advanceAnimationTo = (rive, timeInSeconds) => {
+//   if (!rive?.animator?.animations[0]) return;
 
-  const Animator = rive.animator.animations[0];
-  Animator.instance.time = 0;
-  Animator.instance.advance(timeInSeconds);
-  Animator.instance.apply(1);
-  rive.startRendering();
-};
+//   const Animator = rive.animator.animations[0];
+//   Animator.instance.time = 0;
+//   Animator.instance.advance(timeInSeconds);
+//   Animator.instance.apply(1);
+//   rive.startRendering();
+// };
