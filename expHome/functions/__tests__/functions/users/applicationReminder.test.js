@@ -8,6 +8,8 @@ const {
   mockApplications
 } = require("../../../testUtils");
 
+const { Timestamp } = require("firebase-admin/firestore");
+
 // mock to stop sending emails and detect function calls
 jest.mock("../../../emailing", () => {
   const original = jest.requireActual("../../../emailing");
@@ -51,7 +53,8 @@ describe("users.applicationReminder", () => {
     const _mockUsers = [...mockUsers.data];
     for(const mockUser of _mockUsers) {
       mockUser.projectDone = true;
-      mockUser.applicationSubmitted = {};
+      mockUser.applicationsSubmitted = {};
+      mockUser.createdAt = Timestamp.fromDate(new Date(new Date().getTime() + (2 * 24 * 60 * 60 * 1000)))
     }
 
     const collects = [
