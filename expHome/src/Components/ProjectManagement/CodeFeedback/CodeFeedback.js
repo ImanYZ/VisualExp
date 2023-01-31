@@ -364,7 +364,6 @@ const CodeFeedback = props => {
     if (!sentences.length) return;
     let _choiceConditions = {};
     for (let sentence of sentences) {
-      console.log(sentence);
       for (let codeData of approvedCodes) {
         if (_choiceConditions.hasOwnProperty(sentence)) {
           if (_choiceConditions[sentence].hasOwnProperty(codeData.code)) {
@@ -453,8 +452,7 @@ const CodeFeedback = props => {
         const userData = userDoc.data();
 
         const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
-
-        const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
+        const response = (feedbackData.explanation || "").match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm).filter((s) => s.trim());
         setDocId(docID);
         setSentences(response);
         setChosenCondition(feedbackData.choice);
