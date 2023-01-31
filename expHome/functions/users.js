@@ -1334,10 +1334,10 @@ exports.applicationReminder = async context => {
       }
       if (
         (!userData.hasOwnProperty("withdrew") || !userData.withdrew) &&
-        Object.keys(userData?.applicationSubmitted || {}).length === 0 &&
+        Object.keys(userData?.applicationsSubmitted || {}).length === 0 &&
         (!("reminder" in userData) || userData.reminder.toDate() <= new Date()) &&
         "createdAt" in userData &&
-        userData.createdAt.toDate() > new Date("1-14-2022")
+        userData.createdAt.toDate() > new Date("2023-01-30")
       ) {
         let remindersNum = 0;
         if ("reminders" in userData && userData.reminders) {
