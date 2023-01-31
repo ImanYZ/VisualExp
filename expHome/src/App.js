@@ -232,14 +232,6 @@ const App = () => {
       ...userUpdates,
       pConditions
     };
-
-    let allResponsesReady = true;
-    for (let pCond of userData.pConditions) {
-      if (!("recallreText" in pCond) || !("recall3DaysreText" in pCond) || !("recall1WeekreText" in pCond)) {
-        allResponsesReady = false;
-      }
-    }
-
     const session = toOrdinal(startedSession); // 1st, 2nd, 3rd
     // new logic create recall grades v2 document
     const recallGrades = await firebase.db
@@ -275,6 +267,7 @@ const App = () => {
       }
 
       const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
+    
       if (filtered.length <= 2) {
         let recallResponse;
         switch (session) {
