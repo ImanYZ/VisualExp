@@ -210,6 +210,7 @@ const Communities = props => {
       thisPage={
          "Communities"
       }
+      newHeader={true}
     >
       <Box
         sx={{
