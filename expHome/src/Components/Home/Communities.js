@@ -219,7 +219,7 @@ const Communities = props => {
           columnGap: "16px",
           maxWidth: "1284px",
           m: "auto",
-          pt: { sx: "20px", md: "80px" }
+          pt: { sx: "20px", md: "40px" }
         }}
       >
         <Box>
