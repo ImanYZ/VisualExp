@@ -184,67 +184,59 @@ const AppAppBar2 = props => {
     navigateTo("/auth");
   };
   return (
-    <div>
-      <AppBar>
-        <Box>
+      <Box sx={{ backdropFilter: "blur(4px)", background: "#000000bd",position: "sticky", top: "0" ,zIndex:"10"}}>
+        <Stack
+          direction={"row"}
+          justifyContent="space-between"
+          alignItems="center"
+          spacing={"16px"}
+          sx={{ maxWidth: "1280px", margin: "auto", height: "50px" }}
+        >
           <Stack
             direction={"row"}
-            justifyContent="space-between"
-            alignItems="center"
+            aria-label="scrollable auto tabs navigation bar"
             spacing={"16px"}
-            sx={{ maxWidth: "1280px", margin: "auto", height: "50px" }}
+            alignItems={"center"}
+            justifyContent={"space-between"}
           >
-            <Stack
-              direction={"row"}
-              aria-label="scrollable auto tabs navigation bar"
-              spacing={"16px"}
-              alignItems={"center"}
-              justifyContent={'space-between'}
-            >
-              <Tooltip title="1Cademy's Landing Page">
-                <img
-                  src={LogoDarkMode}
-                  alt="logo"
-                  width="30px"
-                  style={{ cursor: "pointer" }}
-                  onClick={props.homeClick}
-                />
-              </Tooltip>
-              {[0, 1, 2, 3, 4].map(idx => {
-                return (
-                  <Tooltip title={sectionsOrder[idx + 1].title}>
-                    <Link
-                      key={"Key" + idx}
-                      onClick={props.switchSection(idx)}
-                      sx={{ color: "common.white", cursor: "pointer", textDecoration: "none" }}
-                    >
-                      {sectionsOrder[idx + 1].label}
-                    </Link>
-                  </Tooltip>
-                );
-              })}
-              {(leading || props.thisPage) && (
-                <Tooltip title={props.thisPage}>
-                  <Link onClick={props.switchSection(5)} sx={{ color: "common.white", textDecoration: "none" }}>
-                    {props.thisPage}
-                  </Link>
-                </Tooltip>
-              )}
-              {fullname && !props.tutorial && completedExperiment && (
-                <Tooltip title="1Cademy Tutorial">
+            <Tooltip title="1Cademy's Landing Page">
+              <img src={LogoDarkMode} alt="logo" width="30px" style={{ cursor: "pointer" }} onClick={props.homeClick} />
+            </Tooltip>
+            {[0, 1, 2, 3, 4].map(idx => {
+              return (
+                <Tooltip title={sectionsOrder[idx + 1].title}>
                   <Link
-                    href="/tutorial"
-                    target="_blank"
-                    color="inherit"
-                    sx={{ color: "common.white", textDecoration: "none" }}
+                    key={"Key" + idx}
+                    onClick={props.switchSection(idx)}
+                    sx={{ color: "common.white", cursor: "pointer", textDecoration: "none" }}
                   >
-                    Tutorial
+                    {sectionsOrder[idx + 1].label}
                   </Link>
                 </Tooltip>
-              )}
-            </Stack>
-            <Stack direction={"row"} justifyConten="flex-end" alignItems="center"  spacing={"8px"}>
-              {/* <Box
+              );
+            })}
+            {(leading || props.thisPage) && (
+              <Tooltip title={props.thisPage}>
+                <Link onClick={props.switchSection(5)} sx={{ color: "common.white", textDecoration: "none" }}>
+                  {props.thisPage}
+                </Link>
+              </Tooltip>
+            )}
+            {fullname && !props.tutorial && completedExperiment && (
+              <Tooltip title="1Cademy Tutorial">
+                <Link
+                  href="/tutorial"
+                  target="_blank"
+                  color="inherit"
+                  sx={{ color: "common.white", textDecoration: "none" }}
+                >
+                  Tutorial
+                </Link>
+              </Tooltip>
+            )}
+          </Stack>
+          <Stack direction={"row"} justifyConten="flex-end" alignItems="center" spacing={"8px"}>
+            {/* <Box
               sx={{
                 display: "flex",
                 width: "100%",
@@ -269,66 +261,63 @@ const AppAppBar2 = props => {
                 )}
               </IconButton>
             </Box> */}
-              {/* !props.tutorial && !props.joinNowSec && !props.communities && */}
-              {
-                <Tooltip title="Apply to join 1Cademy">
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={props.joinUsClick}
-                    sx={{
-                      fontSize: 14,
-                      color: "common.white",
-                      borderRadius: 40,
-                      height: "25px",
-                      width: "60px",
-                      textTransform: "capitalize"
-                    }}
-                  >
-                    Apply
-                  </Button>
-                </Tooltip>
-              }
-              {fullname ? (
-                <Tooltip title="Account">
-                  <IconButton
-                    size="large"
-                    edge="end"
-                    aria-haspopup="true"
-                    aria-controls="lock-menu"
-                    aria-label={`${fullname}'s Account`}
-                    aria-expanded={isProfileMenuOpen ? "true" : undefined}
-                    onClick={handleProfileMenuOpen}
-                    color="inherit"
-                  >
-                    <AccountCircle />
-                  </IconButton>
-                </Tooltip>
-              ) : (
-                <Tooltip title="SIGN IN/UP">
-                  <Button
-                    variant="outlined"
-                    onClick={signUpHandler}
-                    sx={{
-                      fontSize: 14,
-                      color: "common.white",
-                      borderRadius: 40,
-                      height: "25px",
-                      textTransform: "capitalize",
-                      borderColor: "white"
-                    }}
-                  >
-                    Sign In/Up
-                  </Button>
-                </Tooltip>
-              )}
-            </Stack>
+            {/* !props.tutorial && !props.joinNowSec && !props.communities && */}
+            {
+              <Tooltip title="Apply to join 1Cademy">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={props.joinUsClick}
+                  sx={{
+                    fontSize: 14,
+                    color: "common.white",
+                    borderRadius: 40,
+                    height: "25px",
+                    width: "60px",
+                    textTransform: "capitalize"
+                  }}
+                >
+                  Apply
+                </Button>
+              </Tooltip>
+            }
+            {fullname ? (
+              <Tooltip title="Account">
+                <IconButton
+                  size="large"
+                  edge="end"
+                  aria-haspopup="true"
+                  aria-controls="lock-menu"
+                  aria-label={`${fullname}'s Account`}
+                  aria-expanded={isProfileMenuOpen ? "true" : undefined}
+                  onClick={handleProfileMenuOpen}
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="SIGN IN/UP">
+                <Button
+                  variant="outlined"
+                  onClick={signUpHandler}
+                  sx={{
+                    fontSize: 14,
+                    color: "common.white",
+                    borderRadius: 40,
+                    height: "25px",
+                    textTransform: "capitalize",
+                    borderColor: "white"
+                  }}
+                >
+                  Sign In/Up
+                </Button>
+              </Tooltip>
+            )}
           </Stack>
-        </Box>
-      </AppBar>
-      {fullname && renderProfileMenu}
-      <Toolbar />
-    </div>
+        </Stack>
+        {fullname && renderProfileMenu}
+      </Box>
   );
 };
 
