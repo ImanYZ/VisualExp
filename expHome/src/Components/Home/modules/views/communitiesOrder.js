@@ -715,7 +715,92 @@ export default [
     description: `1Cademy is a collaborative community that supports interdisciplinary research and learning through content generation, mapping, and evaluation. We have multiple successful communities from various fields collaborating regularly by summarizing and organizing content on the platform. This community is focused on learning how to make healthier, more engaged online communities in order to improve our users’ learning, contributions, and experience.
     The UX Research in Online Communities team is dedicated to uncovering, presenting, and compiling the latest literature and research on creating and maintaining engaging and beneficial online communities. Our goal is to understand how to foster online communities where users actively contribute their ideas and value the perspectives of their peers. We are seeking a team of dedicated students to conduct thorough research in various disciplines including psychology, social science, cognitive science, information science, and economics. Utilizing the 1Cademy platform, we will take notes, organize ideas, and map concepts from the literature we find. Ultimately, our aim is to apply our findings to make meaningful improvements to the 1Cademy platform and enhance the user experience of our online communities.
     `,
-    // accomplishments: <></>,
+    accomplishments: (
+      <div>
+        <p>We have recently published the following papers in ACM conferences:</p>
+        <ul>
+          <li>
+            <a>
+              YeckehZaare, I., Chen, S., & Barghi, T. (2023). Reducing Procrastination Without Sacrificing Students'
+              Autonomy Through Optional Weekly Presentations of Student-Generated Content. In <br></br>
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 54th ACM Technical Symposium on Computer Science Education (SIGCSE 2023), March
+                15--18, 2023, Toronto, Canada. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907" target="_blank">
+              YeckehZaare, I., Mulligan, V., Ramstad, G. V., &amp; Resnick, P. (2022). Semester-level Spacing but Not
+              Procrastination Affected Student Exam Performance. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 12th International Conference on Learning Analytics and Knowledge (LAK&#8216;22)
+                online, March 21-25, 2022. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3478431.3499408" target="_blank">
+              YeckehZaare, I., Grot, G., &amp; Aronoff, C. (2022). Retrieval-based Teaching Incentivizes Spacing and
+              Improves Grades in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer Science Education V. 1 (SIGCSE 2022), March
+                3--5, 2022, Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3478431.3499313" target="_blank">
+              YeckehZaare, I., Grot, G., Dimovski, I., Pollock, K., &amp; Fox, E. (2022). Another Victim of COVID-19:
+              Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 53rd ACM Technical Symposium on Computer Science Education V. 1 (SIGCSE 2022), March
+                3--5, 2022, Providence, RI, USA. ACM.
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760" target="_blank">
+              YeckehZaare, I., Fox, E., Grot, G., Chen, S., Walkosak, C., Kwon, K., ... &amp; Silverstein, N. (2021,
+              August). Incentivized Spacing and Gender in Computer Science Education. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 17th ACM Conference on International Computing Education Research
+              </span>{" "}
+              (pp. 18-28).
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3313831.3376882" target="_blank">
+              Yeckehzaare, I., Barghi, T., &amp; Resnick, P. (2020, April). QMaps: Engaging Students in Voluntary
+              Question Generation and Linking. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2020 CHI Conference on Human Factors in Computing Systems
+              </span>{" "}
+              (pp. 1-14).
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3291279.3339411" target="_blank">
+              YeckehZaare, I., Resnick, P., &amp; Ericson, B. (2019, July). A spaced, interleaved retrieval practice
+              tool that is motivating and effective. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 2019 ACM Conference on International Computing Education Research
+              </span>{" "}
+              (pp. 71-79).
+            </a>
+          </li>
+          <li>
+            <a href="https://dl.acm.org/doi/abs/10.1145/3287324.3287417" target="_blank">
+              YeckehZaare, I., &amp; Resnick, P. (2019, February). Speed and Studying: Gendered Pathways to Success. In{" "}
+              <span style={{ fontStyle: "italic" }}>
+                Proceedings of the 50th ACM Technical Symposium on Computer Science Education
+              </span>{" "}
+              (pp. 693-698).
+            </a>
+          </li>
+        </ul>
+      </div>
+    ),
     gains: [
       `Learn how to use the 1Cademy platform for information management, organization, and dissemination purposes `,
       "Collaborate with a team of motivated and invested research interns from around the world",
