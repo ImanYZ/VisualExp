@@ -62,10 +62,10 @@ const Communities = props => {
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [communities, setCommunities] = useState(allCommunities);
-  const [community, setCommunity] = useState(props.commIdx ? allCommunities[props.commIdx] : undefined);
+  const [community, setCommunity] = useState(props.commIdx>=0 ? allCommunities[props.commIdx] : undefined);
 
+  console.log("props.commIdx",props.commIdx,{allCommunities});
   useEffect(() => {
-    console.log("props.commIdx",props.commIdx);
     if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunity(oldCommunity => {
         const newCommunity = allCommunities[props.commIdx]
