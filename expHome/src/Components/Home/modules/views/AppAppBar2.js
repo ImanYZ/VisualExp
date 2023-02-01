@@ -299,7 +299,7 @@ const AppAppBar2 = props => {
             ) : (
               <Tooltip title="SIGN IN/UP">
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   onClick={signUpHandler}
                   sx={{
                     fontSize: 14,
