@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-
+import MenuIcon from "@mui/icons-material/Menu";
 // import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -14,7 +14,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import BiotechIcon from "@mui/icons-material/Biotech";
-
+import CloseIcon from "@mui/icons-material/Close";
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
 
@@ -39,6 +39,7 @@ import { getFullname } from "../../../../utils";
 import LogoDarkMode from "../../../../assets/1Cademy-head.svg";
 import { Link, Toolbar } from "@mui/material";
 import { borderColor, Stack, textTransform } from "@mui/system";
+import AppFooter from "./AppFooter";
 
 const LinkTab = props => {
   return (
@@ -56,6 +57,42 @@ const LinkTab = props => {
   );
 };
 
+const MenuBar = ({ items, switchSection }) => {
+  return (
+    <Stack
+      direction={"column"}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+      sx={{
+        position: "absolute",
+        top: "50px",
+        bottom: "0px",
+        left: "0px",
+        right: "0px",
+        background: "white",
+        zIndex: "12"
+      }}
+    >
+      <Stack flex={1} direction={"column"} alignItems={"center"} spacing="32px" padding={"16px"}>
+        {items.map(idx => {
+          return (
+            <Tooltip title={sectionsOrder[idx + 1].title}>
+              <Link
+                key={"Key" + idx}
+                onClick={switchSection(idx)}
+                sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
+              >
+                {sectionsOrder[idx + 1].label}
+              </Link>
+            </Tooltip>
+          );
+        })}
+      </Stack>
+      <AppFooter />
+    </Stack>
+  );
+};
+
 const AppAppBar2 = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
@@ -70,6 +107,8 @@ const AppAppBar2 = props => {
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
+  const [openMenu, setOpenMenu] = useState(false);
+
   const navigateTo = useNavigate();
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async user => {
@@ -162,7 +201,7 @@ const AppAppBar2 = props => {
   const renderProfileMenu = (
     <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
       {fullname && email && (
-        <MenuItem disabled sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}>
+        <MenuItem disabled sx={{ flexGrow: 3, color: "common.black", opacity: "1 !important" }}>
           {fullname}
         </MenuItem>
       )}
@@ -184,7 +223,16 @@ const AppAppBar2 = props => {
     navigateTo("/auth");
   };
   return (
-      <Box sx={{ backdropFilter: "blur(4px)", background: "#000000bd",position: "sticky", top: "0" ,zIndex:"10"}}>
+    <>
+      <Box
+        sx={{
+          background: theme => (theme.palette.mode === "dark" ? "rgba(0,0,0,.72)" : "#f8f8f894"),
+          backdropFilter: "saturate(180%) blur(20px)",
+          position: "sticky",
+          top: "0",
+          zIndex: "10"
+        }}
+      >
         <Stack
           direction={"row"}
           justifyContent="space-between"
@@ -192,48 +240,60 @@ const AppAppBar2 = props => {
           spacing={"16px"}
           sx={{ maxWidth: "1280px", margin: "auto", height: "50px" }}
         >
-          <Stack
-            direction={"row"}
-            aria-label="scrollable auto tabs navigation bar"
-            spacing={"16px"}
-            alignItems={"center"}
-            justifyContent={"space-between"}
-          >
+          <Stack direction={"row"} alignItems="center" spacing={"16px"}>
             <Tooltip title="1Cademy's Landing Page">
               <img src={LogoDarkMode} alt="logo" width="30px" style={{ cursor: "pointer" }} onClick={props.homeClick} />
             </Tooltip>
-            {[0, 1, 2, 3, 4].map(idx => {
-              return (
-                <Tooltip title={sectionsOrder[idx + 1].title}>
+            <Stack
+              direction={"row"}
+              aria-label="scrollable auto tabs navigation bar"
+              spacing={"16px"}
+              alignItems={"center"}
+              justifyContent={"space-between"}
+              sx={{
+                display: {
+                  xs: "none",
+                  sm: "flex"
+                }
+              }}
+            >
+              {!openMenu &&
+                [0, 1, 2, 3, 4].map(idx => {
+                  return (
+                    <Tooltip title={sectionsOrder[idx + 1].title}>
+                      <Link
+                        key={"Key" + idx}
+                        onClick={props.switchSection(idx)}
+                        sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
+                      >
+                        {sectionsOrder[idx + 1].label}
+                      </Link>
+                    </Tooltip>
+                  );
+                })}
+              {!openMenu && (leading || props.thisPage) && (
+                <Tooltip title={props.thisPage}>
                   <Link
-                    key={"Key" + idx}
-                    onClick={props.switchSection(idx)}
-                    sx={{ color: "common.white", cursor: "pointer", textDecoration: "none" }}
+                    onClick={props.switchSection(5)}
+                    sx={{ color: "common.black", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
                   >
-                    {sectionsOrder[idx + 1].label}
+                    {props.thisPage}
                   </Link>
                 </Tooltip>
-              );
-            })}
-            {(leading || props.thisPage) && (
-              <Tooltip title={props.thisPage}>
-                <Link onClick={props.switchSection(5)} sx={{ color: "common.white", textDecoration: "none" }}>
-                  {props.thisPage}
-                </Link>
-              </Tooltip>
-            )}
-            {fullname && !props.tutorial && completedExperiment && (
-              <Tooltip title="1Cademy Tutorial">
-                <Link
-                  href="/tutorial"
-                  target="_blank"
-                  color="inherit"
-                  sx={{ color: "common.white", textDecoration: "none" }}
-                >
-                  Tutorial
-                </Link>
-              </Tooltip>
-            )}
+              )}
+              {!openMenu && fullname && !props.tutorial && completedExperiment && (
+                <Tooltip title="1Cademy Tutorial">
+                  <Link
+                    href="/tutorial"
+                    target="_blank"
+                    color="inherit"
+                    sx={{ color: "common.black", textDecoration: "none" }}
+                  >
+                    Tutorial
+                  </Link>
+                </Tooltip>
+              )}
+            </Stack>
           </Stack>
           <Stack direction={"row"} justifyConten="flex-end" alignItems="center" spacing={"8px"}>
             {/* <Box
@@ -314,10 +374,21 @@ const AppAppBar2 = props => {
                 </Button>
               </Tooltip>
             )}
+            {
+              <IconButton
+                onClick={() => setOpenMenu(prev=>!prev)}
+                sx={{ display: { xs: "flex", sm: "none" }, alignSelf: "center" }}
+                size="small"
+              >
+                {openMenu ? <CloseIcon /> : <MenuIcon />}
+              </IconButton>
+            }
           </Stack>
         </Stack>
         {fullname && renderProfileMenu}
       </Box>
+      {openMenu && <MenuBar items={[0, 1, 2, 3, 4]} switchSection={props.switchSection} />}
+    </>
   );
 };
 
