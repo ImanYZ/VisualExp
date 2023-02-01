@@ -30,6 +30,7 @@ import allCommunities from "./modules/views/communitiesOrder";
 import { Divider } from "@mui/material";
 import { Stack } from "@mui/system";
 import { transition } from "d3";
+import { Link } from "react-router-dom";
 
 const accumulatePoints = (groups, reputationData, user, points) => {
   for (let communi of groups) {
@@ -64,19 +65,20 @@ const Communities = props => {
   const [community, setCommunity] = useState(props.commIdx ? allCommunities[props.commIdx] : undefined);
 
   useEffect(() => {
+    console.log("props.commIdx",props.commIdx);
     if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunity(oldCommunity => {
-        const newCommunity = allCommunities.find(e => e.id === props.commIdx);
+        const newCommunity = allCommunities[props.commIdx]
         return newCommunity ?? oldCommunity;
       });
 
-      setCommunities(oldCommunities => {
-        return [
-          oldCommunities[props.commIdx],
-          ...oldCommunities.filter(communi => communi.id !== oldCommunities[props.commIdx].id)
-        ];
-      });
-      setExpanded(0);
+      // setCommunities(oldCommunities => {
+      //   return [
+      //     oldCommunities[props.commIdx],
+      //     ...oldCommunities.filter(communi => communi.id !== oldCommunities[props.commIdx].id)
+      //   ];
+      // });
+      // setExpanded(0);
     }
   }, [props.commIdx]);
 
@@ -199,56 +201,70 @@ const Communities = props => {
     if (!newCommunity) return;
 
     setCommunity(newCommunity);
+
   };
 
   return (
     <PagesNavbar
       communities={true}
       thisPage={
-        expanded !== false ? communities[expanded].title : props.communiTitle ? props.communiTitle : "Communities"
+         "Communities"
       }
     >
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "minmax(min-content,210px) 1fr" },
+          gridTemplateColumns: { xs: "1fr", md: "minmax(min-content,250px) 1fr" },
           columnGap: "16px",
           maxWidth: "1284px",
           m: "auto",
-          pt: {xs:"20px",sm:"80px"}
+          pt: { sx: "20px", md: "80px" }
         }}
       >
         <Box>
-          <Box sx={{ position: "sticky", top: "150px", pl: "4px"}}>
-            <Typography variant="h5" gutterBottom align="left" sx={{ mb: "24px", fontSize: "20px" }}>
+          <Box sx={{ position: "sticky", top: "150px" }}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              align="left"
+              sx={{ mb: "24px", fontSize: "20px", px: { xs: "10px",sm:"0px" }}}
+            >
               1CADEMY COMMUNITIES
             </Typography>
-            <Stack component={"ul"}  spacing={"24px"} sx={{ listStyle: "none", p: "0",maxHeight:{xs:"30vh"},overflowY:"auto"  }}>
+            <Stack
+              component={"ul"}
+              spacing={"24px"}
+              sx={{ listStyle: "none", p: { xs: "8px", sm: "0" },maxHeight:{xs:"200px",md:"none"},overflowY:"auto"}}
+            >
               {communities.map((communi, idx) => (
                 <Box
                   key={`${idx}-${communi.title}`}
                   component={"li"}
-                  onClick={() => changeCommunity(idx)}
+                  // onClick={() => changeCommunity(idx)}
                   sx={{
                     position: "relative",
                     color: communi.title === community.title ? "#EF7E2B" : "#28282A",
                     fontWeight: "regular",
-                    ":before": {
-                      content: '""',
-                      position: "absolute",
-                      top: 0,
-                      left: "-8px",
-                      width: "2px",
-                      height: "100%",
-                      border: "1px solid #EF7E2B",
-                      opacity: communi.title === community.title ? "1" : "0",
-                      transition: "opacity 300ms"
-                    },
+                    // ":before": {
+                    //   content: '""',
+                    //   position: "absolute",
+                    //   top: 0,
+                    //   left: "-8px",
+                    //   width: "2px",
+                    //   height: "100%",
+                    //   border: "1px solid #EF7E2B",
+                    //   opacity: communi.title === community.title ? "1" : "0",
+                    //   transition: "opacity 300ms"
+                    // },
+                    borderLeft:communi.title === community.title ? "2px solid #EF7E2B ":"2px solid transparent",
 
+                    p:"2px 16px",
                     "&:hover": { cursor: "pointer", color: "#EF7E2B" }
                   }}
                 >
+                  <Link to={`/community/${communi.id}`} style={{textDecoration:"none",color:"inherit"}}>
                   {communi.title}
+                  </Link>
                 </Box>
               ))}
             </Stack>
@@ -260,11 +276,16 @@ const Communities = props => {
             margin: "auto"
           }} /* columns={{ xs: 1, md: 2, lg: 2, xl: 3 }} spacing={{ xs: 1, md: 2.2 }} */
         >
-          <Typography variant="h4" gutterBottom align="left" sx={{ textTransform: "capitalize" }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            align="left"
+            sx={{ textTransform: "capitalize", p: { xs: "10px" } }}
+          >
             {community.title}
           </Typography>
 
-          <Box sx={{ py: "10px", mb: "19px" }}>
+          <Box sx={{ py: "10px", px: { xs: "10px" }, mb: "19px" }}>
             <YoutubeEmbed embedId={community.YouTube} />
 
             <br />
@@ -558,6 +579,7 @@ const Communities = props => {
                   sm: "repeat(auto-fit,minmax(30%,auto))",
                   lg: "repeat(auto-fit,minmax(25%,auto))"
                 },
+                rowGap:"4px",
                 listStyle: "none",
                 p: 0.5,
                 m: 0
@@ -571,7 +593,6 @@ const Communities = props => {
                       <Chip
                         sx={{
                           height: "49px",
-                          margin: "4px",
                           borderRadius: "28px"
                         }}
                         icon={
