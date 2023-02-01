@@ -469,7 +469,7 @@ export default [
       `Learn about conducting controlled online experiments to prepare for future Ph.D. programs in related disciplines.`,
       `Work towards publishing research on social/political psychology in reputable venues.`,
       `Have opportunities to take on leadership roles within the community.`,
-      `Get involved in all aspects of conducting an online controlled experiment under the supervision of Iman YeckehZaare.`
+      `Get involved in all aspects of conducting online controlled experiments.`
     ],
     requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in disciplines related to behavioral economics or social psychology, and answer our quiz questions to evaluate their domain knowledge.`,
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
