@@ -232,6 +232,7 @@ const App = () => {
       ...userUpdates,
       pConditions
     };
+
     const session = toOrdinal(startedSession); // 1st, 2nd, 3rd
     // new logic create recall grades v2 document
     const recallGrades = await firebase.db
@@ -267,7 +268,7 @@ const App = () => {
       }
 
       const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
-    
+
       if (filtered.length <= 2) {
         let recallResponse;
         switch (session) {
@@ -331,16 +332,42 @@ const App = () => {
   const submitFeedbackCode = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
     const session = toOrdinal(startedSession);
     const pConditions = userData.pConditions || [];
+    const { choice1, choice2 } = convertChoices(pConditions);
+    if (startedSession === 1) {
+      userUpdates = {
+        phase: 0,
+        postQsEnded: currentTime,
+        postQ1Choice: choice1,
+        postQ2Choice: choice2,
+        explanations,
+        pConditions,
+        currentPCon: {
+          passage: pConditions[0].passage,
+          condition: pConditions[0].condition
+        },
+        choices: resetChoices()
+      };
+    } else if (startedSession === 2) {
+      userUpdates = {
+        post3DaysQsEnded: currentTime,
+        post3DaysQ1Choice: choice1,
+        post3DaysQ2Choice: choice2,
+        explanations3Days: explanations
+      };
+    } else if (startedSession === 3) {
+      userUpdates = {
+        post1WeekQsEnded: currentTime,
+        post1WeekQ1Choice: choice1,
+        post1WeekQ2Choice: choice2,
+        explanations1Week: explanations,
+        projectDone: true
+      };
+    }
     userData = {
       ...userData,
       ...userUpdates,
       pConditions
     };
-    userUpdates = {
-      ...userUpdates,
-      pConditions
-    };
-
     const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
     let researcher = "";
     const resSchedules = await firebase.db
@@ -471,29 +498,15 @@ const App = () => {
         }
       }
     }
+
+  
     await firebase.commitBatch();
     pConditions[0] = {
       ...pConditions[0],
       recallStart: currentTime
     };
-    const { choice1, choice2 } = convertChoices(pConditions);
-    await setUserStep(
-      userRef,
-      {
-        phase: 0,
-        postQsEnded: currentTime,
-        postQ1Choice: choice1,
-        postQ2Choice: choice2,
-        explanations,
-        pConditions,
-        currentPCon: {
-          passage: pConditions[0].passage,
-          condition: pConditions[0].condition
-        },
-        choices: resetChoices()
-      },
-      6
-    );
+
+    await setUserStep(userRef, userUpdates, newStep);
   };
   useEffect(() => {
     const setAllScores = async () => {
@@ -553,7 +566,7 @@ const App = () => {
 
   const nextStep = async () => {
     const currentTime = firebase.firestore.Timestamp.fromDate(new Date());
-    let userRef, userDoc, userData, pConditions, choice1, choice2, newStep, userUpdates;
+    let userRef, userDoc, userData, pConditions, newStep, userUpdates;
     if (fullname) {
       userRef = firebase.db.collection("users").doc(fullname);
       userDoc = await userRef.get();
@@ -618,10 +631,10 @@ const App = () => {
         break;
       case 4:
         setTimer(30 * 60);
-        await setUserStep(userRef, { postQsStart: currentTime }, 5);
+        await setUserStep(userRef, { postQsStart: currentTime ,explanations }, 5);
         break;
       case 5:
-        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 7);
+        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 6);
         setPhase(0);
         setPassage(pConditions[0].passage);
         setTimer(5 * 60);
@@ -825,26 +838,8 @@ const App = () => {
         setTimer(30 * 60);
         break;
       case 19:
-        ({ choice1, choice2 } = convertChoices(pConditions));
-        userUpdates = {};
-        if (startedSession === 2) {
-          userUpdates = {
-            post3DaysQsEnded: currentTime,
-            post3DaysQ1Choice: choice1,
-            post3DaysQ2Choice: choice2,
-            explanations3Days: explanations
-          };
-        } else if (startedSession === 3) {
-          userUpdates = {
-            post1WeekQsEnded: currentTime,
-            post1WeekQ1Choice: choice1,
-            post1WeekQ2Choice: choice2,
-            explanations1Week: explanations,
-            projectDone: true
-          };
-        }
+        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 20);
         setTimer(30 * 60);
-        await setUserStep(userRef, userUpdates, 20);
         break;
     }
   };
