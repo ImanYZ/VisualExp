@@ -191,6 +191,7 @@ const App = () => {
   };
 
   const submitFreeRecall = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
+    debugger ; 
     let passageDoc = await firebase.db.collection("passages").doc(passage).get();
     let passageData = passageDoc.data();
     const keywords = passageData.keywords.join(" ");
@@ -813,13 +814,35 @@ const App = () => {
         break;
       case 18:
         userUpdates = {};
-        if (startedSession === 2) {
+        const { choice1, choice2 } = convertChoices(pConditions);
+        if (startedSession === 1) {
           userUpdates = {
-            post3DaysQsStart: currentTime
+            phase: 0,
+            postQsEnded: currentTime,
+            postQ1Choice: choice1,
+            postQ2Choice: choice2,
+            explanations,
+            pConditions,
+            currentPCon: {
+              passage: pConditions[0].passage,
+              condition: pConditions[0].condition
+            },
+            choices: resetChoices()
+          };
+        } else if (startedSession === 2) {
+          userUpdates = {
+            post3DaysQsEnded: currentTime,
+            post3DaysQ1Choice: choice1,
+            post3DaysQ2Choice: choice2,
+            explanations3Days: explanations
           };
         } else if (startedSession === 3) {
           userUpdates = {
-            post1WeekQsStart: currentTime
+            post1WeekQsEnded: currentTime,
+            post1WeekQ1Choice: choice1,
+            post1WeekQ2Choice: choice2,
+            explanations1Week: explanations,
+            projectDone: true
           };
         }
         await setUserStep(
