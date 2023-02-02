@@ -323,6 +323,24 @@ const App = () => {
 
     await firebase.batchSet(recallGradeRef, recallGradeData);
 
+    await firebase.commitBatch();
+
+    await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
+  };
+
+  const submitFeedbackCode = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
+    const session = toOrdinal(startedSession);
+    const pConditions = userData.pConditions || [];
+    userData = {
+      ...userData,
+      ...userUpdates,
+      pConditions
+    };
+    userUpdates = {
+      ...userUpdates,
+      pConditions
+    };
+
     const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
     let researcher = "";
     const resSchedules = await firebase.db
@@ -385,24 +403,21 @@ const App = () => {
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
         let choice;
-        let session;
+
         let response;
         if (explan === "explanations") {
-          session = "1st";
           if (index === 0) {
             choice = "postQ1Choice";
           } else {
             choice = "postQ2Choice";
           }
         } else if (explan === "explanations3Days") {
-          session = "2nd";
           if (index === 0) {
             choice = "post3DaysQ1Choice";
           } else {
             choice = "post3DaysQ2Choice";
           }
         } else if (explan === "explanations1Week") {
-          session = "3rd";
           if (index === 0) {
             choice = "post1WeekQ1Choice";
           } else {
@@ -430,7 +445,7 @@ const App = () => {
 
           // updating feedback code order
           if (researcher) {
-            const codeIds = [];
+            let codeIds = [];
             const feedbackCodeOrders = await firebase.db
               .collection("feedbackCodeOrderV2")
               .where("project", "==", userData.project)
@@ -438,7 +453,7 @@ const App = () => {
               .get();
             if (feedbackCodeOrders.docs.length) {
               const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
-              codeIds.push(feedbackCodeRef.id, ..._codeIds);
+              codeIds = [feedbackCodeRef.id, ..._codeIds];
               const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
               await firebase.batchUpdate(feedbackOrderRef, {
                 codeIds
@@ -456,12 +471,30 @@ const App = () => {
         }
       }
     }
-
     await firebase.commitBatch();
-
-    await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
+    pConditions[0] = {
+      ...pConditions[0],
+      recallStart: currentTime
+    };
+    const { choice1, choice2 } = convertChoices(pConditions);
+    await setUserStep(
+      userRef,
+      {
+        phase: 0,
+        postQsEnded: currentTime,
+        postQ1Choice: choice1,
+        postQ2Choice: choice2,
+        explanations,
+        pConditions,
+        currentPCon: {
+          passage: pConditions[0].passage,
+          condition: pConditions[0].condition
+        },
+        choices: resetChoices()
+      },
+      6
+    );
   };
-
   useEffect(() => {
     const setAllScores = async () => {
       const userDoc = await firebase.db.collection("users").doc(fullname).get();
@@ -588,28 +621,7 @@ const App = () => {
         await setUserStep(userRef, { postQsStart: currentTime }, 5);
         break;
       case 5:
-        pConditions[0] = {
-          ...pConditions[0],
-          recallStart: currentTime
-        };
-        ({ choice1, choice2 } = convertChoices(pConditions));
-        await setUserStep(
-          userRef,
-          {
-            phase: 0,
-            postQsEnded: currentTime,
-            postQ1Choice: choice1,
-            postQ2Choice: choice2,
-            explanations,
-            pConditions,
-            currentPCon: {
-              passage: pConditions[0].passage,
-              condition: pConditions[0].condition
-            },
-            choices: resetChoices()
-          },
-          6
-        );
+        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 7);
         setPhase(0);
         setPassage(pConditions[0].passage);
         setTimer(5 * 60);
