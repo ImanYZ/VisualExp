@@ -57,7 +57,11 @@ const LinkTab = props => {
   );
 };
 
-const MenuBar = ({ items, switchSection }) => {
+const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
+  const [completedExperiment, /* setCompletedExperiment */] = useRecoilState(completedExperimentState);
+  const leading = useRecoilValue(leadingState);
+  const [fullname, /* setFullname */] = useRecoilState(fullnameState);
+
   return (
     <Stack
       direction={"column"}
@@ -87,6 +91,28 @@ const MenuBar = ({ items, switchSection }) => {
             </Tooltip>
           );
         })}
+           {(leading || thisPage) && (
+                <Tooltip title={thisPage}>
+                  <Link
+                    onClick={switchSection(5)}
+                    sx={{ color: "common.black", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
+                  >
+                    {thisPage}
+                  </Link>
+                </Tooltip>
+              )}
+              {fullname && !tutorial && completedExperiment && (
+                <Tooltip title="1Cademy Tutorial">
+                  <Link
+                    href="/tutorial"
+                    target="_blank"
+                    color="inherit"
+                    sx={{ color: "common.black", textDecoration: "none" }}
+                  >
+                    Tutorial
+                  </Link>
+                </Tooltip>
+              )}
       </Stack>
       <AppFooter />
     </Stack>
@@ -173,7 +199,6 @@ const AppAppBar2 = props => {
   }, [firebase]);
 
   const signOut = async event => {
-    console.log("Signing out!");
     setEmail("");
     setFullname("");
     await firebase.logout();
@@ -257,21 +282,20 @@ const AppAppBar2 = props => {
                 }
               }}
             >
-              {!openMenu &&
-                [0, 1, 2, 3, 4].map(idx => {
-                  return (
-                    <Tooltip title={sectionsOrder[idx + 1].title}>
-                      <Link
-                        key={"Key" + idx}
-                        onClick={props.switchSection(idx)}
-                        sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
-                      >
-                        {sectionsOrder[idx + 1].label}
-                      </Link>
-                    </Tooltip>
-                  );
-                })}
-              {!openMenu && (leading || props.thisPage) && (
+              {[0, 1, 2, 3, 4].map(idx => {
+                return (
+                  <Tooltip title={sectionsOrder[idx + 1].title}>
+                    <Link
+                      key={"Key" + idx}
+                      onClick={props.switchSection(idx)}
+                      sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
+                    >
+                      {sectionsOrder[idx + 1].label}
+                    </Link>
+                  </Tooltip>
+                );
+              })}
+              {(leading || props.thisPage) && (
                 <Tooltip title={props.thisPage}>
                   <Link
                     onClick={props.switchSection(5)}
@@ -281,7 +305,7 @@ const AppAppBar2 = props => {
                   </Link>
                 </Tooltip>
               )}
-              {!openMenu && fullname && !props.tutorial && completedExperiment && (
+              {fullname && !props.tutorial && completedExperiment && (
                 <Tooltip title="1Cademy Tutorial">
                   <Link
                     href="/tutorial"
@@ -376,7 +400,7 @@ const AppAppBar2 = props => {
             )}
             {
               <IconButton
-                onClick={() => setOpenMenu(prev=>!prev)}
+                onClick={() => setOpenMenu(prev => !prev)}
                 sx={{ display: { xs: "flex", sm: "none" }, alignSelf: "center" }}
                 size="small"
               >
@@ -387,7 +411,7 @@ const AppAppBar2 = props => {
         </Stack>
         {fullname && renderProfileMenu}
       </Box>
-      {openMenu && <MenuBar items={[0, 1, 2, 3, 4]} switchSection={props.switchSection} />}
+      {openMenu && <MenuBar items={[0, 1, 2, 3, 4]} switchSection={props.switchSection} thisPage={props.thisPage} tutorial={props.tutorial} />}
     </>
   );
 };
