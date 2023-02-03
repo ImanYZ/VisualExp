@@ -346,7 +346,7 @@ const AppAppBar2 = props => {
               </IconButton>
             </Box> */}
             {/* !props.tutorial && !props.joinNowSec && !props.communities && */}
-            {
+            {!fullname&&
               <Tooltip title="Apply to join 1Cademy">
                 <Button
                   variant="contained"
