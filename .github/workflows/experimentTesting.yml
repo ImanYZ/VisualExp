@@ -1,4 +1,4 @@
-name: Knowledge Testing
+name: Experiment Testing
 on:
   pull_request:
     branches:
@@ -28,7 +28,7 @@ jobs:
         run: |
           cd expHome
           npm install --legacy-peer-deps
-          CI=false npm run build:prod
+          NODE_OPTIONS="--max_old_space_size=4096" CI=false npm run build:prod
       - name: Unit tests
         run: |
           cd expHome/functions
