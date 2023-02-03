@@ -428,6 +428,8 @@ const App = () => {
       // code block
     }
 
+    let codeIds = [];
+    
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
         let choice;
@@ -473,30 +475,35 @@ const App = () => {
 
           // updating feedback code order
           if (researcher) {
-            let codeIds = [];
-            const feedbackCodeOrders = await firebase.db
-              .collection("feedbackCodeOrderV2")
-              .where("project", "==", userData.project)
-              .where("researcher", "==", researcher)
-              .get();
-            if (feedbackCodeOrders.docs.length) {
-              const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
-              codeIds = [feedbackCodeRef.id, ..._codeIds];
-              const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-              await firebase.batchUpdate(feedbackOrderRef, {
-                codeIds
-              });
-            } else {
-              await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
-                project: userData.project,
-                researcher,
-                codeIds: [feedbackCodeRef.id]
-              });
-            }
+            codeIds.push(feedbackCodeRef.id);
           }
 
           await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
         }
+      }
+    }
+
+    if(codeIds.length) {
+      const feedbackCodeOrders = await firebase.db
+        .collection("feedbackCodeOrderV2")
+        .where("project", "==", userData.project)
+        .where("researcher", "==", researcher)
+        .get();
+      if (feedbackCodeOrders.docs.length) {
+        const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
+        codeIds = Array.from(new Set([...codeIds, ..._codeIds]));
+        const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+        await firebase.batchUpdate(feedbackOrderRef, {
+          codeIds,
+          updatedAt: new Date()
+        });
+      } else {
+        await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
+          project: userData.project,
+          researcher,
+          codeIds,
+          createdAt: new Date()
+        });
       }
     }
 
