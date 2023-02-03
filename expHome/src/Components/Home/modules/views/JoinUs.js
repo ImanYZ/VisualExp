@@ -297,7 +297,7 @@ const JoinUs = props => {
       {!props.community ? (
         <span />
       ) : (
-        <Alert severity="warning">
+        <Alert severity="warning" sx={{mb:"16px"}}>
           <strong>Note: </strong> Participation is unpaid, solely for the
           purpose of improving research and education, and this position meets{" "}
           <a
