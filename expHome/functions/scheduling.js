@@ -206,14 +206,12 @@ exports.getOngoingResearcherEvent = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).send({ message: "Email id required" });
-    const twoHours = 120 * 60 * 1000;
-    const now = new Date().getTime();
-    const start = new Date(now - twoHours);
+    const start = moment().utcOffset(0).subtract(2, "hours").toDate();
     // get events for next 10 hours.
-    let end = new Date(now + 600 * 60 * 1000);
+    const end = moment().utcOffset(0).add(10, "hours").toDate();
 
-    const events = await getEvents(start, end, "America/Detroit");
-
+    const events = await getEvents(start, end, "UTC");
+    
     const filteredEvents = (events || []).filter(event => {
       return event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
     });
