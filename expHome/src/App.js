@@ -191,6 +191,7 @@ const App = () => {
   };
 
   const submitFreeRecall = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
+    debugger ; 
     let passageDoc = await firebase.db.collection("passages").doc(passage).get();
     let passageData = passageDoc.data();
     const keywords = passageData.keywords.join(" ");
@@ -232,6 +233,7 @@ const App = () => {
       ...userUpdates,
       pConditions
     };
+
     const session = toOrdinal(startedSession); // 1st, 2nd, 3rd
     // new logic create recall grades v2 document
     const recallGrades = await firebase.db
@@ -267,7 +269,7 @@ const App = () => {
       }
 
       const filtered = (pCond[responseName] || "").split(" ").filter(w => w.trim());
-    
+
       if (filtered.length <= 2) {
         let recallResponse;
         switch (session) {
@@ -323,6 +325,50 @@ const App = () => {
 
     await firebase.batchSet(recallGradeRef, recallGradeData);
 
+    await firebase.commitBatch();
+
+    await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
+  };
+
+  const submitFeedbackCode = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
+    const session = toOrdinal(startedSession);
+    const pConditions = userData.pConditions || [];
+    const { choice1, choice2 } = convertChoices(pConditions);
+    if (startedSession === 1) {
+      userUpdates = {
+        phase: 0,
+        postQsEnded: currentTime,
+        postQ1Choice: choice1,
+        postQ2Choice: choice2,
+        explanations,
+        pConditions,
+        currentPCon: {
+          passage: pConditions[0].passage,
+          condition: pConditions[0].condition
+        },
+        choices: resetChoices()
+      };
+    } else if (startedSession === 2) {
+      userUpdates = {
+        post3DaysQsEnded: currentTime,
+        post3DaysQ1Choice: choice1,
+        post3DaysQ2Choice: choice2,
+        explanations3Days: explanations
+      };
+    } else if (startedSession === 3) {
+      userUpdates = {
+        post1WeekQsEnded: currentTime,
+        post1WeekQ1Choice: choice1,
+        post1WeekQ2Choice: choice2,
+        explanations1Week: explanations,
+        projectDone: true
+      };
+    }
+    userData = {
+      ...userData,
+      ...userUpdates,
+      pConditions
+    };
     const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
     let researcher = "";
     const resSchedules = await firebase.db
@@ -382,27 +428,26 @@ const App = () => {
       // code block
     }
 
+    let codeIds = [];
+    
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
         let choice;
-        let session;
+
         let response;
         if (explan === "explanations") {
-          session = "1st";
           if (index === 0) {
             choice = "postQ1Choice";
           } else {
             choice = "postQ2Choice";
           }
         } else if (explan === "explanations3Days") {
-          session = "2nd";
           if (index === 0) {
             choice = "post3DaysQ1Choice";
           } else {
             choice = "post3DaysQ2Choice";
           }
         } else if (explan === "explanations1Week") {
-          session = "3rd";
           if (index === 0) {
             choice = "post1WeekQ1Choice";
           } else {
@@ -430,26 +475,7 @@ const App = () => {
 
           // updating feedback code order
           if (researcher) {
-            const codeIds = [];
-            const feedbackCodeOrders = await firebase.db
-              .collection("feedbackCodeOrderV2")
-              .where("project", "==", userData.project)
-              .where("researcher", "==", researcher)
-              .get();
-            if (feedbackCodeOrders.docs.length) {
-              const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
-              codeIds.push(feedbackCodeRef.id, ..._codeIds);
-              const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-              await firebase.batchUpdate(feedbackOrderRef, {
-                codeIds
-              });
-            } else {
-              await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
-                project: userData.project,
-                researcher,
-                codeIds: [feedbackCodeRef.id]
-              });
-            }
+            codeIds.push(feedbackCodeRef.id);
           }
 
           await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
@@ -457,11 +483,39 @@ const App = () => {
       }
     }
 
+    if(codeIds.length) {
+      const feedbackCodeOrders = await firebase.db
+        .collection("feedbackCodeOrderV2")
+        .where("project", "==", userData.project)
+        .where("researcher", "==", researcher)
+        .get();
+      if (feedbackCodeOrders.docs.length) {
+        const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
+        codeIds = Array.from(new Set([...codeIds, ..._codeIds]));
+        const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+        await firebase.batchUpdate(feedbackOrderRef, {
+          codeIds,
+          updatedAt: new Date()
+        });
+      } else {
+        await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
+          project: userData.project,
+          researcher,
+          codeIds,
+          createdAt: new Date()
+        });
+      }
+    }
+
+  
     await firebase.commitBatch();
+    pConditions[0] = {
+      ...pConditions[0],
+      recallStart: currentTime
+    };
 
-    await setUserStep(userRef, { ...userUpdates, pConditions, choices: resetChoices() }, newStep);
+    await setUserStep(userRef, userUpdates, newStep);
   };
-
   useEffect(() => {
     const setAllScores = async () => {
       const userDoc = await firebase.db.collection("users").doc(fullname).get();
@@ -520,7 +574,7 @@ const App = () => {
 
   const nextStep = async () => {
     const currentTime = firebase.firestore.Timestamp.fromDate(new Date());
-    let userRef, userDoc, userData, pConditions, choice1, choice2, newStep, userUpdates;
+    let userRef, userDoc, userData, pConditions, newStep, userUpdates;
     if (fullname) {
       userRef = firebase.db.collection("users").doc(fullname);
       userDoc = await userRef.get();
@@ -585,31 +639,10 @@ const App = () => {
         break;
       case 4:
         setTimer(30 * 60);
-        await setUserStep(userRef, { postQsStart: currentTime }, 5);
+        await setUserStep(userRef, { postQsStart: currentTime ,explanations }, 5);
         break;
       case 5:
-        pConditions[0] = {
-          ...pConditions[0],
-          recallStart: currentTime
-        };
-        ({ choice1, choice2 } = convertChoices(pConditions));
-        await setUserStep(
-          userRef,
-          {
-            phase: 0,
-            postQsEnded: currentTime,
-            postQ1Choice: choice1,
-            postQ2Choice: choice2,
-            explanations,
-            pConditions,
-            currentPCon: {
-              passage: pConditions[0].passage,
-              condition: pConditions[0].condition
-            },
-            choices: resetChoices()
-          },
-          6
-        );
+        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 6);
         setPhase(0);
         setPassage(pConditions[0].passage);
         setTimer(5 * 60);
@@ -788,13 +821,35 @@ const App = () => {
         break;
       case 18:
         userUpdates = {};
-        if (startedSession === 2) {
+        const { choice1, choice2 } = convertChoices(pConditions);
+        if (startedSession === 1) {
           userUpdates = {
-            post3DaysQsStart: currentTime
+            phase: 0,
+            postQsEnded: currentTime,
+            postQ1Choice: choice1,
+            postQ2Choice: choice2,
+            explanations,
+            pConditions,
+            currentPCon: {
+              passage: pConditions[0].passage,
+              condition: pConditions[0].condition
+            },
+            choices: resetChoices()
+          };
+        } else if (startedSession === 2) {
+          userUpdates = {
+            post3DaysQsEnded: currentTime,
+            post3DaysQ1Choice: choice1,
+            post3DaysQ2Choice: choice2,
+            explanations3Days: explanations
           };
         } else if (startedSession === 3) {
           userUpdates = {
-            post1WeekQsStart: currentTime
+            post1WeekQsEnded: currentTime,
+            post1WeekQ1Choice: choice1,
+            post1WeekQ2Choice: choice2,
+            explanations1Week: explanations,
+            projectDone: true
           };
         }
         await setUserStep(
@@ -813,26 +868,8 @@ const App = () => {
         setTimer(30 * 60);
         break;
       case 19:
-        ({ choice1, choice2 } = convertChoices(pConditions));
-        userUpdates = {};
-        if (startedSession === 2) {
-          userUpdates = {
-            post3DaysQsEnded: currentTime,
-            post3DaysQ1Choice: choice1,
-            post3DaysQ2Choice: choice2,
-            explanations3Days: explanations
-          };
-        } else if (startedSession === 3) {
-          userUpdates = {
-            post1WeekQsEnded: currentTime,
-            post1WeekQ1Choice: choice1,
-            post1WeekQ2Choice: choice2,
-            explanations1Week: explanations,
-            projectDone: true
-          };
-        }
+        await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 20);
         setTimer(30 * 60);
-        await setUserStep(userRef, userUpdates, 20);
         break;
     }
   };
