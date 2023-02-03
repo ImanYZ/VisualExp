@@ -191,7 +191,6 @@ const App = () => {
   };
 
   const submitFreeRecall = async (currentTime, timeSpent, userRef, userData, userUpdates, newStep) => {
-    debugger ; 
     let passageDoc = await firebase.db.collection("passages").doc(passage).get();
     let passageData = passageDoc.data();
     const keywords = passageData.keywords.join(" ");
@@ -429,7 +428,7 @@ const App = () => {
     }
 
     let codeIds = [];
-    
+
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
         let choice;
