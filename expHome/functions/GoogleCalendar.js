@@ -195,7 +195,7 @@ exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
     }
     return items;
   } catch (error) {
-    console.log({ response });
+    console.log({ error });
     console.log(`Error at getEvents --> ${error}`);
     return null;
   }
