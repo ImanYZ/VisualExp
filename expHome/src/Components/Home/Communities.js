@@ -32,6 +32,8 @@ import { Stack } from "@mui/system";
 import { transition } from "d3";
 import { Link } from "react-router-dom";
 
+export const orangeDark = "#FF6D00";
+
 const accumulatePoints = (groups, reputationData, user, points) => {
   for (let communi of groups) {
     for (let deTag of communi.tags) {
@@ -62,13 +64,16 @@ const Communities = props => {
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [communities, setCommunities] = useState(allCommunities);
-  const [community, setCommunity] = useState(props.commIdx>=0 ? allCommunities[props.commIdx] : undefined);
+  const [community, setCommunity] = useState(props.commIdx >= 0 ? allCommunities[props.commIdx] : undefined);
+  const [expandedOption, setExpandedOption] = useState("Option1");
 
-  console.log("props.commIdx",props.commIdx,{allCommunities});
+
+
+  console.log("props.commIdx", props.commIdx, { allCommunities });
   useEffect(() => {
     if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunity(oldCommunity => {
-        const newCommunity = allCommunities[props.commIdx]
+        const newCommunity = allCommunities[props.commIdx];
         return newCommunity ?? oldCommunity;
       });
 
@@ -201,17 +206,17 @@ const Communities = props => {
     if (!newCommunity) return;
 
     setCommunity(newCommunity);
-
   };
 
+
+  const handleChangeOption = (option) => (event, newExpanded) => {
+    setExpandedOption(newExpanded ? option : false);
+   
+  };
+
+
   return (
-    <PagesNavbar
-      communities={true}
-      thisPage={
-         "Communities"
-      }
-      newHeader={true}
-    >
+    <PagesNavbar communities={true} thisPage={"Communities"} newHeader={true}>
       <Box
         sx={{
           display: "grid",
@@ -228,14 +233,19 @@ const Communities = props => {
               variant="h5"
               gutterBottom
               align="left"
-              sx={{ mb: "24px", fontSize: "20px", px: { xs: "10px",sm:"0px" }}}
+              sx={{ mb: "24px", fontSize: "20px", px: { xs: "10px", sm: "0px" } }}
             >
               1CADEMY COMMUNITIES
             </Typography>
             <Stack
               component={"ul"}
               spacing={"24px"}
-              sx={{ listStyle: "none", p: { xs: "8px", sm: "0" },maxHeight:{xs:"200px",md:"none"},overflowY:"auto"}}
+              sx={{
+                listStyle: "none",
+                p: { xs: "8px", sm: "0" },
+                maxHeight: { xs: "200px", md: "none" },
+                overflowY: "auto"
+              }}
             >
               {communities.map((communi, idx) => (
                 <Box
@@ -257,14 +267,14 @@ const Communities = props => {
                     //   opacity: communi.title === community.title ? "1" : "0",
                     //   transition: "opacity 300ms"
                     // },
-                    borderLeft:communi.title === community.title ? "2px solid #EF7E2B ":"2px solid transparent",
+                    borderLeft: communi.title === community.title ? "2px solid #EF7E2B " : "2px solid transparent",
 
-                    p:"2px 16px",
+                    p: "2px 16px",
                     "&:hover": { cursor: "pointer", color: "#EF7E2B" }
                   }}
                 >
-                  <Link to={`/community/${communi.id}`} style={{textDecoration:"none",color:"inherit"}}>
-                  {communi.title}
+                  <Link to={`/community/${communi.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    {communi.title}
                   </Link>
                 </Box>
               ))}
@@ -277,12 +287,7 @@ const Communities = props => {
             margin: "auto"
           }} /* columns={{ xs: 1, md: 2, lg: 2, xl: 3 }} spacing={{ xs: 1, md: 2.2 }} */
         >
-          <Typography
-            variant="h4"
-            gutterBottom
-            align="left"
-            sx={{ textTransform: "capitalize", p: { xs: "10px" } }}
-          >
+          <Typography variant="h4" gutterBottom align="left" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
             {community.title}
           </Typography>
 
@@ -301,120 +306,144 @@ const Communities = props => {
           </Box>
 
           <Divider />
-
-          <Box sx={{ padding: "10px", mb: "19px" }}>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                pt: "19px",
-                pb: "19px",
-                fontWeight: "regular"
-              }}
-            >
-              Qualifications
-            </Typography>
-            <ul>
-              {community.qualifications &&
-                community.qualifications.map((qualifi, qIdx) => {
-                  return <li key={qIdx}>{qualifi}</li>;
-                })}
-              {/* <li>
+          <Stack
+            direction={{ xs: "column-reverse", md: "row" }}
+            justifyContent={"space-between"}
+            sx={{ margin: "auto" }}
+          >
+            <Box sx={{ maxWidth: { xs: "none", md: "500px" } }}>
+              <Accordion
+                disableGutters
+                elevation={0}
+                square
+                sx={{
+                  background: "transparent",
+                  border: "none",
+                  borderLeft: `4px solid ${expandedOption === `Option1` ? orangeDark : "#F8F8F8"}`,
+                  "&:before": {
+                    display: "none"
+                  }
+                }}
+                expanded={expandedOption === `Option1`}
+                onChange={handleChangeOption(`Option1`)}
+              >
+                <AccordionSummary>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px",
+                      fontWeight: "regular"
+                    }}
+                  >
+                    Qualifications
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ul>
+                    {community.qualifications &&
+                      community.qualifications.map((qualifi, qIdx) => {
+                        return <li key={qIdx}>{qualifi}</li>;
+                      })}
+                    {/* <li>
                       Complete the three online sessions of one of our ongoing research studies, as a participant, to
                       better learn how we conduct our experiments.
                     </li> */}
-              <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
-              <li>Explain in a few paragraphs why you apply to this specific community.</li>
-              <li>
-                Complete our community-specific quiz by answering a set of questions about some research papers or book
-                chapters and get a satisfying score.
-              </li>
-              {community.coursera && (
-                <li>
-                  Complete{" "}
-                  <a href={community.coursera} target="_blank">
-                    this Coursera course
-                  </a>{" "}
-                  and upload your certificate as a part of the application.
-                </li>
-              )}
-            </ul>
-          </Box>
+                    <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
+                    <li>Explain in a few paragraphs why you apply to this specific community.</li>
+                    <li>
+                      Complete our community-specific quiz by answering a set of questions about some research papers or
+                      book chapters and get a satisfying score.
+                    </li>
+                    {community.coursera && (
+                      <li>
+                        Complete{" "}
+                        <a href={community.coursera} target="_blank">
+                          this Coursera course
+                        </a>{" "}
+                        and upload your certificate as a part of the application.
+                      </li>
+                    )}
+                  </ul>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                disableGutters
+                elevation={0}
+                square
+                sx={{
+                  background: "transparent",
+                  border: "none",
+                  borderLeft: `4px solid ${expandedOption === `Option2` ? orangeDark : "#F8F8F8"}`,
+                  "&:before": {
+                    display: "none"
+                  }
+                }}
+                expanded={expandedOption === `Option2`}
+                onChange={handleChangeOption(`Option2`)}
+              >
+                <AccordionSummary>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px"
+                    }}
+                  >
+                    By Joining Us, You Will ...
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ul>
+                    {community.gains &&
+                      community.gains.map((gain, gIdx) => {
+                        return <li key={gIdx}>{gain}</li>;
+                      })}
+                  </ul>
+                </AccordionDetails>
+              </Accordion>
+              <Accordion
+                disableGutters
+                elevation={0}
+                square
+                sx={{
+                  background: "transparent",
+                  border: "none",
+                  borderLeft: `4px solid ${expandedOption === `Option3` ? orangeDark : "#F8F8F8"}`,
+                  "&:before": {
+                    display: "none"
+                  }
+                }}
+                expanded={expandedOption === `Option3`}
+                onChange={handleChangeOption(`Option3`)}
+              >
+                <AccordionSummary>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      pt: "19px",
+                      pb: "19px"
+                    }}
+                  >
+                    Responsibilities
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <ul>
+                    {community.responsibilities &&
+                      community.responsibilities.map((responsibility, rIdx) => {
+                        return <li key={rIdx}>{responsibility}</li>;
+                      })}
+                  </ul>
+                </AccordionDetails>
+              </Accordion>
+            </Box>
+          </Stack>
 
-          <Divider />
-
-          <Box sx={{ padding: "10px", mb: "19px" }}>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                pt: "19px",
-                pb: "19px"
-              }}
-            >
-              By Joining Us, You Will ...
-            </Typography>
-            <ul>
-              {community.gains &&
-                community.gains.map((gain, gIdx) => {
-                  return <li key={gIdx}>{gain}</li>;
-                })}
-            </ul>
-          </Box>
-
-          <Divider />
-
-          {/* <Grid item xs={12} lg={6} xl={4}>
-                  <Paper sx={{ padding: "10px", mb: "19px" }}>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Requirements
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ textAlign: "left" }}
-                    >
-                      {communi.requirements}
-                      {communi.coursera && (
-                        <div>
-                          The applicants also need to complete{" "}
-                          <a href={communi.coursera} target="_blank">
-                            this Coursera course
-                          </a>{" "}
-                          and upload their certificate as a part of their
-                          application.
-                        </div>
-                      )}
-                    </Typography>
-                  </Paper>
-                </Grid> */}
-
-          <Box sx={{ padding: "10px", mb: "19px" }}>
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                pt: "19px",
-                pb: "19px"
-              }}
-            >
-              Responsibilities
-            </Typography>
-            <ul>
-              {community.responsibilities &&
-                community.responsibilities.map((responsibility, rIdx) => {
-                  return <li key={rIdx}>{responsibility}</li>;
-                })}
-            </ul>
-          </Box>
-
+         
           <Divider />
 
           <Box sx={{ padding: "10px", mb: "19px" }}>
@@ -580,7 +609,7 @@ const Communities = props => {
                   sm: "repeat(auto-fit,minmax(30%,auto))",
                   lg: "repeat(auto-fit,minmax(25%,auto))"
                 },
-                rowGap:"4px",
+                rowGap: "4px",
                 listStyle: "none",
                 p: 0.5,
                 m: 0
