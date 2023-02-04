@@ -66,6 +66,7 @@ const Communities = props => {
   const [communities, setCommunities] = useState(allCommunities);
   const [community, setCommunity] = useState(props.commIdx >= 0 ? allCommunities[props.commIdx] : undefined);
   const [expandedOption, setExpandedOption] = useState("Option1");
+  const [community, setCommunity] = useState(props.commIdx>=0 ? allCommunities[props.commIdx] : allCommunities[0]);
 
 
 

@@ -250,9 +250,10 @@ const AppRouter = props => {
               } else if (scheduleData.order === "3rd") {
                 setStartedSession(3);
                 thirdSessionDoc = scheduleDoc;
+              } else {
+                setStartedSession(1);
               }
-            }
-            if (currentTime >= session) {
+            } else if (currentTime >= session && !duringSession) {
               setStartedSession(1);
             }
           }
