@@ -39,7 +39,7 @@ const ResearcherAvailabilities = props => {
   return (
     <ScheduleSelector
       selection={props.schedule}
-      selectionScheme="linear"
+      selectionScheme= "square"
       startDate={props.startDate}
       numDays={props.numDays}
       minTime={start}
