@@ -284,7 +284,7 @@ const AppAppBar2 = props => {
             >
               {[0, 1, 2, 3, 4].map(idx => {
                 return (
-                  <Tooltip title={sectionsOrder[idx + 1].title}>
+                  <Tooltip key={idx} title={sectionsOrder[idx + 1].title}>
                     <Link
                       key={"Key" + idx}
                       onClick={props.switchSection(idx)}
@@ -319,7 +319,7 @@ const AppAppBar2 = props => {
               )}
             </Stack>
           </Stack>
-          <Stack direction={"row"} justifyConten="flex-end" alignItems="center" spacing={"8px"}>
+          <Stack direction={"row"} justifyContent="flex-end" alignItems="center" spacing={"8px"}>
             {/* <Box
               sx={{
                 display: "flex",
