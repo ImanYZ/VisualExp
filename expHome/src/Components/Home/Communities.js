@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRecoilValue } from "recoil";
-
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Box from "@mui/material/Box";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Masonry from "@mui/lab/Masonry";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -27,12 +27,15 @@ import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 import JoinUs from "./modules/views/JoinUs";
 
 import allCommunities from "./modules/views/communitiesOrder";
-import { Divider } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CardMedia, Divider } from "@mui/material";
 import { Stack } from "@mui/system";
 import { transition } from "d3";
 import { Link } from "react-router-dom";
 
 export const orangeDark = "#FF6D00";
+export const orangeLight = "#f77a1a";
+export const gray200 = "#EAECF0";
+export const gray600 = "#475467";
 
 const subSections = [
   {
@@ -47,7 +50,6 @@ const subSections = [
         </ul>
       ) : null;
     }
-    
   },
   {
     title: "By Joining Us, You Will ...",
@@ -93,7 +95,7 @@ const subSections = [
   {
     title: "Apply to Join this Community",
     component: community => (community ? <JoinUs community={community} /> : null),
-    image:'Apply_to_Join_this_Community.svg'
+    image: "Apply_to_Join_this_Community.svg"
   }
 ];
 
@@ -116,8 +118,6 @@ const accumulatePoints = (groups, reputationData, user, points) => {
   }
 };
 
-
-
 const Communities = props => {
   const firebase = useRecoilValue(firebaseOneState);
 
@@ -131,7 +131,9 @@ const Communities = props => {
   const [communities, setCommunities] = useState(allCommunities);
   const [community, setCommunity] = useState(props.commIdx >= 0 ? allCommunities[props.commIdx] : allCommunities[0]);
   const [expandedOption, setExpandedOption] = useState("");
+  const [limit, setLimit] = useState(3);
 
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     if (props.commIdx !== undefined && props.commIdx !== -1) {
@@ -247,9 +249,9 @@ const Communities = props => {
   };
 
   const getImage = (subSectionTitle, sx) => {
-    const subSection=subSections.find(subSection=>subSection.title===subSectionTitle);
-    console.log({subSectionTitle,subSection})
-    if(!subSection?.image) return null;
+    const subSection = subSections.find(subSection => subSection.title === subSectionTitle);
+    console.log({ subSectionTitle, subSection });
+    if (!subSection?.image) return null;
 
     return subSection ? (
       <Box
@@ -261,28 +263,27 @@ const Communities = props => {
           ...sx
         }}
       >
-        <img
-          src={`/static/${subSection.image}`}
-          alt={subSection.title}
-          style={{ width: "100%", height: "100%" }}
-        />
+        <img src={`/static/${subSection.image}`} alt={subSection.title} style={{ width: "100%", height: "100%" }} />
       </Box>
     ) : null;
+  };
+
+  const joinUsClick = event => {
+    window.location.replace("/#JoinUsSection");
   };
 
   return (
     <PagesNavbar communities={true} thisPage={"Communities"} newHeader={true}>
       <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "minmax(min-content,250px) 1fr" },
-          columnGap: "16px",
+          // display: "grid",
+          // gridTemplateColumns: { xs: "1fr", md: "minmax(min-content,250px) 1fr" },
+          // columnGap: "16px",
           maxWidth: "1284px",
-          m: "auto",
-          pt: { sx: "20px", md: "40px" }
+          m: "auto"
         }}
       >
-        <Box>
+        {/* <Box>
           <Box sx={{ position: "sticky", top: "150px" }}>
             <Typography
               variant="h5"
@@ -335,16 +336,140 @@ const Communities = props => {
               ))}
             </Stack>
           </Box>
-        </Box>
+        </Box> */}
+
         <Box
           sx={{
             maxWidth: "958px",
             margin: "auto"
           }} /* columns={{ xs: 1, md: 2, lg: 2, xl: 3 }} spacing={{ xs: 1, md: 2.2 }} */
         >
-          <Typography variant="h4" gutterBottom align="left" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
-            {community.title}
-          </Typography>
+          <Box sx={{ position: "relative" }}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                if (!carouselRef.current) return;
+
+                carouselRef.current.scrollBy(600, 0);
+              }}
+              sx={{
+                background: gray200,
+                position: "absolute",
+                right: "-28px",
+                top: "calc(50% - 28px)",
+                zIndex: "9",
+                ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+                width: "32px",
+                minWidth: "56px",
+                height: "56px",
+                p: "0px",
+                borderRadius: "50%",
+                opacity: "0.7",
+                borderColor: gray200,
+                transition: "opacity .3s"
+              }}
+            >
+              <ArrowForwardIcon />
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                if (!carouselRef.current) return;
+
+                carouselRef.current.scrollBy(-600, 0);
+              }}
+              sx={{
+                background: gray200,
+                position: "absolute",
+                left: "-28px",
+                top: "calc(50% - 28px)",
+                zIndex: "9",
+                ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+                width: "32px",
+                minWidth: "56px",
+                height: "56px",
+                p: "0px",
+                borderRadius: "50%",
+                opacity: "0.7",
+                borderColor: gray200,
+                transition: "opacity .3s"
+              }}
+            >
+              <ArrowBackIcon />
+            </Button>
+            <Stack
+              ref={carouselRef}
+              direction={"row"}
+              alignItems="stretch"
+              spacing={"24px"}
+              sx={{
+                position: "relative",
+                overflowX: "hidden",
+                maxWidth: "958px",
+                py: "16px",
+                scrollBehavior: "smooth"
+              }}
+            >
+              {communities.map((item, idx) => (
+                <Link key={item.id} to={`/community/${item.id}`} style={{ textDecoration: "none", color: "inherit",display:"block" }}>
+                  <Card elevation={0} sx={{ minWidth: "210px", maxWidth: "220px",height:"100%", flex: 1 }} square>
+                    <CardActionArea
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                        p: "16px",
+                        border: `1px solid ${gray200}`,
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        height: "100%",
+                        ":hover": {
+                          borderColor: orangeDark
+                        }
+                      }}
+                    >
+                      <CardMedia
+                        component={"img"}
+                        image={item.url}
+                        width="180px"
+                        height="140"
+                        alt={item.title}
+                        sx={{ borderRadius: "8px" }}
+                      />
+                      <CardContent sx={{ p: "16px 0 0 0" }}>
+                        <Typography sx={{ fontSize: "14px", fontWeight: 600, pt: "0" }}>{item.title}</Typography>
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                </Link>
+              ))}
+            </Stack>
+          </Box>
+
+          <br />
+          <Divider />
+          <br />
+
+          <Stack direction={"row"} alignItems="center" justifyContent={"space-between"}>
+            <Typography variant="h4" gutterBottom align="left" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
+              {community.title}
+            </Typography>
+            <Button
+              onClick={joinUsClick}
+              sx={{
+                textTransform: "initial",
+                color: "common.white",
+                backgroundColor: orangeDark,
+                cursor: "pointer",
+                ":hover": {
+                  cursor: "pointer",
+                  backgroundColor: orangeLight
+                }
+              }}
+            >
+              Apply to join this community
+            </Button>
+          </Stack>
 
           <Box sx={{ py: "10px", px: { xs: "10px" }, mb: "19px" }}>
             <YoutubeEmbed embedId={community.YouTube} />
@@ -358,6 +483,87 @@ const Communities = props => {
                 {community.description}
               </Typography>
             )}
+            <br />
+
+            <Box
+              sx={{
+                m: "2.5px",
+                minHeight: "130px"
+              }}
+            >
+              <Stack
+                direction={"row"}
+                flexWrap="wrap"
+                justifyContent={"flex-start"}
+                sx={{
+                  listStyle: "none",
+                  p: 0.5,
+                  m: 0
+                }}
+                component="ul"
+                spacing={"24px"}
+              >
+                {community.leaders &&
+                  community.leaders.map((leader, idx) => {
+                    return (
+                      <li key={leader.name}>
+                        <Stack
+                          alignItems={"center"}
+                          spacing="8px"
+                          sx={{
+                            padding: "24px ",
+                            border: `1px solid ${gray200}`,
+                            borderRadius: "12px",
+                            width: "280px"
+                          }}
+                        >
+                          <Avatar
+                            src={"/static/CommunityLeaders/" + leader.image}
+                            alt={leader.name}
+                            sx={{
+                              width: "100px",
+                              height: "100px",
+                              mb: "4px"
+                            }}
+                          />
+                          <Typography variant="h5" component="div" fontWeight={600}>
+                            {leader.name}
+                          </Typography>
+                          <Typography variant="h5" component="div" sx={{ color: gray600, fontSize: "16px" }}>
+                            Community leader
+                          </Typography>
+                          <Stack direction={"row"} spacing="8px">
+                            {leader.websites &&
+                              leader.websites.map((wSite, wIdx) => {
+                                return (
+                                  <IconButton
+                                    key={wIdx}
+                                    component="a"
+                                    href={wSite.url}
+                                    target="_blank"
+                                    aria-label={wSite.name}
+                                  >
+                                    {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
+                                  </IconButton>
+                                );
+                              })}
+                            <IconButton
+                              component="a"
+                              href={
+                                "mailto:onecademy@umich.edu?subject=" + community.title + " Question for " + leader.name
+                              }
+                              target="_blank"
+                              aria-label="email"
+                            >
+                              <EmailIcon />
+                            </IconButton>
+                          </Stack>
+                        </Stack>
+                      </li>
+                    );
+                  })}
+              </Stack>
+            </Box>
           </Box>
 
           <Divider />
@@ -369,21 +575,22 @@ const Communities = props => {
             sx={{ margin: "auto" }}
           >
             <Box>
-              {subSections.map((subSection,idx) => (
+              {subSections.map((subSection, idx) => (
                 <Accordion
+                key={idx}
                   disableGutters
                   elevation={0}
                   square
                   sx={{
                     background: "transparent",
                     border: "none",
-                    borderLeft: `4px solid ${expandedOption ===  subSection.title ? orangeDark : "#F8F8F8"}`,
+                    borderLeft: `4px solid ${expandedOption === subSection.title ? orangeDark : "#F8F8F8"}`,
                     "&:before": {
                       display: "none"
                     }
                   }}
                   expanded={expandedOption === subSection.title}
-                  onChange={handleChangeOption( subSection.title)}
+                  onChange={handleChangeOption(subSection.title)}
                 >
                   <AccordionSummary>
                     <Typography
@@ -396,9 +603,7 @@ const Communities = props => {
                       {subSection.title}
                     </Typography>
                   </AccordionSummary>
-                  <AccordionDetails>
-                  {subSection.component(community)}
-                  </AccordionDetails>
+                  <AccordionDetails>{subSection.component(community)}</AccordionDetails>
                 </Accordion>
               ))}
             </Box>
@@ -439,95 +644,6 @@ const Communities = props => {
                     >
                       Community Members
                     </Typography> */}
-          <Box
-            sx={{
-              m: "2.5px",
-              minHeight: "130px"
-            }}
-          >
-            <Typography
-              variant="h5"
-              component="div"
-              sx={{
-                display: "block",
-                padding: "19px 0px 0px 19px",
-                fontStyle: "italic"
-              }}
-            >
-              Community Leader{community.leaders.length > 1 ? "s" : ""}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "left",
-                flexWrap: "wrap",
-                listStyle: "none",
-                p: 0.5,
-                m: 0
-              }}
-              component="ul"
-            >
-              {community.leaders &&
-                community.leaders.map((leader, idx) => {
-                  return (
-                    <li key={leader.name}>
-                      <Chip
-                        sx={{
-                          height: "109px",
-                          margin: "10px",
-                          borderRadius: "58px"
-                        }}
-                        icon={
-                          <Avatar
-                            src={"/static/CommunityLeaders/" + leader.image}
-                            alt={leader.name}
-                            sx={{
-                              width: "100px",
-                              height: "100px",
-                              mr: 2.5
-                            }}
-                          />
-                        }
-                        variant="outlined"
-                        label={
-                          <>
-                            <Typography variant="h5" component="div">
-                              {leader.name}
-                            </Typography>
-                            {leader.websites &&
-                              leader.websites.map((wSite, wIdx) => {
-                                return (
-                                  <IconButton
-                                    key={wIdx}
-                                    component="a"
-                                    href={wSite.url}
-                                    target="_blank"
-                                    aria-label={wSite.name}
-                                  >
-                                    {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
-                                  </IconButton>
-                                );
-                              })}
-                            <IconButton
-                              component="a"
-                              href={
-                                "mailto:onecademy@umich.edu?subject=" + community.title + " Question for " + leader.name
-                              }
-                              target="_blank"
-                              aria-label="email"
-                            >
-                              <EmailIcon />
-                            </IconButton>
-                          </>
-                        }
-                      />
-                    </li>
-                  );
-                })}
-            </Box>
-          </Box>
-
-          <Divider />
 
           <Box
             sx={{
@@ -537,25 +653,22 @@ const Communities = props => {
             }}
           >
             <Typography
-              variant="h5"
-              component="div"
               sx={{
-                display: "block",
-                padding: "19px 0px 0px 19px",
-                fontStyle: "italic"
+                display: "block"
               }}
             >
-              Leaderboard (Only those with &gt; 25 points)
+              <b>Leaderboard</b> <br />
+              <span> Only those with &gt; 25 points </span>
             </Typography>
-            <Box
+            <br />
+            <Stack
               sx={{
                 display: "grid",
                 gridTemplateColumns: {
                   xs: "repeat(auto-fit,minmax(50%,auto))",
-                  sm: "repeat(auto-fit,minmax(30%,auto))",
-                  lg: "repeat(auto-fit,minmax(25%,auto))"
+                  sm: "repeat(auto-fit,minmax(20%,auto))"
                 },
-                rowGap: "4px",
+                gap: "4px",
                 listStyle: "none",
                 p: 0.5,
                 m: 0
@@ -563,42 +676,54 @@ const Communities = props => {
               component="ul"
             >
               {community.allTime &&
-                community.allTime.map((member, idx) => {
+                community.allTime.slice(0, limit).map((member, idx) => {
                   return member.points >= 25 ? (
                     <li key={member.uname}>
-                      <Chip
+                      <Stack
+                        direction={"row"}
+                        alignItems={"center"}
                         sx={{
-                          height: "49px",
-                          borderRadius: "28px"
+                          minWidth: "150px",
+                          maxWidth: "260px",
+                          height: "84px",
+                          borderRadius: "12px",
+                          border: `1px solid ${gray200}`,
+                          p: "16px 24px"
                         }}
-                        icon={
-                          <Avatar
-                            src={member.imageUrl}
-                            alt={member.fullname}
-                            sx={{
-                              width: "40px",
-                              height: "40px",
-                              mr: 2.5
-                            }}
-                          />
-                        }
-                        variant="outlined"
-                        label={
-                          <>
-                            <Typography variant="body2" component="div">
-                              {member.fullname}
-                            </Typography>
-                            <Typography variant="body2" component="div">
-                              {idx < 3 ? "🏆" : "✔️"}
-                              {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
-                            </Typography>
-                          </>
-                        }
-                      />
+                      >
+                        <Avatar
+                          src={member.imageUrl}
+                          alt={member.fullname}
+                          sx={{
+                            width: "50px",
+                            height: "50px",
+                            mr: 2.5
+                          }}
+                        />
+                        <Stack>
+                          <Typography sx={{ fontSize: "16px", fontWeight: 600 }}>{member.fullname}</Typography>
+                          <Typography variant="body2" component="div">
+                            {idx < 3 ? "🏆" : "✔️"}
+                            {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
+                          </Typography>
+                        </Stack>
+                      </Stack>
                     </li>
                   ) : null;
                 })}
-            </Box>
+              <Button
+                onClick={() => (community.allTime ? setLimit(community.allTime.length) : setLimit(3))}
+                sx={{
+                  display: limit === 3 ? "block" : "none",
+                  textTransform: "capitalize",
+                  color: orangeDark,
+                  cursor: "pointer",
+                  placeSelf: "center"
+                }}
+              >
+                View more...
+              </Button>
+            </Stack>
           </Box>
           {/* <Grid
                       container
