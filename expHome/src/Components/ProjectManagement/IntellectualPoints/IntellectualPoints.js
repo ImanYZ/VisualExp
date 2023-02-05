@@ -200,7 +200,22 @@ const IntellectualPoints = (props) => {
   const [otherVoting, setOtherVoting] = useState(false);
   const [activitiesLoaded, setActivitiesLoaded] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [reseachers, setResearchers] = useState({});
 
+  useEffect(() => {
+    const getReserchers = async () => {
+      const reserchersByName = {};
+      const researchersDocs = await firebase.db.collection("researchers").get();
+      researchersDocs.forEach(doc => {
+        reserchersByName[doc.id] = doc.data();
+      });
+
+      setResearchers(reserchersByName);
+    };
+    if (firebase) {
+      getReserchers();
+    }
+  }, [firebase]);
   useEffect(() => {
     const loadTags = async () => {
       console.log("fetch tags Data");
@@ -324,6 +339,7 @@ const IntellectualPoints = (props) => {
 
   useEffect(() => {
     console.log("activitiesChanges");
+    if(!Object.keys(reseachers).length) return ;
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];
       setActivitiesChanges([]);
@@ -331,11 +347,12 @@ const IntellectualPoints = (props) => {
       let aActivities = [...allActivities];
       let oActivities = [...othersActivities];
       for (let change of tempActivitiesChanges) {
+        const activityData = change.doc.data();
+        if(!reseachers[activityData.fullname].projects[project].active) continue; 
         if (change.type === "removed") {
           aActivities = aActivities.filter((acti) => acti.id !== change.doc.id);
           oActivities = oActivities.filter((acti) => acti.id !== change.doc.id);
         } else {
-          const activityData = change.doc.data();
           if (activityData.fullname === fullname) {
             const newActivity = {
               description: activityData.description,
