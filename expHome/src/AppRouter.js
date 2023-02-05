@@ -383,7 +383,7 @@ const AppRouter = props => {
           <Route path="/tutorial/*" element={<Tutorial />} />
           <Route path="/ReminderDate/*" element={<ReminderDate />} />
           <Route path="/withdraw/*" element={<Withdraw />} />
-          {leading.length > 0 && (
+          {leading.length  === 0 && (
             <>
               <Route path="/tutorialfeedback/*" element={<TutorialFeedback />} />
 
