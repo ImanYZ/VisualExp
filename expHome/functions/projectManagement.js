@@ -12,6 +12,7 @@ const { deleteEvent } = require("./GoogleCalendar");
 const { assignExpPoints } = require("./helpers/assignExpPoints");
 const moment = require("moment");
 const { delay } = require("lodash");
+const { Timestamp } = require("firebase-admin/firestore");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -27,7 +28,7 @@ const researchers = [
 
 const voteFn = async (voter, activity, vote) => {
   try {
-    const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+    const currentTime = Timestamp.fromDate(new Date());
     await db.runTransaction(async t => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
@@ -474,7 +475,7 @@ exports.voteActivityReset = async (req, res) => {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
-        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        const currentTime = Timestamp.fromDate(new Date());
         await db.runTransaction(async t => {
           const activityRef = db.collection("activities").doc(activity);
           const activityDoc = await t.get(activityRef);
@@ -550,7 +551,7 @@ exports.deleteActivity = async (req, res) => {
     if (activity) {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       try {
-        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        const currentTime = Timestamp.fromDate(new Date());
         await db.runTransaction(async t => {
           const userQuery = db.collection("users").where("uid", "==", authUser.uid).limit(1);
           const userDocs = await t.get(userQuery);
@@ -640,7 +641,7 @@ exports.deleteActivity = async (req, res) => {
 
 const voteInstructorFn = async (voter, instructor, vote, comment, voterProject) => {
   try {
-    const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+    const currentTime = Timestamp.fromDate(new Date());
     await db.runTransaction(async t => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
@@ -830,7 +831,7 @@ exports.voteInstructorReset = async (req, res) => {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
-        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        const currentTime = Timestamp.fromDate(new Date());
         await db.runTransaction(async t => {
           const instructorRef = db.collection("instructors").doc(instructor);
           const instructorDoc = await t.get(instructorRef);
@@ -875,7 +876,7 @@ exports.voteInstructorReset = async (req, res) => {
 
 const voteAdministratorFn = async (voter, administrator, vote, comment, voterProject) => {
   try {
-    const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+    const currentTime = Timestamp.fromDate(new Date());
     await db.runTransaction(async t => {
       const voterRef = db.collection("researchers").doc(voter);
       const voterDoc = await t.get(voterRef);
@@ -1058,7 +1059,7 @@ exports.voteAdministratorReset = async (req, res) => {
       const authUser = await admin.auth().verifyIdToken(req.headers.authorization);
       const userDocs = await db.collection("users").where("uid", "==", authUser.uid).limit(1).get();
       if (userDocs.docs.length > 0) {
-        const currentTime = admin.firestore.Timestamp.fromDate(new Date());
+        const currentTime = Timestamp.fromDate(new Date());
         await db.runTransaction(async t => {
           const administratorRef = db.collection("administrators").doc(administrator);
           const administratorDoc = await t.get(administratorRef);
