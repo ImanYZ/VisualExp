@@ -230,33 +230,31 @@ const CommunityApplications = props => {
   }, [firebase]);
 
   useEffect(() => {
-    if (fullname === "Iman YeckehZaare") {
-      setApplicationsColumns([
-        ...applicationsColms,
-        {
-          field: "invited",
-          headerName: "Invited",
-          width: 10,
-          disableColumnMenu: true,
-          renderCell: cellValues => {
-            return (
-              <div
-                style={{
-                  fontSize: 19,
-                  fontWeight: "bold",
-                  cursor: cellValues.value === "O" ? "default" : "pointer",
-                  width: "100%",
-                  textAlign: "center"
-                }}
-              >
-                {cellValues.value === "O" ? <CircularProgress color="warning" size="16px" /> : cellValues.value}
-              </div>
-            );
-          }
+    if (!fullname || !(fullname === "Iman YeckehZaare")) return;
+       const _applicationsColms = [ ...applicationsColumns ,  {
+        field: "invited",
+        headerName: "Invited",
+        width: 10,
+        disableColumnMenu: true,
+        renderCell: cellValues => {
+          return (
+            <div
+              style={{
+                fontSize: 19,
+                fontWeight: "bold",
+                cursor: cellValues.value === "O" ? "default" : "pointer",
+                width: "100%",
+                textAlign: "center"
+              }}
+            >
+              {cellValues.value === "O" ? <CircularProgress color="warning" size="16px" /> : cellValues.value}
+            </div>
+          );
         }
-      ]);
-    }
-  }, [fullname]);
+      }]
+      setApplicationsColumns(_applicationsColms);
+    
+  }, [applications, fullname]);
 
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
