@@ -282,438 +282,421 @@ const Communities = props => {
     <PagesNavbar communities={true} thisPage={"Communities"} newHeader={true}>
       <Box
         sx={{
-          maxWidth: "1284px",
-          m: "auto"
+          maxWidth: "1280px",
+          margin: "auto",
+          px:{xs:"12px",md:"0px"}
         }}
       >
-        <Box
-          sx={{
-            maxWidth: "1280px",
-            margin: "auto"
-          }}
-        >
-          <Box sx={{ position: "relative" }}>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                if (!carouselRef.current) return;
+        <Box sx={{ position: "relative" }}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              if (!carouselRef.current) return;
 
-                carouselRef.current.scrollBy(600, 0);
-              }}
-              sx={{
-                background: gray200,
-                position: "absolute",
-                right: { xs: "0px", xl: "-28px" },
-                top: "calc(50% - 28px)",
-                zIndex: "9",
-                ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
-                width: { xs: "32px", md: "56px" },
-                minWidth: { xs: "32px", md: "56px" },
-                height: { xs: "32px", md: "56px" },
-                p: "0px",
-                borderRadius: "50%",
-                opacity: "0.7",
-                borderColor: gray200,
-                transition: "opacity .3s"
-              }}
-            >
-              <ArrowForwardIcon />
-            </Button>
-            <Button
-              variant="outlined"
-              onClick={() => {
-                if (!carouselRef.current) return;
-
-                carouselRef.current.scrollBy(-600, 0);
-              }}
-              sx={{
-                background: gray200,
-                position: "absolute",
-                left: { xs: "0px", xl: "-28px" },
-                top: "calc(50% - 28px)",
-                zIndex: "9",
-                ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
-                width: { xs: "32px", md: "56px" },
-                minWidth: { xs: "32px", md: "56px" },
-                height: { xs: "32px", md: "56px" },
-                p: "0px",
-                borderRadius: "50%",
-                opacity: "0.7",
-                borderColor: gray200,
-                transition: "opacity .3s"
-              }}
-            >
-              <ArrowBackIcon />
-            </Button>
-            <Stack
-              ref={carouselRef}
-              direction={"row"}
-              alignItems="stretch"
-              spacing={"24px"}
-              sx={{
-                position: "relative",
-                overflowX: "scroll",
-                maxWidth: "1280px",
-                py: "16px",
-                scrollBehavior: "smooth",
-                "&::-webkit-scrollbar": {
-                  width: "4px",
-                  height: "4px"
-                },
-                "::-webkit-scrollbar-thumb": {
-                  backgroundColor: gray600,
-                  borderRadius: "10px"
-                }
-              }}
-            >
-              {communities.map((item, idx) => (
-                <Link
-                  key={item.id}
-                  to={`/community/${item.id}`}
-                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
-                >
-                  <Card
-                    elevation={0}
-                    sx={{
-                      minWidth: { xs: "150px", sm: "210px" },
-                      maxWidth: { xs: "160px", sm: "220px" },
-                      height: { xs: "100%", sm: "100%" },
-                      flex: 1
-                    }}
-                    square
-                  >
-                    <CardActionArea
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-start",
-                        p: "16px",
-                        border: `1px solid ${gray200}`,
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        height: "100%",
-                        ":hover": {
-                          borderColor: orangeDark
-                        }
-                      }}
-                    >
-                      <CardMedia
-                        component={"img"}
-                        image={item.url}
-                        alt={item.title}
-                        sx={{ borderRadius: "8px", height: { xs: "100px", sm: "140px" } }}
-                      />
-                      <CardContent sx={{ p: "16px 0 0 0" }}>
-                        <Typography sx={{ fontSize: "14px", fontWeight: 600, pt: "0" }}>{item.title}</Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Link>
-              ))}
-            </Stack>
-          </Box>
-
-          <DividerStyled />
-
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={{ xs: "16px", sm: "0px" }}
-            alignItems="center"
-            justifyContent={"space-between"}
-            mb="16px"
+              carouselRef.current.scrollBy(600, 0);
+            }}
+            sx={{
+              background: gray200,
+              position: "absolute",
+              right: { xs: "0px", xl: "-28px" },
+              top: "calc(50% - 28px)",
+              zIndex: "9",
+              ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+              width: { xs: "32px", md: "56px" },
+              minWidth: { xs: "32px", md: "56px" },
+              height: { xs: "32px", md: "56px" },
+              p: "0px",
+              borderRadius: "50%",
+              opacity: "0.7",
+              borderColor: gray200,
+              transition: "opacity .3s"
+            }}
           >
-            <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", m: "0px" }}>
-              {community.title}
-            </Typography>
-            <Button
-              onClick={joinUsClick}
-              sx={{
-                textTransform: "initial",
-                color: "common.white",
-                backgroundColor: orangeDark,
-                cursor: "pointer",
-                ":hover": {
-                  cursor: "pointer",
-                  backgroundColor: orangeLight
-                }
-              }}
-            >
-              Apply to join this community
-            </Button>
-          </Stack>
+            <ArrowForwardIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              if (!carouselRef.current) return;
 
-          <Box sx={{ py: "10px", px: { xs: "10px" }, mb: "19px" }}>
-            {/* Community video */}
-
-            <YoutubeEmbed embedId={community.YouTube} />
-
-            <br />
-
-            {/* Community description */}
-
-            {typeof community.description === "object" && community.description !== null ? (
-              community.description
-            ) : (
-              <Typography variant="body1" color={gray600} sx={{ textAlign: "left" }}>
-                {community.description}
-              </Typography>
-            )}
-
-            <br />
-
-            {/* Communiiity leader */}
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
-                placeItems: "center",
-                gap: "16px",
-                m: "2.5px",
-                minHeight: "130px"
-              }}
-            >
-              {community.leaders &&
-                community.leaders.map((leader, idx) => {
-                  return (
-                    <Stack
-                      alignItems={"center"}
-                      spacing="8px"
-                      sx={{
-                        padding: "24px ",
-                        border: `1px solid ${gray200}`,
-                        borderRadius: "12px",
-                        width: "280px"
-                      }}
-                    >
-                      <Avatar
-                        src={"/static/CommunityLeaders/" + leader.image}
-                        alt={leader.name}
-                        sx={{
-                          width: "100px",
-                          height: "100px",
-                          mb: "4px"
-                        }}
-                      />
-                      <Typography variant="h5" component="div" fontWeight={600}>
-                        {leader.name}
-                      </Typography>
-                      <Typography variant="h5" component="div" sx={{ color: gray600, fontSize: "16px" }}>
-                        Community leader
-                      </Typography>
-                      <Stack direction={"row"} spacing="8px">
-                        {leader.websites &&
-                          leader.websites.map((wSite, wIdx) => {
-                            return (
-                              <IconButton
-                                key={wIdx}
-                                component="a"
-                                href={wSite.url}
-                                target="_blank"
-                                aria-label={wSite.name}
-                              >
-                                {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
-                              </IconButton>
-                            );
-                          })}
-                        <IconButton
-                          component="a"
-                          href={
-                            "mailto:onecademy@umich.edu?subject=" + community.title + " Question for " + leader.name
-                          }
-                          target="_blank"
-                          aria-label="email"
-                        >
-                          <EmailIcon />
-                        </IconButton>
-                      </Stack>
-                    </Stack>
-                  );
-                })}
-            </Box>
-          </Box>
-
-          <DividerStyled />
-
-          {/* Qualification, Joinning and responsabilities */}
-
-          <Box>
-            {subSections.map((subSection, idx) => (
-              <Stack
-                key={idx}
-                direction={{ xs: "column", sm: "row" }}
-                alignItems="center"
-                spacing={{ xs: "24px", sm: "100px" }}
-                sx={{ mb: { xs: "40px", sm: "16px" } }}
+              carouselRef.current.scrollBy(-600, 0);
+            }}
+            sx={{
+              background: gray200,
+              position: "absolute",
+              left: { xs: "0px", xl: "-28px" },
+              top: "calc(50% - 28px)",
+              zIndex: "9",
+              ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+              width: { xs: "32px", md: "56px" },
+              minWidth: { xs: "32px", md: "56px" },
+              height: { xs: "32px", md: "56px" },
+              p: "0px",
+              borderRadius: "50%",
+              opacity: "0.7",
+              borderColor: gray200,
+              transition: "opacity .3s"
+            }}
+          >
+            <ArrowBackIcon />
+          </Button>
+          <Stack
+            ref={carouselRef}
+            direction={"row"}
+            alignItems="stretch"
+            spacing={"24px"}
+            sx={{
+              position: "relative",
+              overflowX: "scroll",
+              maxWidth: "1280px",
+              py: "16px",
+              scrollBehavior: "smooth",
+              "&::-webkit-scrollbar": {
+                width: "4px",
+                height: "4px"
+              },
+              "::-webkit-scrollbar-thumb": {
+                backgroundColor: gray600,
+                borderRadius: "10px"
+              }
+            }}
+          >
+            {communities.map((item, idx) => (
+              <Link
+                key={item.id}
+                to={`/community/${item.id}`}
+                style={{ textDecoration: "none", color: "inherit", display: "block" }}
               >
-                <Box
+                <Card
+                  elevation={0}
                   sx={{
-                    color: gray600,
-                    flex: 1,
-                    maxWidth: "650px",
-                    "& ul": {
-                      pl: "28px"
-                    },
-                    "& li": {
-                      listStyle: "none",
-                      position: "relative"
-                    },
-                    "& li:before": {
-                      content: '""',
-                      width: "6px",
-                      height: "6px",
-                      backgroundColor: gray600,
-                      color: gray600,
-                      borderRadius: "2px",
-                      position: "absolute",
-                      left: "-20px",
-                      top: "8px"
-                    },
-                    "& li:not(:last-child)": {
-                      marginBottom: "12px"
-                    }
+                    minWidth: { xs: "150px", sm: "210px" },
+                    maxWidth: { xs: "160px", sm: "220px" },
+                    height: { xs: "100%", sm: "100%" },
+                    flex: 1
                   }}
+                  square
                 >
-                  <Typography
-                    variant="h5"
-                    component="div"
+                  <CardActionArea
                     sx={{
-                      fontWeight: 600,
-                      color: gray900
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      p: "16px",
+                      border: `1px solid ${gray200}`,
+                      borderRadius: "8px",
+                      cursor: "pointer",
+                      height: "100%",
+                      ":hover": {
+                        borderColor: orangeDark
+                      }
                     }}
                   >
-                    {subSection.title}
-                  </Typography>
-                  {subSection.component(community)}
-                </Box>
-                <Box sx={{ width: { sm: "250px", lg: "300px" }, height: { sm: "250px", lg: "300px" } }}>
-                  <img src={subSection.image} alt={subSection.title} style={{ width: "100%", height: "100%" }} />
-                </Box>
-              </Stack>
+                    <CardMedia
+                      component={"img"}
+                      image={item.url}
+                      alt={item.title}
+                      sx={{ borderRadius: "8px", height: { xs: "100px", sm: "140px" } }}
+                    />
+                    <CardContent sx={{ p: "16px 0 0 0" }}>
+                      <Typography sx={{ fontSize: "14px", fontWeight: 600, pt: "0" }}>{item.title}</Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Link>
             ))}
+          </Stack>
+        </Box>
 
-            {/* {getImage(expandedOption, { display: { xs: "none", md: "block" } })} */}
-          </Box>
+        <DividerStyled />
 
-          <DividerStyled />
-
-          <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
-            Apply to Join this Community
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          spacing={{ xs: "16px", sm: "0px" }}
+          alignItems="center"
+          justifyContent={"space-between"}
+          mb="16px"
+        >
+          <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", m: "0px" }}>
+            {community.title}
           </Typography>
-          <JoinUs community={community} />
+          <Button
+            onClick={joinUsClick}
+            sx={{
+              textTransform: "initial",
+              color: "common.white",
+              backgroundColor: orangeDark,
+              cursor: "pointer",
+              ":hover": {
+                cursor: "pointer",
+                backgroundColor: orangeLight
+              }
+            }}
+          >
+            Apply to join this community
+          </Button>
+        </Stack>
 
-          <DividerStyled />
-          {typeof community.accomplishments === "object" &&
-            !Array.isArray(community.accomplishments) &&
-            community.accomplishments !== null && (
-              <Box sx={{ padding: "10px", mb: "19px" }}>
+        <Box sx={{ py: "10px", px: { xs: "10px" }, mb: "19px" }}>
+          {/* Community video */}
+
+          <YoutubeEmbed embedId={community.YouTube} />
+
+          <br />
+
+          {/* Community description */}
+
+          {typeof community.description === "object" && community.description !== null ? (
+            community.description
+          ) : (
+            <Typography variant="body1" color={gray600} sx={{ textAlign: "left" }}>
+              {community.description}
+            </Typography>
+          )}
+
+          <br />
+
+          {/* Communiiity leader */}
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
+              placeItems: "center",
+              gap: "16px",
+              m: "2.5px",
+              minHeight: "130px"
+            }}
+          >
+            {community.leaders &&
+              community.leaders.map((leader, idx) => {
+                return (
+                  <Stack
+                    alignItems={"center"}
+                    spacing="8px"
+                    sx={{
+                      padding: "24px ",
+                      border: `1px solid ${gray200}`,
+                      borderRadius: "12px",
+                      width: "280px"
+                    }}
+                  >
+                    <Avatar
+                      src={"/static/CommunityLeaders/" + leader.image}
+                      alt={leader.name}
+                      sx={{
+                        width: "100px",
+                        height: "100px",
+                        mb: "4px"
+                      }}
+                    />
+                    <Typography variant="h5" component="div" fontWeight={600}>
+                      {leader.name}
+                    </Typography>
+                    <Typography variant="h5" component="div" sx={{ color: gray600, fontSize: "16px" }}>
+                      Community leader
+                    </Typography>
+                    <Stack direction={"row"} spacing="8px">
+                      {leader.websites &&
+                        leader.websites.map((wSite, wIdx) => {
+                          return (
+                            <IconButton
+                              key={wIdx}
+                              component="a"
+                              href={wSite.url}
+                              target="_blank"
+                              aria-label={wSite.name}
+                            >
+                              {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
+                            </IconButton>
+                          );
+                        })}
+                      <IconButton
+                        component="a"
+                        href={"mailto:onecademy@umich.edu?subject=" + community.title + " Question for " + leader.name}
+                        target="_blank"
+                        aria-label="email"
+                      >
+                        <EmailIcon />
+                      </IconButton>
+                    </Stack>
+                  </Stack>
+                );
+              })}
+          </Box>
+        </Box>
+
+        <DividerStyled />
+
+        {/* Qualification, Joinning and responsabilities */}
+
+        <Box>
+          {subSections.map((subSection, idx) => (
+            <Stack
+              key={idx}
+              direction={{ xs: "column", sm: "row" }}
+              alignItems="center"
+              spacing={{ xs: "24px", sm: "100px" }}
+              sx={{ mb: { xs: "40px", sm: "16px" } }}
+            >
+              <Box
+                sx={{
+                  color: gray600,
+                  flex: 1,
+                  maxWidth: "650px",
+                  "& ul": {
+                    pl: "28px"
+                  },
+                  "& li": {
+                    listStyle: "none",
+                    position: "relative"
+                  },
+                  "& li:before": {
+                    content: '""',
+                    width: "6px",
+                    height: "6px",
+                    backgroundColor: gray600,
+                    color: gray600,
+                    borderRadius: "2px",
+                    position: "absolute",
+                    left: "-20px",
+                    top: "8px"
+                  },
+                  "& li:not(:last-child)": {
+                    marginBottom: "12px"
+                  }
+                }}
+              >
                 <Typography
                   variant="h5"
                   component="div"
                   sx={{
-                    pt: "19px",
-                    pb: "19px"
+                    fontWeight: 600,
+                    color: gray900
                   }}
                 >
-                  Community Accomplishments
+                  {subSection.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: "left" }}>
-                  {community.accomplishments}
-                </Typography>
+                {subSection.component(community)}
               </Box>
-            )}
-          {/* <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        pt: "19px",
-                        pb: "19px",
-                      }}
-                    >
-                      Community Members
-                    </Typography> */}
+              <Box sx={{ width: { sm: "250px", lg: "300px" }, height: { sm: "250px", lg: "300px" } }}>
+                <img src={subSection.image} alt={subSection.title} style={{ width: "100%", height: "100%" }} />
+              </Box>
+            </Stack>
+          ))}
 
-          <Box
-            sx={{
-              m: "2.5px",
-              mt: "10px",
-              minHeight: "130px"
-            }}
-          >
-            <Typography
-              sx={{
-                display: "block",
-                "& span": {
-                  color: gray600
-                }
-              }}
-            >
-              <b>Leaderboard</b>
-              <br />
-              <span> Only those with &gt; 25 points </span>
-            </Typography>
-            <br />
-            <Stack
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
-                placeItems: limit === 3 ? "center" : "stretch",
-                // justifyItems:{xs:"center",sx:"stretch"},
-                gap: "8px",
-                listStyle: "none",
-                p: 0.5,
-                m: 0
-              }}
-            >
-              {community.allTime &&
-                community.allTime.slice(0, limit).map((member, idx) => {
-                  return member.points >= 25 ? (
-                    <Stack
-                      direction={"row"}
-                      alignItems={"center"}
-                      sx={{
-                        minWidth: "150px",
-                        maxWidth: "260px",
-                        height: "84px",
-                        borderRadius: "12px",
-                        border: `1px solid ${gray200}`,
-                        p: { xs: "6px 8px", sm: "16px 24px" }
-                      }}
-                    >
-                      <Avatar
-                        src={member.imageUrl}
-                        alt={member.fullname}
-                        sx={{
-                          width: "50px",
-                          height: "50px",
-                          mr: 2.5
-                        }}
-                      />
-                      <Stack>
-                        <Typography sx={{ fontSize: "16px", fontWeight: 600 }}>{member.fullname}</Typography>
-                        <Typography variant="body2" component="div">
-                          {idx < 3 ? "🏆" : "✔️"}
-                          {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  ) : null;
-                })}
-              <Button
-                onClick={() => (community.allTime ? setLimit(community.allTime.length) : setLimit(3))}
+          {/* {getImage(expandedOption, { display: { xs: "none", md: "block" } })} */}
+        </Box>
+
+        <DividerStyled />
+
+        <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
+          Apply to Join this Community
+        </Typography>
+        <JoinUs community={community} />
+
+        <DividerStyled />
+        {typeof community.accomplishments === "object" &&
+          !Array.isArray(community.accomplishments) &&
+          community.accomplishments !== null && (
+            <Box sx={{ padding: "10px", mb: "19px" }}>
+              <Typography
+                variant="h5"
+                component="div"
                 sx={{
-                  display: limit === 3 ? "block" : "none",
-                  textTransform: "capitalize",
-                  color: orangeDark,
-                  cursor: "pointer"
-                  // placeSelf: "center"
+                  pt: "19px",
+                  pb: "19px"
                 }}
               >
-                View more...
-              </Button>
-            </Stack>
-          </Box>
-          {/* <Grid
+                Community Accomplishments
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "left" }}>
+                {community.accomplishments}
+              </Typography>
+            </Box>
+          )}
+
+        <Box
+          sx={{
+            m: "2.5px",
+            mt: "10px",
+            minHeight: "130px"
+          }}
+        >
+          <Typography
+            sx={{
+              display: "block",
+              "& span": {
+                color: gray600
+              }
+            }}
+          >
+            <b>Leaderboard</b>
+            <br />
+            <span> Only those with &gt; 25 points </span>
+          </Typography>
+          <br />
+          <Stack
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
+              placeItems: limit === 3 ? "center" : "stretch",
+              // justifyItems:{xs:"center",sx:"stretch"},
+              gap: "8px",
+              listStyle: "none",
+              p: 0.5,
+              m: 0
+            }}
+          >
+            {community.allTime &&
+              community.allTime.slice(0, limit).map((member, idx) => {
+                return member.points >= 25 ? (
+                  <Stack
+                    direction={"row"}
+                    alignItems={"center"}
+                    sx={{
+                      minWidth: "150px",
+                      maxWidth: "260px",
+                      height: "84px",
+                      borderRadius: "12px",
+                      border: `1px solid ${gray200}`,
+                      p: { xs: "6px 8px", sm: "16px 24px" }
+                    }}
+                  >
+                    <Avatar
+                      src={member.imageUrl}
+                      alt={member.fullname}
+                      sx={{
+                        width: "50px",
+                        height: "50px",
+                        mr: 2.5
+                      }}
+                    />
+                    <Stack>
+                      <Typography sx={{ fontSize: "16px", fontWeight: 600 }}>{member.fullname}</Typography>
+                      <Typography variant="body2" component="div">
+                        {idx < 3 ? "🏆" : "✔️"}
+                        {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                ) : null;
+              })}
+            <Button
+              onClick={() => (community.allTime ? setLimit(community.allTime.length) : setLimit(3))}
+              sx={{
+                display: limit === 3 ? "block" : "none",
+                textTransform: "capitalize",
+                color: orangeDark,
+                cursor: "pointer"
+                // placeSelf: "center"
+              }}
+            >
+              View more...
+            </Button>
+          </Stack>
+        </Box>
+        {/* <Grid
                       container
                       spacing={2.5}
                       align="center"
@@ -792,7 +775,6 @@ const Communities = props => {
                           );
                         })}
                     </Grid> */}
-        </Box>
       </Box>
     </PagesNavbar>
   );
