@@ -618,12 +618,13 @@ const Communities = props => {
                 component="div"
                 sx={{
                   pt: "19px",
-                  pb: "19px"
+                  pb: "19px",
+                  color:gray200
                 }}
               >
                 Community Accomplishments
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: "left" }}>
+              <Typography variant="body2"  sx={{ textAlign: "left",color:gray200 }}>
                 {community.accomplishments}
               </Typography>
             </Box>
