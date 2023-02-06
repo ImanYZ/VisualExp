@@ -34,10 +34,12 @@ import { Link } from "react-router-dom";
 export const orangeDark = "#FF6D00";
 export const orangeLight = "#f77a1a";
 export const orangeLighter = "#faa666";
+export const darkblue = "#0A0D14";
 export const gray200 = "#EAECF0";
 export const gray400 = "#98A2B3";
 export const gray600 = "#475467";
 export const gray700 = "#344054";
+export const gray800 = "#1D2939";
 export const gray900 = "#0A0D14";
 const subSections = [
   {
@@ -279,12 +281,12 @@ const Communities = props => {
   };
 
   return (
-    <PagesNavbar communities={true} thisPage={"Communities"} newHeader={true}>
+    <PagesNavbar communities={true} thisPage={"Communities"} newHeader={true} theme="dark">
       <Box
         sx={{
           maxWidth: "1280px",
           margin: "auto",
-          px:{xs:"12px",md:"0px"}
+          px: { xs: "12px", md: "0px" }
         }}
       >
         <Box sx={{ position: "relative" }}>
@@ -296,23 +298,22 @@ const Communities = props => {
               carouselRef.current.scrollBy(600, 0);
             }}
             sx={{
-              background: gray200,
+              background: gray600,
               position: "absolute",
               right: { xs: "0px", xl: "-28px" },
               top: "calc(50% - 28px)",
               zIndex: "9",
-              ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+              ":hover": { background: gray600, opacity: "0.9" },
               width: { xs: "32px", md: "56px" },
               minWidth: { xs: "32px", md: "56px" },
               height: { xs: "32px", md: "56px" },
               p: "0px",
               borderRadius: "50%",
               opacity: "0.7",
-              borderColor: gray200,
               transition: "opacity .3s"
             }}
           >
-            <ArrowForwardIcon />
+            <ArrowForwardIcon sx={{color:"common.white"}}/>
           </Button>
           <Button
             variant="outlined"
@@ -322,23 +323,23 @@ const Communities = props => {
               carouselRef.current.scrollBy(-600, 0);
             }}
             sx={{
-              background: gray200,
+              background: gray600,
               position: "absolute",
               left: { xs: "0px", xl: "-28px" },
               top: "calc(50% - 28px)",
               zIndex: "9",
-              ":hover": { background: gray200, borderColor: "#d8d8d8", opacity: "0.9" },
+              ":hover": { background: gray600, opacity: "0.9" },
               width: { xs: "32px", md: "56px" },
               minWidth: { xs: "32px", md: "56px" },
               height: { xs: "32px", md: "56px" },
               p: "0px",
               borderRadius: "50%",
               opacity: "0.7",
-              borderColor: gray200,
+             
               transition: "opacity .3s"
             }}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon sx={{color:"common.white"}}/>
           </Button>
           <Stack
             ref={carouselRef}
@@ -373,7 +374,8 @@ const Communities = props => {
                     minWidth: { xs: "150px", sm: "210px" },
                     maxWidth: { xs: "160px", sm: "220px" },
                     height: { xs: "100%", sm: "100%" },
-                    flex: 1
+                    flex: 1,
+                    backgroundColor:"transparent"
                   }}
                   square
                 >
@@ -383,7 +385,8 @@ const Communities = props => {
                       flexDirection: "column",
                       justifyContent: "flex-start",
                       p: "16px",
-                      border: `1px solid ${gray200}`,
+                      border: `1px solid ${gray800}`,
+                      backgroundColor: "black",
                       borderRadius: "8px",
                       cursor: "pointer",
                       height: "100%",
@@ -399,7 +402,9 @@ const Communities = props => {
                       sx={{ borderRadius: "8px", height: { xs: "100px", sm: "140px" } }}
                     />
                     <CardContent sx={{ p: "16px 0 0 0" }}>
-                      <Typography sx={{ fontSize: "14px", fontWeight: 600, pt: "0" }}>{item.title}</Typography>
+                      <Typography sx={{ fontSize: "14px", fontWeight: 600, pt: "0", color: gray200 }}>
+                        {item.title}
+                      </Typography>
                     </CardContent>
                   </CardActionArea>
                 </Card>
@@ -417,7 +422,12 @@ const Communities = props => {
           justifyContent={"space-between"}
           mb="16px"
         >
-          <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", m: "0px" }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            align="center"
+            sx={{ textTransform: "capitalize", m: "0px", color: gray200 }}
+          >
             {community.title}
           </Typography>
           <Button
@@ -449,7 +459,7 @@ const Communities = props => {
           {typeof community.description === "object" && community.description !== null ? (
             community.description
           ) : (
-            <Typography variant="body1" color={gray600} sx={{ textAlign: "left" }}>
+            <Typography variant="body1" color={gray200} sx={{ textAlign: "left" }}>
               {community.description}
             </Typography>
           )}
@@ -472,14 +482,14 @@ const Communities = props => {
               community.leaders.map((leader, idx) => {
                 return (
                   <Stack
-                  
                     alignItems={"center"}
                     spacing="8px"
                     sx={{
                       padding: "24px ",
-                      border: `1px solid ${gray200}`,
+                      border: `1px solid ${gray800}`,
                       borderRadius: "12px",
-                      width: "280px"
+                      width: "280px",
+                      backgroundColor: "black"
                     }}
                   >
                     <Avatar
@@ -491,10 +501,10 @@ const Communities = props => {
                         mb: "4px"
                       }}
                     />
-                    <Typography variant="h5" component="div" fontWeight={600}>
+                    <Typography variant="h5" component="div" fontWeight={600} sx={{ color: gray200 }}>
                       {leader.name}
                     </Typography>
-                    <Typography variant="h5" component="div" sx={{ color: gray600, fontSize: "16px" }}>
+                    <Typography variant="h5" component="div" sx={{ color: gray200, fontSize: "16px" }}>
                       Community leader
                     </Typography>
                     <Stack direction={"row"} spacing="8px">
@@ -507,6 +517,7 @@ const Communities = props => {
                               href={wSite.url}
                               target="_blank"
                               aria-label={wSite.name}
+                              sx={{ color: gray400 }}
                             >
                               {wSite.name === "LinkedIn" ? <LinkedInIcon /> : <LinkIcon />}
                             </IconButton>
@@ -517,6 +528,7 @@ const Communities = props => {
                         href={"mailto:onecademy@umich.edu?subject=" + community.title + " Question for " + leader.name}
                         target="_blank"
                         aria-label="email"
+                        sx={{ color: gray400 }}
                       >
                         <EmailIcon />
                       </IconButton>
@@ -542,7 +554,7 @@ const Communities = props => {
             >
               <Box
                 sx={{
-                  color: gray600,
+                  color: gray200,
                   flex: 1,
                   maxWidth: "650px",
                   "& ul": {
@@ -556,8 +568,8 @@ const Communities = props => {
                     content: '""',
                     width: "6px",
                     height: "6px",
-                    backgroundColor: gray600,
-                    color: gray600,
+                    backgroundColor: gray200,
+                    color: gray200,
                     borderRadius: "2px",
                     position: "absolute",
                     left: "-20px",
@@ -573,7 +585,7 @@ const Communities = props => {
                   component="div"
                   sx={{
                     fontWeight: 600,
-                    color: gray900
+                    color: gray200
                   }}
                 >
                   {subSection.title}
@@ -627,8 +639,9 @@ const Communities = props => {
           <Typography
             sx={{
               display: "block",
+              color:gray200,
               "& span": {
-                color: gray600
+                color: gray400
               }
             }}
           >
@@ -641,7 +654,7 @@ const Communities = props => {
             sx={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
-              placeItems:  "stretch",
+              placeItems: "stretch",
               gap: "8px",
               listStyle: "none",
               p: 0.5,
@@ -659,7 +672,8 @@ const Communities = props => {
                       maxWidth: "100%",
                       height: "84px",
                       borderRadius: "12px",
-                      border: `1px solid ${gray200}`,
+                      border: `1px solid ${gray800}`,
+                      backgroundColor:"black",
                       p: { xs: "6px 8px", sm: "16px 24px" }
                     }}
                   >
@@ -673,8 +687,8 @@ const Communities = props => {
                       }}
                     />
                     <Stack>
-                      <Typography sx={{ fontSize: "16px", fontWeight: 600 }}>{member.fullname}</Typography>
-                      <Typography variant="body2" component="div">
+                      <Typography sx={{ fontSize: "16px", fontWeight: 600,color:gray200 }}>{member.fullname}</Typography>
+                      <Typography variant="body2" component="div" sx={{color:gray200}}>
                         {idx < 3 ? "🏆" : "✔️"}
                         {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
                       </Typography>

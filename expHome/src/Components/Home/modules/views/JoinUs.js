@@ -340,12 +340,12 @@ const JoinUs = props => {
           "& .MuiStepLabel-label": {
             fontSize: "20px",
             fontWeight: 600,
-            color: gray400
+            color: gray600
           },
           
           "& .MuiStepLabel-label.Mui-active": {
             fontWeight: 600,
-            color: gray900
+            color: gray200
           },
           "& .MuiButton-root": {
             backgroundColor: orangeDark
@@ -364,7 +364,7 @@ const JoinUs = props => {
           <StepContent>
             <Typography
               sx={{
-                color: gray600,
+                color: gray200,
                 lineHeight: "24px"
               }}
             >
