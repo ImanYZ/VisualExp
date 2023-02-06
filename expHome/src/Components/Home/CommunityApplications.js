@@ -490,7 +490,7 @@ const CommunityApplications = props => {
       checkApplicant(clickedCell.id, clickedCell.field)();
     }
   };
-  console.log("applicationsColms :: : :",applicationsColms);
+
   return (
     <PagesNavbar thisPage="Applications">
       <Typography variant="h3" gutterBottom marked="center" align="center">
