@@ -19,12 +19,9 @@ import {
   transcriptUrlState,
   communiTestsEndedState,
   applicationsSubmittedState,
-  emailState,
+  emailState
 } from "../../../../store/AuthAtoms";
-import {
-  hasScheduledState,
-  completedExperimentState,
-} from "../../../../store/ExperimentAtoms";
+import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
 
 import Button from "../components/Button";
 import Typography from "../components/Typography";
@@ -33,6 +30,8 @@ import UploadButton from "../components/UploadButton";
 import { isValidHttpUrl } from "../../../../utils";
 
 import sectionsOrder from "./sectionsOrder";
+import { gray600, gray700, gray900, orangeDark, orangeLight, orangeLighter } from "../../Communities";
+import { Opacity } from "@mui/icons-material";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "JoinUsSection");
 
 const JoinUs = props => {
@@ -77,18 +76,12 @@ const JoinUs = props => {
 
   useEffect(() => {
     if (needsUpdate) {
-      if(!props.community) return;
+      if (!props.community) return;
       let stepsIdx = 0;
-      const commTestEnded =
-        props.community.id in communiTestsEnded &&
-        communiTestsEnded[props.community.id];
+      const commTestEnded = props.community.id in communiTestsEnded && communiTestsEnded[props.community.id];
       if (courseraUrl && portfolioUrl && commTestEnded) {
         stepsIdx = 6;
-      } else if (
-        (courseraUrl && portfolioUrl) ||
-        (courseraUrl && commTestEnded) ||
-        (portfolioUrl && commTestEnded)
-      ) {
+      } else if ((courseraUrl && portfolioUrl) || (courseraUrl && commTestEnded) || (portfolioUrl && commTestEnded)) {
         stepsIdx = 5;
       } else if (courseraUrl || commTestEnded || portfolioUrl) {
         stepsIdx = 4;
@@ -103,11 +96,20 @@ const JoinUs = props => {
       setActiveInnerStep(stepsIdx);
       setNeedsUpdate(false);
     }
-  }, [needsUpdate, resumeUrl, transcriptUrl, explanation, courseraUrl, portfolioUrl, communiTestsEnded, props.community]);
+  }, [
+    needsUpdate,
+    resumeUrl,
+    transcriptUrl,
+    explanation,
+    courseraUrl,
+    portfolioUrl,
+    communiTestsEnded,
+    props.community
+  ]);
 
   useEffect(() => {
     const loadExistingApplication = async () => {
-      if(!props.community) return;
+      if (!props.community) return;
       const applDoc = await firebase.db
         .collection("applications")
         .doc(fullname + "_" + props.community.id)
@@ -160,7 +162,7 @@ const JoinUs = props => {
     if (firebase && fullname && props.community) {
       loadExistingApplication();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase, fullname, props.community, props.community]);
 
   const changeExplanation = event => {
@@ -290,20 +292,21 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        pt: 1,
-        pb: 10,
+        p: 0,
+        m: 0
       }}
     >
-      {!props.community ? (
-        <span />
-      ) : (
-        <Alert severity="warning" sx={{mb:"16px"}}>
-          <strong>Note: </strong> Participation is unpaid, solely for the
-          purpose of improving research and education, and this position meets{" "}
-          <a
-            href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm"
-            target="_blank" rel="noreferrer"
-          >
+      <Alert severity="success" sx={{ p: "24px 20px", mb: "16px", borderRadius: "12px", color: gray700 }}>
+        <strong style={{ color: gray900 }}>Please note: </strong>
+        <br />
+        Our application process is sequential; i.e., you need to complete each step to unlock the following steps.
+      </Alert>
+      {props.community && (
+        <Alert severity="warning" sx={{ p: "24px 20px", borderRadius: "12px", color: gray700 }}>
+          <strong style={{ color: gray900 }}>Please note: </strong>
+          <br />
+          Participation is unpaid, solely for the purpose of improving research and education, and this position meets{" "}
+          <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank" rel="noreferrer">
             US Department of Labor Federal Internship Guidelines
           </a>
           . We DO NOT sponsor CPT or OPT for international students. If you have any questions regarding this community,
@@ -311,17 +314,15 @@ const JoinUs = props => {
           <a
             href={"mailto:onecademy@umich.edu?subject=" + props.community.title + " - Question"}
             aria-label="email"
-            target="_blank" rel="noreferrer"
+            target="_blank"
+            rel="noreferrer"
           >
             the community leaders
           </a>
           .
         </Alert>
       )}
-      <Alert severity="success">
-        <strong>Note:</strong> Our application process is sequential; i.e., you need to complete each step to unlock the
-        following steps.
-      </Alert>
+
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
@@ -331,92 +332,98 @@ const JoinUs = props => {
             color: "warning.dark"
           },
           "& .MuiStepIcon-root.Mui-active": {
-            color: "secondary.main"
+            color: orangeDark
           },
           "& .MuiStepIcon-root.Mui-completed": {
             color: "success.main"
           },
           "& .MuiStepLabel-label": {
-            color: themeName === "dark" ? "rgba(255, 255, 255, 0.6)" : undefined
+            fontSize: "20px",
+            fontWeight: 600,
+            color: gray900
           },
           "& .MuiStepLabel-label.Mui-active": {
             color: themeName === "dark" ? "common.white" : undefined
           },
           "& .MuiButton-root": {
-            backgroundColor: "secondary.main"
+            backgroundColor: orangeDark
           },
           "& .MuiButton-root:hover": {
-            backgroundColor: "secondary.dark"
+            backgroundColor: orangeLight
           },
           "& .MuiButton-root.Mui-disabled": {
             backgroundColor: "secondary.light"
-          }
+          },
+         
         }}
       >
         <Step>
-          <StepLabel>
-            Create an account and Schedule for our knowledge representation
-            test.
-          </StepLabel>
+          <StepLabel>Create an account and Schedule for our knowledge representation test.</StepLabel>
           <StepContent>
-            <Typography sx={{
-              color: themeName === "dark" ? "common.white" : undefined
-            }}>
-              One of the most important aspects of 1Cademy is its unique
-              knowledge representation format. To become a researcher on
-              1Cademy, you should first engage in one of our ongoing research
-              projects, as a participant. In the project, randomly chosen for
-              you, we will test which type of knowledge representation format
-              works better for your reading comprehension, short-term learning,
-              and long-term learning. This will not only help us improve the
-              design of 1Cademy, but along the way, you will get experience
-              about how to use 1Cademy. For this purpose, you should create an
-              account on our research website and specify your availabilities
-              for three sessions with our UX researchers. In the first session,
-              they will ask you to read two short passages and answer some
-              questions about those passages. This will take an hour. The second
-              and third sessions will be only for 30 minutes each and follow a
-              similar format. Note that it is necessary to complete the second
-              and third sessions, exactly three and seven days after the first
-              session. So, please carefully specify your availability on our
-              research website.
+            <Typography
+              sx={{
+                color: gray600,
+                lineHeight: "24px"
+              }}
+            >
+              One of the most important aspects of 1Cademy is its unique knowledge representation format. To become a
+              researcher on 1Cademy, you should first engage in one of our ongoing research projects, as a participant.
+              In the project, randomly chosen for you, we will test which type of knowledge representation format works
+              better for your reading comprehension, short-term learning, and long-term learning. This will not only
+              help us improve the design of 1Cademy, but along the way, you will get experience about how to use
+              1Cademy. For this purpose, you should create an account on our research website and specify your
+              availabilities for three sessions with our UX researchers. In the first session, they will ask you to read
+              two short passages and answer some questions about those passages. This will take an hour. The second and
+              third sessions will be only for 30 minutes each and follow a similar format. Note that it is necessary to
+              complete the second and third sessions, exactly three and seven days after the first session. So, please
+              carefully specify your availability on our research website.
             </Typography>
-            <Box sx={{ mb: 2 }}>
-              <div>
-                <Button
-                  variant="contained"
-                  component="a"
-                  href="/Activities/experiment"
-                  target="_blank"
-                  sx={{ mt: 1, mr: 1, color: "common.white" }}
-                >
-                  Create My Account &amp; Schedule
-                </Button>
-              </div>
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant="contained"
+                component="a"
+                href="/Activities/experiment"
+                target="_blank"
+                sx={{
+                  p: "10px 36px",
+                  color: "common.white",
+                  borderRadius: "8px",
+                  fontSize: "18px",
+                  textTransform: "none"
+                }}
+              >
+                Apply to join
+              </Button>
             </Box>
           </StepContent>
         </Step>
         <Step>
           <StepLabel>Complete our knowledge representation test.</StepLabel>
           <StepContent>
-            <Typography sx={{
-              color: themeName === "dark" ? "common.white" : undefined
-            }}>
-              Please check your Google Calendar. You're invited to three UX
-              Experiment sessions. Please attend all the experiment sessions
-              on-time and carefully answer the questions. Your answers will
-              significantly help 1Cademy communities to improve our
-              collaborative learning and research. Note that your test scores
-              may affect our community leaders' decision in whether to accept
-              your application.
+            <Typography
+              sx={{
+                color: themeName === "dark" ? "common.white" : undefined
+              }}
+            >
+              Please check your Google Calendar. You're invited to three UX Experiment sessions. Please attend all the
+              experiment sessions on-time and carefully answer the questions. Your answers will significantly help
+              1Cademy communities to improve our collaborative learning and research. Note that your test scores may
+              affect our community leaders' decision in whether to accept your application.
             </Typography>
           </StepContent>
         </Step>
         <Step>
           <StepLabel
-            optional={<Typography variant="caption" sx={{
-              color: themeName === "dark" ? "common.white" : undefined
-            }}>Last step</Typography>}
+            optional={
+              <Typography
+                variant="caption"
+                sx={{
+                  color: themeName === "dark" ? "common.white" : undefined
+                }}
+              >
+                Last step
+              </Typography>
+            }
           >
             Complete the community-specific application requirements.
           </StepLabel>
@@ -428,23 +435,23 @@ const JoinUs = props => {
                 sx={{
                   mt: "19px",
                   "& .MuiStepIcon-root": {
-                    color: "warning.dark",
+                    color: "warning.dark"
                   },
                   "& .MuiStepIcon-root.Mui-active": {
-                    color: "secondary.main",
+                    color: "secondary.main"
                   },
                   "& .MuiStepIcon-root.Mui-completed": {
-                    color: "success.main",
+                    color: "success.main"
                   },
                   "& .MuiButton-root": {
-                    backgroundColor: "secondary.main",
+                    backgroundColor: "secondary.main"
                   },
                   "& .MuiButton-root:hover": {
-                    backgroundColor: "secondary.dark",
+                    backgroundColor: "secondary.dark"
                   },
                   "& .MuiButton-root.Mui-disabled": {
-                    backgroundColor: "secondary.light",
-                  },
+                    backgroundColor: "secondary.light"
+                  }
                 }}
               >
                 <Step>
@@ -453,11 +460,11 @@ const JoinUs = props => {
                     sx={
                       0 <= checkedInnerStep
                         ? {
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            }
                           }
-                        }
                         : {}
                     }
                   >
@@ -484,11 +491,11 @@ const JoinUs = props => {
                     sx={
                       1 <= checkedInnerStep
                         ? {
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            }
                           }
-                        }
                         : {}
                     }
                   >
@@ -515,11 +522,11 @@ const JoinUs = props => {
                     sx={
                       2 <= checkedInnerStep
                         ? {
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            cursor: "pointer",
+                            "&:hover": {
+                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                            }
                           }
-                        }
                         : {}
                     }
                   >
@@ -559,11 +566,11 @@ const JoinUs = props => {
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              }
                             }
-                          }
                           : {}
                       }
                     >
@@ -574,9 +581,11 @@ const JoinUs = props => {
                       and enter the certificate URL.
                     </StepLabel>
                     <StepContent>
-                      <Typography sx={{
-                        color: themeName === "dark" ? "common.white" : undefined
-                      }}>
+                      <Typography
+                        sx={{
+                          color: themeName === "dark" ? "common.white" : undefined
+                        }}
+                      >
                         As a requirement to apply to this community, you should complete{" "}
                         <a href={props.community.coursera} target="_blank" rel="noreferrer">
                           this Coursera MOOC
@@ -637,11 +646,11 @@ const JoinUs = props => {
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              }
                             }
-                          }
                           : {}
                       }
                     >
@@ -680,20 +689,22 @@ const JoinUs = props => {
                       sx={
                         3 <= checkedInnerStep
                           ? {
-                            cursor: "pointer",
-                            "&:hover": {
-                              backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor: "rgba(100, 100, 100, 0.1) !important"
+                              }
                             }
-                          }
                           : {}
                       }
                     >
                       Complete your domain-specific knowledge test.
                     </StepLabel>
                     <StepContent>
-                      <Typography sx={{
-                        color: themeName === "dark" ? "common.white" : undefined
-                      }}>
+                      <Typography
+                        sx={{
+                          color: themeName === "dark" ? "common.white" : undefined
+                        }}
+                      >
                         The last step to apply to this community is a test of your domain-specific knowledge. If you are
                         interested in joining this community but don't have the background knowledge, no worries.
                         Similar to the second phase, we have provided you with a document about the topic and ask you

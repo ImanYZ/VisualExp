@@ -27,32 +27,21 @@ import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 import JoinUs from "./modules/views/JoinUs";
 
 import allCommunities from "./modules/views/communitiesOrder";
-import { Button, Card, CardActionArea, CardContent, CardMedia, Divider } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CardMedia, Divider, styled } from "@mui/material";
 import { Stack } from "@mui/system";
-import { transition } from "d3";
 import { Link } from "react-router-dom";
 
 export const orangeDark = "#FF6D00";
 export const orangeLight = "#f77a1a";
+export const orangeLighter = "#faa666";
 export const gray200 = "#EAECF0";
 export const gray600 = "#475467";
-
+export const gray700 = "#344054";
+export const gray900 = "#0A0D14";
 const subSections = [
   {
     title: "Qualifications",
-    component: community => {
-      return community ? (
-        <ul>
-          {community.gains &&
-            community.gains.map((gain, gIdx) => {
-              return <li key={gIdx}>{gain}</li>;
-            })}
-        </ul>
-      ) : null;
-    }
-  },
-  {
-    title: "By Joining Us, You Will ...",
+    image: "/static/requirements/qualifications.svg",
     component: community => {
       return community ? (
         <ul>
@@ -80,7 +69,23 @@ const subSections = [
     }
   },
   {
+    title: "By Joining Us, You Will ...",
+    image: "/static/requirements/joining-us.svg",
+
+    component: community => {
+      return community ? (
+        <ul>
+          {community.gains &&
+            community.gains.map((gain, gIdx) => {
+              return <li key={gIdx}>{gain}</li>;
+            })}
+        </ul>
+      ) : null;
+    }
+  },
+  {
     title: "Responsibilities",
+    image: "/static/requirements/responsabilities.svg",
     component: community => {
       return community ? (
         <ul>
@@ -91,11 +96,6 @@ const subSections = [
         </ul>
       ) : null;
     }
-  },
-  {
-    title: "Apply to Join this Community",
-    component: community => (community ? <JoinUs community={community} /> : null),
-    image: "Apply_to_Join_this_Community.svg"
   }
 ];
 
@@ -117,6 +117,11 @@ const accumulatePoints = (groups, reputationData, user, points) => {
     }
   }
 };
+
+const DividerStyled = styled(props => <Divider {...props} />)(() => ({
+  marginTop: "32px",
+  marginBottom: "32px"
+}));
 
 const Communities = props => {
   const firebase = useRecoilValue(firebaseOneState);
@@ -340,7 +345,7 @@ const Communities = props => {
 
         <Box
           sx={{
-            maxWidth: "958px",
+            maxWidth: "1280px",
             margin: "auto"
           }} /* columns={{ xs: 1, md: 2, lg: 2, xl: 3 }} spacing={{ xs: 1, md: 2.2 }} */
         >
@@ -404,15 +409,27 @@ const Communities = props => {
               spacing={"24px"}
               sx={{
                 position: "relative",
-                overflowX: "hidden",
-                maxWidth: "958px",
+                overflowX: "scroll",
+                maxWidth: "1280px",
                 py: "16px",
-                scrollBehavior: "smooth"
+                scrollBehavior: "smooth",
+                "&::-webkit-scrollbar": {
+                  width: "4px",
+                  height: "4px"
+                },
+                "::-webkit-scrollbar-thumb": {
+                  backgroundColor: gray600,
+                  borderRadius: "10px"
+                }
               }}
             >
               {communities.map((item, idx) => (
-                <Link key={item.id} to={`/community/${item.id}`} style={{ textDecoration: "none", color: "inherit",display:"block" }}>
-                  <Card elevation={0} sx={{ minWidth: "210px", maxWidth: "220px",height:"100%", flex: 1 }} square>
+                <Link
+                  key={item.id}
+                  to={`/community/${item.id}`}
+                  style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                >
+                  <Card elevation={0} sx={{ minWidth: "210px", maxWidth: "220px", height: "100%", flex: 1 }} square>
                     <CardActionArea
                       sx={{
                         display: "flex",
@@ -446,9 +463,7 @@ const Communities = props => {
             </Stack>
           </Box>
 
-          <br />
-          <Divider />
-          <br />
+          <DividerStyled />
 
           <Stack direction={"row"} alignItems="center" justifyContent={"space-between"}>
             <Typography variant="h4" gutterBottom align="left" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
@@ -566,55 +581,61 @@ const Communities = props => {
             </Box>
           </Box>
 
-          <Divider />
-          <br />
+          <DividerStyled />
 
-          <Stack
-            direction={{ xs: "column-reverse", md: "row" }}
-            justifyContent={"space-between"}
-            sx={{ margin: "auto" }}
-          >
-            <Box>
-              {subSections.map((subSection, idx) => (
-                <Accordion
-                key={idx}
-                  disableGutters
-                  elevation={0}
-                  square
+          <Box>
+            {subSections.map((subSection, idx) => (
+              <Stack key={idx} direction={"row"} alignItems="center" spacing={"100px"} sx={{ mb: "16px" }}>
+                <Box
                   sx={{
-                    background: "transparent",
-                    border: "none",
-                    borderLeft: `4px solid ${expandedOption === subSection.title ? orangeDark : "#F8F8F8"}`,
-                    "&:before": {
-                      display: "none"
+                    color: gray600,
+                    flex: 1,
+                    maxWidth: "650px",
+                    "& ul": {
+                      pl: "28px"
+                    },
+                    "& li": {
+                      listStyle: "none",
+                      position: "relative"
+                    },
+                    "& li:before": {
+                      content: '""',
+                      width: "6px",
+                      height: "6px",
+                      backgroundColor: gray600,
+                      color: gray600,
+                      borderRadius: "2px",
+                      position: "absolute",
+                      left: "-20px",
+                      top: "8px"
+                    },
+                    "& li:not(:last-child)": {
+                      marginBottom: "12px"
                     }
                   }}
-                  expanded={expandedOption === subSection.title}
-                  onChange={handleChangeOption(subSection.title)}
                 >
-                  <AccordionSummary>
-                    <Typography
-                      variant="h5"
-                      component="div"
-                      sx={{
-                        fontWeight: "regular"
-                      }}
-                    >
-                      {subSection.title}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>{subSection.component(community)}</AccordionDetails>
-                </Accordion>
-              ))}
-            </Box>
+                  <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{
+                      fontWeight: 600,
+                      color: gray900
+                    }}
+                  >
+                    {subSection.title}
+                  </Typography>
+                  {subSection.component(community)}
+                </Box>
+                <img src={subSection.image} alt={subSection.title} style={{ width: "300px", height: "300px" }} />
+              </Stack>
+            ))}
 
             {/* {getImage(expandedOption, { display: { xs: "none", md: "block" } })} */}
-          </Stack>
+          </Box>
 
-          <br />
-          <Divider />
-          <br />
-
+          <DividerStyled />
+          <JoinUs community={community} />
+          <DividerStyled />
           {typeof community.accomplishments === "object" &&
             !Array.isArray(community.accomplishments) &&
             community.accomplishments !== null && (
