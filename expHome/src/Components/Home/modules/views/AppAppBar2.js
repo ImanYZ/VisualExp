@@ -84,7 +84,7 @@ const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
               <Link
                 key={"Key" + idx}
                 onClick={switchSection(idx)}
-                sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
+                sx={{ color: "common.white", cursor: "pointer", textDecoration: "none" }}
               >
                 {sectionsOrder[idx + 1].label}
               </Link>
@@ -95,7 +95,7 @@ const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
                 <Tooltip title={thisPage}>
                   <Link
                     onClick={switchSection(5)}
-                    sx={{ color: "common.black", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
+                    sx={{ color: "common.white", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
                   >
                     {thisPage}
                   </Link>
@@ -107,7 +107,7 @@ const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
                     href="/tutorial"
                     target="_blank"
                     color="inherit"
-                    sx={{ color: "common.black", textDecoration: "none" }}
+                    sx={{ color: "common.white", textDecoration: "none" }}
                   >
                     Tutorial
                   </Link>
@@ -226,7 +226,7 @@ const AppAppBar2 = props => {
   const renderProfileMenu = (
     <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
       {fullname && email && (
-        <MenuItem disabled sx={{ flexGrow: 3, color: "common.black", opacity: "1 !important" }}>
+        <MenuItem disabled sx={{ flexGrow: 3, color: "common.white", opacity: "1 !important" }}>
           {fullname}
         </MenuItem>
       )}
@@ -251,7 +251,7 @@ const AppAppBar2 = props => {
     <>
       <Box
         sx={{
-          background: theme => (theme.palette.mode === "dark" ? "rgba(0,0,0,.72)" : "#f8f8f894"),
+          background:  "rgba(0,0,0,.72)" ,
           backdropFilter: "saturate(180%) blur(20px)",
           position: "sticky",
           top: "0",
@@ -288,7 +288,7 @@ const AppAppBar2 = props => {
                     <Link
                       key={"Key" + idx}
                       onClick={props.switchSection(idx)}
-                      sx={{ color: "common.black", cursor: "pointer", textDecoration: "none" }}
+                      sx={{ color: "common.white", cursor: "pointer", textDecoration: "none" }}
                     >
                       {sectionsOrder[idx + 1].label}
                     </Link>
@@ -299,7 +299,7 @@ const AppAppBar2 = props => {
                 <Tooltip title={props.thisPage}>
                   <Link
                     onClick={props.switchSection(5)}
-                    sx={{ color: "common.black", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
+                    sx={{ color: "common.white", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
                   >
                     {props.thisPage}
                   </Link>
@@ -311,7 +311,7 @@ const AppAppBar2 = props => {
                     href="/tutorial"
                     target="_blank"
                     color="inherit"
-                    sx={{ color: "common.black", textDecoration: "none" }}
+                    sx={{ color: "common.white", textDecoration: "none" }}
                   >
                     Tutorial
                   </Link>
