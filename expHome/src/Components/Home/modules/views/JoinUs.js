@@ -296,7 +296,7 @@ const JoinUs = props => {
         m: 0
       }}
     >
-      <Alert severity="success" sx={{ p: "24px 20px", mb: "16px", borderRadius: "12px", color: gray700 }}>
+      <Alert severity="success" sx={{ p: "24px 20px", mb: "16px", borderRadius: "12px", color: gray700}}>
         <strong style={{ color: gray900 }}>Please note: </strong>
         <br />
         Our application process is sequential; i.e., you need to complete each step to unlock the following steps.
