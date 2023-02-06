@@ -30,7 +30,7 @@ import UploadButton from "../components/UploadButton";
 import { isValidHttpUrl } from "../../../../utils";
 
 import sectionsOrder from "./sectionsOrder";
-import { gray600, gray700, gray900, orangeDark, orangeLight, orangeLighter } from "../../Communities";
+import { gray200, gray400, gray600, gray700, gray900, orangeDark, orangeLight, orangeLighter } from "../../Communities";
 import { Opacity } from "@mui/icons-material";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "JoinUsSection");
 
@@ -288,7 +288,7 @@ const JoinUs = props => {
   };
 
   return (
-    <Container
+    <Box
       id="JoinUsSection"
       component="section"
       sx={{
@@ -322,7 +322,7 @@ const JoinUs = props => {
           .
         </Alert>
       )}
-
+      
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
@@ -340,10 +340,12 @@ const JoinUs = props => {
           "& .MuiStepLabel-label": {
             fontSize: "20px",
             fontWeight: 600,
-            color: gray900
+            color: gray400
           },
+          
           "& .MuiStepLabel-label.Mui-active": {
-            color: themeName === "dark" ? "common.white" : undefined
+            fontWeight: 600,
+            color: gray900
           },
           "& .MuiButton-root": {
             backgroundColor: orangeDark
@@ -414,16 +416,7 @@ const JoinUs = props => {
         </Step>
         <Step>
           <StepLabel
-            optional={
-              <Typography
-                variant="caption"
-                sx={{
-                  color: themeName === "dark" ? "common.white" : undefined
-                }}
-              >
-                Last step
-              </Typography>
-            }
+           
           >
             Complete the community-specific application requirements.
           </StepLabel>
@@ -801,7 +794,7 @@ const JoinUs = props => {
           </Typography>
         </Paper>
       )}
-    </Container>
+    </Box>
   );
 };
 
