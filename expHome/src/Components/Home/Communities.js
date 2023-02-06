@@ -48,9 +48,9 @@ const subSections = [
     component: community => {
       return community ? (
         <ul>
-          {community.qualifications &&
-            community.qualifications.map((qualifi, qIdx) => {
-              return <li key={qIdx}>{qualifi}</li>;
+          {community.gains &&
+            community.gains.map((gain, gIdx) => {
+              return <li key={gIdx}>{gain}</li>;
             })}
           <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
           <li>Explain in a few paragraphs why you apply to this specific community.</li>
