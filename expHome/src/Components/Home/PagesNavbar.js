@@ -8,6 +8,7 @@ import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
 import AppAppBar2 from "./modules/views/AppAppBar2";
+import { darkblue } from "./Communities";
 
 const switchSection = newValue => event => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
@@ -23,14 +24,15 @@ const joinUsClick = event => {
   window.location.replace("/#JoinUsSection");
 };
 
-const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = false }) => {
+const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = false, theme = "light" }) => {
   return (
     <Box
       id="ScrollableContainer"
       sx={{
         height: "100vh",
         overflowY: "auto",
-        overflowX: "auto"
+        overflowX: "auto",
+        backgroundColor: theme==="dark" ? darkblue:"none"
       }}
     >
       {!newHeader && (
