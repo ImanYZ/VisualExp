@@ -446,7 +446,7 @@ const ExperimentPoints = props => {
         <ResponsiveCalendar
           data={dailyPoints}
           from="2021-05-01"
-          to="2022-05-01"
+          to="2023-05-01"
           emptyColor="#eeeeee"
           colors={["#97e3d5", "#61cdbb"]}
           margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
