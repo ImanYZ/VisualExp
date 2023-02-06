@@ -815,14 +815,17 @@ export default [
     // coursera: "https://www.coursera.org/learn/academicinfoseek",
     hasTest: true,
     qualifications: [
-      "Motivation to read new and upcoming research papers",
+      "Motivation to read new and upcoming research papers outside your area of interest",
       "Enthusiasm for topics related to social sciences, information sciences, or economics",
       "Fluency in writing and reading in English",
       "Ability to verbally communicate effectively and facilitate team meetings",
-      "Experience and willingness to work in collaborative environments ",
+      "Experience and willingness to work in collaborative environments",
       "Ability to engage in group discourse and resolve complex issues",
       "Ability to work asynchronously and independently",
-      "Strong presentation and summarization skills ",
+      "Strong presentation and summarization skills",
+      "Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0",
+      "Explain in a few paragraphs why you apply to this specific community.",
+      "Complete our community-specific quiz by answering a set of questions about some research papers or book chapters and get a satisfying score"
     ],
     responsibilities: [
       "Work asynchronously and attend online meetings once per week. ",
