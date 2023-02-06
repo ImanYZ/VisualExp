@@ -48,9 +48,9 @@ const subSections = [
     component: community => {
       return community ? (
         <ul>
-          {community.gains &&
-            community.gains.map((gain, gIdx) => {
-              return <li key={gIdx}>{gain}</li>;
+          {community.qualifications &&
+            community.qualifications.map((qualifi, qIdx) => {
+              return <li key={qIdx}>{qualifi}</li>;
             })}
           <li>Submit your most current resume and unofficial transcripts, indicating a GPA above 3.4/4.0</li>
           <li>Explain in a few paragraphs why you apply to this specific community.</li>
@@ -313,7 +313,7 @@ const Communities = props => {
               transition: "opacity .3s"
             }}
           >
-            <ArrowForwardIcon sx={{color:"common.white"}}/>
+            <ArrowForwardIcon sx={{ color: "common.white" }} />
           </Button>
           <Button
             variant="outlined"
@@ -335,11 +335,11 @@ const Communities = props => {
               p: "0px",
               borderRadius: "50%",
               opacity: "0.7",
-             
+
               transition: "opacity .3s"
             }}
           >
-            <ArrowBackIcon sx={{color:"common.white"}}/>
+            <ArrowBackIcon sx={{ color: "common.white" }} />
           </Button>
           <Stack
             ref={carouselRef}
@@ -375,7 +375,7 @@ const Communities = props => {
                     maxWidth: { xs: "160px", sm: "220px" },
                     height: { xs: "100%", sm: "100%" },
                     flex: 1,
-                    backgroundColor:"transparent"
+                    backgroundColor: "transparent"
                   }}
                   square
                 >
@@ -639,7 +639,7 @@ const Communities = props => {
           <Typography
             sx={{
               display: "block",
-              color:gray200,
+              color: gray200,
               "& span": {
                 color: gray400
               }
@@ -673,7 +673,7 @@ const Communities = props => {
                       height: "84px",
                       borderRadius: "12px",
                       border: `1px solid ${gray800}`,
-                      backgroundColor:"black",
+                      backgroundColor: "black",
                       p: { xs: "6px 8px", sm: "16px 24px" }
                     }}
                   >
@@ -687,8 +687,10 @@ const Communities = props => {
                       }}
                     />
                     <Stack>
-                      <Typography sx={{ fontSize: "16px", fontWeight: 600,color:gray200 }}>{member.fullname}</Typography>
-                      <Typography variant="body2" component="div" sx={{color:gray200}}>
+                      <Typography sx={{ fontSize: "16px", fontWeight: 600, color: gray200 }}>
+                        {member.fullname}
+                      </Typography>
+                      <Typography variant="body2" component="div" sx={{ color: gray200 }}>
                         {idx < 3 ? "🏆" : "✔️"}
                         {" " + Math.round((member.points + Number.EPSILON) * 100) / 100}
                       </Typography>
