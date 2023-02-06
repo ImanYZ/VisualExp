@@ -472,6 +472,7 @@ const Communities = props => {
               community.leaders.map((leader, idx) => {
                 return (
                   <Stack
+                  
                     alignItems={"center"}
                     spacing="8px"
                     sx={{
@@ -640,8 +641,7 @@ const Communities = props => {
             sx={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))",
-              placeItems: limit === 3 ? "center" : "stretch",
-              // justifyItems:{xs:"center",sx:"stretch"},
+              placeItems:  "stretch",
               gap: "8px",
               listStyle: "none",
               p: 0.5,
@@ -656,7 +656,7 @@ const Communities = props => {
                     alignItems={"center"}
                     sx={{
                       minWidth: "150px",
-                      maxWidth: "260px",
+                      maxWidth: "100%",
                       height: "84px",
                       borderRadius: "12px",
                       border: `1px solid ${gray200}`,
