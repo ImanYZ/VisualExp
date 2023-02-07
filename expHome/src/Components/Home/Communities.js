@@ -35,12 +35,17 @@ export const orangeDark = "#FF6D00";
 export const orangeLight = "#f77a1a";
 export const orangeLighter = "#faa666";
 export const darkblue = "#0A0D14";
+export const gray25 = "#FCFCFD";
+export const gray50 = "#F9FAFB";
+export const gray100 = "#F2F4F7";
 export const gray200 = "#EAECF0";
+export const gray300 = "#D0D5DD";
 export const gray400 = "#98A2B3";
 export const gray600 = "#475467";
 export const gray700 = "#344054";
 export const gray800 = "#1D2939";
 export const gray900 = "#0A0D14";
+
 const subSections = [
   {
     title: "Qualifications",
