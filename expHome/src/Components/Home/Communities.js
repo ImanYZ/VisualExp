@@ -44,7 +44,7 @@ export const gray900 = "#0A0D14";
 const subSections = [
   {
     title: "Qualifications",
-    image: "/static/requirements/qualifications.svg",
+    image: "/static/requirements/qualifications_dark_mode.svg",
     component: community => {
       return community ? (
         <ul>
@@ -73,7 +73,7 @@ const subSections = [
   },
   {
     title: "By Joining Us, You Will ...",
-    image: "/static/requirements/joining-us.svg",
+    image: "/static/requirements/by_joining_us_dark_mode.svg",
 
     component: community => {
       return community ? (
@@ -88,7 +88,7 @@ const subSections = [
   },
   {
     title: "Responsibilities",
-    image: "/static/requirements/responsabilities.svg",
+    image: "/static/requirements/responsibilities_dark_mode.svg",
     component: community => {
       return community ? (
         <ul>
