@@ -44,12 +44,14 @@ import Systems from "./modules/views/Systems";
 import About from "./modules/views/About";
 import Papers from "./modules/views/Papers";
 import Join from "./modules/views/Join";
+import { SectionWrapper } from "./modules/views/SectionWrapper";
+import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
 
-const Values = React.lazy(() => import("./modules/views/Values"));
-const What = React.lazy(() => import("./modules/views/What"));
-const UniversitiesMap = React.lazy(() => import("./modules/views/UniversitiesMap/UniversitiesMap"));
-const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
-const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
+// const Values = React.lazy(() => import("./modules/views/Values"));
+// const What = React.lazy(() => import("./modules/views/What"));
+// const UniversitiesMap = React.lazy(() => import("./modules/views/UniversitiesMap/UniversitiesMap"));
+// const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
+// const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
 const HEADER_HEIGTH = 70;
 export const gray03 = "#AAAAAA";
@@ -510,234 +512,37 @@ function Index() {
           </Box>
         </Box>
       </Box>
+      <HeroMemoized headerHeight={HEADER_HEIGHT} headerHeightMobile={HEADER_HEIGHT_MOBILE} />
 
-      {/* <Box id={sectionsOrder[0].id} ref={section1Ref}>
-        <Landing />
-      </Box> */}
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[1]} textAlign="center">
+        <Mechanism mechanisms={MECHANISM_ITEMS} />
+      </SectionWrapper>
 
-      <Box sx={{ position: "relative" }}>
-        <Box ref={HomeSectionRef} component="section">
-          <HeroMemoized headerHeight={HEADER_HEIGHT} headerHeightMobile={HEADER_HEIGHT_MOBILE} />
-        </Box>
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[2]}>
+        <Magnitude />
+      </SectionWrapper>
 
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: "1280px",
-            px: isDesktop ? "0px" : "10px",
-            margin: "auto",
-            position: "relative",
-            pt: "32px"
-          }}
-        >
-          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[1].title}
-            </CustomTypography>
-            <Mechanism mechanisms={MECHANISM_ITEMS} />
-          </Box>
-          <Box i sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              Magnitude
-            </CustomTypography>
-            <Magnitude />
-            {/* <UniversitiesMap theme={"Dark"} /> */}
-          </Box>
-          <Box i sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              Benefits
-            </CustomTypography>
-            <Benefits />
-          </Box>
-          <Box i sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              Topics
-            </CustomTypography>
-            <Topics />
-          </Box>
-          <Box i sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              Systems
-            </CustomTypography>
-            <Systems />
-          </Box>
-          <Box i sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              About
-            </CustomTypography>
-            <About />
-            <Papers />
-          </Box>
-          <Box sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
-            <Join />
-          </Box>
-          <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[2].title}
-            </CustomTypography>
-            {!whyInViewOnce && <div style={{ height: 2 * height /* background: "red" */ }}></div>}
-            {whyInViewOnce && (
-              <Suspense
-                fallback={
-                  <Grid container spacing={2.5} align="center">
-                    {new Array(8).fill(0).map((a, i) => (
-                      <Grid key={i} item xs={12} sm={6} md={4} lg={3}>
-                        <Skeleton
-                          variant="rounded"
-                          height={210}
-                          animation="wave"
-                          sx={{ background: "#72727263", maxWidth: 340 }}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                }
-              >
-                <Values />
-              </Suspense>
-            )}
-          </Box>
-          <Box id={sectionsOrder[3].id} ref={whatSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography
-              variant="h4"
-              marked="center"
-              align="center"
-              sx={{ pb: 10, color: "#f8f8f8", fontWeight: 700 }}
-            >
-              {sectionsOrder[3].title}
-            </CustomTypography>
-            {!whatInViewOnce ? (
-              <div style={{ height: 2 * height /*  background: "yellow" */ }}></div>
-            ) : (
-              <Suspense
-                fallback={
-                  <Grid container spacing={1} align="center">
-                    {new Array(8).fill(0).map((a, i) => (
-                      <Grid key={i} item xs={12} sm={6} md={4} lg={3}>
-                        <Skeleton
-                          variant="rounded"
-                          height={210}
-                          animation="wave"
-                          sx={{ background: "#72727263", maxWidth: 340 }}
-                        />
-                      </Grid>
-                    ))}
-                  </Grid>
-                }
-              >
-                <What />
-              </Suspense>
-            )}
-          </Box>
-          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography
-              variant="h4"
-              marked="center"
-              align="center"
-              sx={{ pb: 10, color: "#f8f8f8", fontWeight: 700 }}
-            >
-              {sectionsOrder[4].title}
-            </CustomTypography>
-            {!whichInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
-            ) : (
-              <Suspense
-                fallback={
-                  <Box
-                    sx={{
-                      pt: 7,
-                      pb: 10,
-                      position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center"
-                    }}
-                  >
-                    <Grid container spacing={2.5}>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rectangular" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                }
-              >
-                <Which />
-              </Suspense>
-            )}
-          </Box>
-          <Box id={sectionsOrder[5].id} ref={whereSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[5].title}
-            </CustomTypography>
-            {!whereInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "green" */ }}></div>
-            ) : (
-              <Suspense
-                fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
-              >
-                <UniversitiesMap theme={"Dark"} />
-              </Suspense>
-            )}
-          </Box>
-          <Box id={sectionsOrder[6].id} ref={whoSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[6].title}
-            </CustomTypography>
-            {!whoInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
-            ) : (
-              <Suspense
-                fallback={
-                  <Box
-                    sx={{
-                      pt: 7,
-                      pb: 10,
-                      position: "relative",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center"
-                    }}
-                  >
-                    <Grid container spacing={2.5} align="center">
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rounded" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rounded" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                      <Grid item xs={12} sm={6} md={4}>
-                        <Skeleton variant="rounded" height={800} animation="wave" sx={{ background: gray02 }} />
-                      </Grid>
-                    </Grid>
-                  </Box>
-                }
-              >
-                <WhoWeAre />
-              </Suspense>
-            )}
-          </Box>
-          <Box id={sectionsOrder[7].id} ref={JoinSectionRef} sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
-              {sectionsOrder[7].title}
-            </CustomTypography>
-            {!joinInViewOnce ? (
-              <div style={{ height: 2 * height /* background: "#b4f5ea" */ }}></div>
-            ) : (
-              <Suspense
-                fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
-              >
-                <JoinUs themeName={"dark"} />
-              </Suspense>
-            )}
-          </Box>
-        </Box>
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[3]}>
+        <Benefits />
+      </SectionWrapper>
+
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[4]}>
+        <Topics />
+      </SectionWrapper>
+
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[5]}>
+        <Systems />
+      </SectionWrapper>
+
+      <SectionWrapper section={ONE_CADEMY_SECTIONS[6]}>
+        <About />
+        <Papers />
+      </SectionWrapper>
+
+      <Box sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
+        <Join />
       </Box>
+
       <AppFooter />
       <link rel="preload" href="artboard-1.riv" as="fetch" crossOrigin="anonymous" />
     </Box>
