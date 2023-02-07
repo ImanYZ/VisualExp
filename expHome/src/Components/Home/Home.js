@@ -38,7 +38,7 @@ import Which from "./modules/views/Which";
 import { darkblue } from "./Communities";
 import Mechanism, { MECHANISM_ITEMS } from "./modules/views/Mechanism";
 import Magnitude from "./modules/views/Magnitude";
-
+import Benefits from "./modules/views/Benefits";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -529,13 +529,20 @@ function Index() {
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[1].title}
             </CustomTypography>
-            <Mechanism mechanisms={MECHANISM_ITEMS}/>
+            <Mechanism mechanisms={MECHANISM_ITEMS} />
           </Box>
           <Box i sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               Magnitude
             </CustomTypography>
             <Magnitude />
+            {/* <UniversitiesMap theme={"Dark"} /> */}
+          </Box>
+          <Box i sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
+              Benefits
+            </CustomTypography>
+            <Benefits />
           </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
