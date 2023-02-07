@@ -44,7 +44,7 @@ export const gray900 = "#0A0D14";
 const subSections = [
   {
     title: "Qualifications",
-    image: "/static/requirements/qualifications.svg",
+    image: "/static/requirements/qualifications_dark_mode.svg",
     component: community => {
       return community ? (
         <ul>
@@ -73,7 +73,7 @@ const subSections = [
   },
   {
     title: "By Joining Us, You Will ...",
-    image: "/static/requirements/joining-us.svg",
+    image: "/static/requirements/by_joining_us_dark_mode.svg",
 
     component: community => {
       return community ? (
@@ -88,7 +88,7 @@ const subSections = [
   },
   {
     title: "Responsibilities",
-    image: "/static/requirements/responsabilities.svg",
+    image: "/static/requirements/responsibilities_dark_mode.svg",
     component: community => {
       return community ? (
         <ul>
@@ -606,25 +606,34 @@ const Communities = props => {
         <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
           Apply to Join this Community
         </Typography>
-        <JoinUs community={community} />
+        <JoinUs community={community}  themeName="dark"/>
 
         <DividerStyled />
         {typeof community.accomplishments === "object" &&
           !Array.isArray(community.accomplishments) &&
           community.accomplishments !== null && (
-            <Box sx={{ padding: "10px", mb: "19px" }}>
+            <Box
+              sx={{
+                padding: "10px",
+                mb: "19px",
+                "& a:link": {
+                  color: orangeDark
+                },
+                
+              }}
+            >
               <Typography
                 variant="h5"
                 component="div"
                 sx={{
                   pt: "19px",
                   pb: "19px",
-                  color:gray200
+                  color: gray200
                 }}
               >
                 Community Accomplishments
               </Typography>
-              <Typography variant="body2"  sx={{ textAlign: "left",color:gray200 }}>
+              <Typography variant="body2" sx={{ textAlign: "left", color: gray200 }}>
                 {community.accomplishments}
               </Typography>
             </Box>
