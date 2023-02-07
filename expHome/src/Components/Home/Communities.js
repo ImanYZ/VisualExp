@@ -606,7 +606,7 @@ const Communities = props => {
         <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
           Apply to Join this Community
         </Typography>
-        <JoinUs community={community} />
+        <JoinUs community={community}  themeName="dark"/>
 
         <DividerStyled />
         {typeof community.accomplishments === "object" &&
