@@ -612,19 +612,28 @@ const Communities = props => {
         {typeof community.accomplishments === "object" &&
           !Array.isArray(community.accomplishments) &&
           community.accomplishments !== null && (
-            <Box sx={{ padding: "10px", mb: "19px" }}>
+            <Box
+              sx={{
+                padding: "10px",
+                mb: "19px",
+                "& a:link": {
+                  color: orangeDark
+                },
+                
+              }}
+            >
               <Typography
                 variant="h5"
                 component="div"
                 sx={{
                   pt: "19px",
                   pb: "19px",
-                  color:gray200
+                  color: gray200
                 }}
               >
                 Community Accomplishments
               </Typography>
-              <Typography variant="body2"  sx={{ textAlign: "left",color:gray200 }}>
+              <Typography variant="body2" sx={{ textAlign: "left", color: gray200 }}>
                 {community.accomplishments}
               </Typography>
             </Box>
