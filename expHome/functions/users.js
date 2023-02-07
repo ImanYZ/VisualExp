@@ -7,6 +7,9 @@ const { getFullname, getDateString, getDateTimeString } = require("./utils");
 const { delay } = require("./helpers/common");
 const { emailApplicationStatus, emailCommunityLeader, emailImanToInviteApplicants } = require("./emailing");
 
+
+const { Timestamp ,FieldValue} = require("firebase-admin/firestore");
+
 exports.deleteUser = async (snap, context) => {
   // Get an object representing the document prior to deletion
   // e.g. {'name': 'Marie', 'age': 66}
@@ -90,7 +93,7 @@ exports.recalculateFreeRecall = async (req, res) => {
           t.update(userLogRef, {
             pConditions,
             id: userRef.id,
-            updatedAt: admin.firestore.Timestamp.fromDate(new Date())
+            updatedAt: Timestamp.fromDate(new Date())
           });
         });
       } catch (e) {
@@ -129,7 +132,7 @@ exports.reassignAllPConditionNums = async (req, res) => {
       }
     }
     await commitBatch();
-    const increment = admin.firestore.FieldValue.increment(1);
+    const increment = FieldValue.increment(1);
     const userDocs = await db.collection("users").get();
     for (let userDoc of userDocs.docs) {
       const userData = userDoc.data();
