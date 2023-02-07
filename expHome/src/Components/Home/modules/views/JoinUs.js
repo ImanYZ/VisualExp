@@ -32,9 +32,11 @@ import { isValidHttpUrl } from "../../../../utils";
 import sectionsOrder from "./sectionsOrder";
 import { gray200, gray400, gray600, gray700, gray900, orangeDark, orangeLight, orangeLighter } from "../../Communities";
 import { Opacity } from "@mui/icons-material";
+import { useTheme } from "@mui/material";
 const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "JoinUsSection");
 
 const JoinUs = props => {
+
   const { themeName } = props || {};
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -345,6 +347,10 @@ const JoinUs = props => {
           
           "& .MuiStepLabel-label.Mui-active": {
             fontWeight: 600,
+            color: gray600
+          },
+          "& .MuiStepLabel-label.Mui-completed": {
+            fontWeight: 600,
             color: gray200
           },
           "& .MuiButton-root": {
@@ -356,7 +362,6 @@ const JoinUs = props => {
           "& .MuiButton-root.Mui-disabled": {
             backgroundColor: "secondary.light"
           },
-         
         }}
       >
         <Step>
@@ -527,7 +532,7 @@ const JoinUs = props => {
                   </StepLabel>
                   <StepContent>
                     <TextareaAutosize
-                      style={{ width: "100%" }}
+                      style={{ width: "100%",borderRadius:"4px" }}
                       aria-label="explanation text box"
                       minRows={7}
                       placeholder={
