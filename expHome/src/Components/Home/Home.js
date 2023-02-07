@@ -42,6 +42,7 @@ import Benefits from "./modules/views/Benefits";
 import Topics from "./modules/views/Topics";
 import Systems from "./modules/views/Systems";
 import About from "./modules/views/About";
+import Papers from "./modules/views/Papers";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -564,6 +565,7 @@ function Index() {
               About
             </CustomTypography>
             <About />
+            <Papers/>
           </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
