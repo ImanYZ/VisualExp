@@ -41,6 +41,7 @@ import Magnitude from "./modules/views/Magnitude";
 import Benefits from "./modules/views/Benefits";
 import Topics from "./modules/views/Topics";
 import Systems from "./modules/views/Systems";
+import About from "./modules/views/About";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -558,7 +559,12 @@ function Index() {
             </CustomTypography>
             <Systems />
           </Box>
-
+          <Box i sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
+              About
+            </CustomTypography>
+            <About />
+          </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
