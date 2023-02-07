@@ -347,7 +347,7 @@ const JoinUs = props => {
           
           "& .MuiStepLabel-label.Mui-active": {
             fontWeight: 600,
-            color: gray600
+            color: gray200
           },
           "& .MuiStepLabel-label.Mui-completed": {
             fontWeight: 600,
