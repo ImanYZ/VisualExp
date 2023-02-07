@@ -43,6 +43,7 @@ import Topics from "./modules/views/Topics";
 import Systems from "./modules/views/Systems";
 import About from "./modules/views/About";
 import Papers from "./modules/views/Papers";
+import Join from "./modules/views/Join";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -565,7 +566,10 @@ function Index() {
               About
             </CustomTypography>
             <About />
-            <Papers/>
+            <Papers />
+          </Box>
+          <Box sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
+            <Join />
           </Box>
           <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
             <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
