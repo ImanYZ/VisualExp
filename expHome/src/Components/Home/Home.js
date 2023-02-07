@@ -20,6 +20,8 @@ import { HeroMemoized } from "./modules/views/Hero";
 import { darkblue } from "./Communities";
 import Mechanism, { MECHANISM_ITEMS } from "./modules/views/Mechanism";
 import Magnitude from "./modules/views/Magnitude";
+                
+import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import Benefits from "./modules/views/Benefits";
 import Topics from "./modules/views/Topics";
 import Systems from "./modules/views/Systems";
@@ -236,6 +238,8 @@ function Index() {
 
       <SectionWrapper section={ONE_CADEMY_SECTIONS[2]}>
         <Magnitude />
+        <UniversitiesMap theme={"Dark"} />
+        
       </SectionWrapper>
 
       <SectionWrapper section={ONE_CADEMY_SECTIONS[3]}>
