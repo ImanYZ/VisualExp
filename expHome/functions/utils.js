@@ -1,4 +1,5 @@
 const { admin, db } = require("./admin");
+const { Timestamp } = require("firebase-admin/firestore");
 
 // We're using fullname as id in some Firestore collections.
 // For these purposes, we need to escape some characters.
@@ -17,8 +18,8 @@ const getActivityTimeStamps = (aDate, sTime, eTime) => {
   const stTime = new Date(year, month, date, startHours, startMinutes);
   const etTime = new Date(year, month, date, endHours, endMinutes);
 
-  const sTimestamp = admin.firestore.Timestamp.fromDate(stTime);
-  const eTimestamp = admin.firestore.Timestamp.fromDate(etTime);
+  const sTimestamp = Timestamp.fromDate(stTime);
+  const eTimestamp = Timestamp.fromDate(etTime);
   return { sTimestamp, eTimestamp };
 };
 

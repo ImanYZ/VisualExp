@@ -12,7 +12,7 @@ const { deleteEvent } = require("./GoogleCalendar");
 const { assignExpPoints } = require("./helpers/assignExpPoints");
 const moment = require("moment");
 const { delay } = require("lodash");
-const { Timestamp } = require("firebase-admin/firestore");
+const { Timestamp ,FieldValue } = require("firebase-admin/firestore");
 
 const researchers = [
   { fullname: "Jessica Cai", email: "jc126@iu.edu" },
@@ -2104,8 +2104,8 @@ exports.remindCalendarInvitations = async context => {
                     // Also, remove the Calendar event id and order from their schedule doc.
                     const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
                     await scheduleRef.update({
-                      id: admin.firestore.FieldValue.delete(),
-                      order: admin.firestore.FieldValue.delete()
+                      id: FieldValue.delete(),
+                      order: FieldValue.delete()
                     });
                   } else {
                     setTimeout(() => {
@@ -2219,8 +2219,8 @@ exports.remindCalendarInvitations = async context => {
                 // Also, remove the Calendar event id and order from their schedule doc.
                 const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
                 await scheduleRef.update({
-                  id: admin.firestore.FieldValue.delete(),
-                  order: admin.firestore.FieldValue.delete()
+                  id: FieldValue.delete(),
+                  order: FieldValue.delete()
                 });
               } else if (isToday(startTime)) {
                 // Only if it is a 2nd/3rd session that was scheduled today, but they
