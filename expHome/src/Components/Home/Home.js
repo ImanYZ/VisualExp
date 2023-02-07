@@ -35,6 +35,7 @@ import { gray02 } from "./modules/views/WhoWeAre";
 import { useInView } from "./modules/hooks/useObserver";
 import { HeroMemoized } from "./modules/views/Hero";
 import Which from "./modules/views/Which";
+import { darkblue } from "./Communities";
 
 const Values = React.lazy(() => import("./modules/views/Values"));
 const What = React.lazy(() => import("./modules/views/What"));
@@ -52,44 +53,46 @@ const artboards = [
   {
     name: "Summarizing",
     artoboard: "artboard-3",
-    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    getHeight: isMobile => (isMobile ? 900 : 600),
     color: "#f33636",
-    description: `We gather valuable information from various sources such as books, articles, and videos, and divide it into granular pieces. We then combine these pieces into concise notes that focus on a single concept. \nTraditional note-taking methods often only benefit the individual for a short period of time, typically for a semester or two. 1Cademy's collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics. \nThrough this process, we aim to improve the notes semester by semester, making the learning experience more efficient for all. This way, students can spend less time on note-taking and gain the most benefit from the notes.`,
+    description: `We gather valuable information from various sources such as books, articles, and videos, and divide it into granular pieces. We then combine these pieces into concise notes that focus on a single concept. \nTraditional note-taking methods often only benefit the individual for a short period of time, typically for a semester or two. 1Cademy's collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics. \nThrough this process, we aim to improve the notes semester by semester, making the learning experience more efficient for all. This way, students can spend less time on note-taking and gain the most benefit from the notes.`
   },
   {
     name: "Linking",
     artoboard: "artboard-4",
-    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    getHeight: isMobile => (isMobile ? 900 : 600),
     color: "#f38b36",
     description: `Our notes, which are organized in granular pieces, can be transformed into a knowledge graph that visually illustrates the hierarchical relationships between concepts. The linking of concepts is beneficial as it helps us understand how concepts relate to one another and their place in broader topics, fields, or disciplines. All concepts are linked in a logical and ordered manner, starting with the broadest concepts and progressing to the most specific. \nThis step-by-step approach allows us to take a concept we don't understand and trace it back to its prerequisite concepts until we have the necessary knowledge to comprehend it. Additionally, once we understand a concept, we can follow links to more specific concepts to deepen our understanding. These step-by-step learning pathways provide the necessary context when we don't understand something and allow us to delve deeper if we want to learn more.
-    `,
+    `
   },
   {
     name: "Voting",
     artoboard: "artboard-5",
-    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    getHeight: isMobile => (isMobile ? 900 : 600),
     color: "#e6f336",
-    description: `To ensure the quality of the knowledge graph on 1Cademy, we have implemented a peer-review process. Each individual concept, represented as a node, can be voted on by members of the community, and the score of the node will determine its level of modification or the possibility of deletion. \nNodes that receive a significant number of negative votes will be removed as unhelpful. Additionally, 1Cademy uses a reputation system to incentivize high-quality contributions and discourage unhelpful or idle behavior. Users who contribute helpful content and whose nodes receive positive votes will see their reputation increase. \nConversely, users who post unhelpful content or are inactive will see their reputation decrease. This system encourages the development of a high-quality knowledge graph that can benefit a large number of learners and researchers.`,
+    description: `To ensure the quality of the knowledge graph on 1Cademy, we have implemented a peer-review process. Each individual concept, represented as a node, can be voted on by members of the community, and the score of the node will determine its level of modification or the possibility of deletion. \nNodes that receive a significant number of negative votes will be removed as unhelpful. Additionally, 1Cademy uses a reputation system to incentivize high-quality contributions and discourage unhelpful or idle behavior. Users who contribute helpful content and whose nodes receive positive votes will see their reputation increase. \nConversely, users who post unhelpful content or are inactive will see their reputation decrease. This system encourages the development of a high-quality knowledge graph that can benefit a large number of learners and researchers.`
   },
   {
     name: "Improving",
     artoboard: "artboard-6",
-    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    getHeight: isMobile => (isMobile ? 900 : 600),
     color: "#62f336",
-    description: `We work together to improve the knowledge presented by continually updating and refining concepts. For each node, there are multiple versions proposed by different people. \nThe community can then vote on each proposed version. Voting allows the community to disapprove of changes that are unhelpful or to approve of changes that would improve the existing version of the node. \nUsers can upvote or downvote the proposed version of a node, which is then compared to the votes received by the existing version of the node. If a proposal receives enough positive votes in comparison to the votes of the existing node, it will be accepted and the node will be updated. In this way, the community collaborates and perpetually improves the knowledge available.`,
+    description: `We work together to improve the knowledge presented by continually updating and refining concepts. For each node, there are multiple versions proposed by different people. \nThe community can then vote on each proposed version. Voting allows the community to disapprove of changes that are unhelpful or to approve of changes that would improve the existing version of the node. \nUsers can upvote or downvote the proposed version of a node, which is then compared to the votes received by the existing version of the node. If a proposal receives enough positive votes in comparison to the votes of the existing node, it will be accepted and the node will be updated. In this way, the community collaborates and perpetually improves the knowledge available.`
   },
   {
     name: "Magnitude",
     artoboard: "artboard-7",
-    getHeight: (isMobile) => (isMobile ? 900 : 600),
+    getHeight: isMobile => (isMobile ? 900 : 600),
     color: "#36f3c4",
     description: `Over the past two years, [1,529] students and researchers from [183] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [44,665] nodes and [235,674] prerequisite links between them, which have been proposed through [88,167] proposals. \nAs a result of this collaboration, [49] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
     getDescription: ({ users, institutions, nodes, links, proposals, communities }) =>
-      `Over the past two years, [${users}] students and researchers from [${institutions}] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [${nodes}] nodes and [${links}] prerequisite links between them, which have been proposed through [${proposals}] proposals. \nAs a result of this collaboration, [${communities}] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`,
-  },
+      `Over the past two years, [${users}] students and researchers from [${institutions}] institutions have participated in a large-scale collaboration effort through 1Cademy. This collaboration has resulted in the creation of [${nodes}] nodes and [${links}] prerequisite links between them, which have been proposed through [${proposals}] proposals. \nAs a result of this collaboration, [${communities}] research and learning communities have formed, covering a wide range of subjects such as psychology, machine learning, and virology. This collaborative effort has allowed for the sharing of knowledge and resources among students and researchers from different institutions, promoting the advancement of knowledge in various fields. \nFurthermore, it has facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey. This collaborative note-taking approach ensures that the notes are useful and usable for multiple students studying the same topics, and that they can improve semester by semester. Through this process, students can spend less time on note-taking and gain the most benefit from the notes.`
+  }
 ];
 
 export const SECTION_WITH_ANIMATION = 1;
+export const HEADER_HEIGHT = 80;
+export const HEADER_HEIGHT_MOBILE = 72;
 
 const sectionsTmp = [
   { id: "LandingSection", title: "Home", simpleTitle: "Home", children: [] },
@@ -102,8 +105,8 @@ const sectionsTmp = [
       { id: "animation2", title: "Linking", simpleTitle: "Linking" },
       { id: "animation3", title: "Voting", simpleTitle: "Voting" },
       { id: "animation4", title: "Improving", simpleTitle: "Improving" },
-      { id: "animation5", title: "Magnitude", simpleTitle: "Magnitude" },
-    ],
+      { id: "animation5", title: "Magnitude", simpleTitle: "Magnitude" }
+    ]
   },
   { id: "ValuesSection", title: "Why 1Cademy?", simpleTitle: "Why?", children: [] },
   { id: "CommunitiesSection", title: "What we study?", simpleTitle: "What?", children: [] },
@@ -121,7 +124,7 @@ function Index() {
   const [email, setEmail] = useRecoilState(emailState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
-  const [notAResearcher, /* setNotAResearcher */] = useRecoilState(notAResearcherState);
+  const [notAResearcher /* setNotAResearcher */] = useRecoilState(notAResearcherState);
   const navigateTo = useNavigate();
   const isLargeDesktop = useMediaQuery("(min-width:1350px)");
   const isDesktop = useMediaQuery("(min-width:1200px)");
@@ -129,14 +132,13 @@ function Index() {
   const [animationSelected, setSelectedAnimation] = useState(0);
 
   const { entry: homeEntry, inView: homeInView, ref: HomeSectionRef } = useInView();
-  const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({})
-  const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({})
-  const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({})
-  const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({})
-  const { entry: whichEntry, inViewOnce: whichInViewOnce, ref: whichSectionRef } = useInView({})
-  const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({})
+  const { entry: whyEntry, inViewOnce: whyInViewOnce, ref: whySectionRef } = useInView({});
+  const { entry: whatEntry, inViewOnce: whatInViewOnce, ref: whatSectionRef } = useInView({});
+  const { entry: whereEntry, inViewOnce: whereInViewOnce, ref: whereSectionRef } = useInView({});
+  const { entry: whoEntry, inViewOnce: whoInViewOnce, ref: whoSectionRef } = useInView({});
+  const { entry: whichEntry, inViewOnce: whichInViewOnce, ref: whichSectionRef } = useInView({});
+  const { entry: joinEntry, inViewOnce: joinInViewOnce, ref: JoinSectionRef } = useInView({});
   const { inViewOnce: tableOfContentInViewOnce, ref: TableOfContentRef } = useInView();
-
 
   const animationRefs = useRef(null);
   const { height, width } = useWindowSize();
@@ -160,8 +162,8 @@ function Index() {
 
     return [
       { id: homeEntry.target.id, height: 0 },
-      { id: howSectionRef.current.id, height:homeEntry.target.clientHeight },
-      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight  },
+      { id: howSectionRef.current.id, height: homeEntry.target.clientHeight },
+      { id: whyEntry.target.id, height: howSectionRef.current.clientHeight },
       { id: whatEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whichEntry.target.id, height: whatEntry.target.clientHeight },
       { id: whereEntry.target.id, height: whichEntry.target.clientHeight },
@@ -182,7 +184,7 @@ function Index() {
 
     return [
       { id: homeEntry.target.id, height: homeEntry.target.clientHeight },
-      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight},
+      { id: howSectionRef.current.id, height: howSectionRef.current.clientHeight },
       { id: whyEntry.target.id, height: whyEntry.target.clientHeight },
       { id: whatEntry.target.id, height: whatEntry.target.clientHeight },
       { id: whichEntry.target.id, height: whichEntry.target.clientHeight },
@@ -202,7 +204,7 @@ function Index() {
   }, [height]);
 
   const detectScrollPosition = useCallback(
-    (event) => {
+    event => {
       if (!animationRefs.current) return;
       if (notSectionSwitching) {
         const currentScrollPosition = event.target.scrollTop;
@@ -228,7 +230,7 @@ function Index() {
             animationRefs.current.getHeight2(),
             animationRefs.current.getHeight3(),
             animationRefs.current.getHeight4(),
-            animationRefs.current.getHeight5(),
+            animationRefs.current.getHeight5()
           ];
           animationsHeight = getAnimationsPositions(animationsHeightsArray);
         }
@@ -252,7 +254,7 @@ function Index() {
     },
     [getAnimationsPositions, getSectionPositions, height, notSectionSwitching]
   );
- 
+
   const switchSection = useCallback(
     (sectionIdx, animationIndex = -1) => {
       if (!animationRefs.current) return;
@@ -271,7 +273,7 @@ function Index() {
         animationRefs.current.getHeight2(),
         animationRefs.current.getHeight3(),
         animationRefs.current.getHeight4(),
-        animationRefs.current.getHeight5(),
+        animationRefs.current.getHeight5()
       ];
       const animationsHeight = getAnimationsHeight(animationsHeights);
 
@@ -294,7 +296,6 @@ function Index() {
     },
     [getAnimationsHeight, getSectionHeights]
   );
-
 
   const joinUsClick = event => {
     event.preventDefault();
@@ -336,7 +337,6 @@ function Index() {
         <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
           <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
         </MenuItem>
-
       )}
       {fullname && email && (
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
@@ -359,7 +359,7 @@ function Index() {
         overflowY: "auto",
         overflowX: "auto",
         position: "relative",
-        backgroundColor: "#28282a"
+        backgroundColor: darkblue
         // zIndex: -3
       }}
     >
@@ -376,7 +376,7 @@ function Index() {
 
             // filter: "blur(1px)"
           }}
-        // style={{willChange:"filter"}}
+          // style={{willChange:"filter"}}
         />
         <Box
           sx={{
@@ -508,29 +508,22 @@ function Index() {
       </Box> */}
 
       <Box sx={{ position: "relative" }}>
-        <Box
-          sx={{ position: "absolute", top: height, bottom: "0px", left: "0px", minWidth: "10px", maxWidth: "180px" }}
-        >
-          <Box  ref={TableOfContentRef}  className={tableOfContentInViewOnce ? "slide-left-to-right" : "hide"} sx={{ position: "sticky", top: "100px", zIndex: 11 }}>
-            <MemoizedTableOfContent
-              menuItems={sectionsTmp}
-              viewType={isLargeDesktop ? "COMPLETE" : isDesktop ? "NORMAL" : "SIMPLE"}
-              onChangeContent={switchSection}
-              sectionSelected={sectionSelected}
-              animationSelected={animationSelected}
-            />
-          </Box>
-        </Box>
-
         <Box ref={HomeSectionRef} component="section">
-          <HeroMemoized />
+          <HeroMemoized headerHeight={HEADER_HEIGHT} headerHeightMobile={HEADER_HEIGHT_MOBILE} />
         </Box>
 
-
-        <Box sx={{ width: "100%", maxWidth: "980px", px: isDesktop ? "0px" : "10px", margin: "auto" ,position: "relative",pt:"32px"}}>
-          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }} >
-          
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: "980px",
+            px: isDesktop ? "0px" : "10px",
+            margin: "auto",
+            position: "relative",
+            pt: "32px"
+          }}
+        >
+          <Box id={sectionsOrder[1].id} ref={howSectionRef} sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[1].title}
             </CustomTypography>
             <HowItWorks
@@ -551,11 +544,11 @@ function Index() {
               }
             />
           </Box>
-          <Box id={sectionsOrder[2].id} ref={whySectionRef }   sx={{ pb: 10 }}>
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[2].id} ref={whySectionRef} sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[2].title}
             </CustomTypography>
-            {!whyInViewOnce && <div style={{ height: 2 * height, /* background: "red" */ }}></div>}
+            {!whyInViewOnce && <div style={{ height: 2 * height /* background: "red" */ }}></div>}
             {whyInViewOnce && (
               <Suspense
                 fallback={
@@ -577,12 +570,17 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[3].id} ref={whatSectionRef}  sx={{ pb: 10 }} >
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
+          <Box id={sectionsOrder[3].id} ref={whatSectionRef} sx={{ pb: 10 }}>
+            <CustomTypography
+              variant="h4"
+              marked="center"
+              align="center"
+              sx={{ pb: 10, color: "#f8f8f8", fontWeight: 700 }}
+            >
               {sectionsOrder[3].title}
             </CustomTypography>
             {!whatInViewOnce ? (
-              <div style={{ height: 2 * height,/*  background: "yellow" */ }}></div>
+              <div style={{ height: 2 * height /*  background: "yellow" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -604,8 +602,13 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ pb: 10 }} >
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" , fontWeight: 700}}>
+          <Box id={sectionsOrder[4].id} ref={whichSectionRef} sx={{ pb: 10 }}>
+            <CustomTypography
+              variant="h4"
+              marked="center"
+              align="center"
+              sx={{ pb: 10, color: "#f8f8f8", fontWeight: 700 }}
+            >
               {sectionsOrder[4].title}
             </CustomTypography>
             {!whichInViewOnce ? (
@@ -620,7 +623,7 @@ function Index() {
                       position: "relative",
                       display: "flex",
                       flexDirection: "column",
-                      alignItems: "center",
+                      alignItems: "center"
                     }}
                   >
                     <Grid container spacing={2.5}>
@@ -641,12 +644,12 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[5].id} ref={whereSectionRef} sx={{ pb: 10 }} >
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[5].id} ref={whereSectionRef} sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[5].title}
             </CustomTypography>
             {!whereInViewOnce ? (
-              <div style={{ height: 2 * height, /* background: "green" */ }}></div>
+              <div style={{ height: 2 * height /* background: "green" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
@@ -655,12 +658,12 @@ function Index() {
               </Suspense>
             )}
           </Box>
-          <Box id={sectionsOrder[6].id} ref={whoSectionRef}  sx={{ pb: 10 }} >
-            <CustomTypography variant="h4" marked="center" align="center" sx={{  pb: 10, color: "#f8f8f8" }}>
+          <Box id={sectionsOrder[6].id} ref={whoSectionRef} sx={{ pb: 10 }}>
+            <CustomTypography variant="h4" marked="center" align="center" sx={{ pb: 10, color: "#f8f8f8" }}>
               {sectionsOrder[6].title}
             </CustomTypography>
             {!whoInViewOnce ? (
-              <div style={{ height: 2 * height, /* background: "pink" */ }}></div>
+              <div style={{ height: 2 * height /* background: "pink" */ }}></div>
             ) : (
               <Suspense
                 fallback={
@@ -697,7 +700,7 @@ function Index() {
               {sectionsOrder[7].title}
             </CustomTypography>
             {!joinInViewOnce ? (
-              <div style={{ height: 2 * height, /* background: "#b4f5ea" */ }}></div>
+              <div style={{ height: 2 * height /* background: "#b4f5ea" */ }}></div>
             ) : (
               <Suspense
                 fallback={<Skeleton variant="rounded" height={490} animation="wave" sx={{ background: gray02 }} />}
