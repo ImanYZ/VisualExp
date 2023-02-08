@@ -11,9 +11,11 @@ import {
   Link,
   Menu,
   MenuItem,
+  Modal,
   Stack,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme
 } from "@mui/material";
 import React, { useState } from "react";
@@ -21,39 +23,74 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 import { capitalizeString } from "../../../../utils/stringFunctions";
-import { gray200, gray25, gray300, gray600, gray700, gray900, orangeDark, orangeLight } from "../../Communities";
+import { gray200, gray300, gray50, gray600, gray700, gray900, orangeDark, orangeLight } from "../../Communities";
 import oneCademyLogo from "../../../../assets/DarkmodeLogo.png";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-// import oneCademyLogo from "../../public/DarkmodeLogo.png";
+import oneCademyLogoExtended from "../../../../assets/logo-extended.png";
+
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
 const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
+  const fullname = useRecoilValue(fullnameState);
+  const email = useRecoilValue(emailState);
+  const navigate = useNavigate();
+  const signUpHandler = () => {
+    navigate("/auth");
+  };
 
   return (
     <Stack
       direction={"column"}
-      justifyContent={"space-between"}
-      alignItems={"center"}
-      sx={{ height: { xs: `calc(100vh - ${HEADER_HEIGHT_MOBILE}px)`, md: `calc(100vh - ${HEADER_HEIGHT}px)` } }}
+      alignItems={"self-start"}
+      sx={{
+        height: {
+          xs: `calc(100vh)`,
+          md: `calc(100vh)`,
+          overflowY: "auto"
+        },
+        background: theme => (theme.palette.mode === "light" ? "#000000" : "#ffffff")
+      }}
     >
       <Stack
-        flex={1}
-        direction={"column"}
-        alignItems={"center"}
-        justifyContent={"center"}
-        spacing="32px"
-        padding={"32px"}
+        direction={"row"}
+        justifyContent="space-between"
+        alignItems="center"
         sx={{
-          "& a,svg": { color: theme => (theme.palette.mode === "light" ? gray200 : gray600), fontWeight: 600 }
+          px: { xs: "16px", sm: "32px" },
+          width: "100%",
+          height: { xs: `${HEADER_HEIGHT_MOBILE}px`, md: `${HEADER_HEIGHT}px` }
         }}
       >
+        <img
+          src={oneCademyLogoExtended}
+          alt="logo"
+          width={"149px"}
+          height={"40px"}
+          style={{ cursor: "pointer" }}
+          onClick={() => navigate("/")}
+        />
+        <IconButton
+          onClick={() => onCloseMenu("")}
+          sx={{ display: { xs: "flex", md: "none" }, alignSelf: "center", color: gray200 }}
+          size="small"
+        >
+          <CloseIcon />
+        </IconButton>
+      </Stack>
+
+      <Stack
+        width={"100%"}
+        direction={"column"}
+        spacing={{ xs: "4px" }}
+        sx={{ padding: { xs: "0px" }, "& a,svg": { color: gray200, fontWeight: 600 } }}
+      >
         {items.map((cur, idx) => {
-          return cur.options ? (
+          return cur.options?.length ? (
             <Box key={cur.id}>
-              <Box sx={{ display: "flex" }}>
+              <Box sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
                 <Link
                   href={`#${cur.id}`}
                   onClick={() => onCloseMenu(cur.id)}
@@ -74,22 +111,26 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
                   {idxOptionVisible === idx ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                 </IconButton>
               </Box>
-              <SubMenu
-                onCloseSubMenu={() => setIdxOptionVisible(-1)}
-                sectionVisible={items[idxOptionVisible]}
-                sx={{
-                  border: theme => `solid 1px ${theme.palette.mode === "dark" ? "#FFFFFF4D" : gray200}`,
-                  borderRadius: "12px"
-                }}
-              />
+              {idxOptionVisible === idx && (
+                <Box sx={{ p: { xs: "12px 16px" } }}>
+                  <SubMenu
+                    onCloseSubMenu={() => setIdxOptionVisible(-1)}
+                    sectionVisible={items[idxOptionVisible]}
+                    sx={{
+                      border: theme => `solid 1px ${theme.palette.mode === "light" ? "#FFFFFF4D" : gray200}`,
+                      borderRadius: "12px"
+                    }}
+                  />
+                </Box>
+              )}
             </Box>
           ) : (
-            <Tooltip key={cur.id} title={cur.title} placement={"right"}>
+            <Box key={cur.id} sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
               <Link
                 href={`#${cur.id}`}
                 onClick={() => onCloseMenu(cur.id)}
                 sx={{
-                  color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
+                  color: theme => (theme.palette.mode === "dark" ? gray200 : gray600),
                   cursor: "pointer",
                   textDecoration: "none",
                   borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined
@@ -97,12 +138,50 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
               >
                 {cur.label}
               </Link>
-            </Tooltip>
+            </Box>
           );
         })}
+
+        {!fullname && !email && (
+          <Button
+            variant="contained"
+            onClick={() => navigate("/#JoinUsSection")}
+            sx={{
+              display: { xs: "flex", sm: "none" },
+              background: orangeDark,
+              fontSize: 16,
+              borderRadius: 40,
+              textTransform: "capitalize",
+              ":hover": {
+                background: orangeLight
+              }
+            }}
+          >
+            Apply
+          </Button>
+        )}
+        {!fullname && !email && (
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={signUpHandler}
+            sx={{
+              display: { xs: "flex", sm: "none" },
+              fontSize: 16,
+              backgroundColor: theme => (theme.palette.mode === "light" ? "#303030" : "#e4e4e4"),
+              color: theme => (theme.palette.mode === "light" ? theme.palette.common.white : theme.palette.common.black),
+              borderRadius: 40,
+              // height: "25px",
+              textTransform: "capitalize",
+              ":hover": {
+                backgroundColor: theme => (theme.palette.mode === "light" ? "#444444" : "#cacaca")
+              }
+            }}
+          >
+            Sign In/Up
+          </Button>
+        )}
       </Stack>
-      {/* TODO: add footer */}
-      {/* <AppFooter /> */}
     </Stack>
   );
 };
@@ -118,6 +197,8 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
   const firebase = useRecoilValue(firebaseState);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
+
+  const isMobile = useMediaQuery("(max-width:599px)");
 
   const handleProfileMenuOpen = event => {
     setProfileMenuOpen(event.currentTarget);
@@ -181,12 +262,12 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
           <Stack direction={"row"} alignItems="center" spacing={"16px"}>
             <Tooltip title="1Cademy's Landing Page">
               <img
-                src={oneCademyLogo}
+                src={isMobile ? oneCademyLogoExtended : oneCademyLogo}
                 alt="logo"
-                width="60px"
-                height="64px"
+                width={isMobile ? "149px" : "60px"}
+                height={isMobile ? "40px" : "64px"}
                 style={{ cursor: "pointer" }}
-                // onClick={() => router.push("/")}
+                onClick={() =>navigateTo('/')}
               />
             </Tooltip>
             <Stack
@@ -205,32 +286,32 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
             >
               {sections.slice(1).map((cur, idx) => {
                 return cur.options ? (
-                  <Box key={cur.id}>
-                    <Box
+                  <Box key={cur.id} sx={{ display: "flex" }}>
+                    <Link
+                      href={`#${cur.id}`}
+                      onClick={() => onPreventSwitch(cur.id)}
+                      onMouseOver={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       sx={{
-                        display: "flex"
+                        whiteSpace: "nowrap",
+                        color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
+                        cursor: "pointer",
+                        textDecoration: "none",
+                        fontWeight: 600,
+                        borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined,
+                        ":hover": {
+                          color: theme => (theme.palette.mode === "light" ? gray300 : gray700)
+                        }
                       }}
                     >
-                      <Link
-                        href={`#${cur.id}`}
-                        onClick={() => onCloseMenu(cur.id)}
-                        sx={{
-                          color: "inherit",
-                          cursor: "pointer",
-                          textDecoration: "none",
-                          borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined
-                        }}
-                      >
-                        {cur.label}
-                      </Link>
-                      <IconButton
-                        onClick={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
-                        size="small"
-                        sx={{ color: "inherit", p: "0px", ml: { xs: "4px", lg: "13px" } }}
-                      >
-                        {idxOptionVisible === idx ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                      </IconButton>
-                    </Box>
+                      {cur.label}
+                    </Link>
+                    <IconButton
+                      onClick={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
+                      size="small"
+                      sx={{ p: "0px", ml: { xs: "4px", lg: "13px" } }}
+                    >
+                      {idxOptionVisible === idx ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                    </IconButton>
                   </Box>
                 ) : (
                   <Tooltip key={cur.id} title={cur.title} placement={"right"}>
@@ -264,17 +345,20 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                 <Tooltip title="Apply to join 1Cademy">
                   <Button
                     variant="contained"
-                    // onClick={() => window?.open(ROUTES.apply, "_blank")}
+                    onClick={() => navigateTo("/#JoinUsSection")}
                     sx={{
+                      display: { xs: "none", sm: "flex" },
+                      p: { xs: "6px 10px", lg: undefined },
+                      minWidth: "54px",
                       background: orangeDark,
                       fontSize: 16,
                       borderRadius: 40,
                       height: "25px",
-                      width: "60px",
+                      // width: "60px",
                       textTransform: "capitalize",
                       ":hover": {
-                        background: orangeLight
-                      }
+                        background: orangeLight,
+                      },
                     }}
                   >
                     Apply
@@ -307,7 +391,9 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                     variant="contained"
                     onClick={signUpHandler}
                     sx={{
-                      minWidth: "120px",
+                      display: { xs: "none", sm: "flex" },
+                      p: { xs: "6px 10px", lg: undefined },
+                      minWidth: "95px",
                       fontSize: 16,
                       backgroundColor: theme.palette.mode === "light" ? "#303030" : "#e4e4e4",
                       color: theme.palette.mode === "light" ? theme.palette.common.white : theme.palette.common.black,
@@ -325,7 +411,6 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
               )}
             </Stack>
 
-            {/* BUTTONS FOR 1ASSISTANT HOMEPAGE */}
 
             <IconButton
               onClick={() => setOpenMenu(prev => !prev)}
@@ -338,9 +423,15 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
         </Stack>
         {fullname && email && renderProfileMenu}
 
-        {openMenu && (
+        <Modal
+          open={openMenu}
+          onClose={() => setOpenMenu(false)}
+          aria-labelledby="Menu"
+          aria-describedby="Navigate through sections"
+          sx={{ display: { md: "none" } }}
+        >
           <MenuBar items={sections.slice(1)} onCloseMenu={onCloseMenu} selectedSectionId={selectedSectionId} />
-        )}
+        </Modal>
         <Box
           sx={{
             position: "absolute",
@@ -367,14 +458,12 @@ const SubMenu = ({ onCloseSubMenu, sectionVisible, sx }) => {
         <ClickAwayListener onClickAway={onCloseSubMenu}>
           <Box
             sx={{
-              p: { xs: "16px", sm: "32px" },
+              p: { xs: "36px 12px", md: "32px" },
               maxWidth: "1280px",
               margin: "auto"
-              // background: theme => (theme.palette.mode === "dark" ? "#16161aff" : "#f8f8f8ff"),
             }}
           >
-            <Typography sx={{ mb: "12px", color: orangeLight }}>{sectionVisible.title}</Typography>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" } }}>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" } }}>
               {sectionVisible.options.map(cur => (
                 <Link
                   key={cur.title}
@@ -388,16 +477,11 @@ const SubMenu = ({ onCloseSubMenu, sectionVisible, sx }) => {
                     borderRadius: "16px",
                     color: theme => (theme.palette.mode === "light" ? gray200 : "black"),
                     ":hover": {
-                      background: theme => (theme.palette.mode === "light" ? gray25 : "black"),
-                      // color: theme => (theme.palette.mode === "dark" ? "black" : gray200),
-                      ".link-option-title": {
-                        color: theme => (theme.palette.mode === "light" ? gray900 : gray200)
-                      }
+                      background: theme => (theme.palette.mode === "light" ? gray900 : gray50)
                     }
                   }}
                 >
                   <Typography
-                    className="link-option-title"
                     sx={{
                       mb: "4px",
                       color: theme => (theme.palette.mode === "light" ? gray200 : gray900),
@@ -406,6 +490,15 @@ const SubMenu = ({ onCloseSubMenu, sectionVisible, sx }) => {
                     }}
                   >
                     {cur.title}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      display: { xs: "none", md: "block" },
+                      color: theme => (theme.palette.mode === "light" ? gray300 : gray600),
+                      fontSize: "14px"
+                    }}
+                  >
+                    {cur.description.split(" ").slice(0, 13).join(" ") + "..."}
                   </Typography>
                 </Link>
               ))}
