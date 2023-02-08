@@ -335,7 +335,7 @@ const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
                     </IconButton>
                   </Box>
                 ) : (
-                  <Tooltip key={cur.id} title={cur.title} placement={"right"}>
+                  <Tooltip key={cur.id} title={cur.title} placement={"bottom"}>
                     <Link
                       href={`#${cur.id}`}
                       onClick={() => onPreventSwitch(cur.id)}
