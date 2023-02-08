@@ -9,6 +9,8 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import AppAppBar2 from "./modules/views/AppAppBar2";
 import { darkblue } from "./Communities";
+import AppHeaderMemoized from "./modules/views/AppHeader2";
+import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
 
 const switchSection = newValue => event => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
@@ -48,15 +50,16 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
       )}
 
       {newHeader && (
-        <AppAppBar2
-          switchSection={switchSection}
-          homeClick={homeClick}
-          joinUsClick={joinUsClick}
-          tutorial={tutorial}
-          communities={communities}
-          thisPage={thisPage}
-          section={5}
-        />
+        // <AppAppBar2
+        //   switchSection={switchSection}
+        //   homeClick={homeClick}
+        //   joinUsClick={joinUsClick}
+        //   tutorial={tutorial}
+        //   communities={communities}
+        //   thisPage={thisPage}
+        //   section={5}
+        // />
+        <AppHeaderMemoized page="ONE_CADEMY" sections={ONE_CADEMY_SECTIONS}/>
       )}
 
       <Box

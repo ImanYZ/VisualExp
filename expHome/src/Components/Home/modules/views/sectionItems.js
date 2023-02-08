@@ -30,7 +30,41 @@ export const ONE_CADEMY_SECTIONS = [
     title: "Topics",
     label: "Topics",
     description:
-      "1Cademy facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey."
+      "1Cademy facilitated the formation of communities of learners and researchers who can learn from each other, exchange ideas and support one another in their learning journey.",
+    options: [
+      {
+        title: "UX Research In Online Communities",
+        link: "https://1cademy.us/community/Cognitive_Psychology"
+      },
+      {
+        title: "Clinical Psychology",
+        link: "https://1cademy.us/community/Clinical_Psychology"
+      },
+      {
+        title: "Health Psychology",
+        link: "https://1cademy.us/community/Health_Psychology"
+      },
+      {
+        title: "Disability Studies",
+        link: "https://1cademy.us/community/Disability_Studies"
+      },
+      {
+        title: "Social Psychology",
+        link: "https://1cademy.us/community/Social_Psychology"
+      },
+      {
+        title: "Natural Language Processing",
+        link: "https://1cademy.us/community/Deep_Learning"
+      },
+      {
+        title: "UX Research in Online Communities",
+        link: "https://1cademy.us/community/UX_Research_in_Online_Communities"
+      },
+      {
+        title: "Liaison Librarians",
+        link: "https://1cademy.us/community/Liaison_Librarians"
+      }
+    ]
   },
   {
     id: "systems",

@@ -20,7 +20,7 @@ import { HeroMemoized } from "./modules/views/Hero";
 import { darkblue } from "./Communities";
 import Mechanism, { MECHANISM_ITEMS } from "./modules/views/Mechanism";
 import Magnitude from "./modules/views/Magnitude";
-                
+
 import UniversitiesMap from "./modules/views/UniversitiesMap/UniversitiesMap";
 import Benefits from "./modules/views/Benefits";
 import Topics from "./modules/views/Topics";
@@ -30,6 +30,7 @@ import Papers from "./modules/views/Papers";
 import Join from "./modules/views/Join";
 import { SectionWrapper } from "./modules/views/SectionWrapper";
 import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
+import AppHeaderMemoized from "./modules/views/AppHeader2";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -53,8 +54,6 @@ function Index() {
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [notAResearcher /* setNotAResearcher */] = useRecoilState(notAResearcherState);
   const navigateTo = useNavigate();
-  const isDesktop = useMediaQuery("(min-width:1200px)");
-  const isMovil = useMediaQuery("(max-width:600px)");
 
   const handleProfileMenuOpen = event => {
     setProfileMenuOpen(event.currentTarget);
@@ -113,123 +112,12 @@ function Index() {
         overflowY: "auto",
         overflowX: "auto",
         position: "relative",
-        backgroundColor: darkblue
+        backgroundColor: darkblue,
+        scrollBehavior: "smooth"
         // zIndex: -3
       }}
     >
-      <Box
-        component={"header"}
-        sx={{ position: "sticky", width: "100%", top: "0px", zIndex: 12, display: "flex", justifyContent: "center" }}
-      >
-        <Box
-          sx={{
-            height: HEADER_HEIGTH,
-            width: "100%",
-            background: "rgba(0,0,0,.72)",
-            backdropFilter: "saturate(180%) blur(20px)"
-
-            // filter: "blur(1px)"
-          }}
-          // style={{willChange:"filter"}}
-        />
-        <Box
-          sx={{
-            width: "100%",
-            maxWidth: "980px",
-            height: HEADER_HEIGTH,
-            px: isDesktop ? "0px" : "10px",
-            position: "absolute",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-          }}
-        >
-          <Stack
-            spacing={"20px"}
-            alignItems={"center"}
-            justifyContent={"space-between"}
-            direction={"row"}
-            sx={{ color: "#f8f8f8" }}
-          >
-            <img src={LogoDarkMode} alt="logo" width="52px" height={"59px"} />
-
-            {!isMovil && (
-              <>
-                <Tooltip title={sectionsOrder[1].title}>
-                  <Typography sx={{ cursor: "pointer" }}>{sectionsOrder[1].label}</Typography>
-                </Tooltip>
-                <Tooltip title={sectionsOrder[2].title}>
-                  <Typography sx={{ cursor: "pointer" }}>{sectionsOrder[2].label}</Typography>
-                </Tooltip>
-                <Tooltip title={sectionsOrder[3].title}>
-                  <Typography sx={{ cursor: "pointer" }}>{sectionsOrder[3].label}</Typography>
-                </Tooltip>
-                <Tooltip title={sectionsOrder[4].title}>
-                  <Typography sx={{ cursor: "pointer" }}>{sectionsOrder[4].label}</Typography>
-                </Tooltip>
-                <Tooltip title={sectionsOrder[5].title}>
-                  <Typography sx={{ cursor: "pointer" }}>{sectionsOrder[5].label}</Typography>
-                </Tooltip>
-              </>
-            )}
-          </Stack>
-          <Box>
-            {
-              <Tooltip title="Apply to join 1Cademy">
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  size={isMovil ? "small" : "medium"}
-                  sx={{
-                    fontSize: 16,
-                    color: "common.white",
-                    ml: 2.5,
-                    borderRadius: 40
-                  }}
-                >
-                  Apply!
-                </Button>
-              </Tooltip>
-            }
-            {fullname ? (
-              <Tooltip title="Account">
-                <IconButton
-                  size="large"
-                  // edge="end"
-                  aria-haspopup="true"
-                  aria-controls="lock-menu"
-                  aria-label={`${fullname}'s Account`}
-                  aria-expanded={isProfileMenuOpen ? "true" : undefined}
-                  onClick={handleProfileMenuOpen}
-                  sx={{
-                    color: "common.white"
-                  }}
-                >
-                  <AccountCircle color="inherit" />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="SIGN IN/UP">
-                <Button
-                  variant="contained"
-                  onClick={signUpHandler}
-                  size={isMovil ? "small" : "medium"}
-                  sx={{
-                    display: showSignInorUp ? "inline-flex" : "none",
-                    fontSize: 16,
-                    color: "common.white",
-                    ml: 2.5,
-                    borderRadius: 40
-                  }}
-                >
-                  SIGN IN/UP
-                </Button>
-              </Tooltip>
-            )}
-            {fullname && renderProfileMenu}
-          </Box>
-        </Box>
-      </Box>
+      <AppHeaderMemoized page="ONE_CADEMY" sections={ONE_CADEMY_SECTIONS} />
       <HeroMemoized headerHeight={HEADER_HEIGHT} headerHeightMobile={HEADER_HEIGHT_MOBILE} />
 
       <SectionWrapper section={ONE_CADEMY_SECTIONS[1]} textAlign="center">
@@ -239,7 +127,6 @@ function Index() {
       <SectionWrapper section={ONE_CADEMY_SECTIONS[2]}>
         <Magnitude />
         <UniversitiesMap theme={"Dark"} />
-        
       </SectionWrapper>
 
       <SectionWrapper section={ONE_CADEMY_SECTIONS[3]}>
