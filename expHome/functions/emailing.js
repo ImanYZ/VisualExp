@@ -1,6 +1,6 @@
 const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
 
-const { Timestamp } = require("firebase-admin/firestore");
+const { Timestamp ,FieldValue} = require("firebase-admin/firestore");
 
 const nodemailer = require("nodemailer");
 
@@ -370,7 +370,7 @@ exports.inviteAdministrators = async context => {
               await administratorRef.update({
                 // condition: minCondition,
                 emailedAt: Timestamp.fromDate(new Date()),
-                reminders: admin.firestore.FieldValue.increment(1),
+                reminders: FieldValue.increment(1),
                 // The next reminder should be sent one week later.
                 nextReminder: Timestamp.fromDate(nextWeek()),
                 updatedAt: Timestamp.fromDate(new Date())
@@ -615,7 +615,7 @@ exports.inviteInstructors = async context => {
               await instructorRef.update({
                 // condition: minCondition,
                 emailedAt: Timestamp.fromDate(new Date()),
-                reminders: admin.firestore.FieldValue.increment(1),
+                reminders: FieldValue.increment(1),
                 // The next reminder should be sent one week later.
                 nextReminder: Timestamp.fromDate(nextWeek()),
                 updatedAt: Timestamp.fromDate(new Date())
@@ -1046,8 +1046,8 @@ const reschEventNotificationEmail = async (
         await deleteEvent(scheduleData.id);
         const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
         await scheduleRef.update({
-          id: admin.firestore.FieldValue.delete(),
-          order: admin.firestore.FieldValue.delete()
+          id: FieldValue.delete(),
+          order: FieldValue.delete()
         });
       }
     }
