@@ -1,20 +1,18 @@
 import EmailIcon from "@mui/icons-material/Email";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import YouTubeIcon from "@mui/icons-material/YouTube";
-import { Box, Divider, IconButton, Link, Stack, styled,  Typography } from "@mui/material";
+import { Box, Divider, IconButton, Link, Stack, styled, Typography } from "@mui/material";
 import React from "react";
-
 
 import logo1cademy from "../../../../assets/1Cademy-head.svg";
 
 import { gray200, gray800, gray900, orangeDark } from "../../Communities";
 import { ONE_CADEMY_SECTIONS } from "./sectionItems";
 
-
 const color = gray200;
 
-export const DividerStyled = styled((props) => <Divider {...props} />)(() => ({
-  borderColor: gray800,
+export const DividerStyled = styled(props => <Divider {...props} />)(() => ({
+  borderColor: gray800
 }));
 
 const AppFooter = ({ sx }) => {
@@ -30,9 +28,9 @@ const AppFooter = ({ sx }) => {
           whiteSpace: "nowrap",
           color,
           cursor: "pointer",
-          fontWeight: 600,
+          fontWeight: 600
         },
-        ...sx,
+        ...sx
       }}
     >
       <Box sx={{ maxWidth: "1280px", m: "auto", px: { xs: "16px", sm: "32px" } }}>
@@ -44,13 +42,13 @@ const AppFooter = ({ sx }) => {
               sm: "repeat(3,1fr)",
               md: "repeat(6,minmax(max-content,1fr))",
               justifyItems: "start",
-              rowGap: "40px",
-            },
+              rowGap: "40px"
+            }
           }}
         >
           <Box sx={{ gridColumn: { xs: "span 2", sm: "span 3" } }}>
             <Stack direction={"row"} flexWrap={"wrap"} alignItems={"center"} spacing={"12px"} sx={{ mb: "32px" }}>
-              <img src={logo1cademy} alt="logo 1cademy" style={{width:"40px",height:"40px"}} />
+              <img src={logo1cademy} alt="logo 1cademy" style={{ width: "40px", height: "40px" }} />
               <Box component={"span"} sx={{ fontSize: "24px", fontWeight: 600 }}>
                 1Cademy
               </Box>
@@ -93,6 +91,9 @@ const AppFooter = ({ sx }) => {
                 sx={{ color: theme => theme.palette.grey[500] }}
               >
                 Cookie
+              </Link>
+              <Link href="#" underline="none" sx={{ color: theme => theme.palette.grey[500] }}>
+                GDPR
               </Link>
             </Stack>
           </Box>

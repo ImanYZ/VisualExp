@@ -22,7 +22,7 @@ export const SectionItemSwitcher = ({ items }) => {
       <img
         src={`${theme.palette.mode === "dark" ? selectedItem.imageDark : selectedItem.image}`}
         alt={selectedItem.title}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%",color:gray200 }}
       />
     );
   }, [expandedIdx, items, theme.palette.mode]);
@@ -102,6 +102,7 @@ export const SectionItemSwitcher = ({ items }) => {
                   alignSelf: "center",
                   display: { xs: "block", md: "none" },
                   m: "0 auto",
+                 
                 }}
               >
                 {MediaComponent}
