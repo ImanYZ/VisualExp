@@ -1,16 +1,12 @@
 import LogoutIcon from "@mui/icons-material/Logout";
 import BiotechIcon from "@mui/icons-material/Biotech";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import React, { useState } from "react";
 
-import LogoDarkMode from "../../assets/DarkModeLogoMini.png";
 import Box from "@mui/material/Box";
 
-import AppFooter from "./modules/views/AppFooter";
 import withRoot from "./modules/withRoot";
 
-import sectionsOrder from "./modules/views/sectionsOrder";
-import { Button, IconButton, Menu, MenuItem, Stack, Tooltip, Typography, useMediaQuery } from "@mui/material";
+import {  Menu, MenuItem } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +27,8 @@ import Join from "./modules/views/Join";
 import { SectionWrapper } from "./modules/views/SectionWrapper";
 import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
 import AppHeaderMemoized from "./modules/views/AppHeader2";
+import AppFooter from "./modules/views/AppFooter2";
+import JoinUs from "./modules/views/JoinUs";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -146,8 +144,8 @@ function Index() {
         <Papers />
       </SectionWrapper>
 
-      <Box sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
-        <Join />
+      <Box id="JoinUsSection" sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
+        <JoinUs/>
       </Box>
 
       <AppFooter />

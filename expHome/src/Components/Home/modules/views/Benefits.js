@@ -61,7 +61,7 @@ const Benefits = () => {
             <AccordionSummary
               sx={{
                 ":hover": {
-                  background: theme => (theme.palette.mode === "dark" ? "black" : gray50),
+                  background: theme => (theme.palette.mode === "light" ? "black" : gray50),
                   color: "black"
                 }
               }}
@@ -75,9 +75,7 @@ const Benefits = () => {
                   fontWeight: 400,
                   p: "8px",
                   cursor: "pointer",
-                  ":hover": {
-                    color: "black"
-                  }
+                  
                 }}
               >
                 {value.name}

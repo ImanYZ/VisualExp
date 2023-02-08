@@ -116,7 +116,7 @@ const Systems = () => {
             <AccordionSummary
               sx={{
                 ":hover": {
-                  background: theme => (theme.palette.mode === "dark" ? "black" : gray50),
+                  background: theme => (theme.palette.mode === "light" ? "black" : gray50),
                   color: "black"
                 }
               }}
@@ -125,9 +125,7 @@ const Systems = () => {
                 component={"h4"}
                 variant={"h4"}
                 fontSize={20}
-                sx={{ color: gray200, fontWeight: 400, p: "8px", cursor: "pointer" ,":hover": {
-                  color: "black"
-                }}}
+                sx={{ color: gray200, fontWeight: 400, p: "8px", cursor: "pointer" }}
               >
                 {value.name}
               </Typography>
