@@ -61,19 +61,19 @@ function Index() {
 
     setSelectedSectionId(newSelectedSectionId);
 
-    const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";
+    const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : window.location.hash;
     if (window.location.hash === newHash) return;
     window.location.hash = newHash;
   }, [mechanismInView, magnitudeInView, benefitInView, topicsInView, systemsInView, aboutInView]);
 
  const onSwitchSection = (newSelectedSectionId) => {
     isScrolling.current = true;
-    // if (timer.current) clearTimeout(timer.current);
+    if (timer.current) clearTimeout(timer.current);
 
-    // timer.current = setTimeout(() => {
-    //   isScrolling.current = false;
-    //   if (timer.current) clearTimeout(timer.current);
-    // }, 1000);
+    timer.current = setTimeout(() => {
+      isScrolling.current = false;
+      if (timer.current) clearTimeout(timer.current);
+    }, 1000);
 
     setSelectedSectionId(newSelectedSectionId);
     const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";

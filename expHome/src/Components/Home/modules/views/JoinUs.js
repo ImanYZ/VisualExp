@@ -294,6 +294,8 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
+        scrollMarginTop:"80px",
+        
         p: 0,
         m: 0
       }}

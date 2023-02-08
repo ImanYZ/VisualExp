@@ -255,33 +255,15 @@ const Communities = props => {
       setCommunities(groups);
       setReputationsLoaded(true);
     }
-  }, [reputationsChanges, reputations, communities]);
+  }, [reputationsChanges, reputations, communities, users]);
 
   const handleChangeOption = option => (event, newExpanded) => {
     setExpandedOption(newExpanded ? option : false);
   };
 
-  const getImage = (subSectionTitle, sx) => {
-    const subSection = subSections.find(subSection => subSection.title === subSectionTitle);
-    console.log({ subSectionTitle, subSection });
-    if (!subSection?.image) return null;
 
-    return subSection ? (
-      <Box
-        sx={{
-          width: { xs: "350px", sm: "400px", md: "450px", lg: "500px" },
-          minWidth: { xs: "350px", sm: "400px", md: "450px", lg: "500px" },
-          height: { xs: "350px", sm: "400px", md: "450px", lg: "500px" },
-          alignSelf: "center",
-          ...sx
-        }}
-      >
-        <img src={`/static/${subSection.image}`} alt={subSection.title} style={{ width: "100%", height: "100%" }} />
-      </Box>
-    ) : null;
-  };
 
-  const joinUsClick = event => {
+  const joinUsClick = () => {
     window.location.replace("/#JoinUsSection");
   };
 
@@ -611,6 +593,7 @@ const Communities = props => {
         <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
           Apply to Join this Community
         </Typography>
+        
         <JoinUs community={community}  themeName="dark"/>
 
         <DividerStyled />
