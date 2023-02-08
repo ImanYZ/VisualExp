@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 
 import withRoot from "./modules/withRoot";
 
-import {  Menu, MenuItem } from "@mui/material";
+import { Menu, MenuItem } from "@mui/material";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,6 @@ import JoinUs from "./modules/views/JoinUs";
 // const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
 // const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
-const HEADER_HEIGTH = 70;
 export const gray03 = "#AAAAAA";
 
 export const SECTION_WITH_ANIMATION = 1;
@@ -101,6 +100,21 @@ function Index() {
     navigateTo("/auth");
   };
 
+  // const onSwitchSection = (newSelectedSectionId: string) => {
+  //   isScrolling.current = true;
+  //   if (timer.current) clearTimeout(timer.current);
+
+  //   timer.current = setTimeout(() => {
+  //     isScrolling.current = false;
+  //     if (timer.current) clearTimeout(timer.current);
+  //   }, 1000);
+
+  //   setSelectedSectionId(newSelectedSectionId);
+  //   const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";
+  //   if (window.location.hash === newHash) return;
+  //   window.location.hash = newHash;
+  // };
+
   return (
     <Box
       id="ScrollableContainer"
@@ -144,8 +158,16 @@ function Index() {
         <Papers />
       </SectionWrapper>
 
-      <Box id="JoinUsSection" sx={{ py: { xs: "64px", sm: "96px" }, maxWidth: "1216px", m: "auto" }}>
-        <JoinUs/>
+      <Box
+        id="join-us"
+        sx={{
+          py: { xs: "64px", sm: "96px" },
+          maxWidth: "1216px",
+          m: "auto",
+          scrollMarginTop: "16px"
+        }}
+      >
+        <JoinUs />
       </Box>
 
       <AppFooter />

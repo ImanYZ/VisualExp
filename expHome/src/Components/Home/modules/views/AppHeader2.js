@@ -37,6 +37,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
   const fullname = useRecoilValue(fullnameState);
   const email = useRecoilValue(emailState);
   const navigate = useNavigate();
+
   const signUpHandler = () => {
     navigate("/auth");
   };
@@ -145,7 +146,10 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
         {!fullname && !email && (
           <Button
             variant="contained"
-            onClick={() => navigate("/#JoinUsSection")}
+            onClick={() => {
+              window.location.hash = "join-us";
+              onCloseMenu("");
+            }}
             sx={{
               display: { xs: "flex", sm: "none" },
               background: orangeDark,
@@ -169,7 +173,8 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
               display: { xs: "flex", sm: "none" },
               fontSize: 16,
               backgroundColor: theme => (theme.palette.mode === "light" ? "#303030" : "#e4e4e4"),
-              color: theme => (theme.palette.mode === "light" ? theme.palette.common.white : theme.palette.common.black),
+              color: theme =>
+                theme.palette.mode === "light" ? theme.palette.common.white : theme.palette.common.black,
               borderRadius: 40,
               // height: "25px",
               textTransform: "capitalize",
@@ -186,7 +191,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
   );
 };
 
-const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
+const AppHeader = ({ page, sections, selectedSectionId }) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
 
@@ -210,7 +215,7 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
 
   const onCloseMenu = id => {
     setOpenMenu(false);
-    onPreventSwitch(id);
+    // onPreventSwitch(id);
   };
 
   const signOut = async event => {
@@ -267,7 +272,7 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                 width={isMobile ? "149px" : "60px"}
                 height={isMobile ? "40px" : "64px"}
                 style={{ cursor: "pointer" }}
-                onClick={() =>navigateTo('/')}
+                onClick={() => navigateTo("/")}
               />
             </Tooltip>
             <Stack
@@ -289,7 +294,7 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                   <Box key={cur.id} sx={{ display: "flex" }}>
                     <Link
                       href={`#${cur.id}`}
-                      onClick={() => onPreventSwitch(cur.id)}
+                      // onClick={() => onPreventSwitch(cur.id)}
                       onMouseOver={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       sx={{
                         whiteSpace: "nowrap",
@@ -345,7 +350,7 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                 <Tooltip title="Apply to join 1Cademy">
                   <Button
                     variant="contained"
-                    onClick={() => navigateTo("/#JoinUsSection")}
+                    onClick={() => (window.location.hash = "join-us")}
                     sx={{
                       display: { xs: "none", sm: "flex" },
                       p: { xs: "6px 10px", lg: undefined },
@@ -357,8 +362,8 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                       // width: "60px",
                       textTransform: "capitalize",
                       ":hover": {
-                        background: orangeLight,
-                      },
+                        background: orangeLight
+                      }
                     }}
                   >
                     Apply
@@ -410,7 +415,6 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                 </Tooltip>
               )}
             </Stack>
-
 
             <IconButton
               onClick={() => setOpenMenu(prev => !prev)}
