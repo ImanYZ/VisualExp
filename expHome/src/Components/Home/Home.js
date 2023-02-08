@@ -43,62 +43,7 @@ export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
 function Index() {
-  const firebase = useRecoilValue(firebaseState);
-  const [fullname, setFullname] = useRecoilState(fullnameState);
-  const showSignInorUp = useRecoilValue(showSignInorUpState);
-  const [email, setEmail] = useRecoilState(emailState);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(null);
-  const isProfileMenuOpen = Boolean(profileMenuOpen);
-  const [notAResearcher /* setNotAResearcher */] = useRecoilState(notAResearcherState);
-  const navigateTo = useNavigate();
 
-  const handleProfileMenuOpen = event => {
-    setProfileMenuOpen(event.currentTarget);
-  };
-
-  const handleProfileMenuClose = () => {
-    setProfileMenuOpen(null);
-  };
-
-  const navigateToExperiment = () => {
-    if (!notAResearcher) {
-      navigateTo("/Activities/");
-    } else {
-      navigateTo("/Activities/experiment");
-    }
-  };
-
-  const signOut = async event => {
-    // console.log("Signing out!");
-    setEmail("");
-    setFullname("");
-    await firebase.logout();
-    navigateTo("/");
-  };
-
-  const renderProfileMenu = (
-    <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
-      {fullname && email && (
-        <MenuItem disabled sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}>
-          {fullname}
-        </MenuItem>
-      )}
-      {fullname && email && (
-        <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
-          <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
-        </MenuItem>
-      )}
-      {fullname && email && (
-        <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
-          <LogoutIcon /> <span id="LogoutText">Logout</span>
-        </MenuItem>
-      )}
-    </Menu>
-  );
-
-  const signUpHandler = () => {
-    navigateTo("/auth");
-  };
 
   // const onSwitchSection = (newSelectedSectionId: string) => {
   //   isScrolling.current = true;

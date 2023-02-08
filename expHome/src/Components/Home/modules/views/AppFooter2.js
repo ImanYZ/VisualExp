@@ -58,7 +58,6 @@ const AppFooter = ({ sx }) => {
             <Typography color={color}> We Synthesize Books & Research Papers Together</Typography>
           </Box>
           <Box>
-            <Typography sx={{ fontSize: "14px", fontWeight: 600, color, mb: "16px" }}> Navigation</Typography>
             <Stack spacing={"12px"}>
               {ONE_CADEMY_SECTIONS.slice(1).map(cur => {
                 return (
@@ -70,7 +69,6 @@ const AppFooter = ({ sx }) => {
             </Stack>
           </Box>
           <Box>
-            <Typography sx={{ fontSize: "14px", fontWeight: 600, color, mb: "16px" }}> Other</Typography>
             <Stack spacing={"12px"}>
               <Link
                 target="_blank"

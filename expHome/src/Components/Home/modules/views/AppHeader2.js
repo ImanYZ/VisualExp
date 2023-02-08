@@ -2,6 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
+import BiotechIcon from '@mui/icons-material/Biotech';
 import {
   Box,
   Button,
@@ -28,6 +29,7 @@ import oneCademyLogo from "../../../../assets/DarkmodeLogo.png";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import oneCademyLogoExtended from "../../../../assets/logo-extended.png";
+import { notAResearcherState } from "../../../../store/ProjectAtoms";
 
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
@@ -199,6 +201,7 @@ const AppHeader = ({ page, sections, selectedSectionId }) => {
   const [openMenu, setOpenMenu] = useState(false);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [email, setEmail] = useRecoilState(emailState);
+  const notAResearcher=useRecoilValue(notAResearcherState)
   const firebase = useRecoilValue(firebaseState);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
@@ -226,9 +229,22 @@ const AppHeader = ({ page, sections, selectedSectionId }) => {
     navigateTo("/");
   };
 
+  const navigateToExperiment = () => {
+    if (!notAResearcher) {
+      navigateTo("/Activities/");
+    } else {
+      navigateTo("/Activities/experiment");
+    }
+  };
+
   const renderProfileMenu = (
     <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
       {fullname && email && <Typography sx={{ p: "6px 16px", textTransform: "capitalize" }}>{fullname}</Typography>}
+      {fullname && email && (
+        <MenuItem sx={{ flexGrow: 3 }} onClick={navigateToExperiment}>
+          <BiotechIcon /> <span id="ExperimentActivities">Experiment Activities</span>
+        </MenuItem>
+      )}
       {fullname && email && (
         <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
           <LogoutIcon /> <span id="LogoutText">Logout</span>
