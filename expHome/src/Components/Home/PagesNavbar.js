@@ -9,8 +9,8 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import AppAppBar2 from "./modules/views/AppAppBar2";
 import { darkblue } from "./Communities";
-import AppHeaderMemoized from "./modules/views/AppHeader2";
 import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
+import AppHeaderMemoized from "./modules/views/AppHeader2";
 
 const switchSection = newValue => event => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
@@ -34,7 +34,8 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
         height: "100vh",
         overflowY: "auto",
         overflowX: "auto",
-        backgroundColor: theme==="dark" ? darkblue:"none"
+        scrollBehavior:"smooth",
+        backgroundColor: theme === "dark" ? darkblue : "none"
       }}
     >
       {!newHeader && (
@@ -59,7 +60,12 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
         //   thisPage={thisPage}
         //   section={5}
         // />
-        <AppHeaderMemoized page="ONE_CADEMY" sections={ONE_CADEMY_SECTIONS}/>
+        <AppHeaderMemoized
+          page="COMMUNITIES"
+          sections={ONE_CADEMY_SECTIONS}
+          onPreventSwitch={() => {}}
+          selectedSectionId={-1}
+        />
       )}
 
       <Box

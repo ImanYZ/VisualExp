@@ -2,7 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
-import BiotechIcon from '@mui/icons-material/Biotech';
+import BiotechIcon from "@mui/icons-material/Biotech";
 import {
   Box,
   Button,
@@ -34,8 +34,9 @@ import { notAResearcherState } from "../../../../store/ProjectAtoms";
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
-const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
+const MenuBar = ({ page, items, onCloseMenu, selectedSectionId }) => {
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
+  const navigateTo = useNavigate();
   const fullname = useRecoilValue(fullnameState);
   const email = useRecoilValue(emailState);
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
             <Box key={cur.id}>
               <Box sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
                 <Link
-                  href={`#${cur.id}`}
+                  href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
                   onClick={() => onCloseMenu(cur.id)}
                   sx={{
                     color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
@@ -130,7 +131,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
           ) : (
             <Box key={cur.id} sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
               <Link
-                href={`#${cur.id}`}
+                href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
                 onClick={() => onCloseMenu(cur.id)}
                 sx={{
                   color: theme => (theme.palette.mode === "dark" ? gray200 : gray600),
@@ -149,7 +150,8 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
           <Button
             variant="contained"
             onClick={() => {
-              window.location.hash = "join-us";
+              window.location.hash = "";
+              window.location.hash = "JoinUsSection";
               onCloseMenu("");
             }}
             sx={{
@@ -193,15 +195,14 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
   );
 };
 
-const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
+const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
-
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [email, setEmail] = useRecoilState(emailState);
-  const notAResearcher=useRecoilValue(notAResearcherState)
+  const notAResearcher = useRecoilValue(notAResearcherState);
   const firebase = useRecoilValue(firebaseState);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
@@ -309,7 +310,7 @@ const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
                 return cur.options ? (
                   <Box key={cur.id} sx={{ display: "flex" }}>
                     <Link
-                      href={`#${cur.id}`}
+                      href={page === "ONE_CADEMY" ? `#${cur.id}` : `/${cur.id}`}
                       onClick={() => onPreventSwitch(cur.id)}
                       onMouseOver={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       sx={{
@@ -337,7 +338,7 @@ const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
                 ) : (
                   <Tooltip key={cur.id} title={cur.title} placement={"bottom"}>
                     <Link
-                      href={`#${cur.id}`}
+                      href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
                       onClick={() => onPreventSwitch(cur.id)}
                       onMouseOver={() => setIdxOptionVisible(-1)}
                       sx={{
@@ -356,18 +357,15 @@ const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
           </Stack>
 
           <Stack direction={"row"} justifyContent="flex-end" alignItems="center" spacing={"8px"}>
-            <Stack
-              display={page === "ONE_CADEMY" ? "flex" : "none"}
-              direction={"row"}
-              justifyContent="flex-end"
-              alignItems="center"
-              spacing={"8px"}
-            >
+            <Stack display={"flex"} direction={"row"} justifyContent="flex-end" alignItems="center" spacing={"8px"}>
               {!fullname && (
                 <Tooltip title="Apply to join 1Cademy">
                   <Button
                     variant="contained"
-                    onClick={() => (window.location.hash = "join-us")}
+                    onClick={() => {
+                      window.location.hash = "";
+                      window.location.hash = "JoinUsSection";
+                    }}
                     sx={{
                       display: { xs: "none", sm: "flex" },
                       p: { xs: "6px 10px", lg: undefined },
