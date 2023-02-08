@@ -1,17 +1,9 @@
-import LogoutIcon from "@mui/icons-material/Logout";
-import BiotechIcon from "@mui/icons-material/Biotech";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Box from "@mui/material/Box";
 
 import withRoot from "./modules/withRoot";
 
-import { Menu, MenuItem } from "@mui/material";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { emailState, firebaseState, fullnameState } from "../../store/AuthAtoms";
-import { useNavigate } from "react-router-dom";
-import { notAResearcherState } from "../../store/ProjectAtoms";
-import { showSignInorUpState } from "../../store/GlobalAtoms";
 import { HeroMemoized } from "./modules/views/Hero";
 import { darkblue } from "./Communities";
 import Mechanism, { MECHANISM_ITEMS } from "./modules/views/Mechanism";
@@ -23,12 +15,13 @@ import Topics from "./modules/views/Topics";
 import Systems from "./modules/views/Systems";
 import About from "./modules/views/About";
 import Papers from "./modules/views/Papers";
-import Join from "./modules/views/Join";
 import { SectionWrapper } from "./modules/views/SectionWrapper";
 import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
 import AppHeaderMemoized from "./modules/views/AppHeader2";
 import AppFooter from "./modules/views/AppFooter2";
 import JoinUs from "./modules/views/JoinUs";
+import { useInView } from "./modules/hooks/useObserver";
+import { useRef } from "react";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -41,24 +34,52 @@ export const gray03 = "#AAAAAA";
 export const SECTION_WITH_ANIMATION = 1;
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
+const observerOption = { options: { root: null, rootMargin: "-380px 0px -380px 0px", threshold: 0 } };
 
 function Index() {
+  const [selectedSectionId, setSelectedSectionId] = useState("");
+  const isScrolling = useRef(false);
+  const timer = useRef(null);
 
+  const { inView: mechanismInView, ref: MechanismSectionRef } = useInView(observerOption);
+  const { inView: magnitudeInView, ref: MagnitudeSectionRef } = useInView(observerOption);
+  const { inView: benefitInView, ref: BenefitSectionRef } = useInView(observerOption);
+  const { inView: topicsInView, ref: TopicsSectionRef } = useInView(observerOption);
+  const { inView: systemsInView, ref: SystemSectionRef } = useInView(observerOption);
+  const { inView: aboutInView, ref: AboutSectionRef } = useInView(observerOption);
 
-  // const onSwitchSection = (newSelectedSectionId: string) => {
-  //   isScrolling.current = true;
-  //   if (timer.current) clearTimeout(timer.current);
+  useEffect(() => {
+    if (isScrolling.current) return;
 
-  //   timer.current = setTimeout(() => {
-  //     isScrolling.current = false;
-  //     if (timer.current) clearTimeout(timer.current);
-  //   }, 1000);
+    let newSelectedSectionId = "";
+    if (mechanismInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[1].id;
+    if (magnitudeInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[2].id;
+    if (benefitInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[3].id;
+    if (topicsInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[4].id;
+    if (systemsInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[5].id;
+    if (aboutInView) newSelectedSectionId = ONE_CADEMY_SECTIONS[6].id;
 
-  //   setSelectedSectionId(newSelectedSectionId);
-  //   const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";
-  //   if (window.location.hash === newHash) return;
-  //   window.location.hash = newHash;
-  // };
+    setSelectedSectionId(newSelectedSectionId);
+
+    const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";
+    if (window.location.hash === newHash) return;
+    window.location.hash = newHash;
+  }, [mechanismInView, magnitudeInView, benefitInView, topicsInView, systemsInView, aboutInView]);
+
+ const onSwitchSection = (newSelectedSectionId) => {
+    isScrolling.current = true;
+    if (timer.current) clearTimeout(timer.current);
+
+    timer.current = setTimeout(() => {
+      isScrolling.current = false;
+      if (timer.current) clearTimeout(timer.current);
+    }, 1000);
+
+    setSelectedSectionId(newSelectedSectionId);
+    const newHash = newSelectedSectionId ? `#${newSelectedSectionId}` : "";
+    if (window.location.hash === newHash) return;
+    window.location.hash = newHash;
+  };
 
   return (
     <Box
@@ -74,31 +95,31 @@ function Index() {
         // zIndex: -3
       }}
     >
-      <AppHeaderMemoized page="ONE_CADEMY" sections={ONE_CADEMY_SECTIONS} />
+      <AppHeaderMemoized page="ONE_CADEMY" sections={ONE_CADEMY_SECTIONS} selectedSectionId={selectedSectionId} onPreventSwitch={onSwitchSection} />
       <HeroMemoized headerHeight={HEADER_HEIGHT} headerHeightMobile={HEADER_HEIGHT_MOBILE} />
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[1]} textAlign="center">
+      <SectionWrapper ref={MechanismSectionRef} section={ONE_CADEMY_SECTIONS[1]} textAlign="center">
         <Mechanism mechanisms={MECHANISM_ITEMS} />
       </SectionWrapper>
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[2]}>
+      <SectionWrapper ref={MagnitudeSectionRef} section={ONE_CADEMY_SECTIONS[2]}>
         <Magnitude />
         <UniversitiesMap theme={"Dark"} />
       </SectionWrapper>
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[3]}>
+      <SectionWrapper ref={BenefitSectionRef} section={ONE_CADEMY_SECTIONS[3]}>
         <Benefits />
       </SectionWrapper>
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[4]}>
+      <SectionWrapper ref={TopicsSectionRef} section={ONE_CADEMY_SECTIONS[4]}>
         <Topics />
       </SectionWrapper>
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[5]}>
+      <SectionWrapper ref={SystemSectionRef} section={ONE_CADEMY_SECTIONS[5]}>
         <Systems />
       </SectionWrapper>
 
-      <SectionWrapper section={ONE_CADEMY_SECTIONS[6]}>
+      <SectionWrapper ref={AboutSectionRef} section={ONE_CADEMY_SECTIONS[6]}>
         <About />
         <Papers />
       </SectionWrapper>

@@ -193,7 +193,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId }) => {
   );
 };
 
-const AppHeader = ({ page, sections, selectedSectionId }) => {
+const AppHeader = ({ page, sections, selectedSectionId ,onPreventSwitch}) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
 
@@ -218,7 +218,7 @@ const AppHeader = ({ page, sections, selectedSectionId }) => {
 
   const onCloseMenu = id => {
     setOpenMenu(false);
-    // onPreventSwitch(id);
+    onPreventSwitch(id);
   };
 
   const signOut = async event => {
@@ -310,7 +310,7 @@ const AppHeader = ({ page, sections, selectedSectionId }) => {
                   <Box key={cur.id} sx={{ display: "flex" }}>
                     <Link
                       href={`#${cur.id}`}
-                      // onClick={() => onPreventSwitch(cur.id)}
+                      onClick={() => onPreventSwitch(cur.id)}
                       onMouseOver={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       sx={{
                         whiteSpace: "nowrap",
@@ -338,7 +338,8 @@ const AppHeader = ({ page, sections, selectedSectionId }) => {
                   <Tooltip key={cur.id} title={cur.title} placement={"right"}>
                     <Link
                       href={`#${cur.id}`}
-                      onClick={() => onCloseMenu(cur.id)}
+                      onClick={() => onPreventSwitch(cur.id)}
+                      onMouseOver={() => setIdxOptionVisible(-1)}
                       sx={{
                         color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
                         cursor: "pointer",
