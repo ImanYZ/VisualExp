@@ -4,11 +4,14 @@ import Box from "@mui/material/Box";
 
 import AppAppBar from "./modules/views/AppAppBar";
 import AppFooter from "./modules/views/AppFooter";
+import AppFooter2 from "./modules/views/AppFooter2";
+
 import withRoot from "./modules/withRoot";
 
 import sectionsOrder from "./modules/views/sectionsOrder";
-import AppAppBar2 from "./modules/views/AppAppBar2";
-import { darkblue } from "./Communities";
+import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
+import AppHeaderMemoized from "./modules/views/AppHeader2";
+import { darkblue } from "../../utils/colors";
 
 const switchSection = newValue => event => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
@@ -24,6 +27,10 @@ const joinUsClick = event => {
   window.location.replace("/#JoinUsSection");
 };
 
+const onSwitchSection = newSelectedSectionId => {
+  window.location.href = `/#${newSelectedSectionId}`;
+};
+
 const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = false, theme = "light" }) => {
   return (
     <Box
@@ -32,7 +39,8 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
         height: "100vh",
         overflowY: "auto",
         overflowX: "auto",
-        backgroundColor: theme==="dark" ? darkblue:"none"
+        scrollBehavior: "smooth",
+        backgroundColor: theme === "dark" ? darkblue : "none"
       }}
     >
       {!newHeader && (
@@ -48,14 +56,20 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
       )}
 
       {newHeader && (
-        <AppAppBar2
-          switchSection={switchSection}
-          homeClick={homeClick}
-          joinUsClick={joinUsClick}
-          tutorial={tutorial}
-          communities={communities}
-          thisPage={thisPage}
-          section={5}
+        // <AppAppBar2
+        //   switchSection={switchSection}
+        //   homeClick={homeClick}
+        //   joinUsClick={joinUsClick}
+        //   tutorial={tutorial}
+        //   communities={communities}
+        //   thisPage={thisPage}
+        //   section={5}
+        // />
+        <AppHeaderMemoized
+          sections={ONE_CADEMY_SECTIONS}
+          onSwitchSection={onSwitchSection}
+          selectedSectionId={-1}
+          
         />
       )}
 
@@ -66,7 +80,7 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
       >
         {children}
       </Box>
-      <AppFooter />
+      {!newHeader ? <AppFooter /> : <AppFooter2 page="COMMUNITIES" />}
     </Box>
   );
 };

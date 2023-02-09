@@ -13,7 +13,15 @@ import {
   institutionsState,
   isAdminState
 } from "./store/AuthAtoms";
-import { choicesState, conditionState, nullPassageState, passageState, phaseState, startedSessionState, stepState } from "./store/ExperimentAtoms";
+import {
+  choicesState,
+  conditionState,
+  nullPassageState,
+  passageState,
+  phaseState,
+  startedSessionState,
+  stepState
+} from "./store/ExperimentAtoms";
 
 import App from "./App";
 import RouterNav from "./Components/RouterNav/RouterNav";
@@ -51,6 +59,7 @@ import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectSt
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
+import GDPRPolicy from "./Components/Home/GDPRPolicy";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -83,7 +92,7 @@ const AppRouter = props => {
   const [project, setProject] = useRecoilState(projectState);
   const [institutions, setInstitutions] = useRecoilState(institutionsState);
 
-  const processAuth = async (user) => {
+  const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
     const uEmail = user.email.toLowerCase();
@@ -93,23 +102,23 @@ const AppRouter = props => {
     let userData = null;
     let fullName = null;
 
-    if(!users.docs.length) {
-      const usersStudentSurvey = await db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get()
-      if(usersStudentSurvey.docs.length) {
+    if (!users.docs.length) {
+      const usersStudentSurvey = await db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
+      if (usersStudentSurvey.docs.length) {
         isSurvey = true;
         fullName = usersStudentSurvey.docs[0].id;
-        userData = usersStudentSurvey.docs[0].data()
+        userData = usersStudentSurvey.docs[0].data();
       }
     } else {
       fullName = users.docs[0].id;
-      userData = users.docs[0].data()
+      userData = users.docs[0].data();
     }
 
-    if(!userData) return; // if user document doesn't exists
+    if (!userData) return; // if user document doesn't exists
     const researcherDoc = await firebase.db.collection("researchers").doc(fullName).get();
-    let isResearcher = researcherDoc.exists
+    let isResearcher = researcherDoc.exists;
 
-    if(!isSurvey) {
+    if (!isSurvey) {
       setPhase(userData?.phase || 0);
       setStep(userData?.step || 0);
       setPassage(userData?.currentPCon?.passage || "");
@@ -119,20 +128,20 @@ const AppRouter = props => {
     }
 
     if (userData.leading && userData.leading.length > 0) {
-      setLeading(userData.leading.filter((id) => !!communitiesOrder.find((com) => com.id === id)));
+      setLeading(userData.leading.filter(id => !!communitiesOrder.find(com => com.id === id)));
     }
 
-    setFullname(fullName)
-    setEmailVerified("Verified")
-    setEmail(uEmail)
+    setFullname(fullName);
+    setEmailVerified("Verified");
+    setEmail(uEmail);
 
-    if(!isResearcher) {
-      setProject(userData.project)
+    if (!isResearcher) {
+      setProject(userData.project);
     } else {
       // if current user a researcher
       const researcherData = researcherDoc.data();
-      if(researcherData.isAdmin) {
-        setIsAdmin(true)
+      if (researcherData.isAdmin) {
+        setIsAdmin(true);
       }
 
       const myProjects = [];
@@ -148,27 +157,27 @@ const AppRouter = props => {
       }
     }
 
-    setNotAResearcher(!isResearcher)
+    setNotAResearcher(!isResearcher);
 
     // if redirects required
     const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];
-    for(const nonAuthUrl of nonAuthUrls) {
-      if(String(window.location.pathname).startsWith(nonAuthUrl)) {
-        navigateTo("/")
+    for (const nonAuthUrl of nonAuthUrls) {
+      if (String(window.location.pathname).startsWith(nonAuthUrl)) {
+        navigateTo("/");
         break;
       }
     }
-  }
+  };
 
   useEffect(() => {
-    firebase.auth.onAuthStateChanged(async (user) => {
-      if(user) {
+    firebase.auth.onAuthStateChanged(async user => {
+      if (user) {
         // sign in logic
-        if(!user.emailVerified) {
-          setEmailVerified("Sent")
+        if (!user.emailVerified) {
+          setEmailVerified("Sent");
           await user.sendEmailVerification();
           const intvl = setInterval(() => {
-            if(!firebase.auth.currentUser) {
+            if (!firebase.auth.currentUser) {
               clearInterval(intvl);
               return;
             }
@@ -177,7 +186,7 @@ const AppRouter = props => {
               processAuth(user);
               clearInterval(intvl);
             }
-          }, 1000)
+          }, 1000);
         } else {
           processAuth(user);
         }
@@ -193,33 +202,36 @@ const AppRouter = props => {
         setProject(AppConfig.defaultProject);
         setChoices([]);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
     (async () => {
-      dbOne.collection("institutions").where("usersNum", ">=", 1).onSnapshot((snapshot) => {
-        setInstitutions((insitutions) => {
-          let _insitutions = [...insitutions];
-          const docChanges = snapshot.docChanges();
-          for(const docChange of docChanges) {
-            const institutionData = docChange.doc.data();
-            if(docChange.type === "added") {
-              _insitutions.push(institutionData);
-              continue;
+      dbOne
+        .collection("institutions")
+        .where("usersNum", ">=", 1)
+        .onSnapshot(snapshot => {
+          setInstitutions(insitutions => {
+            let _insitutions = [...insitutions];
+            const docChanges = snapshot.docChanges();
+            for (const docChange of docChanges) {
+              const institutionData = docChange.doc.data();
+              if (docChange.type === "added") {
+                _insitutions.push(institutionData);
+                continue;
+              }
+              const idx = _insitutions.findIndex(insitution => insitution.name === institutionData.name);
+              if (docChange.type === "modified") {
+                _insitutions[idx] = institutionData;
+              } else {
+                _insitutions.splice(idx, 1);
+              }
             }
-            const idx = _insitutions.findIndex((insitution) => insitution.name === institutionData.name)
-            if(docChange.type === "modified") {
-              _insitutions[idx] = institutionData;
-            } else {
-              _insitutions.splice(idx, 1)
-            }
-          }
-          return _insitutions;
-        })
-      });
-    })()
-  }, [])
+            return _insitutions;
+          });
+        });
+    })();
+  }, []);
 
   useEffect(() => {
     let schedulUnsubscribe;
@@ -377,6 +389,7 @@ const AppRouter = props => {
       <Route path="/Privacy/*" element={<Privacy />} />
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
+      <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/DissertationGantt" element={<DissertationGantt />} />
       {fullname && emailVerified === "Verified" && (
         <>
