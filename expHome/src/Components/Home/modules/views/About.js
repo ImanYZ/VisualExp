@@ -27,37 +27,21 @@ const ABOUT_ITEMS = [
     description: "awarded research credits to host 1Cademy on GCP services, under award number 205607640.",
     link: "https://cloud.google.com/edu/researchers"
   },
-  {
-    id: "item-1",
-    title: "1Cademy Architect",
-    subtitle: "Iman YeckehZaare",
-    image: "/static/about/team/Iman_YeckehZaare.jpg",
-    description:
-      "Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information",
-    link: "https://www.si.umich.edu/people/iman-yeckehzaare"
-  },
-  {
-    id: "item-2",
-    title: "1Cademy Advisor",
-    subtitle: "Paul Resnick",
-    image: "/static/about/team/Paul_Resnick.jpg",
-    description:
-      "Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information",
-    link: "https://www.si.umich.edu/people/paul-resnick"
-  }
+ 
 ];
 
 const About = () => {
   return (
     <Box
       sx={{
-        pb: { xs: "64px", sm: "96px" },
+        // pb: { xs: "64px", sm: "96px" },
         display: "grid",
         gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
         gap: "32px",
         placeItems: "center"
       }}
     >
+
       {ABOUT_ITEMS.map(cur => (
         <Link key={cur.id} href={cur.link} target="_blank" rel="noopener" sx={{ textDecoration: "none" }}>
           <Box
