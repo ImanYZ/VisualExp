@@ -4,7 +4,7 @@ import { useWindowSize } from "../../hooks/useWindowSize";
 
 import backgroundImageDarkMode from "../../../../assets/darkModeLibraryBackground.jpg";
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
-import { orangeDark, orangeLight } from "../../Communities";
+import { orangeDark, orangeLight } from "../../../../utils/colors";
 
 const Hero = ({ headerHeightMobile, headerHeight }) => {
   const { height, width } = useWindowSize({ initialHeight: 1000, initialWidth: 0 });

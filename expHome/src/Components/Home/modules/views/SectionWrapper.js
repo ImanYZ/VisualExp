@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { forwardRef } from "react";
-import { gray200, gray25, gray600 } from "../../Communities";
+import {  gray200, gray25, gray600  } from "../../../../utils/colors";
+
 import { RE_DETECT_NUMBERS_WITH_COMMAS } from "./HowItWorks";
 import { wrapStringWithBoldTag } from "./Which";
 

@@ -2,18 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Box from "@mui/material/Box";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
-import Grid from "@mui/material/Grid";
-import Chip from "@mui/material/Chip";
 import Avatar from "@mui/material/Avatar";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import Masonry from "@mui/lab/Masonry";
 
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LinkIcon from "@mui/icons-material/Link";
 import EmailIcon from "@mui/icons-material/Email";
@@ -30,21 +22,7 @@ import allCommunities from "./modules/views/communitiesOrder";
 import { Button, Card, CardActionArea, CardContent, CardMedia, Divider, styled } from "@mui/material";
 import { Stack } from "@mui/system";
 import { Link } from "react-router-dom";
-
-export const orangeDark = "#FF6D00";
-export const orangeLight = "#f77a1a";
-export const orangeLighter = "#faa666";
-export const darkblue = "#0A0D14";
-export const gray25 = "#FCFCFD";
-export const gray50 = "#F9FAFB";
-export const gray100 = "#F2F4F7";
-export const gray200 = "#EAECF0";
-export const gray300 = "#D0D5DD";
-export const gray400 = "#98A2B3";
-export const gray600 = "#475467";
-export const gray700 = "#344054";
-export const gray800 = "#1D2939";
-export const gray900 = "#0A0D14";
+import { gray200, gray400, gray600, gray800, orangeDark, orangeLight } from "../../utils/colors";
 
 const subSections = [
   {
@@ -66,7 +44,7 @@ const subSections = [
           {community.coursera && (
             <li>
               Complete{" "}
-              <a href={community.coursera} target="_blank">
+              <a href={community.coursera} target="_blank" rel="noreferrer">
                 this Coursera course
               </a>{" "}
               and upload your certificate as a part of the application.
@@ -140,7 +118,6 @@ const Communities = props => {
   const [usersChanges, setUsersChanges] = useState([]);
   const [users, setUsers] = useState({});
   const [usersLoaded, setUsersLoaded] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [communities, setCommunities] = useState(allCommunities);
   const [community, setCommunity] = useState(props.commIdx >= 0 ? allCommunities[props.commIdx] : allCommunities[0]);
   const [expandedOption, setExpandedOption] = useState("");
@@ -260,8 +237,6 @@ const Communities = props => {
   const handleChangeOption = option => (event, newExpanded) => {
     setExpandedOption(newExpanded ? option : false);
   };
-
-
 
   const joinUsClick = () => {
     window.location.replace("/#JoinUsSection");
@@ -593,8 +568,8 @@ const Communities = props => {
         <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
           Apply to Join this Community
         </Typography>
-        
-        <JoinUs community={community}  themeName="dark"/>
+
+        <JoinUs community={community} themeName="dark" />
 
         <DividerStyled />
         {typeof community.accomplishments === "object" &&
@@ -606,8 +581,7 @@ const Communities = props => {
                 mb: "19px",
                 "& a:link": {
                   color: orangeDark
-                },
-                
+                }
               }}
             >
               <Typography

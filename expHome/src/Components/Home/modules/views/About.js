@@ -1,6 +1,6 @@
 import { Box, Link, Typography } from "@mui/material";
 import React from "react";
-import { gray200 } from "../../Communities";
+import { gray200 } from "../../../../utils/colors";
 
 const ABOUT_ITEMS = [
   {
@@ -9,7 +9,7 @@ const ABOUT_ITEMS = [
     subtitle: "Honor Education",
     image: "/static/about/logo-honor.jpg",
     description: "",
-    link: "https://www.honor.education/",
+    link: "https://www.honor.education/"
   },
   {
     id: "item-4",
@@ -17,7 +17,7 @@ const ABOUT_ITEMS = [
     subtitle: "School of Information",
     image: "/static/about/logo-school-of-information.jpg",
     description: "",
-    link: "https://www.si.umich.edu/",
+    link: "https://www.si.umich.edu/"
   },
   {
     id: "item-5",
@@ -25,7 +25,7 @@ const ABOUT_ITEMS = [
     subtitle: "Google Cloud",
     image: "/static/about/logo-google-cloud.png",
     description: "awarded research credits to host 1Cademy on GCP services, under award number 205607640.",
-    link: "https://cloud.google.com/edu/researchers",
+    link: "https://cloud.google.com/edu/researchers"
   },
   {
     id: "item-1",
@@ -34,7 +34,7 @@ const ABOUT_ITEMS = [
     image: "/static/about/Iman_YeckehZaare.jpg",
     description:
       "Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information",
-    link: "https://www.si.umich.edu/people/iman-yeckehzaare",
+    link: "https://www.si.umich.edu/people/iman-yeckehzaare"
   },
   {
     id: "item-2",
@@ -43,8 +43,8 @@ const ABOUT_ITEMS = [
     image: "/static/about/Paul_Resnick.jpg",
     description:
       "Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information",
-    link: "https://www.si.umich.edu/people/paul-resnick",
-  },
+    link: "https://www.si.umich.edu/people/paul-resnick"
+  }
 ];
 
 const About = () => {
@@ -55,7 +55,7 @@ const About = () => {
         display: "grid",
         gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
         gap: "32px",
-        placeItems: "center",
+        placeItems: "center"
       }}
     >
       {ABOUT_ITEMS.map(cur => (
@@ -64,12 +64,12 @@ const About = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              color:gray200,
+              color: gray200,
               ":hover": {
                 "& .about-card-content": {
-                  background: theme => (theme.palette.mode === "light" ? "#1d1d1d" : "#ebebeb"),
-                },
-              },
+                  background: theme => (theme.palette.mode === "light" ? "#1d1d1d" : "#ebebeb")
+                }
+              }
             }}
           >
             <img
@@ -80,7 +80,7 @@ const About = () => {
                 maxWidth: "300px",
                 height: "240px",
                 borderRadius: "10px 10px 0px 0px",
-                objectFit: "cover",
+                objectFit: "cover"
               }}
             />
             <Box
@@ -90,7 +90,7 @@ const About = () => {
                 maxWidth: "300px",
                 minHeight: "150px",
                 p: "20px 16px",
-                background: theme => (theme.palette.mode === "light" ? "#000000" : "#F9FAFB"),
+                background: theme => (theme.palette.mode === "light" ? "#000000" : "#F9FAFB")
               }}
             >
               <Typography component={"h3"} sx={{ fontSize: "20px", fontWeight: 700, pb: "12px" }}>

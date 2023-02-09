@@ -24,12 +24,13 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { emailState, firebaseState, fullnameState } from "../../../../store/AuthAtoms";
 import { capitalizeString } from "../../../../utils/stringFunctions";
-import { gray200, gray300, gray50, gray600, gray700, gray900, orangeDark, orangeLight } from "../../Communities";
+
 import oneCademyLogo from "../../../../assets/DarkmodeLogo.png";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import oneCademyLogoExtended from "../../../../assets/logo-extended.png";
 import { notAResearcherState } from "../../../../store/ProjectAtoms";
+import { gray200, gray300, gray50, gray600, gray700, gray900, orangeDark, orangeLight } from "../../../../utils/colors";
 
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;

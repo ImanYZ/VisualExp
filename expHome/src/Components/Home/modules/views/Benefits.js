@@ -1,6 +1,7 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Stack, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
-import { gray200, gray300, gray50, orangeDark } from "../../Communities";
+import { gray200, gray300, gray50, orangeDark } from "../../../../utils/colors";
+
 import valuesItems from "./valuesItems";
 
 const Benefits = () => {

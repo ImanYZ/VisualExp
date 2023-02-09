@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import React, { useEffect, useMemo, useState } from "react";
-import { gray200, orangeDark } from "../../Communities";
+import { gray200, orangeDark } from "../../../../utils/colors";
+
 
 
 const MAGNITUDE_ITEMS = [
