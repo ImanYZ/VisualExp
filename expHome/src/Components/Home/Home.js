@@ -1,4 +1,3 @@
-
 import Box from "@mui/material/Box";
 
 import withRoot from "./modules/withRoot";
@@ -17,8 +16,11 @@ import Papers from "./modules/views/Papers";
 import AppFooter from "./modules/views/AppFooter2";
 import JoinUs from "./modules/views/JoinUs";
 
-import { darkblue } from "../../utils/colors";
+import { darkblue, gray200 } from "../../utils/colors";
 import HomeWrapper from "./HomeWrapper";
+import Team from "./modules/views/Team";
+import { Stack } from "@mui/material";
+import Typography from "./modules/components/Typography";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -56,10 +58,60 @@ function Index() {
         topicsSectionChild={<Topics />}
         systemSectionChild={<Systems />}
         aboutSectionChild={
-          <>
-            <About />
-            <Papers />
-          </>
+          <Stack spacing={"32px"}>
+            <Box>
+              <Typography
+                component={"h4"}
+                variant={"h4"}
+                sx={{
+                  fontSize: "30px",
+                  fontWeight: 600,
+                  my: "32px",
+                  cursor: "pointer",
+                  textTransform: "none",
+                  color: gray200
+                }}
+              >
+                Sponsors
+              </Typography>
+              <Typography>Sponsors</Typography>
+              <About />
+            </Box>
+            <Box>
+              <Typography
+                component={"h4"}
+                variant={"h4"}
+                sx={{
+                  fontSize: "30px",
+                  fontWeight: 600,
+                  my: "32px",
+                  cursor: "pointer",
+                  textTransform: "none",
+                  color: gray200
+                }}
+              >
+                Our Team
+              </Typography>
+              <Team />
+            </Box>
+            <Box>
+              <Typography
+                component={"h4"}
+                variant={"h4"}
+                sx={{
+                  fontSize: "30px",
+                  fontWeight: 600,
+                  my: "32px",
+                  cursor: "pointer",
+                  textTransform: "none",
+                  color: gray200
+                }}
+              >
+                Related Research
+              </Typography>
+              <Papers />
+            </Box>
+          </Stack>
         }
       />
 
