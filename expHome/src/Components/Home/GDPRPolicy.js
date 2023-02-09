@@ -3,9 +3,9 @@ import React from "react";
 import Typography from "./modules/components/Typography";
 import PagesNavbar from "./PagesNavbar";
 
-const CookiePolicy = () => {
+const GDPRPolicy = () => {
   return (
-    <PagesNavbar thisPage="Cookie Policy">
+    <PagesNavbar thisPage="GDPR Policy">
       <Typography variant="h3" gutterBottom marked="center" align="center">
         1Cademy General Data Protection Regulation (GDPR) Policy
       </Typography>
@@ -99,4 +99,4 @@ const CookiePolicy = () => {
   );
 };
 
-export default CookiePolicy;
+export default GDPRPolicy;

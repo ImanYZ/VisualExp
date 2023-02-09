@@ -28,12 +28,7 @@ import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
 
 import { isValidHttpUrl } from "../../../../utils";
-
-import sectionsOrder from "./sectionsOrder";
-import { gray200, gray400, gray600, gray700, gray900, orangeDark, orangeLight, orangeLighter } from "../../Communities";
-import { Opacity } from "@mui/icons-material";
-import { useTheme } from "@mui/material";
-const sectionIdx = sectionsOrder.findIndex(sect => sect.id === "JoinUsSection");
+import { gray200, gray600, gray700, gray900, orangeDark, orangeLight  } from "../../../../utils/colors";
 
 const JoinUs = props => {
 
@@ -294,6 +289,8 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
+        scrollMarginTop:"80px",
+        
         p: 0,
         m: 0
       }}

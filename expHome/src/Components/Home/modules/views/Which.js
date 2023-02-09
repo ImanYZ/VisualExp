@@ -2,9 +2,9 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import React, {  useMemo } from "react";
 import { useEffect, useState } from "react";
+import { gray03 } from "../../../../utils/colors";
 
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
-import { gray03 } from "../../Home";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import whichValues from "./whichItems";
 
