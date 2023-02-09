@@ -72,7 +72,7 @@ const HomeWrapper = ({
         page="ONE_CADEMY"
         sections={ONE_CADEMY_SECTIONS}
         selectedSectionId={selectedSectionId}
-        onPreventSwitch={onSwitchSection}
+        onSwitchSection={onSwitchSection}
       />
 
       {heroSectionChild}
@@ -81,7 +81,7 @@ const HomeWrapper = ({
         {mechanismSectionChild}x
       </SectionWrapper>
 
-      <SectionWrapper ref={MagnitudeSectionRef} section={ONE_CADEMY_SECTIONS[2]} /* stats={stats} */>
+      <SectionWrapper ref={MagnitudeSectionRef} section={ONE_CADEMY_SECTIONS[2]} >
         {magnitudeSectionChild}x
       </SectionWrapper>
 
