@@ -92,7 +92,7 @@ const AppFooter = ({ page="ONE_CADEMY",sx }) => {
               >
                 Cookie
               </Link>
-              <Link href="https://1cademy.us/gdpr" underline="none" sx={{ color: theme => theme.palette.grey[500] }}>
+              <Link    target="_blank" href="https://1cademy.us/gdpr" underline="none" sx={{ color: theme => theme.palette.grey[500] }}>
                 GDPR
               </Link>
             </Stack>
