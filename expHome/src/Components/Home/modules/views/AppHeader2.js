@@ -206,7 +206,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId, onSwitchSection, preUr
   );
 };
 
-const AppHeader = ({  sections, selectedSectionId, onSwitchSection, preUrl }) => {
+const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl="" }) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
@@ -266,6 +266,11 @@ const AppHeader = ({  sections, selectedSectionId, onSwitchSection, preUrl }) =>
 
   const signUpHandler = () => {
     navigateTo("/auth");
+  };
+
+  const onSwitchSectionByMenu = (id) => {
+    onSwitchSection(id);
+    setOpenMenu(false);
   };
 
   return (
@@ -334,14 +339,13 @@ const AppHeader = ({  sections, selectedSectionId, onSwitchSection, preUrl }) =>
                     </IconButton>
                   </Box>
                 ) : (
-                  <Tooltip key={cur.id} title={cur.title} placement={"bottom"}>
-                    <ActiveLink
-                      cur={cur}
-                      selectedSectionId={selectedSectionId}
-                      preUrl={preUrl}
-                      onSwitchSection={onSwitchSection}
-                    />
-                  </Tooltip>
+                  <ActiveLink
+                    key={cur.id}
+                    cur={cur}
+                    selectedSectionId={selectedSectionId}
+                    preUrl={preUrl}
+                    onSwitchSection={onSwitchSection}
+                  />
                 );
               })}
             </Stack>
@@ -445,7 +449,7 @@ const AppHeader = ({  sections, selectedSectionId, onSwitchSection, preUrl }) =>
               items={sections.slice(1)}
               onCloseMenu={onCloseMenu}
               selectedSectionId={selectedSectionId}
-              onSwitchSection={onSwitchSection}
+              onSwitchSection={onSwitchSectionByMenu}
               preUrl={preUrl}
             />
           </Box>

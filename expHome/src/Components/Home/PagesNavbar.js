@@ -69,7 +69,7 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
           sections={ONE_CADEMY_SECTIONS}
           onSwitchSection={onSwitchSection}
           selectedSectionId={-1}
-
+          
         />
       )}
 

@@ -16,10 +16,10 @@ const Systems = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch("https://1cademy.com//api/stats");
-      const data = await response.json();
+      // const response = await fetch("https://1cademy.com//api/stats");
+      // const data = await response.json();
 
-      setStats(data);
+      setStats([]);
     })();
   }, []);
 
