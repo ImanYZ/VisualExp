@@ -1,7 +1,8 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Typography, useTheme } from "@mui/material";
 import React, { useMemo, useState } from "react";
-import { gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../Communities";
+import {  gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../../../utils/colors";
+
 
 
 

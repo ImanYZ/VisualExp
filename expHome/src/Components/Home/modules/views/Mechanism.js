@@ -1,7 +1,7 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
-import { useMemo } from "react";
+import { gray200, gray600 } from "../../../../utils/colors";
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
-import { gray200, gray600 } from "../../Communities";
+
 import { useWindowSize } from "../../hooks/useWindowSize";
 
 export const MECHANISM_ITEMS = [

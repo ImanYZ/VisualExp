@@ -5,7 +5,6 @@ import Box from "@mui/material/Box";
 import withRoot from "./modules/withRoot";
 
 import { HeroMemoized } from "./modules/views/Hero";
-import { darkblue } from "./Communities";
 import Mechanism, { MECHANISM_ITEMS } from "./modules/views/Mechanism";
 import Magnitude from "./modules/views/Magnitude";
 
@@ -22,6 +21,7 @@ import AppFooter from "./modules/views/AppFooter2";
 import JoinUs from "./modules/views/JoinUs";
 import { useInView } from "./modules/hooks/useObserver";
 import { useRef } from "react";
+import { darkblue } from "../../utils/colors";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -29,7 +29,7 @@ import { useRef } from "react";
 // const WhoWeAre = React.lazy(() => import("./modules/views/WhoWeAreWrapper"));
 // const JoinUs = React.lazy(() => import("./modules/views/JoinUsWrapper"));
 
-export const gray03 = "#AAAAAA";
+
 
 export const SECTION_WITH_ANIMATION = 1;
 export const HEADER_HEIGHT = 80;

@@ -1,8 +1,9 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import {  gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../../../utils/colors";
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
-import { gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../Communities";
+
 import { RE_DETECT_NUMBERS_WITH_COMMAS, wrapStringWithBoldTag } from "./HowItWorks";
 import whichValues from "./whichItems";
 

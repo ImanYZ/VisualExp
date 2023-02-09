@@ -5,8 +5,8 @@ import { Box, Divider, IconButton, Link, Stack, styled, Typography } from "@mui/
 import React from "react";
 
 import logo1cademy from "../../../../assets/1Cademy-head.svg";
+import { gray200, gray800, gray900, orangeDark } from "../../../../utils/colors";
 
-import { gray200, gray800, gray900, orangeDark } from "../../Communities";
 import { ONE_CADEMY_SECTIONS } from "./sectionItems";
 
 const color = gray200;
@@ -15,7 +15,7 @@ export const DividerStyled = styled(props => <Divider {...props} />)(() => ({
   borderColor: gray800
 }));
 
-const AppFooter = ({ sx }) => {
+const AppFooter = ({ page="ONE_CADEMY",sx }) => {
   return (
     <Box
       component={"footer"}
@@ -59,7 +59,7 @@ const AppFooter = ({ sx }) => {
             <Stack spacing={"12px"}>
               {ONE_CADEMY_SECTIONS.slice(1).map(cur => {
                 return (
-                  <Link key={cur.id} href={`#${cur.id}`} sx={{ textDecoration: "none" }}>
+                  <Link key={cur.id} href={page==="ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`} sx={{ textDecoration: "none" }}>
                     {cur.label}
                   </Link>
                 );
