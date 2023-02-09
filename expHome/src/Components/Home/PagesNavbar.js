@@ -27,6 +27,10 @@ const joinUsClick = event => {
   window.location.replace("/#JoinUsSection");
 };
 
+const onSwitchSection = newSelectedSectionId => {
+  window.location.href = `/#${newSelectedSectionId}`;
+};
+
 const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = false, theme = "light" }) => {
   return (
     <Box
@@ -62,10 +66,10 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
         //   section={5}
         // />
         <AppHeaderMemoized
-          page="COMMUNITIES"
           sections={ONE_CADEMY_SECTIONS}
-          onPreventSwitch={() => {}}
+          onSwitchSection={onSwitchSection}
           selectedSectionId={-1}
+
         />
       )}
 
@@ -76,7 +80,7 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
       >
         {children}
       </Box>
-      {!newHeader ?  <AppFooter /> : <AppFooter2 page="COMMUNITIES"/>}
+      {!newHeader ? <AppFooter /> : <AppFooter2 page="COMMUNITIES" />}
     </Box>
   );
 };
