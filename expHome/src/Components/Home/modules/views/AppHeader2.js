@@ -35,9 +35,31 @@ import { gray200, gray300, gray50, gray600, gray700, gray900, orangeDark, orange
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
-const MenuBar = ({ page, items, onCloseMenu, selectedSectionId }) => {
+const ActiveLink = ({ cur, selectedSectionId, onSwitchSection }) => {
+  return (
+    <Link
+      onClick={() => onSwitchSection(cur.id)}
+      sx={{
+        whiteSpace: "nowrap",
+        color: theme => (theme.palette.mode === "dark" ? gray200 : gray600),
+        cursor: "pointer",
+        textDecoration: "none",
+        fontWeight: 600,
+        // preUrl ? `${preUrl}#${cur.id}` : `#${cur.id}`
+        borderBottom: selectedSectionId === `#${cur.id}` ? `solid 2px ${orangeDark}` : undefined,
+        transitions: "all .5s",
+        ":hover": {
+          color: theme => (theme.palette.mode === "light" ? gray300 : gray700)
+        }
+      }}
+    >
+      {cur.label}
+    </Link>
+  );
+};
+
+const MenuBar = ({ items, onCloseMenu, selectedSectionId, onSwitchSection, preUrl }) => {
   const [idxOptionVisible, setIdxOptionVisible] = useState(-1);
-  const navigateTo = useNavigate();
   const fullname = useRecoilValue(fullnameState);
   const email = useRecoilValue(emailState);
   const navigate = useNavigate();
@@ -96,18 +118,12 @@ const MenuBar = ({ page, items, onCloseMenu, selectedSectionId }) => {
           return cur.options?.length ? (
             <Box key={cur.id}>
               <Box sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
-                <Link
-                  href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
-                  onClick={() => onCloseMenu(cur.id)}
-                  sx={{
-                    color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
-                    cursor: "pointer",
-                    textDecoration: "none",
-                    borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined
-                  }}
-                >
-                  {cur.label}
-                </Link>
+                <ActiveLink
+                  cur={cur}
+                  selectedSectionId={selectedSectionId}
+                  preUrl={preUrl}
+                  onSwitchSection={onSwitchSection}
+                />
                 <IconButton
                   onClick={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                   size="small"
@@ -131,18 +147,12 @@ const MenuBar = ({ page, items, onCloseMenu, selectedSectionId }) => {
             </Box>
           ) : (
             <Box key={cur.id} sx={{ p: { xs: "12px 16px" }, display: "flex", justifyContent: "space-between" }}>
-              <Link
-                href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
-                onClick={() => onCloseMenu(cur.id)}
-                sx={{
-                  color: theme => (theme.palette.mode === "dark" ? gray200 : gray600),
-                  cursor: "pointer",
-                  textDecoration: "none",
-                  borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined
-                }}
-              >
-                {cur.label}
-              </Link>
+              <ActiveLink
+                cur={cur}
+                selectedSectionId={selectedSectionId}
+                preUrl={preUrl}
+                onSwitchSection={onSwitchSection}
+              />
             </Box>
           );
         })}
@@ -196,7 +206,7 @@ const MenuBar = ({ page, items, onCloseMenu, selectedSectionId }) => {
   );
 };
 
-const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
+const AppHeader = ({  sections, selectedSectionId, onSwitchSection, preUrl }) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
@@ -220,11 +230,10 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
 
   const onCloseMenu = id => {
     setOpenMenu(false);
-    onPreventSwitch(id);
+    onSwitchSection(id);
   };
 
   const signOut = async event => {
-    // console.log("Signing out!");
     setEmail("");
     setFullname("");
     await firebase.logout();
@@ -310,24 +319,12 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
               {sections.slice(1).map((cur, idx) => {
                 return cur.options ? (
                   <Box key={cur.id} sx={{ display: "flex" }}>
-                    <Link
-                      href={page === "ONE_CADEMY" ? `#${cur.id}` : `/${cur.id}`}
-                      onClick={() => onPreventSwitch(cur.id)}
-                      onMouseOver={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
-                      sx={{
-                        whiteSpace: "nowrap",
-                        color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
-                        cursor: "pointer",
-                        textDecoration: "none",
-                        fontWeight: 600,
-                        borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined,
-                        ":hover": {
-                          color: theme => (theme.palette.mode === "light" ? gray300 : gray700)
-                        }
-                      }}
-                    >
-                      {cur.label}
-                    </Link>
+                    <ActiveLink
+                      cur={cur}
+                      selectedSectionId={selectedSectionId}
+                      preUrl={preUrl}
+                      onSwitchSection={onSwitchSection}
+                    />
                     <IconButton
                       onClick={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       size="small"
@@ -338,19 +335,12 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
                   </Box>
                 ) : (
                   <Tooltip key={cur.id} title={cur.title} placement={"bottom"}>
-                    <Link
-                      href={page === "ONE_CADEMY" ? `#${cur.id}` : `/#${cur.id}`}
-                      onClick={() => onPreventSwitch(cur.id)}
-                      onMouseOver={() => setIdxOptionVisible(-1)}
-                      sx={{
-                        color: theme => (theme.palette.mode === "light" ? gray200 : gray600),
-                        cursor: "pointer",
-                        textDecoration: "none",
-                        borderBottom: selectedSectionId === cur.id ? `solid 2px ${orangeDark}` : undefined
-                      }}
-                    >
-                      {cur.label}
-                    </Link>
+                    <ActiveLink
+                      cur={cur}
+                      selectedSectionId={selectedSectionId}
+                      preUrl={preUrl}
+                      onSwitchSection={onSwitchSection}
+                    />
                   </Tooltip>
                 );
               })}
@@ -450,7 +440,15 @@ const AppHeader = ({ page, sections, selectedSectionId, onPreventSwitch }) => {
           aria-describedby="Navigate through sections"
           sx={{ display: { md: "none" } }}
         >
-          <MenuBar items={sections.slice(1)} onCloseMenu={onCloseMenu} selectedSectionId={selectedSectionId} />
+          <Box>
+            <MenuBar
+              items={sections.slice(1)}
+              onCloseMenu={onCloseMenu}
+              selectedSectionId={selectedSectionId}
+              onSwitchSection={onSwitchSection}
+              preUrl={preUrl}
+            />
+          </Box>
         </Modal>
         <Box
           sx={{
