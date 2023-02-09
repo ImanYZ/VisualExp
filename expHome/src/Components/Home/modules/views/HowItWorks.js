@@ -8,10 +8,11 @@ import Typography from "../components/Typography";
 
 import { useWindowSize } from "../../hooks/useWindowSize";
 import { Stack, useMediaQuery } from "@mui/material";
-import { gray03 } from "../../Home";
+
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
 import { Magnitude } from "../components/Magnitude";
 import { forwardRef } from "react";
+import { gray03 } from "../../../../utils/colors";
 const statsInit = {
   institutions: "0",
   links: "0",
