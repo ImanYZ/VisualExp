@@ -7,7 +7,7 @@ const ABOUT_ITEMS = [
     id: "item-3",
     title: "Supported by Honor Education",
     subtitle: "Honor Education",
-    image: "/static/about/logo-honor.jpg",
+    image: "/static/about/sponsor/logo-honor.jpg",
     description: "",
     link: "https://www.honor.education/"
   },
@@ -15,7 +15,7 @@ const ABOUT_ITEMS = [
     id: "item-4",
     title: "Supported by University of Michigan",
     subtitle: "School of Information",
-    image: "/static/about/logo-school-of-information.jpg",
+    image: "/static/about/sponsor/logo-school-of-information.jpg",
     description: "",
     link: "https://www.si.umich.edu/"
   },
@@ -23,7 +23,7 @@ const ABOUT_ITEMS = [
     id: "item-5",
     title: "Supported by Google",
     subtitle: "Google Cloud",
-    image: "/static/about/logo-google-cloud.png",
+    image: "/static/about/sponsor/logo-google-cloud.png",
     description: "awarded research credits to host 1Cademy on GCP services, under award number 205607640.",
     link: "https://cloud.google.com/edu/researchers"
   },
@@ -31,7 +31,7 @@ const ABOUT_ITEMS = [
     id: "item-1",
     title: "1Cademy Architect",
     subtitle: "Iman YeckehZaare",
-    image: "/static/about/Iman_YeckehZaare.jpg",
+    image: "/static/about/team/Iman_YeckehZaare.jpg",
     description:
       "Ph.D. Candidate, Awarded as the Best Graduate Student Instructor of the Year 2018-2019 at the University of Michigan, School of Information",
     link: "https://www.si.umich.edu/people/iman-yeckehzaare"
@@ -40,7 +40,7 @@ const ABOUT_ITEMS = [
     id: "item-2",
     title: "1Cademy Advisor",
     subtitle: "Paul Resnick",
-    image: "/static/about/Paul_Resnick.jpg",
+    image: "/static/about/team/Paul_Resnick.jpg",
     description:
       "Michael D. Cohen Collegiate Professor of Information, Associate Dean for Research and Faculty Affairs and Professor of Information, University of Michigan, School of Information",
     link: "https://www.si.umich.edu/people/paul-resnick"
