@@ -231,7 +231,10 @@ const CommunityApplications = props => {
 
   useEffect(() => {
     if (!fullname || !(fullname === "Iman YeckehZaare")) return;
-       const _applicationsColms = [ ...applicationsColumns ,  {
+    if (applicationsColumns.find(col => col.field === "invited")) return;
+    const _applicationsColms = [
+      ...applicationsColumns,
+      {
         field: "invited",
         headerName: "Invited",
         width: 10,
@@ -251,10 +254,11 @@ const CommunityApplications = props => {
             </div>
           );
         }
-      }]
-      setApplicationsColumns(_applicationsColms);
-    
-  }, [applications, fullname]);
+      }
+    ];
+    setApplicationsColumns(_applicationsColms);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applications,fullname]);
 
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
