@@ -324,9 +324,10 @@ exports.inviteAdministrators = async context => {
                 <li><a href="https://1cademy.us/inviteStudents/administrators/${
                   administratorDoc.id
                 }" target="_blank">I'd like to invite students to apply.</a></li>${
-              // '<li><a href="https://1cademy.us/ScheduleAdministratorSurvey/' +
-              //   administratorDoc.id +
-              // '" target="_blank">' + "I'd like to schedule a meeting with you.</a></li>" +
+              '<li><a href="https://1cademy.us/administratorYes/' +
+              administratorDoc.id +
+              '" target="_blank">' +
+              "I'd like to schedule a meeting with you.</a></li>" +
               ""
             }
                 <li><a href="https://1cademy.us/interestedAdministratorLater/${
@@ -391,11 +392,12 @@ exports.inviteAdministrators = async context => {
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
 // allow write: if request.auth != null
 // && request.resource.data.fullname == request.auth.token.name;
+// It also redirects to Iman's Calendar scheduling page.
 exports.administratorYes = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.body
-    if ("id" in req.body && req.body.id) {
-      const administratorId = req.body.id;
+    // This is a get request and we should retrieve the data from req.params
+    if ("id" in req.params && req.params.id) {
+      const administratorId = req.params.id;
       const administratorDoc = db.collection("administrators").doc(administratorId);
       await administratorDoc.update({
         yes: true,
@@ -403,6 +405,9 @@ exports.administratorYes = async (req, res) => {
         later: false,
         updatedAt: Timestamp.fromDate(new Date())
       });
+      return res.redirect(
+        "https://calendar.google.com/calendar/selfsched?sstoken=UU9xYXhzOXBOcXZYfGRlZmF1bHR8MzA2ZTdkMTE1MDBhMWI0NzJiMDg0YmExYTU2NWJmMWI"
+      );
     }
   } catch (err) {
     console.log({ err });
@@ -569,9 +574,10 @@ exports.inviteInstructors = async context => {
                 <li><a href="https://1cademy.us/inviteStudents/instructors/${
                   instructorDoc.id
                 }" target="_blank">I'd like to invite my students to apply to 1Cademy research communities.</a></li>${
-              // '<li><a href="https://1cademy.us/ScheduleInstructorSurvey/' +
-              //   instructorDoc.id +
-              // '" target="_blank">' + "I'd like to schedule a meeting with you.</a></li>" +
+              '<li><a href="https://1cademy.us/instructorYes/' +
+              instructorDoc.id +
+              '" target="_blank">' +
+              "I'd like to schedule a meeting with you.</a></li>" +
               ""
             }
                 <li><a href="https://1cademy.us/interestedFacultyLater/${
@@ -636,11 +642,12 @@ exports.inviteInstructors = async context => {
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
 // allow write: if request.auth != null
 // && request.resource.data.fullname == request.auth.token.name;
+// It also redirects to Iman's Calendar scheduling page.
 exports.instructorYes = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.body
-    if ("id" in req.body && req.body.id) {
-      const instructorId = req.body.id;
+    // This is a get request and we should retrieve the data from req.params
+    if ("id" in req.params && req.params.id) {
+      const instructorId = req.params.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: true,
@@ -648,6 +655,9 @@ exports.instructorYes = async (req, res) => {
         later: false,
         updatedAt: Timestamp.fromDate(new Date())
       });
+      return res.redirect(
+        "https://calendar.google.com/calendar/selfsched?sstoken=UU9xYXhzOXBOcXZYfGRlZmF1bHR8MzA2ZTdkMTE1MDBhMWI0NzJiMDg0YmExYTU2NWJmMWI"
+      );
     }
   } catch (err) {
     console.log({ err });
