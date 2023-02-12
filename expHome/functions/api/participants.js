@@ -57,28 +57,28 @@ participantsRouter.post("/schedule", async (req, res) => {
       // scheduled
       const { schedules: resSchedules, scheduled: resScheduled } = resScheduleData;
 
-      for(const fullnameRes in resSchedules) {
-        const _schedules = resSchedules[fullnameRes] || [];
+      for(const researcher in resSchedules) {
+        const _schedules = resSchedules[researcher] || [];
         for(const scheduleSlot of _schedules) {
           if(!availableScheduleByResearchers[scheduleSlot]) {
             availableScheduleByResearchers[scheduleSlot] = [];
           }
-          if(!availableScheduleByResearchers[scheduleSlot].includes(fullnameRes)) {
-            availableScheduleByResearchers[scheduleSlot].push(fullnameRes);
+          if(!availableScheduleByResearchers[scheduleSlot].includes(researcher)) {
+            availableScheduleByResearchers[scheduleSlot].push(researcher);
           }
         }
       }
-      for(const fullnameRes in resScheduled) {
-        for(const participant in resScheduled[fullnameRes]) {
-          const __scheduled = Object.entries(resScheduled[fullnameRes][participant]);
+      for(const researcher in resScheduled) {
+        for(const participant in resScheduled[researcher]) {
+          const __scheduled = Object.entries(resScheduled[researcher][participant]);
           for(const _scheduled of __scheduled) {
 
             for(const scheduledSlot of _scheduled) {
               if(!availableScheduleByResearchers[scheduledSlot] || participant === fullname ) {
                 continue;
               }
-              if(availableScheduleByResearchers[scheduledSlot].includes(fullnameRes)) {
-                const idx = availableScheduleByResearchers[scheduledSlot].indexOf(fullnameRes);
+              if(availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
+                const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
                 availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
               }
             }
