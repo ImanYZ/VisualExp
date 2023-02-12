@@ -75,17 +75,17 @@ const InviteStudents = props => {
           <p>
             We have developed an online platform for collaborative learning and research, called 1Cademy (more
             information on{" "}
-            <a href="https://1cademy.us/home" target="_blank">
+            <a href="https://1cademy.com/home" target="_blank">
               this page
             </a>
             ). Since Fall 2020, out of more than 10,000 students who applied, 1,490 talented students from 144 schools
             have joined 1Cademy to collaboratively summarize, visualize, and present books and research papers on a
             weekly basis and get constructive feedback about their research. You can check out{" "}
-            <a href="https://1cademy.us/home#CommunitiesSection" target="_blank">
+            <a href="https://1cademy.com/home#CommunitiesSection" target="_blank">
               our existing research communities
             </a>{" "}
             and search through{" "}
-            <a href="https://node.1cademy.us" target="_blank">
+            <a href="https://1cademy.com/search" target="_blank">
               the 1Cademy Knowledge Graph
             </a>{" "}
             to learn more about the topics we've studied so far. We also have community leadership opportunities for
@@ -93,7 +93,7 @@ const InviteStudents = props => {
           </p>
           <p>
             You can learn more about our platform, research communities, and the application process on{" "}
-            <a href="https://1cademy.us/home" target="_blank">
+            <a href="https://1cademy.com/home" target="_blank">
               the 1Cademy homepage
             </a>
             .
