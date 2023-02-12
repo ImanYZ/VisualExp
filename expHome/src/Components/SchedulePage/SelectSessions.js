@@ -201,7 +201,7 @@ const SelectSessions = props => {
     }
     
     if(isSelectable) {
-      console.log("isSelectable");
+      // console.log("isSelectable");
     }
 
     return (

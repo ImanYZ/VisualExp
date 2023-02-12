@@ -30,7 +30,7 @@ import YoutubeEmbed from "./modules/components/YoutubeEmbed/YoutubeEmbed";
 
 import instructs from "./tutorialIntroductionQuestions";
 
-const Tutorial = (props) => {
+const Tutorial = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
 
@@ -49,7 +49,7 @@ const Tutorial = (props) => {
     for (let instId in instructs) {
       instrs.push({
         ...instructs[instId],
-        id: instId,
+        id: instId
       });
     }
     setInstructions(instrs);
@@ -74,7 +74,7 @@ const Tutorial = (props) => {
           oAttempts[instr] = {
             corrects: 0,
             wrongs: 0,
-            questions: {},
+            questions: {}
           };
         } else if ("completed" in oAttempts[instr]) {
           delete oAttempts[instr].completed;
@@ -84,7 +84,7 @@ const Tutorial = (props) => {
             oAttempts[instr].questions[ques] = {
               answers: [],
               corrects: 0,
-              wrongs: 0,
+              wrongs: 0
             };
           }
           const quest = {
@@ -92,17 +92,11 @@ const Tutorial = (props) => {
             id: ques,
             checks: {},
             error: false,
-            helperText: " ",
+            helperText: " "
           };
-          if (
-            "explanation" in oAttempts[instr].questions[ques] &&
-            oAttempts[instr].questions[ques].explanation
-          ) {
+          if ("explanation" in oAttempts[instr].questions[ques] && oAttempts[instr].questions[ques].explanation) {
             quest.explanation = oAttempts[instr].questions[ques].explanation;
-            if (
-              "explaId" in oAttempts[instr].questions[ques] &&
-              oAttempts[instr].questions[ques].explaId
-            ) {
+            if ("explaId" in oAttempts[instr].questions[ques] && oAttempts[instr].questions[ques].explaId) {
               quest.explaId = oAttempts[instr].questions[ques].explaId;
             }
           }
@@ -122,8 +116,7 @@ const Tutorial = (props) => {
               }
             }
             if (wrong) {
-              quest.helperText =
-                "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+              quest.helperText = "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
               quest.error = true;
             } else {
               quest.helperText = "You got it!";
@@ -143,12 +136,7 @@ const Tutorial = (props) => {
       }
       setQuestions(quests);
       if (tutorialDoc.exists) {
-        changeExpand(
-          tutorialData.completed + 1,
-          tutorialRef,
-          tutorialDoc,
-          oAttempts
-        );
+        changeExpand(tutorialData.completed + 1, tutorialRef, tutorialDoc, oAttempts);
       } else {
         setAttempts(oAttempts);
       }
@@ -167,7 +155,7 @@ const Tutorial = (props) => {
     }
   }, [instructions, completed]);
 
-  const checkChoice = (instrId, qIdx) => (event) => {
+  const checkChoice = (instrId, qIdx) => event => {
     const quests = { ...questions };
     quests[instrId][qIdx].checks[event.target.name] = event.target.checked;
     quests[instrId][qIdx].error = false;
@@ -175,20 +163,19 @@ const Tutorial = (props) => {
     setQuestions(quests);
   };
 
-  const openExplanation = (instrId, qIdx) => (event) => {
+  const openExplanation = (instrId, qIdx) => event => {
     const quests = { ...questions };
-    quests[instrId][qIdx].explanationOpen =
-      !quests[instrId][qIdx].explanationOpen;
+    quests[instrId][qIdx].explanationOpen = !quests[instrId][qIdx].explanationOpen;
     setQuestions(quests);
   };
 
-  const changeExplanation = (instrId, qIdx) => (event) => {
+  const changeExplanation = (instrId, qIdx) => event => {
     const quests = { ...questions };
     quests[instrId][qIdx].explanation = event.target.value;
     setQuestions(quests);
   };
 
-  const handleSubmit = (instrId, qIdx) => async (event) => {
+  const handleSubmit = (instrId, qIdx) => async event => {
     event.preventDefault();
 
     if (expanded === false) {
@@ -200,30 +187,21 @@ const Tutorial = (props) => {
     let cAttempts = correctAttempts;
     let wAttempts = wrongAttempts;
     let wrong = false;
-    oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
-      new Date()
-    );
+    oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(new Date());
     if ("explanation" in question && question.explanation) {
-      oAttempts[instrId].questions[question.id].explanation =
-        question.explanation;
+      oAttempts[instrId].questions[question.id].explanation = question.explanation;
       if ("explaId" in question && question.explaId) {
         oAttempts[instrId].questions[question.id].explaId = question.explaId;
       }
     }
     for (let choice in question.checks) {
-      if (
-        question.checks[choice] &&
-        !oAttempts[instrId].questions[question.id].answers.includes(choice)
-      ) {
+      if (question.checks[choice] && !oAttempts[instrId].questions[question.id].answers.includes(choice)) {
         oAttempts[instrId].questions[question.id].answers.push(choice);
       }
-      if (
-        !question.checks[choice] &&
-        oAttempts[instrId].questions[question.id].answers.includes(choice)
-      ) {
-        oAttempts[instrId].questions[question.id].answers = oAttempts[
-          instrId
-        ].questions[question.id].answers.filter((answ) => answ !== choice);
+      if (!question.checks[choice] && oAttempts[instrId].questions[question.id].answers.includes(choice)) {
+        oAttempts[instrId].questions[question.id].answers = oAttempts[instrId].questions[question.id].answers.filter(
+          answ => answ !== choice
+        );
       }
       if (
         (question.checks[choice] && !question.answers.includes(choice)) ||
@@ -238,8 +216,7 @@ const Tutorial = (props) => {
       oAttempts[instrId].wrongs += 1;
       allCorrect = false;
       wAttempts += 1;
-      question.helperText =
-        "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
+      question.helperText = "Incorrect! Please rewatch the video and answer again. Please select all that apply.";
       question.error = true;
     } else {
       oAttempts[instrId].questions[question.id].corrects += 1;
@@ -269,7 +246,7 @@ const Tutorial = (props) => {
       attempts: oAttempts,
       corrects: cAttempts,
       wrongs: wAttempts,
-      completed,
+      completed
     };
     if (allCorrect) {
       // if (expanded < instructions.length - 1) {
@@ -290,36 +267,31 @@ const Tutorial = (props) => {
         let explaRef = firebase.db.collection("explanations").doc();
         let explaDoc;
         if ("explaId" in question && question.explaId) {
-          explaRef = firebase.db
-            .collection("explanations")
-            .doc(question.explaId);
+          explaRef = firebase.db.collection("explanations").doc(question.explaId);
           explaDoc = await explaRef.get();
         } else {
           oAttempts[instrId].questions[question.id].explaId = explaRef.id;
           question.explaId = explaRef.id;
-          tutorialData.attempts[instrId].questions[question.id].explaId =
-            explaRef.id;
+          tutorialData.attempts[instrId].questions[question.id].explaId = explaRef.id;
         }
         const explaData = {
           fullname,
           instrId,
           qId: question.id,
-          explanation: question.explanation,
+          explanation: question.explanation
         };
         if (explaDoc && explaDoc.exists) {
           await explaRef.update({
             ...explaData,
-            updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+            updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
           });
         } else {
           await explaRef.set({
             ...explaData,
-            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date())
           });
         }
-        setSnackbarMessage(
-          "You successfully submitted your feedback about this question!"
-        );
+        setSnackbarMessage("You successfully submitted your feedback about this question!");
       }
       if (tutorialDoc.exists) {
         await tutorialRef.update(tutorialData);
@@ -333,7 +305,7 @@ const Tutorial = (props) => {
     }
   };
 
-  const submitExplanation = (instrId, qIdx) => async (event) => {
+  const submitExplanation = (instrId, qIdx) => async event => {
     event.preventDefault();
 
     if (expanded === false) {
@@ -342,17 +314,14 @@ const Tutorial = (props) => {
     const question = questions[instrId][qIdx];
     if (fullname && "explanation" in question && question.explanation) {
       const oAttempts = { ...attempts };
-      oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(
-        new Date()
-      );
-      oAttempts[instrId].questions[question.id].explanation =
-        question.explanation;
+      oAttempts[instrId].submitted = firebase.firestore.Timestamp.fromDate(new Date());
+      oAttempts[instrId].questions[question.id].explanation = question.explanation;
       if ("explaId" in question && question.explaId) {
         oAttempts[instrId].questions[question.id].explaId = question.explaId;
       }
       setAttempts(oAttempts);
       let tutorialData = {
-        attempts: oAttempts,
+        attempts: oAttempts
       };
       const tutorialRef = firebase.db.collection("tutorial").doc(fullname);
       const tutorialDoc = await tutorialRef.get();
@@ -360,36 +329,31 @@ const Tutorial = (props) => {
         let explaRef = firebase.db.collection("explanations").doc();
         let explaDoc;
         if ("explaId" in question && question.explaId) {
-          explaRef = firebase.db
-            .collection("explanations")
-            .doc(question.explaId);
+          explaRef = firebase.db.collection("explanations").doc(question.explaId);
           explaDoc = await explaRef.get();
         } else {
           oAttempts[instrId].questions[question.id].explaId = explaRef.id;
           question.explaId = explaRef.id;
-          tutorialData.attempts[instrId].questions[question.id].explaId =
-            explaRef.id;
+          tutorialData.attempts[instrId].questions[question.id].explaId = explaRef.id;
         }
         const explaData = {
           fullname,
           instrId,
           qId: question.id,
-          explanation: question.explanation,
+          explanation: question.explanation
         };
         if (explaDoc && explaDoc.exists) {
           await explaRef.update({
             ...explaData,
-            updatedAt: firebase.firestore.Timestamp.fromDate(new Date()),
+            updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
           });
         } else {
           await explaRef.set({
             ...explaData,
-            createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+            createdAt: firebase.firestore.Timestamp.fromDate(new Date())
           });
         }
-        setSnackbarMessage(
-          "You successfully submitted your feedback about this question!"
-        );
+        setSnackbarMessage("You successfully submitted your feedback about this question!");
       }
       if (tutorialDoc.exists) {
         await tutorialRef.update(tutorialData);
@@ -399,12 +363,7 @@ const Tutorial = (props) => {
     }
   };
 
-  const changeExpand = async (
-    newExpand,
-    tutorialRef,
-    tutorialDoc,
-    oAttempts
-  ) => {
+  const changeExpand = async (newExpand, tutorialRef, tutorialDoc, oAttempts) => {
     setExpanded(newExpand);
     if (Number.isInteger(newExpand)) {
       if (!tutorialRef) {
@@ -412,8 +371,7 @@ const Tutorial = (props) => {
         tutorialDoc = await tutorialRef.get();
         oAttempts = { ...attempts };
       }
-      oAttempts[instructions[newExpand].id].started =
-        firebase.firestore.Timestamp.fromDate(new Date());
+      oAttempts[instructions[newExpand].id].started = firebase.firestore.Timestamp.fromDate(new Date());
       setAttempts(oAttempts);
       if (tutorialDoc.exists) {
         await tutorialRef.update({ attempts: oAttempts });
@@ -422,40 +380,37 @@ const Tutorial = (props) => {
           attempts: oAttempts,
           corrects: correctAttempts,
           wrongs: wrongAttempts,
-          completed,
+          completed
         });
       }
       // setTimeout(() => {
-      let cumulativeHeight =
-        window.document.getElementById("TutorialHeader").scrollHeight;
+      let cumulativeHeight = window.document.getElementById("TutorialHeader").scrollHeight;
       for (let sIdx = 0; sIdx < newExpand; sIdx++) {
-        const sectOffsetHeight = window.document.getElementById(
-          "Section" + sIdx
-        ).scrollHeight;
+        const sectOffsetHeight = window.document.getElementById("Section" + sIdx).scrollHeight;
         cumulativeHeight += sectOffsetHeight;
       }
       window.document.getElementById("ScrollableContainer").scroll({
         top: cumulativeHeight + 40,
         left: 0,
-        behavior: "smooth",
+        behavior: "smooth"
       });
       // }, 100);
     }
   };
 
-  const previousStep = (idx) => (event) => {
+  const previousStep = idx => event => {
     if (idx > 0) {
       changeExpand(idx - 1);
     }
   };
 
-  const nextStep = (idx) => (event) => {
+  const nextStep = idx => event => {
     if (idx <= completed + 1 && idx < instructions.length - 1) {
       changeExpand(idx + 1);
     }
   };
 
-  const handleChange = (idx) => (event, newExpanded) => {
+  const handleChange = idx => (event, newExpanded) => {
     if (idx <= completed + 1) {
       changeExpand(newExpanded ? idx : false);
     }
@@ -478,29 +433,24 @@ const Tutorial = (props) => {
                     <a href="https://1cademy.com/" target="_blank">
                       1Cademy web app
                     </a>
-                    , which is different from the account you created before on
-                    this web app.
+                    , which is different from the account you created before on this web app.
                   </strong>{" "}
-                  After creating your account, please go through this tutorial
-                  to learn more about 1Cademy and how it works. This tutorial
-                  takes on average an hour and a half. Make sure to have 1Cademy
-                  open in another tab on your browser, so you can practice on
-                  the platform and complete tasks as you go through this
+                  After creating your account, please go through this tutorial to learn more about 1Cademy and how it
+                  works. This tutorial takes on average an hour and a half. Make sure to have 1Cademy open in another
+                  tab on your browser, so you can practice on the platform and complete tasks as you go through this
                   tutorial.
                 </p>
                 <p>
-                  <strong>Note</strong>: You will find all the answers you need
-                  on{" "}
-                  <a href="https://1cademy.us/home" target="_blank">
+                  <strong>Note</strong>: You will find all the answers you need on{" "}
+                  <a href="https://1cademy.com/home" target="_blank">
                     the 1Cademy homepage
                   </a>
                   , in the tutorial videos, and the notes above each video.
                 </p>
               </Box>
               <Box sx={{ mt: "10px", fontSize: "19px" }}>
-                Make sure to select <strong>all the choices that apply.</strong>{" "}
-                The community leaders will decide about your application based
-                on <strong>your total WRONG attempts.</strong>
+                Make sure to select <strong>all the choices that apply.</strong> The community leaders will decide about
+                your application based on <strong>your total WRONG attempts.</strong>
               </Box>
             </Alert>
           </Box>
@@ -535,7 +485,7 @@ const Tutorial = (props) => {
                         padding: "10px",
                         mb: "19px",
                         maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
-                        overflowY: { sx: "hidden", md: "auto" },
+                        overflowY: { sx: "hidden", md: "auto" }
                       }}
                     >
                       <Alert severity="warning">
@@ -543,7 +493,7 @@ const Tutorial = (props) => {
                           variant="body2"
                           component="div"
                           sx={{
-                            fontSize: "19px",
+                            fontSize: "19px"
                           }}
                         >
                           {instr.description}
@@ -551,15 +501,14 @@ const Tutorial = (props) => {
                       </Alert>
                       {instr.video && <YoutubeEmbed embedId={instr.video} />}
                       <Typography
-                          variant="body2"
-                          component="div"
-                          sx={{
-                            fontSize: "19px",
-                          }}
-                        >
-                           {instr.stem}
-                        </Typography>
-                     
+                        variant="body2"
+                        component="div"
+                        sx={{
+                          fontSize: "19px"
+                        }}
+                      >
+                        {instr.stem}
+                      </Typography>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} md={4}>
@@ -568,23 +517,19 @@ const Tutorial = (props) => {
                         padding: "10px",
                         mb: "19px",
                         maxHeight: { sx: "none", md: "calc(100vh - 160px)" },
-                        overflowY: { sx: "hidden", md: "auto" },
+                        overflowY: { sx: "hidden", md: "auto" }
                       }}
                     >
                       {idx === instructions.length - 1 && (
                         <Box sx={{ mb: "10px", fontWeight: 700 }}>
-                          You had a total of {wrongAttempts} wrong attemps in
-                          answering the questions.
+                          You had a total of {wrongAttempts} wrong attemps in answering the questions.
                         </Box>
                       )}
                       {instr.id in questions &&
                         questions[instr.id].map((question, qIdx) => {
                           return (
                             <>
-                              <form
-                                key={qIdx}
-                                onSubmit={handleSubmit(instr.id, qIdx)}
-                              >
+                              <form key={qIdx} onSubmit={handleSubmit(instr.id, qIdx)}>
                                 <FormControl
                                   error={question.error}
                                   component="fieldset"
@@ -596,44 +541,36 @@ const Tutorial = (props) => {
                                     {question.stem}
                                   </FormLabel>
                                   <FormGroup>
-                                    {Object.keys(question.choices).map(
-                                      (choice, cIdx) => {
-                                        return (
-                                          <FormControlLabel
-                                            key={cIdx}
-                                            sx={{
-                                              "&:hover": {
-                                                bgcolor:
-                                                  "rgba(100, 100, 100, 0.1) !important",
-                                              },
-                                            }}
-                                            control={
-                                              <Checkbox
-                                                checked={
-                                                  question.checks[choice]
-                                                }
-                                                onChange={checkChoice(
-                                                  instr.id,
-                                                  qIdx
-                                                )}
-                                                name={choice}
-                                              />
+                                    {Object.keys(question.choices).map((choice, cIdx) => {
+                                      return (
+                                        <FormControlLabel
+                                          key={cIdx}
+                                          sx={{
+                                            "&:hover": {
+                                              bgcolor: "rgba(100, 100, 100, 0.1) !important"
                                             }
-                                            label={
-                                              <span>
-                                                {choice + ". "}
-                                                {question.choices[choice]}
-                                              </span>
-                                            }
-                                          />
-                                        );
-                                      }
-                                    )}
+                                          }}
+                                          control={
+                                            <Checkbox
+                                              checked={question.checks[choice]}
+                                              onChange={checkChoice(instr.id, qIdx)}
+                                              name={choice}
+                                            />
+                                          }
+                                          label={
+                                            <span>
+                                              {choice + ". "}
+                                              {question.choices[choice]}
+                                            </span>
+                                          }
+                                        />
+                                      );
+                                    })}
                                   </FormGroup>
                                   <FormHelperText>
                                     <span
                                       style={{
-                                        color: question.error ? "red" : "green",
+                                        color: question.error ? "red" : "green"
                                       }}
                                     >
                                       {question.helperText}
@@ -645,21 +582,19 @@ const Tutorial = (props) => {
                                     display: "grid",
                                     gridTemplateColumns: "repeat(2, 1fr)",
                                     width: "100%",
-                                    margin: "-10px 0px 10px 0px",
+                                    margin: "-10px 0px 10px 0px"
                                   }}
                                 >
                                   <Button
                                     sx={{
                                       margin: "0px 7px 10px 7px",
-                                      color: "common.white",
+                                      color: "common.white"
                                     }}
                                     type="submit"
                                     color="success"
                                     variant="contained"
                                     disabled={
-                                      Object.values(question.checks).findIndex(
-                                        (chec) => chec
-                                      ) === -1 ||
+                                      Object.values(question.checks).findIndex(chec => chec) === -1 ||
                                       question.helperText === "You got it!"
                                     }
                                   >
@@ -669,7 +604,7 @@ const Tutorial = (props) => {
                                     onClick={openExplanation(instr.id, qIdx)}
                                     sx={{
                                       margin: "0px 7px 10px 7px",
-                                      color: "common.white",
+                                      color: "common.white"
                                     }}
                                     color="warning"
                                     variant="contained"
@@ -694,7 +629,7 @@ const Tutorial = (props) => {
                                     sx={{
                                       display: "block",
                                       margin: "10px 0px 25px 0px",
-                                      color: "common.white",
+                                      color: "common.white"
                                     }}
                                     onClick={submitExplanation(instr.id, qIdx)}
                                     color="success"
@@ -725,7 +660,7 @@ const Tutorial = (props) => {
                           float: "right",
                           mt: 1,
                           mr: 1,
-                          color: "common.white",
+                          color: "common.white"
                         }}
                         color="success"
                         variant="contained"
@@ -742,14 +677,14 @@ const Tutorial = (props) => {
         {fireworks && (
           <Fireworks
             options={{
-              speed: 3,
+              speed: 3
             }}
             style={{
               left: "25%",
               bottom: 0,
               width: "49%",
               height: "49%",
-              position: "fixed",
+              position: "fixed"
             }}
           />
         )}
@@ -762,12 +697,10 @@ const Tutorial = (props) => {
           top: "0px",
           padding: "10px",
           textAlign: "center",
-          zIndex: 1300,
+          zIndex: 1300
         }}
       >
-        <Box sx={{ mt: "4px", fontWeight: "bold" }}>
-          The fewer wrong attempts, the better.
-        </Box>
+        <Box sx={{ mt: "4px", fontWeight: "bold" }}>The fewer wrong attempts, the better.</Box>
         {/* {expanded !== false &&
           expanded < instructions.length - 1 &&
           instructions[expanded].id in attempts && (
@@ -811,7 +744,7 @@ const Tutorial = (props) => {
               color: "red",
               fontWeight: 700,
               ml: "7px",
-              mr: "7px",
+              mr: "7px"
             }}
           >
             {wrongAttempts} Wrong
@@ -819,10 +752,7 @@ const Tutorial = (props) => {
           attemps so far!
         </Box>
       </Paper>
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </>
   );
 };
