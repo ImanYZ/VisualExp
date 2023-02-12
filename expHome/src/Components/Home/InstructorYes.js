@@ -41,7 +41,7 @@ const InstructorYes = props => {
             1Cademy {props.community} community. Several large communities of student researchers from different schools
             in the US are remotely collaborating through the 1Cademy platform at the University of Michigan, School of
             Information. You can find more information about these communities and the application process on{" "}
-            <a href="https://1cademy.us/home">1Cademy homepage</a>.
+            <a href="https://1cademy.com/home">1Cademy homepage</a>.
           </p>
           <p>
             You can email your questions to{" "}
