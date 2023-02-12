@@ -21,6 +21,7 @@ import { projectState } from "../../store/ProjectAtoms";
 import RouterNav from "../../../src/Components/RouterNav/RouterNav";
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
+import LoadingPage from "./LoadingPage";
 
 import { isEmail } from "../../utils";
 
@@ -126,7 +127,7 @@ const SchedulePage = props => {
           project in researcherData.projects &&
           researcherData.projects[project].active
         ) {
-          researchers[researcherDoc.id] = researcherData.email;
+          researchers[researcherData.email] = researcherDoc.id;
         }
       }
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
@@ -187,14 +188,22 @@ const SchedulePage = props => {
         }
 
         // calculating available schedules by each researchers
-        let availableSchedules = {...schedules};
-        for(const researcherFullname in scheduledByResearchers) {
-          for(const scheduledSlot of scheduledByResearchers[researcherFullname]) {
-            if(!availableSchedules[scheduledSlot] || !availableSchedules[scheduledSlot].includes(researcherFullname)) continue;
-            const researcherIdx = availableSchedules[scheduledSlot].indexOf(researcherFullname)
-            availableSchedules[scheduledSlot].splice(researcherIdx, 1)
-          }
-        }
+        let availableSchedules = { ...schedules };
+        // for (const researcherFullname in scheduledByResearchers) {
+        //   console.log("scheduledByResearchers[researcherFullname]", scheduledByResearchers[researcherFullname]);
+        //   for (const scheduledSlot of scheduledByResearchers[researcherFullname]) {
+        //     console.log(":: ::: scheduledSlot :: :: ", scheduledSlot);
+        //     for (let scheduleSl of Object.values(scheduledSlot)) {
+        //       let scheduleS = moment(scheduleSl).utcOffset(-4, true).toDate();
+        //       scheduleS = scheduleSl.toLocaleString();
+        //       console.log("scheduleS :: :: ", scheduleSl);
+        //       if (!availableSchedules[scheduleS] || !availableSchedules[scheduleS].includes(researcherFullname))
+        //         continue;
+        //       const researcherIdx = availableSchedules[scheduleS].indexOf(researcherFullname);
+        //       availableSchedules[scheduleS].splice(researcherIdx, 1);
+        //     }
+        //   }
+        // }
         availSessions = availableSchedules;
       }
       // We need to retrieve all the currently scheduled events to figure
@@ -218,6 +227,8 @@ const SchedulePage = props => {
         }
         // Only future events
         const startTime = new Date(event.start.dateTime).toLocaleString();
+        const endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+        const duration = new Date(event.end.dateTime).getTime() - new Date(event.start.dateTime).getTime();
         const startMinus30Min = new Date(new Date(event.start.dateTime).getTime() - 30 * 60 * 1000);
         // If the event has some attendees and the start timestamp is a key in availSessions,
         // we should remove all the attendees who are available researchers at this timestamp,
@@ -241,7 +252,11 @@ const SchedulePage = props => {
           ) === -1
         ) {
           for (let attendee of event.attendees) {
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee.email);
+            if (!researchers[attendee.email]) continue;
+            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            if (duration >= 60 * 60 * 1000) {
+              availSessions[endTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            }
           }
         }
       }
@@ -291,38 +306,43 @@ const SchedulePage = props => {
   };
 
   const submitData = async () => {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    const userRef = firebase.db.collection("users").doc(fullname);
-    let userDoc = await userRef.get();
+      const userRef = firebase.db.collection("users").doc(fullname);
+      let userDoc = await userRef.get();
 
-    if (!userDoc.exists) {
-      const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
-      userDoc = await userRef.get();
-    }
-
-    let responseObj = null;
-    if (userDoc.exists) {
-      const userData = userDoc.data();
-      if (userData.projectDone) {
-        setParticipatedBefore(true);
-        return;
+      if (!userDoc.exists) {
+        const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
+        userDoc = await userRef.get();
       }
-      
-      const sessions = selectedSession.map(s => {
-        return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
-      });
 
-      await firebase.idToken()
-      responseObj = await axios.post("/participants/schedule", {
-        sessions,
-        project: userData.project
-      });
-      errorAlert(responseObj.data);
+      let responseObj = null;
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (userData.projectDone) {
+          setParticipatedBefore(true);
+          return;
+        }
 
-      setSubmitted(true);
+        const sessions = selectedSession.map(s => {
+          return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
+        });
+
+        await firebase.idToken();
+        responseObj = await axios.post("/participants/schedule", {
+          sessions,
+          project: userData.project
+        });
+        errorAlert(responseObj.data);
+
+        setSubmitted(true);
+      }
+      setIsSubmitting(false);
+    } catch (error) {
+      setIsSubmitting(false);
+      alert("Something went wrong! Please submit your availability again!");
     }
-    setIsSubmitting(false);
   };
 
   const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
@@ -376,6 +396,7 @@ const SchedulePage = props => {
     );
   };
 
+  if (isSubmitting) return <LoadingPage />;
   return (
     <>
     <RouterNav/>
