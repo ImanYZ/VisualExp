@@ -178,32 +178,33 @@ const SchedulePage = props => {
             scheduledByResearchers[scheduledResearcher] = [];
           }
           let __scheduled = scheduledByResearchers[scheduledResearcher];
-
-          const scheduledSlotsByParticipants = Object.entries(_scheduled[scheduledResearcher])
-          for(const scheduledSlotsByParticipant of scheduledSlotsByParticipants) {
-            __scheduled = __scheduled.concat(scheduledSlotsByParticipant)
+          
+          for(const participant in _scheduled[scheduledResearcher]) {
+            // we don't check already booked sessions for current participant
+            if(participant === fullname) {
+              continue;
+            }
+            const scheduledSlotsByParticipant = _scheduled[scheduledResearcher][participant];
+            __scheduled = __scheduled.concat(
+              Object.values(scheduledSlotsByParticipant).map(
+                (slot) => moment(slot).utcOffset(-4, true).toDate().toLocaleString()
+              )
+            )
           }
           __scheduled.sort((s1, s2) => s1 < s2 ? -1 : 1)
           scheduledByResearchers[scheduledResearcher] = Array.from(new Set(__scheduled));
         }
 
         // calculating available schedules by each researchers
-        let availableSchedules = { ...schedules };
-        // for (const researcherFullname in scheduledByResearchers) {
-        //   console.log("scheduledByResearchers[researcherFullname]", scheduledByResearchers[researcherFullname]);
-        //   for (const scheduledSlot of scheduledByResearchers[researcherFullname]) {
-        //     console.log(":: ::: scheduledSlot :: :: ", scheduledSlot);
-        //     for (let scheduleSl of Object.values(scheduledSlot)) {
-        //       let scheduleS = moment(scheduleSl).utcOffset(-4, true).toDate();
-        //       scheduleS = scheduleSl.toLocaleString();
-        //       console.log("scheduleS :: :: ", scheduleSl);
-        //       if (!availableSchedules[scheduleS] || !availableSchedules[scheduleS].includes(researcherFullname))
-        //         continue;
-        //       const researcherIdx = availableSchedules[scheduleS].indexOf(researcherFullname);
-        //       availableSchedules[scheduleS].splice(researcherIdx, 1);
-        //     }
-        //   }
-        // }
+        let availableSchedules = {...schedules};
+        for(const researcherFullname in scheduledByResearchers) {
+          for(const scheduledSlot of scheduledByResearchers[researcherFullname]) {
+            if(!availableSchedules[scheduledSlot] || !availableSchedules[scheduledSlot].includes(researcherFullname)) continue;
+            const researcherIdx = availableSchedules[scheduledSlot].indexOf(researcherFullname)
+            availableSchedules[scheduledSlot].splice(researcherIdx, 1)
+          }
+        }
+
         availSessions = availableSchedules;
       }
       // We need to retrieve all the currently scheduled events to figure
@@ -278,6 +279,13 @@ const SchedulePage = props => {
           availSessions[sessionStr].length > 0
         ) {
           sch.push(session);
+          const sessionIdx = parseInt(scheduleData.order.replace(/[^0-9]+/g, "")) - 1;
+          if(!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
+            const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
+            for(let i = 1; i < slotCounts; i++) {
+              sch.push(moment(session).add(30 * i, "minutes").toDate());
+            }
+          }
         }
       }
       if (sch.length > 0) {
@@ -341,7 +349,7 @@ const SchedulePage = props => {
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
-      alert("Something went wrong! Please submit your availability again!");
+      alert("Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu");
     }
   };
 
