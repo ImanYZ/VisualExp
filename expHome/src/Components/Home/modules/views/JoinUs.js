@@ -28,7 +28,7 @@ import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
 
 import { isValidHttpUrl } from "../../../../utils";
-import { gray200, gray600, gray700, gray900, orangeDark, orangeLight  } from "../../../../utils/colors";
+import { gray03, gray200, gray600, gray700, gray900, orangeDark, orangeLight  } from "../../../../utils/colors";
 
 const JoinUs = props => {
 
@@ -328,7 +328,7 @@ const JoinUs = props => {
         sx={{
           mt: "19px",
           "& .MuiStepIcon-root": {
-            color: "warning.dark"
+            color: gray03
           },
           "& .MuiStepIcon-root.Mui-active": {
             color: orangeDark
