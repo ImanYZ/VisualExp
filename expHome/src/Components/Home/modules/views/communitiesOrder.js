@@ -136,7 +136,7 @@ export default [
     ],
     responsibilities: [
       `Complete the University of Michigan Program for the Education and Evaluation in Responsible Conduct of Research (PEERRS) before engaging in the research.`,
-      `Dedicate 25 hours a week over the Summer to engage in all aspects of the research project.`,
+      `Dedicate 20 hours a week to engage in all aspects of the research project.`,
       `Conduct several experiment sessions and guide participants through the session.`,
       `Thematically code the qualitative data collected throughout our experiments.`,
       `Engage in ideation, critical thinking, and peer-review of research proposed by other community members.`,

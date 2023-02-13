@@ -1,13 +1,21 @@
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box, Button, IconButton, Stack, styled, Tooltip, tooltipClasses, Typography, useMediaQuery } from "@mui/material";
+import {
+  Box,
+  Button,
+  IconButton,
+  Stack,
+  styled,
+  Tooltip,
+  tooltipClasses,
+  Typography,
+  useMediaQuery
+} from "@mui/material";
 import { useState } from "react";
-
-import LogoDarkMode from '../../../../assets/DarkModeLogoMini.png'
+import { useNavigate } from "react-router-dom";
+import LogoDarkMode from "../../../../assets/DarkModeLogoMini.png";
 export const HEADER_HEIGTH = 70;
-
-
 
 const AppHeader = ({
   sections,
@@ -18,19 +26,17 @@ const AppHeader = ({
   enableApply = true,
   // enableSearcher = true,
   enableSignInUp = true,
-  enableMenu = false,
+  enableMenu = false
 }) => {
-  const router = useRouter();
-
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isTablet = useMediaQuery("(min-width:900px)");
   const isMobile = useMediaQuery("(max-width:600px)");
-
+  const navigateTo = useNavigate();
 
   const [showMenu, setShowMenu] = useState(false);
 
   const signUpHandler = () => {
-    router.push("/signin");
+    navigateTo("/auth");
   };
 
   const showRigthOptionInMobile = isMobile && !enableMenu;
@@ -44,7 +50,7 @@ const AppHeader = ({
         top: "0px",
         zIndex: 20,
         display: "flex",
-        justifyContent: "center",
+        justifyContent: "center"
       }}
     >
       <Box
@@ -52,7 +58,7 @@ const AppHeader = ({
           height: HEADER_HEIGTH,
           width: "100%",
           background: theme => (theme.palette.mode === "dark" ? "rgba(0,0,0,.72)" : "#f8f8f894"),
-          backdropFilter: "saturate(180%) blur(20px)",
+          backdropFilter: "saturate(180%) blur(20px)"
         }}
       />
       <Stack
@@ -65,7 +71,7 @@ const AppHeader = ({
           maxWidth: "1200px",
           height: HEADER_HEIGTH,
           px: isDesktop ? "0px" : "10px",
-          position: "absolute",
+          position: "absolute"
         }}
       >
         <Stack
@@ -93,7 +99,7 @@ const AppHeader = ({
                     sx={{
                       cursor: "pointer",
                       borderBottom: theme =>
-                        sectionSelected === idx + 1 ? `solid 2px ${theme.palette.common.orange}` : undefined,
+                        sectionSelected === idx + 1 ? `solid 2px ${theme.palette.common.orange}` : undefined
                     }}
                     onClick={() => (switchSection ? switchSection(idx + 1) : () => {})}
                   >
@@ -105,7 +111,7 @@ const AppHeader = ({
           )}
         </Stack>
         {/* {((!isMobile && enableSearcher) || enableMenu) && ( */}
-        
+
         <Stack direction={"row"} alignItems="center" spacing={isDesktop ? "20px" : "8px"}>
           {/* isMobile && enableSearcher && !enableMenu */}
           {onClickSearcher && isMobile && (
@@ -116,7 +122,7 @@ const AppHeader = ({
               </IconButton>
             </Tooltip>
           )}
-          
+
           {enableApply && (showRigthOptionsByDesktop || showRigthOptionInMobile) && (
             <Tooltip title="Apply to join 1Cademy">
               <Button
@@ -129,7 +135,7 @@ const AppHeader = ({
                   fontSize: 16,
                   ml: 2.5,
                   borderRadius: 40,
-                  textTransform: "uppercase",
+                  textTransform: "uppercase"
                 }}
               >
                 Apply!
@@ -149,7 +155,7 @@ const AppHeader = ({
                   ml: 2.5,
                   borderRadius: 40,
                   wordBreak: "normal",
-                  whiteSpace: "nowrap",
+                  whiteSpace: "nowrap"
                 }}
               >
                 SIGN IN/UP
@@ -164,7 +170,7 @@ const AppHeader = ({
                 onClick={() => setShowMenu(true)}
                 color="inherit"
                 sx={{
-                  display: { xs: "flex", md: "none" },
+                  display: { xs: "flex", md: "none" }
                 }}
               >
                 <CloseIcon sx={{ color: theme => theme.palette.common.white, m: "auto" }} fontSize="large" />
@@ -180,7 +186,7 @@ const AppHeader = ({
                 onClick={() => setShowMenu(false)}
                 color="inherit"
                 sx={{
-                  display: { xs: "flex", md: "none" },
+                  display: { xs: "flex", md: "none" }
                 }}
               >
                 <MenuIcon sx={{ color: theme => theme.palette.common.white }} fontSize="large" />
@@ -193,14 +199,14 @@ const AppHeader = ({
     </Box>
   );
 };
-const LightTooltip = styled(({ className, ...props }) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.white,
-    color: "rgba(0, 0, 0, 0.87)",
-    boxShadow: "0px 10px 30px 5px rgba(0,0,0,0.5)",
-    fontSize: 12,
-  },
-}));
+const LightTooltip = styled(({ className, ...props }) => <Tooltip {...props} classes={{ popper: className }} />)(
+  ({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.white,
+      color: "rgba(0, 0, 0, 0.87)",
+      boxShadow: "0px 10px 30px 5px rgba(0,0,0,0.5)",
+      fontSize: 12
+    }
+  })
+);
 export default AppHeader;

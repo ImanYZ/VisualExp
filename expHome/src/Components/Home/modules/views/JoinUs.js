@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -28,10 +27,24 @@ import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
 
 import { isValidHttpUrl } from "../../../../utils";
-import { gray200, gray600, gray700, gray900, orangeDark, orangeLight  } from "../../../../utils/colors";
+import {
+  baseG200,
+  baseG400,
+  gray200,
+  gray25,
+  gray400,
+  gray700,
+  green100,
+  orange200,
+  orangeDark,
+  orangeLight,
+  orangeLighter,
+  successDark,
+  warningDark,
+  yellow100
+} from "../../../../utils/colors";
 
 const JoinUs = props => {
-
   const { themeName } = props || {};
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -289,20 +302,44 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        scrollMarginTop:"80px",
-        
+        scrollMarginTop: "80px",
+
         p: 0,
         m: 0
       }}
     >
-      <Alert severity="success" sx={{ p: "24px 20px", mb: "16px", borderRadius: "12px", color: gray700}}>
-        <strong style={{ color: gray900 }}>Please note: </strong>
+      <Alert
+        severity="success"
+        sx={{
+          p: "24px 20px",
+          mb: "16px",
+          borderRadius: "12px",
+          color: green100,
+          fontWeight: 500,
+          backgroundColor: successDark,
+          "& svg": {
+            fill: "common.black"
+          }
+        }}
+      >
+        <strong style={{ color: "common.white" }}>Please note: </strong>
         <br />
         Our application process is sequential; i.e., you need to complete each step to unlock the following steps.
       </Alert>
       {props.community && (
-        <Alert severity="warning" sx={{ p: "24px 20px", borderRadius: "12px", color: gray700 }}>
-          <strong style={{ color: gray900 }}>Please note: </strong>
+        <Alert
+          severity="warning"
+          sx={{
+            p: "24px 20px",
+            borderRadius: "12px",
+            color: yellow100,
+            fontWeight: 500,
+            backgroundColor: warningDark,
+            "&  a:link": { color: orangeDark },
+            "& a:visited": { color: orangeLighter }
+          }}
+        >
+          <strong style={{ color: "common.white" }}>Please note: </strong>
           <br />
           Participation is unpaid, solely for the purpose of improving research and education, and this position meets{" "}
           <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank" rel="noreferrer">
@@ -321,14 +358,22 @@ const JoinUs = props => {
           .
         </Alert>
       )}
-      
+
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
         sx={{
           mt: "19px",
+          "& .MuiStepIcon-text": {
+            fill: baseG400,
+            fontWeight: 600
+          },
+          "& .Mui-active .MuiStepIcon-text": {
+            fill: gray25,
+            fontWeight: 600
+          },
           "& .MuiStepIcon-root": {
-            color: "warning.dark"
+            color: baseG200
           },
           "& .MuiStepIcon-root.Mui-active": {
             color: orangeDark
@@ -339,9 +384,9 @@ const JoinUs = props => {
           "& .MuiStepLabel-label": {
             fontSize: "20px",
             fontWeight: 600,
-            color: gray600
+            color: gray400
           },
-          
+
           "& .MuiStepLabel-label.Mui-active": {
             fontWeight: 600,
             color: gray200
@@ -358,7 +403,7 @@ const JoinUs = props => {
           },
           "& .MuiButton-root.Mui-disabled": {
             backgroundColor: "secondary.light"
-          },
+          }
         }}
       >
         <Step>
@@ -417,11 +462,7 @@ const JoinUs = props => {
           </StepContent>
         </Step>
         <Step>
-          <StepLabel
-           
-          >
-            Complete the community-specific application requirements.
-          </StepLabel>
+          <StepLabel>Complete the community-specific application requirements.</StepLabel>
           <StepContent>
             {props.community ? (
               <Stepper
@@ -529,7 +570,7 @@ const JoinUs = props => {
                   </StepLabel>
                   <StepContent>
                     <TextareaAutosize
-                      style={{ width: "100%",borderRadius:"4px" }}
+                      style={{ width: "100%", borderRadius: "4px" }}
                       aria-label="explanation text box"
                       minRows={7}
                       placeholder={
