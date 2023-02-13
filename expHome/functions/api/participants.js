@@ -103,11 +103,12 @@ participantsRouter.post("/schedule", async (req, res) => {
       batch.delete(scheduleRef);
     }
 
-    let availableResearchers = availableScheduleByResearchers[sessions[0]] || [];
-
     const bookedSlots = [];
 
+    const researchersBySession = {};
+
     for (let i = 0; i < sessions.length; ++i) {
+      let availableResearchers = availableScheduleByResearchers[sessions[i]] || [];
       const start = moment(sessions[i]).utcOffset(-4, true);
       const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
       for(let j = 0; j < sessionDuration; j++) {
@@ -115,22 +116,31 @@ participantsRouter.post("/schedule", async (req, res) => {
         bookedSlots.push(availableSlot);
         availableResearchers = availableResearchers.filter((availableResearcher) => (availableScheduleByResearchers[availableSlot] || []).includes(availableResearcher))
       }
+      researchersBySession[start.format("YYYY-MM-DD")] = availableResearchers;
     }
 
-    
+  
+    const selectedResearchers = {};
 
-    const researcher = availableResearchers[
-      Math.floor(Math.random() * availableResearchers.length)
-    ];
+    for(const session in researchersBySession) {
+      const availableResearchers = researchersBySession[session];
+      const researcher = availableResearchers[
+        Math.floor(Math.random() * availableResearchers.length)
+      ];
 
-    if(!researcher) {
-      throw new Error("No researcher is available in given schedule");
+      if(!researcher) {
+        throw new Error("No researcher is available in given schedule");
+      }
+
+      selectedResearchers[session] = researcher;
     }
-
-    const rUser = await db.collection("users").doc(researcher).get();
-    const rUserData = rUser.data();
 
     for (let i = 0; i < sessions.length; ++i) {
+      const sessionDate = moment(sessions[i]).utcOffset(-4, true).format("YYYY-MM-DD");
+      const researcher = selectedResearchers[sessionDate];
+      const rUser = await db.collection("users").doc(researcher).get();
+      const rUserData = rUser.data();
+
       const start = moment(sessions[i]).utcOffset(-4, true);
       const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
       // adding slotDuration * number of slots for the session
@@ -155,6 +165,9 @@ participantsRouter.post("/schedule", async (req, res) => {
     }
 
     for(const bookedSlot of bookedSlots) {
+      const sessionDate = moment(bookedSlot).utcOffset(-4, true).format("YYYY-MM-DD");
+      const researcher = selectedResearchers[sessionDate];
+      
       const month = moment(bookedSlot).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
       const resScheduleData = resScheduleDataByMonth[month];
       if(!resScheduleData.scheduled[researcher]) {
