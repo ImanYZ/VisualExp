@@ -13,3 +13,4 @@ export const gray600 = "#475467";
 export const gray700 = "#344054";
 export const gray800 = "#1D2939";
 export const gray900 = "#0A0D14";
+export const darkBase = "#242425";

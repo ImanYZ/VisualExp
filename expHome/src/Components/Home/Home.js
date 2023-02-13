@@ -16,7 +16,7 @@ import Papers from "./modules/views/Papers";
 import AppFooter from "./modules/views/AppFooter2";
 import JoinUs from "./modules/views/JoinUs";
 
-import { darkblue, gray200 } from "../../utils/colors";
+import { darkBase, darkblue, gray200 } from "../../utils/colors";
 import HomeWrapper from "./HomeWrapper";
 import Team from "./modules/views/Team";
 import { Stack } from "@mui/material";
@@ -41,7 +41,7 @@ function Index() {
         overflowY: "auto",
         overflowX: "auto",
         position: "relative",
-        backgroundColor: darkblue,
+        backgroundColor: darkBase,
         scrollBehavior: "smooth"
       }}
     >
