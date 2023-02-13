@@ -239,7 +239,7 @@ const Communities = props => {
   };
 
   const joinUsClick = () => {
-    window.location.replace("/#JoinUsSection");
+    window.location.replace("/communities/#JoinUsSection");
   };
 
   return (
