@@ -406,7 +406,7 @@ const JoinUs = props => {
           <StepContent>
             <Typography
               sx={{
-                color: themeName === "dark" ? "common.white" : undefined
+                color: themeName === "dark" ? "common.white" : "common.white"
               }}
             >
               Please check your Google Calendar. You're invited to three UX Experiment sessions. Please attend all the
