@@ -109,32 +109,75 @@ const SelectSessions = props => {
       // satisfy the criteria, we keep the previous values for
       // props.firstSession, props.secondSession, and props.thirdSession.
 
-      let hasAllSessions = true;
+      let hasAllSessions = false;
       const sessions = [];
       // 60 / 2 = 30 (mins)
       const slotDuration = 60 / props.hourlyChunks;
 
-      for (let i = 0; i < props.numberOfSessions; ++i) {
-        let session = null;
-        if (i === 0) {
-          // checking the first session
-          session = consecutiveTimeSlotsExists(props.availableSessions, orderedSch, props.sessionDuration[0], slotDuration);
-        } else {
-          const scheduleForNextDay = orderedSch.filter(s => daysLater(sessions[0], s, props.daysLater[i - 1]));
-          session = consecutiveTimeSlotsExists(props.availableSessions, scheduleForNextDay, props.sessionDuration[i], slotDuration);
+      console.log(orderedSch, "orderedSch")
+
+      for(const scheduleItem of orderedSch) {
+        let sessionsFound = true;
+
+        const requiredSlots = {};
+        const _requiredSlots = [];
+        for(let i = 0; i < props.sessionDuration.length; i++) {
+          const duration = props.sessionDuration[i];
+          const addDays = i === 0 ? 0 : props.daysLater[i - 1];
+          
+          const slotDate = moment(scheduleItem).add(addDays, "days").format("YYYY-MM-DD");
+          requiredSlots[slotDate] = duration;
         }
 
-        if (!session) {
-          hasAllSessions = false;
+        for(const requiredSlotDate in requiredSlots) {
+          // checking first slot
+          const scheduleIdx = orderedSch.findIndex((schedule) => moment(schedule).format("YYYY-MM-DD") === requiredSlotDate);
+          if(scheduleIdx === -1) {
+            sessionsFound = false;
+            break;
+          }
+          let researchers = props.availableSessions[new Date(orderedSch[scheduleIdx]).toLocaleString()];
+
+          // checking other slots if required
+          const duration = requiredSlots[requiredSlotDate];
+          for(let i = 1; i < duration; i++) {
+            const _scheduleIdx = orderedSch.findIndex(
+              (schedule, idx) => {
+                const availableSession = props.availableSessions[new Date(schedule).toLocaleString()];
+                const r = idx > scheduleIdx &&
+                moment(schedule).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).add(30 * i, "minutes").format("YYYY-MM-DD HH:mm") &&
+                availableSession.filter((researcher) => researchers.indexOf(researcher) !== -1).length;
+
+                // only calculate intersaction if current slot coming up consectively and has common researcher
+                // same day can have other consective slots that can have common researcher
+                if(r) {
+                  researchers = researchers.filter((researcher) => availableSession.indexOf(researcher) !== -1);
+                }
+                return r;
+              }
+            );
+            if(_scheduleIdx === -1) {
+              sessionsFound = false;
+              break;
+            }
+          }
+          
+          if(!sessionsFound) {
+            break;
+          }
+          
+          _requiredSlots.push(orderedSch[scheduleIdx]);
+        }
+
+        if(sessionsFound) {
+          hasAllSessions = true;
+          props.setSubmitable(true);
+          props.setSelectedSession(_requiredSlots);
           break;
         }
-
-        sessions.push(session);
       }
-      if (hasAllSessions) {
-        props.setSubmitable(true);
-        props.setSelectedSession(sessions);
-      } else {
+
+      if(!hasAllSessions) {
         props.setSubmitable(false);
         props.setSelectedSession([]);
       }

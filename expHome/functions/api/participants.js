@@ -70,17 +70,14 @@ participantsRouter.post("/schedule", async (req, res) => {
       }
       for(const researcher in resScheduled) {
         for(const participant in resScheduled[researcher]) {
-          const __scheduled = Object.entries(resScheduled[researcher][participant]);
-          for(const _scheduled of __scheduled) {
-
-            for(const scheduledSlot of _scheduled) {
-              if(!availableScheduleByResearchers[scheduledSlot] || participant === fullname ) {
-                continue;
-              }
-              if(availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
-                const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
-                availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
-              }
+          const __scheduled = Object.values(resScheduled[researcher][participant]);
+          for (const scheduledSlot of __scheduled) {
+            if (!availableScheduleByResearchers[scheduledSlot] || participant === fullname) {
+              continue;
+            }
+            if (availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
+              const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
+              availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
             }
           }
         }
