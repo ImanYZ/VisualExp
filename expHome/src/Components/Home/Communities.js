@@ -22,7 +22,7 @@ import allCommunities from "./modules/views/communitiesOrder";
 import { Button, Card, CardActionArea, CardContent, CardMedia, Divider, styled } from "@mui/material";
 import { Stack } from "@mui/system";
 import { Link } from "react-router-dom";
-import { darkBase, gray200, gray400, gray600, orangeDark, orangeLight } from "../../utils/colors";
+import { darkBase, gray200, gray400, gray600, orangeDark, orangeLight, orangeLighter } from "../../utils/colors";
 
 const subSections = [
   {
@@ -583,7 +583,7 @@ const Communities = props => {
                   color: orangeDark
                 },
                 "& a:visited": {
-                  color: orangeLight
+                  color: orangeLighter
                 }
               }}
             >

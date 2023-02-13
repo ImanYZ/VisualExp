@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -29,15 +28,20 @@ import UploadButton from "../components/UploadButton";
 
 import { isValidHttpUrl } from "../../../../utils";
 import {
-  gray03,
+  baseG200,
+  baseG400,
   gray200,
-  gray600,
+  gray25,
+  gray400,
   gray700,
-  gray900,
-  green200,
+  green100,
   orange200,
   orangeDark,
-  orangeLight
+  orangeLight,
+  orangeLighter,
+  successDark,
+  warningDark,
+  yellow100
 } from "../../../../utils/colors";
 
 const JoinUs = props => {
@@ -310,8 +314,9 @@ const JoinUs = props => {
           p: "24px 20px",
           mb: "16px",
           borderRadius: "12px",
-          color: gray700,
-          backgroundColor: green200,
+          color: green100,
+          fontWeight: 500,
+          backgroundColor: successDark,
           "& svg": {
             fill: "common.black"
           }
@@ -324,7 +329,15 @@ const JoinUs = props => {
       {props.community && (
         <Alert
           severity="warning"
-          sx={{ p: "24px 20px", borderRadius: "12px", color: gray700, backgroundColor: orange200 }}
+          sx={{
+            p: "24px 20px",
+            borderRadius: "12px",
+            color: yellow100,
+            fontWeight: 500,
+            backgroundColor: warningDark,
+            "&  a:link": { color: orangeDark },
+            "& a:visited": { color: orangeLighter }
+          }}
         >
           <strong style={{ color: "common.white" }}>Please note: </strong>
           <br />
@@ -351,8 +364,16 @@ const JoinUs = props => {
         orientation="vertical"
         sx={{
           mt: "19px",
+          "& .MuiStepIcon-text": {
+            fill: baseG400,
+            fontWeight: 600
+          },
+          "& .Mui-active .MuiStepIcon-text": {
+            fill: gray25,
+            fontWeight: 600
+          },
           "& .MuiStepIcon-root": {
-            color: gray03
+            color: baseG200
           },
           "& .MuiStepIcon-root.Mui-active": {
             color: orangeDark
@@ -363,7 +384,7 @@ const JoinUs = props => {
           "& .MuiStepLabel-label": {
             fontSize: "20px",
             fontWeight: 600,
-            color: gray600
+            color: gray400
           },
 
           "& .MuiStepLabel-label.Mui-active": {
