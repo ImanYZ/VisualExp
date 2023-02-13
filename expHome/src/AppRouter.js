@@ -11,7 +11,10 @@ import {
   themeOSState,
   leadingState,
   institutionsState,
-  isAdminState
+  isAdminState,
+  resumeUrlState,
+  transcriptUrlState,
+  applicationsSubmittedState
 } from "./store/AuthAtoms";
 import {
   choicesState,
@@ -20,7 +23,9 @@ import {
   passageState,
   phaseState,
   startedSessionState,
-  stepState
+  stepState,
+  hasScheduledState,
+  completedExperimentState
 } from "./store/ExperimentAtoms";
 
 import App from "./App";
@@ -91,7 +96,11 @@ const AppRouter = props => {
   const [choices, setChoices] = useRecoilState(choicesState);
   const [project, setProject] = useRecoilState(projectState);
   const [institutions, setInstitutions] = useRecoilState(institutionsState);
-
+  const setHasScheduled = useSetRecoilState(hasScheduledState);
+  const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
+  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
+  const setResumeUrl = useSetRecoilState(resumeUrlState);
+  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
   const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
@@ -168,6 +177,67 @@ const AppRouter = props => {
       }
     }
   };
+  useEffect(() => {
+    return firebase.auth.onAuthStateChanged(async user => {
+      if (user) {
+        // User is signed in, see docs for a list of available properties
+        // https://firebase.google.com/docs/reference/js/firebase.User
+        const uEmail = user.email.toLowerCase();
+        const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
+        if (userDocs.docs.length > 0) {
+          setEmail(uEmail.toLowerCase());
+          const userData = userDocs.docs[0].data();
+          if (!userData.firstname || !userData.lastname) {
+            window.location.href = "/";
+          }
+          if (userData.applicationsSubmitted) {
+            setApplicationsSubmitted(userData.applicationsSubmitted);
+          }
+          if ("Resume" in userData) {
+            setResumeUrl(userData["Resume"]);
+          }
+          if ("Transcript" in userData) {
+            setTranscriptUrl(userData["Transcript"]);
+          }
+          if ("projectDone" in userData && userData.projectDone) {
+            setHasScheduled(true);
+            setCompletedExperiment(true);
+          } else {
+            const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
+            const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
+            let allPassed = true;
+            if (scheduleDocs.docs.length >= 3) {
+              let scheduledSessions = 0;
+              for (let scheduleDoc of scheduleDocs.docs) {
+                const scheduleData = scheduleDoc.data();
+                if (scheduleData.order) {
+                  scheduledSessions += 1;
+                  if (scheduleData.session >= nowTimestamp) {
+                    allPassed = false;
+                  }
+                }
+              }
+              if (scheduledSessions >= 3) {
+                console.log("All sessions scheduled!");
+                setHasScheduled(true);
+                if (allPassed) {
+                  setCompletedExperiment(true);
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // User is signed out
+        console.log("Signing out!");
+        setFullname("");
+        setEmail("");
+        setHasScheduled(false);
+        setCompletedExperiment(false);
+        setApplicationsSubmitted({});
+      }
+    });
+  }, [firebase]);
 
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
