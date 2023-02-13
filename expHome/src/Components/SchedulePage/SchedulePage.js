@@ -21,6 +21,7 @@ import { projectState } from "../../store/ProjectAtoms";
 import RouterNav from "../../../src/Components/RouterNav/RouterNav";
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
+import LoadingPage from "./LoadingPage";
 
 import { isEmail } from "../../utils";
 
@@ -126,7 +127,7 @@ const SchedulePage = props => {
           project in researcherData.projects &&
           researcherData.projects[project].active
         ) {
-          researchers[researcherDoc.id] = researcherData.email;
+          researchers[researcherData.email] = researcherDoc.id;
         }
       }
       // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
@@ -177,10 +178,18 @@ const SchedulePage = props => {
             scheduledByResearchers[scheduledResearcher] = [];
           }
           let __scheduled = scheduledByResearchers[scheduledResearcher];
-
-          const scheduledSlotsByParticipants = Object.entries(_scheduled[scheduledResearcher])
-          for(const scheduledSlotsByParticipant of scheduledSlotsByParticipants) {
-            __scheduled = __scheduled.concat(scheduledSlotsByParticipant)
+          
+          for(const participant in _scheduled[scheduledResearcher]) {
+            // we don't check already booked sessions for current participant
+            if(participant === fullname) {
+              continue;
+            }
+            const scheduledSlotsByParticipant = _scheduled[scheduledResearcher][participant];
+            __scheduled = __scheduled.concat(
+              Object.values(scheduledSlotsByParticipant).map(
+                (slot) => moment(slot).utcOffset(-4, true).toDate().toLocaleString()
+              )
+            )
           }
           __scheduled.sort((s1, s2) => s1 < s2 ? -1 : 1)
           scheduledByResearchers[scheduledResearcher] = Array.from(new Set(__scheduled));
@@ -195,6 +204,7 @@ const SchedulePage = props => {
             availableSchedules[scheduledSlot].splice(researcherIdx, 1)
           }
         }
+
         availSessions = availableSchedules;
       }
       // We need to retrieve all the currently scheduled events to figure
@@ -218,6 +228,8 @@ const SchedulePage = props => {
         }
         // Only future events
         const startTime = new Date(event.start.dateTime).toLocaleString();
+        const endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+        const duration = new Date(event.end.dateTime).getTime() - new Date(event.start.dateTime).getTime();
         const startMinus30Min = new Date(new Date(event.start.dateTime).getTime() - 30 * 60 * 1000);
         // If the event has some attendees and the start timestamp is a key in availSessions,
         // we should remove all the attendees who are available researchers at this timestamp,
@@ -241,7 +253,11 @@ const SchedulePage = props => {
           ) === -1
         ) {
           for (let attendee of event.attendees) {
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== attendee.email);
+            if (!researchers[attendee.email]) continue;
+            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            if (duration >= 60 * 60 * 1000) {
+              availSessions[endTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+            }
           }
         }
       }
@@ -263,6 +279,13 @@ const SchedulePage = props => {
           availSessions[sessionStr].length > 0
         ) {
           sch.push(session);
+          const sessionIdx = parseInt(scheduleData.order.replace(/[^0-9]+/g, "")) - 1;
+          if(!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
+            const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
+            for(let i = 1; i < slotCounts; i++) {
+              sch.push(moment(session).add(30 * i, "minutes").toDate());
+            }
+          }
         }
       }
       if (sch.length > 0) {
@@ -291,38 +314,43 @@ const SchedulePage = props => {
   };
 
   const submitData = async () => {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
 
-    const userRef = firebase.db.collection("users").doc(fullname);
-    let userDoc = await userRef.get();
+      const userRef = firebase.db.collection("users").doc(fullname);
+      let userDoc = await userRef.get();
 
-    if (!userDoc.exists) {
-      const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
-      userDoc = await userRef.get();
-    }
-
-    let responseObj = null;
-    if (userDoc.exists) {
-      const userData = userDoc.data();
-      if (userData.projectDone) {
-        setParticipatedBefore(true);
-        return;
+      if (!userDoc.exists) {
+        const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
+        userDoc = await userRef.get();
       }
-      
-      const sessions = selectedSession.map(s => {
-        return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
-      });
 
-      await firebase.idToken()
-      responseObj = await axios.post("/participants/schedule", {
-        sessions,
-        project: userData.project
-      });
-      errorAlert(responseObj.data);
+      let responseObj = null;
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (userData.projectDone) {
+          setParticipatedBefore(true);
+          return;
+        }
 
-      setSubmitted(true);
+        const sessions = selectedSession.map(s => {
+          return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
+        });
+
+        await firebase.idToken();
+        responseObj = await axios.post("/participants/schedule", {
+          sessions,
+          project: userData.project
+        });
+        errorAlert(responseObj.data);
+
+        setSubmitted(true);
+      }
+      setIsSubmitting(false);
+    } catch (error) {
+      setIsSubmitting(false);
+      alert("Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu");
     }
-    setIsSubmitting(false);
   };
 
   const slotDuration = 60 / (projectSpecs.hourlyChunks || AppConfig.defaultHourlyChunks);
@@ -376,6 +404,7 @@ const SchedulePage = props => {
     );
   };
 
+  if (isSubmitting) return <LoadingPage />;
   return (
     <>
     <RouterNav/>
