@@ -16,7 +16,7 @@ import Papers from "./modules/views/Papers";
 import AppFooter from "./modules/views/AppFooter2";
 import JoinUs from "./modules/views/JoinUs";
 
-import { darkBase, darkblue, gray200 } from "../../utils/colors";
+import { darkBase, gray200 } from "../../utils/colors";
 import HomeWrapper from "./HomeWrapper";
 import Team from "./modules/views/Team";
 import { Stack } from "@mui/material";
@@ -74,7 +74,6 @@ function Index() {
               >
                 Sponsors
               </Typography>
-              <Typography>Sponsors</Typography>
               <About />
             </Box>
             <Box>
