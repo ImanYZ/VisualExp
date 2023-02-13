@@ -64,7 +64,7 @@ const Mechanism = ({ mechanisms }) => {
           sx={{ mb: { xs: "32px", md: "61px" } }}
         >
           <Box sx={{ maxWidth: { md: "528px" }, textAlign: "left" }}>
-            <Typography component={"h3"} sx={{ fontSize: "30px", fontWeight: "600px", mb: "16px" }}>
+            <Typography component={"h3"} sx={{ fontSize: "30px", fontWeight: "600px", mb: "16px",color:"common.white" }}>
               {cur.title}
             </Typography>
             <Typography sx={{ color: theme.palette.mode === "light" ? gray200 : gray600 }}>

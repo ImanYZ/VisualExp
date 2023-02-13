@@ -22,7 +22,7 @@ import allCommunities from "./modules/views/communitiesOrder";
 import { Button, Card, CardActionArea, CardContent, CardMedia, Divider, styled } from "@mui/material";
 import { Stack } from "@mui/system";
 import { Link } from "react-router-dom";
-import { gray200, gray400, gray600, gray800, orangeDark, orangeLight } from "../../utils/colors";
+import { darkBase, gray200, gray400, gray600, orangeDark, orangeLight, orangeLighter } from "../../utils/colors";
 
 const subSections = [
   {
@@ -347,8 +347,8 @@ const Communities = props => {
                       flexDirection: "column",
                       justifyContent: "flex-start",
                       p: "16px",
-                      border: `1px solid ${gray800}`,
-                      backgroundColor: "black",
+                      border: `1px solid ${darkBase}`,
+                      backgroundColor: "#181818",
                       borderRadius: "8px",
                       cursor: "pointer",
                       height: "100%",
@@ -448,10 +448,10 @@ const Communities = props => {
                     spacing="8px"
                     sx={{
                       padding: "24px ",
-                      border: `1px solid ${gray800}`,
+                      border: `1px solid ${darkBase}`,
                       borderRadius: "12px",
                       width: "280px",
-                      backgroundColor: "black"
+                      backgroundColor: "#181818"
                     }}
                   >
                     <Avatar
@@ -565,7 +565,7 @@ const Communities = props => {
 
         <DividerStyled />
 
-        <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" } }}>
+        <Typography variant="h4" gutterBottom align="center" sx={{ textTransform: "capitalize", p: { xs: "10px" },color:"common.white" }}>
           Apply to Join this Community
         </Typography>
 
@@ -581,6 +581,9 @@ const Communities = props => {
                 mb: "19px",
                 "& a:link": {
                   color: orangeDark
+                },
+                "& a:visited": {
+                  color: orangeLighter
                 }
               }}
             >
@@ -644,8 +647,8 @@ const Communities = props => {
                       maxWidth: "100%",
                       height: "84px",
                       borderRadius: "12px",
-                      border: `1px solid ${gray800}`,
-                      backgroundColor: "black",
+                      border: `1px solid ${darkBase}`,
+                      backgroundColor:"#181818",
                       p: { xs: "6px 8px", sm: "16px 24px" }
                     }}
                   >
