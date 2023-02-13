@@ -118,15 +118,13 @@ function Index() {
       <Box
         id="join-us"
         sx={{
-          py: { xs: "16px", sm: "32px" },
+          py: { xs: "64px", sm: "96px" },
           maxWidth: "1216px",
           m: "auto",
           scrollMarginTop: "16px"
         }}
       >
-        <Typography sx={{ fontSize: "36px", mb: "20px", textTransform: "uppercase", fontWeight: 600,color:"common.white",textAlign:"center" }}>
-          Apply to Join Us
-        </Typography>
+       
         <JoinUs />
       </Box>
 
