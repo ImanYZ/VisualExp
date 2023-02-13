@@ -218,7 +218,6 @@ const AppRouter = props => {
                 }
               }
               if (scheduledSessions >= 3) {
-                console.log("All sessions scheduled!");
                 setHasScheduled(true);
                 if (allPassed) {
                   setCompletedExperiment(true);
