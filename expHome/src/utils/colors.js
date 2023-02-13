@@ -1,6 +1,7 @@
 export const orangeDark = "#FF6D00";
 export const orangeLight = "#f77a1a";
 export const orangeLighter = "#faa666";
+export const orange200="#F9DBAF";
 export const darkblue = "#0A0D14";
 export const gray03 = "#AAAAAA";
 export const gray25 = "#FCFCFD";
@@ -15,3 +16,4 @@ export const gray800 = "#1D2939";
 export const gray850 = "#302F2F";
 export const gray900 = "#0A0D14";
 export const darkBase = "#242425";
+export const green200="#A6F4C5";

@@ -28,10 +28,19 @@ import Typography from "../components/Typography";
 import UploadButton from "../components/UploadButton";
 
 import { isValidHttpUrl } from "../../../../utils";
-import { gray03, gray200, gray600, gray700, gray900, orangeDark, orangeLight  } from "../../../../utils/colors";
+import {
+  gray03,
+  gray200,
+  gray600,
+  gray700,
+  gray900,
+  green200,
+  orange200,
+  orangeDark,
+  orangeLight
+} from "../../../../utils/colors";
 
 const JoinUs = props => {
-
   const { themeName } = props || {};
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -289,20 +298,35 @@ const JoinUs = props => {
       id="JoinUsSection"
       component="section"
       sx={{
-        scrollMarginTop:"80px",
-        
+        scrollMarginTop: "80px",
+
         p: 0,
         m: 0
       }}
     >
-      <Alert severity="success" sx={{ p: "24px 20px", mb: "16px", borderRadius: "12px", color: gray700}}>
-        <strong style={{ color: gray900 }}>Please note: </strong>
+      <Alert
+        severity="success"
+        sx={{
+          p: "24px 20px",
+          mb: "16px",
+          borderRadius: "12px",
+          color: gray700,
+          backgroundColor: green200,
+          "& svg": {
+            fill: "common.black"
+          }
+        }}
+      >
+        <strong style={{ color: "common.white" }}>Please note: </strong>
         <br />
         Our application process is sequential; i.e., you need to complete each step to unlock the following steps.
       </Alert>
       {props.community && (
-        <Alert severity="warning" sx={{ p: "24px 20px", borderRadius: "12px", color: gray700 }}>
-          <strong style={{ color: gray900 }}>Please note: </strong>
+        <Alert
+          severity="warning"
+          sx={{ p: "24px 20px", borderRadius: "12px", color: gray700, backgroundColor: orange200 }}
+        >
+          <strong style={{ color: "common.white" }}>Please note: </strong>
           <br />
           Participation is unpaid, solely for the purpose of improving research and education, and this position meets{" "}
           <a href="https://www.dol.gov/whd/regs/compliance/whdfs71.htm" target="_blank" rel="noreferrer">
@@ -321,7 +345,7 @@ const JoinUs = props => {
           .
         </Alert>
       )}
-      
+
       <Stepper
         activeStep={activeStep}
         orientation="vertical"
@@ -341,7 +365,7 @@ const JoinUs = props => {
             fontWeight: 600,
             color: gray600
           },
-          
+
           "& .MuiStepLabel-label.Mui-active": {
             fontWeight: 600,
             color: gray200
@@ -358,7 +382,7 @@ const JoinUs = props => {
           },
           "& .MuiButton-root.Mui-disabled": {
             backgroundColor: "secondary.light"
-          },
+          }
         }}
       >
         <Step>
@@ -417,11 +441,7 @@ const JoinUs = props => {
           </StepContent>
         </Step>
         <Step>
-          <StepLabel
-           
-          >
-            Complete the community-specific application requirements.
-          </StepLabel>
+          <StepLabel>Complete the community-specific application requirements.</StepLabel>
           <StepContent>
             {props.community ? (
               <Stepper
@@ -529,7 +549,7 @@ const JoinUs = props => {
                   </StepLabel>
                   <StepContent>
                     <TextareaAutosize
-                      style={{ width: "100%",borderRadius:"4px" }}
+                      style={{ width: "100%", borderRadius: "4px" }}
                       aria-label="explanation text box"
                       minRows={7}
                       placeholder={
