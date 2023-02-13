@@ -78,11 +78,11 @@ const HomeWrapper = ({
       {heroSectionChild}
 
       <SectionWrapper ref={MechanismSectionRef} section={ONE_CADEMY_SECTIONS[1]} textAlign="center">
-        {mechanismSectionChild}x
+        {mechanismSectionChild}
       </SectionWrapper>
 
       <SectionWrapper ref={MagnitudeSectionRef} section={ONE_CADEMY_SECTIONS[2]} >
-        {magnitudeSectionChild}x
+        {magnitudeSectionChild}
       </SectionWrapper>
 
       <SectionWrapper ref={BenefitSectionRef} section={ONE_CADEMY_SECTIONS[3]}>

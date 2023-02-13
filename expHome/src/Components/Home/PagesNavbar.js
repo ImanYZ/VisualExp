@@ -11,7 +11,7 @@ import withRoot from "./modules/withRoot";
 import sectionsOrder from "./modules/views/sectionsOrder";
 import { ONE_CADEMY_SECTIONS } from "./modules/views/sectionItems";
 import AppHeaderMemoized from "./modules/views/AppHeader2";
-import { darkblue } from "../../utils/colors";
+import { darkBase, darkblue } from "../../utils/colors";
 
 const switchSection = newValue => event => {
   if (newValue > 0 && newValue < sectionsOrder.length - 1) {
@@ -40,7 +40,7 @@ const PagesNavbar = ({ children, tutorial, communities, thisPage, newHeader = fa
         overflowY: "auto",
         overflowX: "auto",
         scrollBehavior: "smooth",
-        backgroundColor: theme === "dark" ? darkblue : "none"
+        backgroundColor: theme === "dark" ?  darkBase: "none"
       }}
     >
       {!newHeader && (
