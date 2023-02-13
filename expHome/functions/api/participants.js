@@ -68,9 +68,9 @@ participantsRouter.post("/schedule", async (req, res) => {
           }
         }
       }
-      for(const researcher in resScheduled) {
-        for(const participant in resScheduled[researcher]) {
-          const __scheduled = Object.entries(resScheduled[researcher][participant]);
+      for(const fullnameRes in resScheduled) {
+        for(const participant in resScheduled[fullnameRes]) {
+          const __scheduled = Object.values(resScheduled[fullnameRes][participant]);
           for(const _scheduled of __scheduled) {
 
             for(const scheduledSlot of _scheduled) {
