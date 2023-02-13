@@ -30,7 +30,17 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import oneCademyLogoExtended from "../../../../assets/logo-extended.png";
 import { notAResearcherState } from "../../../../store/ProjectAtoms";
-import { gray200, gray300, gray50, gray600, gray700, gray850, gray900, orangeDark, orangeLight } from "../../../../utils/colors";
+import {
+  gray200,
+  gray300,
+  gray50,
+  gray600,
+  gray700,
+  gray850,
+  gray900,
+  orangeDark,
+  orangeLight
+} from "../../../../utils/colors";
 
 export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
@@ -206,7 +216,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId, onSwitchSection, preUr
   );
 };
 
-const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl="" }) => {
+const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl = "" }) => {
   const theme = useTheme();
   const navigateTo = useNavigate();
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
@@ -268,7 +278,7 @@ const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl="" }) 
     navigateTo("/auth");
   };
 
-  const onSwitchSectionByMenu = (id) => {
+  const onSwitchSectionByMenu = id => {
     onSwitchSection(id);
     setOpenMenu(false);
   };
@@ -324,12 +334,14 @@ const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl="" }) 
               {sections.slice(1).map((cur, idx) => {
                 return cur.options ? (
                   <Box key={cur.id} sx={{ display: "flex" }}>
-                    <ActiveLink
-                      cur={cur}
-                      selectedSectionId={selectedSectionId}
-                      preUrl={preUrl}
-                      onSwitchSection={onSwitchSection}
-                    />
+                    <Box onMouseEnter={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}>
+                      <ActiveLink
+                        cur={cur}
+                        selectedSectionId={selectedSectionId}
+                        preUrl={preUrl}
+                        onSwitchSection={onSwitchSection}
+                      />
+                    </Box>
                     <IconButton
                       onClick={() => setIdxOptionVisible(prev => (prev === idx ? -1 : idx))}
                       size="small"
@@ -499,8 +511,8 @@ const SubMenu = ({ onCloseSubMenu, sectionVisible, sx }) => {
                     borderRadius: "16px",
                     color: theme => (theme.palette.mode === "light" ? gray200 : "black"),
                     ":hover": {
-                      background: theme => (theme.palette.mode === "light" ? gray850 : gray50),
-                    },
+                      background: theme => (theme.palette.mode === "light" ? gray850 : gray50)
+                    }
                   }}
                 >
                   <Typography
