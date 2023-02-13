@@ -1,6 +1,6 @@
 const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
 
-const { Timestamp ,FieldValue} = require("firebase-admin/firestore");
+const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 
 const nodemailer = require("nodemailer");
 
@@ -182,7 +182,7 @@ exports.sendPersonalInvitations = async (req, res) => {
                 }
                 <p></p>
                 <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.com/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.com/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://1cademy.com/search" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
               <img src="https://1cademy.us/api/loadImage/individual/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -312,7 +312,7 @@ exports.inviteAdministrators = async context => {
               <p></p>
               <p>We are a research group at the University of Michigan, School of Information. We would like to invite your students to join our online research communities and collaborate with us on research literature review on their desired topics.</p>
               <p></p>
-              <p>We have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.com" target="_blank">on this page</a>). Since Fall 2020, out of more than 10,000 students who applied, 1,529 talented students from 183 schools have joined 1Cademy to collaboratively summarize, visualize, improve, and present books and research papers on a weekly basis and get constructive feedback about their research. You can check out <a href="https://1cademy.com/#CommunitiesSection" target="_blank">our existing research communities</a> and search through <a href="https://1cademy.com/search" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students. We also have community leadership opportunities for qualified students to lead our existing communities or establish new research communities.</p>
+              <p>We have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.com" target="_blank">on this page</a>). Since Fall 2020, out of more than 10,000 students who applied, 1,529 talented students from 183 schools have joined 1Cademy to collaboratively summarize, visualize, improve, and present books and research papers on a weekly basis and get constructive feedback about their research. You can check out <a href="https://1cademy.com/#topics" target="_blank">our existing research communities</a> and search through <a href="https://1cademy.com/search" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students. We also have community leadership opportunities for qualified students to lead our existing communities or establish new research communities.</p>
               <p></p>
               <p>${
                 administratorData.country === "🇺🇸 United States;US"
@@ -324,9 +324,10 @@ exports.inviteAdministrators = async context => {
                 <li><a href="https://1cademy.us/inviteStudents/administrators/${
                   administratorDoc.id
                 }" target="_blank">I'd like to invite students to apply.</a></li>${
-              // '<li><a href="https://1cademy.us/ScheduleAdministratorSurvey/' +
-              //   administratorDoc.id +
-              // '" target="_blank">' + "I'd like to schedule a meeting with you.</a></li>" +
+              '<li><a href="https://1cademy.us/administratorYes/' +
+              administratorDoc.id +
+              '" target="_blank">' +
+              "I'd like to schedule a meeting with you.</a></li>" +
               ""
             }
                 <li><a href="https://1cademy.us/interestedAdministratorLater/${
@@ -341,7 +342,7 @@ exports.inviteAdministrators = async context => {
               <p>Reply to this email if you have any questions or concerns.</p>
               <p></p>
               <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.com/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://1cademy.com/search" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
               <img src="https://1cademy.us/api/loadImage/administrator/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -391,11 +392,12 @@ exports.inviteAdministrators = async context => {
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
 // allow write: if request.auth != null
 // && request.resource.data.fullname == request.auth.token.name;
+// It also redirects to Iman's Calendar scheduling page.
 exports.administratorYes = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.body
-    if ("id" in req.body && req.body.id) {
-      const administratorId = req.body.id;
+    // This is a get request and we should retrieve the data from req.params
+    if ("id" in req.params && req.params.id) {
+      const administratorId = req.params.id;
       const administratorDoc = db.collection("administrators").doc(administratorId);
       await administratorDoc.update({
         yes: true,
@@ -403,6 +405,9 @@ exports.administratorYes = async (req, res) => {
         later: false,
         updatedAt: Timestamp.fromDate(new Date())
       });
+      return res.redirect(
+        "https://calendar.google.com/calendar/selfsched?sstoken=UU9xYXhzOXBOcXZYfGRlZmF1bHR8MzA2ZTdkMTE1MDBhMWI0NzJiMDg0YmExYTU2NWJmMWI"
+      );
     }
   } catch (err) {
     console.log({ err });
@@ -536,7 +541,7 @@ exports.inviteInstructors = async context => {
           const mailOptions = {
             from: process.env.EMAIL,
             to: instructorData.email,
-            subject: `A Large-scale Collaborative ${
+            subject: `A ChatGPT-integrated Large-scale Collaborative ${
               instructorData.GoogleScholar ? "Literature Review" : "Note-taking"
             } Platform for ${capitalizeSentence(instructorData.interestedTopic)} Learning/Research`,
             html: `<p>Hello ${
@@ -549,13 +554,13 @@ exports.inviteInstructors = async context => {
               <p></p>
               ${
                 instructorData.GoogleScholar
-                  ? "<p>A comprehensive literature review is essential for research, but it is time-consuming. What if we can crowd-source it through talented students who are eager to engage in research?</p>"
+                  ? "<p>A comprehensive literature review is essential for research, but it is time-consuming. What if we can crowdsource it through talented students who are eager to engage in research?</p>"
                   : "<p>We all want our students to master and retain knowledge from their courses. Note-taking in general, and increasingly collaborative note-taking, can play vital roles in deepening students' learning and retention.</p>"
               }
               <p></p>
               <p>We are a research group at the University of Michigan, School of Information, who have developed an online platform for collaborative learning and research, called 1Cademy (more information <a href="https://1cademy.com" target="_blank">on this page</a>). So far, out of more than 10,000 students who applied, 1,529 talented students from 183 schools have joined 1Cademy to collaboratively summarize, visualize, improve, and present books and research papers. You can ${
                 instructorData.GoogleScholar
-                  ? 'check out <a href="https://1cademy.com/#CommunitiesSection" target="_blank">our existing research communities and their accomplishments</a> and '
+                  ? 'check out <a href="https://1cademy.com/#topics" target="_blank">our existing research communities and their accomplishments</a> and '
                   : ""
               }search through <a href="https://1cademy.com/search" target="_blank">the 1Cademy Knowledge Graph</a> to learn more about the content generated by students.</p>
               ${
@@ -569,9 +574,10 @@ exports.inviteInstructors = async context => {
                 <li><a href="https://1cademy.us/inviteStudents/instructors/${
                   instructorDoc.id
                 }" target="_blank">I'd like to invite my students to apply to 1Cademy research communities.</a></li>${
-              // '<li><a href="https://1cademy.us/ScheduleInstructorSurvey/' +
-              //   instructorDoc.id +
-              // '" target="_blank">' + "I'd like to schedule a meeting with you.</a></li>" +
+              '<li><a href="https://1cademy.us/instructorYes/' +
+              instructorDoc.id +
+              '" target="_blank">' +
+              "I'd like to schedule a meeting with you.</a></li>" +
               ""
             }
                 <li><a href="https://1cademy.us/interestedFacultyLater/${
@@ -586,7 +592,7 @@ exports.inviteInstructors = async context => {
               <p>Reply to this email if you have any questions or concerns.</p>
               <p></p>
               <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.com/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://1cademy.com/search" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman <span zeum4c17="PR_2_0" data-ddnwab="PR_2_0" aria-invalid="spelling" class="LI ng">YeckehZaare</span></div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Jolie Safier Smith<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
               <img src="https://1cademy.us/api/loadImage/professor/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -636,11 +642,12 @@ exports.inviteInstructors = async context => {
 // We should not do this directly in the front-end because in Firebase.rules we have defined:
 // allow write: if request.auth != null
 // && request.resource.data.fullname == request.auth.token.name;
+// It also redirects to Iman's Calendar scheduling page.
 exports.instructorYes = async (req, res) => {
   try {
-    // This is a post request and we should retrieve the data from req.body
-    if ("id" in req.body && req.body.id) {
-      const instructorId = req.body.id;
+    // This is a get request and we should retrieve the data from req.params
+    if ("id" in req.params && req.params.id) {
+      const instructorId = req.params.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: true,
@@ -648,6 +655,9 @@ exports.instructorYes = async (req, res) => {
         later: false,
         updatedAt: Timestamp.fromDate(new Date())
       });
+      return res.redirect(
+        "https://calendar.google.com/calendar/selfsched?sstoken=UU9xYXhzOXBOcXZYfGRlZmF1bHR8MzA2ZTdkMTE1MDBhMWI0NzJiMDg0YmExYTU2NWJmMWI"
+      );
     }
   } catch (err) {
     console.log({ err });

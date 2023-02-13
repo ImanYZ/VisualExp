@@ -57,27 +57,28 @@ participantsRouter.post("/schedule", async (req, res) => {
       // scheduled
       const { schedules: resSchedules, scheduled: resScheduled } = resScheduleData;
 
-      for(const fullname in resSchedules) {
-        const _schedules = resSchedules[fullname] || [];
+      for(const researcher in resSchedules) {
+        const _schedules = resSchedules[researcher] || [];
         for(const scheduleSlot of _schedules) {
           if(!availableScheduleByResearchers[scheduleSlot]) {
             availableScheduleByResearchers[scheduleSlot] = [];
           }
-          if(!availableScheduleByResearchers[scheduleSlot].includes(fullname)) {
-            availableScheduleByResearchers[scheduleSlot].push(fullname);
+          if(!availableScheduleByResearchers[scheduleSlot].includes(researcher)) {
+            availableScheduleByResearchers[scheduleSlot].push(researcher);
           }
         }
       }
-      for(const fullname in resScheduled) {
-        for(const participant in resScheduled[fullname]) {
-          const __scheduled = Object.entries(resScheduled[fullname][participant]);
+      for(const researcher in resScheduled) {
+        for(const participant in resScheduled[researcher]) {
+          const __scheduled = Object.entries(resScheduled[researcher][participant]);
           for(const _scheduled of __scheduled) {
+
             for(const scheduledSlot of _scheduled) {
-              if(!availableScheduleByResearchers[scheduledSlot]) {
+              if(!availableScheduleByResearchers[scheduledSlot] || participant === fullname ) {
                 continue;
               }
-              if(availableScheduleByResearchers[scheduledSlot].includes(fullname)) {
-                const idx = availableScheduleByResearchers[scheduledSlot].indexOf(fullname);
+              if(availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
+                const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
                 availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
               }
             }

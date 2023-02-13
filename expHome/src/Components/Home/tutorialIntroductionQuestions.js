@@ -110,7 +110,7 @@ export default {
         stem: (
           <div>
             {quNum()}How can 1Cademy help us? (Hint: find the answer from{" "}
-            <a href="https://1cademy.us/home" target="_blank">
+            <a href="https://1cademy.com/home" target="_blank">
               the 1Cademy homepage
             </a>
             .)
@@ -129,7 +129,7 @@ export default {
         stem: (
           <div>
             {quNum()}How does 1Cademy aim to help our society? (Hint: find the answer from{" "}
-            <a href="https://1cademy.us/home" target="_blank">
+            <a href="https://1cademy.com/home" target="_blank">
               the 1Cademy homepage
             </a>
             .)
@@ -366,7 +366,7 @@ export default {
       //         {quNum()}What are the overarching learning activities supported by
       //         the personalized knowledge map view? [Hint: one of the correct
       //         answers was not mentioned in the video, but you can find it from{" "}
-      //         <a href="https://1cademy.us/home" target="_blank">
+      //         <a href="https://1cademy.com/home" target="_blank">
       //           the 1Cademy homepage
       //         </a>
       //       </div>
