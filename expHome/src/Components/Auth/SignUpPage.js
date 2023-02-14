@@ -8,7 +8,14 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
 import axios from "axios";
-import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState, institutionsState } from "../../store/AuthAtoms";
+import {
+  firebaseState,
+  emailState,
+  emailVerifiedState,
+  fullnameState,
+  leadingState,
+  institutionsState
+} from "../../store/AuthAtoms";
 import { Autocomplete, Paper, TextField, Checkbox, Backdrop, CircularProgress, Link } from "@mui/material";
 import backgroundImage from "../../assets/HomeBackGroundDarkMode.png";
 import { styled } from "@mui/material/styles";
@@ -27,6 +34,7 @@ import AppConfig from "../../AppConfig";
 import { color } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 
+const GDPRPolicy = React.lazy(() => import("../../Components/modals/GDPRPolicy"));
 const CookiePolicy = React.lazy(() => import("../../Components/modals/CookiePolicy"));
 const PrivacyPolicy = React.lazy(() => import("../../Components/modals/PrivacyPolicy"));
 const TermsOfUse = React.lazy(() => import("../../Components/modals/TermsOfUse"));
@@ -66,10 +74,19 @@ const SignUpPage = props => {
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const [signUpAgreement, setSignUpAgreement] = useState(false);
+  const [GDPRAgreement, setGDPRAgreement] = useState(false);
+  const [privacyAgreement, setPrivacyAgreement] = useState(false);
+  const [termAgreement, setTermAgreement] = useState(false);
+  const [cookieAgreement, setCookieAgreement] = useState(false);
+  const [ageAgreement, setAgeAgreement] = useState(false);
+
+
+
   const [openInformedConsent, setOpenInformedConsent] = useState(false);
   const [openTermOfUse, setOpenTermsOfUse] = useState(false);
   const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
   const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
+  const [openGDPRPolicy, setOpenGDPRPolicy] = useState(false);
 
   const institutions = useRecoilValue(institutionsState);
 
@@ -206,7 +223,7 @@ const SignUpPage = props => {
     setForgotPassword(oldValue => !oldValue);
   };
 
-  const signUp = async (e) => {
+  const signUp = async e => {
     setIsSubmitting(true);
     const loweredEmail = email.toLowerCase();
     try {
@@ -228,8 +245,8 @@ const SignUpPage = props => {
             firstName: firstname,
             lastName: lastname,
             institutionName: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
-            projectName: project,
-          })
+            projectName: project
+          });
           await firebase.login(loweredEmail, password);
         }
       }
@@ -270,7 +287,17 @@ const SignUpPage = props => {
     zIndex: -2
   });
   return (
-    <Box sx={{ p: { xs: "8px", md: "24px", width: "100%" } }}>
+    <Box
+      sx={{
+        p: { xs: "8px", md: "24px", width: "100%" },
+        height: "100vh",
+        overflowY: "auto",
+        overflowX: "auto",
+        position: "relative",
+        scrollBehavior: "smooth"
+      }}
+      id="ScrollableContainer"
+    >
       <Background
         sx={{
           backgroundImage: `url(${backgroundImage})`,
@@ -278,12 +305,14 @@ const SignUpPage = props => {
           backgroundPosition: "center"
         }}
       />
-      <Paper sx={{
-        m: "10px 500px 200px 500px",
-        "@media (max-width: 1120px)": {
-          m: "0px"
-        }
-      }}>
+      <Paper
+        sx={{
+          m: "10px 500px 200px 500px",
+          "@media (max-width: 1120px)": {
+            m: "0px"
+          }
+        }}
+      >
         {emailVerified === "Sent" ? (
           <div
             style={{
@@ -442,34 +471,65 @@ const SignUpPage = props => {
                 </Box>
                 <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
                   <Checkbox checked={signUpAgreement} onChange={(_, value) => setSignUpAgreement(value)} />I acknowledge
-                  and agree to 1Cademy's{" "}
+                  and agree that any data generated from my use of 1Cademy may be utilized for research purposes by the
+                  investigators at 1Cademy, the University of Michigan School of Information, and Honor Education.
+                </Box>
+
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  <Checkbox checked={GDPRAgreement} onChange={(_, value) => setGDPRAgreement(value)} />I acknowledge
+                  and agree to{" "}
+                  <Link
+                    onClick={() => {
+                      setOpenGDPRPolicy(true);
+                    }}
+                    sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
+                  >
+                    1Cademy's General Data Protection Regulation (GDPR) Policy.
+                  </Link>
+                </Box>
+
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  <Checkbox checked={termAgreement} onChange={(_, value) => setTermAgreement(value)} />I acknowledge
+                  and agree to{" "}
                   <Link
                     onClick={() => {
                       setOpenTermsOfUse(true);
                     }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                    sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
                   >
-                    Terms of Use
+                    1Cademy's Terms of Service.
                   </Link>
-                  ,{" "}
+                </Box>
+
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  <Checkbox checked={privacyAgreement} onChange={(_, value) => setPrivacyAgreement(value)} />I acknowledge
+                  and agree to{" "}
                   <Link
                     onClick={() => {
                       setOpenPrivacyPolicy(true);
                     }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                    sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
                   >
-                    Privacy Policy
-                  </Link>{" "}
-                  and{" "}
+                    1Cademy's Privacy Policy.
+                  </Link>
+                </Box>
+
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  <Checkbox checked={cookieAgreement} onChange={(_, value) => setCookieAgreement(value)} />I acknowledge
+                  and agree to{" "}
                   <Link
                     onClick={() => {
                       setOpenCookiePolicy(true);
                     }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
+                    sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
                   >
-                    Cookie Policy
+                    1Cademy's Cookies Policy.
                   </Link>
-                  .
+                </Box>
+
+                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
+                  <Checkbox checked={ageAgreement} onChange={(_, value) => setAgeAgreement(value)} />I confirm
+                  that I am 18 years of age or older.
                 </Box>
               </TabPanel>
               {invalidAuth && <div className="Error">{invalidAuth.replace("Firebase:", "")}</div>}
@@ -477,7 +537,7 @@ const SignUpPage = props => {
               <div style={{ textAlign: "center", marginTop: "10px" }}>
                 <Button
                   id="SignButton"
-                  className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
+                  className={submitable && !isSubmitting && signUpAgreement && ageAgreement && privacyAgreement && termAgreement && cookieAgreement && GDPRAgreement ? "Button" : "Button Disabled"}
                   onClick={signUp}
                   sx={{ width: isSignUp === 0 ? "150px" : "250" }}
                   variant="contained"
@@ -487,7 +547,7 @@ const SignUpPage = props => {
                       ? submitable && !isSubmitting
                         ? null
                         : true
-                      : submitable && !isSubmitting && signUpAgreement
+                      : submitable && !isSubmitting && signUpAgreement && ageAgreement && privacyAgreement && termAgreement && cookieAgreement && GDPRAgreement
                       ? null
                       : true
                   }
@@ -499,6 +559,7 @@ const SignUpPage = props => {
               <Suspense fallback={<div></div>}>
                 <>
                   <InformedConsent open={openInformedConsent} handleClose={() => setOpenInformedConsent(false)} />
+                  <GDPRPolicy open={openGDPRPolicy} handleClose={() => setOpenGDPRPolicy(false)} />
                   <CookiePolicy open={openCookiePolicy} handleClose={() => setOpenCookiePolicy(false)} />
                   <PrivacyPolicy open={openPrivacyPolicy} handleClose={() => setOpenPrivacyPolicy(false)} />
                   <TermsOfUse open={openTermOfUse} handleClose={() => setOpenTermsOfUse(false)} />
