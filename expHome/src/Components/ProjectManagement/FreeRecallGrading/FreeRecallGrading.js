@@ -436,7 +436,7 @@ const FreeRecallGrading = props => {
       }
       <Paper style={{ paddingBottom: "19px" }}>
         <p>1- Carefully read this free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }} id="recall-response">
           {recallGrades[recallGradeIdx]?.response}
         </Paper>
         <p>
@@ -451,7 +451,7 @@ const FreeRecallGrading = props => {
           const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
           return (
             <div key={index}>
-              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }} className="recall-phrase">
                 <Box sx={{ display: "inline", mr: "19px" }}>
                   NO
                   <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
@@ -462,7 +462,7 @@ const FreeRecallGrading = props => {
             </div>
           );
         })}
-        <Button onClick={handleSubmit} className="Button" variant="contained" color="success" disabled={submitting}>
+        <Button onClick={handleSubmit} className="Button" variant="contained" color="success" disabled={submitting} id="recall-submit">
           {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
         </Button>
         <div
@@ -477,6 +477,7 @@ const FreeRecallGrading = props => {
         ></div>
         <p>The original passage is:</p>
         <Paper
+          id="recall-passage"
           style={{
             padding: "10px 19px 10px 19px",
             margin: "19px 19px 70px 19px"

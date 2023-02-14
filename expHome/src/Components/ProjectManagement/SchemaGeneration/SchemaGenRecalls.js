@@ -621,7 +621,7 @@ export const SchemaGenRecalls = props => {
               </Box>
             </div>
             <Box sx={{}}>
-              <Button onClick={handleNext} className="Button" variant="contained" color="success" disabled={false}>
+              <Button onClick={handleNext} className="Button" variant="contained" color="success" disabled={false} id="schema-recall-submit">
                 {submitButtonLoader ? (
                   <CircularProgress color="warning" size="15px" />
                 ) : wrongRecallVotes.findIndex(object => {
