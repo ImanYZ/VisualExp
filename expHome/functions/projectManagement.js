@@ -1949,6 +1949,7 @@ exports.remindCalendarInvitations = async context => {
     const researcherDocs = await db.collection("researchers").get();
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
+      if (!researcherData.email) continue;
       researchers[researcherData.email.toLowerCase()] = researcherDoc.id;
     }
     // Retrieve all the scheduled sessions.
