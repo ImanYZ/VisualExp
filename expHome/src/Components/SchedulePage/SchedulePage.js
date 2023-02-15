@@ -268,6 +268,7 @@ const SchedulePage = props => {
       const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
+        if (!scheduleData.order || !scheduleData.id) continue;
         const session = scheduleData.session.toDate();
         const sessionStr = session.toLocaleString();
         // We should only show the availble timeslots that are:
