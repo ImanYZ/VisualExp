@@ -57,6 +57,7 @@ import QuizFeedBack from "./Components/Home/QuizFeedBack";
 import SignUpPage from "./Components/Auth/SignUpPage";
 import DissertationGantt from "./Components/DissertationGantt";
 import { isToday } from "./utils/DateFunctions";
+import { getFullname } from "./utils";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
@@ -96,11 +97,25 @@ const AppRouter = props => {
   const [choices, setChoices] = useRecoilState(choicesState);
   const [project, setProject] = useRecoilState(projectState);
   const [institutions, setInstitutions] = useRecoilState(institutionsState);
-  const setHasScheduled = useSetRecoilState(hasScheduledState);
+  const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
   const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
-  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
-  const setResumeUrl = useSetRecoilState(resumeUrlState);
-  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
+  const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
+  const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
+
+  useEffect(() => {
+    if (!email) return;
+    window.parent.postMessage(
+      { email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname },
+      "http://1cademy.com/"
+    );
+    window.parent.postMessage(
+      { email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname },
+      "http://localhost:3000/"
+    );
+
+  }, [email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname]);
+
   const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
@@ -190,6 +205,7 @@ const AppRouter = props => {
           if (!userData.firstname || !userData.lastname) {
             window.location.href = "/";
           }
+          setFullname(getFullname(userData.firstname, userData.lastname));
           if (userData.applicationsSubmitted) {
             setApplicationsSubmitted(userData.applicationsSubmitted);
           }

@@ -331,6 +331,7 @@ const SchedulePage = props => {
         const userData = userDoc.data();
         if (userData.projectDone) {
           setParticipatedBefore(true);
+          setIsSubmitting(false);
           return;
         }
 
