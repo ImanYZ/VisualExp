@@ -74,5 +74,21 @@ module.exports = new MockData([
     },
     "participants": [],
     "email": "oneweb@umich.edu"
+  },
+  {
+    "documentId": "Iman YeckehZaare",
+    "projects": {
+      "H1L2": {
+        "negativeBooleanExpPionts": 0,
+        "negativeCodingPoints": 0,
+        "dayOneUpVotePoints": 0,
+        "active": true,
+        "positiveBooleanExpPionts": 0,
+        "onePoints": 0,
+        "positiveCodingPoints": 0
+      }
+    },
+    "participants": [],
+    "email": "onewebw@umich.edu"
   }
 ], "researchers")
