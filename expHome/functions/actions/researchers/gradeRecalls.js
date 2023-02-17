@@ -85,7 +85,7 @@ module.exports = async (req, res) => {
 
         // removing gpt user from docResearchers and docGrades
         // gpt user should not be counted for approval or for done phrases
-        const gptIdx = docResearchers.indexOf(fullname);
+        const gptIdx = docResearchers.indexOf(gptResearcher);
         if(gptIdx !== -1) {
           docResearchers.splice(gptIdx, 1);
           docGrades.splice(gptIdx, 1);
@@ -155,7 +155,7 @@ module.exports = async (req, res) => {
           if(!votesOfPhrase?.researchers || votesOfPhrase.researchers.filter((r) => r !== gptResearcher).length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
 
           // if document already had 4 researchers or phrase was approve, we don't continue calculations
-          if(votesOfPhrase.hasGPTVote) {
+          if(votesOfPhrase.hasGPTVote && fullname === gptResearcher) {
             continue;
           }
 
