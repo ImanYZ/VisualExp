@@ -35,6 +35,8 @@ describe("POST /api/researchers/gradeRecalls", () => {
     mockBooleanScratch
   ];
 
+  const gptResearcher = "Iman YeckehZaare";
+
   const fullname = "Sam Ouhra";
   const email = "ouhrac@gmail.com";
   const password = "sam2022";
@@ -203,6 +205,42 @@ describe("POST /api/researchers/gradeRecalls", () => {
       }
     }
   })
+
+  it("gpt researcher should not receive points for phrase", async () => {
+    const recallGradeRef = db.collection("recallGradesV2").doc(mockRecallGradesV2.data[0].documentId);
+    const recallGradeUpdates = {...recallGradeData};
+    const { sessions } = recallGradeUpdates;
+    const session = sessions["1st"] || [];
+    const conditionIdx = session.findIndex((conditionItem) => conditionItem.condition === "H1");
+    const conditionItem = session[conditionIdx];
+    const phrase = conditionItem.phrases.find((phrase) => phrase.phrase === "Barn owl's life depends on hearing");
+    phrase.researchers = [...otherResearchers, gptResearcher];
+    phrase.grades = [true, true, false, true];
+
+    await recallGradeRef.update(recallGradeUpdates);
+
+    await chai.request(server).post("/api/researchers/gradeRecalls")
+      .set("Content-Type", "application/json")
+      .set("Authorization", "Bearer " + accessToken)
+      .send(payload);
+
+    const _otherResearchers = [...otherResearchers];
+    const disagreeingResearchers = _otherResearchers.splice(otherResearchers.length-1);
+    const agreeingResearchers = [..._otherResearchers, fullname];
+
+    const researchers = await db.collection("researchers").where("__name__", "in", [...disagreeingResearchers, ...agreeingResearchers, gptResearcher]).get();
+    
+    for(let researcher of researchers.docs) {
+      const researcherData = researcher.data();
+      if(agreeingResearchers.includes(researcher.id)) {
+        expect(researcherData.projects[project].gradingPoints).toEqual(0.5); // agreement points
+      } else if(gptResearcher === researcher.id) { // gpt researcher should not get points
+        expect(researcherData.projects[project].gradingPoints).toEqual(undefined);
+      } else {
+        expect(researcherData.projects[project].gradingPoints).toEqual(-0.5); // disagreement points
+      }
+    }
+  });
 
   it("participant should get recall grade points on phrase approval", async () => {
     const conditionIdx = recallGradeData.sessions["1st"].findIndex((conditionItem) => conditionItem.condition === "H1");
