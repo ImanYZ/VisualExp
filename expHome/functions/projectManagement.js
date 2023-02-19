@@ -1,6 +1,6 @@
 const { admin, db, commitBatch, batchUpdate } = require("./admin");
 const { allPastEvents, futureEvents, pastEvents, last30DayEvents } = require("./scheduling");
-const { isToday } = require("./utils");
+const { isToday, delay } = require("./utils");
 const {
   reschEventNotificationEmail,
   researcherEventNotificationEmail,
@@ -11,7 +11,6 @@ const {
 const { deleteEvent } = require("./GoogleCalendar");
 const { assignExpPoints } = require("./helpers/assignExpPoints");
 const moment = require("moment");
-const { delay } = require("lodash");
 const { Timestamp ,FieldValue } = require("firebase-admin/firestore");
 
 const researchers = [
@@ -1668,7 +1667,7 @@ exports.remindResearchersForAvailability = async context => {
         for (const project in researcherData.projects) {
           if (researcherData.projects[project].active && researcherData.projects[project].scheduleSessions) {
             // month for next 10 days
-            const month = moment().utcOffset(-4).add(10, "day").format("YYYY-MM-DD");
+            const month = moment().utcOffset(-4).add(10, "day").startOf("month").format("YYYY-MM-DD");
             const resSchedules = await db
               .collection("resSchedule")
               .where("project", "==", project)
@@ -1680,7 +1679,7 @@ exports.remindResearchersForAvailability = async context => {
             if (resSchedules.docs.length) {
               const resSchedule = resSchedules.docs[0];
               const resScheduleData = resSchedule.data();
-              const availabilities = resScheduleData[researcherDoc.id]?.schedules || [];
+              const availabilities = resScheduleData?.schedules?.[researcherDoc.id] || [];
               for (const availability of availabilities) {
                 const _availability = moment(availability).utcOffset(-4, true).toDate();
                 if (_availability.getTime() > lastAvailability.getTime()) {
@@ -1689,8 +1688,7 @@ exports.remindResearchersForAvailability = async context => {
               }
             }
 
-            let tenDaysLater = new Date();
-            tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
+            const tenDaysLater = moment().utcOffset(-4).startOf("day").add(10, "days").toDate();
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
               // Increase waitTime by a random integer between 1 to 4 seconds.
               const waitTime = 1000 * (1 + Math.floor(Math.random() * 4));
