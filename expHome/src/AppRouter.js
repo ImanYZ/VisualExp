@@ -66,6 +66,7 @@ import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
+import JoinUsIframe from "./Components/Home/JoinUsIframe";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -102,19 +103,6 @@ const AppRouter = props => {
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
-
-  useEffect(() => {
-    if (!email) return;
-    window.parent.postMessage(
-      { email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname },
-      "http://1cademy.com/"
-    );
-    window.parent.postMessage(
-      { email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname },
-      "http://localhost:3000/"
-    );
-
-  }, [email, completedExperiment, applicationsSubmitted, hasScheduled, resumeUrl, transcriptUrl, fullname]);
 
   const processAuth = async user => {
     const { db } = firebase;
@@ -252,7 +240,8 @@ const AppRouter = props => {
         setApplicationsSubmitted({});
       }
     });
-  }, [firebase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase, fullname]);
 
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
@@ -476,6 +465,7 @@ const AppRouter = props => {
       <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/DissertationGantt" element={<DissertationGantt />} />
+      <Route path="/JoinUsIframe/*" element={<JoinUsIframe community={props.community} />} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
