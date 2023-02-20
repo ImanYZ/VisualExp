@@ -30,13 +30,13 @@ exports.deleteUser = functions.firestore.document("users/{fullname}").onDelete(d
 //   .schedule("every 40 minutes")
 //   .onRun(updateNotTakenSessions);
 
-exports.assignExperimentSessionsPoints = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 4 hours")
-  .onRun(assignExperimentSessionsPoints);
+// exports.assignExperimentSessionsPoints = functions
+//   .runWith({
+//     memory: "1GB",
+//     timeoutSeconds: 520
+//   })
+//   .pubsub.schedule("every 4 hours")
+//   .onRun(assignExperimentSessionsPoints);
 
 exports.remindResearchersForAvailability = functions
   .runWith({
