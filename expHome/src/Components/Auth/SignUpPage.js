@@ -78,7 +78,7 @@ const SignUpPage = props => {
   const [privacyAgreement, setPrivacyAgreement] = useState(false);
   const [termAgreement, setTermAgreement] = useState(false);
   const [cookieAgreement, setCookieAgreement] = useState(false);
-  const [ageAgreement, setAgeAgreement] = useState(false);
+  //const [ageAgreement, setAgeAgreement] = useState(false);
 
   const [openInformedConsent, setOpenInformedConsent] = useState(false);
   const [openTermOfUse, setOpenTermsOfUse] = useState(false);
@@ -532,10 +532,10 @@ const SignUpPage = props => {
                     </Link>
                   </Box>
 
-                  <Box sx={{ ml: "20px" }}>
+                  {/* <Box sx={{ ml: "20px" }}>
                     <Checkbox checked={ageAgreement} onChange={(_, value) => setAgeAgreement(value)} />I confirm that I
                     am 18 years of age or older.
-                  </Box>
+                  </Box> */}
                 </TabPanel>
                 {invalidAuth && <div className="Error">{invalidAuth.replace("Firebase:", "")}</div>}
 
@@ -546,7 +546,6 @@ const SignUpPage = props => {
                       submitable &&
                       !isSubmitting &&
                       signUpAgreement &&
-                      ageAgreement &&
                       privacyAgreement &&
                       termAgreement &&
                       cookieAgreement &&
@@ -566,7 +565,6 @@ const SignUpPage = props => {
                         : submitable &&
                           !isSubmitting &&
                           signUpAgreement &&
-                          ageAgreement &&
                           privacyAgreement &&
                           termAgreement &&
                           cookieAgreement &&
