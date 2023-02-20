@@ -41,6 +41,8 @@ const FreeRecallGrading = props => {
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
 
+  const gptResearcher = "Iman YeckehZaare";
+
   // When the paper gets loaded and every time the researcher submits their
   // answer, we should retrive the next free-recall response for them to
   // evaluate. This states helps us signal the useEffect to invoke
@@ -205,6 +207,7 @@ const FreeRecallGrading = props => {
             .filter(w => w.trim());
           if (
             recallGradeData.user !== fullname &&
+            (conditionItem.researchers.length < 4 || gptResearcher === fullname) &&
             !conditionItem.researchers.includes(fullname) &&
             filtered.length > 2
           ) {

@@ -8,7 +8,14 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
 import axios from "axios";
-import { firebaseState, emailState, emailVerifiedState, fullnameState, leadingState, institutionsState } from "../../store/AuthAtoms";
+import {
+  firebaseState,
+  emailState,
+  emailVerifiedState,
+  fullnameState,
+  leadingState,
+  institutionsState
+} from "../../store/AuthAtoms";
 import { Autocomplete, Paper, TextField, Checkbox, Backdrop, CircularProgress, Link } from "@mui/material";
 import backgroundImage from "../../assets/HomeBackGroundDarkMode.png";
 import { styled } from "@mui/material/styles";
@@ -27,6 +34,7 @@ import AppConfig from "../../AppConfig";
 import { color } from "@mui/system";
 import { useNavigate } from "react-router-dom";
 
+const GDPRPolicy = React.lazy(() => import("../../Components/modals/GDPRPolicy"));
 const CookiePolicy = React.lazy(() => import("../../Components/modals/CookiePolicy"));
 const PrivacyPolicy = React.lazy(() => import("../../Components/modals/PrivacyPolicy"));
 const TermsOfUse = React.lazy(() => import("../../Components/modals/TermsOfUse"));
@@ -66,10 +74,17 @@ const SignUpPage = props => {
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const [signUpAgreement, setSignUpAgreement] = useState(false);
+  const [GDPRAgreement, setGDPRAgreement] = useState(false);
+  const [privacyAgreement, setPrivacyAgreement] = useState(false);
+  const [termAgreement, setTermAgreement] = useState(false);
+  const [cookieAgreement, setCookieAgreement] = useState(false);
+  const [ageAgreement, setAgeAgreement] = useState(false);
+
   const [openInformedConsent, setOpenInformedConsent] = useState(false);
   const [openTermOfUse, setOpenTermsOfUse] = useState(false);
   const [openPrivacyPolicy, setOpenPrivacyPolicy] = useState(false);
   const [openCookiePolicy, setOpenCookiePolicy] = useState(false);
+  const [openGDPRPolicy, setOpenGDPRPolicy] = useState(false);
 
   const institutions = useRecoilValue(institutionsState);
 
@@ -200,13 +215,18 @@ const SignUpPage = props => {
 
   const switchSignUp = (event, newValue) => {
     setIsSignUp(newValue);
+    setForgotPassword(false);
   };
 
   const openForgotPassword = event => {
     setForgotPassword(oldValue => !oldValue);
+    setTimeout(() => {
+      let window = document.getElementById("ScrollableContainer");
+      window.scrollTo(0, window.scrollHeight);
+    }, 100);
   };
 
-  const signUp = async (e) => {
+  const signUp = async e => {
     setIsSubmitting(true);
     const loweredEmail = email.toLowerCase();
     try {
@@ -228,8 +248,8 @@ const SignUpPage = props => {
             firstName: firstname,
             lastName: lastname,
             institutionName: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
-            projectName: project,
-          })
+            projectName: project
+          });
           await firebase.login(loweredEmail, password);
         }
       }
@@ -270,285 +290,350 @@ const SignUpPage = props => {
     zIndex: -2
   });
   return (
-    <Box sx={{ p: { xs: "8px", md: "24px", width: "100%" } }}>
+    <Box>
       <Background
         sx={{
           backgroundImage: `url(${backgroundImage})`,
-          backgroundColor: "primary.light", // Average color of the background image.
           backgroundPosition: "center"
         }}
       />
-      <Paper sx={{
-        m: "10px 500px 200px 500px",
-        "@media (max-width: 1120px)": {
-          m: "0px"
-        }
-      }}>
-        {emailVerified === "Sent" ? (
-          <div
-            style={{
-              height: "200px",
-              marginTop: "200px",
-              flexDirection: "column",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Box>
-              <p>
-                We just sent you a verification email. Please click the link in the email to verify and complete your
-                sign-up.
-              </p>
-            </Box>
-            <Box>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={resendVerificationEmail}
-                style={{ marginRight: "19px" }}
-              >
-                <EmailIcon /> Resend Verification Email
-              </Button>
-              <Button variant="contained" color="error" onClick={switchAccount}>
-                <SwitchAccountIcon /> Switch Account
-              </Button>
-            </Box>
-          </div>
-        ) : (
-          <>
-            <Alert severity="error">
-              Please only use your Gmail address to create an account. You can also use your school email address, only
-              if your school email is provided by Google.
-            </Alert>
-            <Box sx={{ width: "100%" }}>
-              <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <Tabs value={isSignUp} onChange={switchSignUp} aria-label="basic tabs" variant="fullWidth">
-                  <Tab label="Sign In" {...a11yProps(0)} />
-                  <Tab label="Sign Up" {...a11yProps(1)} />
-                </Tabs>
+
+      <Box
+        sx={{
+          p: { xs: "0px", width: "100%" },
+          height: "100vh",
+          overflowY: "auto",
+          overflowX: "auto",
+          position: "relative",
+          scrollBehavior: "smooth"
+        }}
+        id="ScrollableContainer"
+      >
+        <Paper
+          sx={{
+            m: "10px 500px 200px 500px",
+            "@media (max-width: 1120px)": {
+              m: "0px"
+            }
+          }}
+        >
+          {emailVerified === "Sent" ? (
+            <div
+              style={{
+                height: "200px",
+                marginTop: "200px",
+                flexDirection: "column",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Box>
+                <p>
+                  We just sent you a verification email. Please click the link in the email to verify and complete your
+                  sign-up.
+                </p>
               </Box>
-              <TabPanel value={isSignUp} index={0}>
-                <Box sx={{ m: "20px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    label="Email address"
-                    onChange={emailChange}
-                    name="email"
-                    value={email}
-                    errorMessage={validEmail ? null : "Please enter your valid email address!"}
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    onChange={passwordChange}
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    label="Password"
-                    errorMessage={
-                      validPassword ? null : "Please enter your desired password with at least 7 characters!"
-                    }
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-              </TabPanel>
-              <TabPanel value={isSignUp} index={1}>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    label="Firstname"
-                    onChange={firstnameChange}
-                    name="firstname"
-                    value={firstname}
-                    errorMessage={validFirstname ? null : "Please enter your firstname!"}
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    label="lastname"
-                    onChange={lastnameChange}
-                    name="lastname"
-                    value={lastname}
-                    errorMessage={validlastname ? null : "Please enter your lastname!"}
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    label="Email address"
-                    onChange={emailChange}
-                    name="email"
-                    value={email}
-                    errorMessage={validEmail ? null : "Please enter your valid email address!"}
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <Autocomplete
-                    className="inputValidate"
-                    id="institution"
-                    value={nameFromInstitutionSelected}
-                    options={institutions}
-                    onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
-                    renderInput={params => (
-                      <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />
-                    )}
-                    getOptionLabel={option => (option.name ? option.name : "")}
-                    renderOption={(props, option) => (
-                      <li key={option.id} {...props}>
-                        {option.name}
-                      </li>
-                    )}
-                    isOptionEqualToValue={(option, value) => option.id === value.id}
-                    fullWidth
-                    sx={{ mb: "16px" }}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    onChange={passwordChange}
-                    name="password"
-                    type="password"
-                    placeholder="Password"
-                    label="Password"
-                    value={password}
-                    errorMessage={
-                      validPassword ? null : "Please enter your desired password with at least 7 characters!"
-                    }
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ m: "0px 20px 0px 20px" }}>
-                  <ValidatedInput
-                    className="inputValidate"
-                    onChange={confirmPasswordChange}
-                    name="ConfirmPassword"
-                    type="password"
-                    placeholder="Re-enter Password"
-                    label="Confirm Password"
-                    value={confirmPassword}
-                    errorMessage={
-                      validConfirmPassword ? null : "Your password and the re-entered password should match!"
-                    }
-                    onKeyPress={onKeyPress}
-                  />
-                </Box>
-                <Box sx={{ mb: "16px", m: "20px 20px 0px 20px" }}>
-                  <Checkbox checked={signUpAgreement} onChange={(_, value) => setSignUpAgreement(value)} />I acknowledge
-                  and agree to 1Cademy's{" "}
-                  <Link
-                    onClick={() => {
-                      setOpenTermsOfUse(true);
-                    }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
-                  >
-                    Terms of Use
-                  </Link>
-                  ,{" "}
-                  <Link
-                    onClick={() => {
-                      setOpenPrivacyPolicy(true);
-                    }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
-                  >
-                    Privacy Policy
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    onClick={() => {
-                      setOpenCookiePolicy(true);
-                    }}
-                    sx={{ cursor: "pointer", textDecoration: "none" }}
-                  >
-                    Cookie Policy
-                  </Link>
-                  .
-                </Box>
-              </TabPanel>
-              {invalidAuth && <div className="Error">{invalidAuth.replace("Firebase:", "")}</div>}
-
-              <div style={{ textAlign: "center", marginTop: "10px" }}>
+              <Box>
                 <Button
-                  id="SignButton"
-                  className={submitable && !isSubmitting ? "Button" : "Button Disabled"}
-                  onClick={signUp}
-                  sx={{ width: isSignUp === 0 ? "150px" : "250" }}
-                  variant="contained"
-                  color="secondary"
-                  disabled={
-                    isSignUp === 0
-                      ? submitable && !isSubmitting
-                        ? null
-                        : true
-                      : submitable && !isSubmitting && signUpAgreement
-                      ? null
-                      : true
-                  }
-                >
-                  {isSignUp === 0 ? "Sign In" : isSubmitting ? "Creating your account..." : " Sign Up"}
-                </Button>
-              </div>
-
-              <Suspense fallback={<div></div>}>
-                <>
-                  <InformedConsent open={openInformedConsent} handleClose={() => setOpenInformedConsent(false)} />
-                  <CookiePolicy open={openCookiePolicy} handleClose={() => setOpenCookiePolicy(false)} />
-                  <PrivacyPolicy open={openPrivacyPolicy} handleClose={() => setOpenPrivacyPolicy(false)} />
-                  <TermsOfUse open={openTermOfUse} handleClose={() => setOpenTermsOfUse(false)} />
-                </>
-              </Suspense>
-              <div style={{ textAlign: "center", marginTop: "10px" }}>
-                <Button
-                  onClick={openForgotPassword}
-                  sx={{ m: "0px 10px 10px 10px" }}
                   variant="contained"
                   color="warning"
+                  onClick={resendVerificationEmail}
+                  style={{ marginRight: "19px" }}
                 >
-                  Forgot Password?
+                  <EmailIcon /> Resend Verification Email
                 </Button>
-              </div>
-              {forgotPassword && (
-                <>
+                <Button variant="contained" color="error" onClick={switchAccount}>
+                  <SwitchAccountIcon /> Switch Account
+                </Button>
+              </Box>
+            </div>
+          ) : (
+            <Box>
+              <Alert severity="error">
+                Please only use your Gmail address to create an account. You can also use your school email address,
+                only if your school email is provided by Google.
+              </Alert>
+              <Box sx={{ width: "100%" }}>
+                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+                  <Tabs value={isSignUp} onChange={switchSignUp} aria-label="basic tabs" variant="fullWidth">
+                    <Tab label="Sign In" {...a11yProps(0)} />
+                    <Tab label="Sign Up" {...a11yProps(1)} />
+                  </Tabs>
+                </Box>
+                <TabPanel value={isSignUp} index={0}>
                   <Box sx={{ m: "20px 20px 0px 20px" }}>
-                    <p>Enter your account email below to receive a password reset link.</p>
                     <ValidatedInput
-                      identification="email"
+                      className="inputValidate"
+                      label="Email address"
+                      onChange={emailChange}
                       name="email"
-                      type="email"
-                      placeholder="Email"
-                      label="Email"
-                      onChange={event => setResetPasswordEmail(event.target.value)}
-                      value={resetPasswordEmail}
-                      errorMessage={passwordResetError}
-                      // autocomplete="off"
+                      value={email}
+                      errorMessage={validEmail ? null : "Please enter your valid email address!"}
+                      onKeyPress={onKeyPress}
                     />
                   </Box>
-                  <div style={{ textAlign: "center", marginTop: "10px" }}>
-                    {isPasswordReset && <h4>Check your email to reset the password.</h4>}
-                  </div>
-                  <div style={{ textAlign: "center", marginTop: "10px" }}>
-                    <Button
-                      id="ForgotPasswordEmailButton"
-                      onClick={handleResetPassword}
-                      className={!isSubmitting && validPasswordResetEmail ? "Button" : "Button Disabled"}
-                      disabled={isSubmitting || !validPasswordResetEmail}
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      onChange={passwordChange}
+                      name="password"
+                      type="password"
+                      placeholder="Password"
+                      label="Password"
+                      errorMessage={
+                        validPassword ? null : "Please enter your desired password with at least 7 characters!"
+                      }
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                </TabPanel>
+                <TabPanel value={isSignUp} index={1}>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      label="Firstname"
+                      onChange={firstnameChange}
+                      name="firstname"
+                      value={firstname}
+                      errorMessage={validFirstname ? null : "Please enter your firstname!"}
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      label="lastname"
+                      onChange={lastnameChange}
+                      name="lastname"
+                      value={lastname}
+                      errorMessage={validlastname ? null : "Please enter your lastname!"}
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      label="Email address"
+                      onChange={emailChange}
+                      name="email"
+                      value={email}
+                      errorMessage={validEmail ? null : "Please enter your valid email address!"}
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <Autocomplete
+                      className="inputValidate"
+                      id="institution"
+                      value={nameFromInstitutionSelected}
+                      options={institutions}
+                      onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
+                      renderInput={params => (
+                        <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />
+                      )}
+                      getOptionLabel={option => (option.name ? option.name : "")}
+                      renderOption={(props, option) => (
+                        <li key={option.id} {...props}>
+                          {option.name}
+                        </li>
+                      )}
+                      isOptionEqualToValue={(option, value) => option.id === value.id}
+                      fullWidth
+                      sx={{ mb: "16px" }}
+                    />
+                  </Box>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      onChange={passwordChange}
+                      name="password"
+                      type="password"
+                      placeholder="Password"
+                      label="Password"
+                      value={password}
+                      errorMessage={
+                        validPassword ? null : "Please enter your desired password with at least 7 characters!"
+                      }
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                  <Box sx={{ m: "0px 20px 0px 20px" }}>
+                    <ValidatedInput
+                      className="inputValidate"
+                      onChange={confirmPasswordChange}
+                      name="ConfirmPassword"
+                      type="password"
+                      placeholder="Re-enter Password"
+                      label="Confirm Password"
+                      value={confirmPassword}
+                      errorMessage={
+                        validConfirmPassword ? null : "Your password and the re-entered password should match!"
+                      }
+                      onKeyPress={onKeyPress}
+                    />
+                  </Box>
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={signUpAgreement} onChange={(_, value) => setSignUpAgreement(value)} />I
+                    acknowledge and agree that any data generated from my use of 1Cademy may be utilized for research
+                    purposes by the investigators at 1Cademy, the University of Michigan School of Information, and
+                    Honor Education.
+                  </Box>
+
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={GDPRAgreement} onChange={(_, value) => setGDPRAgreement(value)} />I acknowledge
+                    and agree to{" "}
+                    <Link
+                      onClick={() => {
+                        setOpenGDPRPolicy(true);
+                      }}
+                      sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
                     >
-                      Send Email
-                    </Button>
-                  </div>
-                </>
-              )}
+                      1Cademy's General Data Protection Regulation (GDPR) Policy.
+                    </Link>
+                  </Box>
+
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={termAgreement} onChange={(_, value) => setTermAgreement(value)} />I acknowledge
+                    and agree to{" "}
+                    <Link
+                      onClick={() => {
+                        setOpenTermsOfUse(true);
+                      }}
+                      sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
+                    >
+                      1Cademy's Terms of Service.
+                    </Link>
+                  </Box>
+
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={privacyAgreement} onChange={(_, value) => setPrivacyAgreement(value)} />I
+                    acknowledge and agree to{" "}
+                    <Link
+                      onClick={() => {
+                        setOpenPrivacyPolicy(true);
+                      }}
+                      sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
+                    >
+                      1Cademy's Privacy Policy.
+                    </Link>
+                  </Box>
+
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={cookieAgreement} onChange={(_, value) => setCookieAgreement(value)} />I
+                    acknowledge and agree to{" "}
+                    <Link
+                      onClick={() => {
+                        setOpenCookiePolicy(true);
+                      }}
+                      sx={{ cursor: "pointer", textDecoration: "none", color: "#ed6c02" }}
+                    >
+                      1Cademy's Cookies Policy.
+                    </Link>
+                  </Box>
+
+                  <Box sx={{ ml: "20px" }}>
+                    <Checkbox checked={ageAgreement} onChange={(_, value) => setAgeAgreement(value)} />I confirm that I
+                    am 18 years of age or older.
+                  </Box>
+                </TabPanel>
+                {invalidAuth && <div className="Error">{invalidAuth.replace("Firebase:", "")}</div>}
+
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <Button
+                    id="SignButton"
+                    className={
+                      submitable &&
+                      !isSubmitting &&
+                      signUpAgreement &&
+                      ageAgreement &&
+                      privacyAgreement &&
+                      termAgreement &&
+                      cookieAgreement &&
+                      GDPRAgreement
+                        ? "Button"
+                        : "Button Disabled"
+                    }
+                    onClick={signUp}
+                    sx={{ width: isSignUp === 0 ? "150px" : "250" }}
+                    variant="contained"
+                    color="secondary"
+                    disabled={
+                      isSignUp === 0
+                        ? submitable && !isSubmitting
+                          ? null
+                          : true
+                        : submitable &&
+                          !isSubmitting &&
+                          signUpAgreement &&
+                          ageAgreement &&
+                          privacyAgreement &&
+                          termAgreement &&
+                          cookieAgreement &&
+                          GDPRAgreement
+                        ? null
+                        : true
+                    }
+                  >
+                    {isSignUp === 0 ? "Sign In" : isSubmitting ? "Creating your account..." : " Sign Up"}
+                  </Button>
+                </div>
+
+                <Suspense fallback={<div></div>}>
+                  <>
+                    <InformedConsent open={openInformedConsent} handleClose={() => setOpenInformedConsent(false)} />
+                    <GDPRPolicy open={openGDPRPolicy} handleClose={() => setOpenGDPRPolicy(false)} />
+                    <CookiePolicy open={openCookiePolicy} handleClose={() => setOpenCookiePolicy(false)} />
+                    <PrivacyPolicy open={openPrivacyPolicy} handleClose={() => setOpenPrivacyPolicy(false)} />
+                    <TermsOfUse open={openTermOfUse} handleClose={() => setOpenTermsOfUse(false)} />
+                  </>
+                </Suspense>
+                <div style={{ textAlign: "center", marginTop: "10px" }}>
+                  <Button
+                    onClick={openForgotPassword}
+                    sx={{ m: "0px 10px 10px 10px" }}
+                    variant="contained"
+                    color="warning"
+                  >
+                    Forgot Password?
+                  </Button>
+                </div>
+                {forgotPassword && (
+                  <>
+                    <Box sx={{ m: "20px 20px 0px 20px" }}>
+                      <p>Enter your account email below to receive a password reset link.</p>
+                      <ValidatedInput
+                        identification="email"
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        label="Email"
+                        onChange={event => setResetPasswordEmail(event.target.value)}
+                        value={resetPasswordEmail}
+                        errorMessage={passwordResetError}
+                        // autocomplete="off"
+                      />
+                    </Box>
+                    <div style={{ textAlign: "center", marginTop: "10px" }}>
+                      {isPasswordReset && <h4>Check your email to reset the password.</h4>}
+                    </div>
+                    <div style={{ textAlign: "center", marginTop: "10px" }}>
+                      <Button
+                        id="ForgotPasswordEmailButton"
+                        onClick={handleResetPassword}
+                        className={!isSubmitting && validPasswordResetEmail ? "Button" : "Button Disabled"}
+                        disabled={isSubmitting || !validPasswordResetEmail}
+                      >
+                        Send Email
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </Box>
             </Box>
-          </>
-        )}
-      </Paper>
+          )}
+        </Paper>
+      </Box>
     </Box>
   );
 };
