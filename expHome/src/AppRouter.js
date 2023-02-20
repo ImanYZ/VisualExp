@@ -57,6 +57,7 @@ import QuizFeedBack from "./Components/Home/QuizFeedBack";
 import SignUpPage from "./Components/Auth/SignUpPage";
 import DissertationGantt from "./Components/DissertationGantt";
 import { isToday } from "./utils/DateFunctions";
+import { getFullname } from "./utils";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
@@ -65,6 +66,7 @@ import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
+import JoinUsIframe from "./Components/Home/JoinUsIframe";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -96,11 +98,12 @@ const AppRouter = props => {
   const [choices, setChoices] = useRecoilState(choicesState);
   const [project, setProject] = useRecoilState(projectState);
   const [institutions, setInstitutions] = useRecoilState(institutionsState);
-  const setHasScheduled = useSetRecoilState(hasScheduledState);
+  const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
   const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
-  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
-  const setResumeUrl = useSetRecoilState(resumeUrlState);
-  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
+  const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
+  const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
+
   const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
@@ -190,6 +193,7 @@ const AppRouter = props => {
           if (!userData.firstname || !userData.lastname) {
             window.location.href = "/";
           }
+          setFullname(getFullname(userData.firstname, userData.lastname));
           if (userData.applicationsSubmitted) {
             setApplicationsSubmitted(userData.applicationsSubmitted);
           }
@@ -236,7 +240,8 @@ const AppRouter = props => {
         setApplicationsSubmitted({});
       }
     });
-  }, [firebase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase, fullname]);
 
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
@@ -460,6 +465,7 @@ const AppRouter = props => {
       <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/DissertationGantt" element={<DissertationGantt />} />
+      <Route path="/JoinUsIframe/*" element={<JoinUsIframe community={props.community} />} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
