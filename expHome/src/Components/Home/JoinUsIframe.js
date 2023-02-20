@@ -95,22 +95,7 @@ const JoinUsIframe = props => {
         applicationProcess,
         uploadError
       },
-      "http://1cademy.com/"
-    );
-
-    window.parent.postMessage(
-      {
-        email,
-        completedExperiment,
-        applicationsSubmitted,
-        hasScheduled,
-        resumeUrl,
-        transcriptUrl,
-        fullname,
-        applicationProcess,
-        uploadError
-      },
-      "http://localhost:3000/"
+      "*"
     );
   }, [
     email,
