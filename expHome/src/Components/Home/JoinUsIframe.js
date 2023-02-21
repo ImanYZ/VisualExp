@@ -95,7 +95,7 @@ const JoinUsIframe = props => {
         applicationProcess,
         uploadError
       },
-      "http://localhost:3000"
+      "http://1cademy.com"
     );
   }, [
     email,
@@ -113,7 +113,7 @@ const JoinUsIframe = props => {
   useEffect(() => {
     const parentResponse = async event => {
       console.log("Visual EXp :: event.origin", event.origin);
-      if (!(event.origin === "http://localhost:3000") && !(event.origin === "http://1cademy.com/")) return;
+      if (!(event.origin === "http://1cademy.com")) return;
       if (event?.data) {
         if (event.data.function === "uploadButton") {
           const { fil, storageFolder, nameFeild } = event.data;
