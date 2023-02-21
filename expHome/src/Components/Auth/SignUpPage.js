@@ -543,13 +543,17 @@ const SignUpPage = props => {
                   <Button
                     id="SignButton"
                     className={
-                      submitable &&
-                      !isSubmitting &&
-                      signUpAgreement &&
-                      privacyAgreement &&
-                      termAgreement &&
-                      cookieAgreement &&
-                      GDPRAgreement
+                      isSignUp === 0
+                        ? submitable && !isSubmitting
+                          ? "Button"
+                          : "Button Disabled"
+                        : submitable &&
+                          !isSubmitting &&
+                          signUpAgreement &&
+                          privacyAgreement &&
+                          termAgreement &&
+                          cookieAgreement &&
+                          GDPRAgreement
                         ? "Button"
                         : "Button Disabled"
                     }
