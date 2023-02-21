@@ -113,7 +113,7 @@ const JoinUsIframe = props => {
   useEffect(() => {
     const parentResponse = async event => {
       console.log("Visual EXp :: event.origin", event.origin);
-      if (!(event.origin === "https://1cademy.com")) return;
+      if (!event.origin.startsWith("https://1cademy.com")) return;
       if (event?.data) {
         if (event.data.function === "uploadButton") {
           const { fil, storageFolder, nameFeild } = event.data;
