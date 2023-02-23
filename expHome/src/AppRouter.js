@@ -193,7 +193,7 @@ const AppRouter = props => {
           if (!userData.firstname || !userData.lastname) {
             window.location.href = "/";
           }
-          setFullname(getFullname(userData.firstname, userData.lastname));
+          setFullname(userDocs.docs[0].id);
           if (userData.applicationsSubmitted) {
             setApplicationsSubmitted(userData.applicationsSubmitted);
           }
