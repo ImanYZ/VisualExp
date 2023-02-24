@@ -1061,7 +1061,7 @@ const reschEventNotificationEmail = async (
           order: FieldValue.delete()
         });
       }
-      // THIS IS WHERE THE SCHEDULE OF THE PARTICIPNAT IN THE resSchedule COLLECTION IS DELETED
+      // THIS IS WHERE WE DELETE THE SCHEDULE OF THE PARTICIPANT IN THE `resSchedule` COLLECTION 
       const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
       const resScheduleDocs = await db
         .collection("resSchedule")
