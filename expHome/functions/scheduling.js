@@ -242,10 +242,10 @@ exports.getOngoingResearcherEvent = async (req, res) => {
       }
 
       const userData = userDocs.docs?.[0]?.data();
-
+      if(!userData) continue;
       let userName = `${userData?.firstname} ${userData?.lastname}`;
 
-      if (userData.prefix) {
+      if (userData.hasOwnProperty("prefix") && userData.prefix) {
         userName =
           userData.prefix +
           ". " +

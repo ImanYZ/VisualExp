@@ -21,7 +21,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
-import { firebaseState, fullnameState } from "../../store/AuthAtoms";
+import { firebaseState, fullnameState, emailState } from "../../store/AuthAtoms";
 
 import SnackbarComp from "../SnackbarComp";
 import PagesNavbar from "./PagesNavbar";
@@ -33,7 +33,7 @@ import instructs from "./tutorialIntroductionQuestions";
 const Tutorial = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-
+  const email = useRecoilValue(emailState);
   const [instructions, setInstructions] = useState([]);
   const [questions, setQuestions] = useState({});
   const [expanded, setExpanded] = useState(0);
@@ -277,6 +277,7 @@ const Tutorial = props => {
         const explaData = {
           fullname,
           instrId,
+          email,
           qId: question.id,
           explanation: question.explanation
         };

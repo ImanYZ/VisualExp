@@ -254,17 +254,17 @@ const ExperimentPoints = props => {
         setSnackbarMessage(
           "Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their 3rd session!"
         );
-      } else {
-        setScheduleError(false);
-        setSnackbarMessage("Your availability is successfully saved in the database!");
-      }
+      } 
       await firebase.idToken()
       await axios.post("/researchers/schedule", {
         fullname,
         project,
         schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD HH:mm"))
       });
+      setScheduleError(false);
+      setSnackbarMessage("Your availability is successfully saved in the database!");
     } catch (error) {
+      setSnackbarMessage("Please Submit Again!"+error);
       console.log(error);
     }
   };

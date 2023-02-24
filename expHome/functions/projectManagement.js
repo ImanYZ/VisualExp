@@ -2061,7 +2061,8 @@ exports.remindCalendarInvitations = async context => {
                         false,
                         true,
                         true,
-                        null
+                        userData.project,
+                        null,
                       );
                     }, waitTime);
                     // Increase waitTime by a random integer between 1 to 4 seconds.
@@ -2208,7 +2209,8 @@ exports.remindCalendarInvitations = async context => {
                     hoursLeft,
                     false,
                     attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
-                    null
+                    null,
+                    userData.project
                   );
                 }, waitTime);
                 waitTime += 1000 * (1 + Math.floor(Math.random() * 4));

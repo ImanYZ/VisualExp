@@ -420,7 +420,7 @@ const FreeRecallGrading = props => {
         </ul>
       </Alert>
       {
-        recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
+        recentParticipants.includes(recallGrades[recallGradeIdx]?.email) ? (
           <Alert severity="error" sx={{
             color: "rgb(95, 33, 32)",
             background: "rgb(253, 237, 237)",

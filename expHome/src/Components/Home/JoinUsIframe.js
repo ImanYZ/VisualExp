@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import {
   firebaseState,
   emailState,
@@ -12,17 +12,17 @@ import {
 import { hasScheduledState, completedExperimentState } from "../../store/ExperimentAtoms";
 
 const JoinUsIframe = props => {
-  const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
-  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
+  const hasScheduled = useRecoilValue(hasScheduledState);
+  const completedExperiment = useRecoilValue(completedExperimentState);
+  const applicationsSubmitted = useRecoilValue(applicationsSubmittedState);
   const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
   const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
   const [applicationProcess, setApplicationProcess] = useState({});
   const [needsUpdate, setNeedsUpdate] = useState(true);
   const [uploadError, setUploadError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [fullname, setFullname] = useRecoilState(fullnameState);
-  const [email, setEmail] = useRecoilState(emailState);
+  const fullname = useRecoilValue(fullnameState);
+  const email = useRecoilValue(emailState);
 
   const firebase = useRecoilValue(firebaseState);
 
@@ -143,6 +143,7 @@ const JoinUsIframe = props => {
           } else {
             await applRef.set({
               fullname,
+              email,
               communiId: communityId,
               explanation,
               createdAt: firebase.firestore.Timestamp.fromDate(new Date())
@@ -176,6 +177,7 @@ const JoinUsIframe = props => {
           } else {
             await applRef.set({
               fullname,
+              email,
               communiId: props.community.id,
               courseraUrl,
               createdAt: firebase.firestore.Timestamp.fromDate(new Date())

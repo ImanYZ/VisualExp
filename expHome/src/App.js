@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
-import { firebaseState, fullnameState } from "./store/AuthAtoms";
+import { firebaseState, fullnameState, emailState } from "./store/AuthAtoms";
 import {
   phaseState,
   stepState,
@@ -51,6 +51,7 @@ const postQuestions = [
 
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
+  const email = useRecoilValue(emailState);
   // eslint-disable-next-line no-unused-vars
   const [fullname, setFullname] = useRecoilState(fullnameState);
   const [phase, setPhase] = useRecoilState(phaseState);
@@ -237,7 +238,7 @@ const App = () => {
     // new logic create recall grades v2 document
     const recallGrades = await firebase.db
       .collection("recallGradesV2")
-      .where("user", "==", fullname)
+      .where("email", "==", email)
       .where("project", "==", userData.project)
       .get();
     let recallGradeRef = firebase.db.collection("recallGradesV2").doc();
@@ -248,7 +249,8 @@ const App = () => {
       done: false,
       createdAt: new Date(),
       project: userData.project,
-      user: fullname
+      user: fullname,
+      email: userData.email
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
@@ -382,13 +384,13 @@ const App = () => {
       const scheduled = resScheduleData.scheduled || {};
       for (const _researcher in scheduled) {
         const participants = Object.keys(scheduled[_researcher] || {});
-        if (participants.includes(fullname)) {
+        if (participants.includes(email)) {
           // this will help us during testing App.js flow
           if (!researcher) {
             researcher = _researcher;
           }
           const currentDate = moment().utcOffset(-4).format("YYYY-MM-DD");
-          const scheduledDate = moment(scheduled[_researcher][fullname][0]).utcOffset(-4, true).format("YYYY-MM-DD");
+          const scheduledDate = moment(scheduled[_researcher][email][0]).utcOffset(-4, true).format("YYYY-MM-DD");
           if (currentDate === scheduledDate) {
             researcher = _researcher;
             break;
@@ -464,6 +466,7 @@ const App = () => {
             project: userData.project,
             fullname: fullname,
             session: session,
+            email: userData.email,
             explanation: response,
             createdAt: new Date(),
             expIdx: index,
@@ -517,7 +520,9 @@ const App = () => {
   };
   useEffect(() => {
     const setAllScores = async () => {
-      const userDoc = await firebase.db.collection("users").doc(fullname).get();
+      const userDocs = await firebase.db.collection("users").where("email", "==", email).get();
+      if (!userDocs.docs.length) return;
+      const userDoc = userDocs.docs[0];
       const userData = userDoc.data();
       const pConditions = userData.pConditions;
       const tempScores = [];
@@ -574,10 +579,10 @@ const App = () => {
   const nextStep = async () => {
     const currentTime = firebase.firestore.Timestamp.fromDate(new Date());
     let userRef, userDoc, userData, pConditions, newStep, userUpdates;
-    if (fullname) {
-      userRef = firebase.db.collection("users").doc(fullname);
-      userDoc = await userRef.get();
-      userData = userDoc.data();
+    if (email) {
+      userDoc = await firebase.db.collection("users").where("email", "==", email).get();
+      userRef = userDoc.docs[0].ref;
+      userData = userDoc.docs[0].data();
       pConditions = userData.pConditions;
     }
     // eslint-disable-next-line default-case
@@ -877,8 +882,9 @@ const App = () => {
     const setUserStatus = () => {
       if (startedSession === 2 || startedSession === 3) {
         setTimeout(async () => {
-          const userDoc = await firebase.db.collection("users").doc(fullname).get();
-          if (userDoc.exists) {
+          const userDocs = await firebase.db.collection("users").where("email", "==", email).get();
+          const userDoc = userDocs.docs[0];
+          if (userDoc.docs.length > 0) {
             const userData = userDoc.data();
             if (
               (userData.gender && userData.step < 11) ||

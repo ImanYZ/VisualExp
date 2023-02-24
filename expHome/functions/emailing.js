@@ -1045,7 +1045,8 @@ const reschEventNotificationEmail = async (
   hoursLeft,
   httpReq,
   declined,
-  res
+  res,
+  project
 ) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
@@ -1060,6 +1061,23 @@ const reschEventNotificationEmail = async (
           order: FieldValue.delete()
         });
       }
+      // THIS IS WHERE THE SCHEDULE OF THE PARTICIPNAT IN THE resSchedule COLLECTION IS DELETED
+      const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
+      const resScheduleDocs = await db
+        .collection("resSchedule")
+        .where("month", "==", month)
+        .where("project", "==", project)
+        .get();
+      const resScheduleDoc = resScheduleDocs.docs[0];
+      const resScheduleData = resScheduleDoc.data();
+      const scheduledUpdate = resScheduleData.scheduled;
+      for (let researcher in scheduledUpdate) {
+        if (scheduledUpdate[researcher].hasOwnProperty(email)) {
+          delete scheduledUpdate[researcher][email];
+        }
+      }
+      const resScheduleRef = db.collection("resSchedule").doc(resScheduleDoc.id);
+      await resScheduleRef.update({ scheduled: scheduledUpdate });
     }
 
     const nameString = await getNameFormatted(email, firstname);
