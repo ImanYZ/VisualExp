@@ -1183,7 +1183,7 @@ const CodeFeedback = props => {
             </h2>
           </Alert>
 
-          {recentParticipants.includes(feedbackCode?.fullname) ? (
+          {recentParticipants.includes(feedbackCode?.email) ? (
             <Alert
               severity="error"
               sx={{

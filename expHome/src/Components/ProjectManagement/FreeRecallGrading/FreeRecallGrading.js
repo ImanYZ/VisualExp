@@ -225,8 +225,8 @@ const FreeRecallGrading = props => {
 
     // sorting researcher's related participants first
     _recallGrades.sort((g1, g2) => {
-        const p1 = recentParticipants.includes(g1.user);
-        const p2 = recentParticipants.includes(g2.user);
+        const p1 = recentParticipants.includes(g1.email);
+        const p2 = recentParticipants.includes(g2.email);
         if(p1 && p2) return 0;
         return p1 && !p2 ? -1 : 1;
     })

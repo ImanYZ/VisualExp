@@ -106,9 +106,9 @@ export const LeaderBoard = ({
       }
       
       let hasRecentParticipantRecalls = false;
-      const unameChunks = chunk(recentParticipants, 10); // firebase has 10 item limit for "where-in"
-      for(const unameChunk of unameChunks) {
-        const recallGrades = await firebase.db.collection("recallGradesV2").where("project", "==", project).where("user", "in", unameChunk).get();
+      const emailChunks = chunk(recentParticipants, 10); // firebase has 10 item limit for "where-in"
+      for(const emailChunk of emailChunks) {
+        const recallGrades = await firebase.db.collection("recallGradesV2").where("project", "==", project).where("email", "in", emailChunk).get();
         for(const recallGrade of recallGrades.docs) {
           const recallGradeData = recallGrade.data();
           for(const sessionKey in recallGradeData.sessions) {
