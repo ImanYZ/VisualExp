@@ -125,7 +125,7 @@ describe("POST /api/participants/schedule", () => {
 
     for (const resSchedule of resSchedules) {
       const resScheduleData = resSchedule.data();
-      totalSlots += Object.values(resScheduleData?.scheduled?.[fullname]?.[participant.fullname] || {}).length;
+      totalSlots += Object.values(resScheduleData?.scheduled?.[fullname]?.[participant.email] || {}).length;
     }
 
     expect(totalSlots).toEqual(4);
@@ -175,7 +175,7 @@ describe("POST /api/participants/schedule", () => {
 
     for (const resSchedule of resSchedules) {
       const resScheduleData = resSchedule.data();
-      totalSlots += Object.values(resScheduleData?.scheduled?.[fullname]?.[participant.fullname] || {}).length;
+      totalSlots += Object.values(resScheduleData?.scheduled?.[fullname]?.[participant.email] || {}).length;
     }
 
     expect(totalSlots).toEqual(4);
