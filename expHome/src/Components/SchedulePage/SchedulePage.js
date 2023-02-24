@@ -100,12 +100,15 @@ const SchedulePage = props => {
       let isSurvey = false;
       // We need to first retrieve which project this user belongs to.
 
-      let userDoc = await firebase.db.collection("users").doc(fullname).get();
-
-      if (!userDoc.exists) {
-        userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
+      let userDocs = await firebase.db.collection("users").where("email", "==", email).get();
+      if (!userDocs.docs.length) {
+        userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", email).get();
         isSurvey = true;
       }
+
+      if (!userDocs.docs.length) return;
+      const userDoc = userDocs.docs[0];
+
       const userData = userDoc.data();
       const project = userData.project;
       if (isSurvey) {
@@ -136,15 +139,17 @@ const SchedulePage = props => {
       let availSessions = {};
 
       const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-      const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
-      if(!scheduleMonths.includes(scheduleEnd)) {
+      const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD");
+      if (!scheduleMonths.includes(scheduleEnd)) {
         scheduleMonths.push(scheduleEnd);
       }
 
       // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db.collection("resSchedule")
+      const resScheduleDocs = await firebase.db
+        .collection("resSchedule")
         .where("month", "in", scheduleMonths)
-        .where("project", "==", project).get();
+        .where("project", "==", project)
+        .get();
 
       let schedules = {};
       let scheduledByResearchers = {};
@@ -181,7 +186,7 @@ const SchedulePage = props => {
           
           for(const participant in _scheduled[scheduledResearcher]) {
             // we don't check already booked sessions for current participant
-            if(participant === fullname) {
+            if(participant === email) {
               continue;
             }
             const scheduledSlotsByParticipant = _scheduled[scheduledResearcher][participant];
@@ -318,16 +323,15 @@ const SchedulePage = props => {
     try {
       setIsSubmitting(true);
 
-      const userRef = firebase.db.collection("users").doc(fullname);
-      let userDoc = await userRef.get();
+      let userDocs = await firebase.db.collection("users").where("email", "==", email).get();
 
-      if (!userDoc.exists) {
-        const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
-        userDoc = await userRef.get();
+      if (!userDocs.docs.length) {
+        userDocs = await firebase.db.collection("usersStudentCoNoteSurvey").where("email", "==", email).get();
       }
 
       let responseObj = null;
-      if (userDoc.exists) {
+      if (userDocs.docs.length > 0) {
+        let userDoc = userDocs.docs[0];
         const userData = userDoc.data();
         if (userData.projectDone) {
           setParticipatedBefore(true);
@@ -351,7 +355,9 @@ const SchedulePage = props => {
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
-      alert("Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu");
+      alert(
+        "Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu"
+      );
     }
   };
 

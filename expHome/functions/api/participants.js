@@ -16,7 +16,7 @@ participantsRouter.use(isParticipant);
 participantsRouter.post("/schedule", async (req, res) => {
   try {
     let { sessions, project } = req.body;
-    const { fullname, email } = req.userData;
+    const { email } = req.userData;
     const batch = db.batch();
     
     sessions.sort((a, b) => a < b ? -1 : 1); // asc sorting
@@ -72,7 +72,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         for(const participant in resScheduled[researcher]) {
           const __scheduled = Object.values(resScheduled[researcher][participant]);
           for (const scheduledSlot of __scheduled) {
-            if (!availableScheduleByResearchers[scheduledSlot] || participant === fullname) {
+            if (!availableScheduleByResearchers[scheduledSlot] || participant === email) {
               continue;
             }
             if (availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
@@ -93,9 +93,9 @@ participantsRouter.post("/schedule", async (req, res) => {
       const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
       const resScheduleData = resScheduleDataByMonth[month];
 
-      for(const researcher in resScheduleData.scheduled) {
-        if(resScheduleData.scheduled?.[researcher]?.[fullname]) {
-          resScheduleData.scheduled[researcher][fullname] = {};
+      for (const researcher in resScheduleData.scheduled) {
+        if (resScheduleData.scheduled?.[researcher]?.[email]) {
+          resScheduleData.scheduled[researcher][email] = {};
         }
       }
 
@@ -175,14 +175,14 @@ participantsRouter.post("/schedule", async (req, res) => {
       }
       const scheduled = resScheduleData.scheduled[researcher];
 
-      if(!resScheduleData.scheduled[researcher][fullname]) {
-        resScheduleData.scheduled[researcher][fullname] = {};
+      if (!resScheduleData.scheduled[researcher][email]) {
+        resScheduleData.scheduled[researcher][email] = {};
       }
-      const participantScheduled = scheduled[fullname];
+      const participantScheduled = scheduled[email];
 
       const _participantScheduled = Object.values(participantScheduled);
       _participantScheduled.push(bookedSlot);
-      scheduled[fullname] = _participantScheduled.reduce((c, v, i) => ({...c, [i]: v}), {})
+      scheduled[email] = _participantScheduled.reduce((c, v, i) => ({ ...c, [i]: v }), {});
     }
 
     for(const month in resScheduleRefsByMonth) {
