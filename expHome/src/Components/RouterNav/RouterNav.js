@@ -236,7 +236,6 @@ const RouterNav = props => {
             oldGraNums[researcher] = { num: graNums[researcher] };
           }
           delete oldGraNums["Iman YeckehZaare"];
-          console.log(oldGraNums);
           const maxGraNum = Math.max(...Object.values(oldGraNums).map(({ num }) => num));
           for (let researcher in oldGraNums) {
             if(researcher === "Iman YeckehZaare") continue ; 
