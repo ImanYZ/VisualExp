@@ -235,8 +235,10 @@ const RouterNav = props => {
           for (let researcher in graNums) {
             oldGraNums[researcher] = { num: graNums[researcher] };
           }
+          delete oldGraNums["Iman YeckehZaare"];
           const maxGraNum = Math.max(...Object.values(oldGraNums).map(({ num }) => num));
           for (let researcher in oldGraNums) {
+            if(researcher === "Iman YeckehZaare") continue ; 
             oldGraNums[researcher].percent = Math.round(((oldGraNums[researcher].num * 100.0) / maxGraNum) * 100) / 100;
           }
           return oldGraNums;
