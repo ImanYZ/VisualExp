@@ -224,13 +224,16 @@ const FreeRecallGrading = props => {
     }
 
     // sorting researcher's related participants first
-    _recallGrades.sort((g1, g2) => {
+    if (recentParticipants.length > 0) {
+      _recallGrades.sort((g1, g2) => {
         const p1 = recentParticipants.includes(g1.user);
         const p2 = recentParticipants.includes(g2.user);
-        if(p1 && p2) return 0;
+        if (p1 && p2) return 0;
         return p1 && !p2 ? -1 : 1;
-    })
-
+      });
+    } else {
+      _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
+    }
     setRecallGrades(_recallGrades);
     setRecallGradeIdx(0);
     setSubmitting(false);
