@@ -2,6 +2,7 @@ const { app } = require("firebase-admin");
 const fs = require("fs");
 const csv = require("fast-csv");
 const { v4: uuidv4 } = require("uuid");
+const { Configuration, OpenAIApi } = require("openai");
 
 const {
   admin,
@@ -1967,6 +1968,227 @@ exports.convertRsearchersProject = async (req, res) => {
     }
     await commitBatch();
     console.log("Done");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.generateTheCSVfileChatGTP = async (req, res) => {
+  try {
+    const rowData = [
+      [
+        "Response",
+        "Phrase",
+        "chatGPT grade",
+        "Majority Of votes",
+        "Other Researchers grades",
+        "Satisfied the boolean expression",
+        "chatGPT Explanation",
+      ],
+    ];
+    let row;
+    const recallGradesV2Docs = await db.collection("recallGradesV2").get();
+    let numBot = 0;
+    recallGradesV2Docs.docs.forEach((recallDoc) => {
+      const recallV2Data = recallDoc.data();
+      for (let session in recallV2Data.sessions) {
+        for (
+          let condition = 0;
+          condition < recallV2Data.sessions[session].length;
+          condition++
+        ) {
+          if (!recallV2Data.sessions[session][condition]) continue;
+          for (let phrase in recallV2Data.sessions[session][condition]
+            .phrases) {
+            row = [];
+            if (
+              !recallV2Data.sessions[session][condition].phrases[phrase]
+                .researchers ||
+              !recallV2Data.sessions[session][condition].phrases[phrase]
+                .researchers.length
+            )
+              continue;
+            //response
+            row.push(recallV2Data.sessions[session][condition].response);
+
+            //phrase
+            row.push(
+              recallV2Data.sessions[session][condition].phrases[phrase].phrase
+            );
+
+            //majority of votes (three/four out of four agreement, excluding the bot)
+            const botIndex = recallV2Data.sessions[session][condition].phrases[
+              phrase
+            ].researchers.findIndex((r) => r === "Iman YeckehZaare");
+            let grades =
+              recallV2Data.sessions[session][condition].phrases[phrase].grades;
+            if (botIndex > -1) {
+              numBot = numBot + 1;
+              grades = recallV2Data.sessions[session][condition].phrases[
+                phrase
+              ].grades.filter((r, i) => i !== botIndex);
+            } 
+
+            const countTrue = grades.filter((r) => r === true).length;
+            const countFalse = grades.filter((r) => r === false).length;
+            if (countTrue >= 3) {
+              row.push("true");
+            } else if (countFalse >= 3) {
+              row.push("false");
+            } else {
+              row.push("undecided");
+            }
+            //bot grade
+
+            //Each of the other four researchers' grades
+            row.push(
+              grades.map((grade) => (grade ? "true" : "false")).join(",")
+            );
+
+            //satisfied
+
+            row.push(
+              recallV2Data.sessions[session][condition].phrases[phrase]
+                .satisfied
+            );
+
+            if(recallV2Data.sessions[session][condition].phrases[phrase].hasOwnProperty("chatGPTGrade")){
+              row.push(
+                recallV2Data.sessions[session][condition].phrases[phrase].chatGPTGrade
+              );
+            }
+            // console.log(row[4]);
+            if (row[4] !== "undecided") {
+              rowData.push(row);
+            }
+          }
+        }
+      }
+    });
+    csv
+      .writeToPath("chatGPTRecallGrades.csv", rowData, { headers: true })
+      .on("finish", () => {
+        console.log("Done!");
+      });
+    console.log("numBot :: : ", numBot);
+  } catch (err) {
+    console.log({ err });
+    return res.status(400).json({ err });
+  }
+  return res.status(200).json({ done: true });
+};
+
+exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
+  try {
+    console.log("start");
+    const configuration = new Configuration({
+      apiKey: "",
+    });
+    const openai = new OpenAIApi(configuration);
+
+    const passageTextbyID = {};
+
+    const passageDocs = await db.collection("passages").get();
+    passageDocs.forEach((passageDoc) => {
+      const passageData = passageDoc.data();
+      passageTextbyID[passageDoc.id] = passageData.text;
+    });
+
+    const recallGradesV2Docs = await db.collection("recallGradesV2").get();
+
+    recallGradesV2Docs.forEach(async (recallDoc) => {
+      const recallV2Data = recallDoc.data();
+      const sessionsUpdate = recallV2Data.sessions;
+      for (let session in recallV2Data.sessions) {
+        for (
+          let condition = 0;
+          condition < recallV2Data.sessions[session].length;
+          condition++
+        ) {
+          const response = recallV2Data.sessions[session][condition].response;
+          const passageText =
+            passageTextbyID[recallV2Data.sessions[session][condition].passage];
+          for (let indexPhrase in recallV2Data.sessions[session][condition]
+            .phrases) {
+            if (
+              !recallV2Data.sessions[session][condition].phrases[indexPhrase] ||
+              !recallV2Data.sessions[session][condition].phrases[indexPhrase]
+                .researchers ||
+              !recallV2Data.sessions[session][condition].phrases[indexPhrase]
+                .researchers.length
+            )
+              continue;
+            const phrase =
+              recallV2Data.sessions[session][condition].phrases[indexPhrase]
+                .phrase;
+            let grades =
+              recallV2Data.sessions[session][condition].phrases[indexPhrase]
+                .grades;
+            const botIndex = recallV2Data.sessions[session][condition].phrases[
+              indexPhrase
+            ].researchers.findIndex((r) => r === "Iman YeckehZaare");
+            if (botIndex > -1) {
+              grades = grades.splice(botIndex, 1);
+            }
+            const countTrue = grades.filter((r) => r === true).length;
+            const countFalse = grades.filter((r) => r === false).length;
+            if (countTrue < 3 && countFalse < 3) continue;
+            const chatGPTRequest =
+              `We asked a student to learn the following passage and write whatever they recall. The passage is in triple-quote:\n` +
+              `'''\n` +
+              `${passageText}` +
+              `'''\n` +
+              `The student's response is bellow in triple-quotes:\n` +
+              +`'''\n` +
+              `${response}` +
+              `'''\n` +
+              `Respond whether the student has mentioned the key phrase` +
+              `"` +
+              `${phrase}` +
+              `"\n` +
+              `If they have mentioned it, respond YES, otherwise NO.\n
+            Your response should include two lines, separated by a new line character.\n
+            In the first line, only print YES or NO. Do not add any more explanations.\n
+            In the next line of your response, explain why you answered YES or NO in the previous line. `;
+
+            const completion = await openai.createCompletion({
+              model: "text-davinci-003",
+              prompt: chatGPTRequest,
+              max_tokens: 1000,
+            });
+
+            const responseFromChatGPT = completion.data.choices[0].text;
+            console.log("***");
+            console.log(
+              responseFromChatGPT.trim(),
+              "Resulte:",
+              responseFromChatGPT.trim().slice(0, 3)
+            );
+            console.log("***");
+
+            const grade =
+              responseFromChatGPT.trim().slice(0, 3).toLowerCase() === "yes"
+                ? true
+                : false;
+            const explanation = responseFromChatGPT
+              .trim()
+              .slice(3)
+              .split(".")
+              .join(".");
+            sessionsUpdate[session][condition].phrases[
+              indexPhrase
+            ].chatGPTGrade = grade;
+            sessionsUpdate[session][condition].phrases[
+              indexPhrase
+            ].chatGPTExplanation = explanation;
+          }
+        }
+      }
+      const recallGradesRef = db.collection("recallGradesV2").doc(recallDoc.id);
+      await batchUpdate(recallGradesRef, { sessions: sessionsUpdate });
+    });
+    await commitBatch();
+    console.log("Done:");
   } catch (error) {
     console.log(error);
   }
