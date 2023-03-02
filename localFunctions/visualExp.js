@@ -1979,8 +1979,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       [
         "Response",
         "Phrase",
-        "chatGPT grade",
         "Majority Of votes",
+        "chatGPT grade",
         "Other Researchers grades",
         "Satisfied the boolean expression",
         "chatGPT Explanation",
@@ -2031,14 +2031,30 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
 
             const countTrue = grades.filter((r) => r === true).length;
             const countFalse = grades.filter((r) => r === false).length;
+
+            //majority of votes (three/four out of four agreement, excluding the bot)
+
             if (countTrue >= 3) {
               row.push("true");
             } else if (countFalse >= 3) {
               row.push("false");
             } else {
+              continue;
               row.push("undecided");
             }
-            //bot grade
+          //chatGPT grade
+          if (
+            recallV2Data.sessions[session][condition].phrases[
+              phrase
+            ].hasOwnProperty("chatGPTGrade")
+          ) {
+            row.push(
+              recallV2Data.sessions[session][condition].phrases[phrase]
+                .chatGPTGrade
+            );
+          } else {
+            row.push("NAN");
+          }
 
             //Each of the other four researchers' grades
             row.push(
@@ -2046,21 +2062,29 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
             );
 
             //satisfied
-
-            row.push(
-              recallV2Data.sessions[session][condition].phrases[phrase]
-                .satisfied
-            );
-
-            if(recallV2Data.sessions[session][condition].phrases[phrase].hasOwnProperty("chatGPTGrade")){
+            if(recallV2Data.sessions[session][condition].phrases[phrase].hasOwnProperty("satisfied")){
               row.push(
-                recallV2Data.sessions[session][condition].phrases[phrase].chatGPTGrade
+                recallV2Data.sessions[session][condition].phrases[phrase]
+                  .satisfied
               );
+            }else{
+              row.push("NAN");
             }
-            // console.log(row[4]);
-            if (row[4] !== "undecided") {
-              rowData.push(row);
+           
+            if (
+              recallV2Data.sessions[session][condition].phrases[
+                phrase
+              ].hasOwnProperty("chatGPTExplanation")
+            ) {
+              row.push(
+                recallV2Data.sessions[session][condition].phrases[phrase]
+                  .chatGPTExplanation
+              );
+            } else {
+              row.push("NAN");
             }
+
+            rowData.push(row);
           }
         }
       }
