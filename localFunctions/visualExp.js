@@ -2175,7 +2175,7 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
               messages: [{role: "user", content: chatGPTRequest}],
               });
 
-            const responseFromChatGPT = completion.data.choices[0].message;
+            const responseFromChatGPT = completion.data.choices[0].message.content;
             console.log("***");
             console.log(
               responseFromChatGPT.trim(),
