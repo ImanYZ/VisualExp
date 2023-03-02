@@ -69,7 +69,7 @@ const FreeRecallGrading = props => {
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
-    
+
     if (!text) return;
     let keys = {};
 
@@ -127,12 +127,12 @@ const FreeRecallGrading = props => {
     }
 
     // sorting boolean expressions based on votes
-    for(const phrase in booleanHashMap) {
+    for (const phrase in booleanHashMap) {
       booleanHashMap[phrase].sort((e1, e2) => {
         const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
         const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
         return e1Vote < e2Vote ? 1 : -1; // desc order
-      })
+      });
     }
 
     const nonSatisfiedPhrases = [];
@@ -164,8 +164,14 @@ const FreeRecallGrading = props => {
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
         // pick only 4 wrong phrases
-        phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
-        setRandomizedPhrases(phrases);
+        console.log(phrases);
+        if (fullname !== gptResearcher) {
+          phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
+          setRandomizedPhrases(phrases);
+        } else {
+          setRandomizedPhrases(phrases);
+        }
+
         setProcessing(false);
       }
     })();
@@ -192,7 +198,7 @@ const FreeRecallGrading = props => {
 
     for (const recallGradeDoc of recallGrades.docs) {
       const recallGradeData = recallGradeDoc.data();
-      
+
       let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
         parseInt(sessionKey.replace(/[^0-9]+/g, ""))
       );
@@ -208,7 +214,7 @@ const FreeRecallGrading = props => {
           if (
             recallGradeData.user !== fullname &&
             (conditionItem.researchers.length < 4 || gptResearcher === fullname) &&
-            !conditionItem.researchers.includes(fullname) &&
+            (!conditionItem.researchers.includes(fullname) || gptResearcher === fullname) &&
             filtered.length > 2
           ) {
             _recallGrades.push({
@@ -222,9 +228,8 @@ const FreeRecallGrading = props => {
         }
       }
     }
-
     // sorting researcher's related participants first
-    if (recentParticipants.length > 0) {
+    if (recentParticipants.length > 0 && gptResearcher !== fullname) {
       _recallGrades.sort((g1, g2) => {
         const p1 = recentParticipants.includes(g1.user);
         const p2 = recentParticipants.includes(g2.user);
