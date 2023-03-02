@@ -1977,6 +1977,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
   try {
     const rowData = [
       [
+        "Passage_id",
         "Response",
         "Phrase",
         "Majority Of votes",
@@ -2000,7 +2001,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
           if (!recallV2Data.sessions[session][condition]) continue;
           for (let phrase in recallV2Data.sessions[session][condition]
             .phrases) {
-            row = [];
+            row = [recallV2Data.sessions[session][condition].passage];
             if (
               !recallV2Data.sessions[session][condition].phrases[phrase]
                 .researchers ||
@@ -2119,7 +2120,7 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
     });
 
     const recallGradesV2Docs = await db.collection("recallGradesV2").get();
-
+    let counter = 0;
     recallGradesV2Docs.forEach(async (recallDoc) => {
       const recallV2Data = recallDoc.data();
       const sessionsUpdate = recallV2Data.sessions;
@@ -2158,30 +2159,23 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
             const countFalse = grades.filter((r) => r === false).length;
             if (countTrue < 3 && countFalse < 3) continue;
             const chatGPTRequest =
-              `We asked a student to learn the following passage and write whatever they recall. The passage is in triple-quote:\n` +
-              `'''\n` +
-              `${passageText}` +
-              `'''\n` +
-              `The student's response is bellow in triple-quotes:\n` +
+              `Is the phrase` +
+              `"` +
+              `${phrase}` +
+              `" mentioned in the following triple-quoted text?` +
               +`'''\n` +
               `${response}` +
               `'''\n` +
-              `Respond whether the student has mentioned the key phrase` +
-              `"` +
-              `${phrase}` +
-              `"\n` +
-              `If they have mentioned it, respond YES, otherwise NO.\n
-            Your response should include two lines, separated by a new line character.\n
-            In the first line, only print YES or NO. Do not add any more explanations.\n
-            In the next line of your response, explain why you answered YES or NO in the previous line. `;
+              `Your response should include two lines, separated by a new line character.\n
+              In the first line, only print YES or NO. Do not add any more explanations.\n
+              In the next line of your response, explain why you answered YES or NO in the previous line.`;
 
-            const completion = await openai.createCompletion({
-              model: "text-davinci-003",
-              prompt: chatGPTRequest,
-              max_tokens: 1000,
-            });
+            const completion = await openai.createChatCompletion({
+              model: "gpt-3.5-turbo",
+              messages: [{role: "user", content: chatGPTRequest}],
+              });
 
-            const responseFromChatGPT = completion.data.choices[0].text;
+            const responseFromChatGPT = completion.data.choices[0].message;
             console.log("***");
             console.log(
               responseFromChatGPT.trim(),
@@ -2189,6 +2183,7 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
               responseFromChatGPT.trim().slice(0, 3)
             );
             console.log("***");
+            console.log(counter++);
 
             const grade =
               responseFromChatGPT.trim().slice(0, 3).toLowerCase() === "yes"
@@ -2209,9 +2204,8 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
         }
       }
       const recallGradesRef = db.collection("recallGradesV2").doc(recallDoc.id);
-      await batchUpdate(recallGradesRef, { sessions: sessionsUpdate });
+      await recallGradesRef.update({ sessions: sessionsUpdate });
     });
-    await commitBatch();
     console.log("Done:");
   } catch (error) {
     console.log(error);
