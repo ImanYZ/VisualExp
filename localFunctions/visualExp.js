@@ -2110,7 +2110,7 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
   try {
     console.log("start");
     const configuration = new Configuration({
-      apiKey: "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",
+      apiKey: "",
     });
     const openai = new OpenAIApi(configuration);
 
