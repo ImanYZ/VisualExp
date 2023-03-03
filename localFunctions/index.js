@@ -90,6 +90,8 @@ app.get("/convertRsearchersProject",convertRsearchersProject);
 app.get("/generateTheCSVfileChatGTP",generateTheCSVfileChatGTP);
 app.get("/gradeRecallGradesV2ChatGPT", gradeRecallGradesV2ChatGPT);
 
+app.get("/removeTheBotsVotes",removeTheBotsVotes);
+
 const port = 8080;
 app.listen(port, () => {
   console.log("1Cademy local Express server for one-time functions!", port);

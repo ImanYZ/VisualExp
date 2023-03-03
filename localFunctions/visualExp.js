@@ -2214,3 +2214,42 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.removeTheBotsVotes = async (req, res) => {
+  try {
+    const gptResearcher = "Iman YeckehZaare";
+
+    const _recallGrades = await db.collection("recallGradesV2").get();
+    for (const recallGrade of _recallGrades.docs) {
+      const recallGradeData = recallGrade.data();
+
+      for (const session in recallGradeData.sessions) {
+        for (const conditionItem of recallGradeData.sessions[session]) {
+          for (const phrase of conditionItem.phrases) {
+            if(!phrase.researchers) continue;
+            const researcherIdx = phrase.researchers.indexOf(gptResearcher);
+            if (researcherIdx !== -1) {
+              phrase.researchers.splice(researcherIdx, 1);
+              phrase.grades.splice(researcherIdx, 1);
+            }
+          }
+           if(conditionItem.researcher){
+            const rmResearcherIdx =
+            conditionItem.researchers.indexOf(gptResearcher);
+             conditionItem.researchers.splice(rmResearcherIdx, 1);
+           }
+
+        }
+      }
+
+      const recallRef = db.collection("recallGradesV2").doc(recallGrade.id);
+      await batchUpdate(recallRef, {
+        sessions: recallGradeData.sessions,
+      });
+    }
+
+    await commitBatch();
+  } catch (error) {
+    console.log(error);
+  }
+};
