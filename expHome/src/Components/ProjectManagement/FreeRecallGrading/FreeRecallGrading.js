@@ -213,8 +213,7 @@ const FreeRecallGrading = props => {
             .filter(w => w.trim());
           if (
             recallGradeData.user !== fullname &&
-            (conditionItem.researchers.length < 4 || gptResearcher === fullname) &&
-            (!conditionItem.researchers.includes(fullname) || gptResearcher === fullname) &&
+            !conditionItem.researchers.includes(fullname) &&
             filtered.length > 2
           ) {
             _recallGrades.push({
@@ -244,19 +243,6 @@ const FreeRecallGrading = props => {
     setSubmitting(false);
   };
 
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useEffect(async () => {
-  //   const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
-  //   if (recallGradesLogsDoc.exists) {
-  //     const recallGradesLogsData = recallGradesLogsDoc.data();
-  //     if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
-  //       // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
-  //       // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
-  //       // setShowTheSchemaGen(true);
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (firebase) {
       loadedRecallGrades();
@@ -267,6 +253,7 @@ const FreeRecallGrading = props => {
   useEffect(() => {
     (async () => {
       const passageId = recallGrades?.[recallGradeIdx]?.passage;
+      console.log("passageId ::: :: ",recallGrades)
       if (!passages[passageId]) {
         const passageDoc = await firebase.db.collection("passages").doc(passageId).get();
         setPassages(passages => {
