@@ -1981,6 +1981,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
         "Response",
         "Phrase",
         "Majority Of votes",
+        "Davinci-02",
         "chatGPT grade",
         "Other Researchers grades",
         "Satisfied the boolean expression",
@@ -2023,8 +2024,10 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
             ].researchers.findIndex((r) => r === "Iman YeckehZaare");
             let grades =
               recallV2Data.sessions[session][condition].phrases[phrase].grades;
+            let botGrade = "";
             if (botIndex > -1) {
               numBot = numBot + 1;
+              botGrade = grades[botIndex];
               grades = recallV2Data.sessions[session][condition].phrases[
                 phrase
               ].grades.filter((r, i) => i !== botIndex);
@@ -2041,8 +2044,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               row.push("false");
             } else {
               continue;
-              row.push("undecided");
             }
+            row.push(botGrade);
           //chatGPT grade
           if (
             recallV2Data.sessions[session][condition].phrases[
