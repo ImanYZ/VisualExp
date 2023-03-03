@@ -164,7 +164,6 @@ const FreeRecallGrading = props => {
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
         // pick only 4 wrong phrases
-        console.log(phrases);
         if (fullname !== gptResearcher) {
           phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
           setRandomizedPhrases(phrases);
@@ -253,7 +252,6 @@ const FreeRecallGrading = props => {
   useEffect(() => {
     (async () => {
       const passageId = recallGrades?.[recallGradeIdx]?.passage;
-      console.log("passageId ::: :: ",recallGrades)
       if (!passages[passageId]) {
         const passageDoc = await firebase.db.collection("passages").doc(passageId).get();
         setPassages(passages => {
