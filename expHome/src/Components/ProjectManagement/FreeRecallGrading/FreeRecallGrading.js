@@ -164,7 +164,6 @@ const FreeRecallGrading = props => {
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
         // pick only 4 wrong phrases
-        console.log(phrases);
         if (fullname !== gptResearcher) {
           phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
           setRandomizedPhrases(phrases);
@@ -213,8 +212,7 @@ const FreeRecallGrading = props => {
             .filter(w => w.trim());
           if (
             recallGradeData.user !== fullname &&
-            (conditionItem.researchers.length < 4 || gptResearcher === fullname) &&
-            (!conditionItem.researchers.includes(fullname) || gptResearcher === fullname) &&
+            !conditionItem.researchers.includes(fullname) &&
             filtered.length > 2
           ) {
             _recallGrades.push({
@@ -243,19 +241,6 @@ const FreeRecallGrading = props => {
     setRecallGradeIdx(0);
     setSubmitting(false);
   };
-
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useEffect(async () => {
-  //   const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
-  //   if (recallGradesLogsDoc.exists) {
-  //     const recallGradesLogsData = recallGradesLogsDoc.data();
-  //     if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
-  //       // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
-  //       // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
-  //       // setShowTheSchemaGen(true);
-  //     }
-  //   }
-  // }, []);
 
   useEffect(() => {
     if (firebase) {
