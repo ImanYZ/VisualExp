@@ -192,12 +192,17 @@ describe("POST /api/researchers/gradeRecalls", () => {
     
     for(let researcher of researchers.docs) {
       const researcherData = researcher.data();
-      if(agreeingResearchers.includes(researcher.id)) {
-        expect(researcherData.projects[project].gradingPoints).toEqual(0.5); // agreement points
-      } else if(gptResearcher === researcher.id) { // gpt researcher should not get points
+      if(gptResearcher === researcher.id) { // gpt researcher should not get points
         expect(researcherData.projects[project].gradingPoints).toEqual(undefined);
+      } else if(agreeingResearchers.includes(researcher.id)) {
+        expect(researcherData.projects[project].gradingPoints).toEqual(0.5); // agreement points
       }
     }
+
+    const _recallGradeData = (await recallGradeRef.get()).data();
+    const _conditionItem = _recallGradeData.sessions["1st"][conditionIdx];
+    const _phrase = _conditionItem.phrases.find((phrase) => phrase.phrase === "Barn owl's life depends on hearing");
+    expect(_phrase.researchers.includes(gptResearcher)).toBeTruthy();
 
     // resetting recall grading and users
     await Promise.all([mockResearchers.clean(), mockUsers.clean()]);

@@ -213,6 +213,7 @@ const FreeRecallGrading = props => {
           if (
             recallGradeData.user !== fullname &&
             !conditionItem.researchers.includes(fullname) &&
+            (conditionItem.researchers.length < 4 || fullname === gptResearcher) &&
             filtered.length > 2
           ) {
             _recallGrades.push({
