@@ -1978,6 +1978,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
     const rowData = [
       [
         "Passage_id",
+        "Response_id",
         "Response",
         "Phrase",
         "Majority Of votes",
@@ -2002,7 +2003,10 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
           if (!recallV2Data.sessions[session][condition]) continue;
           for (let phrase in recallV2Data.sessions[session][condition]
             .phrases) {
-            row = [recallV2Data.sessions[session][condition].passage];
+            row = [
+              recallV2Data.sessions[session][condition].passage,
+              recallDoc.id,
+            ];
             if (
               !recallV2Data.sessions[session][condition].phrases[phrase]
                 .researchers ||
@@ -2031,7 +2035,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               grades = recallV2Data.sessions[session][condition].phrases[
                 phrase
               ].grades.filter((r, i) => i !== botIndex);
-            } 
+            }
 
             const countTrue = grades.filter((r) => r === true).length;
             const countFalse = grades.filter((r) => r === false).length;
@@ -2046,19 +2050,19 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               continue;
             }
             row.push(botGrade);
-          //chatGPT grade
-          if (
-            recallV2Data.sessions[session][condition].phrases[
-              phrase
-            ].hasOwnProperty("chatGPTGrade")
-          ) {
-            row.push(
-              recallV2Data.sessions[session][condition].phrases[phrase]
-                .chatGPTGrade
-            );
-          } else {
-            row.push("NAN");
-          }
+            //chatGPT grade
+            if (
+              recallV2Data.sessions[session][condition].phrases[
+                phrase
+              ].hasOwnProperty("chatGPTGrade")
+            ) {
+              row.push(
+                recallV2Data.sessions[session][condition].phrases[phrase]
+                  .chatGPTGrade
+              );
+            } else {
+              row.push("NAN");
+            }
 
             //Each of the other four researchers' grades
             row.push(
@@ -2066,15 +2070,19 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
             );
 
             //satisfied
-            if(recallV2Data.sessions[session][condition].phrases[phrase].hasOwnProperty("satisfied")){
+            if (
+              recallV2Data.sessions[session][condition].phrases[
+                phrase
+              ].hasOwnProperty("satisfied")
+            ) {
               row.push(
                 recallV2Data.sessions[session][condition].phrases[phrase]
                   .satisfied
               );
-            }else{
+            } else {
               row.push("NAN");
             }
-           
+
             if (
               recallV2Data.sessions[session][condition].phrases[
                 phrase
@@ -2175,10 +2183,11 @@ exports.gradeRecallGradesV2ChatGPT = async (req, res) => {
 
             const completion = await openai.createChatCompletion({
               model: "gpt-3.5-turbo",
-              messages: [{role: "user", content: chatGPTRequest}],
-              });
+              messages: [{ role: "user", content: chatGPTRequest }],
+            });
 
-            const responseFromChatGPT = completion.data.choices[0].message.content;
+            const responseFromChatGPT =
+              completion.data.choices[0].message.content;
             console.log("***");
             console.log(
               responseFromChatGPT.trim(),
@@ -2226,29 +2235,28 @@ exports.removeTheBotsVotes = async (req, res) => {
       for (const session in recallGradeData.sessions) {
         for (const conditionItem of recallGradeData.sessions[session]) {
           for (const phrase of conditionItem.phrases) {
-            if(!phrase.researchers) continue;
+            if (!phrase.researchers) continue;
             const researcherIdx = phrase.researchers.indexOf(gptResearcher);
             if (researcherIdx !== -1) {
               phrase.researchers.splice(researcherIdx, 1);
               phrase.grades.splice(researcherIdx, 1);
             }
           }
-           if(conditionItem.researcher){
+          if (conditionItem.researcher) {
             const rmResearcherIdx =
-            conditionItem.researchers.indexOf(gptResearcher);
-             conditionItem.researchers.splice(rmResearcherIdx, 1);
-           }
-
+              conditionItem.researchers.indexOf(gptResearcher);
+            conditionItem.researchers.splice(rmResearcherIdx, 1);
+          }
         }
       }
 
       const recallRef = db.collection("recallGradesV2").doc(recallGrade.id);
-      await batchUpdate(recallRef, {
+      await recallRef.update({
         sessions: recallGradeData.sessions,
       });
     }
 
-    await commitBatch();
+    console.log("Done.");
   } catch (error) {
     console.log(error);
   }
