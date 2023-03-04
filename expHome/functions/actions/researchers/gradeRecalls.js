@@ -86,8 +86,10 @@ module.exports = async (req, res) => {
         // removing gpt user from docResearchers and docGrades
         // gpt user should not be counted for approval or for done phrases
         const gptIdx = docResearchers.indexOf(gptResearcher);
+        let gptGrade = false;
         if(gptIdx !== -1) {
           docResearchers.splice(gptIdx, 1);
+          gptGrade = docGrades[gptIdx];
           docGrades.splice(gptIdx, 1);
         }
 
@@ -115,6 +117,12 @@ module.exports = async (req, res) => {
         const wasPresented = viewedPhrases.includes(phrase.phrase);
         phrase.grades = [...docGrades]
         phrase.researchers = [...docResearchers]
+
+        // pushing gpt user after 
+        if(gptIdx !== -1) {
+          phrase.grades.push(gptGrade);
+          phrase.researchers.push(gptResearcher);
+        }
 
         if(wasPresented) {
           phrase.grades.push(grade)
