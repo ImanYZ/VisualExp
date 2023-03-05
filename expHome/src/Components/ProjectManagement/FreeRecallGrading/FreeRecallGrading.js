@@ -21,8 +21,9 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
-import { toOrdinal } from "number-to-words";
+import _ from "lodash";
 import { fetchRecentParticipants } from "../../../utils/researcher";
+import { consumeRecallGradesChanges } from "../../../utils/helpers";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -187,65 +188,41 @@ const FreeRecallGrading = props => {
     const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
-    const recallGrades = await firebase.db
+    const recallGradesQ = firebase.db
       .collection("recallGradesV2")
       .where("project", "==", project)
-      .where("done", "==", false)
-      .get();
+      .where("done", "==", false);
 
-    let _recallGrades = [];
+    return recallGradesQ.onSnapshot((snapshot) => {
+      const changedDocs = snapshot.docChanges();
 
-    for (const recallGradeDoc of recallGrades.docs) {
-      const recallGradeData = recallGradeDoc.data();
+      setRecallGrades((recallGrades) => {
+        let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
 
-      let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
-        parseInt(sessionKey.replace(/[^0-9]+/g, ""))
-      );
-      sessionNums.sort((a, b) => (a < b ? -1 : 1));
-
-      for (const sessionNum of sessionNums) {
-        if (!sessionNum) continue;
-        for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
-          const filtered = (conditionItem.response || "")
-            .replace(/[\.,]/g, " ")
-            .split(" ")
-            .filter(w => w.trim());
-          if (
-            recallGradeData.user !== fullname &&
-            !conditionItem.researchers.includes(fullname) &&
-            (conditionItem.researchers.length < 4 || fullname === gptResearcher) &&
-            filtered.length > 2
-          ) {
-            _recallGrades.push({
-              docId: recallGradeDoc.id,
-              session: toOrdinal(sessionNum),
-              user: recallGradeData.user,
-              project: recallGradeData.project,
-              ...conditionItem
-            });
-          }
+        // sorting researcher's related participants first
+        if (recentParticipants.length > 0 && gptResearcher !== fullname) {
+          _recallGrades.sort((g1, g2) => {
+            const p1 = recentParticipants.includes(g1.user);
+            const p2 = recentParticipants.includes(g2.user);
+            if (p1 && p2) return 0;
+            return p1 && !p2 ? -1 : 1;
+          });
+        } else {
+          _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
         }
-      }
-    }
-    // sorting researcher's related participants first
-    if (recentParticipants.length > 0 && gptResearcher !== fullname) {
-      _recallGrades.sort((g1, g2) => {
-        const p1 = recentParticipants.includes(g1.user);
-        const p2 = recentParticipants.includes(g2.user);
-        if (p1 && p2) return 0;
-        return p1 && !p2 ? -1 : 1;
+  
+        console.log(_recallGrades, "_recallGrades")
+        return _recallGrades;
       });
-    } else {
-      _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
-    }
-    setRecallGrades(_recallGrades);
-    setRecallGradeIdx(0);
-    setSubmitting(false);
+      
+      setRecallGradeIdx(0);
+      setSubmitting(false);
+    });
   };
 
   useEffect(() => {
     if (firebase) {
-      loadedRecallGrades();
+      return loadedRecallGrades();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase]);
