@@ -202,14 +202,14 @@ const RecallForIman = props => {
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {majorityDifferentThanBot.length > 0 &&
             majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
-              return <>{grade ? "true" : "false"} </>;
+              return <>{grade ? "YES" : "NO"} </>;
             })}
         </Paper>
-        <Box>The bot’s grade</Box>
+        <Box>Iman's grade</Box>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade
-            ? "true"
-            : "false"}
+            ? "YES"
+            : "NO"}
         </Paper>
         <Button onClick={previousPhrase} className="Button" variant="contained" color="success" id="recall-submit">
           Previous
@@ -256,12 +256,12 @@ const RecallForIman = props => {
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {noMajority.length > 0 &&
             noMajority[indexOfNoMajority].grades.map(grade => {
-              return <>{grade ? "true" : "false"} </>;
+              return <>{grade ? "YES" : "NO"} </>;
             })}
         </Paper>
-        <Box>The bot’s grade</Box>
+        <Box>Iman's grade</Box>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "true" : "false"}
+          {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
         </Paper>
         <Button
           onClick={previousPhraseMajority}
