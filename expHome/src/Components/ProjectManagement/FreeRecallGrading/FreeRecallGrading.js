@@ -211,7 +211,6 @@ const FreeRecallGrading = props => {
           _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
         }
   
-        console.log(_recallGrades, "_recallGrades")
         return _recallGrades;
       });
       
