@@ -217,7 +217,7 @@ const FreeRecallGrading = props => {
           _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
         }
 
-        if(_recallGrades?.[0] && recallBotId !== _recallGrades?.[0]?.gptInstance && !_recallGrades?.[0]?.gptInstance) {
+        if(_recallGrades?.[0] && recallBotId !== _recallGrades?.[0]?.gptInstance && !_recallGrades?.[0]?.gptInstance && gptResearcher === fullname) {
           firebase.db.runTransaction(async (t) => {
             const recallGradeRef = firebase.db.collection("recallGradesV2").doc(_recallGrades?.[0]?.docId);
             const recallGrade = await t.get(recallGradeRef);
