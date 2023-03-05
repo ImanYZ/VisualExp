@@ -59,6 +59,7 @@ import DissertationGantt from "./Components/DissertationGantt";
 import { isToday } from "./utils/DateFunctions";
 import { getFullname } from "./utils";
 
+
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
 import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
@@ -67,6 +68,8 @@ import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
 import JoinUsIframe from "./Components/Home/JoinUsIframe";
+
+
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -516,6 +519,7 @@ const AppRouter = props => {
               <Route path="Activities/Experiments" element={<Activities activityName="Experiments" />} />
               <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
               <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
+              <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
               <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
               <Route
                 path="Activities/FreeRecallGrading"
