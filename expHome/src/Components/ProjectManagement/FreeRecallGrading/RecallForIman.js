@@ -188,7 +188,7 @@ const RecallForIman = props => {
     <Box sx={{ mb: "15px", ml: "15px" }}>
       <Box>
         <Typography variant="h5" component="h5">
-          They have three or four grades, but the majority of votes disagrees with my grade, assigned by the bot :
+          They have three or four grades, but the majority of votes disagrees with Iman grade :
         </Typography>
         {"\n"}
         <Box>OriginalPassgae :</Box>
