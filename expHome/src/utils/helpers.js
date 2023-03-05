@@ -101,6 +101,7 @@ const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, gptResearche
 }
 
 const consumeRecallGradesChanges = (changes, recallGrades, fullname, gptResearcher) => {
+  const recallBotId = localStorage.getItem("recall-bot-id");
   let _recallGrades = [...recallGrades];
   for (const change of changes) {
     const recallGradeDoc = change.doc;
@@ -113,6 +114,12 @@ const consumeRecallGradesChanges = (changes, recallGrades, fullname, gptResearch
 
       const __recallGrades = getRecallConditionsByRecallGrade(recallGradeDoc, fullname, gptResearcher);
       for(const __recallGrade of __recallGrades) {
+        // if its bot then we need to check if these recalls are being processed by other bot instance
+        if(gptResearcher === fullname) {
+          if(__recallGrade.gptInstance && __recallGrade.gptInstance !== recallBotId) {
+            continue;
+          }
+        }
         _recallGrades.push(__recallGrade);
       }
     } else if(change.type === "modified") {

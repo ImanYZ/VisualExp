@@ -59,6 +59,7 @@ const FreeRecallGrading = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [recallGrades, setRecallGrades] = useState([]);
   const [recallGradeIdx, setRecallGradeIdx] = useState(0);
+  const [recallGradeSId, setRecallGradeSId] = useState("");
   const [passages, setPassages] = useState({});
 
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
@@ -175,7 +176,7 @@ const FreeRecallGrading = props => {
         setProcessing(false);
       }
     })();
-  }, [recallGradeIdx, passages]);
+  }, [recallGradeSId, passages]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -188,13 +189,18 @@ const FreeRecallGrading = props => {
     const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
-    const recallGradesQ = firebase.db
+    let recallGradesQ = firebase.db
       .collection("recallGradesV2")
-      .where("project", "==", project)
-      .where("done", "==", false);
+      .where("project", "==", project);
+    if(fullname !== gptResearcher) {
+      recallGradesQ = recallGradesQ
+        .where("done", "==", false);
+    }
 
     return recallGradesQ.onSnapshot((snapshot) => {
       const changedDocs = snapshot.docChanges();
+
+      const recallBotId = localStorage.getItem("recall-bot-id");
 
       setRecallGrades((recallGrades) => {
         let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
@@ -210,7 +216,23 @@ const FreeRecallGrading = props => {
         } else {
           _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
         }
-  
+
+        if(_recallGrades?.[0] && recallBotId !== _recallGrades?.[0]?.gptInstance && !_recallGrades?.[0]?.gptInstance) {
+          firebase.db.runTransaction(async (t) => {
+            const recallGradeRef = firebase.db.collection("recallGradesV2").doc(_recallGrades?.[0]?.docId);
+            const recallGrade = await t.get(recallGradeRef);
+            const recallGradeData = recallGrade.data();
+            const session = recallGradeData.sessions[_recallGrades?.[0]?.session];
+            const conditionItem = session.find((conditionItem) => conditionItem.passage === _recallGrades?.[0]?.passage);
+            if(conditionItem && !conditionItem.gptInstance) {
+              conditionItem.gptInstance = recallBotId;
+            }
+            t.update(recallGradeRef, {
+              sessions: recallGradeData.sessions
+            });
+          })
+        }
+        setRecallGradeSId(`${_recallGrades?.[0]?.docId}-${_recallGrades?.[0]?.session}-${_recallGrades?.[0]?.passage}`)
         return _recallGrades;
       });
       
@@ -220,6 +242,11 @@ const FreeRecallGrading = props => {
   };
 
   useEffect(() => {
+    let recallBotId = localStorage.getItem("recall-bot-id");
+    if(!recallBotId) {
+      recallBotId = String(new Date().getTime());
+      localStorage.setItem("recall-bot-id", recallBotId);
+    }
     if (firebase) {
       return loadedRecallGrades();
     }
@@ -283,7 +310,7 @@ const FreeRecallGrading = props => {
         setProcessing(true);
       }
       setRandomizedPhrases([]);
-      setRecallGradeIdx(recallGradeIdx + 1);
+      // setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
     } catch (err) {
