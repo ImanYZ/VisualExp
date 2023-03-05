@@ -21,8 +21,9 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
-import { toOrdinal } from "number-to-words";
+import _ from "lodash";
 import { fetchRecentParticipants } from "../../../utils/researcher";
+import { consumeRecallGradesChanges } from "../../../utils/helpers";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -58,6 +59,7 @@ const FreeRecallGrading = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [recallGrades, setRecallGrades] = useState([]);
   const [recallGradeIdx, setRecallGradeIdx] = useState(0);
+  const [recallGradeSId, setRecallGradeSId] = useState("");
   const [passages, setPassages] = useState({});
 
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
@@ -174,7 +176,7 @@ const FreeRecallGrading = props => {
         setProcessing(false);
       }
     })();
-  }, [recallGradeIdx, passages]);
+  }, [recallGradeSId, passages]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -187,64 +189,66 @@ const FreeRecallGrading = props => {
     const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
-    const recallGrades = await firebase.db
+    let recallGradesQ = firebase.db
       .collection("recallGradesV2")
-      .where("project", "==", project)
-      .where("done", "==", false)
-      .get();
+      .where("project", "==", project);
+    if(fullname !== gptResearcher) {
+      recallGradesQ = recallGradesQ
+        .where("done", "==", false);
+    }
 
-    let _recallGrades = [];
+    return recallGradesQ.onSnapshot((snapshot) => {
+      const changedDocs = snapshot.docChanges();
 
-    for (const recallGradeDoc of recallGrades.docs) {
-      const recallGradeData = recallGradeDoc.data();
+      const recallBotId = localStorage.getItem("recall-bot-id");
 
-      let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
-        parseInt(sessionKey.replace(/[^0-9]+/g, ""))
-      );
-      sessionNums.sort((a, b) => (a < b ? -1 : 1));
+      setRecallGrades((recallGrades) => {
+        let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
 
-      for (const sessionNum of sessionNums) {
-        if (!sessionNum) continue;
-        for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
-          const filtered = (conditionItem.response || "")
-            .replace(/[\.,]/g, " ")
-            .split(" ")
-            .filter(w => w.trim());
-          if (
-            recallGradeData.user !== fullname &&
-            !conditionItem.researchers.includes(fullname) &&
-            filtered.length > 2
-          ) {
-            _recallGrades.push({
-              docId: recallGradeDoc.id,
-              session: toOrdinal(sessionNum),
-              user: recallGradeData.user,
-              project: recallGradeData.project,
-              ...conditionItem
-            });
-          }
+        // sorting researcher's related participants first
+        if (recentParticipants.length > 0 && gptResearcher !== fullname) {
+          _recallGrades.sort((g1, g2) => {
+            const p1 = recentParticipants.includes(g1.user);
+            const p2 = recentParticipants.includes(g2.user);
+            if (p1 && p2) return 0;
+            return p1 && !p2 ? -1 : 1;
+          });
+        } else {
+          _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
         }
-      }
-    }
-    // sorting researcher's related participants first
-    if (recentParticipants.length > 0 && gptResearcher !== fullname) {
-      _recallGrades.sort((g1, g2) => {
-        const p1 = recentParticipants.includes(g1.user);
-        const p2 = recentParticipants.includes(g2.user);
-        if (p1 && p2) return 0;
-        return p1 && !p2 ? -1 : 1;
+
+        if(_recallGrades?.[0] && recallBotId !== _recallGrades?.[0]?.gptInstance && !_recallGrades?.[0]?.gptInstance && gptResearcher === fullname) {
+          firebase.db.runTransaction(async (t) => {
+            const recallGradeRef = firebase.db.collection("recallGradesV2").doc(_recallGrades?.[0]?.docId);
+            const recallGrade = await t.get(recallGradeRef);
+            const recallGradeData = recallGrade.data();
+            const session = recallGradeData.sessions[_recallGrades?.[0]?.session];
+            const conditionItem = session.find((conditionItem) => conditionItem.passage === _recallGrades?.[0]?.passage);
+            if(conditionItem && !conditionItem.gptInstance) {
+              conditionItem.gptInstance = recallBotId;
+            }
+            t.update(recallGradeRef, {
+              sessions: recallGradeData.sessions
+            });
+          })
+        }
+        setRecallGradeSId(`${_recallGrades?.[0]?.docId}-${_recallGrades?.[0]?.session}-${_recallGrades?.[0]?.passage}`)
+        return _recallGrades;
       });
-    } else {
-      _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
-    }
-    setRecallGrades(_recallGrades);
-    setRecallGradeIdx(0);
-    setSubmitting(false);
+      
+      setRecallGradeIdx(0);
+      setSubmitting(false);
+    });
   };
 
   useEffect(() => {
+    let recallBotId = localStorage.getItem("recall-bot-id");
+    if(!recallBotId) {
+      recallBotId = String(new Date().getTime());
+      localStorage.setItem("recall-bot-id", recallBotId);
+    }
     if (firebase) {
-      loadedRecallGrades();
+      return loadedRecallGrades();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase]);
@@ -306,7 +310,7 @@ const FreeRecallGrading = props => {
         setProcessing(true);
       }
       setRandomizedPhrases([]);
-      setRecallGradeIdx(recallGradeIdx + 1);
+      // setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
     } catch (err) {
