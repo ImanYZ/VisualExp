@@ -57,9 +57,7 @@ const RecallForIman = props => {
               if (trueVotes === falseVotes && _grades.length >= 4) {
                 _noMajority.push({
                   ...phraseItem,
-                  grades: _grades.filter(
-                    (grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)
-                  ),
+                  grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
                   botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
                   Response: conditionItem.response,
                   session: session,
@@ -82,9 +80,7 @@ const RecallForIman = props => {
                 _majorityDifferentThanBot.push({
                   ...phraseItem,
                   botGrade: _grades.slice()[_researchers.indexOf(gptResearcher)],
-                  grades: _grades.filter(
-                    (grade, index) =>  index !== phraseItem.researchers.indexOf(gptResearcher)
-                  ),
+                  grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
                   Response: conditionItem.response,
                   session: session,
                   condition: conditionIndex,
@@ -142,29 +138,39 @@ const RecallForIman = props => {
   };
 
   const voteOnPhraseMajority1 = async vote => {
-    const majorityDifferentData = majorityDifferentThanBot[indexOfmajorityDifferentThanBot];
+    try {
+      const majorityDifferentData = majorityDifferentThanBot[indexOfmajorityDifferentThanBot];
 
-    const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.id);
-    const recallDoc = await recallgradeRef.get();
-    console.log("recallData", recallDoc.data());
-    const sessions = recallDoc.data().sessions;
-    sessions[majorityDifferentData.session][majorityDifferentData.condition].phrases[
-      majorityDifferentData.phraseIndex
-    ].majority = vote = "yes" ? true : false;
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.id);
+      const recallDoc = await recallgradeRef.get();
+      console.log("recallData", recallDoc.data());
+      const sessions = recallDoc.data().sessions;
+      sessions[majorityDifferentData.session][majorityDifferentData.condition].phrases[
+        majorityDifferentData.phraseIndex
+      ].majority = vote === "yes" ? true : false;
 
-    await recallgradeRef.update({ sessions });
+      await recallgradeRef.update({ sessions });
+      setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
   const voteOnPhraseMajority2 = async vote => {
-    const noMajorityData = noMajority[indexOfNoMajority];
+    try {
+      const noMajorityData = noMajority[indexOfNoMajority];
 
-    const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.id);
-    const recallDoc = await recallgradeRef.get();
-    console.log("recallData", recallDoc.data());
-    const sessions = recallDoc.data().sessions;
-    sessions[noMajorityData.session][noMajorityData.condition].phrases[noMajorityData.phraseIndex].majority = vote =
-      "yes" ? true : false;
+      const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.id);
+      const recallDoc = await recallgradeRef.get();
+      console.log("recallData", recallDoc.data());
+      const sessions = recallDoc.data().sessions;
+      sessions[noMajorityData.session][noMajorityData.condition].phrases[noMajorityData.phraseIndex].majority =
+        vote === "yes" ? true : false;
 
-    await recallgradeRef.update({ sessions });
+      await recallgradeRef.update({ sessions });
+      setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
   if (!majorityDifferentThanBot.length)
     return (
@@ -211,10 +217,10 @@ const RecallForIman = props => {
             ? "YES"
             : "NO"}
         </Paper>
-        <Button onClick={previousPhrase} className="Button" variant="contained" color="success" id="recall-submit">
+        <Button disabled={indexOfmajorityDifferentThanBot === 0} onClick={previousPhrase} className="Button" variant="contained" color="success" id="recall-submit">
           Previous
         </Button>
-        <Button onClick={nextPhrase} className="Button" variant="contained" color="success" id="recall-submit">
+        <Button disabled={indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1}  onClick={nextPhrase} className="Button" variant="contained" color="success" id="recall-submit">
           Next
         </Button>
         <Button
@@ -269,10 +275,18 @@ const RecallForIman = props => {
           variant="contained"
           color="success"
           id="recall-submit"
+          disabled={indexOfNoMajority === 0}
         >
           Previous
         </Button>
-        <Button onClick={nextPhraseMajority} className="Button" variant="contained" color="success" id="recall-submit">
+        <Button
+          disabled={indexOfNoMajority === noMajority.length - 1}
+          onClick={nextPhraseMajority}
+          className="Button"
+          variant="contained"
+          color="success"
+          id="recall-submit"
+        >
           Next
         </Button>
         <Button
