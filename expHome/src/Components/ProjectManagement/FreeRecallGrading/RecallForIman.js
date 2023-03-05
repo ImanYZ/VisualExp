@@ -58,7 +58,7 @@ const RecallForIman = props => {
                 _noMajority.push({
                   ...phraseItem,
                   grades: _grades.filter(
-                    (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
+                    (grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)
                   ),
                   botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
                   Response: conditionItem.response,
@@ -83,7 +83,7 @@ const RecallForIman = props => {
                   ...phraseItem,
                   botGrade: _grades.slice()[_researchers.indexOf(gptResearcher)],
                   grades: _grades.filter(
-                    (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
+                    (grade, index) =>  index !== phraseItem.researchers.indexOf(gptResearcher)
                   ),
                   Response: conditionItem.response,
                   session: session,
