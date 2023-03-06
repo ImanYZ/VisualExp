@@ -38,6 +38,7 @@ const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "AddAdministrator",
 const AdminAccessPages = [
   { page: "Intellectual", view: <ExpenseReports /> },
   { page: "Experiments", view: <ManageEvents /> },
+  { page: "RecallForIman", view: <RecallForIman /> }
 ];
 
 const CommonPages = [
@@ -50,7 +51,6 @@ const CommonPages = [
   { page: "CodeFeedback", view: <CodeFeedback /> },
   { page: "ResearcherPassage", view: <ResearcherPassage /> },
   { page: "SchemaGenerationTool", view: <SchemaGeneration /> },
-  { page: "RecallForIman", view: <RecallForIman /> }
 ];
 
 const Activities = props => {
