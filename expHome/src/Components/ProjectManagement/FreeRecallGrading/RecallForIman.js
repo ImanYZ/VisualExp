@@ -190,7 +190,7 @@ const RecallForIman = props => {
     <Box sx={{ mb: "15px", ml: "15px" }}>
       <Box>
         <Typography variant="h5" component="h5">
-          They have three or four grades, but the majority of votes disagrees with Iman grade :
+          The Response has three or four grades, but the majority of votes disagrees with Iman's grade :
         </Typography>
         {"\n"}
         <Box>OriginalPassgae :</Box>
@@ -259,7 +259,7 @@ const RecallForIman = props => {
       </Box>
       <Box sx={{ mt: "15px" }}>
         <Typography variant="h5" component="h5">
-          The Response have four grades, but do not satisfy the majority of votes :
+          The Response has four grades, but do not satisfy the majority of votes :
         </Typography>
         <Box>OriginalPassgae :</Box>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
