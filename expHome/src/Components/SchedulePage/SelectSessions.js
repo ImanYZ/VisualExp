@@ -31,57 +31,6 @@ if (end > 23) {
   end = 23;
 }
 
-/* 
-  consecutiveTimeSlotsExists is a function that takes an
-  array of dates and return the first slot that is consecutive
-
-  ******* PARAMS ********
-  slots: an array of dates, must be sorted in ascending order.
-  count: number of consecutive slots that we want to check for
-  slotDifference: minutes of a slot, ususally 30 mins.
-*/
-const consecutiveTimeSlotsExists = (availableSessions = {}, slots = [], count = 1, slotDifference = 30) => {
-  // loop through all the slots
-  for (let i = 0; i < slots.length; ++i) {
-    // have a variable to know in the end of the below loop
-    // wether we have a consecutive array or not
-    // be default set to true, and set to false if next entries are not consecutive.
-    let exists = true;
-
-    // looping to check the next elements of array to be consecutive
-    // j represents the nth next element of the current element represented by i.
-    for (let j = 0; j < count; ++j) {
-      // if [i + j] don't exist then set to false and break
-      // convert slotDifference minutes into timestamp seconds and multiply with j
-      // if we add this to the current time slot this should be equal to the next jth element
-      if (!slots[i + j] || slots[i].getTime() + slotDifference * j * 60000 !== slots[i + j].getTime()) {
-        exists = false;
-        break;
-      }
-
-      // TODO: this logic only works with 2 consecutive time slots
-      // should choose same researcher for each session
-      const researchersOfSlot1 = availableSessions[new Date(slots[i]).toLocaleString()] || [];
-      const researchersOfSlot2 = availableSessions[new Date(slots[i + j]).toLocaleString()] || [];
-      let hasSameResearcher = false;
-      for(const researcherFullname of researchersOfSlot2) {
-        hasSameResearcher = researchersOfSlot1.includes(researcherFullname);
-        if(hasSameResearcher) {
-          break;
-        }
-      }
-      if(!hasSameResearcher) {
-        exists = false;
-        break;
-      }
-    }
-    if (exists) {
-      return slots[i];
-    }
-  }
-  return null;
-};
-
 // A wrapper around ScheduleSelector to label available, unavailable, selected,
 // and 1st, 2nd, and 3rd sessions that satisfy the experiment criteria.
 // It also sets props.setFirstSession, props.setSecondSession, and
@@ -125,13 +74,13 @@ const SelectSessions = props => {
           const duration = props.sessionDuration[i];
           const addDays = i === 0 ? 0 : props.daysLater[i - 1];
           
-          const slotDate = moment(scheduleItem).add(addDays, "days").format("YYYY-MM-DD");
+          const slotDate = moment(scheduleItem).utcOffset(-4).add(addDays, "days").format("YYYY-MM-DD");
           requiredSlots[slotDate] = duration;
         }
 
         for(const requiredSlotDate in requiredSlots) {
           // checking first slot
-          const scheduleIdx = orderedSch.findIndex((schedule) => moment(schedule).format("YYYY-MM-DD") === requiredSlotDate);
+          const scheduleIdx = orderedSch.findIndex((schedule) => moment(schedule).utcOffset(-4).format("YYYY-MM-DD") === requiredSlotDate);
           if(scheduleIdx === -1) {
             sessionsFound = false;
             break;
@@ -145,7 +94,7 @@ const SelectSessions = props => {
               (schedule, idx) => {
                 const availableSession = props.availableSessions[new Date(schedule).toLocaleString()];
                 const r = idx > scheduleIdx &&
-                moment(schedule).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).add(30 * i, "minutes").format("YYYY-MM-DD HH:mm") &&
+                moment(schedule).utcOffset(-4).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).utcOffset(-4).add(30 * i, "minutes").format("YYYY-MM-DD HH:mm") &&
                 availableSession.filter((researcher) => researchers.indexOf(researcher) !== -1).length;
 
                 // only calculate intersaction if current slot coming up consectively and has common researcher
