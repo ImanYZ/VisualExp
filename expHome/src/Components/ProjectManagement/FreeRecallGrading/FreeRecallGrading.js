@@ -21,8 +21,9 @@ import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
 
 import SchemaGenRecalls from "../SchemaGeneration/SchemaGenRecalls";
-import { toOrdinal } from "number-to-words";
+import _ from "lodash";
 import { fetchRecentParticipants } from "../../../utils/researcher";
+import { consumeRecallGradesChanges } from "../../../utils/helpers";
 
 // Group grading participants' free-recall responses by researchers.
 // - Each free-recall response should be compared with every signle key phrase
@@ -41,6 +42,8 @@ const FreeRecallGrading = props => {
   const fullname = useRecoilValue(fullnameState);
   const project = useRecoilValue(projectState);
 
+  const gptResearcher = "Iman YeckehZaare";
+
   // When the paper gets loaded and every time the researcher submits their
   // answer, we should retrive the next free-recall response for them to
   // evaluate. This states helps us signal the useEffect to invoke
@@ -56,6 +59,7 @@ const FreeRecallGrading = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [recallGrades, setRecallGrades] = useState([]);
   const [recallGradeIdx, setRecallGradeIdx] = useState(0);
+  const [recallGradeSId, setRecallGradeSId] = useState("");
   const [passages, setPassages] = useState({});
 
   const [notSatisfiedPhrases, setNotSatisfiedPhrases] = useState([]);
@@ -67,7 +71,7 @@ const FreeRecallGrading = props => {
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
-    
+
     if (!text) return;
     let keys = {};
 
@@ -125,12 +129,12 @@ const FreeRecallGrading = props => {
     }
 
     // sorting boolean expressions based on votes
-    for(const phrase in booleanHashMap) {
+    for (const phrase in booleanHashMap) {
       booleanHashMap[phrase].sort((e1, e2) => {
         const e1Vote = (e1.upVotes || 0) - (e1.downVotes || 0);
         const e2Vote = (e2.upVotes || 0) - (e2.downVotes || 0);
         return e1Vote < e2Vote ? 1 : -1; // desc order
-      })
+      });
     }
 
     const nonSatisfiedPhrases = [];
@@ -162,12 +166,17 @@ const FreeRecallGrading = props => {
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
         // pick only 4 wrong phrases
-        phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
-        setRandomizedPhrases(phrases);
+        if (fullname !== gptResearcher) {
+          phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
+          setRandomizedPhrases(phrases);
+        } else {
+          setRandomizedPhrases(phrases);
+        }
+
         setProcessing(false);
       }
     })();
-  }, [recallGradeIdx, passages]);
+  }, [recallGradeSId, passages]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
 
@@ -180,75 +189,63 @@ const FreeRecallGrading = props => {
     const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
-    const recallGrades = await firebase.db
-      .collection("recallGradesV2")
-      .where("project", "==", project)
-      .where("done", "==", false)
-      .get();
-
-    let _recallGrades = [];
-
-    for (const recallGradeDoc of recallGrades.docs) {
-      const recallGradeData = recallGradeDoc.data();
-      
-      let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
-        parseInt(sessionKey.replace(/[^0-9]+/g, ""))
-      );
-      sessionNums.sort((a, b) => (a < b ? -1 : 1));
-
-      for (const sessionNum of sessionNums) {
-        if (!sessionNum) continue;
-        for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
-          const filtered = (conditionItem.response || "")
-            .replace(/[\.,]/g, " ")
-            .split(" ")
-            .filter(w => w.trim());
-          if (
-            recallGradeData.user !== fullname &&
-            !conditionItem.researchers.includes(fullname) &&
-            filtered.length > 2
-          ) {
-            _recallGrades.push({
-              docId: recallGradeDoc.id,
-              session: toOrdinal(sessionNum),
-              user: recallGradeData.user,
-              project: recallGradeData.project,
-              ...conditionItem
-            });
-          }
-        }
-      }
+    let recallGradesQ = firebase.db.collection("recallGradesV2");
+    if (fullname !== gptResearcher) {
+      recallGradesQ = recallGradesQ.where("project", "==", project).where("done", "==", false);
     }
 
-    // sorting researcher's related participants first
-    _recallGrades.sort((g1, g2) => {
-        const p1 = recentParticipants.includes(g1.user);
-        const p2 = recentParticipants.includes(g2.user);
-        if(p1 && p2) return 0;
-        return p1 && !p2 ? -1 : 1;
-    })
+    return recallGradesQ.onSnapshot((snapshot) => {
+      const changedDocs = snapshot.docChanges();
 
-    setRecallGrades(_recallGrades);
-    setRecallGradeIdx(0);
-    setSubmitting(false);
+      const recallBotId = localStorage.getItem("recall-bot-id");
+
+      setRecallGrades((recallGrades) => {
+        let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
+
+        // sorting researcher's related participants first
+        if (recentParticipants.length > 0 && gptResearcher !== fullname) {
+          _recallGrades.sort((g1, g2) => {
+            const p1 = recentParticipants.includes(g1.user);
+            const p2 = recentParticipants.includes(g2.user);
+            if (p1 && p2) return 0;
+            return p1 && !p2 ? -1 : 1;
+          });
+        } else {
+          _recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
+        }
+
+        if(_recallGrades?.[0] && recallBotId !== _recallGrades?.[0]?.gptInstance && !_recallGrades?.[0]?.gptInstance && gptResearcher === fullname) {
+          firebase.db.runTransaction(async (t) => {
+            const recallGradeRef = firebase.db.collection("recallGradesV2").doc(_recallGrades?.[0]?.docId);
+            const recallGrade = await t.get(recallGradeRef);
+            const recallGradeData = recallGrade.data();
+            const session = recallGradeData.sessions[_recallGrades?.[0]?.session];
+            const conditionItem = session.find((conditionItem) => conditionItem.passage === _recallGrades?.[0]?.passage);
+            if(conditionItem && !conditionItem.gptInstance) {
+              conditionItem.gptInstance = recallBotId;
+            }
+            t.update(recallGradeRef, {
+              sessions: recallGradeData.sessions
+            });
+          })
+        }
+        setRecallGradeSId(`${_recallGrades?.[0]?.docId}-${_recallGrades?.[0]?.session}-${_recallGrades?.[0]?.passage}`)
+        return _recallGrades;
+      });
+      
+      setRecallGradeIdx(0);
+      setSubmitting(false);
+    });
   };
 
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useEffect(async () => {
-  //   const recallGradesLogsDoc = await firebase.db.collection("recallGradesLogs").doc(fullname).get();
-  //   if (recallGradesLogsDoc.exists) {
-  //     const recallGradesLogsData = recallGradesLogsDoc.data();
-  //     if (recallGradesLogsData.hasOwnProperty("wrongRecallGrades") && recallGradesLogsData.wrongRecallGrades.length) {
-  //       // setNotSatisfiedRecallGrades(recallGradesLogsData.wrongRecallGrades);
-  //       // setFirstBatchOfRecallGrades(recallGradesLogsData.firstBatchOfRecallGrades);
-  //       // setShowTheSchemaGen(true);
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
+    let recallBotId = localStorage.getItem("recall-bot-id");
+    if(!recallBotId) {
+      recallBotId = String(new Date().getTime());
+      localStorage.setItem("recall-bot-id", recallBotId);
+    }
     if (firebase) {
-      loadedRecallGrades();
+      return loadedRecallGrades();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase]);
@@ -310,7 +307,7 @@ const FreeRecallGrading = props => {
         setProcessing(true);
       }
       setRandomizedPhrases([]);
-      setRecallGradeIdx(recallGradeIdx + 1);
+      // setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
     } catch (err) {
@@ -436,7 +433,7 @@ const FreeRecallGrading = props => {
       }
       <Paper style={{ paddingBottom: "19px" }}>
         <p>1- Carefully read this free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }} id="recall-response">
           {recallGrades[recallGradeIdx]?.response}
         </Paper>
         <p>
@@ -451,7 +448,7 @@ const FreeRecallGrading = props => {
           const grade = researcherIdx !== -1 && phrase.grades[researcherIdx];
           return (
             <div key={index}>
-              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
+              <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }} className="recall-phrase">
                 <Box sx={{ display: "inline", mr: "19px" }}>
                   NO
                   <Switch checked={grade} onChange={() => handleGradeChange(row.index)} color="secondary" />
@@ -462,7 +459,7 @@ const FreeRecallGrading = props => {
             </div>
           );
         })}
-        <Button onClick={handleSubmit} className="Button" variant="contained" color="success" disabled={submitting}>
+        <Button onClick={handleSubmit} className="Button" variant="contained" color="success" disabled={submitting} id="recall-submit">
           {submitting ? <CircularProgress color="warning" size="16px" /> : "SUBMIT"}
         </Button>
         <div
@@ -477,6 +474,7 @@ const FreeRecallGrading = props => {
         ></div>
         <p>The original passage is:</p>
         <Paper
+          id="recall-passage"
           style={{
             padding: "10px 19px 10px 19px",
             margin: "19px 19px 70px 19px"

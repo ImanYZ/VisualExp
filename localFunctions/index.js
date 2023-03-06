@@ -30,6 +30,9 @@ const {
   addH2K2toQuotes,
   generatedBooleanExpressionData,
   convertRsearchersProject,
+  generateTheCSVfileChatGTP,
+  gradeRecallGradesV2ChatGPT,
+  removeTheBotsVotes
 } = require("./visualExp");
 
 const app = express();
@@ -82,6 +85,12 @@ app.get("/addH2K2toQuotes", addH2K2toQuotes);
 app.get("/generatedBooleanExpressionData", generatedBooleanExpressionData);
 
 app.get("/convertRsearchersProject",convertRsearchersProject);
+
+
+app.get("/generateTheCSVfileChatGTP",generateTheCSVfileChatGTP);
+app.get("/gradeRecallGradesV2ChatGPT", gradeRecallGradesV2ChatGPT);
+
+app.get("/removeTheBotsVotes",removeTheBotsVotes);
 
 const port = 8080;
 app.listen(port, () => {

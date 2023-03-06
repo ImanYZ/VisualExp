@@ -1,3 +1,5 @@
+import { toOrdinal } from "number-to-words";
+
 const isEmail = (email) => {
   const regEx =
   // eslint-disable-next-line
@@ -59,6 +61,92 @@ const shuffleArray = (array) => {
   return array;
 }
 
+const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname, gptResearcher) => {
+  const recallGradeData = recallGradeDoc.data();
+  const conditionItems = [];
+
+  let sessionNums = Object.keys(recallGradeData.sessions).map(sessionKey =>
+    parseInt(sessionKey.replace(/[^0-9]+/g, ""))
+  );
+  sessionNums.sort((a, b) => (a < b ? -1 : 1));
+
+  for (const sessionNum of sessionNums) {
+    if (!sessionNum) continue;
+    for (const conditionItem of recallGradeData.sessions[toOrdinal(sessionNum)]) {
+      const filtered = (conditionItem.response || "")
+        .replace(/[\.,]/g, " ")
+        .split(" ")
+        .filter(w => w.trim());
+      if (
+        recallGradeData.user !== fullname &&
+        !conditionItem.researchers.includes(fullname) &&
+        (
+          conditionItem.researchers.filter((researcher) => researcher !== gptResearcher).length < 4 ||
+          fullname === gptResearcher
+        ) &&
+        filtered.length > 2
+      ) {
+        conditionItems.push({
+          docId: recallGradeDoc.id,
+          session: toOrdinal(sessionNum),
+          user: recallGradeData.user,
+          project: recallGradeData.project,
+          ...conditionItem
+        });
+      }
+    }
+  }
+
+  return conditionItems;
+}
+
+const consumeRecallGradesChanges = (changes, recallGrades, fullname, gptResearcher) => {
+  const recallBotId = localStorage.getItem("recall-bot-id");
+  let _recallGrades = [...recallGrades];
+  for (const change of changes) {
+    const recallGradeDoc = change.doc;
+
+    if(change.type === "removed") {
+      _recallGrades = _recallGrades.filter((_recallGrade) => _recallGrade.docId !== recallGradeDoc.id);
+    } else if(change.type === "added") {
+      const alreadyExisting = _recallGrades.some((_recallGrade) => _recallGrade.docId === recallGradeDoc.id);
+      if(alreadyExisting) continue;
+
+      const __recallGrades = getRecallConditionsByRecallGrade(recallGradeDoc, fullname, gptResearcher);
+      for(const __recallGrade of __recallGrades) {
+        // if its bot then we need to check if these recalls are being processed by other bot instance
+        if(gptResearcher === fullname) {
+          if(__recallGrade.gptInstance && __recallGrade.gptInstance !== recallBotId) {
+            continue;
+          }
+        }
+        _recallGrades.push(__recallGrade);
+      }
+    } else if(change.type === "modified") {
+      const __recallGrades = getRecallConditionsByRecallGrade(recallGradeDoc, fullname, gptResearcher);
+      const currentRecallGrades = _recallGrades.filter((_recallGrade) => _recallGrade.docId === recallGradeDoc.id);
+      // removing recall grades from state if they are removed due to conditions
+      for(const currentRecallGrade of currentRecallGrades) {
+        const conditionItems = __recallGrades.filter(
+          (__recallGrade) =>
+          __recallGrade.session === currentRecallGrade.session && 
+          __recallGrade.passage === currentRecallGrade.passage
+        );
+        const currentRecallIdx = _recallGrades.indexOf(currentRecallGrade);
+        if(currentRecallIdx !== -1) {
+          // if condition item is removed
+          if(!conditionItems.length) {
+            _recallGrades.splice(currentRecallIdx, 1);
+          } else {
+            _recallGrades[currentRecallIdx] = conditionItems[0];
+          }
+        }
+      }
+    }
+  }
+  return _recallGrades;
+}
+
 export {
   isEmail,
   formatPoints,
@@ -66,5 +154,7 @@ export {
   uuidv4,
   getFullname,
   sortedIndex,
-  shuffleArray
+  shuffleArray,
+  getRecallConditionsByRecallGrade,
+  consumeRecallGradesChanges
 }

@@ -17,6 +17,7 @@ import {
 
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
+import RecallForIman from "../FreeRecallGrading/RecallForIman";
 import { SchemaGeneration } from "../SchemaGeneration";
 import ManageEvents from "../ManageEvents/ManageEvents";
 import ExperimentPoints from "../ExperimentPoints/ExperimentPoints";
@@ -36,7 +37,8 @@ const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "AddAdministrator",
 
 const AdminAccessPages = [
   { page: "Intellectual", view: <ExpenseReports /> },
-  { page: "Experiments", view: <ManageEvents /> }
+  { page: "Experiments", view: <ManageEvents /> },
+  { page: "RecallForIman", view: <RecallForIman /> }
 ];
 
 const CommonPages = [
@@ -48,7 +50,7 @@ const CommonPages = [
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
   { page: "ResearcherPassage", view: <ResearcherPassage /> },
-  { page: "SchemaGenerationTool", view: <SchemaGeneration /> }
+  { page: "SchemaGenerationTool", view: <SchemaGeneration /> },
 ];
 
 const Activities = props => {
@@ -402,10 +404,13 @@ const Activities = props => {
   return (
     <>
       <RouterNav />
-      <div id="ActivitiesContainer" style={{
-        position: activePage === 'SchemaGenerationTool' && 'fixed',
-        margin: activePage === 'SchemaGenerationTool' && 0,
-      }}>
+      <div
+        id="ActivitiesContainer"
+        style={{
+          position: activePage === "SchemaGenerationTool" && "fixed",
+          margin: activePage === "SchemaGenerationTool" && 0
+        }}
+      >
         {showLeaderBoard && project !== "Autograding" && (
           <div className="Columns40_60">
             <Alert severity="warning">

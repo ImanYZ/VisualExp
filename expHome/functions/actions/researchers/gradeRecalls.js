@@ -11,6 +11,8 @@ module.exports = async (req, res) => {
       viewedPhrases
     } = req.body;
     const { docId: fullname } = req.researcher;
+
+    const gptResearcher = "Iman YeckehZaare";
     
     const { researcher } = req;
   
@@ -81,6 +83,16 @@ module.exports = async (req, res) => {
         docGrades = docGrades || [];
         docResearchers = docResearchers || [];
 
+        // removing gpt user from docResearchers and docGrades
+        // gpt user should not be counted for approval or for done phrases
+        const gptIdx = docResearchers.indexOf(gptResearcher);
+        let gptGrade = false;
+        if(gptIdx !== -1) {
+          docResearchers.splice(gptIdx, 1);
+          gptGrade = docGrades[gptIdx];
+          docGrades.splice(gptIdx, 1);
+        }
+
         const previousGrades = {
           // sum of previous up votes from all researchers
           upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
@@ -106,6 +118,12 @@ module.exports = async (req, res) => {
         phrase.grades = [...docGrades]
         phrase.researchers = [...docResearchers]
 
+        // pushing gpt user after 
+        if(gptIdx !== -1) {
+          phrase.grades.push(gptGrade);
+          phrase.researchers.push(gptResearcher);
+        }
+
         if(wasPresented) {
           phrase.grades.push(grade)
           phrase.researchers.push(fullname)
@@ -120,7 +138,8 @@ module.exports = async (req, res) => {
             // list of all researchers that voted on this phrase
             researchers: phrase.researchers,
             grades: phrase.grades,
-            previousResearcher: previousGrades.upVotes + previousGrades.downVotes
+            previousResearcher: previousGrades.upVotes + previousGrades.downVotes,
+            hasGPTVote: gptIdx !== -1
           }
         };
       }, {});
@@ -141,7 +160,12 @@ module.exports = async (req, res) => {
           if(!phraseApproval) continue;
 
           // we are only processing points when we have 4 researchers voted on phrase
-          if(!votesOfPhrase?.researchers || votesOfPhrase.researchers.length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
+          if(!votesOfPhrase?.researchers || votesOfPhrase.researchers.filter((r) => r !== gptResearcher).length !== 4 || votesOfPhrase.previousResearcher >= 4) continue;
+
+          // if document already had 4 researchers or phrase was approve, we don't continue calculations
+          if(votesOfPhrase.hasGPTVote && fullname === gptResearcher) {
+            continue;
+          }
 
           let recallResponse = "";
           switch (session) {
@@ -184,6 +208,11 @@ module.exports = async (req, res) => {
           const upVoteResearchers = [];
           const downVoteResearchers = [];
           for(let r = 0; r < votesOfPhrase.grades.length; r++) {
+            // skipping gpt researcher to be counted in grading
+            if(votesOfPhrase.researchers[r] === gptResearcher) {
+              continue;
+            }
+
             if(votesOfPhrase.grades[r]) {
               upVoteResearchers.push(votesOfPhrase.researchers[r]);
             } else {
