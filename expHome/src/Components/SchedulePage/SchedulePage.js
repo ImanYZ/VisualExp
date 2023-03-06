@@ -268,6 +268,7 @@ const SchedulePage = props => {
       const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
+        if (!scheduleData.order || !scheduleData.id) continue;
         const session = scheduleData.session.toDate();
         const sessionStr = session.toLocaleString();
         // We should only show the availble timeslots that are:
@@ -283,7 +284,7 @@ const SchedulePage = props => {
           if(!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
             const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
             for(let i = 1; i < slotCounts; i++) {
-              sch.push(moment(session).add(30 * i, "minutes").toDate());
+              sch.push(moment(session).utcOffset(-4).add(30 * i, "minutes").toDate());
             }
           }
         }
@@ -330,6 +331,7 @@ const SchedulePage = props => {
         const userData = userDoc.data();
         if (userData.projectDone) {
           setParticipatedBefore(true);
+          setIsSubmitting(false);
           return;
         }
 
