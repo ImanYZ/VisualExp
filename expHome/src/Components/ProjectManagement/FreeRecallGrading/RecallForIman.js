@@ -45,49 +45,51 @@ const RecallForIman = props => {
         for (let session in recallData.sessions) {
           recallData.sessions[session].forEach((conditionItem, conditionIndex) => {
             conditionItem.phrases.forEach((phraseItem, phraseIndex) => {
-              let _grades = phraseItem.grades.slice();
-              let _researchers = phraseItem.researchers.slice();
-              const trueVotes = _grades.filter(
-                (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
-              ).length;
-              const falseVotes = _grades.filter(
-                (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
-              ).length;
+              if (!phraseItem.hasOwnProperty("majority")) {
+                let _grades = phraseItem.grades.slice();
+                let _researchers = phraseItem.researchers.slice();
+                const trueVotes = _grades.filter(
+                  (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
+                ).length;
+                const falseVotes = _grades.filter(
+                  (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
+                ).length;
 
-              if (trueVotes === falseVotes && _grades.length >= 4) {
-                _noMajority.push({
-                  ...phraseItem,
-                  grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                  botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
-                  Response: conditionItem.response,
-                  session: session,
-                  consdition: conditionIndex,
-                  id: recallDoc.id,
-                  originalPassgae: passagesHash[conditionItem.passage],
-                  phraseIndex
-                });
-              }
-              _grades = phraseItem.grades.slice();
-              _researchers = phraseItem.researchers.slice();
-              if (
-                (trueVotes >= 3 &&
-                  _researchers.indexOf(gptResearcher) > -1 &&
-                  !_grades[_researchers.indexOf(gptResearcher)]) ||
-                (falseVotes >= 3 &&
-                  _researchers.slice().indexOf(gptResearcher) > -1 &&
-                  phraseItem.grades[_researchers.indexOf(gptResearcher)])
-              ) {
-                _majorityDifferentThanBot.push({
-                  ...phraseItem,
-                  botGrade: _grades.slice()[_researchers.indexOf(gptResearcher)],
-                  grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                  Response: conditionItem.response,
-                  session: session,
-                  condition: conditionIndex,
-                  id: recallDoc.id,
-                  originalPassgae: passagesHash[conditionItem.passage],
-                  phraseIndex
-                });
+                if (trueVotes === falseVotes && _grades.length >= 4) {
+                  _noMajority.push({
+                    ...phraseItem,
+                    grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
+                    botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
+                    Response: conditionItem.response,
+                    session: session,
+                    consdition: conditionIndex,
+                    id: recallDoc.id,
+                    originalPassgae: passagesHash[conditionItem.passage],
+                    phraseIndex
+                  });
+                }
+                _grades = phraseItem.grades.slice();
+                _researchers = phraseItem.researchers.slice();
+                if (
+                  (trueVotes >= 3 &&
+                    _researchers.indexOf(gptResearcher) > -1 &&
+                    !_grades[_researchers.indexOf(gptResearcher)]) ||
+                  (falseVotes >= 3 &&
+                    _researchers.slice().indexOf(gptResearcher) > -1 &&
+                    phraseItem.grades[_researchers.indexOf(gptResearcher)])
+                ) {
+                  _majorityDifferentThanBot.push({
+                    ...phraseItem,
+                    botGrade: _grades.slice()[_researchers.indexOf(gptResearcher)],
+                    grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
+                    Response: conditionItem.response,
+                    session: session,
+                    condition: conditionIndex,
+                    id: recallDoc.id,
+                    originalPassgae: passagesHash[conditionItem.passage],
+                    phraseIndex
+                  });
+                }
               }
             });
           });
@@ -217,10 +219,23 @@ const RecallForIman = props => {
             ? "YES"
             : "NO"}
         </Paper>
-        <Button disabled={indexOfmajorityDifferentThanBot === 0} onClick={previousPhrase} className="Button" variant="contained" color="success" id="recall-submit">
+        {indexOfmajorityDifferentThanBot} / {majorityDifferentThanBot.length}
+        <Button
+          disabled={indexOfmajorityDifferentThanBot === 0}
+          onClick={previousPhrase}
+          className="Button"
+          variant="contained"
+          id="recall-submit"
+        >
           Previous
         </Button>
-        <Button disabled={indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1}  onClick={nextPhrase} className="Button" variant="contained" color="success" id="recall-submit">
+        <Button
+          disabled={indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1}
+          onClick={nextPhrase}
+          className="Button"
+          variant="contained"
+          id="recall-submit"
+        >
           Next
         </Button>
         <Button
@@ -236,7 +251,7 @@ const RecallForIman = props => {
           onClick={() => voteOnPhraseMajority1("no")}
           className="Button"
           variant="contained"
-          color="success"
+          color="error"
           id="recall-submit"
         >
           NO
@@ -269,11 +284,11 @@ const RecallForIman = props => {
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
         </Paper>
+        {indexOfNoMajority} / {noMajority.length}
         <Button
           onClick={previousPhraseMajority}
           className="Button"
           variant="contained"
-          color="success"
           id="recall-submit"
           disabled={indexOfNoMajority === 0}
         >
@@ -284,7 +299,6 @@ const RecallForIman = props => {
           onClick={nextPhraseMajority}
           className="Button"
           variant="contained"
-          color="success"
           id="recall-submit"
         >
           Next
@@ -302,7 +316,7 @@ const RecallForIman = props => {
           onClick={() => voteOnPhraseMajority2("no")}
           className="Button"
           variant="contained"
-          color="success"
+          color="error"
           id="recall-submit"
         >
           NO

@@ -189,12 +189,9 @@ const FreeRecallGrading = props => {
     const recentParticipants = await fetchRecentParticipants(fullname);
     setRecentParticipants(recentParticipants);
 
-    let recallGradesQ = firebase.db
-      .collection("recallGradesV2")
-      .where("project", "==", project);
-    if(fullname !== gptResearcher) {
-      recallGradesQ = recallGradesQ
-        .where("done", "==", false);
+    let recallGradesQ = firebase.db.collection("recallGradesV2");
+    if (fullname !== gptResearcher) {
+      recallGradesQ = recallGradesQ.where("project", "==", project).where("done", "==", false);
     }
 
     return recallGradesQ.onSnapshot((snapshot) => {
@@ -366,7 +363,7 @@ const FreeRecallGrading = props => {
       gradeIt([]);
     }
   };
-
+console.log("recallgrades", recallGrades);
   if (showTheSchemaGen)
     return (
       <SchemaGenRecalls
