@@ -284,7 +284,7 @@ const SchedulePage = props => {
           if(!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
             const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
             for(let i = 1; i < slotCounts; i++) {
-              sch.push(moment(session).add(30 * i, "minutes").toDate());
+              sch.push(moment(session).utcOffset(-4).add(30 * i, "minutes").toDate());
             }
           }
         }
