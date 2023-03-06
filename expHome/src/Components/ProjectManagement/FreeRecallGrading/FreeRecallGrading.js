@@ -363,7 +363,7 @@ const FreeRecallGrading = props => {
       gradeIt([]);
     }
   };
-console.log("recallgrades", recallGrades);
+
   if (showTheSchemaGen)
     return (
       <SchemaGenRecalls
