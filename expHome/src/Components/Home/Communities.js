@@ -352,6 +352,7 @@ const Communities = props => {
                       borderRadius: "8px",
                       cursor: "pointer",
                       height: "100%",
+                      borderColor: item.id === community.id? orangeDark : "",
                       ":hover": {
                         borderColor: orangeDark
                       }
