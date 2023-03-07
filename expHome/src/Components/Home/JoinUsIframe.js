@@ -95,7 +95,7 @@ const JoinUsIframe = props => {
         applicationProcess,
         uploadError
       },
-      "https://1cademy.com"
+      "*"
     );
   }, [
     email,
