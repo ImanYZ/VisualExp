@@ -20,6 +20,8 @@ const RecallForIman = props => {
 
   const [passagesHash, setPassagesHash] = useState({});
 
+  const [botVotes, setBotVotes] = useState(0);
+  const [pairPhrases, setPairPhrases] = useState(0);
   useEffect(() => {
     const getPassages = async () => {
       const _passagesHash = {};
@@ -40,14 +42,21 @@ const RecallForIman = props => {
       const _noMajority = [];
       const _majorityDifferentThanBot = [];
       const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-      recallGradesDocs.forEach(recallDoc => {
+      let countBotVotes = 0;
+      let countPairPhrases = 0;
+      recallGradesDocs.docs.forEach(recallDoc => {
         const recallData = recallDoc.data();
         for (let session in recallData.sessions) {
+          // eslint-disable-next-line no-loop-func
           recallData.sessions[session].forEach((conditionItem, conditionIndex) => {
             conditionItem.phrases.forEach((phraseItem, phraseIndex) => {
+              countPairPhrases++;
+              if (phraseItem.researchers.includes(gptResearcher)) countBotVotes = countBotVotes + 1;
+
               if (!phraseItem.hasOwnProperty("majority")) {
                 let _grades = phraseItem.grades.slice();
                 let _researchers = phraseItem.researchers.slice();
+
                 const trueVotes = _grades.filter(
                   (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
                 ).length;
@@ -58,7 +67,7 @@ const RecallForIman = props => {
                 if (trueVotes === falseVotes && _grades.length >= 4) {
                   _noMajority.push({
                     ...phraseItem,
-                    grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
+                    grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
                     botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
                     Response: conditionItem.response,
                     session: session,
@@ -102,8 +111,8 @@ const RecallForIman = props => {
       );
       setNoMajority(__noMajority);
       setMajorityDifferentThanBot(__majorityDifferentThanBot);
-      console.log("no majority", _noMajority);
-      console.log("majority different than bot", _majorityDifferentThanBot);
+      setBotVotes(countBotVotes);
+      setPairPhrases(countPairPhrases);
     };
 
     if (firebase && passagesHash) {
@@ -111,16 +120,11 @@ const RecallForIman = props => {
     }
   }, [firebase, passagesHash]);
 
-  console.log(
-    "passagesHash",
-    majorityDifferentThanBot[indexOfmajorityDifferentThanBot] &&
-      majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades
-  );
+
 
   const nextPhrase = () => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
       return setIndexOfmajorityDifferentThanBot(0);
-    console.log("indexOfmajorityDifferentThanBot", majorityDifferentThanBot[indexOfmajorityDifferentThanBot]);
     setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
   };
   const previousPhrase = () => {
@@ -135,7 +139,6 @@ const RecallForIman = props => {
 
   const nextPhraseMajority = () => {
     if (indexOfNoMajority === noMajority.length - 1) return setIndexOfNoMajority(0);
-    console.log("indexOfNoMajority", noMajority[indexOfNoMajority + 1]);
     setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
   };
 
@@ -145,7 +148,6 @@ const RecallForIman = props => {
 
       const recallgradeRef = firebase.db.collection("recallGradesV2").doc(majorityDifferentData.id);
       const recallDoc = await recallgradeRef.get();
-      console.log("recallData", recallDoc.data());
       const sessions = recallDoc.data().sessions;
       sessions[majorityDifferentData.session][majorityDifferentData.condition].phrases[
         majorityDifferentData.phraseIndex
@@ -163,7 +165,6 @@ const RecallForIman = props => {
 
       const recallgradeRef = firebase.db.collection("recallGradesV2").doc(noMajorityData.id);
       const recallDoc = await recallgradeRef.get();
-      console.log("recallData", recallDoc.data());
       const sessions = recallDoc.data().sessions;
       sessions[noMajorityData.session][noMajorityData.condition].phrases[noMajorityData.phraseIndex].majority =
         vote === "yes" ? true : false;
@@ -190,8 +191,9 @@ const RecallForIman = props => {
     <Box sx={{ mb: "15px", ml: "15px" }}>
       <Box>
         <Typography variant="h5" component="h5">
-          The Response has three or four grades, but the majority of votes disagrees with Iman's grade :
+          The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} / { pairPhrases}
         </Typography>
+
         {"\n"}
         <Box>OriginalPassgae :</Box>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
@@ -219,7 +221,7 @@ const RecallForIman = props => {
             ? "YES"
             : "NO"}
         </Paper>
-        {indexOfmajorityDifferentThanBot} / {majorityDifferentThanBot.length}
+        {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length + 1}
         <Button
           disabled={indexOfmajorityDifferentThanBot === 0}
           onClick={previousPhrase}
@@ -284,7 +286,7 @@ const RecallForIman = props => {
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
           {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
         </Paper>
-        {indexOfNoMajority} / {noMajority.length}
+        {indexOfNoMajority + 1} / {noMajority.length + 1}
         <Button
           onClick={previousPhraseMajority}
           className="Button"
