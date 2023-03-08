@@ -364,7 +364,7 @@ const FreeRecallGrading = props => {
     }
   };
 
-  if (showTheSchemaGen)
+  if (showTheSchemaGen && fullname !== gptResearcher)
     return (
       <SchemaGenRecalls
         recallGrade={recallGrades?.[recallGradeIdx]}
