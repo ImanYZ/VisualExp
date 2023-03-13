@@ -1975,138 +1975,135 @@ exports.convertRsearchersProject = async (req, res) => {
 
 exports.generateTheCSVfileChatGTP = async (req, res) => {
   try {
-    const rowData = [
-      [
-        "Passage_id",
-        "Response_id",
-        "Response",
-        "Phrase",
-        "Majority Of votes",
-        "Davinci-02",
-        "chatGPT grade",
-        "Other Researchers grades",
-        "Satisfied the boolean expression",
-        "chatGPT Explanation",
-      ],
+    const gptResearcher = "Iman YeckehZaare";
+    let columns = [
+      "Passage_id",
+      "Response_id",
+      "Response",
+      "Phrase",
+      "Grade by Davinci",
+      "Confidence by Davinci ",
+      "Grade by Turbo",
+      "Majority Of votes",
+      "Researchers grades",
+      "Satisfied the boolean expression",
     ];
+
+    const Researchers = [
+      "Ethan Hiew",
+      "Louwis Truong",
+      "Benjamin Brown",
+      "Jennifer Tso",
+      "Rehana Naik Olson",
+      "Iman YeckehZaare",
+      "Yizhou Chao",
+      "Tirdad Barghi",
+      "Xiaowen Yuan",
+      "Amelia Henriques",
+      "Leah O'Neill",
+      "Jessica Cai",
+      "Ziyi Wang",
+      "Cynthia Lee",
+      "Shaobo Liang",
+      "Ember Shan",
+      "Roman Zapata",
+      "Sarah Berland",
+      "Jeffery Phonn",
+      "Amy Deng",
+      "Jennifer Tso",
+      "Weiwei Tan",
+      "Mike Deng",
+    ];
+    let rowData = [[...columns, ...Researchers]];
     let row;
+    console.log(":: start ::");
     const recallGradesV2Docs = await db.collection("recallGradesV2").get();
-    let numBot = 0;
-    recallGradesV2Docs.docs.forEach((recallDoc) => {
-      const recallV2Data = recallDoc.data();
-      for (let session in recallV2Data.sessions) {
-        for (
-          let condition = 0;
-          condition < recallV2Data.sessions[session].length;
-          condition++
-        ) {
-          if (!recallV2Data.sessions[session][condition]) continue;
-          for (let phrase in recallV2Data.sessions[session][condition]
-            .phrases) {
+    for (let recallDoc of recallGradesV2Docs.docs) {
+      const recallData = recallDoc.data();
+      for (let session in recallData.sessions) {
+        for (conditionItem of recallData.sessions[session]) {
+          for (let phrase of conditionItem.phrases) {
+            const researcherIdx = phrase.researchers.indexOf(gptResearcher);
+            let otherResearchers = phrase.researchers.slice();
+            let otherGrades = phrase.grades.slice();
+            if (researcherIdx !== -1) {
+              otherResearchers.splice(researcherIdx, 1);
+              otherGrades.splice(researcherIdx, 1);
+            }
+            console.log(
+              "phrase.researchers",
+              phrase.researchers,
+              phrase.phrase,
+              conditionItem.passage
+            );
+            const upVotes = otherGrades.filter((grade) => grade).length;
+            const downVotes = otherGrades.filter((grade) => !grade).length;
+
+            if (otherResearchers.length === 0 && !phrase.satisfied) {
+              otherResearchers = [
+                ...[
+                  "Ethan Hiew",
+                  "Louwis Truong",
+                  "Benjamin Brown",
+                  "Jennifer Tso",
+                  "Rehana Naik Olson",
+                  "Iman YeckehZaare",
+                ]
+                  .sort(() => 0.5 - Math.random())
+                  .slice(0, 4),
+              ];
+              otherGrades = Array(4).fill(false);
+            }
             row = [
-              recallV2Data.sessions[session][condition].passage,
+              conditionItem.passage,
               recallDoc.id,
+              conditionItem.response,
+              phrase.phrase,
+              phrase.hasOwnProperty("DavinciGrade")
+                ? phrase.DavinciGrade
+                  ? "YES"
+                  : "NO"
+                : "",
+              phrase.hasOwnProperty("DavinciConfidence")
+                ? phrase.DavinciConfidence
+                : "",
+              phrase.hasOwnProperty("chatGPTGrade")
+                ? phrase.chatGPTGrade
+                  ? "YES"
+                  : "NO"
+                : "",
+              upVotes < downVotes ? "NO" : "YES",
+              [otherGrades.map((grade) => (grade ? "Yes" : "No")).join(",")],
+              phrase.hasOwnProperty("satisfied")
+                ? phrase.satisfied
+                  ? "YES"
+                  : "NO"
+                : "",
             ];
-            if (
-              !recallV2Data.sessions[session][condition].phrases[phrase]
-                .researchers ||
-              !recallV2Data.sessions[session][condition].phrases[phrase]
-                .researchers.length
-            )
-              continue;
-            //response
-            row.push(recallV2Data.sessions[session][condition].response);
 
-            //phrase
-            row.push(
-              recallV2Data.sessions[session][condition].phrases[phrase].phrase
-            );
-
-            //majority of votes (three/four out of four agreement, excluding the bot)
-            const botIndex = recallV2Data.sessions[session][condition].phrases[
-              phrase
-            ].researchers.findIndex((r) => r === "Iman YeckehZaare");
-            let grades =
-              recallV2Data.sessions[session][condition].phrases[phrase].grades;
-            let botGrade = "";
-            if (botIndex > -1) {
-              numBot = numBot + 1;
-              botGrade = grades[botIndex];
-              grades = recallV2Data.sessions[session][condition].phrases[
-                phrase
-              ].grades.filter((r, i) => i !== botIndex);
+            let rowGrades = Array(Researchers.length).fill("");
+            for (let researcher of otherResearchers) {
+              const indexRes = Researchers.indexOf(researcher);
+              if (indexRes === -1) continue;
+              rowGrades[indexRes] = otherGrades[
+                otherResearchers.indexOf(researcher)
+              ]
+                ? "YES"
+                : "NO";
             }
-
-            const countTrue = grades.filter((r) => r === true).length;
-            const countFalse = grades.filter((r) => r === false).length;
-
-            //majority of votes (three/four out of four agreement, excluding the bot)
-
-            if (countTrue >= 3) {
-              row.push("true");
-            } else if (countFalse >= 3) {
-              row.push("false");
-            } else {
-              continue;
-            }
-            row.push(botGrade);
-            //chatGPT grade
-            if (
-              recallV2Data.sessions[session][condition].phrases[
-                phrase
-              ].hasOwnProperty("chatGPTGrade")
-            ) {
-              row.push(
-                recallV2Data.sessions[session][condition].phrases[phrase]
-                  .chatGPTGrade
-              );
-            } else {
-              row.push("NAN");
-            }
-
-            //Each of the other four researchers' grades
-            row.push(
-              grades.map((grade) => (grade ? "true" : "false")).join(",")
-            );
-
-            //satisfied
-            if (
-              recallV2Data.sessions[session][condition].phrases[
-                phrase
-              ].hasOwnProperty("satisfied")
-            ) {
-              row.push(
-                recallV2Data.sessions[session][condition].phrases[phrase]
-                  .satisfied
-              );
-            } else {
-              row.push("NAN");
-            }
-
-            if (
-              recallV2Data.sessions[session][condition].phrases[
-                phrase
-              ].hasOwnProperty("chatGPTExplanation")
-            ) {
-              row.push(
-                recallV2Data.sessions[session][condition].phrases[phrase]
-                  .chatGPTExplanation
-              );
-            } else {
-              row.push("NAN");
-            }
-
+            row = [...row, ...rowGrades];
             rowData.push(row);
           }
         }
       }
-    });
+    }
     csv
-      .writeToPath("chatGPTRecallGrades.csv", rowData, { headers: true })
+      .writeToPath("chatGPTRecallGrades.csv", [...rowData], {
+        headers: true,
+      })
       .on("finish", () => {
         console.log("Done!");
       });
-    console.log("numBot :: : ", numBot);
   } catch (err) {
     console.log({ err });
     return res.status(400).json({ err });
