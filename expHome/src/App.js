@@ -248,7 +248,8 @@ const App = () => {
       done: false,
       createdAt: new Date(),
       project: userData.project,
-      user: fullname
+      user: fullname,
+      priority: 0
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
