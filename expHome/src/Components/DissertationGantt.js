@@ -2,8 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 import { Chart } from "react-google-charts";
-
-import { firebaseState } from "../store/AuthAtoms";
+import Button from "@mui/material/Button";
+import { firebaseState, emailState } from "../store/AuthAtoms";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
 
 const daysToMilliseconds = days => {
   return days * 24 * 60 * 60 * 1000;
@@ -23,7 +35,15 @@ const columns = [
 const DissertationGantt = () => {
   const firebase = useRecoilValue(firebaseState);
   const [dt, setDt] = useState(false);
-
+  const [open, setOpen] = React.useState(false);
+  const email = useRecoilValue(emailState);
+  const [name, setName] = useState("");
+  const [resource, setResource] = useState("");
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [completed, setCompleted] = useState("");
+  const [selectedDoc, setSelectedDoc] = useState("");
+  const [dependencies, setDependencies] = useState("");
   useEffect(() => {
     const drawChart = async () => {
       if (firebase) {
@@ -40,7 +60,7 @@ const DissertationGantt = () => {
         const dissertationTimeLineQuery = firebase.db.collection("dissertationTimeLine");
         const dissertationTimeLineSnapshot = dissertationTimeLineQuery.onSnapshot(snapshot => {
           const docChanges = snapshot.docChanges();
-          const rows = [];
+          let rows = [];
           for (let docChange of docChanges) {
             const { name, resource, start, end, duration, completed, dependencies } = docChange.doc.data();
             rows.push([
@@ -54,6 +74,7 @@ const DissertationGantt = () => {
               dependencies
             ]);
           }
+          // rows = rows.filter(row => row[0] !== "zzP2i9zo9C4xzyH2wpER");
           setDt([columns, ...rows]);
         });
         //   const rows = [
@@ -69,12 +90,182 @@ const DissertationGantt = () => {
       }
     };
     return drawChart();
-  }, [firebase]);
+  }, [firebase, open]);
+
+  const handleClickOpen = row => {
+    console.log("row :: :: :: ", row);
+    const dependencie = dt.find(d => d[0] === row[7]);
+    setSelectedDoc(row[0] || "");
+    setName(row[1] || "");
+    setResource(row[2] || "");
+    setCompleted(row[6] || 0);
+    setEnd(row[4] || new Date());
+    setStart(row[3] || new Date());
+    if (dependencie) {
+      setDependencies(dependencie[1] || "");
+    } else {
+      setDependencies("");
+    }
+    setOpen(true);
+    console.log("dt", dt);
+  };
+
+  const handleSave = async () => {
+    try {
+      const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
+      setOpen(false);
+      await dissertationRef.update({
+        name,
+        resource,
+        start,
+        end,
+        completed,
+        dependencies: dt.find(d => d[1] === dependencies) ? dt.find(d => d[1] === dependencies)[0] : ""
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const options = {
+    g: {
+      text: {
+        color: "black"
+      }
+    }
+  };
+  useEffect(() => {}, [dt]);
 
   return (
     dt && (
-      <div style={{ width: "100%", height: "100vh", overflowX: "hidden", overflowY: "auto" }}>
-        <Chart chartType="Gantt" data={dt} width="100%" height={1600} legendToggle />
+      <div
+        style={{
+          width: "90%",
+          marginLeft: "14px",
+          height: "100vh",
+          overflowX: "hidden",
+          overflowY: "auto"
+        }}
+      >
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogContent>
+            <Box
+              component="form"
+              sx={{
+                "& > :not(style)": { m: 1, width: "25ch" }
+              }}
+              noValidate
+              autoComplete="off"
+            >
+              <TextField
+                id="outlined-basic"
+                label="Name"
+                variant="outlined"
+                value={name}
+                onChange={e => {
+                  setName(e.currentTarget.value);
+                }}
+              />
+              <TextField
+                id="outlined-basic"
+                label="Resource"
+                variant="outlined"
+                value={resource}
+                onChange={e => {
+                  setResource(e.currentTarget.value);
+                }}
+              />
+              <FormControl>
+                <InputLabel>Dependencies</InputLabel>
+                <Select
+                  value={dependencies}
+                  onChange={e => {
+                    setDependencies(e.target.value);
+                  }}
+                  sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                >
+                  {dt
+                    .slice()
+                    .splice(1)
+                    ?.map(
+                      row =>
+                        row[0] &&
+                        row[1] && (
+                          <MenuItem key={row[0]} value={row[1]} sx={{ display: "center" }}>
+                            {row[1]}
+                          </MenuItem>
+                        )
+                    )}
+                </Select>
+              </FormControl>
+
+              <TextField
+                id="outlined-basic"
+                label="Percent Done"
+                variant="outlined"
+                value={completed}
+                onChange={e => {
+                  setCompleted(e.currentTarget.value);
+                }}
+              />
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <div className="ActivityDateTimePicker">
+                  <DatePicker
+                    label="Start Date"
+                    value={start}
+                    onChange={newValue => {
+                      setStart(newValue);
+                    }}
+                    renderInput={params => <TextField {...params} />}
+                  />
+                </div>
+              </LocalizationProvider>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <div className="ActivityDateTimePicker">
+                  <DatePicker
+                    label="End Date"
+                    value={end}
+                    onChange={newValue => {
+                      setEnd(newValue);
+                    }}
+                    renderInput={params => <TextField {...params} />}
+                  />
+                </div>
+              </LocalizationProvider>
+            </Box>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={handleSave}>Save</Button>
+            <Button onClick={handleClose} autoFocus>
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Chart
+          chartType="Gantt"
+          data={dt}
+          height={1600}
+          legendToggle
+          options={options}
+          chartEvents={[
+            {
+              eventName: "select",
+              callback: e => {
+                if (email !== "oneweb@umich.edu") return;
+                handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+              }
+            }
+          ]}
+        />
       </div>
     )
   );
