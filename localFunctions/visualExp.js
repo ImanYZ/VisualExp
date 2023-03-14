@@ -2071,7 +2071,11 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                   ? "YES"
                   : "NO"
                 : "",
-                upVotes===downVotes
+              phrase.hasOwnProperty("majority")
+                ? phrase.majority
+                  ? "NO"
+                  : "YES"
+                : upVotes < 3 && downVotes < 3
                 ? ""
                 : upVotes < downVotes
                 ? "NO"
