@@ -94,34 +94,54 @@ const DissertationGantt = () => {
 
   const handleClickOpen = row => {
     console.log("row :: :: :: ", row);
-    const dependencie = dt.find(d => d[0] === row[7]);
+    const dependencies = row[7];
+    const _dependencies = [];
+    dependencies?.split(",").forEach(element => {
+      _dependencies.push(dt.find(d => d[0] === element)[1]);
+    });
+
     setSelectedDoc(row[0] || "");
     setName(row[1] || "");
     setResource(row[2] || "");
     setCompleted(row[6] || 0);
     setEnd(row[4] || new Date());
     setStart(row[3] || new Date());
-    if (dependencie) {
-      setDependencies(dependencie[1] || "");
-    } else {
-      setDependencies("");
-    }
+
+    setDependencies(_dependencies);
+
     setOpen(true);
     console.log("dt", dt);
   };
 
   const handleSave = async () => {
     try {
-      const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
       setOpen(false);
-      await dissertationRef.update({
-        name,
-        resource,
-        start,
-        end,
-        completed,
-        dependencies: dt.find(d => d[1] === dependencies) ? dt.find(d => d[1] === dependencies)[0] : ""
+      let _dependencies = "";
+      dependencies.forEach(element => {
+        console.log(element);
+        _dependencies += !dt.find(d => d[1] === element) ? "" : dt.find(d => d[1] === element)[0] + ",";
       });
+      if (selectedDoc) {
+        const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
+        await dissertationRef.update({
+          name,
+          resource,
+          start,
+          end,
+          completed,
+          dependencies: _dependencies.trim().substring(0, _dependencies.trim().length - 1)
+        });
+      } else {
+        const dissertationRef = firebase.db.collection("dissertationTimeLine").doc();
+        await dissertationRef.set({
+          name,
+          resource,
+          start,
+          end,
+          completed,
+          dependencies: _dependencies.trim().substring(0, _dependencies.trim().length - 1)
+        });
+      }
     } catch (error) {
       console.log("error", error);
     }
@@ -130,144 +150,154 @@ const DissertationGantt = () => {
     setOpen(false);
   };
 
-  const options = {
-    g: {
-      text: {
-        color: "black"
-      }
-    }
+  const handleAddNew = () => {
+    setSelectedDoc("");
+    setName("");
+    setResource("");
+    setCompleted(0);
+    setEnd(new Date());
+    setStart(new Date());
+    setDependencies([]);
+    setOpen(true);
   };
-  useEffect(() => {}, [dt]);
-
   return (
-    dt && (
-      <div
-        style={{
-          width: "90%",
-          marginLeft: "14px",
-          height: "100vh",
-          overflowX: "hidden",
-          overflowY: "auto"
-        }}
-      >
-        <Dialog
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
+    <>
+      {email === "oneweb@umich.edu" && (
+        <Button variant="contained" onClick={handleAddNew}>
+          {" "}
+          Add new item{" "}
+        </Button>
+      )}
+
+      {dt && (
+        <div
+          style={{
+            width: "90%",
+            marginLeft: "14px",
+            height: "100vh",
+            overflowX: "hidden",
+            overflowY: "auto"
+          }}
         >
-          <DialogContent>
-            <Box
-              component="form"
-              sx={{
-                "& > :not(style)": { m: 1, width: "25ch" }
-              }}
-              noValidate
-              autoComplete="off"
-            >
-              <TextField
-                id="outlined-basic"
-                label="Name"
-                variant="outlined"
-                value={name}
-                onChange={e => {
-                  setName(e.currentTarget.value);
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogContent>
+              <Box
+                component="form"
+                sx={{
+                  "& > :not(style)": { m: 1, width: "25ch" }
                 }}
-              />
-              <TextField
-                id="outlined-basic"
-                label="Resource"
-                variant="outlined"
-                value={resource}
-                onChange={e => {
-                  setResource(e.currentTarget.value);
-                }}
-              />
-              <FormControl>
-                <InputLabel>Dependencies</InputLabel>
-                <Select
-                  value={dependencies}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  id="outlined-basic"
+                  label="Name"
+                  variant="outlined"
+                  value={name}
                   onChange={e => {
-                    setDependencies(e.target.value);
+                    setName(e.currentTarget.value);
                   }}
-                  sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                >
-                  {dt
-                    .slice()
-                    .splice(1)
-                    ?.map(
-                      row =>
-                        row[0] &&
-                        row[1] && (
-                          <MenuItem key={row[0]} value={row[1]} sx={{ display: "center" }}>
-                            {row[1]}
-                          </MenuItem>
-                        )
-                    )}
-                </Select>
-              </FormControl>
-
-              <TextField
-                id="outlined-basic"
-                label="Percent Done"
-                variant="outlined"
-                value={completed}
-                onChange={e => {
-                  setCompleted(e.currentTarget.value);
-                }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <div className="ActivityDateTimePicker">
-                  <DatePicker
-                    label="Start Date"
-                    value={start}
-                    onChange={newValue => {
-                      setStart(newValue);
+                />
+                <TextField
+                  id="outlined-basic"
+                  label="Resource"
+                  variant="outlined"
+                  value={resource}
+                  onChange={e => {
+                    setResource(e.currentTarget.value);
+                  }}
+                />
+                <FormControl>
+                  <InputLabel>Dependencies</InputLabel>
+                  <Select
+                    value={dependencies}
+                    multiple
+                    onChange={e => {
+                      setDependencies(e.target.value);
                     }}
-                    renderInput={params => <TextField {...params} />}
-                  />
-                </div>
-              </LocalizationProvider>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <div className="ActivityDateTimePicker">
-                  <DatePicker
-                    label="End Date"
-                    value={end}
-                    onChange={newValue => {
-                      setEnd(newValue);
-                    }}
-                    renderInput={params => <TextField {...params} />}
-                  />
-                </div>
-              </LocalizationProvider>
-            </Box>
-          </DialogContent>
+                    sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                  >
+                    {dt
+                      .slice()
+                      .splice(1)
+                      ?.map(
+                        row =>
+                          row[0] &&
+                          row[1] && (
+                            <MenuItem key={row[0]} value={row[1]} sx={{ display: "center" }}>
+                              {row[1]}
+                            </MenuItem>
+                          )
+                      )}
+                  </Select>
+                </FormControl>
 
-          <DialogActions>
-            <Button onClick={handleSave}>Save</Button>
-            <Button onClick={handleClose} autoFocus>
-              Cancel
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Chart
-          chartType="Gantt"
-          data={dt}
-          height={1600}
-          legendToggle
-          options={options}
-          chartEvents={[
-            {
-              eventName: "select",
-              callback: e => {
-                if (email !== "oneweb@umich.edu") return;
-                handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                <TextField
+                  id="outlined-basic"
+                  label="Percent Done"
+                  variant="outlined"
+                  value={completed}
+                  onChange={e => {
+                    setCompleted(e.currentTarget.value);
+                  }}
+                />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <div className="ActivityDateTimePicker">
+                    <DatePicker
+                      label="Start Date"
+                      value={start}
+                      onChange={newValue => {
+                        setStart(newValue);
+                      }}
+                      renderInput={params => <TextField {...params} />}
+                    />
+                  </div>
+                </LocalizationProvider>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <div className="ActivityDateTimePicker">
+                    <DatePicker
+                      label="End Date"
+                      value={end}
+                      onChange={newValue => {
+                        setEnd(newValue);
+                      }}
+                      renderInput={params => <TextField {...params} />}
+                    />
+                  </div>
+                </LocalizationProvider>
+              </Box>
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={handleSave}>Save</Button>
+              <Button onClick={handleClose} autoFocus>
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Chart
+            chartType="Gantt"
+            data={dt}
+            height={1600}
+            legendToggle
+            chartEvents={[
+              {
+                eventName: "select",
+                callback: e => {
+                  if (email !== "oneweb@umich.edu") return;
+                  handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                }
               }
-            }
-          ]}
-        />
-      </div>
-    )
+            ]}
+          />
+        </div>
+      )}
+    </>
   );
 };
 
