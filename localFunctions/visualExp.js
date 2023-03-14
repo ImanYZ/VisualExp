@@ -2036,9 +2036,6 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               phrase.phrase,
               conditionItem.passage
             );
-            const upVotes = otherGrades.filter((grade) => grade).length;
-            const downVotes = otherGrades.filter((grade) => !grade).length;
-
             if (otherResearchers.length === 0 && !phrase.satisfied) {
               otherResearchers = [
                 ...[
@@ -2054,6 +2051,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               ];
               otherGrades = Array(4).fill(false);
             }
+            const upVotes = otherGrades.filter((grade) => grade).length;
+            const downVotes = otherGrades.filter((grade) => !grade).length;
             row = [
               conditionItem.passage,
               recallDoc.id,
@@ -2072,7 +2071,11 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                   ? "YES"
                   : "NO"
                 : "",
-              upVotes < downVotes ? "NO" : "YES",
+                upVotes===downVotes
+                ? ""
+                : upVotes < downVotes
+                ? "NO"
+                : "YES",
               [otherGrades.map((grade) => (grade ? "Yes" : "No")).join(",")],
               phrase.hasOwnProperty("satisfied")
                 ? phrase.satisfied
