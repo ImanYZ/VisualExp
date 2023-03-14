@@ -2071,7 +2071,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                   ? "YES"
                   : "NO"
                 : "",
-              otherGrades.length === 0
+                upVotes===downVotes
                 ? ""
                 : upVotes < downVotes
                 ? "NO"
