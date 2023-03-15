@@ -243,7 +243,7 @@ service cloud.firestore {
     }
     match /dissertationTimeLine/{dissertationTimeLineId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if true;
     }
     match /lifeLog/{lifeLogId} {
       allow read: if true;
