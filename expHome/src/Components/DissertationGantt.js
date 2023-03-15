@@ -100,7 +100,9 @@ const DissertationGantt = () => {
     const dependencies = row[7];
     const _dependencies = [];
     dependencies?.split(",").forEach(element => {
-      _dependencies.push(dt.find(d => d[0] === element)[1]);
+      if (dt.find(d => d[0] === element)) {
+        _dependencies.push(dt.find(d => d[0] === element)[1]);
+      }
     });
 
     setSelectedDoc(row[0] || "");
@@ -154,8 +156,10 @@ const DissertationGantt = () => {
   };
   const handleDelete = async () => {
     try {
-      const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
-      await dissertationRef.delete();
+      if (selectedDoc) {
+        const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
+        await dissertationRef.delete();
+      }
       setOpen(false);
       setDeleteDialogOpen(false);
     } catch (error) {}
@@ -183,7 +187,7 @@ const DissertationGantt = () => {
       {dt && (
         <div
           style={{
-            width: "90%",
+            width: "100%",
             marginLeft: "14px",
             height: "100vh",
             overflowX: "hidden",
