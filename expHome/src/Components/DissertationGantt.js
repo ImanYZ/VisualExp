@@ -47,6 +47,7 @@ const DissertationGantt = () => {
   const [selectedDoc, setSelectedDoc] = useState("");
   const [dependencies, setDependencies] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   useEffect(() => {
     const drawChart = async () => {
       if (firebase) {
@@ -174,6 +175,30 @@ const DissertationGantt = () => {
     setDependencies([]);
     setOpen(true);
   };
+  const redrawsvg = svg => {
+    let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
+    let rectGroups = svg.getElementsByTagName("g")[5]?.getElementsByTagName("rect");
+    for (let i = 0; i < ganttGroups.length; i++) {
+      let x = rectGroups[i].getAttribute("x") - rectGroups[i].getAttribute("width") / 2;
+      if (x < 300) {
+        x = x + 900;
+      } else if (x > 1000) {
+        x = x - 500;
+      }
+      ganttGroups[i].setAttribute("fill", "#1c2e12");
+      ganttGroups[i].setAttribute("transform", "translate(" + x + ")");
+    }
+  };
+  setTimeout(() => {
+    let container = document.getElementById("chart_div");
+    if (container) {
+      let svg = container.getElementsByTagName("svg")[0];
+      svg.addEventListener("mousemove", () => {
+        console.log("::: ::: svg ::: :: ", svg);
+        redrawsvg(svg);
+      });
+    }
+  }, 1000);
 
   return (
     <>
@@ -323,21 +348,51 @@ const DissertationGantt = () => {
               </Button>
             </DialogActions>
           </Dialog>
-          <Chart
-            chartType="Gantt"
-            data={dt}
-            height={1600}
-            legendToggle
-            chartEvents={[
-              {
-                eventName: "select",
-                callback: e => {
-                  if (email !== "oneweb@umich.edu") return;
-                  handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+          <div
+            id="chart_div"
+            style={{ marginLeft: "19px", marginRight: "19px", width: "97%", height: "1600px", overflow: "hidden" }}
+          >
+            <Chart
+              chartType="Gantt"
+              data={dt}
+              height={1600}
+              legendToggle
+              chartEvents={[
+                {
+                  eventName: "ready",
+                  callback: async e => {
+                    e.chartWrapper.setOption("staticPosition", true);
+                    let container = document.getElementById("chart_div");
+                    let chart = e.chartWrapper.getChart();
+                    window.google.visualization.events.addListener(chart, "ready", () => {
+                      let svg = container.getElementsByTagName("svg")[0];
+                      redrawsvg(svg);
+                    });
+                  }
+                },
+                {
+                  eventName: "ready",
+                  callback: async e => {
+                    e.chartWrapper.setOption("staticPosition", true);
+                    let container = document.getElementById("chart_div");
+                    let svg = container.getElementsByTagName("svg")[0];
+                    svg.addEventListener("mouseleave", () => {
+                      console.log("::: ::: svg ::: :: ", svg);
+                      redrawsvg(svg);
+                    });
+                  }
+                },
+                {
+                  eventName: "select",
+                  callback: e => {
+                    if (email !== "oneweb@umich.edu") return;
+                    console.log(":: :: e.chartWrapper.getChart().getSelection() :: :: ", e.chartWrapper.getChart());
+                    handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                  }
                 }
-              }
-            ]}
-          />
+              ]}
+            />
+          </div>
         </div>
       )}
     </>
