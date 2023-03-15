@@ -16,6 +16,8 @@ import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 
 const daysToMilliseconds = days => {
   return days * 24 * 60 * 60 * 1000;
@@ -44,6 +46,7 @@ const DissertationGantt = () => {
   const [completed, setCompleted] = useState("");
   const [selectedDoc, setSelectedDoc] = useState("");
   const [dependencies, setDependencies] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   useEffect(() => {
     const drawChart = async () => {
       if (firebase) {
@@ -149,7 +152,14 @@ const DissertationGantt = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
+  const handleDelete = async () => {
+    try {
+      const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
+      await dissertationRef.delete();
+      setOpen(false);
+      setDeleteDialogOpen(false);
+    } catch (error) {}
+  };
   const handleAddNew = () => {
     setSelectedDoc("");
     setName("");
@@ -160,6 +170,7 @@ const DissertationGantt = () => {
     setDependencies([]);
     setOpen(true);
   };
+
   return (
     <>
       {email === "oneweb@umich.edu" && (
@@ -271,6 +282,34 @@ const DissertationGantt = () => {
                   </div>
                 </LocalizationProvider>
               </Box>
+              <IconButton
+                color="error"
+                aria-label="delete"
+                onClick={() => {
+                  setDeleteDialogOpen(true);
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+
+              <Dialog
+                open={deleteDialogOpen}
+                onClose={handleClose}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+              >
+                <DialogActions>
+                  <Button onClick={handleDelete}>Confirm</Button>
+                  <Button
+                    onClick={() => {
+                      setDeleteDialogOpen(false);
+                    }}
+                    autoFocus
+                  >
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </DialogContent>
 
             <DialogActions>
