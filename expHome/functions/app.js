@@ -63,6 +63,7 @@ const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
 
 const express = require("express");
+const recallUpload = require("./actions/recallUpload");
 
 const app = express();
 
@@ -129,6 +130,7 @@ app.post("/scheduleLifeLog", scheduleLifeLog);
 app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
+app.post("/recallUpload", recallUpload);
 
 // Knowledge endpoints
 
