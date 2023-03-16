@@ -4,7 +4,7 @@ module.exports = async (req, res) => {
   try {
     const { rawFileContent } = req.body;
     console.log(rawFileContent, "rawFileContent")
-    const bucket = "visualexp-a7d2c.appspot.com";
+    const bucket = storage.bucket("visualexp-a7d2c.appspot.com");
     const filePath = `recalls/${rawFileContent.docId}-${rawFileContent.session}-${rawFileContent.conditionIndex}.json`;
     const file = bucket.file(filePath);
     await file.save(JSON.stringify(rawFileContent), {
