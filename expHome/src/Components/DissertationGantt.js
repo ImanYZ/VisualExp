@@ -97,7 +97,6 @@ const DissertationGantt = () => {
   }, [firebase, open]);
 
   const handleClickOpen = row => {
-    console.log("row :: :: :: ", row);
     const dependencies = row[7];
     const _dependencies = [];
     dependencies?.split(",").forEach(element => {
@@ -116,7 +115,6 @@ const DissertationGantt = () => {
     setDependencies(_dependencies);
 
     setOpen(true);
-    console.log("dt", dt);
   };
 
   const handleSave = async () => {
@@ -124,7 +122,6 @@ const DissertationGantt = () => {
       setOpen(false);
       let _dependencies = "";
       dependencies.forEach(element => {
-        console.log(element);
         _dependencies += !dt.find(d => d[1] === element) ? "" : dt.find(d => d[1] === element)[0] + ",";
       });
       if (selectedDoc) {
@@ -177,29 +174,43 @@ const DissertationGantt = () => {
   };
   const redrawsvg = svg => {
     let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
-    let rectGroups = svg.getElementsByTagName("g")[5]?.getElementsByTagName("rect");
+    // let rectGroups = svg.getElementsByTagName("g")[5]?.getElementsByTagName("rect");
+    if (!ganttGroups) return;
     for (let i = 0; i < ganttGroups.length; i++) {
-      let x = rectGroups[i].getAttribute("x") - rectGroups[i].getAttribute("width") / 2;
-      if (x < 300) {
-        x = x + 900;
-      } else if (x > 1000) {
-        x = x - 500;
+      if (ganttGroups[i].getElementsByTagName("tspan").length > 0) continue;
+      const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "");
+      let s2 = [];
+      let s1 = [];
+      ganttGroups[i].setAttribute("x", "0");
+      ganttGroups[i].setAttribute("dx", "0");
+      ganttGroups[i].removeAttribute("style");
+      if (text.length > 48) {
+        let middle = Math.floor(text.length / 2);
+        let before = text.lastIndexOf(" ", middle);
+        let after = text.indexOf(" ", middle + 1);
+        if (middle - before < after - middle) {
+          middle = before;
+        } else {
+          middle = after;
+        }
+        s1 = text.substr(0, middle);
+        s2 = text.substr(middle + 1);
+        const dx = s1.length * 0.46;
+
+        ganttGroups[
+          i
+        ].innerHTML = `<tspan><tspan inline dy="-0.5em"">${s1}</tspan><tspan  dx="-${dx}em" dy="1.3em">${s2}</tspan></tspan>`;
       }
-      ganttGroups[i].setAttribute("fill", "#1c2e12");
-      ganttGroups[i].setAttribute("transform", "translate(" + x + ")");
     }
   };
-  setTimeout(() => {
+  setInterval(() => {
     let container = document.getElementById("chart_div");
     if (container) {
       let svg = container.getElementsByTagName("svg")[0];
-      svg.addEventListener("mousemove", () => {
-        console.log("::: ::: svg ::: :: ", svg);
-        redrawsvg(svg);
-      });
+      if (!svg) return;
+      redrawsvg(svg);
     }
-  }, 1000);
-
+  }, 5);
   return (
     <>
       {email === "oneweb@umich.edu" && (
@@ -210,15 +221,7 @@ const DissertationGantt = () => {
       )}
 
       {dt && (
-        <div
-          style={{
-            width: "100%",
-            marginLeft: "14px",
-            height: "100vh",
-            overflowX: "hidden",
-            overflowY: "auto"
-          }}
-        >
+        <div>
           <Dialog
             open={open}
             onClose={handleClose}
@@ -350,7 +353,15 @@ const DissertationGantt = () => {
           </Dialog>
           <div
             id="chart_div"
-            style={{ marginLeft: "19px", marginRight: "19px", width: "97%", height: "1600px", overflow: "hidden" }}
+            style={{
+              marginLeft: "30px",
+              marginRight: "19px",
+              width: "97%",
+              height: "100vh",
+              overflow: "hidden",
+              overflowX: "hidden",
+              overflowY: "auto"
+            }}
           >
             <Chart
               chartType="Gantt"
@@ -377,7 +388,6 @@ const DissertationGantt = () => {
                     let container = document.getElementById("chart_div");
                     let svg = container.getElementsByTagName("svg")[0];
                     svg.addEventListener("mouseleave", () => {
-                      console.log("::: ::: svg ::: :: ", svg);
                       redrawsvg(svg);
                     });
                   }
@@ -386,7 +396,6 @@ const DissertationGantt = () => {
                   eventName: "select",
                   callback: e => {
                     if (email !== "oneweb@umich.edu") return;
-                    console.log(":: :: e.chartWrapper.getChart().getSelection() :: :: ", e.chartWrapper.getChart());
                     handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
                   }
                 }
