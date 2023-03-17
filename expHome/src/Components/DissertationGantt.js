@@ -18,10 +18,10 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
-
-const daysToMilliseconds = days => {
-  return days * 24 * 60 * 60 * 1000;
-};
+import DocumentDiss from "./DocumentDiss";
+// const daysToMilliseconds = days => {
+//   return days * 24 * 60 * 60 * 1000;
+// };
 
 const columns = [
   { type: "string", label: "Task ID" },
@@ -213,13 +213,6 @@ const DissertationGantt = () => {
   }, 5);
   return (
     <>
-      {email === "oneweb@umich.edu" && (
-        <Button variant="contained" onClick={handleAddNew}>
-          {" "}
-          Add new item{" "}
-        </Button>
-      )}
-
       {dt && (
         <div>
           <Dialog
@@ -363,35 +356,19 @@ const DissertationGantt = () => {
               overflowY: "auto"
             }}
           >
+            <DocumentDiss />
+            {email === "oneweb@umich.edu" && (
+              <Button variant="contained" onClick={handleAddNew}>
+                {" "}
+                Add new item{" "}
+              </Button>
+            )}
             <Chart
               chartType="Gantt"
               data={dt}
               height={1600}
               legendToggle
               chartEvents={[
-                {
-                  eventName: "ready",
-                  callback: async e => {
-                    e.chartWrapper.setOption("staticPosition", true);
-                    let container = document.getElementById("chart_div");
-                    let chart = e.chartWrapper.getChart();
-                    window.google.visualization.events.addListener(chart, "ready", () => {
-                      let svg = container.getElementsByTagName("svg")[0];
-                      redrawsvg(svg);
-                    });
-                  }
-                },
-                {
-                  eventName: "ready",
-                  callback: async e => {
-                    e.chartWrapper.setOption("staticPosition", true);
-                    let container = document.getElementById("chart_div");
-                    let svg = container.getElementsByTagName("svg")[0];
-                    svg.addEventListener("mouseleave", () => {
-                      redrawsvg(svg);
-                    });
-                  }
-                },
                 {
                   eventName: "select",
                   callback: e => {
