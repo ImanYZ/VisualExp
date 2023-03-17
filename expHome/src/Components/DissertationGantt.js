@@ -47,6 +47,30 @@ const DissertationGantt = () => {
   const [selectedDoc, setSelectedDoc] = useState("");
   const [dependencies, setDependencies] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [expanded, setExpanded] = React.useState(false);
+
+  const topologicalSort = resources => {
+    const visited = new Set();
+    const result = [];
+
+    function visit(resource, index) {
+      if (!visited.has(index)) {
+        visited.add(index);
+
+        for (const dependencyIndex of resource.resDepencies) {
+          visit(resources[dependencyIndex], dependencyIndex);
+        }
+
+        result.push(resource);
+      }
+    }
+
+    for (const [index, resource] of resources.entries()) {
+      visit(resource, index);
+    }
+
+    return result;
+  };
 
   useEffect(() => {
     const drawChart = async () => {
@@ -65,6 +89,43 @@ const DissertationGantt = () => {
         const dissertationTimeLineSnapshot = dissertationTimeLineQuery.onSnapshot(snapshot => {
           const docChanges = snapshot.docChanges();
           let rows = [];
+          let resources = [];
+          for (let docChange of docChanges) {
+            const { resource, dependencies, end } = docChange.doc.data();
+
+            const resIndex = resources.findIndex(res => res.resource === resource);
+            if (resIndex !== -1) {
+              resources[resIndex].itemIds.push(docChange.doc.id);
+              resources[resIndex].num += 1;
+              resources[resIndex].endAvg += end.toDate().getTime() / 1000;
+              resources[resIndex].dependencies.concat(dependencies.split(","));
+            } else {
+              resources.push({
+                resource,
+                itemIds: [docChange.doc.id],
+                endAvg: end.toDate().getTime() / 1000,
+                num: 1,
+                dependencies: dependencies.split(",")
+              });
+            }
+          }
+          for (let resource of resources) {
+            resource.endAvg = resource.endAvg / resource.num;
+            resource.resDepencies = [];
+            for (let dependency of resource.dependencies) {
+              for (let rIdex = 0; rIdex < resources.length; rIdex++) {
+                if (resources[rIdex].itemIds.includes(dependency)) {
+                  resource.resDepencies.push(rIdex);
+                }
+              }
+            }
+          }
+
+          resources.sort((a, b) => {
+            return a.endAvg < b.endAvg ? 1 : -1;
+          });
+          resources = topologicalSort(resources);
+
           for (let docChange of docChanges) {
             const { name, resource, start, end, duration, completed, dependencies } = docChange.doc.data();
             rows.push([
@@ -78,6 +139,15 @@ const DissertationGantt = () => {
               dependencies
             ]);
           }
+          rows.sort((a, b) => {
+            return a[4] < b[4] ? 1 : -1;
+          });
+          rows.sort((a, b) => {
+            const indexA = resources.findIndex(res => res.resource === a[2]);
+            const indexB = resources.findIndex(res => res.resource === b[2]);
+            return indexA < indexB ? 1 : -1;
+          });
+
           // rows = rows.filter(row => row[0] !== "zzP2i9zo9C4xzyH2wpER");
           setDt([columns, ...rows]);
         });
@@ -172,6 +242,7 @@ const DissertationGantt = () => {
     setDependencies([]);
     setOpen(true);
   };
+
   const redrawsvg = svg => {
     let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
     // let rectGroups = svg.getElementsByTagName("g")[5]?.getElementsByTagName("rect");
@@ -197,9 +268,7 @@ const DissertationGantt = () => {
         s2 = text.substr(middle + 1);
         const dx = s1.length * 0.46;
 
-        ganttGroups[
-          i
-        ].innerHTML = `<tspan><tspan inline dy="-0.5em"">${s1}</tspan><tspan  dx="-${dx}em" dy="1.3em">${s2}</tspan></tspan>`;
+        ganttGroups[i].innerHTML = `<tspan dy="-0.5em">${s1.trim()}</tspan><tspan  x="0" dy="1em">${s2}</tspan>`;
       }
     }
   };
@@ -210,7 +279,13 @@ const DissertationGantt = () => {
       if (!svg) return;
       redrawsvg(svg);
     }
-  }, 5);
+  }, 100);
+  const options = {
+    gantt: {
+      sortTasks: false
+    }
+  };
+
   return (
     <>
       {dt && (
@@ -345,7 +420,6 @@ const DissertationGantt = () => {
             </DialogActions>
           </Dialog>
           <div
-            id="chart_div"
             style={{
               marginLeft: "30px",
               marginRight: "19px",
@@ -363,21 +437,24 @@ const DissertationGantt = () => {
                 Add new item{" "}
               </Button>
             )}
-            <Chart
-              chartType="Gantt"
-              data={dt}
-              height={1600}
-              legendToggle
-              chartEvents={[
-                {
-                  eventName: "select",
-                  callback: e => {
-                    if (email !== "oneweb@umich.edu") return;
-                    handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+            <h2>Dissertation Gantt Chart : </h2>
+            <div id="chart_div">
+              <Chart
+                chartType="Gantt"
+                data={dt}
+                height={1600}
+                options={options}
+                chartEvents={[
+                  {
+                    eventName: "select",
+                    callback: e => {
+                      if (email !== "oneweb@umich.edu") return;
+                      handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                    }
                   }
-                }
-              ]}
-            />
+                ]}
+              />
+            </div>
           </div>
         </div>
       )}
