@@ -24,7 +24,7 @@ const panels = [
   },
   {
     id: "panel2",
-    heading: <h2>Chapter 2 :Optimal chunk size and representation for learning</h2>,
+    heading: <h2>Chapter 2 : Optimal chunk size and representation for learning</h2>,
     details: (
       <div>
         <p>
