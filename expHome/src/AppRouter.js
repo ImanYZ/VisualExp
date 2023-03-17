@@ -467,7 +467,7 @@ const AppRouter = props => {
       <Route path="/Terms/*" element={<Terms />} />
       <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
-      <Route path="/DissertationGantt" element={<DissertationGantt />} />
+      <Route path="/Iman-Dissertation-Prospectus" element={<DissertationGantt />} />
       <Route path="/JoinUsIframe/*" element={<JoinUsIframe community={props.community} />} />
       {fullname && emailVerified === "Verified" && (
         <>
