@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
-import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
+import { firebaseState } from "../../../store/AuthAtoms";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@mui/material";
@@ -22,6 +22,8 @@ const RecallForIman = props => {
 
   const [botVotes, setBotVotes] = useState(0);
   const [pairPhrases, setPairPhrases] = useState(0);
+  const [doneProcessing, setDoneProcessing] = useState(true);
+
   useEffect(() => {
     const getPassages = async () => {
       const _passagesHash = {};
@@ -44,18 +46,20 @@ const RecallForIman = props => {
       const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
       let countBotVotes = 0;
       let countPairPhrases = 0;
+      let i = 0;
       recallGradesDocs.docs.forEach(recallDoc => {
         const recallData = recallDoc.data();
+
+        console.log(i++);
         for (let session in recallData.sessions) {
           // eslint-disable-next-line no-loop-func
           recallData.sessions[session].forEach((conditionItem, conditionIndex) => {
             conditionItem.phrases.forEach((phraseItem, phraseIndex) => {
               countPairPhrases++;
-              if (phraseItem.researchers.includes(gptResearcher)) countBotVotes = countBotVotes + 1;
+              if (phraseItem.hasOwnProperty("gpt4Grade")) countBotVotes = countBotVotes + 1;
 
               if (!phraseItem.hasOwnProperty("majority")) {
                 let _grades = phraseItem.grades.slice();
-                let _researchers = phraseItem.researchers.slice();
 
                 const trueVotes = _grades.filter(
                   (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
@@ -64,11 +68,11 @@ const RecallForIman = props => {
                   (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
                 ).length;
 
-                if (trueVotes === falseVotes && _grades.length >= 4) {
+                if (trueVotes === falseVotes && _grades.length >= 4 && phraseItem.hasOwnProperty("gpt4Grade")) {
                   _noMajority.push({
                     ...phraseItem,
                     grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                    botGrade: _grades[_researchers.indexOf(gptResearcher)] || "NAN",
+                    botGrade: phraseItem.gpt4Grade ,
                     Response: conditionItem.response,
                     session: session,
                     consdition: conditionIndex,
@@ -78,18 +82,13 @@ const RecallForIman = props => {
                   });
                 }
                 _grades = phraseItem.grades.slice();
-                _researchers = phraseItem.researchers.slice();
                 if (
-                  (trueVotes >= 3 &&
-                    _researchers.indexOf(gptResearcher) > -1 &&
-                    !_grades[_researchers.indexOf(gptResearcher)]) ||
-                  (falseVotes >= 3 &&
-                    _researchers.slice().indexOf(gptResearcher) > -1 &&
-                    phraseItem.grades[_researchers.indexOf(gptResearcher)])
+                  phraseItem.hasOwnProperty("gpt4Grade") &&
+                  ((trueVotes >= 3 && !phraseItem.gpt4Grade) || (falseVotes >= 3 && phraseItem.gpt4Grade))
                 ) {
                   _majorityDifferentThanBot.push({
                     ...phraseItem,
-                    botGrade: _grades.slice()[_researchers.indexOf(gptResearcher)],
+                    botGrade: phraseItem.gpt4Grade,
                     grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
                     Response: conditionItem.response,
                     session: session,
@@ -113,14 +112,13 @@ const RecallForIman = props => {
       setMajorityDifferentThanBot(__majorityDifferentThanBot);
       setBotVotes(countBotVotes);
       setPairPhrases(countPairPhrases);
+      setDoneProcessing(true);
     };
 
     if (firebase && passagesHash) {
       getRecall();
     }
   }, [firebase, passagesHash]);
-
-
 
   const nextPhrase = () => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
@@ -175,6 +173,9 @@ const RecallForIman = props => {
       console.log("error", error);
     }
   };
+
+  if (doneProcessing && !majorityDifferentThanBot.length) return <>NO RECORDS TO COMPARE</>;
+
   if (!majorityDifferentThanBot.length)
     return (
       <Box
@@ -191,9 +192,9 @@ const RecallForIman = props => {
     <Box sx={{ mb: "15px", ml: "15px" }}>
       <Box>
         <Typography variant="h5" component="h5">
-          The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} / { pairPhrases}
+          The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} /{" "}
+          {pairPhrases}
         </Typography>
-
         {"\n"}
         <Box>OriginalPassgae :</Box>
         <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
