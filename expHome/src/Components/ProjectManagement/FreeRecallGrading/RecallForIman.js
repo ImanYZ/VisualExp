@@ -173,14 +173,6 @@ const RecallForIman = props => {
       console.log("error", error);
     }
   };
-
-  if (doneProcessing && !majorityDifferentThanBot.length)
-    return (
-      <>
-        NO RECORDS TO COMPARE {botVotes} / {pairPhrases}
-      </>
-    );
-
   if (!majorityDifferentThanBot.length)
     return (
       <Box
@@ -193,6 +185,13 @@ const RecallForIman = props => {
         <CircularProgress />
       </Box>
     );
+  if (doneProcessing && !majorityDifferentThanBot.length)
+    return (
+      <>
+        NO RECORDS TO COMPARE {botVotes} / {pairPhrases}
+      </>
+    );
+
   return (
     <Box sx={{ mb: "15px", ml: "15px" }}>
       <Box>
