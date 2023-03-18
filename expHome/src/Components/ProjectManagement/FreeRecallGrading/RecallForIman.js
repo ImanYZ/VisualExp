@@ -72,7 +72,7 @@ const RecallForIman = props => {
                   _noMajority.push({
                     ...phraseItem,
                     grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                    botGrade: phraseItem.gpt4Grade || "NAN",
+                    botGrade: phraseItem.gpt4Grade ,
                     Response: conditionItem.response,
                     session: session,
                     consdition: conditionIndex,
