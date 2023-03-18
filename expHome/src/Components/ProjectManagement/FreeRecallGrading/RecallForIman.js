@@ -191,144 +191,148 @@ const RecallForIman = props => {
         NO RECORDS TO COMPARE {botVotes} / {pairPhrases}
       </>
     );
-
+  console.log("noMajority", majorityDifferentThanBot);
   return (
     <Box sx={{ mb: "15px", ml: "15px" }}>
-      <Box>
-        <Typography variant="h5" component="h5">
-          The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} /{" "}
-          {pairPhrases}
-        </Typography>
-        {"\n"}
-        <Box>OriginalPassgae :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {majorityDifferentThanBot.length > 0 &&
-            majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
-        </Paper>
-        <Box>Response :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
-        </Paper>
-        <Box>The key phrase :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
-        </Paper>
-        <Box>The three of four grades :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {majorityDifferentThanBot.length > 0 &&
-            majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
-              return <>{grade ? "YES" : "NO"} </>;
-            })}
-        </Paper>
-        <Box>Iman's grade</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade
-            ? "YES"
-            : "NO"}
-        </Paper>
-        {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length + 1}
-        <Button
-          disabled={indexOfmajorityDifferentThanBot === 0}
-          onClick={previousPhrase}
-          className="Button"
-          variant="contained"
-          id="recall-submit"
-        >
-          Previous
-        </Button>
-        <Button
-          disabled={indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1}
-          onClick={nextPhrase}
-          className="Button"
-          variant="contained"
-          id="recall-submit"
-        >
-          Next
-        </Button>
-        <Button
-          onClick={() => voteOnPhraseMajority1("yes")}
-          className="Button"
-          variant="contained"
-          color="success"
-          id="recall-submit"
-        >
-          YES
-        </Button>
-        <Button
-          onClick={() => voteOnPhraseMajority1("no")}
-          className="Button"
-          variant="contained"
-          color="error"
-          id="recall-submit"
-        >
-          NO
-        </Button>
-      </Box>
-      <Box sx={{ mt: "15px" }}>
-        <Typography variant="h5" component="h5">
-          The Response has four grades, but do not satisfy the majority of votes :
-        </Typography>
-        <Box>OriginalPassgae :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 && noMajority[indexOfNoMajority].originalPassgae}
-        </Paper>
-        <Box>Response :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 && noMajority[indexOfNoMajority].Response}
-        </Paper>
-        <Box>The key phrase :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 && noMajority[indexOfNoMajority].phrase}
-        </Paper>
-        <Box>Researchers grades :</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 &&
-            noMajority[indexOfNoMajority].grades.map(grade => {
-              return <>{grade ? "YES" : "NO"} </>;
-            })}
-        </Paper>
-        <Box>Iman's grade</Box>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-          {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
-        </Paper>
-        {indexOfNoMajority + 1} / {noMajority.length + 1}
-        <Button
-          onClick={previousPhraseMajority}
-          className="Button"
-          variant="contained"
-          id="recall-submit"
-          disabled={indexOfNoMajority === 0}
-        >
-          Previous
-        </Button>
-        <Button
-          disabled={indexOfNoMajority === noMajority.length - 1}
-          onClick={nextPhraseMajority}
-          className="Button"
-          variant="contained"
-          id="recall-submit"
-        >
-          Next
-        </Button>
-        <Button
-          onClick={() => voteOnPhraseMajority2("yes")}
-          className="Button"
-          variant="contained"
-          color="success"
-          id="recall-submit"
-        >
-          YES
-        </Button>
-        <Button
-          onClick={() => voteOnPhraseMajority2("no")}
-          className="Button"
-          variant="contained"
-          color="error"
-          id="recall-submit"
-        >
-          NO
-        </Button>
-      </Box>
+      {majorityDifferentThanBot.length > 0 && (
+        <Box>
+          <Typography variant="h5" component="h5">
+            The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} /{" "}
+            {pairPhrases}
+          </Typography>
+          {"\n"}
+          <Box>OriginalPassgae :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {majorityDifferentThanBot.length > 0 &&
+              majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
+          </Paper>
+          <Box>Response :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
+          </Paper>
+          <Box>The key phrase :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
+          </Paper>
+          <Box>The three of four grades :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {majorityDifferentThanBot.length > 0 &&
+              majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
+                return <>{grade ? "YES" : "NO"} </>;
+              })}
+          </Paper>
+          <Box>Iman's grade</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade
+              ? "YES"
+              : "NO"}
+          </Paper>
+          {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
+          <Button
+            disabled={indexOfmajorityDifferentThanBot === 0}
+            onClick={previousPhrase}
+            className="Button"
+            variant="contained"
+            id="recall-submit"
+          >
+            Previous
+          </Button>
+          <Button
+            disabled={indexOfmajorityDifferentThanBot + 1 >= majorityDifferentThanBot.length}
+            onClick={nextPhrase}
+            className="Button"
+            variant="contained"
+            id="recall-submit"
+          >
+            Next
+          </Button>
+          <Button
+            onClick={() => voteOnPhraseMajority1("yes")}
+            className="Button"
+            variant="contained"
+            color="success"
+            id="recall-submit"
+          >
+            YES
+          </Button>
+          <Button
+            onClick={() => voteOnPhraseMajority1("no")}
+            className="Button"
+            variant="contained"
+            color="error"
+            id="recall-submit"
+          >
+            NO
+          </Button>
+        </Box>
+      )}
+      {noMajority.length > 0 && (
+        <Box sx={{ mt: "15px" }}>
+          <Typography variant="h5" component="h5">
+            The Response has four grades, but do not satisfy the majority of votes :
+          </Typography>
+          <Box>OriginalPassgae :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {noMajority.length > 0 && noMajority[indexOfNoMajority].originalPassgae}
+          </Paper>
+          <Box>Response :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {noMajority.length > 0 && noMajority[indexOfNoMajority].Response}
+          </Paper>
+          <Box>The key phrase :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {noMajority.length > 0 && noMajority[indexOfNoMajority].phrase}
+          </Paper>
+          <Box>Researchers grades :</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {noMajority.length > 0 &&
+              noMajority[indexOfNoMajority].grades.map(grade => {
+                return <>{grade ? "YES" : "NO"} </>;
+              })}
+          </Paper>
+          <Box>Iman's grade</Box>
+          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+            {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
+          </Paper>
+          {indexOfNoMajority + 1} / {noMajority.length}
+          <Button
+            onClick={previousPhraseMajority}
+            className="Button"
+            variant="contained"
+            id="recall-submit"
+            disabled={indexOfNoMajority === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            disabled={indexOfNoMajority + 1 >= noMajority.length}
+            onClick={nextPhraseMajority}
+            className="Button"
+            variant="contained"
+            id="recall-submit"
+          >
+            Next
+          </Button>
+          <Button
+            onClick={() => voteOnPhraseMajority2("yes")}
+            className="Button"
+            variant="contained"
+            color="success"
+            id="recall-submit"
+          >
+            YES
+          </Button>
+          <Button
+            onClick={() => voteOnPhraseMajority2("no")}
+            className="Button"
+            variant="contained"
+            color="error"
+            id="recall-submit"
+          >
+            NO
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
