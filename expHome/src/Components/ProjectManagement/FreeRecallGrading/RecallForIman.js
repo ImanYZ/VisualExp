@@ -72,7 +72,7 @@ const RecallForIman = props => {
                   _noMajority.push({
                     ...phraseItem,
                     grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                    botGrade: phraseItem.gpt4Grade ,
+                    botGrade: phraseItem.gpt4Grade,
                     Response: conditionItem.response,
                     session: session,
                     consdition: conditionIndex,
@@ -174,7 +174,12 @@ const RecallForIman = props => {
     }
   };
 
-  if (doneProcessing && !majorityDifferentThanBot.length) return <>NO RECORDS TO COMPARE</>;
+  if (doneProcessing && !majorityDifferentThanBot.length)
+    return (
+      <>
+        NO RECORDS TO COMPARE {botVotes} / {pairPhrases}
+      </>
+    );
 
   if (!majorityDifferentThanBot.length)
     return (
