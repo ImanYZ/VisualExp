@@ -13,7 +13,7 @@ const PAPER_ITEMS = [
     `,
     link: "https://dl.acm.org/doi/10.1145/3545945.3569839",
     image: "/static/about/research/ACM-SIGCSE-2023-Reducing-Procrastination.svg",
-    imageDark: "/static/about/research/ACM-SIGCSE-2023-Reducing-Procrastination.svg"
+    imageDark: "/static/about/research/ACM-SIGCSE-2023-Reducing-Procrastination--dark.svg"
   },
   {
     id: "paper-101",
@@ -22,7 +22,7 @@ const PAPER_ITEMS = [
     content: `Desirable difficulties such as retrieval practice (testing) and spacing (distributed studying) are shown to improve long-term learning. Despite their knowledge about the benefits of retrieval practice, students struggle with application. We propose a mechanism of embedding desirable difficulties in the classroom called "retrieval-based teaching." We define it as asking students many ungraded, granular questions in class. We hypothesized that this method could motivate students to (1) study more and (2) increase the spacing of their studying. We tested these two hypotheses through a quasi-experiment in an introductory programming course. We compared 684 students' granular activities with an interactive eBook between the class discussion sections where the intervention was implemented and the control discussion sections. Over four semesters, there were a total of 17 graduate student instructors (GSIs) that taught the discussion sections. Each semester, there were five discussion sections, each taught by a distinct GSI. Only one of the five per semester implemented the treatment in their discussion section(s) by dedicating most of the class time for retrieval-based teaching. Our analysis of these data collected over four consecutive semesters shows that retrieval-based teaching motivated students to space their studying over an average of 3.78 more days, but it did not significantly increase the amount they studied. Students in the treatment group earned an average of 2.36 percentage points higher in course grades. Our mediation analysis indicates that spacing was the main factor in increasing the treated students' grades.`,
     link: "https://dl.acm.org/doi/abs/10.1145/3478431.3499408",
     image: "/static/about/research/ACM-SIGCSE-2022-Retrieval-base-Teaching.svg",
-    imageDark: "/static/about/research/ACM-SIGCSE-2022-Retrieval-base-Teaching--dark.svg"
+    imageDark: "/static/about/research/ACM-SIGCSE-2022-Retrieval-base-Teaching.svg"
   },
   {
     id: "paper-102",
