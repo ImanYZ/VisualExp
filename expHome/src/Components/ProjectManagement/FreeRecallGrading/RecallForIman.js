@@ -74,7 +74,7 @@ const RecallForIman = props => {
                     grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
                     Response: conditionItem.response,
                     session: session,
-                    consdition: conditionIndex,
+                    condition: conditionIndex,
                     id: recallDoc.id,
                     originalPassgae: passagesHash[conditionItem.passage],
                     phraseIndex
