@@ -68,18 +68,19 @@ const RecallForIman = props => {
                   (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
                 ).length;
 
-                if (trueVotes === falseVotes && _grades.length >= 4 && phraseItem.hasOwnProperty("gpt4Grade")) {
-                  _noMajority.push({
+                if (trueVotes === falseVotes && _grades.length >= 4) {
+                  const _itemPharse = {
                     ...phraseItem,
                     grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
-                    botGrade: phraseItem.gpt4Grade,
                     Response: conditionItem.response,
                     session: session,
                     consdition: conditionIndex,
                     id: recallDoc.id,
                     originalPassgae: passagesHash[conditionItem.passage],
                     phraseIndex
-                  });
+                  };
+                  if (phraseItem.hasOwnProperty("gpt4Grade")) _itemPharse.botGrade = phraseItem.gpt4Grade;
+                  _noMajority.push(_itemPharse);
                 }
                 _grades = phraseItem.grades.slice();
                 if (
@@ -203,29 +204,25 @@ const RecallForIman = props => {
           {"\n"}
           <Box>OriginalPassgae :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot.length > 0 &&
-              majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
+            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].originalPassgae}
           </Paper>
           <Box>Response :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
+            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].Response}
           </Paper>
           <Box>The key phrase :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
+            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].phrase}
           </Paper>
           <Box>The three of four grades :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot.length > 0 &&
-              majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
-                return <>{grade ? "YES" : "NO"} </>;
-              })}
+            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].grades.map((grade, index) => {
+              return <>{grade ? "YES" : "NO"} </>;
+            })}
           </Paper>
           <Box>Iman's grade</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade
-              ? "YES"
-              : "NO"}
+            {majorityDifferentThanBot[indexOfmajorityDifferentThanBot].botGrade ? "YES" : "NO"}
           </Paper>
           {indexOfmajorityDifferentThanBot + 1} / {majorityDifferentThanBot.length}
           <Button
@@ -273,27 +270,30 @@ const RecallForIman = props => {
           </Typography>
           <Box>OriginalPassgae :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority.length > 0 && noMajority[indexOfNoMajority].originalPassgae}
+            {noMajority[indexOfNoMajority].originalPassgae}
           </Paper>
           <Box>Response :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority.length > 0 && noMajority[indexOfNoMajority].Response}
+            {noMajority[indexOfNoMajority].Response}
           </Paper>
           <Box>The key phrase :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority.length > 0 && noMajority[indexOfNoMajority].phrase}
+            {noMajority[indexOfNoMajority].phrase}
           </Paper>
           <Box>Researchers grades :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority.length > 0 &&
-              noMajority[indexOfNoMajority].grades.map(grade => {
-                return <>{grade ? "YES" : "NO"} </>;
-              })}
+            {noMajority[indexOfNoMajority].grades.map(grade => {
+              return <>{grade ? "YES" : "NO"} </>;
+            })}
           </Paper>
-          <Box>Iman's grade</Box>
-          <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
-            {noMajority.length > 0 && noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
-          </Paper>
+          {noMajority[indexOfNoMajority].hasOwnProperty("botGrade") && (
+            <>
+              <Box>Iman's grade</Box>
+              <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
+                {noMajority[indexOfNoMajority].botGrade ? "YES" : "NO"}
+              </Paper>
+            </>
+          )}
           {indexOfNoMajority + 1} / {noMajority.length}
           <Button
             onClick={previousPhraseMajority}
