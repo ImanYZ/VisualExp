@@ -8,7 +8,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 const panels = [
   {
     id: "panel1",
-    heading: <h2>Chapter 1 : Introduction</h2>,
+    heading: <h2>Chapter 1: Introduction</h2>,
     details: (
       <p>
         <span>
@@ -24,14 +24,14 @@ const panels = [
   },
   {
     id: "panel2",
-    heading: <h2>Chapter 2 : Optimal chunk size and representation for learning</h2>,
+    heading: <h2>Chapter 2: Optimal chunk size and presentation for learning</h2>,
     details: (
       <div>
         <p>
           <span>I designed Hybrid Maps, a method of visualizing </span>
           <span>hierarchical</span>
           <span>
-            &nbsp;knowledge graph motivated by past research on knowledge representation and hypertext. Its key design
+            &nbsp;knowledge graph motivated by past research on knowledge presentation and hypertext. Its key design
             features are:
           </span>
         </p>
@@ -40,7 +40,7 @@ const panels = [
             <span>Each node has a title and a paragraph, small enough to describe only one main concept.</span>
           </li>
           <li>
-            <span>The links between nodes are visualized in a left-to-right orientation.</span>
+            <span>The links between nodes are visualized in a two-dimensional, left-to-right and top-to-bottom, orientation.</span>
           </li>
           <li>
             <span>
@@ -96,7 +96,7 @@ const panels = [
   },
   {
     id: "panel3",
-    heading: <h2>Chapter 3 : Crowdsourcing coherent taxonomy of small, mutually exclusive learning modules</h2>,
+    heading: <h2>Chapter 3: Crowdsourcing coherent taxonomy of small, mutually exclusive learning modules</h2>,
     details: (
       <div>
         {" "}
@@ -152,7 +152,7 @@ const panels = [
     id: "panel4",
     heading: (
       <h2>
-        Chapter 4 : How to utilize spaced, interleaved retrieval practice to improve learner retention of micro-content
+        Chapter 4: How to utilize spaced, interleaved retrieval practice to improve learner retention of micro-content
       </h2>
     ),
     details: (
@@ -258,7 +258,7 @@ const panels = [
     id: "panel6",
     heading: <h2>Visualized Dissertation Prospectus</h2>,
     details: (
-      <img src="https://docs.google.com/drawings/d/e/2PACX-1vRhqhVxMg00Av4QaNpbZ3kRDNpGud6VEbYnvXIM4nyi4lOV0D6cnTA2-h0ifipNLTB6pormZJeCjABz/pub?w=963&amp;h=1413"></img>
+      <img alt="" src="https://docs.google.com/drawings/d/e/2PACX-1vRhqhVxMg00Av4QaNpbZ3kRDNpGud6VEbYnvXIM4nyi4lOV0D6cnTA2-h0ifipNLTB6pormZJeCjABz/pub?w=963&amp;h=1413"/>
     )
   }
 ];
