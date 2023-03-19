@@ -75,7 +75,7 @@ const RecallForIman = props => {
                     botGrade: phraseItem.gpt4Grade,
                     Response: conditionItem.response,
                     session: session,
-                    consdition: conditionIndex,
+                    condition: conditionIndex,
                     id: recallDoc.id,
                     originalPassgae: passagesHash[conditionItem.passage],
                     phraseIndex
