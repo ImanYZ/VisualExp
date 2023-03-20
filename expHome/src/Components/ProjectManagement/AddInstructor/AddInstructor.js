@@ -398,7 +398,7 @@ const AddInstructor = props => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [otherInterestedTopic, setOtherInterestedTopic] = useState("");
   const [otherInstructorData, setOtherInstructorData] = useState({});
-
+  const [doneVoteChanges, setDoneVoteChanges] = useState(false);
   useEffect(() => {
     setSelectedRows([]);
     setValues(initialState);
@@ -712,7 +712,7 @@ const AddInstructor = props => {
               downVote: voteData.downVote ? "👎" : "◻",
               currentVote: voteData.upVote - voteData.downVote
             };
-          } else {
+          } /* else {
             // If the othersInstructor object does not exist, create it with
             // default values for other fields until we load those values. This
             // will probably never happen becuase an othersInstructor should be
@@ -730,9 +730,10 @@ const AddInstructor = props => {
               ...initialState,
               id: voteData.instructor
             });
-          }
+          } */
         }
       }
+      setDoneVoteChanges(true);
       assignDayUpVotesPoint(nUpVotedToday);
       // When a researcher upvotes 16 instructors/school administrators that are
       // added by other researchers, today, they get a point for it. No partial
@@ -762,6 +763,7 @@ const AddInstructor = props => {
   // equal to 3 votes from researchers, we should remove it from
   // othersInstructors.
   useEffect(() => {
+    if (!doneVoteChanges) return;
     let theInstructor;
     let uInstructorsNum = 0;
     let oInsts = [...othersInstructors];
@@ -789,7 +791,10 @@ const AddInstructor = props => {
     if (oInstsChanged) {
       setOthersInstructors(oInsts);
     }
-  }, [othersInstructors]);
+    return () => {
+      setDoneVoteChanges(false);
+    };
+  }, [othersInstructors, doneVoteChanges]);
 
   // If the authenticated research clicks one of the rows in the other
   // instructors' data grid, we should load that as the other instructor to show
