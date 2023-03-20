@@ -228,15 +228,12 @@ const panels = [
         </ul>
         <p>
           <span>
-            Research indicates that interleaved practice, mixing problems from different topics, is more effective than
-            traditional mathematics assignments focused on a block of questions about a single topic. Interleaving
-            challenges students to use the appropriate strategy for each problem, leading to higher test scores. Despite
-            the proven benefits of interleaved practice, most math textbooks rely on blocked practice. Interleaving has
-            been found to have a positive impact on learning, but its effectiveness may depend on the course design. In
-            progressive learning pathways where concepts build upon each other, interleaving may hinder learning if
-            prior chapters are not distinct enough. We conducted a randomized, controlled experiment across eight
-            computer science courses, where the topics progressively built upon one another. The results showed a
-            significant negative effect of high interleaving on standardized exam scores.
+            The effectiveness of interleaved practice has been established in previous studies. However, I conducted a
+            randomized controlled experiment across eight computer science courses and found that when topics are
+            interrelated, interleaving can negatively impact standardized exam scores. The experiment suggests that
+            interleaving is only beneficial when topics are distinct enough to cause forgetting. When topics
+            progressively build upon one another, revisiting prior topics is necessary, and interleaving can waste
+            students' time.
           </span>
         </p>
       </div>
