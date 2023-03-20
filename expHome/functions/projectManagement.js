@@ -2605,9 +2605,12 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
         .where("project", "==", project)
         .where("researcher", "==", fullname)
         .get();
-      const feedbackCodeOrderRef = db
-        .collection("feedbackCodeOrderV2")
-        .doc(feedbackCodeOrders.docs.length ? feedbackCodeOrders.docs[0].id : undefined);
+      let feedbackCodeOrderRef;
+      if (!feedbackCodeOrders.docs.length) {
+        feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc();
+      } else {
+        feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+      }
       const feedbackCodeData = feedbackCodeOrders.docs.length
         ? feedbackCodeOrders.docs[0].data()
         : {
