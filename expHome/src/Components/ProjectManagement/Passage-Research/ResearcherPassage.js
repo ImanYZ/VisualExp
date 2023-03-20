@@ -27,8 +27,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import CustomTextInput from "./customTextField";
-import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 
 const modalStyle = {
   position: "absolute",
@@ -54,8 +52,6 @@ const ResearcherPassage = () => {
   const [userCondition2, setUserCondition2] = React.useState({});
   const [passage2, setPassage2] = useState({});
   const [passage1, setPassage1] = useState({});
-  const [passageKeys1, setPassageKeys1] = useState({});
-  const [passageKeys2, setPassageKeys2] = useState({});
   const [passageCondition, setPassageCondition] = React.useState(0);
   const [passageCondition2, setPassageCondition2] = React.useState(0);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -140,16 +136,12 @@ const ResearcherPassage = () => {
         setPConURL2(passags[0]["linkK2"]);
         setPassage2(passags[0]);
         setPassage1(passags[0]);
-        setPassageKeys1(passags[0].keys || {});
-        setPassageKeys2(passags[0].keys || {});
         setFirstLoad(false);
       } else {
         const index1 = titles.indexOf(passage1.title);
         const index2 = titles.indexOf(passage2.title);
         setPassage1(passags[index1]);
         setPassage2(passags[index2]);
-        setPassageKeys1(passags[index1].keys || {});
-        setPassageKeys2(passags[index2].keys || {});
       }
       setPassagesLoadedUse(false);
     }
@@ -164,7 +156,6 @@ const ResearcherPassage = () => {
     setUserCondition(userCondition);
     setPassageCondition("H2");
     setPassage1(passage);
-    setPassageKeys1(passage.keys || {});
   };
 
   const handlePassageConditionChange = event => {
@@ -182,7 +173,6 @@ const ResearcherPassage = () => {
     setUserCondition2(userCondition);
     setPassageCondition2("K2");
     setPassage2(passage);
-    setPassageKeys2(passage.keys || {});
   };
 
   const handlePassageConditionChange2 = event => {
@@ -192,79 +182,79 @@ const ResearcherPassage = () => {
   };
 
   const hundleUpdatePhrase = async event => {
-    const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
-    const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-    const passageUpdate = passageDoc.docs[0].data();
-    passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
-    if (passageUpdate.keys && passageUpdate.keys[selectedPhrase]) {
-      passageUpdate.keys[newPhrase] = passageUpdate.keys[selectedPhrase];
-      delete passageUpdate.keys[selectedPhrase];
-    }
-    await firebase.batchUpdate(passageRef, passageUpdate);
-    const recallGradesDoc = await firebase.db
-      .collection("recallGrades")
-      .where("passage", "==", passageDoc.docs[0].id)
-      .where("phrase", "==", selectedPhrase)
-      .get();
-    const recallGradesDocH1L2 = await firebase.db
-      .collection("recallGradesH1L2")
-      .where("passage", "==", passageDoc.docs[0].id)
-      .where("phrase", "==", selectedPhrase)
-      .get();
+    try {
+      const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
+      const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
+      const passageUpdate = passageDoc.docs[0].data();
+      passageUpdate.phrases[passageUpdate.phrases.indexOf(selectedPhrase)] = newPhrase;
 
-    for (let recallDoc of recallGradesDoc.docs) {
-      const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-      const recallUpdate = {
-        phrase: newPhrase
-      };
-      await firebase.batchUpdate(recallRef, recallUpdate);
+      const recallGradesDoc = await firebase.db
+        .collection("recallGradesV2")
+        .where("passages", "array-contains", passageDoc.docs[0].id)
+        .get();
+
+      recallGradesDoc.docs.forEach(async recallDoc => {
+        const recallData = recallDoc.data();
+        let sessions = recallData.sessions;
+
+        for (let session in sessions) {
+          sessions[session].forEach(conditionItem => {
+            for (let phraseItem of conditionItem.phrases) {
+              if (phraseItem.phrase === selectedPhrase) {
+                phraseItem.phrase = newPhrase;
+              }
+            }
+          });
+        }
+
+        const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
+
+        await recallRef.update({
+          sessions
+        });
+      });
+
+      await passageRef.update(passageUpdate);
+      handleCloseEditModal();
+      setPassagesLoaded(false);
+      setUpdatingPhrase(false);
+    } catch (error) {
+      handleCloseEditModal();
+      setPassagesLoaded(false);
+      setUpdatingPhrase(false);
+      console.log(error);
     }
-    for (let recallDoc of recallGradesDocH1L2.docs) {
-      const recallRef = firebase.db.collection("recallGradesH1L2").doc(recallDoc.id);
-      const recallUpdate = {
-        phrase: newPhrase
-      };
-      await firebase.batchUpdate(recallRef, recallUpdate);
-    }
-    await firebase.commitBatch();
-    handleCloseEditModal();
-    setPassagesLoaded(false);
-    setUpdatingPhrase(false);
   };
 
   const handleDeletePhrase = async event => {
+    let updateDocuments = [];
     const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
     let allowDelete = true;
     let numberRecord = 0;
+
     const recallGradesDoc = await firebase.db
-      .collection("recallGrades")
-      .where("passage", "==", passageDoc.docs[0].id)
-      .where("phrase", "==", selectedPhrase)
-      .get();
-    const recallGradesDocH1L2 = await firebase.db
-      .collection("recallGradesH1L2")
-      .where("passage", "==", passageDoc.docs[0].id)
-      .where("phrase", "==", selectedPhrase)
+      .collection("recallGradesV2")
+      .where("passages", "array-contains", passageDoc.docs[0].id)
       .get();
 
     if (numberRecorded === 0) {
       for (let recallDoc of recallGradesDoc.docs) {
         const recallData = recallDoc.data();
-        if (recallData.researchersNum !== 0) {
-          allowDelete = false;
-          numberRecord = numberRecord + 1;
+        let sessions = recallData.sessions;
+        for (let session in sessions) {
+          for (let conditionItem of sessions[session]) {
+            if (conditionItem.passage === passageDoc.docs[0].id) {
+              updateDocuments.push(recallDoc.id);
+              allowDelete = false;
+              numberRecord = numberRecord + 1;
+            }
+          }
         }
       }
-      for (let recallDoc of recallGradesDocH1L2.docs) {
-        const recallData = recallDoc.data();
-        if (recallData.researchersNum !== 0) {
-          allowDelete = false;
-          numberRecord = numberRecord + 1;
-        }
-      }
-
-      setNumberRecorded(numberRecord);
     }
+
+    setNumberRecorded(numberRecord);
+
     const oldPhrase = selectedPhrase;
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
@@ -277,16 +267,25 @@ const ResearcherPassage = () => {
       if (passageUpdate.keys) {
         delete passageUpdate.keys[oldPhrase];
       }
-      await firebase.batchUpdate(passageRef, passageUpdate);
-      for (let recallDoc of recallGradesDoc.docs) {
-        const recallRef = firebase.db.collection("recallGrades").doc(recallDoc.id);
-        await firebase.batchDelete(recallRef);
+
+      for (let updateDoc of recallGradesDoc.docs) {
+        const recallRef = firebase.db.collection("recallGradesV2").doc(updateDoc.id);
+        const recallData = updateDoc.data();
+        let updateSessions = recallData.sessions;
+
+        for (let session in updateSessions) {
+          for (let conditionItem of updateSessions[session]) {
+            if (conditionItem.passage === passageDoc.docs[0].id) {
+              conditionItem.phrases.splice(
+                conditionItem.phrases.findIndex(_phrase => _phrase.phrase === oldPhrase),
+                1
+              );
+            }
+          }
+        }
+        await recallRef.update({ sessions: updateSessions });
       }
-      for (let recallDoc of recallGradesDocH1L2.docs) {
-        const recallRef = firebase.db.collection("recallGradesH1L2").doc(recallDoc.id);
-        await firebase.batchDelete(recallRef);
-      }
-      await firebase.commitBatch();
+      await passageRef.update(passageUpdate);
       setPassagesLoaded(false);
       handleCloseDeleteModal();
     }
@@ -294,53 +293,30 @@ const ResearcherPassage = () => {
   };
 
   const handleAddNewPhrase = async () => {
-    let responses = new Set();
     const passageDoc = await firebase.db.collection("passages").where("title", "==", chosenPassage).get();
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     const passageUpdate = passageDoc.docs[0].data();
     passageUpdate.phrases.push(newPhraseAdded);
-    await firebase.batchUpdate(passageRef, passageUpdate);
+
     const recallGradesDoc = await firebase.db
-      .collection("recallGrades")
-      .where("passage", "==", passageDoc.docs[0].id)
+      .collection("recallGradesV2")
+      .where("passages", "array-contains", passageDoc.docs[0].id)
       .get();
-    const recallGradesDocH1L2 = await firebase.db
-      .collection("recallGradesH1L2")
-      .where("passage", "==", passageDoc.docs[0].id)
-      .get();
+
     for (let recallDoc of recallGradesDoc.docs) {
-      const recallRef = firebase.db.collection("recallGrades").doc();
+      const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
       const recallData = recallDoc.data();
-      if (!responses.has(recallData.response)) {
-        const newRecallGrade = {
-          ...recallData,
-          done: false,
-          phrase: newPhraseAdded,
-          researchers: [],
-          researchersNum: 0,
-          grades: []
-        };
-        await firebase.batchSet(recallRef, newRecallGrade);
-        responses.add(recallData.response);
+      let updateSessions = recallData.sessions;
+      for (let session in updateSessions) {
+        for (let conditionItem of recallData.sessions[session]) {
+          if (conditionItem.passage === passageDoc.docs[0].id) {
+            conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
+          }
+        }
       }
+      await recallRef.update({ sessions: updateSessions });
     }
-    for (let recallDoc of recallGradesDocH1L2.docs) {
-      const recallRef = firebase.db.collection("recallGradesH1L2").doc();
-      const recallData = recallDoc.data();
-      if (!responses.has(recallData.response)) {
-        const newRecallGrade = {
-          ...recallData,
-          done: false,
-          phrase: newPhraseAdded,
-          researchers: [],
-          researchersNum: 0,
-          grades: []
-        };
-        await firebase.batchSet(recallRef, newRecallGrade);
-        responses.add(recallData.response);
-      }
-    }
-    await firebase.commitBatch();
+    await passageRef.update(passageUpdate);
     handleCloseAddPhraseModal();
     setPassagesLoaded(false);
     setSubmtingNewPhrase(false);
@@ -372,230 +348,6 @@ const ResearcherPassage = () => {
 
     const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
     passageRef.update(passageUpdate);
-  };
-
-  const onChangePhrases = ({ key, event, phrase, valueIdx }) => {
-    event.preventDefault();
-    console.log({ key, event: event.target.value, phrase, valueIdx });
-    const allKeys = { ...passageKeys1 };
-    allKeys[phrase][key][valueIdx] = event.target.value;
-    // console.log({ allKeys })
-    // const updatePassage = { ...passage1 };
-    // updatePassage.keys = allKeys;
-    // setPassage1(updatePassage);
-    setPassageKeys1(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys2(allKeys);
-    }
-    // console.log(updatePassage?.keys[phrase][key]);
-    // setPassage1(updatePassage);
-    // setTimeout(() => {
-    //   console.log(updatePassage);
-    // }, 1000);
-  };
-  const onChangePhrases2 = ({ key, event, phrase, valueIdx }) => {
-    event.preventDefault();
-    console.log({ key, event: event.target.value, phrase, valueIdx });
-    const allKeys = { ...passageKeys2 };
-    allKeys[phrase][key][valueIdx] = event.target.value;
-    // console.log({ allKeys })
-    // const updatePassage = { ...passage1 };
-    // updatePassage.keys = allKeys;
-    // setPassage1(updatePassage);
-    setPassageKeys2(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys1(allKeys);
-    }
-    // console.log(updatePassage?.keys[phrase][key]);
-    // setPassage1(updatePassage);
-    // setTimeout(() => {
-    //   console.log(updatePassage);
-    // }, 1000);
-  };
-
-  const addOR = ({ phrase, key }) => {
-    const allKeys = { ...passageKeys1 };
-    const orValues = allKeys[phrase][key] || [];
-    orValues.push("");
-    console.log({ orValues });
-    allKeys[phrase][key] = orValues;
-    setPassageKeys1(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys2(allKeys);
-    }
-  };
-
-  const addOR2 = ({ phrase, key }) => {
-    const allKeys = { ...passageKeys2 };
-    const orValues = allKeys[phrase][key] || [];
-    orValues.push("");
-    console.log({ orValues });
-    allKeys[phrase][key] = orValues;
-    setPassageKeys2(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys1(allKeys);
-    }
-  };
-
-  const addAND = ({ phrase, key }) => {
-    const allKeys = { ...passageKeys1 };
-    const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
-    if (andLength > 0) {
-      let num = 1;
-      let checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
-      while (checkKeyNumbers) {
-        num = (num + 1);
-        // eslint-disable-next-line no-loop-func
-        checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
-      }
-      allKeys[phrase][`AND${num}`] = [""];
-    } else {
-      allKeys[phrase] = {
-        AND1: [""]
-      };
-    }
-
-    setPassageKeys1(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys2(allKeys);
-    }
-  };
-
-  const addAND2 = ({ phrase, key }) => {
-    const allKeys = { ...passageKeys2 };
-    const andLength = allKeys[phrase] ? Object.keys(allKeys[phrase]).length : -1;
-    if (andLength > 0) {
-      let num = 1;
-      let checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
-      while (checkKeyNumbers) {
-        num = (num + 1);
-        // eslint-disable-next-line no-loop-func
-        checkKeyNumbers = Object.keys(allKeys[phrase]).some(x => x === `AND${num}`);
-      }
-      allKeys[phrase][`AND${num}`] = [""];
-    } else {
-      allKeys[phrase] = {
-        AND1: [""]
-      };
-    }
-
-    setPassageKeys2(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys1(allKeys);
-    }
-  };
-
-  const deletePhrases = ({ phrase, key, value }) => {
-    const allKeys = { ...passageKeys1 };
-    const orValues = allKeys[phrase][key] || [];
-
-    const findIndex = orValues.findIndex(x => x === value);
-    orValues.splice(findIndex, 1);
-
-    if (orValues.length <= 0) {
-      delete allKeys[phrase][key];
-      if (Object.keys(allKeys[phrase]).length <= 0) {
-        delete allKeys[phrase];
-      }
-      setPassageKeys1(allKeys);
-      if (passage1.title === passage2.title) {
-        setPassageKeys2(allKeys);
-      }
-      return;
-    }
-
-    allKeys[phrase][key] = orValues;
-    setPassageKeys1(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys2(allKeys);
-    }
-  };
-
-  const deletePhrases2 = ({ phrase, key, value }) => {
-    const allKeys = { ...passageKeys2 };
-    const orValues = allKeys[phrase][key] || [];
-
-    const findIndex = orValues.findIndex(x => x === value);
-    orValues.splice(findIndex, 1);
-
-    if (orValues.length <= 0) {
-      delete allKeys[phrase][key];
-      if (Object.keys(allKeys[phrase]).length <= 0) {
-        delete allKeys[phrase];
-      }
-      setPassageKeys2(allKeys);
-      if (passage1.title === passage2.title) {
-        setPassageKeys1(allKeys);
-      }
-      return;
-    }
-    allKeys[phrase][key] = orValues;
-    setPassageKeys2(allKeys);
-    if (passage1.title === passage2.title) {
-      setPassageKeys1(allKeys);
-    }
-  };
-
-  const handleSubmit = async ({ passage, phrase, passageKeys, passageNumber }) => {
-    try {
-      const passageDoc = await firebase.db.collection("passages").where("title", "==", passage.title).get();
-      const passageData = passageDoc.docs[0].data();
-      const currentPhrase = Object.keys(passageKeys).length > 0 && passageKeys[phrase];
-      const checkPhrase = currentPhrase && Object.keys(currentPhrase).length > 0;
-      let passageUpdate = { ...passageData };
-      let keysUpdate = { ...passageKeys };
-      if (checkPhrase) {
-        const updatedPhrase = {};
-        Object.entries(currentPhrase).forEach(([and, or]) => {
-          const filteredElements = or.filter(x => x && (x !== null || x !== ""));
-          if (filteredElements.length > 0) {
-            updatedPhrase[and] = filteredElements;
-          }
-        });
-        keysUpdate[phrase] = updatedPhrase;
-        if (passageData.keys) {
-          passageUpdate.keys = {
-            ...passageData.keys,
-            [phrase]: updatedPhrase
-          };
-        } else {
-          passageUpdate = {
-            ...passageData,
-            keys: {
-              [phrase]: updatedPhrase
-            }
-          };
-        }
-      } else {
-        if (passageData.keys) {
-          delete passageData.keys[phrase];
-          delete keysUpdate[phrase];
-          console.log(passageData);
-          passageUpdate = {
-            ...passageData,
-            keys: {
-              ...passageData.keys
-            }
-          };
-        }
-      }
-      const pssageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
-      pssageRef.update(passageUpdate);
-      setPassage1({ ...passageUpdate });
-      if (passageNumber === 1) {
-        setPassageKeys1({ ...keysUpdate });
-        if (passage1.title === passage2.title) {
-          setPassageKeys2({ ...keysUpdate });
-        }
-      } else {
-        setPassageKeys2({ ...keysUpdate });
-        if (passage1.title === passage2.title) {
-          setPassageKeys1({ ...keysUpdate });
-        }
-      }
-    } catch (error) {
-      console.error(":::::::ERROR ON PHRASE SUBMIT FUNC::::::::", { error });
-    }
   };
 
   return (
@@ -932,90 +684,6 @@ const ResearcherPassage = () => {
                               </ListItem>
                             ))}
                           </List>
-                          <Box>
-                            {passageKeys1[phrase] &&
-                              Object.entries(passageKeys1[phrase]).map(([key, values], index) => {
-                                return (
-                                  <div key={`${index}`} style={{ display: "flex", marginBottom: "10px" }}>
-                                    <DoubleArrowIcon style={{ marginTop: "15px" }} />
-                                    <div style={{ width: "100%" }}>
-                                      <div style={{ width: "100%" }}>
-                                        {values.map((elemen, vIdx) => (
-                                          <Box
-                                            key={`${vIdx}`}
-                                            sx={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                              marginRight: "10px",
-                                              width: "90%"
-                                            }}
-                                          >
-                                            <CustomTextInput
-                                              value={elemen}
-                                              onChange={event =>
-                                                onChangePhrases({
-                                                  key,
-                                                  event,
-                                                  phrase,
-                                                  passage1,
-                                                  valueIdx: vIdx
-                                                })
-                                              }
-                                            />
-                                            {vIdx + 1 === values.length ? (
-                                              <Box sx={{ display: "flex" }}>
-                                                <IconButton
-                                                  sx={{ mR: "10px" }}
-                                                  edge="end"
-                                                  aria-label="edit"
-                                                  onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}
-                                                >
-                                                  <DeleteIcon />
-                                                </IconButton>
-                                                <Button onClick={() => addOR({ phrase, key })}>
-                                                  <AddIcon /> OR
-                                                </Button>
-                                              </Box>
-                                            ) : (
-                                              <div style={{ display: "flex" }}>
-                                                <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
-                                                <Button
-                                                  onClick={() => deletePhrases({ phrase, key, value: values[vIdx] })}
-                                                >
-                                                  <DeleteIcon />
-                                                </Button>
-                                              </div>
-                                            )}
-                                          </Box>
-                                        ))}
-                                      </div>
-                                      {index + 1 === Object.keys(passageKeys1[phrase]).length && (
-                                        <Box>
-                                          <Button onClick={() => addAND({ phrase, key })}>
-                                            <AddIcon /> AND
-                                          </Button>
-                                        </Box>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                          </Box>
-                          <Box>
-                            {(!passageKeys1[phrase] || passageKeys1[phrase].length === 0) && (
-                              <Button onClick={() => addAND({ phrase })}>
-                                <AddIcon /> AND
-                              </Button>
-                            )}
-                            <Button
-                              variant="contained"
-                              onClick={() =>
-                                handleSubmit({ passage: passage1, phrase, passageKeys: passageKeys1, passageNumber: 1 })
-                              }
-                            >
-                              Submit
-                            </Button>
-                          </Box>
                         </div>
                       )}
                     </li>
@@ -1191,90 +859,6 @@ const ResearcherPassage = () => {
                               </ListItem>
                             ))}
                           </List>
-                          <Box>
-                            {passageKeys2[phrase] &&
-                              Object.entries(passageKeys2[phrase]).map(([key, values], index) => {
-                                return (
-                                  <div key={`${index}`} style={{ display: "flex", marginBottom: "10px" }}>
-                                    <DoubleArrowIcon style={{ marginTop: "15px" }} />
-                                    <div style={{ width: "100%" }}>
-                                      <div style={{ width: "100%" }}>
-                                        {values.map((elemen, vIdx) => (
-                                          <Box
-                                            key={`${vIdx}`}
-                                            sx={{
-                                              display: "flex",
-                                              alignItems: "center",
-                                              marginRight: "10px",
-                                              width: "90%"
-                                            }}
-                                          >
-                                            <CustomTextInput
-                                              value={elemen}
-                                              onChange={event =>
-                                                onChangePhrases2({
-                                                  key,
-                                                  event,
-                                                  phrase,
-                                                  passage1,
-                                                  valueIdx: vIdx
-                                                })
-                                              }
-                                            />
-                                            {vIdx + 1 === values.length ? (
-                                              <Box sx={{ display: "flex" }}>
-                                                <IconButton
-                                                  sx={{ mR: "10px" }}
-                                                  edge="end"
-                                                  aria-label="edit"
-                                                  onClick={() => deletePhrases2({ phrase, key, value: values[vIdx] })}
-                                                >
-                                                  <DeleteIcon />
-                                                </IconButton>
-                                                <Button onClick={() => addOR2({ phrase, key })}>
-                                                  <AddIcon /> OR
-                                                </Button>
-                                              </Box>
-                                            ) : (
-                                              <div style={{ display: "flex" }}>
-                                                <Typography sx={{ marginLeft: "10px" }}>OR</Typography>
-                                                <Button
-                                                  onClick={() => deletePhrases2({ phrase, key, value: values[vIdx] })}
-                                                >
-                                                  <DeleteIcon />
-                                                </Button>
-                                              </div>
-                                            )}
-                                          </Box>
-                                        ))}
-                                      </div>
-                                      {index + 1 === Object.keys(passageKeys2[phrase]).length && (
-                                        <Box>
-                                          <Button onClick={() => addAND2({ phrase, key })}>
-                                            <AddIcon /> AND
-                                          </Button>
-                                        </Box>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                          </Box>
-                          <Box>
-                            {!passageKeys2[phrase] && (
-                              <Button onClick={() => addAND2({ phrase })}>
-                                <AddIcon /> AND
-                              </Button>
-                            )}
-                            <Button
-                              variant="contained"
-                              onClick={() =>
-                                handleSubmit({ passage: passage2, phrase, passageKeys: passageKeys2, passageNumber: 2 })
-                              }
-                            >
-                              Submit
-                            </Button>
-                          </Box>
                         </>
                       )}
                     </li>

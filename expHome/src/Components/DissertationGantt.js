@@ -98,14 +98,14 @@ const DissertationGantt = () => {
               resources[resIndex].itemIds.push(docChange.doc.id);
               resources[resIndex].num += 1;
               resources[resIndex].endAvg += end.toDate().getTime() / 1000;
-              resources[resIndex].dependencies.concat(dependencies.split(","));
+              resources[resIndex].dependencies.concat(dependencies ? dependencies?.split(",") : []);
             } else {
               resources.push({
                 resource,
                 itemIds: [docChange.doc.id],
                 endAvg: end.toDate().getTime() / 1000,
                 num: 1,
-                dependencies: dependencies.split(",")
+                dependencies: dependencies ? dependencies.split(",") : []
               });
             }
           }
