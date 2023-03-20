@@ -141,7 +141,7 @@ const panels = [
         </ul>
         <p>
           <span>
-            I discuss my design space exploration of these topics and my solutions for crowdsourcing such a scale
+            I discuss my design space exploration of these topics and my solutions for crowdsourcing such a scalable
             knowledge graph on 1Cademy to achieve the listed objectives.
           </span>
         </p>
