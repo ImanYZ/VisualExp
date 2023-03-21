@@ -1984,6 +1984,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       "Grade by Davinci",
       "Confidence by Davinci ",
       "Grade by Turbo",
+      "Grade by GPT-4",
+      "Confidence by GPT-4",
       "Majority Of votes",
       "Researchers grades",
       "Satisfied the boolean expression",
@@ -2071,6 +2073,15 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                   ? "YES"
                   : "NO"
                 : "",
+              phrase.hasOwnProperty("gpt4Grade")
+                ? phrase.gpt4Grade
+                  ? "NO"
+                  : "YES"
+                : "",
+              phrase.hasOwnProperty("gpt4Confidence")
+                ? phrase.gpt4Confidence
+                : "",
+
               phrase.hasOwnProperty("majority")
                 ? phrase.majority
                   ? "NO"
