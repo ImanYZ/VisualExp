@@ -21,8 +21,14 @@ const RecallForIman = props => {
   const [passagesHash, setPassagesHash] = useState({});
 
   const [botVotes, setBotVotes] = useState(0);
-  const [pairPhrases, setPairPhrases] = useState(0);
   const [doneProcessing, setDoneProcessing] = useState(true);
+
+
+  const [countNSatisfiedGraded, setCountNSatisfiedGraded] = useState(0);
+  const [countSatifiedGraded, setCountSatifiedGraded] = useState(0);
+  const [notSatisfied, setNotSatisfied] = useState(0);
+  const [satisfiedThreeRes, setSatisfiedThreeRes] = useState(0);
+  const [totalpairPhrases, setTotalpairPhrases] = useState(0);
 
   useEffect(() => {
     const getPassages = async () => {
@@ -44,8 +50,19 @@ const RecallForIman = props => {
       const _noMajority = [];
       const _majorityDifferentThanBot = [];
       const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-      let countBotVotes = 0;
+      // # of phrases that the bot has graded and their boolean expressions are not satisfied
+      let _countNSatisfiedGraded = 0;
+      //# of phrases that the bot has graded and their boolean expressions are satisfied and three or more researchers graded them
+      let _countSatifiedGraded = 0;
+      //# of phrases that their boolean expressions are not satisfied
+      let _notSatisfied = 0;
+      //# of phrases that their boolean expressions are satisfied and three or more researchers graded them
+      let _satisfiedThreeRes = 0;
+
+      //Total # of phrases
       let countPairPhrases = 0;
+
+
       let i = 0;
       recallGradesDocs.docs.forEach(recallDoc => {
         const recallData = recallDoc.data();
@@ -55,8 +72,22 @@ const RecallForIman = props => {
           // eslint-disable-next-line no-loop-func
           recallData.sessions[session].forEach((conditionItem, conditionIndex) => {
             conditionItem.phrases.forEach((phraseItem, phraseIndex) => {
+              
               countPairPhrases++;
-              if (phraseItem.hasOwnProperty("gpt4Grade")) countBotVotes = countBotVotes + 1;
+              const _researchers = phraseItem.researchers.slice().filter(researcher => researcher !== gptResearcher);
+              if (phraseItem.hasOwnProperty("gpt4Grade") && !phraseItem.satisfied) {
+                _countNSatisfiedGraded++;
+              }
+
+              if (phraseItem.hasOwnProperty("gpt4Grade") /* && phraseItem.satisfied  */&& _researchers.length >= 3) {
+                 _countSatifiedGraded++;
+              }
+              if (!phraseItem.satisfied) {
+                _notSatisfied++;
+              }
+              if (_researchers.length >= 3 /* && phraseItem.satisfied */) {
+                _satisfiedThreeRes++;
+              }
 
               if (!phraseItem.hasOwnProperty("majority")) {
                 let _grades = phraseItem.grades.slice();
@@ -111,8 +142,14 @@ const RecallForIman = props => {
       );
       setNoMajority(__noMajority);
       setMajorityDifferentThanBot(__majorityDifferentThanBot);
-      setBotVotes(countBotVotes);
-      setPairPhrases(countPairPhrases);
+
+      setCountNSatisfiedGraded(_countNSatisfiedGraded);
+      setCountSatifiedGraded(_countSatifiedGraded);
+      setNotSatisfied(_notSatisfied);
+      setSatisfiedThreeRes(_satisfiedThreeRes);
+      setTotalpairPhrases(countPairPhrases);
+
+
       setDoneProcessing(true);
     };
 
@@ -125,6 +162,7 @@ const RecallForIman = props => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
       return setIndexOfmajorityDifferentThanBot(0);
     setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
+    console.log(majorityDifferentThanBot[indexOfmajorityDifferentThanBot + 1]);
   };
   const previousPhrase = () => {
     if (indexOfmajorityDifferentThanBot === 0) return setIndexOfmajorityDifferentThanBot(0);
@@ -189,17 +227,17 @@ const RecallForIman = props => {
   if (doneProcessing && !majorityDifferentThanBot.length)
     return (
       <>
-        NO RECORDS TO COMPARE {botVotes} / {pairPhrases}
+        NO RECORDS TO COMPARE {botVotes} / {totalpairPhrases}
       </>
     );
-  console.log("noMajority", majorityDifferentThanBot);
+
   return (
     <Box sx={{ mb: "15px", ml: "15px" }}>
       {majorityDifferentThanBot.length > 0 && (
         <Box>
           <Typography variant="h5" component="h5">
-            The Response has three or four grades, but the majority of votes disagrees with Iman's grade : {botVotes} /{" "}
-            {pairPhrases}
+            The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
+            {countNSatisfiedGraded} /{countSatifiedGraded}/{notSatisfied}/{satisfiedThreeRes}/{totalpairPhrases}
           </Typography>
           {"\n"}
           <Box>OriginalPassgae :</Box>
@@ -337,3 +375,6 @@ const RecallForIman = props => {
   );
 };
 export default RecallForIman;
+
+
+
