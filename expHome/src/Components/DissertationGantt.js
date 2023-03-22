@@ -484,7 +484,7 @@ const DissertationGantt = () => {
             <DocumentDiss />
             <Accordion expanded={expanded} onChange={handlChange}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <h2>Dissertation Gantt Chart: </h2>
+                <h2>Dissertation Gantt Chart </h2>
               </AccordionSummary>
               <AccordionDetails>
                 {email === "oneweb@umich.edu" && (
