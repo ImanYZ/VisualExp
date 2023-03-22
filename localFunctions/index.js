@@ -31,8 +31,9 @@ const {
   generatedBooleanExpressionData,
   convertRsearchersProject,
   generateTheCSVfileChatGTP,
+  generateCSVChatGTPNotSatisfied,
   gradeRecallGradesV2ChatGPT,
-  removeTheBotsVotes
+  removeTheBotsVotes,
 } = require("./visualExp");
 
 const app = express();
@@ -84,13 +85,13 @@ app.get("/addTheInstitutionFeildForUsers", addTheInstitutionFeildForUsers);
 app.get("/addH2K2toQuotes", addH2K2toQuotes);
 app.get("/generatedBooleanExpressionData", generatedBooleanExpressionData);
 
-app.get("/convertRsearchersProject",convertRsearchersProject);
+app.get("/convertRsearchersProject", convertRsearchersProject);
 
-
-app.get("/generateTheCSVfileChatGTP",generateTheCSVfileChatGTP);
+app.get("/generateTheCSVfileChatGTP", generateTheCSVfileChatGTP);
+app.get("/generateCSVChatGTPNotSatisfied", generateCSVChatGTPNotSatisfied);
 app.get("/gradeRecallGradesV2ChatGPT", gradeRecallGradesV2ChatGPT);
 
-app.get("/removeTheBotsVotes",removeTheBotsVotes);
+app.get("/removeTheBotsVotes", removeTheBotsVotes);
 
 const port = 8080;
 app.listen(port, () => {
