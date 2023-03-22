@@ -91,7 +91,7 @@ const panels = [
               different ChatGPT engines, and assessing it through{" "}
             </span>
             <span>
-              <a href="https://www.google.com/url?q=https://arxiv.org/pdf/2106.01254.pdf&amp;sa=D&amp;source=editors&amp;ust=1679056223252872&amp;usg=AOvVaw3qLRk2hN19mKMnugcUNH_o">
+              <a href="https://www.google.com/url?q=https://arxiv.org/pdf/2106.01254.pdf&amp;sa=D&amp;source=editors&amp;ust=1679056223252872&amp;usg=AOvVaw3qLRk2hN19mKMnugcUNH_o" target="_blank"  rel="noreferrer">
                 the Survey Equivalence mechanism
               </a>
             </span>
@@ -185,7 +185,7 @@ const panels = [
           <li>
             <span>In </span>
             <span>
-              <a href="https://www.google.com/url?q=https://dl.acm.org/doi/abs/10.1145/3446871.3469760&amp;sa=D&amp;source=editors&amp;ust=1679056223255122&amp;usg=AOvVaw2B6c_6Vq9QpwpIXzxhu7La">
+              <a href="https://www.google.com/url?q=https://dl.acm.org/doi/abs/10.1145/3446871.3469760&amp;sa=D&amp;source=editors&amp;ust=1679056223255122&amp;usg=AOvVaw2B6c_6Vq9QpwpIXzxhu7La" target="_blank"  rel="noreferrer">
                 ICER 2019
               </a>
             </span>
@@ -200,7 +200,7 @@ const panels = [
           <li>
             <span>In </span>
             <span>
-              <a href="https://www.google.com/url?q=https://dl.acm.org/doi/abs/10.1145/3506860.3506907&amp;sa=D&amp;source=editors&amp;ust=1679056223255551&amp;usg=AOvVaw1D-l7UPOObcLXvn7bMpY24">
+              <a href="https://www.google.com/url?q=https://dl.acm.org/doi/abs/10.1145/3506860.3506907&amp;sa=D&amp;source=editors&amp;ust=1679056223255551&amp;usg=AOvVaw1D-l7UPOObcLXvn7bMpY24" target="_blank" rel="noreferrer" >
                 LAK 2022
               </a>
             </span>
