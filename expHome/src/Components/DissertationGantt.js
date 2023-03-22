@@ -19,6 +19,11 @@ import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import DocumentDiss from "./DocumentDiss";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
 // const daysToMilliseconds = days => {
 //   return days * 24 * 60 * 60 * 1000;
 // };
@@ -68,6 +73,7 @@ const DissertationGantt = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resourcesT, setResourcesT] = useState([]);
   const [colors, setColors] = useState([]);
+  const [expanded, setExpanded] = useState(false);
   const topologicalSort = resources => {
     const visited = new Set();
     const result = [];
@@ -327,6 +333,10 @@ const DissertationGantt = () => {
       sortTasks: false
     }
   };
+
+  const handlChange = () => {
+    setExpanded(!expanded);
+  };
   return (
     <>
       {dt && (
@@ -472,35 +482,42 @@ const DissertationGantt = () => {
             }}
           >
             <DocumentDiss />
-            {email === "oneweb@umich.edu" && (
-              <Button variant="contained" onClick={handleAddNew}>
-                {" "}
-                Add new item{" "}
-              </Button>
-            )}
-            <h2>Dissertation Gantt Chart : </h2>
-            <Box sx={{ display: "flex", marginBottom: "15px" }}>
-              {resourcesT.map((resource, index) => (
-                <ColorBox key={resource} text={resource} color={colors[resource]} />
-              ))}
-            </Box>
-            <div id="chart_div">
-              <Chart
-                chartType="Gantt"
-                data={dt}
-                height={1600}
-                options={options}
-                chartEvents={[
-                  {
-                    eventName: "select",
-                    callback: e => {
-                      if (email !== "oneweb@umich.edu") return;
-                      handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
-                    }
-                  }
-                ]}
-              />
-            </div>
+            <Accordion expanded={expanded} onChange={handlChange}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <h2>Dissertation Gantt Chart: </h2>
+              </AccordionSummary>
+              <AccordionDetails>
+                {email === "oneweb@umich.edu" && (
+                  <Button variant="contained" onClick={handleAddNew} sx={{ mb: 4 }}>
+                    {" "}
+                    Add new item{" "}
+                  </Button>
+                )}
+                <Box sx={{ display: "flex", marginBottom: "15px" }}>
+                  {resourcesT.map((resource, index) => (
+                    <ColorBox key={resource} text={resource} color={colors[resource]} />
+                  ))}
+                </Box>
+
+                <div id="chart_div">
+                  <Chart
+                    chartType="Gantt"
+                    data={dt}
+                    height={1600}
+                    options={options}
+                    chartEvents={[
+                      {
+                        eventName: "select",
+                        callback: e => {
+                          if (email !== "oneweb@umich.edu") return;
+                          handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                        }
+                      }
+                    ]}
+                  />
+                </div>
+              </AccordionDetails>
+            </Accordion>
           </div>
         </div>
       )}
