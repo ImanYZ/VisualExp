@@ -34,6 +34,25 @@ const columns = [
   { type: "string", label: "Dependencies" }
 ];
 
+function ColorBox(props) {
+  return (
+    <Box
+      sx={{
+        bgcolor: props.color,
+        color: "primary.contrastText",
+        p: 2,
+        borderRadius: 2,
+        maxWidth: 150,
+        mr: 1,
+        mb: 1
+      }}
+      key={props.text}
+    >
+      {props.text}
+    </Box>
+  );
+}
+
 const DissertationGantt = () => {
   const firebase = useRecoilValue(firebaseState);
   const [dt, setDt] = useState(false);
@@ -47,8 +66,8 @@ const DissertationGantt = () => {
   const [selectedDoc, setSelectedDoc] = useState("");
   const [dependencies, setDependencies] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [expanded, setExpanded] = React.useState(false);
-
+  const [resourcesT, setResourcesT] = useState([]);
+  const [colors, setColors] = useState([]);
   const topologicalSort = resources => {
     const visited = new Set();
     const result = [];
@@ -124,6 +143,8 @@ const DissertationGantt = () => {
           resources.sort((a, b) => {
             return a.endAvg < b.endAvg ? 1 : -1;
           });
+          const _resources = resources.map(res => res.resource);
+          setResourcesT(_resources.reverse());
           resources = topologicalSort(resources);
 
           for (let docChange of docChanges) {
@@ -243,6 +264,28 @@ const DissertationGantt = () => {
     setOpen(true);
   };
 
+  setTimeout(() => {
+    if (!dt.length || Object.keys(colors).length === resourcesT.length) return;
+    let container = document.getElementById("chart_div");
+    const _colors = {};
+    if (container) {
+      let svg = container.getElementsByTagName("svg")[0];
+      if (!svg) return;
+      let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
+      for (let i = 0; i < ganttGroups.length; i++) {
+        const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "").trim();
+        const _index = dt.filter(
+          d => typeof d[1] === "string" && d[1].replace(/\s/g, "") === text.replace(/\s/g, "")
+        )[0];
+
+        if (_index && _index[2] && !_colors.hasOwnProperty(_index[2])) {
+          _colors[_index[2]] = ganttGroups[i].getAttribute("fill");
+        }
+      }
+    }
+    setColors(_colors);
+  }, 400);
+
   const redrawsvg = svg => {
     let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
     // let rectGroups = svg.getElementsByTagName("g")[5]?.getElementsByTagName("rect");
@@ -266,7 +309,6 @@ const DissertationGantt = () => {
         }
         s1 = text.substr(0, middle);
         s2 = text.substr(middle + 1);
-        const dx = s1.length * 0.46;
 
         ganttGroups[i].innerHTML = `<tspan dy="-0.5em">${s1.trim()}</tspan><tspan  x="0" dy="1em">${s2}</tspan>`;
       }
@@ -285,7 +327,6 @@ const DissertationGantt = () => {
       sortTasks: false
     }
   };
-
   return (
     <>
       {dt && (
@@ -438,6 +479,11 @@ const DissertationGantt = () => {
               </Button>
             )}
             <h2>Dissertation Gantt Chart : </h2>
+            <Box sx={{ display: "flex", marginBottom: "15px" }}>
+              {resourcesT.map((resource, index) => (
+                <ColorBox key={resource} text={resource} color={colors[resource]} />
+              ))}
+            </Box>
             <div id="chart_div">
               <Chart
                 chartType="Gantt"
