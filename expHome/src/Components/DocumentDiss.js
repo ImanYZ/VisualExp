@@ -91,7 +91,7 @@ const panels = [
               different ChatGPT engines, and assessing it through{" "}
             </span>
             <span>
-              <a href="https://arxiv.org/pdf/2106.01254.pdf" target="_blank"  rel="noreferrer">
+              <a href="https://arxiv.org/pdf/2106.01254.pdf" target="_blank" rel="noreferrer">
                 the Survey Equivalence mechanism
               </a>
             </span>
@@ -130,12 +130,14 @@ const panels = [
           </li>
         </ul>
         <ul>
-          <li>
-            <span>In large magnitude</span>
-          </li>
-          <li>
-            <span>Of high quality (mitigates dissemination of misinformation or disinformation)</span>
-          </li>
+          <ul>
+            <li>
+              <span>In large magnitude</span>
+            </li>
+            <li>
+              <span>Of high quality (mitigates dissemination of misinformation or disinformation)</span>
+            </li>
+          </ul>
         </ul>
         <ul>
           <li>
@@ -185,7 +187,7 @@ const panels = [
           <li>
             <span>In </span>
             <span>
-              <a href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760" target="_blank"  rel="noreferrer">
+              <a href="https://dl.acm.org/doi/abs/10.1145/3446871.3469760" target="_blank" rel="noreferrer">
                 ICER 2019
               </a>
             </span>
@@ -200,7 +202,7 @@ const panels = [
           <li>
             <span>In </span>
             <span>
-              <a href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907" target="_blank" rel="noreferrer" >
+              <a href="https://dl.acm.org/doi/abs/10.1145/3506860.3506907" target="_blank" rel="noreferrer">
                 LAK 2022
               </a>
             </span>
