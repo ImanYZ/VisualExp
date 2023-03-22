@@ -272,8 +272,11 @@ const panels = [
 
 const DocumentDiss = props => {
   const [expanded, setExpanded] = React.useState(0);
+  const [expandedDefault, setExpandedDefault] = React.useState(true);
+
   const handleChange = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
+    setExpandedDefault(false);
   };
   return (
     <>
@@ -288,7 +291,11 @@ const DocumentDiss = props => {
         {panels.map(accordion => {
           const { id, heading, details } = accordion;
           return (
-            <Accordion expanded={expanded === id} key={id} onChange={handleChange(id)}>
+            <Accordion
+              expanded={(id === "panel1" && expandedDefault) || expanded === id}
+              key={id}
+              onChange={handleChange(id)}
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <div>{heading}</div>
               </AccordionSummary>
