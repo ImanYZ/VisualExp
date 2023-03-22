@@ -12,12 +12,15 @@ const panels = [
     details: (
       <p>
         <span>
-          In this dissertation, I report on the design of 1Cademy, a crowdsourcing platform for creating and updating a
-          scalable knowledge graph of learning pathways. I explore design mechanisms that lead to a shared graph with
-          individualized views for self-directed learning. I explore the optimal size of content nodes for reader
-          comprehension and learning, the design space of collaboration mechanisms that maintain coherence of the shared
-          graph, and how to utilize spaced, interleaved retrieval practice to improve learner retention of
-          micro-content.
+          In this dissertation, I report on the design of{" "}
+          <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
+            1Cademy
+          </a>
+          , a crowdsourcing platform for creating and updating a scalable knowledge graph of learning pathways. I
+          explore design mechanisms that lead to a shared graph with individualized views for self-directed learning. I
+          explore the optimal size of content nodes for reader comprehension and learning, the design space of
+          collaboration mechanisms that maintain coherence of the shared graph, and how to utilize spaced, interleaved
+          retrieval practice to improve learner retention of micro-content.
         </span>
       </p>
     )
@@ -145,11 +148,18 @@ const panels = [
         <p>
           <span>
             I discuss my design space exploration of these topics and my solutions for crowdsourcing such a scalable
-            knowledge graph on 1Cademy to achieve the listed objectives in large student communities. Over the past two
-            years, 1,543 students and researchers from 183 institutions have participated in a large-scale collaboration
-            effort through 1Cademy. This collaboration has resulted in the creation of 44,665 nodes and 235,674
-            prerequisite links between them, which have been proposed through 88,167 proposals. I will also report on my
-            smaller field trials on voluntary question-generation and mapping, and Hybrid mapping as course assignments.
+            knowledge graph on{" "}
+            <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
+              1Cademy
+            </a>{" "}
+            to achieve the listed objectives in large student communities. Over the past two years, 1,543 students and
+            researchers from 183 institutions have participated in a large-scale collaboration effort through{" "}
+            <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
+              1Cademy
+            </a>
+            . This collaboration has resulted in the creation of 44,665 nodes and 235,674 prerequisite links between
+            them, which have been proposed through 88,167 proposals. I will also report on my smaller field trials on
+            voluntary question-generation and mapping, and Hybrid mapping as course assignments.
           </span>
         </p>
       </div>
@@ -253,7 +263,11 @@ const panels = [
       <p>
         <span>
           I summarize my experience gained through the studies discussed in the prior chapters and over the 15 years of
-          developing 1Cademy, the feedback collected from users, and my future research and development plans.
+          developing{" "}
+          <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
+            1Cademy
+          </a>
+          , the feedback collected from users, and my future research and development plans.
         </span>
       </p>
     )
