@@ -28,19 +28,22 @@ const panels = [
     details: (
       <div>
         <p>
-          <span>I designed Hybrid Maps, a method of visualizing </span>
-          <span>hierarchical</span>
           <span>
-            &nbsp;knowledge graph motivated by past research on knowledge presentation and hypertext. Its key design
-            features are:
+            I introduce “Hybrid maps,” a new knowledge presentation format that combines the benefits of hypertext and
+            Novakian concept maps. The design was inspired by previous research on knowledge presentation and hypertext.
+            Its key design features are:
           </span>
         </p>
         <ul>
           <li>
-            <span>Each node has a title and a paragraph, small enough to describe only one main concept.</span>
+            <span>
+              Each node (micro-content) has a title and a paragraph, small enough to describe only one main concept.
+            </span>
           </li>
           <li>
-            <span>The links between nodes are visualized in a two-dimensional, left-to-right and top-to-bottom, orientation.</span>
+            <span>
+              The links between nodes are visualized in a two-dimensional, left-to-right and top-to-bottom, orientation.
+            </span>
           </li>
           <li>
             <span>
@@ -142,7 +145,11 @@ const panels = [
         <p>
           <span>
             I discuss my design space exploration of these topics and my solutions for crowdsourcing such a scalable
-            knowledge graph on 1Cademy to achieve the listed objectives.
+            knowledge graph on 1Cademy to achieve the listed objectives in large student communities. Over the past two
+            years, 1,543 students and researchers from 183 institutions have participated in a large-scale collaboration
+            effort through 1Cademy. This collaboration has resulted in the creation of 44,665 nodes and 235,674
+            prerequisite links between them, which have been proposed through 88,167 proposals. I will also report on my
+            smaller field trials on voluntary question-generation and mapping, and Hybrid mapping as course assignments.
           </span>
         </p>
       </div>
@@ -255,13 +262,16 @@ const panels = [
     id: "panel6",
     heading: <h2>Visualized Dissertation Prospectus</h2>,
     details: (
-      <img alt="" src="https://docs.google.com/drawings/d/e/2PACX-1vRhqhVxMg00Av4QaNpbZ3kRDNpGud6VEbYnvXIM4nyi4lOV0D6cnTA2-h0ifipNLTB6pormZJeCjABz/pub?w=963&amp;h=1413"/>
+      <img
+        alt=""
+        src="https://docs.google.com/drawings/d/e/2PACX-1vRhqhVxMg00Av4QaNpbZ3kRDNpGud6VEbYnvXIM4nyi4lOV0D6cnTA2-h0ifipNLTB6pormZJeCjABz/pub?w=963&amp;h=1413"
+      />
     )
   }
 ];
 
 const DocumentDiss = props => {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(0);
   const handleChange = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
