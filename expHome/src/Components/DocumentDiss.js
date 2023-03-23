@@ -127,19 +127,15 @@ const panels = [
           </li>
           <li>
             <span>Enhances contributions:</span>
+            <ul>
+              <li>
+                <span>In large magnitude</span>
+              </li>
+              <li>
+                <span>Of high quality (mitigates dissemination of misinformation or disinformation)</span>
+              </li>
+            </ul>
           </li>
-        </ul>
-        <ul>
-          <ul>
-            <li>
-              <span>In large magnitude</span>
-            </li>
-            <li>
-              <span>Of high quality (mitigates dissemination of misinformation or disinformation)</span>
-            </li>
-          </ul>
-        </ul>
-        <ul>
           <li>
             <span>Encourages reading and improving upon others&rsquo; contributions</span>
           </li>
