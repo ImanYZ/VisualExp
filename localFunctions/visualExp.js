@@ -2032,7 +2032,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               otherResearchers.splice(researcherIdx, 1);
               otherGrades.splice(researcherIdx, 1);
             }
-            if (otherGrades.length >= 3) {
+            if (otherGrades.length >= 2) {
               console.log(
                 "phrase.researchers",
                 phrase.researchers,
