@@ -2,7 +2,7 @@ import React from "react";
 
 export default [
   {
-    id: "Cognitive_Psychology",
+    id: "ux-research-in-cognitive-psychology-of-Learning",
     tags: [
       {
         title: "Cognitive Psychology",
@@ -225,7 +225,7 @@ export default [
   //   ]
   // },
   {
-    id: "Clinical_Psychology",
+    id: "clinical-psychology",
     tags: [
       {
         title: "Clinical Psychology",
@@ -280,7 +280,7 @@ export default [
     ]
   },
   {
-    id: "Health_Psychology",
+    id: "health-psychology",
     tags: [
       {
         title: "Psychology",
@@ -345,7 +345,7 @@ export default [
     ]
   },
   {
-    id: "Disability_Studies",
+    id: "disability_studies",
     tags: [
       {
         title: "Disability Studies",
@@ -419,7 +419,7 @@ export default [
     ]
   },
   {
-    id: "Social_Psychology",
+    id: "social-psychology",
     tags: [
       {
         title: "Social psychology",
@@ -550,7 +550,7 @@ export default [
   //   ]
   // },
   {
-    id: "Deep_Learning",
+    id: "natural-language-processing",
     tags: [
       {
         title: "Data Science",
@@ -687,7 +687,7 @@ export default [
     ]
   },
   {
-    id: "UX_Research_in_Online_Communities",
+    id: "ux-research-in-online-communities",
     tags: [
       {
         title: "Online Communities",
@@ -1068,7 +1068,7 @@ export default [
   //   ]
   // },
   {
-    id: "Liaison_Librarians",
+    id: "liaison-librarians",
     tags: [
       {
         title: "Library Science",
