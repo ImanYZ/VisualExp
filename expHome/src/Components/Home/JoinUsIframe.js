@@ -113,94 +113,99 @@ const JoinUsIframe = props => {
   useEffect(() => {
     const parentResponse = async event => {
       console.log("Visual EXp :: event.origin", event.origin);
-      if (!event.origin.startsWith("https://1cademy.com")) return;
-      if (event?.data) {
-        if (event.data.function === "uploadButton") {
-          const { fil, storageFolder, nameFeild } = event.data;
-          await uploadFile({
-            fil,
-            mimeTypes: "application/pdf",
-            maxSize: 10,
-            storageFolder,
-            fullname,
-            nameFeild
-          });
-        } else if (event.data.function === "explanation") {
-          const { explanation, communityId } = event.data;
-          const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
-          const applDoc = await applRef.get();
-          if (applDoc.exists) {
-            const appData = applDoc.data();
-            await applRef.update({
-              explanation,
-              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-            });
-            setApplicationProcess({
-              ...appData,
-              explanation,
-              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-            });
-          } else {
-            await applRef.set({
+      if (
+        event.origin.startsWith("https://1cademy.com") ||
+        event.origin.startsWith("https://knowledge-dev-s5jvhocnvq-uc.a.run.app")
+      ) {
+        if (event?.data) {
+          // console.log("Visual EXp :: event.data", event.data);
+          if (event.data.function === "uploadButton") {
+            const { fil, storageFolder, nameFeild } = event.data;
+            await uploadFile({
+              fil,
+              mimeTypes: "application/pdf",
+              maxSize: 10,
+              storageFolder,
               fullname,
-              communiId: communityId,
-              explanation,
-              createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+              nameFeild
             });
-            setApplicationProcess({
-              fullname,
-              communiId: communityId,
-              explanation,
-              createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-            });
+          } else if (event.data.function === "explanation") {
+            const { explanation, communityId } = event.data;
+            const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
+            const applDoc = await applRef.get();
+            if (applDoc.exists) {
+              const appData = applDoc.data();
+              await applRef.update({
+                explanation,
+                updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+              setApplicationProcess({
+                ...appData,
+                explanation,
+                updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+            } else {
+              await applRef.set({
+                fullname,
+                communiId: communityId,
+                explanation,
+                createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+              setApplicationProcess({
+                fullname,
+                communiId: communityId,
+                explanation,
+                createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+            }
+          } else if (event.data.function === "applications") {
+            const { communityId } = event.data;
+            const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
+            const applDoc = await applRef.get();
+            if (applDoc.exists) {
+              const applData = applDoc.data();
+              setApplicationProcess(applData);
+            } else {
+              setApplicationProcess({});
+            }
+          } else if (event.data.function === "courseraUrl") {
+            const { communityId, courseraUrl } = event.data;
+            const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
+            const applDoc = await applRef.get();
+            if (applDoc.exists()) {
+              await applRef.update({
+                courseraUrl,
+                updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+            } else {
+              await applRef.set({
+                fullname,
+                communiId: communityId,
+                courseraUrl,
+                createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+              });
+            }
+          } else if (event.data.function === "portfolioUrl") {
+            const { communityId, portfolioUrl } = event.data;
+            const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
+            const applDoc = await applRef.get();
+            if (applDoc.exists()) {
+              await applRef.update({
+                portfolioUrl,
+                updatedAt: firebase.firestore.fromDate(new Date())
+              });
+            } else {
+              await applRef.set({
+                fullname,
+                email,
+                communiId: communityId,
+                portfolioUrl,
+                createdAt: firebase.firestore.fromDate(new Date())
+              });
+            }
           }
-        } else if (event.data.function === "applications") {
-          const { communityId } = event.data;
-          const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
-          const applDoc = await applRef.get();
-          if (applDoc.exists) {
-            const applData = applDoc.data();
-            setApplicationProcess(applData);
-          } else {
-            setApplicationProcess({});
-          }
-        } else if (event.data.function === "courseraUrl") {
-          const { communityId, courseraUrl } = event.data;
-          const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
-          const applDoc = await applRef.get();
-          if (applDoc.exists()) {
-            await applRef.update({
-              courseraUrl,
-              updatedAt: firebase.firestore.Timestamp.fromDate(new Date())
-            });
-          } else {
-            await applRef.set({
-              fullname,
-              communiId: props.community.id,
-              courseraUrl,
-              createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-            });
-          }
-        } else if (event.data.function === "portfolioUrl") {
-          const { communityId, portfolioUrl } = event.data;
-          const applRef = firebase.db.collection("applications").doc(`${fullname}_${communityId}`);
-          const applDoc = await applRef.get();
-          if (applDoc.exists()) {
-            await applRef.update({
-              portfolioUrl,
-              updatedAt: firebase.firestore.fromDate(new Date())
-            });
-          } else {
-            await applRef.set({
-              fullname,
-              email,
-              communiId: props.community.id,
-              portfolioUrl,
-              createdAt: firebase.firestore.fromDate(new Date())
-            });
-          }
+          setNeedsUpdate(true);
         }
-        setNeedsUpdate(true);
       }
     };
     window.addEventListener("message", parentResponse);
