@@ -20,7 +20,6 @@ const RecallForIman = props => {
 
   const [passagesHash, setPassagesHash] = useState({});
 
-  const [botVotes, setBotVotes] = useState(0);
   const [doneProcessing, setDoneProcessing] = useState(false);
 
   const [countNSatisfiedGraded, setCountNSatisfiedGraded] = useState(0);
@@ -49,6 +48,7 @@ const RecallForIman = props => {
       const _noMajority = [];
       const _majorityDifferentThanBot = [];
       const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
+
       // # of phrases that the bot has graded and their boolean expressions are not satisfied
       let _countNSatisfiedGraded = 0;
       //# of phrases that the bot has graded and their boolean expressions are satisfied and three or more researchers graded them
@@ -61,7 +61,6 @@ const RecallForIman = props => {
       //Total # of phrases
       let countPairPhrases = 0;
 
-
       let i = 0;
       for (let recallDoc of recallGradesDocs.docs) {
         const recallData = recallDoc.data();
@@ -73,37 +72,39 @@ const RecallForIman = props => {
             for (let phraseItem of conditionItem.phrases) {
               const phraseIndex = conditionItem.phrases.indexOf(phraseItem);
               countPairPhrases++;
-              console.log(phraseItem, phraseIndex);
-              const _researchers = phraseItem.researchers.slice().filter(researcher => researcher !== gptResearcher);
-              if (phraseItem.hasOwnProperty("gpt4Grade") && !phraseItem.satisfied) {
+              const researcherIdx = phraseItem.researchers.indexOf(gptResearcher);
+              let otherResearchers = phraseItem.researchers.slice();
+              let otherGrades = phraseItem.grades.slice();
+              if (researcherIdx !== -1) {
+                otherResearchers.splice(researcherIdx, 1);
+                otherGrades.splice(researcherIdx, 1);
+              }
+              const trueVotes = otherGrades.filter(grade => grade).length;
+              const falseVotes = otherGrades.filter(grade => !grade).length;
+              if (phraseItem.hasOwnProperty("GPT-4-with-Title") && !phraseItem.satisfied) {
                 _countNSatisfiedGraded++;
               }
-              if (phraseItem.hasOwnProperty("gpt4Grade") /* && phraseItem.satisfied  */ && _researchers.length >= 3) {
+              if (
+                phraseItem.hasOwnProperty("GPT-4-with-Title") &&
+                phraseItem.satisfied &&
+                otherResearchers.length >= 3
+              ) {
                 _countSatifiedGraded++;
               }
               if (!phraseItem.satisfied) {
                 _notSatisfied++;
               }
-              if (_researchers.length >= 3 /* && phraseItem.satisfied */) {
+              if (otherResearchers.length >= 3 && phraseItem.satisfied) {
                 _satisfiedThreeRes++;
               }
-
+              debugger;
               if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-with-Title")) {
-                const trueVotes = phraseItem.grades.filter(
-                  (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
-                ).length;
-                const falseVotes = phraseItem.grades.filter(
-                  (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
-                ).length;
-                const _grades = phraseItem.grades.filter(
-                  (_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)
-                );
                 const botGrade = phraseItem["GPT-4-with-Title"];
-                if (trueVotes === falseVotes && phraseItem.grades.length >= 4) {
+                if (trueVotes === falseVotes && otherGrades.length >= 4) {
                   _noMajority.push({
                     ...phraseItem,
                     botGrade,
-                    grades: _grades,
+                    grades: otherGrades,
                     Response: conditionItem.response,
                     session: session,
                     condition: conditionIndex,
@@ -117,7 +118,7 @@ const RecallForIman = props => {
                   _majorityDifferentThanBot.push({
                     ...phraseItem,
                     botGrade,
-                    grades: _grades,
+                    grades: otherGrades,
                     Response: conditionItem.response,
                     session: session,
                     condition: conditionIndex,
@@ -144,7 +145,6 @@ const RecallForIman = props => {
       setNotSatisfied(_notSatisfied);
       setSatisfiedThreeRes(_satisfiedThreeRes);
       setTotalpairPhrases(countPairPhrases);
-
 
       setDoneProcessing(true);
     };
