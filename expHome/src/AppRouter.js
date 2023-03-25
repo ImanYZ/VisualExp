@@ -488,11 +488,11 @@ const AppRouter = props => {
       <Route path="/communities/" element={<Communities />} />
       {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
-          <Route path={"/community/" + communi.id} element={<Communities commIdx={idx} />} />
+          <Route path={"/community/" + communi.link} element={<Communities commIdx={idx} />} />
 
           {fullname && emailVerified === "Verified" && (
             <Route
-              path={"/paperTest/" + communi.id}
+              path={"/paperTest/" + communi.link}
               element={<PaperTest communiId={communi.id} communiTitle={communi.title} />}
             />
           )}
