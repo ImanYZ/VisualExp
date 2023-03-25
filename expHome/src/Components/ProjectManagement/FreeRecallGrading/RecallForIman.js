@@ -97,7 +97,6 @@ const RecallForIman = props => {
               if (otherResearchers.length >= 3 && phraseItem.satisfied) {
                 _satisfiedThreeRes++;
               }
-              debugger;
               if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-with-Title")) {
                 const botGrade = phraseItem["GPT-4-with-Title"];
                 if (trueVotes === falseVotes && otherGrades.length >= 4) {
