@@ -21,8 +21,7 @@ const RecallForIman = props => {
   const [passagesHash, setPassagesHash] = useState({});
 
   const [botVotes, setBotVotes] = useState(0);
-  const [doneProcessing, setDoneProcessing] = useState(true);
-
+  const [doneProcessing, setDoneProcessing] = useState(false);
 
   const [countNSatisfiedGraded, setCountNSatisfiedGraded] = useState(0);
   const [countSatifiedGraded, setCountSatifiedGraded] = useState(0);
@@ -64,23 +63,23 @@ const RecallForIman = props => {
 
 
       let i = 0;
-      recallGradesDocs.docs.forEach(recallDoc => {
+      for (let recallDoc of recallGradesDocs.docs) {
         const recallData = recallDoc.data();
 
         console.log(i++);
         for (let session in recallData.sessions) {
-          // eslint-disable-next-line no-loop-func
-          recallData.sessions[session].forEach((conditionItem, conditionIndex) => {
-            conditionItem.phrases.forEach((phraseItem, phraseIndex) => {
-              
+          for (let conditionItem of recallData.sessions[session]) {
+            const conditionIndex = recallData.sessions[session].indexOf(conditionItem);
+            for (let phraseItem of conditionItem.phrases) {
+              const phraseIndex = conditionItem.phrases.indexOf(phraseItem);
               countPairPhrases++;
+              console.log(phraseItem, phraseIndex);
               const _researchers = phraseItem.researchers.slice().filter(researcher => researcher !== gptResearcher);
               if (phraseItem.hasOwnProperty("gpt4Grade") && !phraseItem.satisfied) {
                 _countNSatisfiedGraded++;
               }
-
-              if (phraseItem.hasOwnProperty("gpt4Grade") /* && phraseItem.satisfied  */&& _researchers.length >= 3) {
-                 _countSatifiedGraded++;
+              if (phraseItem.hasOwnProperty("gpt4Grade") /* && phraseItem.satisfied  */ && _researchers.length >= 3) {
+                _countSatifiedGraded++;
               }
               if (!phraseItem.satisfied) {
                 _notSatisfied++;
@@ -89,39 +88,36 @@ const RecallForIman = props => {
                 _satisfiedThreeRes++;
               }
 
-              if (!phraseItem.hasOwnProperty("majority")) {
-                let _grades = phraseItem.grades.slice();
-
-                const trueVotes = _grades.filter(
+              if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-with-Title")) {
+                const trueVotes = phraseItem.grades.filter(
                   (grade, index) => grade === true && index !== phraseItem.researchers.indexOf(gptResearcher)
                 ).length;
-                const falseVotes = _grades.filter(
+                const falseVotes = phraseItem.grades.filter(
                   (grade, index) => grade === false && index !== phraseItem.researchers.indexOf(gptResearcher)
                 ).length;
-
-                if (trueVotes === falseVotes && _grades.length >= 4) {
-                  const _itemPharse = {
+                const _grades = phraseItem.grades.filter(
+                  (_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)
+                );
+                const botGrade = phraseItem["GPT-4-with-Title"];
+                if (trueVotes === falseVotes && phraseItem.grades.length >= 4) {
+                  _noMajority.push({
                     ...phraseItem,
-                    grades: _grades.filter((_grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
+                    botGrade,
+                    grades: _grades,
                     Response: conditionItem.response,
                     session: session,
                     condition: conditionIndex,
                     id: recallDoc.id,
                     originalPassgae: passagesHash[conditionItem.passage],
                     phraseIndex
-                  };
-                  if (phraseItem.hasOwnProperty("gpt4Grade")) _itemPharse.botGrade = phraseItem.gpt4Grade;
-                  _noMajority.push(_itemPharse);
+                  });
                 }
-                _grades = phraseItem.grades.slice();
-                if (
-                  phraseItem.hasOwnProperty("gpt4Grade") &&
-                  ((trueVotes >= 3 && !phraseItem.gpt4Grade) || (falseVotes >= 3 && phraseItem.gpt4Grade))
-                ) {
+
+                if ((trueVotes >= 3 && !botGrade) || (falseVotes >= 3 && botGrade)) {
                   _majorityDifferentThanBot.push({
                     ...phraseItem,
-                    botGrade: phraseItem.gpt4Grade,
-                    grades: _grades.filter((grade, index) => index !== phraseItem.researchers.indexOf(gptResearcher)),
+                    botGrade,
+                    grades: _grades,
                     Response: conditionItem.response,
                     session: session,
                     condition: conditionIndex,
@@ -131,10 +127,10 @@ const RecallForIman = props => {
                   });
                 }
               }
-            });
-          });
+            }
+          }
         }
-      });
+      }
 
       const __noMajority = _noMajority.filter(gradeMajority => gradeMajority.grades.length !== 0);
       const __majorityDifferentThanBot = _majorityDifferentThanBot.filter(
@@ -212,7 +208,17 @@ const RecallForIman = props => {
       console.log("error", error);
     }
   };
-  if (!majorityDifferentThanBot.length)
+  console.log(doneProcessing);
+  if (doneProcessing && !majorityDifferentThanBot.length) {
+    return (
+      <>
+        THERE IS NO RECORDS TO COMPARE {countNSatisfiedGraded} /{countSatifiedGraded}/{notSatisfied}/{satisfiedThreeRes}
+        /{totalpairPhrases}
+      </>
+    );
+  }
+
+  if (!doneProcessing && !majorityDifferentThanBot.length)
     return (
       <Box
         sx={{
@@ -223,12 +229,6 @@ const RecallForIman = props => {
       >
         <CircularProgress />
       </Box>
-    );
-  if (doneProcessing && !majorityDifferentThanBot.length)
-    return (
-      <>
-        NO RECORDS TO COMPARE {botVotes} / {totalpairPhrases}
-      </>
     );
 
   return (
@@ -375,6 +375,3 @@ const RecallForIman = props => {
   );
 };
 export default RecallForIman;
-
-
-
