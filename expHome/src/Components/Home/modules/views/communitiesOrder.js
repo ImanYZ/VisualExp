@@ -2,7 +2,8 @@ import React from "react";
 
 export default [
   {
-    id: "ux-research-in-cognitive-psychology-of-Learning",
+    id: "Cognitive_Psychology",
+    link: "ux-research-in-cognitive-psychology-of-Learning",
     tags: [
       {
         title: "Cognitive Psychology",
@@ -225,7 +226,8 @@ export default [
   //   ]
   // },
   {
-    id: "clinical-psychology",
+    id: "Clinical_Psychology",
+    link: "clinical-psychology",
     tags: [
       {
         title: "Clinical Psychology",
@@ -280,7 +282,8 @@ export default [
     ]
   },
   {
-    id: "health-psychology",
+    id: "Health_Psychology",
+    link: "health-psychology",
     tags: [
       {
         title: "Psychology",
@@ -345,7 +348,8 @@ export default [
     ]
   },
   {
-    id: "disability_studies",
+    id: "Disability_Studies",
+    link: "disability-studies",
     tags: [
       {
         title: "Disability Studies",
@@ -419,7 +423,8 @@ export default [
     ]
   },
   {
-    id: "social-psychology",
+    id: "Social_Psychology",
+    link: "social-psychology",
     tags: [
       {
         title: "Social psychology",
@@ -550,7 +555,8 @@ export default [
   //   ]
   // },
   {
-    id: "natural-language-processing",
+    id: "Deep_Learning",
+    link: "natural-language-processing",
     tags: [
       {
         title: "Data Science",
@@ -687,7 +693,8 @@ export default [
     ]
   },
   {
-    id: "ux-research-in-online-communities",
+    id: "UX_Research_in_Online_Communities",
+    link: "ux-research-in-online-communities",
     tags: [
       {
         title: "Online Communities",
@@ -1068,7 +1075,8 @@ export default [
   //   ]
   // },
   {
-    id: "liaison-librarians",
+    id: "Liaison_Librarians",
+    link: "liaison-librarians",
     tags: [
       {
         title: "Library Science",
