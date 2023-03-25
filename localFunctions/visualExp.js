@@ -1981,6 +1981,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       "Response_id",
       "Response",
       "Phrase",
+      "GPT-4-with-Title Grade",
       "Grade by Davinci",
       "Confidence by Davinci ",
       "Grade by Turbo",
@@ -2046,6 +2047,11 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                 recallDoc.id,
                 conditionItem.response,
                 phrase.phrase,
+                phrase.hasOwnProperty("GPT-4-with-Title")
+                  ? phrase["GPT-4-with-Title"]
+                    ? "YES"
+                    : "NO"
+                  : "",
                 phrase.hasOwnProperty("DavinciGrade")
                   ? phrase.DavinciGrade
                     ? "YES"
@@ -2124,6 +2130,7 @@ exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
         "Passage_id",
         "Response_id",
         "Phrase",
+        "GPT-4-with-Title Grade",
         "Grade by Davinci",
         "Confidence by Davinci ",
         "Grade by Turbo",
@@ -2144,6 +2151,11 @@ exports.generateCSVChatGTPNotSatisfied = async (req, res) => {
               conditionItem.passage,
               recallDoc.id,
               phrase.phrase,
+              phrase.hasOwnProperty("GPT-4-with-Title")
+                ? phrase["GPT-4-with-Title"]
+                  ? "YES"
+                  : "NO"
+                : "",
               phrase.hasOwnProperty("DavinciGrade")
                 ? phrase.DavinciGrade
                   ? "YES"
