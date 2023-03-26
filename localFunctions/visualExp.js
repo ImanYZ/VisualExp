@@ -2047,8 +2047,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                 recallDoc.id,
                 conditionItem.response,
                 phrase.phrase,
-                phrase.hasOwnProperty("GPT-4-with-Title")
-                  ? phrase["GPT-4-with-Title"]
+                phrase.hasOwnProperty("GPT_4_Guided")
+                  ? phrase["GPT_4_Guided"]
                     ? "YES"
                     : "NO"
                   : "",
