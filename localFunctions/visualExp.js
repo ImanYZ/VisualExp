@@ -1981,7 +1981,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       "Response_id",
       "Response",
       "Phrase",
-      "GPT-4-Guided",
+      "GPT-4-Mentioned",
       "GPT-4-with-Title Grade",
       "Grade by Davinci",
       "Confidence by Davinci ",
@@ -2028,7 +2028,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       for (let session in recallData.sessions) {
         for (conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
-            if (!phrase.hasOwnProperty("GPT-4-Guided")) continue;
+            if (!phrase.hasOwnProperty("GPT-4-Mentioned")) continue;
             const researcherIdx = phrase.researchers.indexOf(gptResearcher);
             let otherResearchers = phrase.researchers.slice();
             let otherGrades = phrase.grades.slice();
@@ -2054,8 +2054,8 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                 recallDoc.id,
                 conditionItem.response,
                 phrase.phrase,
-                phrase.hasOwnProperty("GPT-4-Guided")
-                  ? phrase["GPT-4-Guided"]
+                phrase.hasOwnProperty("GPT-4-Mentioned")
+                  ? phrase["GPT-4-Mentioned"]
                     ? "YES"
                     : "NO"
                   : "",
