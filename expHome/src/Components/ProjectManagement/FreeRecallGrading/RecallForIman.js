@@ -97,22 +97,8 @@ const RecallForIman = props => {
               if (otherResearchers.length >= 3 && phraseItem.satisfied) {
                 _satisfiedThreeRes++;
               }
+              const botGrade = phraseItem.hasOwnProperty("GPT-4-Mentioned") ? phraseItem["GPT-4-Mentioned"] : null;
               if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
-                const botGrade = phraseItem["GPT-4-Mentioned"];
-                if (trueVotes === falseVotes && otherGrades.length >= 4) {
-                  _noMajority.push({
-                    ...phraseItem,
-                    botGrade,
-                    grades: otherGrades,
-                    Response: conditionItem.response,
-                    session: session,
-                    condition: conditionIndex,
-                    id: recallDoc.id,
-                    originalPassgae: passagesHash[conditionItem.passage],
-                    phraseIndex
-                  });
-                }
-
                 if ((trueVotes >= 3 && !botGrade) || (falseVotes >= 3 && botGrade)) {
                   _majorityDifferentThanBot.push({
                     ...phraseItem,
@@ -126,6 +112,19 @@ const RecallForIman = props => {
                     phraseIndex
                   });
                 }
+              }
+              if (trueVotes === falseVotes && otherGrades.length >= 4) {
+                _noMajority.push({
+                  ...phraseItem,
+                  botGrade,
+                  grades: otherGrades,
+                  Response: conditionItem.response,
+                  session: session,
+                  condition: conditionIndex,
+                  id: recallDoc.id,
+                  originalPassgae: passagesHash[conditionItem.passage],
+                  phraseIndex
+                });
               }
             }
           }
