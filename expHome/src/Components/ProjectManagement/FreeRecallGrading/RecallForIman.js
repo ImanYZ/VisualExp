@@ -81,11 +81,11 @@ const RecallForIman = props => {
               }
               const trueVotes = otherGrades.filter(grade => grade).length;
               const falseVotes = otherGrades.filter(grade => !grade).length;
-              if (phraseItem.hasOwnProperty("GPT-4-with-Title") && !phraseItem.satisfied) {
+              if (phraseItem.hasOwnProperty("GPT-4-Mentioned") && !phraseItem.satisfied) {
                 _countNSatisfiedGraded++;
               }
               if (
-                phraseItem.hasOwnProperty("GPT-4-with-Title") &&
+                phraseItem.hasOwnProperty("GPT-4-Mentioned") &&
                 phraseItem.satisfied &&
                 otherResearchers.length >= 3
               ) {
@@ -97,8 +97,8 @@ const RecallForIman = props => {
               if (otherResearchers.length >= 3 && phraseItem.satisfied) {
                 _satisfiedThreeRes++;
               }
-              if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-with-Title")) {
-                const botGrade = phraseItem["GPT-4-with-Title"];
+              if (!phraseItem.hasOwnProperty("majority") && phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
+                const botGrade = phraseItem["GPT-4-Mentioned"];
                 if (trueVotes === falseVotes && otherGrades.length >= 4) {
                   _noMajority.push({
                     ...phraseItem,
