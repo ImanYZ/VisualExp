@@ -1981,12 +1981,14 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       "Response_id",
       "Response",
       "Phrase",
+      "GPT-4-Guided",
       "GPT-4-with-Title Grade",
       "Grade by Davinci",
       "Confidence by Davinci ",
       "Grade by Turbo",
       "Grade by GPT-4",
       "Confidence by GPT-4",
+      "Majority_Num",
       "Majority Of votes",
       "Researchers grades",
       "Satisfied the boolean expression",
@@ -2026,6 +2028,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
       for (let session in recallData.sessions) {
         for (conditionItem of recallData.sessions[session]) {
           for (let phrase of conditionItem.phrases) {
+            if (!phrase.hasOwnProperty("GPT-4-Guided")) continue;
             const researcherIdx = phrase.researchers.indexOf(gptResearcher);
             let otherResearchers = phrase.researchers.slice();
             let otherGrades = phrase.grades.slice();
@@ -2042,13 +2045,22 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
               );
               const upVotes = otherGrades.filter((grade) => grade).length;
               const downVotes = otherGrades.filter((grade) => !grade).length;
+              const majority = phrase.hasOwnProperty("majority")
+                ? phrase.majority
+                : upVotes > downVotes;
+
               row = [
                 conditionItem.passage,
                 recallDoc.id,
                 conditionItem.response,
                 phrase.phrase,
-                phrase.hasOwnProperty("GPT_4_Guided")
-                  ? phrase["GPT_4_Guided"]
+                phrase.hasOwnProperty("GPT-4-Guided")
+                  ? phrase["GPT-4-Guided"]
+                    ? "YES"
+                    : "NO"
+                  : "",
+                phrase.hasOwnProperty("GPT-4-with-Title")
+                  ? phrase["GPT-4-with-Title"]
                     ? "YES"
                     : "NO"
                   : "",
@@ -2073,7 +2085,7 @@ exports.generateTheCSVfileChatGTP = async (req, res) => {
                 phrase.hasOwnProperty("gpt4Confidence")
                   ? phrase.gpt4Confidence
                   : "",
-
+                majority ? upVotes : downVotes,
                 phrase.hasOwnProperty("majority")
                   ? phrase.majority
                     ? "YES"
