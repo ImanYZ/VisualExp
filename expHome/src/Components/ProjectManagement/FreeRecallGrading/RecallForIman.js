@@ -322,7 +322,7 @@ const RecallForIman = props => {
               return <>{grade ? "YES" : "NO"} </>;
             })}
           </Paper>
-          {noMajority[indexOfNoMajority].hasOwnProperty("botGrade") && (
+          {noMajority[indexOfNoMajority].botGrade !== null && (
             <>
               <Box>Iman's grade</Box>
               <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>
