@@ -623,7 +623,7 @@ const RouterNav = props => {
           ...researcherData.projects,
           [project]: {
             ...researcherData.projects[project],
-            onePoints: oneCademyPoints,
+            onePoints: roundNum(oneCademyPoints),
             dayOneUpVotePoints: totalDayPoints
           }
         }
@@ -909,10 +909,13 @@ const RouterNav = props => {
                           <div>
                             <div>
                               You've earned {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)} total 1Cademy points,
-                              including {oneCademyPoints} from others' votes and {dayOneUpVotes} points for casting 25
-                              upvotes per day on others' proposals.
+                              including {roundNum(oneCademyPoints)} from others' votes and {roundNum(dayOneUpVotes)}{" "}
+                              points for casting 25 upvotes per day on others' proposals.
                             </div>
-                            <div>You cast {proposalUpvotesToday} / 25 up-votes today on others' 1Cademy proposals.</div>
+                            <div>
+                              You cast {roundNum(proposalUpvotesToday)} / 25 up-votes today on others' 1Cademy
+                              proposals.
+                            </div>
                           </div>
                         }
                       >
@@ -924,7 +927,7 @@ const RouterNav = props => {
                           {username ? (
                             <div>
                               <img src={favicon} width="15.1" /> {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)}
-                              <br />✔ {oneCademyPoints}
+                              <br />✔ {roundNum(oneCademyPoints)}
                               <br />
                               <span>🌞 {roundNum(proposalUpvotesToday)} / 25</span>
                             </div>
