@@ -327,7 +327,7 @@ const Communities = props => {
             {communities.map((item, idx) => (
               <Link
                 key={item.id}
-                to={`/community/${item.id}`}
+                to={`/community/${item.link}`}
                 style={{ textDecoration: "none", color: "inherit", display: "block" }}
               >
                 <Card
