@@ -20,11 +20,8 @@ import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 
 import QueryBuilder from "./components/QueryBuilder";
-import { Pagination } from "./components/Pagination";
 import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
-
-let PageSize = 10;
 
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
@@ -68,7 +65,6 @@ export const SchemaGeneration = ({}) => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const project = useRecoilValue(projectState);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -185,6 +181,7 @@ export const SchemaGeneration = ({}) => {
         schemas[index] = { id: change.doc.id, ...shemaData };
       }
     }
+    schemas.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
     setSchemasBoolean(schemas);
     setSchmaLoadedUse(false);
     setSelectedPhrase1(selectedPhrase);
@@ -271,6 +268,7 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
+      _schemasBoolean.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
       setSchemasBoolean(_schemasBoolean);
       const schemaGenerationUpdate = {
         upVotes: _upVotes,
@@ -338,6 +336,7 @@ export const SchemaGeneration = ({}) => {
         downVotes: _downVotes,
         downVoters: _downVoters
       };
+      _schemasBoolean.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
       setSchemasBoolean(_schemasBoolean);
       const schemaGenerationUpdate = {
         upVotes: _upVotes,
@@ -531,15 +530,29 @@ export const SchemaGeneration = ({}) => {
 
   useEffect(() => {
     if (selectedPhrase && selectedPassage && recallResponses.length > 0 && !searching) {
-      QuerySearching(schema);
+      QuerySearching(temp_schema);
     }
-  }, [schema, selectedPhrase, selectedPassage, recallResponses, searching]);
+  }, [selectedPhrase, selectedPassage, recallResponses, searching]);
 
-  const currentTableData = useMemo(() => {
-    const firstPageIndex = (currentPage - 1) * PageSize;
-    const lastPageIndex = firstPageIndex + PageSize;
-    return searchResules.slice(firstPageIndex, lastPageIndex);
-  }, [currentPage, searchResules]);
+  const searchResultsRD = useMemo(() => {
+    const highlightMap = {};
+    return (searchResules || []).map((respon, index) => {
+      return (
+        <Paper
+          key={index}
+          elevation={3}
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            mb: "20px",
+            p: "10px"
+          }}
+        >
+          {renderResponses(respon, highlightMap)}
+        </Paper>
+      );
+    });
+  }, [searchResules]);
 
   return (
     <div className="schema-generation">
@@ -689,6 +702,7 @@ export const SchemaGeneration = ({}) => {
                 setSchema(q);
               }}
               handleSubmit={handleSubmit}
+              QuerySearching={QuerySearching}
               readOnly={false}
             />
           </div>
@@ -704,7 +718,7 @@ export const SchemaGeneration = ({}) => {
           <div
             style={{
               overflow: "auto",
-              // marginBottom: "200px",
+              marginBottom: "90px",
               paddingLeft: "15px",
               paddingRight: "15px",
               paddingTop: "15px",
@@ -716,23 +730,8 @@ export const SchemaGeneration = ({}) => {
             }}
           >
             <Box>
-              {currentTableData.length > 0 ? (
-                currentTableData.map((respon, index) => {
-                  return (
-                    <Paper
-                      key={index}
-                      elevation={3}
-                      sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        mb: "20px",
-                        p: "10px"
-                      }}
-                    >
-                      {renderResponses(respon)}
-                    </Paper>
-                  );
-                })
+              {searchResules.length > 0 ? (
+                searchResultsRD
               ) : searching ? (
                 <CircularProgress color="warning" size="50px" />
               ) : (
@@ -742,13 +741,6 @@ export const SchemaGeneration = ({}) => {
               )}
             </Box>
           </div>
-          <Pagination
-            className="pagination-bar"
-            currentPage={currentPage}
-            totalCount={searchResules.length}
-            pageSize={PageSize}
-            onPageChange={page => setCurrentPage(page)}
-          />
         </div>
       </div>
     </div>
