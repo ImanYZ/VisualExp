@@ -58,4 +58,5 @@
 .query-block {
   overflow: auto;
   padding: 0 10px;
+  margin-bottom: 80px;
 }
