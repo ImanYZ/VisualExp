@@ -16,11 +16,10 @@ import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
 import Switch from "@mui/material/Switch";
 import Alert from "@mui/material/Alert";
 import QueryBuilder from "./components/QueryBuilder";
-import { Pagination } from "./components/Pagination";
 import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
 
-let PageSize = 10;
+
 
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
@@ -44,7 +43,6 @@ export const SchemaGenRecalls = props => {
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [wrongRecallVotes, setWrongRecallVotes] = useState([]);
   const [selectedRecall, setSelectedRecall] = useState();
 

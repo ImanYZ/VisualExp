@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import QueryBox from "./QueryBox";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import { uuidv4 } from "../../../../utils";
 import "./QueryBuilder.css";
@@ -68,14 +69,12 @@ const QueryBuilder = ({ ...props }) => {
   //     // props.onQueryChange([..._schemaE]);
   //   }
   // }
-  const handleSelectedTags = (items,id) => {
+  const handleSelectedTags = (items, id) => {
     const schemaE = [...schema];
     const index = schemaE.findIndex(elm => elm.id === id);
     schemaE[index].alternatives = items;
     props.onQueryChange(schemaE);
   };
-
-
 
   const showIfQueryExists = (() => {
     const filteredNOTSchema = Array.isArray(schema) && schema?.filter(elem => elem.not).length > 0;
@@ -133,23 +132,35 @@ const QueryBuilder = ({ ...props }) => {
         />
       )}
       {props.handleSubmit && (
-        <div className="query-container footer">
-          <div className="content">
-            <div style={{ marginRight: "15px" }}>
-              <span className="result-text">
-                Check what the result will look like on the right side, before you submit.
-              </span>
+        <>
+          <div className="query-container footer">
+            <div className="content">
+              <div style={{ marginRight: "15px" }}>
+                <span className="result-text">
+                  Check what the result will look like on the right side, before you submit.
+                </span>
+              </div>
+              <div>
+                <Button
+                  sx={{ mt: 1, mr: 1, mb: 1, backgroundColor: "#ff9800", color: "common.white" }}
+                  variant="contained"
+                  disabled={!disableSubmitBtn}
+                  onClick={props.handleSubmit}
+                >
+                  Submit
+                </Button>
+                <Button variant="outlined" onClick={() => props.QuerySearching(schema)}>{`Try it out `}</Button>
+              </div>
             </div>
-            <Button
-              sx={{ mt: 1, mr: 1, backgroundColor: "#ff9800", color: "common.white" }}
-              variant="contained"
-              disabled={!disableSubmitBtn}
-              onClick={props.handleSubmit}
-            >
-              Submit
-            </Button>
           </div>
-        </div>
+          <div
+            style={{
+              marginLeft: "550px",
+              paddingTop: "10px",
+              paddingBottom: "20px"
+            }}
+          ></div>
+        </>
       )}
     </div>
   );
