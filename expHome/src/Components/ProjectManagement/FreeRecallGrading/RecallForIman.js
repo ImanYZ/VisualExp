@@ -185,7 +185,9 @@ const RecallForIman = props => {
       ].majority = vote === "yes" ? true : false;
 
       await recallgradeRef.update({ sessions });
-      setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
+      if (indexOfmajorityDifferentThanBot < majorityDifferentThanBot.length - 1) {
+        setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
+      }
     } catch (error) {
       console.log("error", error);
     }
@@ -201,7 +203,9 @@ const RecallForIman = props => {
         vote === "yes" ? true : false;
 
       await recallgradeRef.update({ sessions });
-      setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
+      if (indexOfNoMajority < noMajority.length - 1) {
+        setIndexOfNoMajority(indexOfNoMajority => indexOfNoMajority + 1);
+      }
     } catch (error) {
       console.log("error", error);
     }
@@ -231,7 +235,7 @@ const RecallForIman = props => {
 
   return (
     <Box sx={{ mb: "15px", ml: "15px" }}>
-      {majorityDifferentThanBot.length > 0 && (
+      {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot] && (
         <Box>
           <Typography variant="h5" component="h5">
             The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
@@ -283,8 +287,8 @@ const RecallForIman = props => {
             onClick={() => voteOnPhraseMajority1("yes")}
             className="Button"
             variant="contained"
-            color="success"
             id="recall-submit"
+            sx={{ bgcolor: "#4caf50" }}
           >
             YES
           </Button>
@@ -292,14 +296,14 @@ const RecallForIman = props => {
             onClick={() => voteOnPhraseMajority1("no")}
             className="Button"
             variant="contained"
-            color="error"
             id="recall-submit"
+            sx={{ bgcolor: "#f44336" }}
           >
             NO
           </Button>
         </Box>
       )}
-      {noMajority.length > 0 && (
+      {noMajority.length > 0 && noMajority[indexOfNoMajority] && (
         <Box sx={{ mt: "15px" }}>
           <Typography variant="h5" component="h5">
             The Response has four grades, but do not satisfy the majority of votes :
@@ -353,8 +357,8 @@ const RecallForIman = props => {
             onClick={() => voteOnPhraseMajority2("yes")}
             className="Button"
             variant="contained"
-            color="success"
             id="recall-submit"
+            sx={{ bgcolor: "#4caf50" }}
           >
             YES
           </Button>
@@ -362,8 +366,8 @@ const RecallForIman = props => {
             onClick={() => voteOnPhraseMajority2("no")}
             className="Button"
             variant="contained"
-            color="error"
             id="recall-submit"
+            sx={{ bgcolor: "#f44336" }}
           >
             NO
           </Button>
