@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
-import DeleteIcon from "@mui/icons-material/Delete";
-import IconButton from "@mui/material/IconButton";
-import ChipInput from "./ChipInput";
 import "./QueryBox.css";
 import SchemaInput from "./QueryBox/SchemaInput";
 
