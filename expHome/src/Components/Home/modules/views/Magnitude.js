@@ -61,8 +61,9 @@ const Magnitude = () => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill,minmax(200px,max-content))",
+        gridTemplateColumns: "repeat(auto-fill,minmax(205px,max-content))",
         alignItems: "start",
+        justifyContent:"center",
         color: gray200,
         gap: "96px",
         mb: "64px"
