@@ -512,6 +512,29 @@ const DissertationGantt = () => {
                           if (email !== "oneweb@umich.edu") return;
                           handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
                         }
+                      },
+                      {
+                        eventName: "ready",
+                        callback: ({ chartWrapper }) => {
+                          let container = document.getElementById("chart_div");
+                          let svg = container.getElementsByTagName("svg")[0];
+                          const rect = svg.getBoundingClientRect();
+                          const x = 550;
+                          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                          const height = parseFloat(svg.getAttribute("height"));
+                          text.setAttribute("x", 480);
+                          text.setAttribute("y", height-130);
+                          text.textContent = "Today";
+                          line.setAttribute("x1", x - rect.left);
+                          line.setAttribute("x2", x - rect.left);
+                          line.setAttribute("y1", 0);
+                          line.setAttribute("y2", height-150);
+                          line.setAttribute("stroke", "#212121");
+                          line.setAttribute("stroke-width", 3.5);
+                          svg.appendChild(text);
+                          svg.appendChild(line);
+                        }
                       }
                     ]}
                   />
