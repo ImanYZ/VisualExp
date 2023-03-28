@@ -1,7 +1,7 @@
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Stack, Typography, useTheme } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import {  gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../../../utils/colors";
+import { gray100, gray200, gray25, gray300, gray50, orangeDark } from "../../../../utils/colors";
 import { RiveComponentMemoized } from "../../../Rive/RiveComponentMemoized";
 
 import { RE_DETECT_NUMBERS_WITH_COMMAS, wrapStringWithBoldTag } from "./HowItWorks";
@@ -16,10 +16,16 @@ const Systems = () => {
 
   useEffect(() => {
     (async () => {
-      // const response = await fetch("https://1cademy.com//api/stats");
-      // const data = await response.json();
-
-      setStats([]);
+      try {
+        const response = await fetch("https://1cademy.com/api/stats", {
+          headers: { "Content-Type": "application/json" }
+        });
+        const data = await response.json();
+        console.log({ data });
+        setStats(data);
+      } catch (error) {
+        setStats([]);
+      }
     })();
   }, []);
 
@@ -28,6 +34,7 @@ const Systems = () => {
       if (!whichItem.getBody) return whichItem.body;
       if (!stats) return whichItem.body;
 
+      console.log({stats2:stats})
       stats.communities = "49";
       return whichItem.getBody(stats);
     },

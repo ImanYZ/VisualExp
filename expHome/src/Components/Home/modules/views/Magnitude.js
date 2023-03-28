@@ -36,16 +36,14 @@ const Magnitude = () => {
   useEffect(() => {
     (async () => {
       try {
-      
-        await fetch("http://localhost:3000/api/stats", { headers:{ 'Content-Type': 'application/json'} })
+        
+        await fetch("https://1cademy.com/api/stats", { headers: { "Content-Type": "application/json" } })
           .then(res => res.json())
           .then(data => {
-            console.log({ data });
             setStats(data);
           });
       } catch (error) {
         setStats([]);
-        console.error(error);
       }
     })();
   }, []);
