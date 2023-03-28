@@ -35,16 +35,21 @@ const Magnitude = () => {
 
   useEffect(() => {
     (async () => {
-      // const response = await fetch("https://1cademy.com//api/stats");
-      // const data = await response.json();
-
-      setStats([]);
+      try {
+        
+        await fetch("https://1cademy.com/api/stats", { headers: { "Content-Type": "application/json" } })
+          .then(res => res.json())
+          .then(data => {
+            setStats(data);
+          });
+      } catch (error) {
+        setStats([]);
+      }
     })();
   }, []);
 
   const MAGNITUDE_ITEMS_Memo = useMemo(() => {
     if (!stats) return MAGNITUDE_ITEMS;
-
     const x = MAGNITUDE_ITEMS.reduce((acc, item) => {
       item.value = stats[item.id] ?? item.value;
       return [...acc, item];
@@ -57,9 +62,9 @@ const Magnitude = () => {
       sx={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill,minmax(200px,max-content))",
-        alignItems:"start",
+        alignItems: "start",
         color: gray200,
-        gap:"96px",
+        gap: "96px",
         mb: "64px"
       }}
     >
