@@ -231,10 +231,10 @@ const panels = [
             </span>
             <span>
               , we described the design of our practice tool. While each hour spent using the tool was associated with a
-              1.04% increase in final exam grades, the hours of studying the textbook was not. To assess motivation, we
-              report on the amount of practice tool use: 62 of the 193 students (32%) voluntarily used the tool more
-              than the required 45 days. This indicates that the tool design successfully overcame negative perceptions
-              of these desirable difficulties.
+              1.04% increase in final exam grades, the number of hours of studying the textbook was not. To assess
+              motivation, we report on the amount of practice tool use: 62 of the 193 students (32%) voluntarily used
+              the tool more than the required 45 days. This indicates that the tool design successfully overcame
+              negative perceptions of these desirable difficulties.
             </span>
           </li>
           <li>
