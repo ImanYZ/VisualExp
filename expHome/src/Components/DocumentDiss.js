@@ -42,13 +42,13 @@ const panels = [
         <p>
           My goal is to convert human knowledge into an easily digestible presentation and representation that
           facilitates efficient learning. The issue of “knowledge overload” arises from the redundant nature of the same
-          topics being covered in numerous books, websites, and videos. To maximize our learning potential, we must
-          eliminate overlapping content and merge all available explanations for a particular subject into a single
-          comprehensive chunk. This chunk should encompass various perspectives and use-cases side-by-side, allowing
-          learners to refer to it as the sole source for complete mastery of the topic. Conventional knowledge
-          structures organized in pages, whether in books or on websites, do not serve this purpose. Instead, we must
-          divide the content into smaller chunks, each dedicated to a single topic, and present them as paragraphs
-          within a single knowledge graph.
+          topics being covered in numerous books, websites, and videos. This is exacerbated by mass generation of
+          content by large language models. To maximize our learning potential, we must eliminate overlapping content
+          and merge all available explanations for a particular subject into a single comprehensive chunk. This chunk
+          should encompass various perspectives and use-cases side-by-side, allowing learners to refer to it as the sole
+          source for complete mastery of the topic. Conventional knowledge structures organized in pages, whether in
+          books or on websites, do not serve this purpose. Instead, we must divide the content into smaller chunks, each
+          dedicated to a single topic, and present them as paragraphs within a single knowledge graph.
         </p>
         <p>
           <strong>
@@ -231,10 +231,10 @@ const panels = [
             </span>
             <span>
               , we described the design of our practice tool. While each hour spent using the tool was associated with a
-              1.04% increase in final exam grades, the hours of studying the textbook was not. To assess motivation, we
-              report on the amount of practice tool use: 62 of the 193 students (32%) voluntarily used the tool more
-              than the required 45 days. This indicates that the tool design successfully overcame negative perceptions
-              of these desirable difficulties.
+              1.04% increase in final exam grades, the number of hours of studying the textbook was not. To assess
+              motivation, we report on the amount of practice tool use: 62 of the 193 students (32%) voluntarily used
+              the tool more than the required 45 days. This indicates that the tool design successfully overcame
+              negative perceptions of these desirable difficulties.
             </span>
           </li>
           <li>
