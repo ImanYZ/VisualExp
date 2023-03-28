@@ -10,19 +10,61 @@ const panels = [
     id: "panel1",
     heading: <h2>Chapter 1: Introduction</h2>,
     details: (
-      <p>
-        <span>
+      <div>
+        <p>
           In this dissertation, I report on the design of{" "}
           <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
             1Cademy
           </a>
           , a crowdsourcing platform for creating and updating a scalable knowledge graph of learning pathways. I
-          explore design mechanisms that lead to a shared graph with individualized views for self-directed learning. I
-          explore the optimal size of content nodes for reader comprehension and learning, the design space of
+          explore design mechanisms that lead to a shared graph with individualized views for self-directed learning.
+        </p>
+        <p>
+          The studies included in this dissertation largely focus on representation, presentation, and scheduling of
+          learning content. It is important to define these terms because they are instrumental to the research
+          described and a major component of 1Cademy’s design.
+        </p>
+        <ul>
+          <li>
+            <strong>Representation</strong>: the way knowledge is stored and organized in a database or knowledge graph,
+            including the content of nodes, the meaning of links, and the relationships between them.
+          </li>
+          <li>
+            <strong>Presentation</strong>: the way knowledge is displayed and accessed, including the layout of content
+            on a page, the ability to search and filter it, and the use of different views for different audiences to
+            enhance understanding.
+          </li>
+          <li>
+            <strong>Scheduling</strong>: the timing in which knowledge is interacted with, including the frequency and
+            distribution that subjects are studied.
+          </li>
+        </ul>
+        <p>
+          My goal is to convert human knowledge into an easily digestible presentation and representation that
+          facilitates efficient learning. The issue of “knowledge overload” arises from the redundant nature of the same
+          topics being covered in numerous books, websites, and videos. To maximize our learning potential, we must
+          eliminate overlapping content and merge all available explanations for a particular subject into a single
+          comprehensive chunk. This chunk should encompass various perspectives and use-cases side-by-side, allowing
+          learners to refer to it as the sole source for complete mastery of the topic. Conventional knowledge
+          structures organized in pages, whether in books or on websites, do not serve this purpose. Instead, we must
+          divide the content into smaller chunks, each dedicated to a single topic, and present them as paragraphs
+          within a single knowledge graph.
+        </p>
+        <p>
+          <strong>
+            It is important to note that the representation of these smaller chunks should not be combined into any
+            larger constructs, such as books or collections. Doing so only perpetuates the issue of overlapping content
+            and defeats the purpose of efficient learning.
+          </strong>
+        </p>
+        <p>
+          I explore the optimal size of content nodes for reader comprehension and learning, the design space of
           collaboration mechanisms that maintain coherence of the shared graph, and how to utilize spaced, interleaved
-          retrieval practice to improve learner retention of micro-content.
-        </span>
-      </p>
+          retrieval practice to improve learner retention of micro-content. The findings offer practical solutions for
+          generating a coherent and scalable knowledge graph, and empowering learners to improve and personalize their
+          self-directed learning.
+        </p>
+      </div>
     )
   },
   {
