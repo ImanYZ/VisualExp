@@ -11,6 +11,7 @@ const mockSchedules = require("./mockCollections/schedule.data");
 const mockFeedbackCodes = require("./mockCollections/feedbackCode.data");
 const MockData = require("./MockData")
 const deleteAllUsers = require("./deleteAllUsers")
+const writeTransaction = require("./writeTransaction")
 
 module.exports = {
   MockData,
@@ -25,5 +26,6 @@ module.exports = {
   mockBooleanScratch,
   mockSchedules,
   mockFeedbackCodes,
-  deleteAllUsers
+  deleteAllUsers,
+  writeTransaction
 }
