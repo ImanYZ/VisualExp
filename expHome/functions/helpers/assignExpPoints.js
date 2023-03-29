@@ -45,15 +45,15 @@ exports.assignExpPoints = async obj => {
     let _eventId = "";
     if (!eventId) {
       // schedule is not available
-      if (!schedules.docs.length) return transactionWrites;
+      if (!schedules.docs.length) return ;
       const schedule = schedules.docs[0];
       scheduleData = schedule.data();
 
       // if google calender event does not exists
-      if (!scheduleData?.id) return transactionWrites;
+      if (!scheduleData?.id) return ;
 
       // if schedule wasn't started
-      if (!scheduleData?.hasStarted) return transactionWrites;
+      if (!scheduleData?.hasStarted) return ;
 
       _eventId = scheduleData?.id;
     }
@@ -75,11 +75,11 @@ exports.assignExpPoints = async obj => {
 
     // if points already distributed for this session we are not going to run this logic
     if (expSessions.docs.length) {
-      return transactionWrites;
+      return ;
     }
 
     // checking if researcher attended session
-    if (!attendees.includes(researcherData.email)) return transactionWrites;
+    if (!attendees.includes(researcherData.email)) return ;
 
     if (checkRecallgrading) {
       const userRecallGrades = await t.get(
@@ -99,7 +99,7 @@ exports.assignExpPoints = async obj => {
 
       for (let recall of reacallSession) {
         if (!recall.researchers.includes(researcher)) {
-          return transactionWrites;
+          return ;
         }
       }
       let currentfeedbackId = "";
@@ -110,7 +110,7 @@ exports.assignExpPoints = async obj => {
         let feedbackData = feedback.data();
         if (feedback.id === currentfeedbackId) feedbackData = feedbackCodeData;
         if (!feedbackData.coders.includes(researcher)) {
-          return transactionWrites;
+          return ;
         }
       }
     }
@@ -165,6 +165,7 @@ exports.assignExpPoints = async obj => {
         updatedAt: new Date()
       }
     });
-    return transactionWrites;
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };

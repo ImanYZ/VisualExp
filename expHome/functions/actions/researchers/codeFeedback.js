@@ -159,7 +159,7 @@ module.exports = async (req, res) => {
       const { fullname: participant, project: _project, session } = feedbackCodeData;
       // to assign points to researcher for session if feedback coding and recall grading is done
 
-      transactionWrites = await assignExpPoints({
+      await assignExpPoints({
         researcher: fullname,
         participant,
         session,
