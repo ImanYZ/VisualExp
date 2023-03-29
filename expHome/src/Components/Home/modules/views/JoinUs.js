@@ -752,7 +752,7 @@ const JoinUs = props => {
                       <Button
                         variant="contained"
                         component="a"
-                        href={"/paperTest/" + props.community.id}
+                        href={"/paperTest/" + props.community.link}
                         target="_blank"
                         sx={{ mt: 1, mr: 1, color: "common.white" }}
                       >
