@@ -535,15 +535,16 @@ const DissertationGantt = () => {
                           const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                           const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                           const height = parseFloat(svg.getAttribute("height"));
-                          text.setAttribute("x", x - 65);
-                          text.setAttribute("y", height - 130);
-                          text.textContent = "Today";
                           line.setAttribute("x1", x - rect.left);
                           line.setAttribute("x2", x - rect.left);
                           line.setAttribute("y1", 0);
                           line.setAttribute("y2", height - 150);
-                          line.setAttribute("stroke", "#212121");
+                          line.setAttribute("stroke", "#9e9e9e");
+                          line.setAttribute("stroke-dasharray", "5,5");
                           line.setAttribute("stroke-width", 3.5);
+                          text.setAttribute("x", x - 65);
+                          text.setAttribute("y", height - 130);
+                          text.textContent = "Today";
                           svg.appendChild(text);
                           svg.appendChild(line);
                         }
