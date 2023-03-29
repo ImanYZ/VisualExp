@@ -2357,194 +2357,18 @@ exports.passagesNumberCorrection = async context => {
   }
 };
 
-exports.handleSubmitFeebackCode = async (req, res) => {
+
+
+exports.createTemFeedback = async (req, res) => {
   try {
-    if (
-      "fullname" in req.body &&
-      "docId" in req.body &&
-      "quotesSelectedForCodes" in req.body &&
-      "choiceConditions" in req.body &&
-      "approvedCodes" in req.body &&
-      "project" in req.body
-    ) {
-      const fullname = req.body.fullname;
-      const docId = req.body.docId;
-      const quotesSelectedForCodes = req.body.quotesSelectedForCodes;
-      const choiceConditions = req.body.choiceConditions;
-      const approvedCodes = req.body.approvedCodes;
-      const project = req.body.project;
-      await db.runTransaction(async t => {
-        let recievePositivePoints = [];
-        let recieveNegativePoints = [];
-        const feedbackCodesRef = db.collection("feedbackCode").doc(docId);
-        const feedbackCodeOrders = await db
-          .collection("feedbackCodeOrderV2")
-          .where("project", "==", project)
-          .where("researcher", "==", fullname)
-          .get();
-        const feedbackOrderRef = feedbackCodeOrders.docs.length
-          ? db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id)
-          : db.collection("feedbackCodeOrderV2").doc();
-        if (!feedbackCodeOrders.docs.length) {
-          // creating empty doc if not exists
-          await feedbackOrderRef.set({
-            researcher: fullname,
-            project,
-            codeIds: []
-          });
-        }
-        const feedOrderDoc = await t.get(feedbackOrderRef);
-        const feedOrderData = feedOrderDoc.data();
-        feedOrderData.codeIds.splice(feedOrderData.codeIds.indexOf(docId), 1);
-        const feedbackCodesDoc = await t.get(feedbackCodesRef);
-        const feedbackCodeData = feedbackCodesDoc.data();
-        let codesVotes = {};
 
-        approvedCodes.forEach(codeData => {
-          if (quotesSelectedForCodes[codeData.code] && quotesSelectedForCodes[codeData.code].length !== 0) {
-            if (feedbackCodeData.codesVotes[codeData.code]) {
-              if (!feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
-                const voters = feedbackCodeData.codesVotes[codeData.code];
-                voters.push(fullname);
-                codesVotes[codeData.code] = voters;
-              }
-            } else {
-              codesVotes[codeData.code] = [fullname];
-            }
-          } else {
-            if (feedbackCodeData.codesVotes[codeData.code]) {
-              if (feedbackCodeData.codesVotes[codeData.code].includes(fullname)) {
-                const voters = feedbackCodeData.codesVotes[codeData.code];
-                voters.splice(voters.indexOf(fullname), 1);
-                codesVotes[codeData.code] = voters;
-              }
-            } else {
-              codesVotes[codeData.code] = [];
-            }
-          }
-        });
-        let feedbackCodeUpdate = {
-          codersChoices: {
-            ...feedbackCodeData.codersChoices,
-            [fullname]: quotesSelectedForCodes
-          },
-          codersChoiceConditions: {
-            ...feedbackCodeData.codersChoiceConditions,
-            [fullname]: choiceConditions
-          },
-          coders: feedbackCodeData.coders.includes(fullname)
-            ? feedbackCodeData.coders
-            : [...feedbackCodeData.coders, fullname],
-          codesVotes,
-          updatedAt: new Date()
-        };
-        const tWriteOperations = [];
-        if (feedbackCodeUpdate.coders.length === 3) {
-          feedbackCodeUpdate.approved = true;
-          for (let code in feedbackCodeUpdate.codesVotes) {
-            if (feedbackCodeUpdate.codesVotes[code].length >= 2) {
-              for (let researcher of feedbackCodeUpdate.codesVotes[code]) {
-                recievePositivePoints.push(researcher);
-              }
-              if (feedbackCodeUpdate.codesVotes[code].length === 2) {
-                for (let otherCoder of feedbackCodeUpdate.coders) {
-                  if (!feedbackCodeUpdate.codesVotes[code].includes(otherCoder)) {
-                    recieveNegativePoints.push(otherCoder);
-                  }
-                }
-              }
-            } else if (feedbackCodeUpdate.codesVotes[code].length === 1) {
-              const theCoder = feedbackCodeUpdate.codesVotes[code][0];
-              recieveNegativePoints.push(theCoder);
-              for (let otherCoder of feedbackCodeUpdate.coders) {
-                if (otherCoder !== theCoder) {
-                  recievePositivePoints.push(otherCoder);
-                }
-              }
-            } else if (feedbackCodeUpdate.codesVotes[code].length === 0) {
-              for (let otherCoder of feedbackCodeUpdate.coders) {
-                recievePositivePoints.push(otherCoder);
-              }
-            }
-          }
-          for (let res of feedbackCodeUpdate.coders) {
-            const researcherRef = db.collection("researchers").doc(res);
-
-            const researcherData = (await t.get(researcherRef)).data();
-            let negativeCodingPoints = 0;
-            let positiveCodingPoints = 0;
-            recievePositivePoints.forEach(coder => {
-              if (coder === res) {
-                positiveCodingPoints += 0.04;
-              }
-            });
-            recieveNegativePoints.forEach(coder => {
-              if (coder === res) {
-                negativeCodingPoints += 0.04;
-              }
-            });
-
-            positiveCodingPoints = Number(Number.parseFloat(positiveCodingPoints).toFixed(2));
-            negativeCodingPoints = Number(Number.parseFloat(negativeCodingPoints).toFixed(2));
-
-            const researcherUpdates = {
-              projects: {
-                ...researcherData.projects,
-                [project]: {
-                  ...researcherData.projects[project]
-                }
-              }
-            };
-
-            let calulatedProject = project;
-            if (!(project in researcherData.projects)) {
-              calulatedProject = Object.keys(researcherData.projects)[0];
-            }
-            if (researcherUpdates.projects[calulatedProject]) {
-              if ("negativeCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-                researcherUpdates.projects[calulatedProject].negativeCodingPoints += negativeCodingPoints;
-              } else {
-                researcherUpdates.projects[calulatedProject].negativeCodingPoints = negativeCodingPoints;
-              }
-              if ("positiveCodingPoints" in researcherUpdates.projects[calulatedProject]) {
-                researcherUpdates.projects[calulatedProject].positiveCodingPoints += positiveCodingPoints;
-              } else {
-                researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
-              }
-              tWriteOperations.push({ docRef: researcherRef, data: researcherUpdates });
-            }
-          }
-        }
-
-        tWriteOperations.push({ docRef: feedbackCodesRef, data: feedbackCodeUpdate });
-        tWriteOperations.push({ docRef: feedbackOrderRef, data: feedOrderData });
-
-        for (let operation of tWriteOperations) {
-          t.update(operation.docRef, operation.data);
-        }
-      });
-
-      const feedbackCode = await db.collection("feedbackCode").doc(docId).get();
-      const feedbackCodeData = feedbackCode.data();
-      const { fullname: participant, project: _project, session } = feedbackCodeData;
-      // to assign points to researcher for session if feedback coding and recall grading is done
-      await assignExpPoints(fullname, participant, session, _project);
-
-      return res
-        .status(200)
-        .json({ success: true, endpoint: "FeedBack upload", successData: req.body.quotesSelectedForCodes });
-    }
-  } catch (err) {
-    console.error({ err });
-    return res.status(500).json({ errMsg: err.message, success: false });
-  }
-};
-
-exports.createTemporaryFeedbacodeCollection = async (req, res) => {
-  try {
-    if ("fullname" in req.body && "project" in req.body) {
-      console.log(":: ::: createTemporaryFeedbacodeCollection  called :: :: ");
       const { fullname, project } = req.body;
+      if (!fullname || !project) {
+        return res.status(500).send({
+          message: "some parameters are missing"
+        });
+      }
+
       const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
 
       const previousIds = [];
@@ -2648,7 +2472,7 @@ exports.createTemporaryFeedbacodeCollection = async (req, res) => {
       }
 
       await batch.commit();
-    }
+    
   } catch (error) {
     console.log({ error }, "error----------");
   }

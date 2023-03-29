@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
 import GridCellToolTip from "../../GridCellToolTip";
@@ -415,7 +415,7 @@ const CodeFeedback = props => {
       const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
       const orderData = feedbackCodesOrderDocs.docs[0].data();
       if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
-        await axios.post("/createTemporaryFeedbacodeCollection", {
+        await axios.post("/createTemFeedback", {
           fullname,
           project
         });
@@ -566,7 +566,7 @@ const CodeFeedback = props => {
         }
       }
       await firebase.idToken();
-      await axios.post("/handleSubmitFeebackCode", {
+      await axios.post("/researchers/codeFeedback", {
         fullname,
         docId,
         quotesSelectedForCodes: _quotesSelectedForCodes,
