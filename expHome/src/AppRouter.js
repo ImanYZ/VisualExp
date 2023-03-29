@@ -29,7 +29,6 @@ import {
 } from "./store/ExperimentAtoms";
 
 import App from "./App";
-import RouterNav from "./Components/RouterNav/RouterNav";
 import SchedulePage from "./Components/SchedulePage/SchedulePage";
 import ScheduleInstructorPage from "./Components/SchedulePage/ScheduleInstructorPage";
 import ScheduleAdministratorPage from "./Components/SchedulePage/ScheduleAdministratorPage";
@@ -468,7 +467,7 @@ const AppRouter = props => {
       <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/Iman-Dissertation-Prospectus" element={<DissertationGantt />} />
-      <Route path="/JoinUsIframe/*" element={<JoinUsIframe community={props.community} />} />
+      <Route path="/JoinUsIframe/*" element={<JoinUsIframe/>} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
@@ -486,6 +485,7 @@ const AppRouter = props => {
       )}
 
       <Route path="/communities/" element={<Communities />} />
+      <Route path="/community/*" element={<Communities />} />
       {communitiesOrder.map((communi, idx) => (
         <React.Fragment key={communi.id}>
           <Route path={"/community/" + communi.link} element={<Communities commIdx={idx} />} />
