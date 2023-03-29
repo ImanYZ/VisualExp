@@ -23,20 +23,20 @@ module.exports = async (req, res) => {
     }
   
     const { session, condition } = sessionRecallGrade;
-  
-    await db.runTransaction(async (t) => {
-      const transactionWrites = [];
-      
+
+    await db.runTransaction(async t => {
+      let transactionWrites = [];
+
       const researcherProject = researcher.projects[voterProject];
       let gradingNum = researcherProject?.gradingNum || 0;
       gradingNum += viewedPhrases.length;
       researcher.projects[voterProject].gradingNum = gradingNum;
-  
-      const passage = await db.collection("passages").doc(sessionRecallGrade.passage).get();
+
+      const passage = await t.get(db.collection("passages").doc(sessionRecallGrade.passage));
       const passageData = passage.data();
-  
+
       const recallGradeRef = db.collection("recallGradesV2").doc(sessionRecallGrade.docId);
-      const recallGrade = await recallGradeRef.get();
+      const recallGrade = await t.get(recallGradeRef);
       const recallGradeData = recallGrade.data();
       const conditionIdx = recallGradeData.sessions[session].findIndex((conditionItem) => conditionItem.condition === condition);
       if(conditionIdx === -1) {
@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
       }
       const conditionUpdates = recallGradeData.sessions[session][conditionIdx];
 
-      const researchers = await db.collection("researchers").get();
+      const researchers = await t.get(db.collection("researchers"));
       let researchersUpdates = {};
       let updatedResearcers = [];
       for(const researcher of researchers.docs) {
@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
       updatedResearcers.push(researcher.docId);
 
       // loading user data from recall grade document
-      const user = await db.collection("users").doc(recallGradeData.user).get();
+      const user = await t.get(db.collection("users").doc(recallGradeData.user));
       let userUpdates = user.data();
       let userUpdated = false;
   
@@ -179,11 +179,13 @@ module.exports = async (req, res) => {
               recallResponse = "recall1WeekreGrade";
               break;
             default:
-              throw new Error("Unknown value for session")
+              throw new Error("Unknown value for session");
           }
 
-          const passageIdx = (userUpdates.pConditions || []).findIndex((conditionItem) => conditionItem.passage === sessionRecallGrade.passage);
-          if(passageIdx === -1) {
+          const passageIdx = (userUpdates.pConditions || []).findIndex(
+            conditionItem => conditionItem.passage === sessionRecallGrade.passage
+          );
+          if (passageIdx === -1) {
             throw new Error("Unknown value for passage");
           }
 
@@ -314,6 +316,26 @@ module.exports = async (req, res) => {
         });
       }
 
+      let readyRecalls = true;
+      for (let recall of recallGradeData.sessions[session]) {
+        if (!recall.researchers.includes(fullname)) {
+          readyRecalls = false;
+          break;
+        }
+      }
+      if (readyRecalls) {
+         await assignExpPoints({
+          researcher: fullname,
+          participant: recallGradeData.user,
+          session,
+          project: voterProject,
+          recallGradeData,
+          feedbackCodeData:null,
+          transactionWrites: transactionWrites,
+          t
+        });
+      }
+
       for (const transactionWrite of transactionWrites) {
         if (transactionWrite.type === "update") {
           t.update(transactionWrite.refObj, transactionWrite.updateObj);
@@ -323,7 +345,6 @@ module.exports = async (req, res) => {
           t.delete(transactionWrite.refObj);
         }
       }
-      await assignExpPoints(fullname, recallGradeData.user, session, voterProject);
     });
 
     return res.status(200).json({
