@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
-import { firebaseState, fullnameState } from "./store/AuthAtoms";
+import { firebaseState, fullnameState , emailState} from "./store/AuthAtoms";
 import {
   phaseState,
   stepState,
@@ -48,11 +48,13 @@ const postQuestions = [
     b: "Choosing/entering the options"
   }
 ];
+const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
   // eslint-disable-next-line no-unused-vars
   const [fullname, setFullname] = useRecoilState(fullnameState);
+  const email = useRecoilValue(emailState);
   const [phase, setPhase] = useRecoilState(phaseState);
   const [step, setStep] = useRecoilState(stepState);
   const [passage, setPassage] = useRecoilState(passageState);
@@ -216,9 +218,9 @@ const App = () => {
     pConditions[phase] = {
       ...pConditions[phase],
       [prefieldName + "reText"]: reText,
-      [prefieldName + "Score"]: score,
-      [prefieldName + "ScoreRatio"]: score / keywordsText.length,
-      [prefieldName + "CosineSim"]: textCosineSimilarity(mainText, recalledText),
+      [prefieldName + "Score"]: roundNum(score),
+      [prefieldName + "ScoreRatio"]: roundNum(score / keywordsText.length),
+      [prefieldName + "CosineSim"]: roundNum(textCosineSimilarity(mainText, recalledText)),
       [prefieldName + "Ended"]: currentTime,
       [prefieldName + "Time"]: timeSpent
     };
@@ -249,7 +251,8 @@ const App = () => {
       createdAt: new Date(),
       project: userData.project,
       user: fullname,
-      priority: 0
+      priority: 0,
+      email,
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
