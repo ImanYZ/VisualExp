@@ -324,7 +324,7 @@ module.exports = async (req, res) => {
         }
       }
       if (readyRecalls) {
-        transactionWrites = await assignExpPoints({
+         await assignExpPoints({
           researcher: fullname,
           participant: recallGradeData.user,
           session,

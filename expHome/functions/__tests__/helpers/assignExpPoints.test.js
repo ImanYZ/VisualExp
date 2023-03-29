@@ -61,7 +61,7 @@ describe("assignExpPoints", () => {
     it("researcher should get points for 1st session", async () => {
       await db.runTransaction(async t => {
         let transactionWrites = [];
-        transactionWrites = await assignExpPoints({
+        await assignExpPoints({
           researcher,
           participant,
           session: "1st",
@@ -82,7 +82,7 @@ describe("assignExpPoints", () => {
     it("researcher should get points for 2nd session", async () => {
       await db.runTransaction(async t => {
         let transactionWrites = [];
-        transactionWrites = await assignExpPoints({
+         await assignExpPoints({
           researcher,
           participant,
           session: "2nd",
@@ -100,9 +100,9 @@ describe("assignExpPoints", () => {
     });
 
     it("researcher should get points for 3rd session", async () => {
-      let transactionWrites = [];
       await db.runTransaction(async t => {
-        transactionWrites = await assignExpPoints({
+      let transactionWrites = [];
+       await assignExpPoints({
           researcher,
           participant,
           session: "2nd",
@@ -147,7 +147,7 @@ describe("assignExpPoints", () => {
     it("researcher should get points for taking session with survey participant", async () => {
       await db.runTransaction(async t => {
         let transactionWrites = [];
-        transactionWrites = await assignExpPoints({
+        await assignExpPoints({
           researcher,
           participant,
           session: "1st",
@@ -167,7 +167,7 @@ describe("assignExpPoints", () => {
     it("researcher should get points for taking session with survey participant (Annotating)", async () => {
       await db.runTransaction(async t => {
         let transactionWrites = [];
-        transactionWrites = await assignExpPoints({
+         await assignExpPoints({
           researcher,
           participant,
           session: "1st",
