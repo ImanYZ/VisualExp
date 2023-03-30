@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import moment from "moment";
 
 import Button from "@mui/material/Button";
 
@@ -30,31 +31,15 @@ const PassageRight = props => {
   const step = useRecoilValue(stepState);
   const startedSession = useRecoilValue(startedSessionState);
   const projectSpecs = useRecoilValue(projectSpecsState);
-  const [personalInfoProcessChoices, setPersonalInfoProcessChoices] = useRecoilState(personalInfoProcessChoicesState)
+  const [personalInfoProcessChoices, setPersonalInfoProcessChoices] = useRecoilState(personalInfoProcessChoicesState);
 
   const [nextSessionDate, setNextSessionDate] = useState("");
 
   useEffect(() => {
     if (startedSession !== 3 && [10, 20].includes(step)) {
       const daysLater = projectSpecs?.daysLater || AppConfig.daysLater;
-      const daysInNextSession = startedSession === 2
-        ? daysLater?.[1] || AppConfig.daysLater[1]
-        : daysLater?.[0] || AppConfig.daysLater[0];
-      let d = new Date();
-      d.setDate(d.getDate() + daysInNextSession);
-      const weekDays = new Array(7);
-      weekDays[0] = "Sunday";
-      weekDays[1] = "Monday";
-      weekDays[2] = "Tuesday";
-      weekDays[3] = "Wednesday";
-      weekDays[4] = "Thursday";
-      weekDays[5] = "Friday";
-      weekDays[6] = "Saturday";
-      const weekDay = weekDays[d.getDay()];
-      const ye = new Intl.DateTimeFormat("en", { year: "numeric" }).format(d);
-      const mo = new Intl.DateTimeFormat("en", { month: "short" }).format(d);
-      const da = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(d);
-      setNextSessionDate(weekDay + ", " + mo + " " + da + ", " + ye);
+      const daysInNextSession = startedSession === 2 ? daysLater?.[1] - daysLater?.[0] : daysLater?.[0];
+      setNextSessionDate(moment().add(daysInNextSession, "days").format("dddd MMM DD, YYYY"));
     }
   }, [startedSession, step]);
 
@@ -118,7 +103,9 @@ const PassageRight = props => {
         </>
       ) : [5, 19].includes(step) ? (
         <>
-          {startedSession === 3 && step === 19 && <p>Now that you know your scores, rethink through these two questions.</p>}
+          {startedSession === 3 && step === 19 && (
+            <p>Now that you know your scores, rethink through these two questions.</p>
+          )}
           <p>Please click the "Submit &amp; Continue!" button on the left after answering both questions.</p>
           {startedSession === 3 &&
             props.scores.length > 0 &&
