@@ -23,12 +23,6 @@ const RecallForIman = props => {
   const [doneProcessing, setDoneProcessing] = useState(false);
   const [countPhrases, setCountPhrases] = useState([]);
 
-  const [countNSatisfiedGraded, setCountNSatisfiedGraded] = useState(0);
-  const [countSatifiedGraded, setCountSatifiedGraded] = useState(0);
-  const [notSatisfied, setNotSatisfied] = useState(0);
-  const [satisfiedThreeRes, setSatisfiedThreeRes] = useState(0);
-  const [totalpairPhrases, setTotalpairPhrases] = useState(0);
-
   const text = [
     "of phrases that the bot has graded and their boolean expressions are not satisfied",
     "of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them",
