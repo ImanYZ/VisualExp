@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-
+import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 
 const RecallForIman = props => {
@@ -21,12 +21,15 @@ const RecallForIman = props => {
   const [passagesHash, setPassagesHash] = useState({});
 
   const [doneProcessing, setDoneProcessing] = useState(false);
+  const [countPhrases, setCountPhrases] = useState([]);
 
-  const [countNSatisfiedGraded, setCountNSatisfiedGraded] = useState(0);
-  const [countSatifiedGraded, setCountSatifiedGraded] = useState(0);
-  const [notSatisfied, setNotSatisfied] = useState(0);
-  const [satisfiedThreeRes, setSatisfiedThreeRes] = useState(0);
-  const [totalpairPhrases, setTotalpairPhrases] = useState(0);
+  const text = [
+    "of phrases that the bot has graded and their boolean expressions are not satisfied",
+    "of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them",
+    "of phrases that their boolean expressions are not satisfied",
+    "of phrases that their boolean expressions are satisfied and 2 or more researchers graded them",
+    "Total of phrases"
+  ];
 
   useEffect(() => {
     const getPassages = async () => {
@@ -51,11 +54,11 @@ const RecallForIman = props => {
 
       // # of phrases that the bot has graded and their boolean expressions are not satisfied
       let _countNSatisfiedGraded = 0;
-      //# of phrases that the bot has graded and their boolean expressions are satisfied and three or more researchers graded them
+      //# of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them
       let _countSatifiedGraded = 0;
       //# of phrases that their boolean expressions are not satisfied
       let _notSatisfied = 0;
-      //# of phrases that their boolean expressions are satisfied and three or more researchers graded them
+      //# of phrases that their boolean expressions are satisfied and 2 or more researchers graded them
       let _satisfiedThreeRes = 0;
 
       //Total # of phrases
@@ -87,14 +90,14 @@ const RecallForIman = props => {
               if (
                 phraseItem.hasOwnProperty("GPT-4-Mentioned") &&
                 phraseItem.satisfied &&
-                otherResearchers.length >= 3
+                otherResearchers.length >= 2
               ) {
                 _countSatifiedGraded++;
               }
               if (!phraseItem.satisfied) {
                 _notSatisfied++;
               }
-              if (otherResearchers.length >= 3 && phraseItem.satisfied) {
+              if (otherResearchers.length >= 2 && phraseItem.satisfied) {
                 _satisfiedThreeRes++;
               }
               const botGrade = phraseItem.hasOwnProperty("GPT-4-Mentioned") ? phraseItem["GPT-4-Mentioned"] : null;
@@ -137,13 +140,13 @@ const RecallForIman = props => {
       );
       setNoMajority(__noMajority);
       setMajorityDifferentThanBot(__majorityDifferentThanBot);
-
-      setCountNSatisfiedGraded(_countNSatisfiedGraded);
-      setCountSatifiedGraded(_countSatifiedGraded);
-      setNotSatisfied(_notSatisfied);
-      setSatisfiedThreeRes(_satisfiedThreeRes);
-      setTotalpairPhrases(countPairPhrases);
-
+      setCountPhrases([
+        _countNSatisfiedGraded,
+        _countSatifiedGraded,
+        _notSatisfied,
+        _satisfiedThreeRes,
+        countPairPhrases
+      ]);
       setDoneProcessing(true);
     };
 
@@ -213,10 +216,25 @@ const RecallForIman = props => {
   console.log(doneProcessing);
   if (doneProcessing && !majorityDifferentThanBot.length) {
     return (
-      <>
-        THERE IS NO RECORDS TO COMPARE {countNSatisfiedGraded} /{countSatifiedGraded}/{notSatisfied}/{satisfiedThreeRes}
-        /{totalpairPhrases}
-      </>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Typography variant="h5" component="h5">
+          THERE IS NO RECORDS TO COMPARE :{" "}
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {text.map((meaning, index) => (
+            <Tooltip title={meaning} placement="top">
+              <Box
+                style={{
+                  fontSize: 25,
+                  overflow: "hidden"
+                }}
+              >
+                {countPhrases[index] + "/"}
+              </Box>
+            </Tooltip>
+          ))}
+        </Box>
+      </Box>
     );
   }
 
@@ -237,10 +255,25 @@ const RecallForIman = props => {
     <Box sx={{ mb: "15px", ml: "15px" }}>
       {majorityDifferentThanBot.length > 0 && majorityDifferentThanBot[indexOfmajorityDifferentThanBot] && (
         <Box>
-          <Typography variant="h5" component="h5">
-            The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
-            {countNSatisfiedGraded} /{countSatifiedGraded}/{notSatisfied}/{satisfiedThreeRes}/{totalpairPhrases}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Typography variant="h5" component="h5">
+              The Response has three or four grades, but the majority of votes disagrees with Iman's grade :{" "}
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              {text.map((meaning, index) => (
+                <Tooltip title={meaning} placement="top">
+                  <Box
+                    style={{
+                      fontSize: 25,
+                      overflow: "hidden"
+                    }}
+                  >
+                    {countPhrases[index] + "/"}
+                  </Box>
+                </Tooltip>
+              ))}
+            </Box>
+          </Box>
           {"\n"}
           <Box>OriginalPassgae :</Box>
           <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }}>

@@ -52,7 +52,7 @@ const panels = [
         </p>
         <p>
           <strong>
-            It is important to note that the representation of these smaller chunks should not be combined into any
+            It is important to note that the representation of these smaller chunks should not be combined into multiple
             larger constructs, such as books or collections. Doing so only perpetuates the issue of overlapping content
             and defeats the purpose of efficient learning.
           </strong>
