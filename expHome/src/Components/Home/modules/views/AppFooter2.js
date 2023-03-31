@@ -53,7 +53,7 @@ const AppFooter = ({ page="ONE_CADEMY",sx }) => {
                 1Cademy
               </Box>
             </Stack>
-            <Typography color={color}> We Synthesize Books & Research Papers Together</Typography>
+            <Typography color={color}> The Largest Human-AI Collaboration to Synthesize Books & Research Papers</Typography>
           </Box>
           <Box>
             <Stack spacing={"12px"}>

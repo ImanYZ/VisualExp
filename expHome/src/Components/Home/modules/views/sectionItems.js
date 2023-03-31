@@ -9,7 +9,7 @@ export const ONE_CADEMY_SECTIONS = [
     id: "mechanism",
     title: "Mechanism",
     label: "Mechanism",
-    description: "We collaboratively summarize, link, evaluate, and improve science on 1Cademy."
+    description: "Through human-AI collaboration, we summarize, link, evaluate, and improve science on 1Cademy."
   },
   {
     id: "magnitude",
