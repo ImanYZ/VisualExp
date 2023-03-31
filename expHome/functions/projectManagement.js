@@ -2303,54 +2303,48 @@ exports.remindCalendarInvitations = async context => {
 
 exports.passagesNumberCorrection = async context => {
   try {
-    let passageNumberOfParticipant = {};
-    let UsersDocs = await db.collection("users").get();
-    for (let userDoc of UsersDocs.docs) {
+    const passageNumberOfParticipant = {};
+    const usersDocs = await db.collection("users").get();
+  
+    usersDocs.forEach((userDoc) => {
       const userData = userDoc.data();
-      if (
+  
+      const hasRequiredData =
         userData.explanations &&
         userData.explanations1Week &&
         userData.explanations3Days &&
-        !userData.damagedDocument
-      ) {
-        for (let cond of userData.pConditions) {
-          if (passageNumberOfParticipant[cond.passage]) {
-            if (passageNumberOfParticipant[cond.passage][userData.project]) {
-              if (passageNumberOfParticipant[cond.passage][userData.project][cond.condition]) {
-                passageNumberOfParticipant[cond.passage][userData.project][cond.condition] += 1;
-              } else {
-                passageNumberOfParticipant[cond.passage][userData.project][cond.condition] = 1;
-              }
-            } else {
-              passageNumberOfParticipant[cond.passage][userData.project] = {
-                [cond.condition]: 1
-              };
-            }
-          } else {
-            passageNumberOfParticipant[cond.passage] = {
-              [userData.project]: { [cond.condition]: 1 }
-            };
+        !userData.damagedDocument;
+  
+      if (hasRequiredData) {
+        userData.pConditions.forEach((cond) => {
+          const { project } = userData;
+          const { passage, condition } = cond;
+  
+          if (!passageNumberOfParticipant[passage]) {
+            passageNumberOfParticipant[passage] = {};
           }
-        }
+  
+          if (!passageNumberOfParticipant[passage][project]) {
+            passageNumberOfParticipant[passage][project] = {};
+          }
+  
+          if (!passageNumberOfParticipant[passage][project][condition]) {
+            passageNumberOfParticipant[passage][project][condition] = 0;
+          }
+  
+          passageNumberOfParticipant[passage][project][condition]++;
+        });
       }
-    }
-    for (let passage in passageNumberOfParticipant) {
+    });
+    for (const passage in passageNumberOfParticipant) {
       const passageRef = db.collection("passages").doc(passage);
-      const passageDoc = await passageRef.get();
-      let passageUpdate = passageDoc.data();
-      for (let project in passageNumberOfParticipant[passage]) {
-          passageUpdate = {
-            projects: {
-              ...passageUpdate.projects,
-              [project]: passageNumberOfParticipant[passage][project],
-            },
-          };
+      const passageData = (await passageRef.get()).data();
+      const projects = passageData.projects || {};
+      for (const project in passageNumberOfParticipant[passage]) {
+        projects[project] = passageNumberOfParticipant[passage][project];
       }
-      passageRef.update(passageUpdate);
-      await batchUpdate(passageRef, passageUpdate);
+      await passageRef.update({ projects });
     }
-    await commitBatch();
-    console.log({ success: true, endpoint: "passagesNumberCorrection" });
     return null;
   } catch (err) {
     console.log({ err });
