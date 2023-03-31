@@ -2337,16 +2337,17 @@ exports.passagesNumberCorrection = async context => {
     for (let passage in passageNumberOfParticipant) {
       const passageRef = db.collection("passages").doc(passage);
       const passageDoc = await passageRef.get();
-      const passageData = passageDoc.data();
+      let passageUpdate = passageDoc.data();
       for (let project in passageNumberOfParticipant[passage]) {
-        let passageUpdate = {
-          projects: {
-            ...passageData.projects,
-            [project]: passageNumberOfParticipant[passage][project]
-          }
-        };
-        await batchUpdate(passageRef, passageUpdate);
+          passageUpdate = {
+            projects: {
+              ...passageUpdate.projects,
+              [project]: passageNumberOfParticipant[passage][project],
+            },
+          };
       }
+      passageRef.update(passageUpdate);
+      await batchUpdate(passageRef, passageUpdate);
     }
     await commitBatch();
     console.log({ success: true, endpoint: "passagesNumberCorrection" });
