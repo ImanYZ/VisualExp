@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import moment from "moment";
-
+import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 
 import { Fireworks } from "fireworks-js/dist/react";
 
-import { phaseState, stepState, startedSessionState, personalInfoProcessChoicesState } from "../../store/ExperimentAtoms";
+import {
+  phaseState,
+  stepState,
+  startedSessionState,
+  personalInfoProcessChoicesState
+} from "../../store/ExperimentAtoms";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import MCQuestion from "../MCQuestion/MCQuestion";
@@ -42,6 +48,84 @@ const PassageRight = props => {
       setNextSessionDate(moment().add(daysInNextSession, "days").format("dddd MMM DD, YYYY"));
     }
   }, [startedSession, step]);
+
+  function renderPassageScores(passageIndex, passageScores, showTitle = true) {
+    const {
+      title,
+      pretestScore,
+      testScore,
+      test3DaysScore,
+      test1WeekScore,
+      recallScore,
+      recall3DaysScore,
+      recall1WeekScore,
+      questionsNum,
+      keywordsLen
+    } = passageScores;
+
+    return (
+      <Box key={`passage-${passageIndex}`} sx={{mb:6}}>
+        {showTitle && <Typography variant="h6">{`Passage ${passageIndex + 1}: ${title}`}</Typography>}
+        <Box id="ScoresContainer">
+          <Typography variant="subtitle1" className="ScoreTitle">
+            Pretest Score
+          </Typography>
+          <Box></Box>
+          <Typography variant="subtitle1" className="ScoreNum">{`${pretestScore} / ${questionsNum}`}</Typography>
+
+          <Typography variant="subtitle1" className="ScoreTitle">
+            Test Score
+          </Typography>
+          <Box></Box>
+          <Typography variant="subtitle1" className="ScoreNum">{`${testScore} / ${questionsNum}`}</Typography>
+
+          <Typography variant="subtitle1" className="ScoreTitle">{`${
+            test1WeekScore ? "3 Days Later" : "Today's"
+          } Test Score`}</Typography>
+          <Box></Box>
+          <Typography variant="subtitle1" className="ScoreNum">{`${test3DaysScore} / ${questionsNum}`}</Typography>
+
+          {test1WeekScore !== undefined && (
+            <>
+              <Typography variant="subtitle1" className="ScoreTitle">
+                Today's Test Score
+              </Typography>
+              <Box></Box>
+              <Typography variant="subtitle1" className="ScoreNum">{`${test1WeekScore} / ${questionsNum}`}</Typography>
+            </>
+          )}
+
+          <Typography variant="subtitle1" className="ScoreTitle">
+            Written Response Score
+          </Typography>
+          <Box></Box>
+          <Typography variant="subtitle1" className="ScoreNum">{`${recallScore} / ${
+            recallScore !== 0 ? keywordsLen : ""
+          }`}</Typography>
+
+          <Typography variant="subtitle1" className="ScoreTitle">{`${
+            recall1WeekScore ? "3 Days Later" : "Today's"
+          } Written Response Score`}</Typography>
+          <Box></Box>
+          <Typography variant="subtitle1" className="ScoreNum">{`${recall3DaysScore} / ${
+            recall3DaysScore !== 0 ? keywordsLen : ""
+          }`}</Typography>
+
+          {recall1WeekScore !== undefined && (
+            <>
+              <Typography variant="subtitle1" className="ScoreTitle">
+                Today's Written Response Score
+              </Typography>
+              <Box></Box>
+              <Typography variant="subtitle1" className="ScoreNum">{`${recall1WeekScore} / ${
+                recall1WeekScore !== 0 ? keywordsLen : ""
+              }`}</Typography>
+            </>
+          )}
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <div id="QuestionsContainer">
@@ -110,67 +194,7 @@ const PassageRight = props => {
           {startedSession === 3 &&
             props.scores.length > 0 &&
             step === 19 &&
-            [0, 1].map(num => {
-              return (
-                <div key={"Key" + num}>
-                  <h2>Passage {num + 1 + ": " + props.scores[num].title}</h2>
-                  <div id="ScoresContainer">
-                    <div className="ScoreTitle">Pretest Score</div>
-                    <div></div>
-                    <div className="ScoreNum">
-                      {props.scores[num].pretestScore + " / " + props.scores[num].questionsNum}
-                    </div>
-                    <div className="ScoreTitle">Test Score</div>
-                    <div></div>
-                    <div className="ScoreNum">
-                      {props.scores[num].testScore + " / " + props.scores[num].questionsNum}
-                    </div>
-                    <div className="ScoreTitle">
-                      {(typeof props.scores[num].test1WeekScore !== "undefined" ? "3 Days Later" : "Today's") +
-                        " Test Score"}
-                    </div>
-                    <div></div>
-                    <div className="ScoreNum">
-                      {props.scores[num].test3DaysScore + " / " + props.scores[num].questionsNum}
-                    </div>
-                    {typeof props.scores[num].test1WeekScore !== "undefined" && (
-                      <>
-                        <div className="ScoreTitle">Today's Test Score</div>
-                        <div></div>
-                        <div className="ScoreNum">
-                          {props.scores[num].test1WeekScore + " / " + props.scores[num].questionsNum}
-                        </div>
-                      </>
-                    )}
-                    <div className="ScoreTitle">Written Response Score</div>
-                    <div></div>
-                    <div className="ScoreNum">
-                      {props.scores[num].recallScore +
-                        (props.scores[num].recallScore !== 0 ? " / " + props.scores[num].keywordsLen : "")}
-                    </div>
-                    <div className="ScoreTitle">
-                      {(typeof props.scores[num].recall1WeekScore !== "undefined" ? "3 Days Later" : "Today's") +
-                        " Written Response Score"}
-                    </div>
-                    <div></div>
-                    <div className="ScoreNum">
-                      {props.scores[num].recall3DaysScore +
-                        (props.scores[num].recall3DaysScore !== 0 ? " / " + props.scores[num].keywordsLen : "")}
-                    </div>
-                    {typeof props.scores[num].recall1WeekScore !== "undefined" && (
-                      <>
-                        <div className="ScoreTitle">Today's Written Response Score</div>
-                        <div></div>
-                        <div className="ScoreNum">
-                          {props.scores[num].recall1WeekScore +
-                            (props.scores[num].recall1WeekScore !== 0 ? " / " + props.scores[num].keywordsLen : "")}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+            props.scores.map((passageScores, index) => renderPassageScores(index, passageScores))}
         </>
       ) : step === 9 && props.answeredPersonalTrait ? (
         <>
@@ -222,7 +246,7 @@ const PassageRight = props => {
           ) : (
             <h1>
               You can now click{" "}
-              <a href="https://1cademy.us/communities" target="_blank">
+              <a href="https://1cademy.us/communities" target="_blank" rel="noreferrer">
                 this link
               </a>{" "}
               to explore 1Cademy communities, at your convenience, and complete the requirements of whichever community
@@ -251,85 +275,7 @@ const PassageRight = props => {
             You went through multiple tests based on the content of the passage on the left. You can see your scores
             below. Whenever you feel comfortable, please click the "CONTINUE" button.
           </p>
-          {props.scores.length > 0 && (
-            <div id="ScoresContainer">
-              <div className="ScoreTitle">Pretest Score</div>
-              <div></div>
-              <div className="ScoreNum">
-                {props.scores[phase].pretestScore + " / " + props.scores[phase].questionsNum}
-              </div>
-              {/* <div className="ScoreTitle">Pretest Score Ratio</div>
-            <div></div>
-            <div className="ScoreNum">
-              {props.scores[phase].pretestScoreRatio.toFixed(2)}
-            </div> */}
-              <div className="ScoreTitle">Test Score</div>
-              <div></div>
-              <div className="ScoreNum">{props.scores[phase].testScore + " / " + props.scores[phase].questionsNum}</div>
-              {/* <div className="ScoreTitle">Test Score Ratio</div>
-            <div></div>
-            <div className="ScoreNum">
-              {props.scores[phase].testScoreRatio.toFixed(2)}
-            </div> */}
-              <div className="ScoreTitle">
-                {(typeof props.scores[phase].test1WeekScore !== "undefined" ? "3 Days Later" : "Today's") +
-                  " Test Score"}
-              </div>
-              <div></div>
-              <div className="ScoreNum">
-                {props.scores[phase].test3DaysScore + " / " + props.scores[phase].questionsNum}
-              </div>
-              {typeof props.scores[phase].test1WeekScore !== "undefined" && (
-                <>
-                  <div className="ScoreTitle">Today's Test Score</div>
-                  <div></div>
-                  <div className="ScoreNum">
-                    {props.scores[phase].test1WeekScore + " / " + props.scores[phase].questionsNum}
-                  </div>
-                </>
-              )}
-              {/* <div className="ScoreTitle">Test After 4 Days Score Ratio</div>
-            <div></div>
-            <div className="ScoreNum">
-              {props.scores[phase].test3DaysScoreRatio.toFixed(2)}
-            </div> */}
-              <div className="ScoreTitle">Written Response Score</div>
-              <div></div>
-              <div className="ScoreNum">
-                {props.scores[phase].recallScore +
-                  (props.scores[phase].recallScore !== 0 ? " / " + props.scores[phase].keywordsLen : "")}
-              </div>
-              {/* <div className="ScoreTitle">Recall Score Ratio</div>
-            <div></div>
-            <div className="ScoreNum">
-              {props.scores[phase].recallScoreRatio.toFixed(2)}
-            </div> */}
-              <div className="ScoreTitle">
-                {(typeof props.scores[phase].recall1WeekScore !== "undefined" ? "3 Days Later" : "Today's") +
-                  " Written Response Score"}
-              </div>
-              <div></div>
-              <div className="ScoreNum">
-                {props.scores[phase].recall3DaysScore +
-                  (props.scores[phase].recall3DaysScore !== 0 ? " / " + props.scores[phase].keywordsLen : "")}
-              </div>
-              {typeof props.scores[phase].recall1WeekScore !== "undefined" && (
-                <>
-                  <div className="ScoreTitle">Today's Written Response Score</div>
-                  <div></div>
-                  <div className="ScoreNum">
-                    {props.scores[phase].recall1WeekScore +
-                      (props.scores[phase].recall1WeekScore !== 0 ? " / " + props.scores[phase].keywordsLen : "")}
-                  </div>
-                </>
-              )}
-              {/* <div className="ScoreTitle">Recall After 4 Days Score Ratio</div>
-            <div></div>
-            <div className="ScoreNum">
-              {props.scores[phase].recall3DaysScoreRatio.toFixed(2)}
-            </div> */}
-            </div>
-          )}
+          {props.scores.length > 0 && renderPassageScores(phase, props.scores[phase], false)}
           <div id="StartTestContainer">
             <Button id="StartTestButton" className="Button" onClick={props.nextStep} variant="contained">
               CONTINUE
