@@ -12,11 +12,9 @@ import {
   firebaseState,
   emailState,
   emailVerifiedState,
-  fullnameState,
-  leadingState,
   institutionsState
 } from "../../store/AuthAtoms";
-import { Autocomplete, Paper, TextField, Checkbox, Backdrop, CircularProgress, Link } from "@mui/material";
+import { Autocomplete, Paper, TextField, Checkbox, Link } from "@mui/material";
 import backgroundImage from "../../assets/HomeBackGroundDarkMode.png";
 import { styled } from "@mui/material/styles";
 
@@ -25,14 +23,12 @@ import { projectSpecsState, projectState } from "../../store/ProjectAtoms";
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
 
-import { isEmail, getFullname, shuffleArray } from "../../utils";
+import { isEmail } from "../../utils";
 
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
-import AppConfig from "../../AppConfig";
-import { color } from "@mui/system";
-import { useNavigate } from "react-router-dom";
+
 
 const GDPRPolicy = React.lazy(() => import("../../Components/modals/GDPRPolicy"));
 const CookiePolicy = React.lazy(() => import("../../Components/modals/CookiePolicy"));
@@ -41,8 +37,6 @@ const TermsOfUse = React.lazy(() => import("../../Components/modals/TermsOfUse")
 const InformedConsent = React.lazy(() => import("../../Components/modals/InformedConsent"));
 
 const SignUpPage = props => {
-  const navigateTo = useNavigate();
-
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
