@@ -52,18 +52,14 @@ const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
-  // eslint-disable-next-line no-unused-vars
-  const [fullname, setFullname] = useRecoilState(fullnameState);
-  const email = useRecoilValue(emailState);
+  const fullname = useRecoilValue(fullnameState);
+  const nullPassage = useRecoilValue(nullPassageState);
+  const startedSession = useRecoilValue(startedSessionState);
   const [phase, setPhase] = useRecoilState(phaseState);
   const [step, setStep] = useRecoilState(stepState);
   const [passage, setPassage] = useRecoilState(passageState);
   const [condition, setCondition] = useRecoilState(conditionState);
-  // eslint-disable-next-line no-unused-vars
-  const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
   const [choices, setChoices] = useRecoilState(choicesState);
-  // eslint-disable-next-line no-unused-vars
-  const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
 
   const [passageTitle, setPassageTitle] = useState("");
   const [pConURL, setPConURL] = useState("");
@@ -164,12 +160,10 @@ const App = () => {
       let testName = "pretest";
       if (step === 3) {
         testName = "test";
-      } else if (step === 13 || step === 16) {
-        if (startedSession === 2) {
-          testName = "test3Days";
-        } else if (startedSession === 3) {
-          testName = "test1Week";
-        }
+      } else if ((step === 13 || step === 16) && startedSession === 2) {
+        testName = "test3Days";
+      } else if ((step === 13 || step === 16) && startedSession === 3) {
+        testName = "test1Week";
       }
       let score = 0;
       let originalChoicesOrder = [];
@@ -930,20 +924,6 @@ const App = () => {
         setPConURL(passageData["link" + condition]);
         setQuestions(passageData.questions);
         setCurrentQIdx(0);
-        // const fromOps = [""];
-        // const linkOps = [""];
-        // const toOps = [""];
-        // for (let cRow of passageData.cMap) {
-        //   fromOps.push(cRow.from);
-        //   linkOps.push(cRow.link);
-        //   toOps.push(cRow.to);
-        // }
-        // fromOps.sort();
-        // linkOps.sort();
-        // toOps.sort();
-        // setFromOptions(fromOps);
-        // setLinkOptions(linkOps);
-        // setToOptions(toOps);
       }
       if (fullname && nullPassage && condition) {
         const passageDoc = await firebase.db.collection("passages").doc(nullPassage).get();
