@@ -178,7 +178,7 @@ const App = () => {
         ...pConditions[phase],
         [testName]: originalChoicesOrder,
         [testName + "Score"]: score,
-        [testName + "ScoreRatio"]: score / questions.length,
+        [testName + "ScoreRatio"]: roundNum(score / questions.length),
         [testName + "Ended"]: currentTime,
         [testName + "Time"]: timeSpent
       };

@@ -7,6 +7,7 @@ const firebaseAuth = require("../middlewares/firebaseAuth");
 const isParticipant = require("../middlewares/isParticipant");
 const { createExperimentEvent } = require("../scheduling");
 const { deleteEvent } = require("../GoogleCalendar");
+const { futureEvents } = require("../scheduling");
 const participantsRouter = express.Router();
 
 participantsRouter.use(firebaseAuth);
@@ -16,7 +17,7 @@ participantsRouter.use(isParticipant);
 participantsRouter.post("/schedule", async (req, res) => {
   try {
     let { sessions, project } = req.body;
-    const { fullname, email } = req.userData;
+    const {email } = req.userData;
     const batch = db.batch();
     
     sessions.sort((a, b) => a < b ? -1 : 1); // asc sorting
@@ -25,8 +26,14 @@ participantsRouter.post("/schedule", async (req, res) => {
       throw new Error("invalid request")
     }
 
-    // const events = [];
+    const researchers = {};
+    const researcherDocs = await db.collection("researchers").get();
+    for (let researcherDoc of researcherDocs.docs) {
+      const researcherData = researcherDoc.data();
+      researchers[researcherData.email] = researcherDoc.id;
+    }
 
+    const events = await futureEvents(40);
     const projectSpecs = await db.collection("projectSpecs").doc(project).get();
     if (!projectSpecs.exists) {
       throw new Error("Project Specs not found.");
@@ -55,7 +62,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       resScheduleRefsByMonth[resScheduleData.month] = db.collection("resSchedule").doc(resSchedule.id);
       resScheduleDataByMonth[resScheduleData.month] = resScheduleData;
       // scheduled
-      const { schedules: resSchedules, scheduled: resScheduled } = resScheduleData;
+      const { schedules: resSchedules } = resScheduleData;
 
       for(const researcher in resSchedules) {
         const _schedules = resSchedules[researcher] || [];
@@ -68,39 +75,66 @@ participantsRouter.post("/schedule", async (req, res) => {
           }
         }
       }
-      for(const researcher in resScheduled) {
-        for(const participant in resScheduled[researcher]) {
-          const __scheduled = Object.values(resScheduled[researcher][participant]);
-          for (const scheduledSlot of __scheduled) {
-            if (!availableScheduleByResearchers[scheduledSlot] || participant === fullname) {
-              continue;
-            }
-            if (availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
-              const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
-              availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
-            }
-          }
+    }
+    
+    function convertDateString(dateString) {
+      // Convert the date string to a Date object
+      const dateObj = new Date(dateString);
+
+      // Convert the Date object to the desired string format
+      const year = dateObj.getFullYear();
+      const month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+      const day = ("0" + dateObj.getDate()).slice(-2);
+      const hours = ("0" + dateObj.getHours()).slice(-2);
+      const minutes = ("0" + dateObj.getMinutes()).slice(-2);
+      const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+      return formattedDate;
+    }
+    for (let event of events) {
+      const startTime = new Date(event.start.dateTime).toLocaleString();
+      const endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+      const duration = new Date(event.end.dateTime).getTime() - new Date(event.start.dateTime).getTime();
+      const startMinus30Min = new Date(new Date(event.start.dateTime).getTime() - 30 * 60 * 1000);
+      const startSlot = convertDateString(startTime);
+      const endSlot = convertDateString(endTime);
+      if (
+        !event.attendees ||
+        !event.attendees.length === 0 ||
+        availableScheduleByResearchers.hasOwnProperty(convertDateString(startTime))
+      )
+        continue;
+      if (event.attendees.some(at => at.email === email)) continue;
+
+      const indexOfevent = events.findIndex(
+        eve =>
+          new Date(eve.start.dateTime).getTime() === startMinus30Min.getTime() &&
+          new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 === new Date(eve.end.dateTime).getTime() &&
+          eve.attendees.includes(email)
+      );
+      if (indexOfevent !== -1) continue;
+      for (let attendee of event.attendees) {
+        if (researchers.hasOwnProperty(attendee.email) && availableScheduleByResearchers.hasOwnProperty(startSlot)) {
+          availableScheduleByResearchers[startSlot].filter(res => res !== researchers[attendee.email]);
+        }
+        if (duration >= 60 * 60 * 1000 && availableScheduleByResearchers.hasOwnProperty(endSlot)) {
+          availableScheduleByResearchers[endSlot].splice(
+            availableScheduleByResearchers[endSlot].indexOf(researchers[attendee.email]),
+            1
+          );
         }
       }
     }
 
+    // DELETE previous schedule : if any
     const previousSchedules = await db.collection("schedule").where("email", "==", email.toLowerCase()).get();
     for (let scheduleDoc of previousSchedules.docs) {
       const scheduleData = scheduleDoc.data();
       if (scheduleData?.id) {
-        await deleteEvent(scheduleData.id)
-      }
-      const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
-      const resScheduleData = resScheduleDataByMonth[month];
-
-      for(const researcher in resScheduleData.scheduled) {
-        if(resScheduleData.scheduled?.[researcher]?.[fullname]) {
-          resScheduleData.scheduled[researcher][fullname] = {};
-        }
-      }
-
+        await deleteEvent(scheduleData.id);
       const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
       batch.delete(scheduleRef);
+      }
     }
 
     const bookedSlots = [];
@@ -142,9 +176,10 @@ participantsRouter.post("/schedule", async (req, res) => {
       const rUserData = rUser.data();
 
       const start = moment(sessions[i]).utcOffset(-4, true);
-      const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
+      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
       // adding slotDuration * number of slots for the session
       const end = moment(start).add(slotDuration * sessionDuration, "minutes");
+      // const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
       const eventCreated = await createExperimentEvent(
         email,
         rUserData.email,
@@ -161,36 +196,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         session: Timestamp.fromDate(start.toDate()),
         order: toOrdinal(i + 1),
         id: eventCreated.data.id
-      })
-    }
-
-    for(const bookedSlot of bookedSlots) {
-      const sessionDate = moment(bookedSlot).utcOffset(-4, true).format("YYYY-MM-DD");
-      const researcher = selectedResearchers[sessionDate];
-      
-      const month = moment(bookedSlot).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
-      const resScheduleData = resScheduleDataByMonth[month];
-      if(!resScheduleData.scheduled[researcher]) {
-        resScheduleData.scheduled[researcher] = {};
-      }
-      const scheduled = resScheduleData.scheduled[researcher];
-
-      if(!resScheduleData.scheduled[researcher][fullname]) {
-        resScheduleData.scheduled[researcher][fullname] = {};
-      }
-      const participantScheduled = scheduled[fullname];
-
-      const _participantScheduled = Object.values(participantScheduled);
-      _participantScheduled.push(bookedSlot);
-      scheduled[fullname] = _participantScheduled.reduce((c, v, i) => ({...c, [i]: v}), {})
-    }
-
-    for(const month in resScheduleRefsByMonth) {
-      const resScheduleRef = resScheduleRefsByMonth[month];
-      const resScheduleData = resScheduleDataByMonth[month];
-      batch.update(resScheduleRef, {
-        scheduled: resScheduleData.scheduled
-      })
+      });
     }
 
     await batch.commit();
@@ -199,6 +205,6 @@ participantsRouter.post("/schedule", async (req, res) => {
     console.log(err);
     return res.status(400).json({ message: "Error occurred, please try later" });
   }
-})
+});
 
 module.exports = participantsRouter;
