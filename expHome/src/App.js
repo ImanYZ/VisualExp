@@ -53,6 +53,7 @@ const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
+  const email = useRecoilValue(emailState);
   const nullPassage = useRecoilValue(nullPassageState);
   const startedSession = useRecoilValue(startedSessionState);
   const [phase, setPhase] = useRecoilState(phaseState);
