@@ -554,144 +554,144 @@ export default [
   //     `All interactions, task fulfillment, and communications will be remote.`
   //   ]
   // },
-  {
-    id: "Deep_Learning",
-    link: "natural-language-processing",
-    tags: [
-      {
-        title: "Data Science",
-        node: "FJfzAX7zbgQS8jU5XcEk"
-      },
-      {
-        title: "Deep Learning (in Machine learning)",
-        node: "DkS1Gz9mxKBbvZ5bs6he"
-      },
-      {
-        title: "Natural language processing",
-        node: "khCWqIXa9xQiojnEqHCT"
-      }
-    ],
-    allTime: [],
-    weekly: [],
-    url: "/static/Communities/Deep_Learning.jpg",
-    title: "Natural Language Processing",
-    width: "34%",
-    leaders: [
-      {
-        name: "Ge Zhang",
-        image: "Ge_Zhang.jpeg",
-        about: `I'm Ge Zhang, a second year dual master of Umich, majoring in data science and ece tracking in information system. My research interest focus on natural language processing and information retrieval, especially using lexical information or other structured expert knowledge to accelerate or help the training procedure of word or knowledge representation. I'm actively seeking for a phd position starting from 2022 fall or 2023 spring.`,
-        websites: [
-          {
-            name: "LinkedIn",
-            url: "https://www.linkedin.com/in/ge-zhang-792797169/"
-          }
-        ]
-      }
-    ],
-    YouTube: "W07nvZ2wcX0",
-    description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different deep learning topics , mainly NLP topics, by going through selected papers every week. Our team members will dive into these papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. We also encourage our interns to work on a specific topic together as a team so that they may write a survey paper together before finishing the internship. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
-    accomplishments: (
-      <div>
-        We have recently published:{" "}
-        <ul>
-          <li>
-            <a href="https://arxiv.org/abs/2301.00395">
-              Zhang, G., Li, Y., Wu, Y., Zhang, L., Lin, C., Geng, J., ... & Fu, J. (2023). CORGI-PM: A Chinese Corpus
-              For Gender Bias Probing and Mitigation. arXiv preprint arXiv:2301.00395.
-            </a>
-          </li>
-          <li>
-            <a href="https://ieeexplore.ieee.org/abstract/document/10020761">
-              Zhang, C., Zhang, X., Wang, Q., Liang, J., Zhang, G., Guo, S., ... & Zhang, Y. (2022, December). Abusive
-              Language Detection with Graph based Multi-task Learning. In 2022 IEEE International Conference on Big Data
-              (Big Data) (pp. 675-684). IEEE.
-            </a>
-          </li>
-          <li>
-            <a href="https://aclanthology.org/2022.case-1.13">
-              Nik, A., Zhang, G., Chen, X., Li, M., & Fu, J. (2022). 1Cademy@ Causal News Corpus 2022: Leveraging
-              Self-Training in Causality Classification of Socio-Political Event Data. arXiv preprint arXiv:2211.02729
-            </a>
-          </li>
-          <li>
-            <a href="https://aclanthology.org/2022.case-1.14">
-              Chen, X., Zhang, G., Nik, A., Li, M., & Fu, J. (2022). 1Cademy@ Causal News Corpus 2022: Enhance Causal
-              Span Detection via Beam-Search-based Position Selector. arXiv preprint arXiv:2210.17157.
-            </a>
-          </li>
-          <li>
-            <a href="https://arxiv.org/pdf/2206.03702.pdf">
-              Wang, Z., Zhang, G., Lashkarashvili, N., 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness
-              of Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv
-              preprint arXiv:2206.03702, 2022.
-            </a>{" "}
-            Will appear on Semeval 2022.
-          </li>
-          <li>
-            <a>
-              Liu, R., Jia, C., Zhang, G., Zhuang, Z., Liu, T. X., & Vosoughi, S.{" "}
-              <a href="https://openreview.net/forum?id=u6OfmaGIya1">
-                Second Thoughts are Best: Learning to Re-Align With Human Values from Text Edits.
-              </a>{" "}
-              In Advances in Neural Information Processing Systems.
-            </a>{" "}
-          </li>
-          <li>
-            Ruibo Liu, Ge Zhang, Xinyu Feng, and Soroush Vosoughi. 2022.
-            <a href="https://aclanthology.org/2022.findings-naacl.18/">
-              Aligning Generative Language Models with Human Values.
-            </a>{" "}
-            In Findings of the Association for Computational Linguistics: NAACL 2022, pages 241–252, Seattle, United
-            States. Association for Computational Linguistics.
-          </li>
-          <li>
-            Yizhi Li, Ge Zhang, Bohao Yang, Chenghua Lin, Anton Ragni, Shi Wang, and Jie Fu. 2022.{" "}
-            <a href="https://aclanthology.org/2022.findings-aacl.32/">
-              HERB: Measuring Hierarchical Regional Bias in Pre-trained Language Models.
-            </a>{" "}
-            In Findings of the Association for Computational Linguistics: AACL-IJCNLP 2022.
-          </li>
-          <li>
-            Zhiyong Wang, Ge Zhang, and Nineli Lashkarashvili. 2022.
-            <a href="https://aclanthology.org/2022.semeval-1.2/">
-              1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of Multilingual, Multitask, and
-              Language-Agnostic Tricks for the Reverse Dictionary Task.
-            </a>{" "}
-            In Proceedings of the 16th International Workshop on Semantic Evaluation (SemEval-2022), pages 15–22,
-            Seattle, United States. Association for Computational Linguistics.
-          </li>
-        </ul>
-      </div>
-    ),
-    gains: [
-      `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required. `,
-      `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines). `,
-      `Top contributors to our community would have the opportunity to co-author research papers in the field. `,
-      `All interactions, task fulfillment, and communications will be online. `,
-      `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `
-    ],
-    requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
-    hasTest: true,
-    qualifications: [
-      `Knowledge and enthusiasm for topics related to machine learning and deep learning. `,
-      `Proficiency in Python and linear algebra. `,
-      `Displayed interest in machine learning through university-level coursework. `,
-      `Basic Knowledge of coding in Pytorch.`,
-      `(Preferred)Familiar with Huggingface/Fairseq.`,
-      `(Preferred)Previous research experience, or other relevant involvement. `,
-      `(Preferred)Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning. `,
-      `(Preferred) Background in Natural Language Processing (NLP) `,
-      `(Preferred) Background in Linguistics `
-    ],
-    responsibilities: [
-      `Constantly study a specific Natural Language Processing/Computational Social Science/AI for Science topic. `,
-      `Attend weekly team meetings to discuss the research and present your efforts throughout the week.(Both Reading Assignment and Optional Research Project) `,
-      `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians. `,
-      `All interactions, task fulfillment, and communications will be remote. `,
-      `Enthusiastically participate in the research assignments if needed. `
-    ]
-  },
+  // {
+  //   id: "Deep_Learning",
+  //   link: "natural-language-processing",
+  //   tags: [
+  //     {
+  //       title: "Data Science",
+  //       node: "FJfzAX7zbgQS8jU5XcEk"
+  //     },
+  //     {
+  //       title: "Deep Learning (in Machine learning)",
+  //       node: "DkS1Gz9mxKBbvZ5bs6he"
+  //     },
+  //     {
+  //       title: "Natural language processing",
+  //       node: "khCWqIXa9xQiojnEqHCT"
+  //     }
+  //   ],
+  //   allTime: [],
+  //   weekly: [],
+  //   url: "/static/Communities/Deep_Learning.jpg",
+  //   title: "Natural Language Processing",
+  //   width: "34%",
+  //   leaders: [
+  //     {
+  //       name: "Ge Zhang",
+  //       image: "Ge_Zhang.jpeg",
+  //       about: `I'm Ge Zhang, a second year dual master of Umich, majoring in data science and ece tracking in information system. My research interest focus on natural language processing and information retrieval, especially using lexical information or other structured expert knowledge to accelerate or help the training procedure of word or knowledge representation. I'm actively seeking for a phd position starting from 2022 fall or 2023 spring.`,
+  //       websites: [
+  //         {
+  //           name: "LinkedIn",
+  //           url: "https://www.linkedin.com/in/ge-zhang-792797169/"
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   YouTube: "W07nvZ2wcX0",
+  //   description: `Welcome to the Deep Learning Community! Our community predominantly contributes to the nlp area on 1Cademy, our collaborative research platform. This semester, we will explore different deep learning topics , mainly NLP topics, by going through selected papers every week. Our team members will dive into these papers and present what they've been learning throughout each week by walking us through the nodes they have designed during our weekly team meetings. We also encourage our interns to work on a specific topic together as a team so that they may write a survey paper together before finishing the internship. After meeting certain requirements, you will be invited to join our small research group to work on concrete research ideas.`,
+  //   accomplishments: (
+  //     <div>
+  //       We have recently published:{" "}
+  //       <ul>
+  //         <li>
+  //           <a href="https://arxiv.org/abs/2301.00395">
+  //             Zhang, G., Li, Y., Wu, Y., Zhang, L., Lin, C., Geng, J., ... & Fu, J. (2023). CORGI-PM: A Chinese Corpus
+  //             For Gender Bias Probing and Mitigation. arXiv preprint arXiv:2301.00395.
+  //           </a>
+  //         </li>
+  //         <li>
+  //           <a href="https://ieeexplore.ieee.org/abstract/document/10020761">
+  //             Zhang, C., Zhang, X., Wang, Q., Liang, J., Zhang, G., Guo, S., ... & Zhang, Y. (2022, December). Abusive
+  //             Language Detection with Graph based Multi-task Learning. In 2022 IEEE International Conference on Big Data
+  //             (Big Data) (pp. 675-684). IEEE.
+  //           </a>
+  //         </li>
+  //         <li>
+  //           <a href="https://aclanthology.org/2022.case-1.13">
+  //             Nik, A., Zhang, G., Chen, X., Li, M., & Fu, J. (2022). 1Cademy@ Causal News Corpus 2022: Leveraging
+  //             Self-Training in Causality Classification of Socio-Political Event Data. arXiv preprint arXiv:2211.02729
+  //           </a>
+  //         </li>
+  //         <li>
+  //           <a href="https://aclanthology.org/2022.case-1.14">
+  //             Chen, X., Zhang, G., Nik, A., Li, M., & Fu, J. (2022). 1Cademy@ Causal News Corpus 2022: Enhance Causal
+  //             Span Detection via Beam-Search-based Position Selector. arXiv preprint arXiv:2210.17157.
+  //           </a>
+  //         </li>
+  //         <li>
+  //           <a href="https://arxiv.org/pdf/2206.03702.pdf">
+  //             Wang, Z., Zhang, G., Lashkarashvili, N., 1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness
+  //             of Multilingual, Multitask, and Language-Agnostic Tricks for the Reverse Dictionary Task[J]. arXiv
+  //             preprint arXiv:2206.03702, 2022.
+  //           </a>{" "}
+  //           Will appear on Semeval 2022.
+  //         </li>
+  //         <li>
+  //           <a>
+  //             Liu, R., Jia, C., Zhang, G., Zhuang, Z., Liu, T. X., & Vosoughi, S.{" "}
+  //             <a href="https://openreview.net/forum?id=u6OfmaGIya1">
+  //               Second Thoughts are Best: Learning to Re-Align With Human Values from Text Edits.
+  //             </a>{" "}
+  //             In Advances in Neural Information Processing Systems.
+  //           </a>{" "}
+  //         </li>
+  //         <li>
+  //           Ruibo Liu, Ge Zhang, Xinyu Feng, and Soroush Vosoughi. 2022.
+  //           <a href="https://aclanthology.org/2022.findings-naacl.18/">
+  //             Aligning Generative Language Models with Human Values.
+  //           </a>{" "}
+  //           In Findings of the Association for Computational Linguistics: NAACL 2022, pages 241–252, Seattle, United
+  //           States. Association for Computational Linguistics.
+  //         </li>
+  //         <li>
+  //           Yizhi Li, Ge Zhang, Bohao Yang, Chenghua Lin, Anton Ragni, Shi Wang, and Jie Fu. 2022.{" "}
+  //           <a href="https://aclanthology.org/2022.findings-aacl.32/">
+  //             HERB: Measuring Hierarchical Regional Bias in Pre-trained Language Models.
+  //           </a>{" "}
+  //           In Findings of the Association for Computational Linguistics: AACL-IJCNLP 2022.
+  //         </li>
+  //         <li>
+  //           Zhiyong Wang, Ge Zhang, and Nineli Lashkarashvili. 2022.
+  //           <a href="https://aclanthology.org/2022.semeval-1.2/">
+  //             1Cademy at Semeval-2022 Task 1: Investigating the Effectiveness of Multilingual, Multitask, and
+  //             Language-Agnostic Tricks for the Reverse Dictionary Task.
+  //           </a>{" "}
+  //           In Proceedings of the 16th International Workshop on Semantic Evaluation (SemEval-2022), pages 15–22,
+  //           Seattle, United States. Association for Computational Linguistics.
+  //         </li>
+  //       </ul>
+  //     </div>
+  //   ),
+  //   gains: [
+  //     `You will spend the majority of the fall semester going through different high quality papers to deeply learn about natural language processing. No prior experience is required. `,
+  //     `You'll gain experience using crucial skills in research (paper analysis, summarization, making connections between disciplines). `,
+  //     `Top contributors to our community would have the opportunity to co-author research papers in the field. `,
+  //     `All interactions, task fulfillment, and communications will be online. `,
+  //     `We do not have a strict deadline for this position, and you can apply to join our team at any point in your program. `
+  //   ],
+  //   requirements: `In addition to the 1Cademy general application process, we require our interns to submit both their most current resume and unofficial transcripts, with GPA included on those transcripts. We require our interns to have a minimum of a 3.5/4.0 GPA to apply for this position. Interns are required to have a degree path in computer science, statistics, economics, math, or a related field.`,
+  //   hasTest: true,
+  //   qualifications: [
+  //     `Knowledge and enthusiasm for topics related to machine learning and deep learning. `,
+  //     `Proficiency in Python and linear algebra. `,
+  //     `Displayed interest in machine learning through university-level coursework. `,
+  //     `Basic Knowledge of coding in Pytorch.`,
+  //     `(Preferred)Familiar with Huggingface/Fairseq.`,
+  //     `(Preferred)Previous research experience, or other relevant involvement. `,
+  //     `(Preferred)Completion of Coursera Deep Learning Specialization (https://www.coursera.org/specializations/deep-learning) or an equivalent on the topics of primarily deep learning but also machine learning or statistical learning. `,
+  //     `(Preferred) Background in Natural Language Processing (NLP) `,
+  //     `(Preferred) Background in Linguistics `
+  //   ],
+  //   responsibilities: [
+  //     `Constantly study a specific Natural Language Processing/Computational Social Science/AI for Science topic. `,
+  //     `Attend weekly team meetings to discuss the research and present your efforts throughout the week.(Both Reading Assignment and Optional Research Project) `,
+  //     `Must be prepared and excited to collaborate with our already established team of computer scientists, information scientists, and statisticians. `,
+  //     `All interactions, task fulfillment, and communications will be remote. `,
+  //     `Enthusiastically participate in the research assignments if needed. `
+  //   ]
+  // },
   {
     id: "UX_Research_in_Online_Communities",
     link: "ux-research-in-online-communities",
