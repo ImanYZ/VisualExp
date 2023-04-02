@@ -168,13 +168,8 @@ const FreeRecallGrading = props => {
         phrases.sort(() => 0.5 - Math.random());
         let wrongNum = 0;
         // pick only 4 wrong phrases
-        if (fullname !== gptResearcher) {
-          phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
-          setRandomizedPhrases(phrases);
-        } else {
-          setRandomizedPhrases(phrases);
-        }
-
+        phrases = phrases.filter(phrase => (notSatisfiedPhrases.includes(phrase.phrase) ? wrongNum++ < 4 : true));
+        setRandomizedPhrases(phrases);
         setProcessing(false);
       }
     })();
@@ -205,7 +200,7 @@ const FreeRecallGrading = props => {
         let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
 
         // sorting researcher's related participants first
-        if (recentParticipants.length > 0 && gptResearcher !== fullname) {
+        if (recentParticipants.length > 0 ) {
           _recallGrades.sort((g1, g2) => {
             const p1 = recentParticipants.includes(g1.user);
             const p2 = recentParticipants.includes(g2.user);
