@@ -2,7 +2,6 @@
 const functions = require("firebase-functions");
 
 const {
-  assignExperimentSessionsPoints,
   remindCalendarInvitations,
   passagesNumberCorrection,
   remindResearchersForAvailability
@@ -29,14 +28,6 @@ exports.deleteUser = functions.firestore.document("users/{fullname}").onDelete(d
 // exports.updateNotTakenSessionsScheduler = functions.pubsub
 //   .schedule("every 40 minutes")
 //   .onRun(updateNotTakenSessions);
-
-exports.assignExperimentSessionsPoints = functions
-  .runWith({
-    memory: "1GB",
-    timeoutSeconds: 520
-  })
-  .pubsub.schedule("every 4 hours")
-  .onRun(assignExperimentSessionsPoints);
 
 exports.remindResearchersForAvailability = functions
   .runWith({

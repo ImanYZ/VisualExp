@@ -73,7 +73,40 @@ export const LeaderBoard = ({
   const markAttended = async (ev, index) => {
     try {
       const { scheduleId } = ev.schedule;
+      console.log(ev);
       setStarting(true);
+      const participantFullname = ev.schedule.userId;
+      const order = ev.schedule.order;
+      const session = ev.schedule.session;
+      const month = moment(session).utcOffset(-4).startOf("month").format("YYYY-MM-DD");
+      const resScheduleDocs = await firebase.db
+        .collection("resSchedule")
+        .where("month", "==", month)
+        .where("project", "==", project)
+        .get();
+      let resScheduleData = {};
+      if (resScheduleDocs.docs.length > 0) {
+        resScheduleData = resScheduleDocs.docs[0].data();
+        if (!resScheduleData.hasOwnProperty("attendedSessions")) {
+          resScheduleData.attendedSessions = {};
+        }
+        const attendedSessions = resScheduleData.attendedSessions;
+        if (!attendedSessions.hasOwnProperty(fullname)) {
+          attendedSessions[fullname] = {};
+        }
+        if (attendedSessions.hasOwnProperty(fullname)) {
+          const startedSessionsByUser = attendedSessions[fullname];
+          if (startedSessionsByUser.hasOwnProperty(participantFullname)) {
+            if (!startedSessionsByUser[participantFullname].includes(order)) {
+              startedSessionsByUser[participantFullname].push(order);
+            }
+          } else {
+            startedSessionsByUser[participantFullname] = [order];
+          }
+        }
+      }
+      const resScheduleRef = firebase.db.collection("resSchedule").doc(resScheduleDocs.docs[0].id);
+      await resScheduleRef.update({ attendedSessions: resScheduleData.attendedSessions });
       await firebase.db.collection("schedule").doc(scheduleId).update({ attended: true });
       const evs = [...onGoingEvents];
       evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
@@ -95,49 +128,53 @@ export const LeaderBoard = ({
       const recentParticipants = [];
       const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
       const month2WeeksAgo = moment().utcOffset(-4).subtract(16, "days").startOf("month").format("YYYY-MM-DD");
-      if(!scheduleMonths.includes(month2WeeksAgo)) {
+      if (!scheduleMonths.includes(month2WeeksAgo)) {
         scheduleMonths.push(month2WeeksAgo);
       }
       const resSchedules = await firebase.db.collection("resSchedule").where("month", "in", scheduleMonths).get();
-      for(const resSchedule of resSchedules.docs) {
+      for (const resSchedule of resSchedules.docs) {
         const resScheduleData = resSchedule.data();
         const scheduled = resScheduleData?.scheduled?.[fullname] || {};
         recentParticipants.push(...Object.keys(scheduled));
       }
-      
+
       let hasRecentParticipantRecalls = false;
       const unameChunks = chunk(recentParticipants, 10); // firebase has 10 item limit for "where-in"
-      for(const unameChunk of unameChunks) {
-        const recallGrades = await firebase.db.collection("recallGradesV2").where("project", "==", project).where("user", "in", unameChunk).get();
-        for(const recallGrade of recallGrades.docs) {
+      for (const unameChunk of unameChunks) {
+        const recallGrades = await firebase.db
+          .collection("recallGradesV2")
+          .where("project", "==", project)
+          .where("user", "in", unameChunk)
+          .get();
+        for (const recallGrade of recallGrades.docs) {
           const recallGradeData = recallGrade.data();
-          for(const sessionKey in recallGradeData.sessions) {
-            for(const conditionItem of recallGradeData.sessions[sessionKey]) {
+          for (const sessionKey in recallGradeData.sessions) {
+            for (const conditionItem of recallGradeData.sessions[sessionKey]) {
               // if researcher didn't graded condition item and condition not flagged as done
-              if(!conditionItem.researchers.includes(fullname) && !conditionItem.done) {
+              if (!conditionItem.researchers.includes(fullname) && !conditionItem.done) {
                 hasRecentParticipantRecalls = true;
                 break;
               }
             }
 
-            if(hasRecentParticipantRecalls) {
+            if (hasRecentParticipantRecalls) {
               break;
             }
           }
 
-          if(hasRecentParticipantRecalls) {
+          if (hasRecentParticipantRecalls) {
             break;
           }
         }
 
-        if(hasRecentParticipantRecalls) {
+        if (hasRecentParticipantRecalls) {
           break;
         }
       }
-      
-      setHasRecentParticipantRecalls(hasRecentParticipantRecalls)
-    })()
-  }, [project, fullname])
+
+      setHasRecentParticipantRecalls(hasRecentParticipantRecalls);
+    })();
+  }, [project, fullname]);
 
   return (
     <div id="Leaderboard">
@@ -178,20 +215,29 @@ export const LeaderBoard = ({
         })}
       </Paper>
       {hasRecentParticipantRecalls ? (
-        <Box sx={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "10px"
-        }}>
-          <Button className="Button Green" variant="contained" sx={{
-            textTransform: "uppercase"
-          }} onClick={() => {
-            navigate("/Activities/FreeRecallGrading")
-          }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "10px"
+          }}
+        >
+          <Button
+            className="Button Green"
+            variant="contained"
+            sx={{
+              textTransform: "uppercase"
+            }}
+            onClick={() => {
+              navigate("/Activities/FreeRecallGrading");
+            }}
+          >
             Your participants recall responses
           </Button>
         </Box>
-      ) : <span />}
+      ) : (
+        <span />
+      )}
       {(onGoingEvents || []).map((ev, index) => {
         const now = new Date().getTime();
         const isHappening =

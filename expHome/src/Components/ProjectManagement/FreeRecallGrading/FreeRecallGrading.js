@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
 import axios from "axios";
-import moment from "moment";
 
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
@@ -202,8 +201,8 @@ const FreeRecallGrading = props => {
         // sorting researcher's related participants first
         if (recentParticipants.length > 0 ) {
           _recallGrades.sort((g1, g2) => {
-            const p1 = recentParticipants.includes(g1.user);
-            const p2 = recentParticipants.includes(g2.user);
+            const p1 = Object.keys(recentParticipants).includes(g1.user);
+            const p2 = Object.keys(recentParticipants).includes(g2.user);
             if (p1 && p2) return 0;
             return p1 && !p2 ? -1 : 1;
           });
@@ -417,7 +416,8 @@ const FreeRecallGrading = props => {
           </li>
         </ul>
       </Alert>
-      {recentParticipants.includes(recallGrades[recallGradeIdx]?.user) ? (
+      {Object.keys(recentParticipants).includes(recallGrades[recallGradeIdx]?.user) &&
+      recentParticipants[recallGrades[recallGradeIdx]?.user].includes(recallGrades[recallGradeIdx].session) ? (
         <Alert
           severity="error"
           sx={{
