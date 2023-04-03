@@ -199,7 +199,7 @@ const FreeRecallGrading = props => {
         let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
 
         // sorting researcher's related participants first
-        if (Object.keys(recentParticipants).length > 0 && gptResearcher !== fullname) {
+        if (recentParticipants.length > 0 ) {
           _recallGrades.sort((g1, g2) => {
             const p1 = Object.keys(recentParticipants).includes(g1.user);
             const p2 = Object.keys(recentParticipants).includes(g2.user);
