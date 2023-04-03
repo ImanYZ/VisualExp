@@ -146,8 +146,6 @@ const SchedulePage = props => {
         .where("month", "in", scheduleMonths)
         .where("project", "==", project).get();
 
-      let schedules = {};
-      let scheduledByResearchers = {};
 
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
@@ -162,50 +160,14 @@ const SchedulePage = props => {
               continue;
             }
             const _scheduleSlot = slotDT.toLocaleString();
-            if(!schedules[_scheduleSlot]) {
-              schedules[_scheduleSlot] = [];
+            if(!availSessions[_scheduleSlot]) {
+              availSessions[_scheduleSlot] = [];
             }
-            schedules[_scheduleSlot].push(researcherFullname)
+            availSessions[_scheduleSlot].push(researcherFullname)
           }
         }
 
         // date time already booked by participants
-        const _scheduled = resScheduleData.scheduled || {};
-        const scheduledResearchers = Object.keys(_scheduled);
-
-        for(const scheduledResearcher of scheduledResearchers) {
-          if(!scheduledByResearchers[scheduledResearcher]) {
-            scheduledByResearchers[scheduledResearcher] = [];
-          }
-          let __scheduled = scheduledByResearchers[scheduledResearcher];
-          
-          for(const participant in _scheduled[scheduledResearcher]) {
-            // we don't check already booked sessions for current participant
-            if(participant === fullname) {
-              continue;
-            }
-            const scheduledSlotsByParticipant = _scheduled[scheduledResearcher][participant];
-            __scheduled = __scheduled.concat(
-              Object.values(scheduledSlotsByParticipant).map(
-                (slot) => moment(slot).utcOffset(-4, true).toDate().toLocaleString()
-              )
-            )
-          }
-          __scheduled.sort((s1, s2) => s1 < s2 ? -1 : 1)
-          scheduledByResearchers[scheduledResearcher] = Array.from(new Set(__scheduled));
-        }
-
-        // calculating available schedules by each researchers
-        let availableSchedules = {...schedules};
-        for(const researcherFullname in scheduledByResearchers) {
-          for(const scheduledSlot of scheduledByResearchers[researcherFullname]) {
-            if(!availableSchedules[scheduledSlot] || !availableSchedules[scheduledSlot].includes(researcherFullname)) continue;
-            const researcherIdx = availableSchedules[scheduledSlot].indexOf(researcherFullname)
-            availableSchedules[scheduledSlot].splice(researcherIdx, 1)
-          }
-        }
-
-        availSessions = availableSchedules;
       }
       // We need to retrieve all the currently scheduled events to figure
       // out which sessions are already taken and exclude them from availSessions.
@@ -256,7 +218,7 @@ const SchedulePage = props => {
             if (!researchers[attendee.email]) continue;
             availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
             if (duration >= 60 * 60 * 1000) {
-              availSessions[endTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+              availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
             }
           }
         }
@@ -342,7 +304,7 @@ const SchedulePage = props => {
         await firebase.idToken();
         responseObj = await axios.post("/participants/schedule", {
           sessions,
-          project: userData.project
+          project: userData.project,
         });
         errorAlert(responseObj.data);
 
@@ -542,3 +504,4 @@ const SchedulePage = props => {
 };
 
 export default SchedulePage;
+
