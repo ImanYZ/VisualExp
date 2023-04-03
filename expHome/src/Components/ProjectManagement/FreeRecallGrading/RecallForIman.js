@@ -24,6 +24,8 @@ const RecallForIman = props => {
   const [countPhrases, setCountPhrases] = useState([]);
 
   const text = [
+    "records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them",
+    "number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them",
     "of phrases that the bot has graded and their boolean expressions are not satisfied",
     "of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them",
     "of phrases that their boolean expressions are not satisfied",
@@ -51,7 +53,10 @@ const RecallForIman = props => {
       const _noMajority = [];
       const _majorityDifferentThanBot = [];
       const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-
+      //records that the bot should grade (remaining ) : their boolean expressions are satisfied and less than 2  researchers graded them
+      let _countGraded = 0;
+      //number of records it's already graded : their boolean expressions are satisfied and  less than 2 researchers graded them
+      let _notGrades = 0;
       // # of phrases that the bot has graded and their boolean expressions are not satisfied
       let _countNSatisfiedGraded = 0;
       //# of phrases that the bot has graded and their boolean expressions are satisfied and 2 or more researchers graded them
@@ -84,6 +89,14 @@ const RecallForIman = props => {
               }
               const trueVotes = otherGrades.filter(grade => grade).length;
               const falseVotes = otherGrades.filter(grade => !grade).length;
+              if(!phraseItem.hasOwnProperty("GPT-4-Mentioned") && phraseItem.satisfied && otherResearchers.length <=2) {
+                _notGrades++;
+              }
+              if(phraseItem.hasOwnProperty("GPT-4-Mentioned") && phraseItem.satisfied && otherResearchers.length <=2) {
+                _countGraded++;
+              }
+
+
               if (phraseItem.hasOwnProperty("GPT-4-Mentioned") && !phraseItem.satisfied) {
                 _countNSatisfiedGraded++;
               }
@@ -141,6 +154,8 @@ const RecallForIman = props => {
       setNoMajority(__noMajority);
       setMajorityDifferentThanBot(__majorityDifferentThanBot);
       setCountPhrases([
+        _notGrades,
+        _countGraded,
         _countNSatisfiedGraded,
         _countSatifiedGraded,
         _notSatisfied,
