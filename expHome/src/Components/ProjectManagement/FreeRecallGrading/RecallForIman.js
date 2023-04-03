@@ -116,7 +116,7 @@ const RecallForIman = props => {
                   });
                 }
               }
-              if (trueVotes === falseVotes && otherGrades.length >= 4) {
+              if (!phraseItem.hasOwnProperty("majority") && trueVotes === falseVotes && otherGrades.length >= 4) {
                 _noMajority.push({
                   ...phraseItem,
                   botGrade,

@@ -41,28 +41,18 @@ const panels = [
         </ul>
         <p>
           My goal is to convert human knowledge into an easily digestible presentation and representation that
-          facilitates efficient learning. The issue of “knowledge overload” arises from the redundant nature of the same
-          topics being covered in numerous books, websites, and videos. This is exacerbated by mass generation of
-          content by large language models. To maximize our learning potential, we must eliminate overlapping content
-          and merge all available explanations for a particular subject into a single comprehensive chunk. This chunk
-          should encompass various perspectives and use-cases side-by-side, allowing learners to refer to it as the sole
-          source for complete mastery of the topic. Conventional knowledge structures organized in pages, whether in
-          books or on websites, do not serve this purpose. Instead, we must divide the content into smaller chunks, each
-          dedicated to a single topic, and present them as paragraphs within a single knowledge graph.
-        </p>
-        <p>
-          <strong>
-            It is important to note that the representation of these smaller chunks should not be combined into multiple
-            larger constructs, such as books or collections. Doing so only perpetuates the issue of overlapping content
-            and defeats the purpose of efficient learning.
-          </strong>
-        </p>
-        <p>
-          I explore the optimal size of content nodes for reader comprehension and learning, the design space of
-          collaboration mechanisms that maintain coherence of the shared graph, and how to utilize spaced, interleaved
-          retrieval practice to improve learner retention of micro-content. The findings offer practical solutions for
-          generating a coherent and scalable knowledge graph, and empowering learners to improve and personalize their
-          self-directed learning.
+          facilitates efficient learning. The problem of "knowledge overload" arises from the repetition of the same
+          topics across multiple sources. This is made worse by the mass generation of content by large language models.
+          To improve our learning, we need to eliminate overlapping content and merge different explanations into a
+          single comprehensive chunk that includes various perspectives and use-cases. While large language models serve
+          this purpose, they do not provide us with pathways to progressively learn any topic. For this purpose, we
+          should organize the content into smaller chunks, each dedicated to a single topic, and present them in a
+          single knowledge graph. Combining these chunks into multiple larger constructs like books would not be a
+          helpful solution. Doing so perpetuates the issue of overlapping content because larger constructs require
+          contextual knowledge that are also covered in other large constructs. While they provide progressive learning
+          content, in the aggregate they create a surplus of overlapping knowledge and defeat the purpose of efficient
+          learning. Instead, we should create a single "prerequisite knowledge graph" that covers all the small chunks
+          comprehensively.
         </p>
       </div>
     )
