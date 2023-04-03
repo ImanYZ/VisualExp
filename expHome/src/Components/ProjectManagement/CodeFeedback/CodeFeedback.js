@@ -1182,8 +1182,8 @@ const CodeFeedback = props => {
               participant favors based on this specific code.
             </h2>
           </Alert>
-
-          {recentParticipants.includes(feedbackCode?.fullname) ? (
+          {Object.keys(recentParticipants).includes(feedbackCode?.fullname) &&
+          recentParticipants[feedbackCode?.fullname].includes(feedbackCode?.session) ? (
             <Alert
               severity="error"
               sx={{

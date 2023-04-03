@@ -100,17 +100,19 @@ exports.scheduleSingleSession = async (req, res) => {
       const start = new Date(req.body.session);
 
       const projectSpecs = await db.collection("projectSpecs").doc(req.body.project).get();
+      const researcherDoc = await db.collection("researchers").doc(researcher).get();
       if (!projectSpecs.exists) {
         throw new Error("Project Specs not found.");
       }
       const projectSpecsData = projectSpecs.data();
+      const researcherData = researcherDoc.data();
       // 1 hour / 2 = 30 mins
       const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
       const end = new Date(
         start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[req.body.sessionIndex] || 1) * 60000
       );
-      const eventCreated = await createExperimentEvent(email, researcher, order, start, end, projectSpecsData);
+      const eventCreated = await createExperimentEvent(email, researcherData.email, order, start, end, projectSpecsData);
       return res.status(200).json({ events: [eventCreated] });
     }
   } catch (err) {
@@ -240,7 +242,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
           .where("email", "==", participantEmail.toLowerCase())
           .get();
       }
-
+      if (userDocs.docs.length === 0) continue;
       const userData = userDocs.docs?.[0]?.data();
 
       let userName = `${userData?.firstname} ${userData?.lastname}`;
@@ -259,7 +261,8 @@ exports.getOngoingResearcherEvent = async (req, res) => {
           scheduleId: schedule.docs[0].id,
           ...scheduleData,
           session: scheduleData.session.toDate(),
-          firstname: userName
+          firstname: userName,
+          userId: userDocs.docs?.[0].id
         }
       });
     }

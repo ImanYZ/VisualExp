@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
-import { firebaseState, fullnameState } from "./store/AuthAtoms";
+import { firebaseState, fullnameState , emailState} from "./store/AuthAtoms";
 import {
   phaseState,
   stepState,
@@ -48,10 +48,12 @@ const postQuestions = [
     b: "Choosing/entering the options"
   }
 ];
+const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
 const App = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
+  const email = useRecoilValue(emailState);
   const nullPassage = useRecoilValue(nullPassageState);
   const startedSession = useRecoilValue(startedSessionState);
   const [phase, setPhase] = useRecoilState(phaseState);
@@ -177,7 +179,7 @@ const App = () => {
         ...pConditions[phase],
         [testName]: originalChoicesOrder,
         [testName + "Score"]: score,
-        [testName + "ScoreRatio"]: score / questions.length,
+        [testName + "ScoreRatio"]: roundNum(score / questions.length),
         [testName + "Ended"]: currentTime,
         [testName + "Time"]: timeSpent
       };
@@ -211,9 +213,9 @@ const App = () => {
     pConditions[phase] = {
       ...pConditions[phase],
       [prefieldName + "reText"]: reText,
-      [prefieldName + "Score"]: score,
-      [prefieldName + "ScoreRatio"]: score / keywordsText.length,
-      [prefieldName + "CosineSim"]: textCosineSimilarity(mainText, recalledText),
+      [prefieldName + "Score"]: roundNum(score),
+      [prefieldName + "ScoreRatio"]: roundNum(score / keywordsText.length),
+      [prefieldName + "CosineSim"]: roundNum(textCosineSimilarity(mainText, recalledText)),
       [prefieldName + "Ended"]: currentTime,
       [prefieldName + "Time"]: timeSpent
     };
@@ -244,7 +246,8 @@ const App = () => {
       createdAt: new Date(),
       project: userData.project,
       user: fullname,
-      priority: 0
+      priority: 0,
+      email,
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
