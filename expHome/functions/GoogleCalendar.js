@@ -72,7 +72,7 @@ exports.insertEvent = async (start, end, summary, description, attendees, colorI
       sendUpdates: process.env.NODE_ENV === "test" ? "none" : "all"
     });
 
-    if (response["status"] == 200 && response["statusText"] === "OK") {
+    if (response["status"] === 200 && response["statusText"] === "OK") {
       return response;
     } else {
       return false;
@@ -125,37 +125,14 @@ exports.getEvent = async eventId => {
 
 // Get all the events between two dates
 exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
-  if(process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
-    mockSchedules.data.map((schedule) => {
+  if (process.env.NODE_ENV === "test" && !process.env.TEST_CALENDAR) {
+    let items = [];
+    mockSchedules.data.forEach(schedule => {
       const startTime = moment(schedule ? schedule.session.toDate() : undefined);
       const endTime = moment(startTime).add(schedule ? (schedule.order === "1st" ? 60 : 30) : 60, "minutes");
       const timeZone = new Intl.DateTimeFormat().resolvedOptions(new Date()).timeZone;
-      return {
-        data: {
-          id: schedule.id || generateUID(),
-          attendees: [
-            {
-              email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
-            },
-            {
-              email: "ouhrac@gmail.com" // mock researcher
-            }
-          ],
-          start: {
-            dateTime: startTime.format("YYYY-MM-DD HH:mm"),
-            timeZone
-          },
-          end: {
-            dateTime: endTime.format("YYYY-MM-DD HH:mm"),
-            timeZone
-          }
-        }      
-      };
-    });
-    
-    return {
-      data: {
-        id: eventId,
+      items.push({
+        id: schedule.id || generateUID(),
         attendees: [
           {
             email: schedule ? schedule.email : "r3alst@gmail.com" // mock participant
@@ -172,8 +149,9 @@ exports.getEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
           dateTime: endTime.format("YYYY-MM-DD HH:mm"),
           timeZone
         }
-      }      
-    };
+      });
+    });
+    return items;
   }
   try {
     let items = [];
@@ -294,10 +272,10 @@ exports.getLifeLogEvents = async (dateTimeStart, dateTimeEnd, timeZone) => {
           params.pageToken = response.data.nextPageToken;
         }
       }
+      console.log({ response });
     }
     return items;
   } catch (error) {
-    console.log({ response });
     console.log(`Error at getEvents --> ${error}`);
     return null;
   }
@@ -330,7 +308,7 @@ exports.insertLifeLogEvent = async (start, end, summary, description) => {
       resource: event
     });
 
-    if (response["status"] == 200 && response["statusText"] === "OK") {
+    if (response["status"] === 200 && response["statusText"] === "OK") {
       return response;
     } else {
       return false;

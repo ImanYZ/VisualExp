@@ -7,6 +7,7 @@ const firebaseAuth = require("../middlewares/firebaseAuth");
 const isParticipant = require("../middlewares/isParticipant");
 const { createExperimentEvent } = require("../scheduling");
 const { deleteEvent } = require("../GoogleCalendar");
+const { futureEvents } = require("../scheduling");
 const participantsRouter = express.Router();
 
 participantsRouter.use(firebaseAuth);
@@ -16,7 +17,10 @@ participantsRouter.use(isParticipant);
 participantsRouter.post("/schedule", async (req, res) => {
   try {
     let { sessions, project } = req.body;
-    const { fullname, email } = req.userData;
+
+
+
+    const {email } = req.userData;
     const batch = db.batch();
     
     sessions.sort((a, b) => a < b ? -1 : 1); // asc sorting
@@ -25,8 +29,14 @@ participantsRouter.post("/schedule", async (req, res) => {
       throw new Error("invalid request")
     }
 
-    // const events = [];
+    const researchers = {};
+    const researcherDocs = await db.collection("researchers").get();
+    for (let researcherDoc of researcherDocs.docs) {
+      const researcherData = researcherDoc.data();
+      researchers[researcherData.email] = researcherDoc.id;
+    }
 
+    const events = await futureEvents(40);
     const projectSpecs = await db.collection("projectSpecs").doc(project).get();
     if (!projectSpecs.exists) {
       throw new Error("Project Specs not found.");
@@ -42,85 +52,99 @@ participantsRouter.post("/schedule", async (req, res) => {
       scheduleMonths.push(scheduleEnd);
     }
 
-    const resScheduleRefsByMonth = {};
-    const resScheduleDataByMonth = {};
+    // Retrieve all the researchers' avaialbilities in this project.
+    const resScheduleDocs = await db.collection("resSchedule")
+      .where("month", "in", scheduleMonths)
+      .where("project", "==", project).get();
 
-    let availableScheduleByResearchers = {};
-    const resSchedules = await db.collection("resSchedule")
-      .where("project", "==", project)
-      .where("month", "in", scheduleMonths).get();
-    
-    for(const resSchedule of resSchedules.docs) {
-      const resScheduleData = resSchedule.data();
-      resScheduleRefsByMonth[resScheduleData.month] = db.collection("resSchedule").doc(resSchedule.id);
-      resScheduleDataByMonth[resScheduleData.month] = resScheduleData;
-      // scheduled
-      const { schedules: resSchedules, scheduled: resScheduled } = resScheduleData;
+    let availSessions = {};
+    for (let resScheduleDoc of resScheduleDocs.docs) {
+      const resScheduleData = resScheduleDoc.data();
 
-      for(const researcher in resSchedules) {
-        const _schedules = resSchedules[researcher] || [];
-        for(const scheduleSlot of _schedules) {
-          if(!availableScheduleByResearchers[scheduleSlot]) {
-            availableScheduleByResearchers[scheduleSlot] = [];
+      // date time flagged by researchers as available by them
+      let _schedules = resScheduleData.schedules || {};
+      for (const researcherFullname in _schedules) {
+        for(const scheduleSlot of _schedules[researcherFullname]) {
+          const slotDT = moment(scheduleSlot).utcOffset(-4, true).toDate();
+          // if availability is expired already
+          if(slotDT.getTime() < new Date().getTime()) {
+            continue;
           }
-          if(!availableScheduleByResearchers[scheduleSlot].includes(researcher)) {
-            availableScheduleByResearchers[scheduleSlot].push(researcher);
+          const _scheduleSlot = slotDT.toLocaleString();
+          if(!availSessions[_scheduleSlot]) {
+            availSessions[_scheduleSlot] = [];
           }
+          availSessions[_scheduleSlot].push(researcherFullname)
         }
       }
-      for(const researcher in resScheduled) {
-        for(const participant in resScheduled[researcher]) {
-          const __scheduled = Object.values(resScheduled[researcher][participant]);
-          for (const scheduledSlot of __scheduled) {
-            if (!availableScheduleByResearchers[scheduledSlot] || participant === fullname) {
-              continue;
-            }
-            if (availableScheduleByResearchers[scheduledSlot].includes(researcher)) {
-              const idx = availableScheduleByResearchers[scheduledSlot].indexOf(researcher);
-              availableScheduleByResearchers[scheduledSlot].splice(idx, 1);
-            }
+      // date time already booked by participants
+    }
+    for (let event of events) {
+      // First, we should figure out whether the user participated in the past:
+      if (new Date(event.start.dateTime) < new Date()) {
+        // Only if one of the attendees of the event is this user:
+        if (
+          event.attendees &&
+          event.attendees.length > 0 &&
+          event.attendees.findIndex(attendee => attendee.email === email) !== -1
+        ) {
+          // return;
+        }
+      }
+      // Only future events
+      const startTime = new Date(event.start.dateTime).toLocaleString();
+      const endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+      const duration = new Date(event.end.dateTime).getTime() - new Date(event.start.dateTime).getTime();
+      const startMinus30Min = new Date(new Date(event.start.dateTime).getTime() - 30 * 60 * 1000);
+      if (
+        event.attendees &&
+        event.attendees.length > 0 &&
+        startTime in availSessions &&
+        event.attendees.findIndex(attendee => attendee.email === email) === -1 &&
+        events.findIndex(
+          eve =>
+            new Date(eve.start.dateTime).getTime() === startMinus30Min.getTime() &&
+            new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 === new Date(eve.end.dateTime).getTime() &&
+            eve.attendees.includes(email)
+        ) === -1
+      ) {
+        for (let attendee of event.attendees) {
+          if (!researchers[attendee.email] || !availSessions.hasOwnProperty(startTime)) continue;
+          availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
+          if (duration >= 60 * 60 * 1000 || !availSessions.hasOwnProperty(endTime)) {
+            availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
           }
         }
       }
     }
 
+    // DELETE previous schedule : if any
     const previousSchedules = await db.collection("schedule").where("email", "==", email.toLowerCase()).get();
     for (let scheduleDoc of previousSchedules.docs) {
       const scheduleData = scheduleDoc.data();
       if (scheduleData?.id) {
-        await deleteEvent(scheduleData.id)
-      }
-      const month = moment(scheduleData.session.toDate()).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
-      const resScheduleData = resScheduleDataByMonth[month];
-
-      for(const researcher in resScheduleData.scheduled) {
-        if(resScheduleData.scheduled?.[researcher]?.[fullname]) {
-          resScheduleData.scheduled[researcher][fullname] = {};
-        }
-      }
-
+        await deleteEvent(scheduleData.id);
       const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
       batch.delete(scheduleRef);
+      }
     }
-
-    const bookedSlots = [];
 
     const researchersBySession = {};
 
     for (let i = 0; i < sessions.length; ++i) {
-      let availableResearchers = availableScheduleByResearchers[sessions[i]] || [];
-      const start = moment(sessions[i]).utcOffset(-4, true);
-      const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
+      const start = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();
+      let availableResearchers = availSessions[start] || [];
+      const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2); //[2,1,1]
       for(let j = 0; j < sessionDuration; j++) {
-       const  availableSlot = moment(start).add(j * 30, "minutes").format("YYYY-MM-DD HH:mm");
-        bookedSlots.push(availableSlot);
-        availableResearchers = availableResearchers.filter((availableResearcher) => (availableScheduleByResearchers[availableSlot] || []).includes(availableResearcher))
+       const  availableSlot = moment(sessions[i]).add(j * 30, "minutes").utcOffset(-4, true).toDate().toLocaleString();
+        availableResearchers = availableResearchers.filter((availableResearcher) => (availSessions[availableSlot] || []).includes(availableResearcher))
       }
-      researchersBySession[start.format("YYYY-MM-DD")] = availableResearchers;
+      researchersBySession[start] = availableResearchers;
     }
 
   
     const selectedResearchers = {};
+
 
     for(const session in researchersBySession) {
       const availableResearchers = researchersBySession[session];
@@ -134,17 +158,17 @@ participantsRouter.post("/schedule", async (req, res) => {
 
       selectedResearchers[session] = researcher;
     }
-
     for (let i = 0; i < sessions.length; ++i) {
-      const sessionDate = moment(sessions[i]).utcOffset(-4, true).format("YYYY-MM-DD");
+      const sessionDate = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();;
       const researcher = selectedResearchers[sessionDate];
       const rUser = await db.collection("users").doc(researcher).get();
       const rUserData = rUser.data();
 
       const start = moment(sessions[i]).utcOffset(-4, true);
-      const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2);
+      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
       // adding slotDuration * number of slots for the session
       const end = moment(start).add(slotDuration * sessionDuration, "minutes");
+      // const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
       const eventCreated = await createExperimentEvent(
         email,
         rUserData.email,
@@ -153,7 +177,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         end,
         projectSpecsData
       );
-      // events.push(eventCreated);
+      events.push(eventCreated);
 
       const scheduleRef = db.collection("schedule").doc();
       batch.set(scheduleRef, {
@@ -161,36 +185,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         session: Timestamp.fromDate(start.toDate()),
         order: toOrdinal(i + 1),
         id: eventCreated.data.id
-      })
-    }
-
-    for(const bookedSlot of bookedSlots) {
-      const sessionDate = moment(bookedSlot).utcOffset(-4, true).format("YYYY-MM-DD");
-      const researcher = selectedResearchers[sessionDate];
-      
-      const month = moment(bookedSlot).utcOffset(-4, true).startOf("month").format("YYYY-MM-DD");
-      const resScheduleData = resScheduleDataByMonth[month];
-      if(!resScheduleData.scheduled[researcher]) {
-        resScheduleData.scheduled[researcher] = {};
-      }
-      const scheduled = resScheduleData.scheduled[researcher];
-
-      if(!resScheduleData.scheduled[researcher][fullname]) {
-        resScheduleData.scheduled[researcher][fullname] = {};
-      }
-      const participantScheduled = scheduled[fullname];
-
-      const _participantScheduled = Object.values(participantScheduled);
-      _participantScheduled.push(bookedSlot);
-      scheduled[fullname] = _participantScheduled.reduce((c, v, i) => ({...c, [i]: v}), {})
-    }
-
-    for(const month in resScheduleRefsByMonth) {
-      const resScheduleRef = resScheduleRefsByMonth[month];
-      const resScheduleData = resScheduleDataByMonth[month];
-      batch.update(resScheduleRef, {
-        scheduled: resScheduleData.scheduled
-      })
+      });
     }
 
     await batch.commit();
@@ -199,6 +194,7 @@ participantsRouter.post("/schedule", async (req, res) => {
     console.log(err);
     return res.status(400).json({ message: "Error occurred, please try later" });
   }
-})
+});
 
 module.exports = participantsRouter;
+
