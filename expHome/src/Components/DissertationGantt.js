@@ -518,31 +518,38 @@ const DissertationGantt = () => {
                         callback: ({ chartWrapper }) => {
                           let container = document.getElementById("chart_div");
                           let svg = container.getElementsByTagName("svg")[0];
-                          const rect = svg.getBoundingClientRect();
                           let ganttGroups = svg.getElementsByTagName("g")[1]?.getElementsByTagName("text");
                           const date = new Date();
-                          const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-
-                          let x = 0;
                           const currenYear = new Date().getFullYear();
+                          const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                          const formattedDat = new Date(formattedDate + ` ${currenYear}`);
+                          let x = 0;
+                          let dateP;
                           for (let i = 0; i < ganttGroups.length; i++) {
                             const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "").trim();
-                            const formattedDat = new Date(formattedDate + ` ${currenYear}`);
                             const textDat = new Date(text + ` ${currenYear}`);
+                            if(!new Date(textDat).getTime()) continue ; 
+                            if (formattedDat.getTime() <= textDat.getTime()) {
+                              break;
+                            }
                             x = ganttGroups[i].getAttribute("x");
-                            if (formattedDat.getTime() <= textDat.getTime()) break;
+                            dateP = textDat;
+                          }
+                          const timestamp = new Date().getTime() - new Date(dateP).getTime();
+                          if(timestamp){
+                            x = parseInt(x) + timestamp / 10000000;
                           }
                           const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                           const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                           const height = parseFloat(svg.getAttribute("height"));
-                          line.setAttribute("x1", x - rect.left);
-                          line.setAttribute("x2", x - rect.left);
+                          line.setAttribute("x1", x);
+                          line.setAttribute("x2", x);
                           line.setAttribute("y1", 0);
                           line.setAttribute("y2", height - 150);
                           line.setAttribute("stroke", "#9e9e9e");
                           line.setAttribute("stroke-dasharray", "5,5");
                           line.setAttribute("stroke-width", 3.5);
-                          text.setAttribute("x", x - 65);
+                          text.setAttribute("x", x - 20);
                           text.setAttribute("y", height - 130);
                           text.textContent = "Today";
                           svg.appendChild(text);
