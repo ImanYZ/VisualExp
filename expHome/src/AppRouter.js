@@ -182,6 +182,11 @@ const AppRouter = props => {
       }
     }
   };
+  
+  useEffect(()=>{
+      window.location.href='https://1cademy.com/home'
+  },[])
+
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async user => {
       if (user) {
