@@ -87,31 +87,34 @@ const panels = [
             </span>
           </li>
         </ul>
+        <p>
+          To improve learning through the “prerequisite knowledge graph,” we should consider how we present and
+          represent the content within each paragraph and the relationship between paragraphs.
+        </p>
         <h3>
           <span>Experiment 1</span>
         </h3>
         <p>
-          <span>
-            We compared reading through Hybrid maps and their equivalent Novakian knowledge models through a
-            within-subject controlled experiment. We found that Hybrid maps improved readability, learnability, recall,
-            and recognition, on both factual and inferential questions, in immediate and delayed tests, on college-level
-            passages.
-          </span>
+          Regrading the within paragraph relations, we compared reading through Hybrid maps and their equivalent
+          Novakian knowledge models through a within-subject controlled experiment. We found that Hybrid maps improved
+          readability, learnability, recall, and recognition, on both factual and inferential questions, in immediate
+          and delayed tests, on college-level passages. Through quantitative and qualitative analysis of the results, we
+          concluded that for efficient learning of college-level course content in the form of the prerequisite
+          knowledge graph, each node should be represented as a paragraph of sentences and all the graph should be
+          represented on a single page.
         </p>
         <h3>
           <span>Experiment 2</span>
         </h3>
         <p>
-          <span>
-            We are going to run a similar experiment comparing reading through Hybrid maps with their equivalent linear
-            text.
-          </span>
+          Regrading the between paragraph relations, we are going to run a similar experiment comparing reading through
+          Hybrid maps with their equivalent hierarchical hypertext. We chose the hierarchical hypertext representation,
+          because prior studies have shown that hierarchical hypertext, compared to network hypertext, is more efficient
+          for navigation and results in faster response time on tests.
         </p>
         <p>
-          <span>
-            In addition to the substantive contribution, I also describe methodological contributions for conducting
-            this kind of research with a Volunteer Research Team
-          </span>
+          In addition to the substantive contribution, I also describe methodological contributions for conducting this
+          kind of research with a Volunteer Research Team
         </p>
         <ul>
           <li>
@@ -140,11 +143,12 @@ const panels = [
         {" "}
         <p>
           <span>
-            I discuss alternative design elements and social mechanisms with respect to how they contribute to a
-            knowledge graph that:
+            I discuss alternative design elements and social mechanisms with respect to how they contribute to large
+            prerequisite knowledge graph that:
           </span>
         </p>
         <ul>
+          <li>Is fully interconnected, scalable, and usable</li>
           <li>
             <span>Is understandable to newcomers and readers from different disciplines</span>
           </li>
