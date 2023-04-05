@@ -159,7 +159,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       selectedResearchers[session] = researcher;
     }
     for (let i = 0; i < sessions.length; ++i) {
-      const sessionDate = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();;
+      const sessionDate = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();
       const researcher = selectedResearchers[sessionDate];
       const rUser = await db.collection("users").doc(researcher).get();
       const rUserData = rUser.data();
