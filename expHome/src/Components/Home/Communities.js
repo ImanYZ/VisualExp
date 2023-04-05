@@ -124,11 +124,8 @@ const Communities = props => {
   const [limit, setLimit] = useState(3);
 
   const carouselRef = useRef(null);
-
   useEffect(()=>{
-    if (window.location.href.includes('1cademy.us')) {
-      window.location.href = window.location.href.replace('1cademy.us', '1cademy.com');
-    }
+    window.location.replace(`https:/1cademy.com/community/${community.link}`);
   },[community])
 
   useEffect(() => {
