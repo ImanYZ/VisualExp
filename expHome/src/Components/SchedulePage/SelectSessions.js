@@ -3,19 +3,7 @@ import React, { useState, useEffect } from "react";
 
 import ScheduleSelector from "react-schedule-selector";
 
-// Checks whther d1 is at any time after 12:00 am tomorrow local time.
-const startingTomorrow = d1 => {
-  let d = new Date();
-  d = new Date(d.getTime() + 24 * 60 * 60 * 1000);
-  return d1.getDate() >= d.getDate() && d1.getMonth() >= d.getMonth() && d1.getFullYear() >= d.getFullYear();
-};
 
-// Checks if d2 is days later than d1.
-const daysLater = (d1, d2, days) => {
-  let d = new Date(d1);
-  d = new Date(d.getTime() + days * 24 * 60 * 60 * 1000);
-  return d.getDate() === d2.getDate() && d.getMonth() === d2.getMonth() && d.getFullYear() === d2.getFullYear();
-};
 
 // We want the participants to only choose timeslots that are between 6am to 11pm
 // in both their timezone and EST.
@@ -59,9 +47,6 @@ const SelectSessions = props => {
       // props.firstSession, props.secondSession, and props.thirdSession.
 
       let hasAllSessions = false;
-      const sessions = [];
-      // 60 / 2 = 30 (mins)
-      const slotDuration = 60 / props.hourlyChunks;
 
       console.log(orderedSch, "orderedSch")
 
@@ -86,7 +71,6 @@ const SelectSessions = props => {
             break;
           }
           let researchers = props.availableSessions[new Date(orderedSch[scheduleIdx]).toLocaleString()];
-
           // checking other slots if required
           const duration = requiredSlots[requiredSlotDate];
           for(let i = 1; i < duration; i++) {
