@@ -55,6 +55,7 @@ const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInsti
 const signUp = require("./api/signUp");
 const researchersRouter = require("./api/researchers");
 const participantsRouter = require("./api/participants");
+const adminRouter = require("./api/admin");
 
 const EST_TIMEZONE = "America/Detroit";
 process.env.TZ = EST_TIMEZONE;
@@ -126,7 +127,7 @@ app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
-
+app.use("/admin",adminRouter);
 // Knowledge endpoints
 
 // Misinformation Experiment
