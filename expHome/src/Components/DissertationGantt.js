@@ -530,27 +530,30 @@ const DissertationGantt = () => {
                             const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "").trim();
                             const textDat = new Date(text + ` ${currenYear}`);
                             if (!new Date(textDat).getTime()) continue;
-                            if (formattedDat.getTime() <= textDat.getTime()) {
-                              break;
-                            }
                             index = i + 1;
                             x = ganttGroups[i].getAttribute("x");
                             dateP = textDat;
+                            if (formattedDat.getTime() <= textDat.getTime()) {
+                              break;
+                            }
                           }
-                          let xi = ganttGroups[index].getAttribute("x");
-                          let texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
-                          if(texti.includes(currenYear)) {
-                            index += 1;
+                          if(formattedDat.getTime()!==dateP.getTime()) {
+                            let xi = ganttGroups[index].getAttribute("x");
+                            let texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
+                            if(texti.includes(currenYear)) {
+                              index += 1;
+                            }
+                            xi = ganttGroups[index].getAttribute("x");
+                            texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
+                            const textDat1 = new Date(texti + ` ${currenYear}`);
+                            const timestamp = new Date().getTime() - new Date(dateP).getTime();
+                            const timestamp1 = new Date(textDat1).getTime() - new Date(dateP).getTime();
+                            const ratio  = (xi-x)/ timestamp1;            
+                            if (timestamp) {
+                              x = parseInt(x)+(timestamp * ratio);
+                            }
                           }
-                          xi = ganttGroups[index].getAttribute("x");
-                          texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
-                          const textDat1 = new Date(texti + ` ${currenYear}`);
-                          const timestamp = new Date().getTime() - new Date(dateP).getTime();
-                          const timestamp1 = new Date(textDat1).getTime() - new Date(dateP).getTime();
-                          const ratio  = (xi-x)/ timestamp1;            
-                          if (timestamp) {
-                            x = parseInt(x)+(timestamp * ratio);
-                          }
+              
                           const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                           const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                           const height = parseFloat(svg.getAttribute("height"));
