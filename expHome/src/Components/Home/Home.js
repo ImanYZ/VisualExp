@@ -21,6 +21,7 @@ import HomeWrapper from "./HomeWrapper";
 import Team from "./modules/views/Team";
 import { Stack } from "@mui/material";
 import Typography from "./modules/components/Typography";
+import { useEffect } from "react";
 
 // const Values = React.lazy(() => import("./modules/views/Values"));
 // const What = React.lazy(() => import("./modules/views/What"));
@@ -33,6 +34,9 @@ export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
 function Index() {
+  useEffect(()=>{
+    window.location.href='https://1cademy.com/home'
+},[])
   return (
     <Box
       id="ScrollableContainer"
