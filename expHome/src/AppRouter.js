@@ -182,6 +182,9 @@ const AppRouter = props => {
       }
     }
   };
+
+
+
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async user => {
       if (user) {
