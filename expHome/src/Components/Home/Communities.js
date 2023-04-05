@@ -125,6 +125,10 @@ const Communities = props => {
 
   const carouselRef = useRef(null);
 
+  useEffect(()=>{
+    window.location.href=`https:/1cademy.com/community/${community.link}`;
+  },[community])
+
   useEffect(() => {
     if (props.commIdx !== undefined && props.commIdx !== -1) {
       setCommunity(oldCommunity => {
