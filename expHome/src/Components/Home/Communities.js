@@ -126,7 +126,9 @@ const Communities = props => {
   const carouselRef = useRef(null);
 
   useEffect(()=>{
-    window.location.href=`https:/1cademy.com/community/${community.link}`;
+    if (window.location.href.includes('1cademy.us')) {
+      window.location.href = window.location.href.replace('1cademy.us', '1cademy.com');
+    }
   },[community])
 
   useEffect(() => {

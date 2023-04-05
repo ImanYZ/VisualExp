@@ -34,9 +34,11 @@ export const HEADER_HEIGHT = 80;
 export const HEADER_HEIGHT_MOBILE = 72;
 
 function Index() {
-  useEffect(()=>{
-    window.location.href='https://1cademy.com/home'
-},[])
+  useEffect(() => {
+    if (window.location.href.includes("1cademy.us")) {
+      window.location.href = window.location.href.replace("1cademy.us", "1cademy.com");
+    }
+  }, []);
   return (
     <Box
       id="ScrollableContainer"
@@ -127,7 +129,6 @@ function Index() {
           scrollMarginTop: "16px"
         }}
       >
-       
         <JoinUs />
       </Box>
 
