@@ -246,7 +246,7 @@ const PassageRight = props => {
           ) : (
             <h1>
               You can now click{" "}
-              <a href="https://1cademy.us/communities" target="_blank" rel="noreferrer">
+              <a href="https://1cademy.com/community/ux-research-in-cognitive-psychology-of-Learning" target="_blank" rel="noreferrer">
                 this link
               </a>{" "}
               to explore 1Cademy communities, at your convenience, and complete the requirements of whichever community
