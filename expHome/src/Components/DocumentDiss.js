@@ -20,39 +20,48 @@ const panels = [
           explore design mechanisms that lead to a shared graph with individualized views for self-directed learning.
         </p>
         <p>
-          The studies included in this dissertation largely focus on representation, presentation, and scheduling of
-          learning content. It is important to define these terms because they are instrumental to the research
-          described and a major component of 1Cademy’s design.
+          The studies included in this dissertation focus on representation, presentation, and scheduling of studying
+          micro-content to optimize their learning:
         </p>
         <ul>
           <li>
-            <strong>Representation</strong>: the way knowledge is stored and organized in a database or knowledge graph,
-            including the content of nodes, the meaning of links, and the relationships between them.
+            <strong>Representation</strong>: how should we structure the network of micro-content in a knowledge graph,
+            including their representation in nodes and links? How should we design collaboration mechanisms to
+            generate, evaluate, and improve such a representation at scale?
           </li>
           <li>
-            <strong>Presentation</strong>: the way knowledge is displayed and accessed, including the layout of content
-            on a page, the ability to search and filter it, and the use of different views for different audiences to
-            enhance understanding.
+            <strong>Presentation</strong>: how should we display and navigate the relationships among the micro-content?
           </li>
           <li>
-            <strong>Scheduling</strong>: the timing in which knowledge is interacted with, including the frequency and
-            distribution that subjects are studied.
+            <strong>Scheduling</strong>: how should we plan for studying/practicing the micro-content to optimize their
+            retention?
           </li>
         </ul>
         <p>
-          My goal is to convert human knowledge into an easily digestible presentation and representation that
-          facilitates efficient learning. The problem of "knowledge overload" arises from the repetition of the same
-          topics across multiple sources. This is made worse by the mass generation of content by large language models.
-          To improve our learning, we need to eliminate overlapping content and merge different explanations into a
-          single comprehensive chunk that includes various perspectives and use-cases. While large language models serve
-          this purpose, they do not provide us with pathways to progressively learn any topic. For this purpose, we
-          should organize the content into smaller chunks, each dedicated to a single topic, and present them in a
-          single knowledge graph. Combining these chunks into multiple larger constructs like books would not be a
-          helpful solution. Doing so perpetuates the issue of overlapping content because larger constructs require
-          contextual knowledge that are also covered in other large constructs. While they provide progressive learning
-          content, in the aggregate they create a surplus of overlapping knowledge and defeat the purpose of efficient
-          learning. Instead, we should create a single "prerequisite knowledge graph" that covers all the small chunks
-          comprehensively.
+          How can we optimize life-long learning? Studying any book is a very time-consuming activity, as it may take
+          months to complete. While instructors choose textbooks for us in school, after graduation, we must rely on
+          search engines to select books, courses, and other resources. This can result in uncertainty about whether we
+          have invested in the right learning materials, how they align with our learning objectives, and what we should
+          study next.
+        </p>
+        <p>
+          Another challenge is the need for a note-taking mechanism that connects concepts from different courses and
+          books studied after graduation, as each resource often introduces its own terminology and thought process. To
+          optimize life-long learning, I dedicated my Ph.D. to designing and developing a scalable, collaborative
+          note-taking platform, called 1Cademy, for students, instructors, and researchers. 1Cademy aims to provide a
+          digestible presentation and representation of science, facilitating more efficient learning.
+        </p>
+        <p>
+          Minimizing redundancy in educational materials, such as books, websites, and videos, is crucial for optimizing
+          life-long learning. This challenge is exacerbated by the mass generation of content by large language models.
+          To maximize learning potential, we must eliminate overlapping content and merge all available explanations for
+          a subject into a single comprehensive chunk. This chunk should encompass various perspectives and use-cases
+          side-by-side, allowing learners to refer to it as the sole source for complete mastery of the topic.
+        </p>
+        <p>
+          Large language models can serve this purpose by digesting all available content, automatically summarizing it,
+          and providing short explanations. However, determining the most effective way to represent and present these
+          small chunks (micro-content) for optimal learning remains an open question.
         </p>
       </div>
     )
@@ -134,10 +143,11 @@ const panels = [
           due to the effort invested in their creation and research into similar entries.
         </p>
         <p>
-          To reduce knowledge overload, I proposed a scalable prerequisite knowledge graph of mutually exclusive
-          micro-content, where each entry covers a unique topic. However, creators may consider these entries trivial
-          and put less effort into ensuring coherence with other entries. In this chapter, I explore alternative design
-          elements and social mechanisms that can improve coherence in the scalable prerequisite knowledge graph that:
+          For collaborative note-taking to optimize life-long learning at scale, I proposed a scalable prerequisite
+          knowledge graph of mutually exclusive micro-content, where each entry covers a unique topic. However, creators
+          may consider these entries trivial and put less effort into ensuring coherence with other entries. In this
+          chapter, I explore alternative design elements and social mechanisms that can improve coherence in the
+          scalable prerequisite knowledge graph that:
         </p>
         <ul>
           <li>Is fully interconnected, scalable, and usable</li>
