@@ -125,7 +125,7 @@ const Communities = props => {
 
   const carouselRef = useRef(null);
   useEffect(()=>{
-    window.location.replace(`https:/1cademy.com/community/${community.link}`);
+    window.location = `https://1cademy.com/community/${community.link}`;
   },[community])
 
   useEffect(() => {
