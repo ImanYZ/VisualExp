@@ -21,7 +21,7 @@ const panels = [
         </p>
         <p>
           The studies included in this dissertation focus on representation, presentation, and scheduling of studying
-          micro-content to optimize their learning:
+          micro-content to optimize learning:
         </p>
         <ul>
           <li>
