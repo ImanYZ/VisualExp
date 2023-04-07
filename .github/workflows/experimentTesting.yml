@@ -26,12 +26,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: npm install and build
         run: |
-          cd expHome
           npm install --legacy-peer-deps
           CI=false npm run build:prod
       - name: Unit tests
         run: |
-          cd expHome/functions
+          cd functions
           npm install --legacy-peer-deps
           npm i -g firebase-tools
           NODE_OPTIONS="--max_old_space_size=4096" firebase emulators:exec  --project test --only auth,firestore 'npx jest --ci --runInBand'
