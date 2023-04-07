@@ -552,7 +552,9 @@ const AppRouter = props => {
               <Route
                 path="Activities/Experiment"
                 element={
-                  startedSession === 1 ? (
+                  !notAResearcher ? (
+                    <Activities activityName="Experiments" />
+                  ) : startedSession === 1 ? (
                     <div className="Error">
                       At this point, you cannot change your scheduled sessions! Please convey your questions or concerns
                       to Iman Yeckehzaare at oneweb@umich.edu
