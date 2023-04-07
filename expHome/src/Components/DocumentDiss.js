@@ -21,13 +21,13 @@ const panels = [
         </p>
         <p>
           The studies included in this dissertation focus on representation, presentation, and scheduling of studying
-          micro-content to optimize their learning:
+          micro-content to optimize learning:
         </p>
         <ul>
           <li>
             <strong>Representation</strong>: how should we structure the network of micro-content in a knowledge graph,
-            including their representation in nodes and links? How should we design collaboration mechanisms to
-            generate, evaluate, and improve such a representation at scale?
+            including optimal representation and size of nodes and links, to improve reading comprehension? How should
+            we design collaboration mechanisms to generate, evaluate, and improve such a representation at scale?
           </li>
           <li>
             <strong>Presentation</strong>: how should we display and navigate the relationships among the micro-content?
@@ -71,11 +71,18 @@ const panels = [
     heading: <h2>Chapter 2: Optimal chunk size and presentation for learning</h2>,
     details: (
       <div>
-        <p>
-          I introduce “Hybrid maps,” a new knowledge presentation format that combines the benefits of hypertext and
-          Novakian concept maps. The design was inspired by previous research on knowledge presentation and hypertext.
-          Its key design features are:
-        </p>
+        <p>I study two research questions:</p>
+        <ul>
+          <li>
+            To structure each piece of micro-content, should a paragraph be broken down into smaller pieces, for example
+            in the form of a Novakian concept map?
+          </li>
+          <li>
+            To present the relationship between pieces of micro-content, would it be more helpful to visualize their
+            graph on a single page or separate their pieces into different linked pages?
+          </li>
+        </ul>
+        <p>I introduce “Hybrid maps,” with the following characteristics:</p>
         <ul>
           <li>
             Each node (micro-content) has a title and a paragraph, small enough to describe only one main concept.
