@@ -71,7 +71,7 @@ const panels = [
     heading: <h2>Chapter 2: Optimal chunk size and presentation for learning</h2>,
     details: (
       <div>
-        <p>I discuss two research questions:</p>
+        <p>I study two research questions:</p>
         <ul>
           <li>
             To structure each piece of micro-content, should a paragraph be broken down into smaller pieces, for example
