@@ -5,7 +5,7 @@ steps:
     args:
       [
         "-c",
-        'source /root/.bashrc && cd expHome && npm install --legacy-peer-deps && npm run build:prod'
+        'source /root/.bashrc && npm install --legacy-peer-deps && npm run build:prod'
       ]
   # running install for backend
   - name: "gcr.io/visualexp-a7d2c/firebase:latest"
@@ -13,7 +13,7 @@ steps:
     args:
       [
         "-c",
-        'source /root/.bashrc && cd expHome/functions && npm install --legacy-peer-deps'
+        'source /root/.bashrc && cd functions && npm install --legacy-peer-deps'
       ]
   # running firebase deploy
   - name: "gcr.io/visualexp-a7d2c/firebase:latest"
@@ -21,7 +21,7 @@ steps:
     args:
       [
         "-c",
-        'echo $$VISUALEXP_PROD | base64 -d > expHome/functions/onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json && source /root/.bashrc && cd expHome && firebase --debug deploy'
+        'echo $$VISUALEXP_PROD | base64 -d > functions/onecademy-dev-firebase-adminsdk-91m0g-0f326557b6.json && source /root/.bashrc &&  firebase --debug deploy'
       ]
     secretEnv: ['VISUALEXP_PROD']
 availableSecrets:
