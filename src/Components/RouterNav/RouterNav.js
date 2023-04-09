@@ -238,7 +238,7 @@ const RouterNav = props => {
           delete oldGraNums["Iman YeckehZaare"];
           const maxGraNum = Math.max(...Object.values(oldGraNums).map(({ num }) => num));
           for (let researcher in oldGraNums) {
-            if(researcher === "Iman YeckehZaare") continue ; 
+            if (researcher === "Iman YeckehZaare") continue;
             oldGraNums[researcher].percent = Math.round(((oldGraNums[researcher].num * 100.0) / maxGraNum) * 100) / 100;
           }
           return oldGraNums;
@@ -455,8 +455,14 @@ const RouterNav = props => {
       for (let change of tempUserVersionsChanges) {
         const userVersionData = change.doc.data();
         if (userVersionData.version in othersProposals) {
-          const voteDate = getISODateString(userVersionData.updatedAt.toDate());
-          if (change.type === "removed" || userVersionData.deleted) {
+          let voteDate = getISODateString(new Date());
+          if (userVersionData.hasOwnProperty("updatedAt")) {
+            voteDate = getISODateString(userVersionData.updatedAt.toDate());
+          } else if (userVersionData.hasOwnProperty("createdAt")) {
+            voteDate = getISODateString(userVersionData.createdAt.toDate());
+          }
+
+          if (change.type === "removed" || (userVersionData.hasOwnProperty("deleted") && userVersionData.deleted)) {
             if (change.doc.id in uVersions) {
               delete uVersions[change.doc.id];
               if (voteDate in upVotes) {
