@@ -438,7 +438,10 @@ const FreeRecallGrading = props => {
       )}
       <Paper style={{ paddingBottom: "19px" }}>
         <p>1- Carefully read this free-recall response:</p>
-        <Paper style={{ padding: "10px 19px 10px 19px", margin: "19px" }} id="recall-response">
+        <Paper
+          style={{ position: "sticky", top: "0",backgroundColor:"#e0e0e0",  zIndex:"1", padding: "10px 19px 10px 19px", margin: "19px" }}
+          id="recall-response"
+        >
           {recallGrades[recallGradeIdx]?.response}
         </Paper>
         <p>
