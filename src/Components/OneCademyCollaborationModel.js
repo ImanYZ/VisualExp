@@ -19,6 +19,8 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Popover from "@mui/material/Popover";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Typography } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { async } from "q";
 const d3 = require("d3");
@@ -39,6 +41,7 @@ const OneCademyCollaborationModel = () => {
   const [children, setChildren] = useState([]);
   const [loadData, setLoadData] = useState(false);
   const [selectedNode, setSelectedNode] = useState("");
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   function ColorBox(props) {
     return (
@@ -184,6 +187,7 @@ const OneCademyCollaborationModel = () => {
     setTitle("");
     setType("");
     setOpenAddNode(false);
+    setDeleteDialogOpen(false);
   };
   const handleSave = async () => {
     if (!selectedNode) {
@@ -198,6 +202,7 @@ const OneCademyCollaborationModel = () => {
       await collabModelRef.update({ title, type, children: children.map(child => child.id) });
     }
     setOpenAddNode(false);
+    setLoadData(true);
   };
 
   const changeExplanation = event => {
@@ -222,6 +227,14 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
   };
 
+  const deleteNode = async () => {
+    if (!selectedNode) return;
+    const nodeRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
+    await nodeRef.delete();
+    setOpenAddNode(false);
+    setDeleteDialogOpen(false);
+  };
+
   const showDetails = async nodeId => {
     const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
     const node = nodeDoc.data();
@@ -236,25 +249,31 @@ const OneCademyCollaborationModel = () => {
   };
   return (
     <div>
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left"
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left"
-        }}
-      >
-        <Box sx={{ p: 1 }}>
-          {popoverTitle}, {popoverType}
-        </Box>
-      </Popover>
+      <Dialog open={deleteDialogOpen} onClose={handleClose}>
+        <DialogActions>
+          <Button onClick={deleteNode}>Confirm</Button>
+          <Button
+            onClick={() => {
+              setDeleteDialogOpen(false);
+            }}
+            autoFocus
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={openAddNode} onClose={handleClose} sx={{ fontWeight: "50px" }}>
         <DialogContent>
+          <IconButton
+            color="error"
+            aria-label="delete"
+            onClick={() => {
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
           <Box
             component="form"
             sx={{
