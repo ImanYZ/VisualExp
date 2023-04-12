@@ -157,20 +157,11 @@ const panels = [
           scalable prerequisite knowledge graph that:
         </p>
         <ul>
-          <li>Is fully interconnected, scalable, and usable</li>
           <li>Is understandable to newcomers and readers from different disciplines</li>
           <li>Avoids duplication and overlapping content</li>
           <li>Provides learning pathways</li>
           <li>Facilitates exploratory searching</li>
-          <li>
-            Enhances contributions:
-            <ul>
-              <li>In large magnitude</li>
-              <li>Of high quality (mitigates dissemination of misinformation or disinformation)</li>
-            </ul>
-          </li>
           <li>Encourages reading and improving upon others&rsquo; contributions</li>
-          <li>Favors majority of votes over individual biases</li>
         </ul>
         <p>
           I discuss my design space exploration of these topics and my solutions for crowdsourcing such a scalable
