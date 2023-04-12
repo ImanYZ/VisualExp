@@ -55,9 +55,9 @@ import AdministratorLater from "./Components/Home/AdministratorLater";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
 import SignUpPage from "./Components/Auth/SignUpPage";
 import DissertationGantt from "./Components/DissertationGantt";
+import OneCademyCollaborationModel from "./Components/OneCademyCollaborationModel";
 import { isToday } from "./utils/DateFunctions";
 import { getFullname } from "./utils";
-
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
@@ -67,8 +67,6 @@ import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
 import JoinUsIframe from "./Components/Home/JoinUsIframe";
-
-
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -182,8 +180,6 @@ const AppRouter = props => {
       }
     }
   };
-
-
 
   useEffect(() => {
     return firebase.auth.onAuthStateChanged(async user => {
@@ -470,7 +466,8 @@ const AppRouter = props => {
       <Route path="/cookie/*" element={<CookiePolicy />} />
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/Iman-Dissertation-Prospectus" element={<DissertationGantt />} />
-      <Route path="/JoinUsIframe/*" element={<JoinUsIframe/>} />
+      <Route path="/OneCademyCollaborationModel" element={<OneCademyCollaborationModel />} />
+      <Route path="/JoinUsIframe/*" element={<JoinUsIframe />} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
