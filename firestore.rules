@@ -249,5 +249,9 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /collabModelNodes/{collabModelNodeId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }
