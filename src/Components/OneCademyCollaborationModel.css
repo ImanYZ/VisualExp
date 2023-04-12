@@ -1,0 +1,43 @@
+g.type-PO>rect {
+  fill: #4caf50;
+}
+
+g.type-NO>rect {
+  fill: #cc0119;
+}
+g.type-DF>rect {
+  fill: #33b9f7;
+}
+
+
+text {
+  font-weight: 500;
+  fill: #fdf6f6;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 12px;
+}
+
+.node rect {
+  stroke: #ecf3ed;
+  fill: #fff;
+  stroke-width: 1.5px;
+}
+
+.edgePath path {
+  stroke: #0cd894;
+  fill: #0cd894;
+  stroke-width: 1.3px;
+}
+.dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: #333;
+  margin-right: 5px;
+}
+.hide-btn {
+  position: absolute;
+  top: -30px;
+  right: 0;
+}
