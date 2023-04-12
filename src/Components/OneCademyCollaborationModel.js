@@ -19,6 +19,7 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import Popover from "@mui/material/Popover";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Typography } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { async } from "q";
 const d3 = require("d3");
 
@@ -36,8 +37,9 @@ const OneCademyCollaborationModel = () => {
   const [popoverTitle, setPopoverTitle] = useState("");
   const [popoverType, setPopoverType] = useState("");
   const [children, setChildren] = useState([]);
-  const [loadData , setLoadData] = useState(false);
-   
+  const [loadData, setLoadData] = useState(false);
+  const [selectedNode, setSelectedNode] = useState("");
+
   function ColorBox(props) {
     return (
       <Box
@@ -184,12 +186,17 @@ const OneCademyCollaborationModel = () => {
     setOpenAddNode(false);
   };
   const handleSave = async () => {
-    const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
-    await collabModelRef.set({
-      title,
-      type: type,
-      children: children.map(child => child.id)
-    });
+    if (!selectedNode) {
+      const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
+      await collabModelRef.set({
+        title,
+        type: type,
+        children: children.map(child => child.id)
+      });
+    } else {
+      const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
+      await collabModelRef.update({ title, type, children: children.map(child => child.id) });
+    }
     setOpenAddNode(false);
   };
 
@@ -202,6 +209,7 @@ const OneCademyCollaborationModel = () => {
     const node = nodeDoc.data();
     setTitle(node.title);
     setType(node.type);
+    setSelectedNode(nodeId);
     setOpenAddNode(true);
     const _children = [];
     for (let node of allNodes) {
