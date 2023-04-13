@@ -25,7 +25,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-
+import Popover from "@mui/material/Popover";
 const d3 = require("d3");
 
 const legends = [
@@ -64,6 +64,7 @@ const OneCademyCollaborationModel = () => {
   const [openModifyLink, setOpenModifyLink] = useState(false);
   const [typeLink, setTypeLink] = useState("");
   const [selectedLink, setSelectedLink] = useState({});
+  const open = Boolean(anchorEl);
   function ColorBox(props) {
     return (
       <Box
@@ -116,7 +117,7 @@ const OneCademyCollaborationModel = () => {
         _allNodes.push({ id: tempNodesChange.doc.id, ...collabModelNode });
       }
       if (g.nodes().some(node => node === tempNodesChange.doc.id)) continue;
-
+      if (!visibleNodes.includes(tempNodesChange.doc.id)) continue;
       g.setNode(tempNodesChange.doc.id, {
         label: collabModelNode.title,
         class:
@@ -136,6 +137,7 @@ const OneCademyCollaborationModel = () => {
         const _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
         const _arrowheadStyle =
           legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
+        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
         g.setEdge(tempNodeChange.doc.id, elementChild.id, {
           curve: d3.curveBasis,
           style: _style,
@@ -174,21 +176,22 @@ const OneCademyCollaborationModel = () => {
 
       var buttonBody = button
         .append("xhtml:body")
-        .style("margin", "0px") // remove margin to better align the button
+        .style("margin", "0px") 
         .style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
-        .style("background", "transparent") // transparent background
-        .style("color", "black") // text color
-        .style("border", "none") // no border
-        .style("font-weight", "bold") // bold text
+        .style("background", "transparent") 
+        .style("color", "black") 
+        .style("border", "none") 
+        .style("font-weight", "bold") 
         .style("width", "100%")
         .style("height", "100%")
-        .text("X") // change text to "X"
+        .text("X") 
         .on("click", function (e) {
-          e.stopPropagation(); // Prevent triggering the node click event
-          toggleNodeVisibility(v);
+          e.stopPropagation(); 
+          removeNode(v);
+          console.log("clicked", v);
         });
     });
 
@@ -200,12 +203,12 @@ const OneCademyCollaborationModel = () => {
     nodes.on("click", function (d) {
       modifyNode(d.target.__data__);
     });
-    // nodes.on("mouseover", function (d) {
+    var edges = svg.selectAll("g.edgePath");
+    // edges.on("pointerover", function (d) {
     //   showDetails(d.target.__data__);
     //   handlePopoverOpen(d);
     // });
-    var edges = svg.selectAll("g.edgePath");
-    edges.on("click", function (d) {
+    edges.on("pointerdown", function (d) {
       modifyLink(d.target.__data__);
       console.log(d.target.__data__);
     });
@@ -265,7 +268,7 @@ const OneCademyCollaborationModel = () => {
     const node = nodeDoc.data();
     const childrenNodes = await firebase.firestore().collection("collabModelNodes").get();
     const _children = [];
-    for (let _nodeDoc of childrenNodes.docs) { 
+    for (let _nodeDoc of childrenNodes.docs) {
       if (node.children.some(child => child.id === _nodeDoc.id)) {
         _children.push(_nodeDoc.id);
       }
@@ -295,19 +298,25 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
   };
 
-  const showDetails = async nodeId => {
+  const showDetails = async data => {
+    const nodeId = data.v;
+    const childId = data.w;
     const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
-    const node = nodeDoc.data();
-    setPopoverTitle(node.title);
-    setPopoverType(node.type);
+    const nodeData = nodeDoc.data();
+    const children = nodeData.children;
+    const child = children.find(child => child.id === childId);
+    setPopoverTitle(child.explanation);
+    setPopoverType(child.type);
   };
   const handlePopoverOpen = event => {
+    setAnchorEl(null);
     setAnchorEl(event.currentTarget);
   };
-  const handlePopoverClose = () => {
+  const handleClosePopover = () => {
     setAnchorEl(null);
   };
   console.log("render", allNodes);
+
   const handleVisibileNodes = node => {
     const _visibleNodes = visibleNodes;
     if (_visibleNodes.includes(node.id)) {
@@ -316,6 +325,7 @@ const OneCademyCollaborationModel = () => {
       _visibleNodes.push(node.id);
     }
     setVisibleNodes(_visibleNodes);
+    setLoadData(true);
     console.log("visibleNodes", _visibleNodes);
   };
 
@@ -360,8 +370,40 @@ const OneCademyCollaborationModel = () => {
     setTypeLink("");
     setLoadData(true);
   };
+
+  const removeNode = nodeId => {
+    console.log("remove node", nodeId);
+    const _visibleNodes = visibleNodes;
+    console.log("visibleNodes", _visibleNodes)
+    if (_visibleNodes.includes(nodeId)) {
+      _visibleNodes.splice(_visibleNodes.indexOf(nodeId), 1);
+    }
+    setVisibleNodes(_visibleNodes);
+    setLoadData(true);
+  };
   return (
     <Box>
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClosePopover}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "left"
+        }}
+        elevation={1}
+      >
+        <Box
+          sx={{
+            p: 3,
+            color: "black",
+            display: "flex"
+          }}
+        >
+          Explanation : lkdzjdlkjdlkzejlkdjlkezjdklzejdklzejdlzed {popoverTitle} <br />
+        </Box>
+      </Popover>
+
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -506,41 +548,6 @@ const OneCademyCollaborationModel = () => {
         </DialogActions>
       </Dialog>
       <Grid container spacing={2}>
-        <Grid item xs={2}>
-          {/* <Box sx={{ pt: "10px", width: "90%", p: 1, height: "800px" }}>
-            {allNodes.map((node, index) => (
-              <ListItem
-                key={index}
-                disablePadding
-                sx={{
-                  mb: "5px",
-                  "&$selected": {
-                    backgroundColor: "orange",
-                    zIndex: 100
-                  }
-                }}
-              >
-                <ListItemButton
-                  role={undefined}
-                  style={{ width: 500 }}
-                  onClick={() => {
-                    handleVisibileNodes(node);
-                  }}
-                >
-                  <ListItemIcon>
-                    {visibleNodes.includes(node.id) ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
-                  </ListItemIcon>
-                  <ListItemText id={node.title} primary={`${node.title}`} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </Box> */}
-          <Box elevation={3} sx={{ mt: "50px" }}>
-            <Button sx={{ ml: "30px" }} variant="contained" onClick={AddNewNode}>
-              Add New Node
-            </Button>
-          </Box>
-        </Grid>
         <Grid item xs={9}>
           <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "700px" }}>
             <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ padding: "15px" }}></svg>
@@ -570,6 +577,48 @@ const OneCademyCollaborationModel = () => {
             </Box>
           </Paper>
           <Box sx={{ display: "flex", marginBottom: "15px" }}></Box>
+        </Grid>
+        <Grid item xs={2}>
+          <Box
+            sx={{
+              width: "100%",
+              p: 1,
+              height: "800px",
+              overflow: "auto" // Add this line
+            }}
+          >
+            {allNodes.map((node, index) => (
+              <ListItem
+                key={index}
+                disablePadding
+                sx={{
+                  mb: "5px",
+                  "&$selected": {
+                    backgroundColor: "orange",
+                    zIndex: 100
+                  }
+                }}
+              >
+                <ListItemButton
+                  role={undefined}
+                  style={{ width: 500 }}
+                  onClick={() => {
+                    handleVisibileNodes(node);
+                  }}
+                >
+                  <ListItemIcon>
+                    {visibleNodes.includes(node.id) ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
+                  </ListItemIcon>
+                  <ListItemText id={node.title} primary={`${node.title}`} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </Box>
+          <Box elevation={3} sx={{ mt: "50px" }}>
+            <Button sx={{ ml: "30px" }} variant="contained" onClick={AddNewNode}>
+              Add New Node
+            </Button>
+          </Box>
         </Grid>
       </Grid>
     </Box>
