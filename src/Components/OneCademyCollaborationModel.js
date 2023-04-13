@@ -48,11 +48,12 @@ const OneCademyCollaborationModel = () => {
           bgcolor: props.color,
           color: "primary.contrastText",
           p: 1,
-          fontSize: 12,
+          fontSize: 14,
           borderRadius: 2,
           maxWidth: 90,
           mr: 1,
-          mb: 1
+          mb: 1,
+          textAlign: "center"
         }}
         key={props.text}
       >
@@ -361,29 +362,29 @@ const OneCademyCollaborationModel = () => {
         <Grid item xs={9}>
           <Paper elevation={3} sx={{ mt: "10px", ml: "10px" }}>
             <svg id="graphGroup" width="100%" height="700" ref={svgRef} style={{ padding: "15px" }}></svg>
-            <Box sx={{ display: "flex", marginBottom: "15px" }}>
-              {[
-                { text: "Design Features", color: "#33b9f7" },
-                { text: "Positive Outcome", color: "#4caf50" },
-                { text: "Negative Outcome", color: "#cc0119" }
-              ].map((resource, index) => (
-                <ColorBox key={resource.text} text={resource.text} color={resource.color} />
-              ))}
-              {[
-                { text: "Known Positive Effect", color: "#1b5e20" },
-                { text: "Hypothetical Positive Effect", color: "#8bc34a" },
-                { text: "Known Negative Effect", color: "#b71c1c" },
-                { text: "Hypothetical Negative Effect", color: "#e57373" }
-              ].map((resource, index) => (
-                <Grid key={resource.text} container alignItems="center" spacing={0.5}>
-                  <Grid item>
+            <Box sx={{ display: "flex" }}>
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { text: "Design Features", color: "#33b9f7" },
+                  { text: "Positive Outcome", color: "#4caf50" },
+                  { text: "Negative Outcome", color: "#cc0119" }
+                ].map((resource, index) => (
+                  <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                ))}
+              </Box>
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { text: "Known Positive Effect", color: "#1b5e20" },
+                  { text: "Hypothetical Positive Effect", color: "#8bc34a" },
+                  { text: "Known Negative Effect", color: "#b71c1c" },
+                  { text: "Hypothetical Negative Effect", color: "#e57373" }
+                ].map((resource, index) => (
+                  <div style={{ marginInline: "14px" }}>
                     <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                  </Grid>
-                  <Grid item>
-                    <Typography> {resource.text}</Typography>
-                  </Grid>
-                </Grid>
-              ))}
+                    <Typography sx={{ fontSize: "14px", color: resource.color }}> {resource.text}</Typography>
+                  </div>
+                ))}
+              </Box>
             </Box>
           </Paper>
           <Box sx={{ display: "flex", marginBottom: "15px" }}></Box>
