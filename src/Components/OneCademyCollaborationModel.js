@@ -16,13 +16,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
-import Popover from "@mui/material/Popover";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import { async } from "q";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+
 const d3 = require("d3");
 
 const OneCademyCollaborationModel = () => {
@@ -38,7 +36,7 @@ const OneCademyCollaborationModel = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [popoverTitle, setPopoverTitle] = useState("");
   const [popoverType, setPopoverType] = useState("");
-  const [children, setChildren] = useState([]);
+  const [childrenIds, setChildrenIds] = useState([]);
   const [loadData, setLoadData] = useState(false);
   const [selectedNode, setSelectedNode] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -66,7 +64,6 @@ const OneCademyCollaborationModel = () => {
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
       setNodesChanges(oldChanges => [...oldChanges, ...changes]);
-      console.log(changes);
       setNodesLoded(true);
       setLoadData(false);
     });
@@ -110,10 +107,14 @@ const OneCademyCollaborationModel = () => {
     for (let tempNodeChange of tempNodesChanges) {
       const collabModelNode = tempNodeChange.doc.data();
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
-      for (let child of collabModelNode.children) {
-        g.setEdge(tempNodeChange.doc.id, child, {
-          curve: d3.curveBasis,
-          style: false ? "filter: drop-shadow(0px 0px 5px blue); stroke-width: 2.3px;" : ""
+      for (let elementChild of collabModelNode.children) {
+        g.setEdge(tempNodeChange.doc.id, elementChild, {
+          curve: d3.curveBasis
+          /* ,
+          style:
+            elementChild.type === "Positive Effect"
+              ? "stroke: #0cd894; fill: #0cd894;"
+              : "stroke: #cc0119; fill: #cc0119;" */
         });
       }
     }
@@ -124,41 +125,47 @@ const OneCademyCollaborationModel = () => {
         node.rx = node.ry = 5;
       }
     });
-    console.log("dagreD3", g);
 
     var render = new dagreD3.render();
 
     const svg = d3.select("svg");
     const svgGroup = svg.append("g");
 
-    // console.log(svg);
-
     render(svgGroup, g);
-    // svgGroup.selectAll("g.node").each(function (v) {
-    //   var node = g.node(v);
-    //   var button = d3
-    //     .select(this)
-    //     .append("foreignObject")
-    //     .attr("width", 30)
-    //     .attr("height", 20)
-    //     .attr("x", -15)
-    //     .attr("y", -30)
-    //     .attr("class", "hide-button");
+    svgGroup.selectAll("g.node").each(function (v) {
+      var node = g.node(v);
+      var nodeElement = d3.select(this);
+      var nodeLabel = nodeElement.select("rect");
+      var nodeBBox = nodeLabel.node().getBBox();
 
-    //   var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+      var button = nodeElement
+        .append("foreignObject")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("x", nodeBBox.width / 2 - 9)
+        .attr("y", -nodeBBox.height / 2 - 9)
+        .attr("class", "hide-button");
 
-    //   buttonBody
-    //     .append("xhtml:button")
-    //     .text("Hide")
-    //     .style("width", "100%")
-    //     .style("height", "100%")
-    //     .on("click", function (e) {
-    //       e.stopPropagation();
-    //       // toggleNodeVisibility(v);
-    //     });
-    // });
+      var buttonBody = button
+        .append("xhtml:body")
+        .style("margin", "0px") // remove margin to better align the button
+        .style("padding", "0px");
 
-    console.log("svgGroup", svgGroup);
+      buttonBody
+        .append("xhtml:button")
+        .style("background", "transparent") // transparent background
+        .style("color", "black") // text color
+        .style("border", "none") // no border
+        .style("font-weight", "bold") // bold text
+        .style("width", "100%")
+        .style("height", "100%")
+        .text("X") // change text to "X"
+        .on("click", function (e) {
+          e.stopPropagation(); // Prevent triggering the node click event
+          // toggleNodeVisibility(v);
+        });
+    });
+
     const zoom = d3.zoom().on("zoom", function (d) {
       svgGroup.attr("transform", d3.zoomTransform(this));
     });
@@ -172,9 +179,7 @@ const OneCademyCollaborationModel = () => {
     //   handlePopoverOpen(d);
     // });
     var edges = svg.selectAll("g.edgePath");
-    edges.on("click", function (d) {
-      console.log(d.target.__data__);
-    });
+    edges.on("click", function (d) {});
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
     };
@@ -186,6 +191,8 @@ const OneCademyCollaborationModel = () => {
   const handleClose = () => {
     setTitle("");
     setType("");
+    setChildrenIds([]);
+    setSelectedNode("");
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
   };
@@ -195,11 +202,11 @@ const OneCademyCollaborationModel = () => {
       await collabModelRef.set({
         title,
         type: type,
-        children: children.map(child => child.id)
+        children: childrenIds
       });
     } else {
       const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-      await collabModelRef.update({ title, type, children: children.map(child => child.id) });
+      await collabModelRef.update({ title, type, children: childrenIds });
     }
     setOpenAddNode(false);
     setLoadData(true);
@@ -212,27 +219,35 @@ const OneCademyCollaborationModel = () => {
   const modifyNode = async nodeId => {
     const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
     const node = nodeDoc.data();
+    const childrenNodes = await firebase.firestore().collection("collabModelNodes").get();
+    const _children = [];
+    for (let _nodeDoc of childrenNodes.docs) {
+      if (node.children.includes(_nodeDoc.id)) {
+        _children.push(_nodeDoc.id);
+      }
+    }
+    setChildrenIds(_children);
     setTitle(node.title);
     setType(node.type);
     setSelectedNode(nodeId);
     setOpenAddNode(true);
-    const _children = [];
-    for (let node of allNodes) {
-      if (node.children && node.children.includes(node.id)) {
-        _children.push(node);
-      }
-    }
-    console.log("_children", _children);
-    setChildren(_children);
-    setLoadData(true);
   };
 
   const deleteNode = async () => {
     if (!selectedNode) return;
     const nodeRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
+    for (let node of allNodes) {
+      const _children = node.children;
+      if (node.children.includes(selectedNode)) {
+        _children.splice(_children.indexOf(selectedNode), 1);
+        const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+        await _nodeRef.update({ children: _children });
+      }
+    }
     await nodeRef.delete();
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
+    setLoadData(true);
   };
 
   const showDetails = async nodeId => {
@@ -310,16 +325,16 @@ const OneCademyCollaborationModel = () => {
             <FormControl>
               <InputLabel>children</InputLabel>
               <Select
-                label="to"
-                value={children}
+                label="children"
+                value={childrenIds}
                 multiple
                 onChange={e => {
-                  setChildren(e.target.value);
+                  setChildrenIds(e.target.value);
                 }}
                 sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
               >
                 {allNodes.map(node => (
-                  <MenuItem key={node.id} value={node} sx={{ display: "center" }}>
+                  <MenuItem key={node.id} value={node.id} sx={{ display: "center" }}>
                     {node.title}
                   </MenuItem>
                 ))}
@@ -346,10 +361,21 @@ const OneCademyCollaborationModel = () => {
               ].map((resource, index) => (
                 <ColorBox key={resource.text} text={resource.text} color={resource.color} />
               ))}
-              <ArrowForwardIcon sx={{ color: "#4caf50", width: "50px", transform: "scaleX(2)" }} />
-              <Typography sx={{ color: "#4caf50" }}>Positive Effect</Typography>
-              <ArrowForwardIcon sx={{ color: "#cc0119", width: "50px", transform: "scaleX(2)" }} />
-              <Typography sx={{ color: "#cc0119" }}>Negative Effect</Typography>
+              {[
+                { text: "Known Positive Effect", color: "#1b5e20" },
+                { text: "Hypothetical Positive Effect", color: "#8bc34a" },
+                { text: "Known Negative Effect", color: "#b71c1c" },
+                { text: "Hypothetical Negative Effect", color: "#e57373" }
+              ].map((resource, index) => (
+                <Grid key={resource.text} container alignItems="center" spacing={0.5}>
+                  <Grid item>
+                    <TrendingFlatIcon style={{ fontSize: "48px", color: resource.color }} />
+                  </Grid>
+                  <Grid item>
+                    <Typography> {resource.text}</Typography>
+                  </Grid>
+                </Grid>
+              ))}
             </Box>
           </Paper>
           <Box sx={{ display: "flex", marginBottom: "15px" }}></Box>
