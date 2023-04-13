@@ -133,6 +133,7 @@ const OneCademyCollaborationModel = () => {
     const svgGroup = svg.append("g");
 
     render(svgGroup, g);
+
     svgGroup.selectAll("g.node").each(function (v) {
       var node = g.node(v);
       var nodeElement = d3.select(this);
@@ -211,6 +212,12 @@ const OneCademyCollaborationModel = () => {
     }
     setOpenAddNode(false);
     setLoadData(true);
+    setTitle("");
+    setType("");
+    setChildrenIds([]);
+    setSelectedNode("");
+    setOpenAddNode(false);
+    setDeleteDialogOpen(false);
   };
 
   const changeExplanation = event => {
