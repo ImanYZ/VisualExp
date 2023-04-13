@@ -38,8 +38,8 @@ const legends = [
   { text: "Known Negative Effect", style: "stroke: #b71c1c; stroke-width: 2px;", arrowheadStyle: "fill: #b71c1c" },
   {
     text: "Hypothetical Negative Effect",
-    style: "stroke: #e57373; stroke-width: 2px;",
-    arrowheadStyle: "fill: #e57373"
+    style: "stroke: #ef6c00; stroke-width: 2px;",
+    arrowheadStyle: "fill: #ef6c00"
   }
 ];
 
@@ -236,7 +236,7 @@ const OneCademyCollaborationModel = () => {
       children.push({
         id: child,
         explanation: "",
-        type: ""
+        type: "Hypothetical Positive Effect"
       });
     }
     if (!selectedNode) {
@@ -559,7 +559,7 @@ const OneCademyCollaborationModel = () => {
                   { text: "Known Positive Effect", color: "#1b5e20" },
                   { text: "Hypothetical Positive Effect", color: "#8bc34a" },
                   { text: "Known Negative Effect", color: "#b71c1c" },
-                  { text: "Hypothetical Negative Effect", color: "#e57373" }
+                  { text: "Hypothetical Negative Effect", color: "#ef6c00" }
                 ].map((resource, index) => (
                   <div style={{ marginInline: "14px" }}>
                     <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
