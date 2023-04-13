@@ -6,6 +6,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import { firebaseOne } from "../../Components/firebase/firebase";
 
 import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, institutionsState } from "../../store/AuthAtoms";
@@ -25,6 +26,8 @@ import AppConfig from "../../AppConfig";
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
+  const { db: dbOne } = firebaseOne;
+
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [project, setProject] = useRecoilState(projectState);
@@ -117,16 +120,29 @@ const Auth = props => {
   }, [resetPasswordEmail]);
 
   useEffect(() => {
-    const getNameFromInstitutionSelected = async () => {
-      if (email !== "") {
-        const data = await axios.post("/checkEmailInstitution", { email });
-        if (data?.data.institution) {
-          setNameFromInstitutionSelected(data.data.institution);
+    const checkEmailInstitution = async () => {
+      try {
+        const domainName = email.match("@(.+)$")?.[0];
+        const institutionDoc = await dbOne
+          .collection("institutions")
+          .where("domains", "array-contains", domainName)
+          .limit(1)
+          .get();
+        if (institutionDoc && institutionDoc.docs.length > 0) {
+          const institutionData = institutionDoc.docs[0].data();
+          console.log("institutionData", institutionData);
+          setNameFromInstitutionSelected(institutionData);
+          return institutionData;
+        } else {
+          setNameFromInstitutionSelected({});
         }
+      } catch (err) {
+        console.log("err", err);
       }
     };
-    getNameFromInstitutionSelected();
+    checkEmailInstitution();
   }, [email]);
+
   const switchAccount = event => {
     event.preventDefault();
     setIsSubmitting(false);
@@ -198,8 +214,8 @@ const Auth = props => {
             firstName: firstname,
             lastName: lastname,
             institutionName: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
-            projectName: project,
-          })
+            projectName: project
+          });
           await firebase.login(loweredEmail, password);
         }
       }
@@ -241,12 +257,7 @@ const Auth = props => {
             We just sent you a verification email. Please click the link in the email to verify and complete your
             sign-up.
           </p>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={resendVerificationEmail}
-            style={{ marginRight: "19px" }}
-          >
+          <Button variant="contained" color="warning" onClick={resendVerificationEmail} style={{ marginRight: "19px" }}>
             <EmailIcon /> Resend Verification Email
           </Button>
           <Button variant="contained" color="error" onClick={switchAccount}>
