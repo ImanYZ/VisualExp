@@ -165,7 +165,7 @@ const OneCademyCollaborationModel = () => {
         .text("X") // change text to "X"
         .on("click", function (e) {
           e.stopPropagation(); // Prevent triggering the node click event
-          // toggleNodeVisibility(v);
+          toggleNodeVisibility(v);
         });
     });
 
@@ -182,11 +182,15 @@ const OneCademyCollaborationModel = () => {
     //   handlePopoverOpen(d);
     // });
     var edges = svg.selectAll("g.edgePath");
-    edges.on("click", function (d) {});
+    edges.on("click", function (d) {
+      // console.log(d.target.__data__);
+    });
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
     };
   }, [nodesLoded]);
+
+  const toggleNodeVisibility = v => {};
 
   const AddNewNode = second => {
     setOpenAddNode(true);
@@ -272,7 +276,7 @@ const OneCademyCollaborationModel = () => {
     setAnchorEl(null);
   };
   return (
-    <div>
+    <Box>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -362,10 +366,10 @@ const OneCademyCollaborationModel = () => {
         <Grid item xs={9}>
           <Paper elevation={3} sx={{ mt: "10px", ml: "10px" }}>
             <svg id="graphGroup" width="100%" height="700" ref={svgRef} style={{ padding: "15px" }}></svg>
-            <Box sx={{ display: "flex" }}>
+            <Box>
               <Box sx={{ display: "flex" }}>
                 {[
-                  { text: "Design Features", color: "#33b9f7" },
+                  { text: "Design Features", color: "#1976d2" },
                   { text: "Positive Outcome", color: "#4caf50" },
                   { text: "Negative Outcome", color: "#cc0119" }
                 ].map((resource, index) => (
@@ -406,7 +410,7 @@ const OneCademyCollaborationModel = () => {
           </Box>
         </Grid>
       </Grid>
-    </div>
+    </Box>
   );
 };
 
