@@ -23,7 +23,7 @@ text {
   stroke-width: 1.5px;
 }
 
-.edgePath path {
+.edgePath path.path {
   stroke: #0cd894;
   fill: #0cd894;
   stroke-width: 1.3px;
