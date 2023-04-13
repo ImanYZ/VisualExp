@@ -276,7 +276,7 @@ const OneCademyCollaborationModel = () => {
     setAnchorEl(null);
   };
   return (
-    <Box>
+    <Box >
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -364,8 +364,8 @@ const OneCademyCollaborationModel = () => {
       </Dialog>
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <Paper elevation={3} sx={{ mt: "10px", ml: "10px" }}>
-            <svg id="graphGroup" width="100%" height="700" ref={svgRef} style={{ padding: "15px" }}></svg>
+          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height:"700px" }}>
+            <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ padding: "15px" }}></svg>
             <Box>
               <Box sx={{ display: "flex" }}>
                 {[
