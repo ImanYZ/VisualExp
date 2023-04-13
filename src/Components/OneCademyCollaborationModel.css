@@ -24,8 +24,8 @@ text {
 }
 
 .edgePath path.path {
-  stroke: #0cd894;
-  fill: #0cd894;
+  stroke: transparent;
+  fill: transparent;
   stroke-width: 1.3px;
 }
 .dot {
