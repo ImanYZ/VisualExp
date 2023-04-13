@@ -265,8 +265,8 @@ const OneCademyCollaborationModel = () => {
     const node = nodeDoc.data();
     const childrenNodes = await firebase.firestore().collection("collabModelNodes").get();
     const _children = [];
-    for (let _nodeDoc of childrenNodes.docs) {
-      if (node.children.includes(_nodeDoc.id)) {
+    for (let _nodeDoc of childrenNodes.docs) { 
+      if (node.children.some(child => child.id === _nodeDoc.id)) {
         _children.push(_nodeDoc.id);
       }
     }
@@ -283,7 +283,8 @@ const OneCademyCollaborationModel = () => {
     for (let node of allNodes) {
       const _children = node.children;
       if (node.children.includes(selectedNode)) {
-        _children.splice(_children.indexOf(selectedNode), 1);
+        const index = node.children.findIndex(child => child.id === selectedNode);
+        _children.splice(_children.indexOf(index), 1);
         const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
         await _nodeRef.update({ children: _children });
       }
