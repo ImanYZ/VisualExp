@@ -36,7 +36,7 @@ const OneCademyCollaborationModel = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [popoverTitle, setPopoverTitle] = useState("");
   const [popoverType, setPopoverType] = useState("");
-  const [children, setChildren] = useState([]);
+  const [childrenIds, setChildrenIds] = useState([]);
   const [loadData, setLoadData] = useState(false);
   const [selectedNode, setSelectedNode] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -191,7 +191,8 @@ const OneCademyCollaborationModel = () => {
   const handleClose = () => {
     setTitle("");
     setType("");
-    setChildren([]);
+    setChildrenIds([]);
+    setSelectedNode("");
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
   };
@@ -201,11 +202,11 @@ const OneCademyCollaborationModel = () => {
       await collabModelRef.set({
         title,
         type: type,
-        children: children.map(child => child.id)
+        children: childrenIds
       });
     } else {
       const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-      await collabModelRef.update({ title, type, children: children.map(child => child.id) });
+      await collabModelRef.update({ title, type, children: childrenIds });
     }
     setOpenAddNode(false);
     setLoadData(true);
@@ -221,12 +222,11 @@ const OneCademyCollaborationModel = () => {
     const childrenNodes = await firebase.firestore().collection("collabModelNodes").get();
     const _children = [];
     for (let _nodeDoc of childrenNodes.docs) {
-      const _node = _nodeDoc.data();
       if (node.children.includes(_nodeDoc.id)) {
-        _children.push({ id: _nodeDoc.id, ..._node });
+        _children.push(_nodeDoc.id);
       }
     }
-    setChildren(_children);
+    setChildrenIds(_children);
     setTitle(node.title);
     setType(node.type);
     setSelectedNode(nodeId);
@@ -326,15 +326,15 @@ const OneCademyCollaborationModel = () => {
               <InputLabel>children</InputLabel>
               <Select
                 label="children"
-                value={children}
+                value={childrenIds}
                 multiple
                 onChange={e => {
-                  setChildren(e.target.value);
+                  setChildrenIds(e.target.value);
                 }}
                 sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
               >
                 {allNodes.map(node => (
-                  <MenuItem key={node.id} value={node} sx={{ display: "center" }}>
+                  <MenuItem key={node.id} value={node.id} sx={{ display: "center" }}>
                     {node.title}
                   </MenuItem>
                 ))}
