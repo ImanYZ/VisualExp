@@ -20,8 +20,28 @@ import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Checkbox from "@mui/material/Checkbox";
 
 const d3 = require("d3");
+
+const legends = [
+  { text: "Known Positive Effect", style: "stroke: #1b5e20; stroke-width: 2px;", arrowheadStyle: "fill: #1b5e20" },
+  {
+    text: "Hypothetical Positive Effect",
+    style: "stroke: #8bc34a; stroke-width: 2px;",
+    arrowheadStyle: "fill: #8bc34a"
+  },
+  { text: "Known Negative Effect", style: "stroke: #b71c1c; stroke-width: 2px;", arrowheadStyle: "fill: #b71c1c" },
+  {
+    text: "Hypothetical Negative Effect",
+    style: "stroke: #e57373; stroke-width: 2px;",
+    arrowheadStyle: "fill: #e57373"
+  }
+];
 
 const OneCademyCollaborationModel = () => {
   const firebase = useRecoilValue(firebaseState);
@@ -40,7 +60,10 @@ const OneCademyCollaborationModel = () => {
   const [loadData, setLoadData] = useState(false);
   const [selectedNode, setSelectedNode] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
+  const [visibleNodes, setVisibleNodes] = useState([]);
+  const [openModifyLink, setOpenModifyLink] = useState(false);
+  const [typeLink, setTypeLink] = useState("");
+  const [selectedLink, setSelectedLink] = useState({});
   function ColorBox(props) {
     return (
       <Box
@@ -110,13 +133,13 @@ const OneCademyCollaborationModel = () => {
       const collabModelNode = tempNodeChange.doc.data();
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
-        g.setEdge(tempNodeChange.doc.id, elementChild, {
-          curve: d3.curveBasis
-          /* ,
-          style:
-            elementChild.type === "Positive Effect"
-              ? "stroke: #0cd894; fill: #0cd894;"
-              : "stroke: #cc0119; fill: #cc0119;" */
+        const _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
+        const _arrowheadStyle =
+          legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
+        g.setEdge(tempNodeChange.doc.id, elementChild.id, {
+          curve: d3.curveBasis,
+          style: _style,
+          arrowheadStyle: _arrowheadStyle
         });
       }
     }
@@ -183,12 +206,15 @@ const OneCademyCollaborationModel = () => {
     // });
     var edges = svg.selectAll("g.edgePath");
     edges.on("click", function (d) {
-      // console.log(d.target.__data__);
+      modifyLink(d.target.__data__);
+      console.log(d.target.__data__);
     });
+    setNodesLoded(false);
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
     };
   }, [nodesLoded]);
+  console.log("allNodes", nodesLoded);
 
   const toggleNodeVisibility = v => {};
 
@@ -203,17 +229,26 @@ const OneCademyCollaborationModel = () => {
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
   };
+
   const handleSave = async () => {
+    const children = [];
+    for (let child of childrenIds) {
+      children.push({
+        id: child,
+        explanation: "",
+        type: ""
+      });
+    }
     if (!selectedNode) {
       const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
       await collabModelRef.set({
         title,
         type: type,
-        children: childrenIds
+        children
       });
     } else {
       const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-      await collabModelRef.update({ title, type, children: childrenIds });
+      await collabModelRef.update({ title, type, children });
     }
     setOpenAddNode(false);
     setLoadData(true);
@@ -223,10 +258,6 @@ const OneCademyCollaborationModel = () => {
     setSelectedNode("");
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
-  };
-
-  const changeExplanation = event => {
-    setExplanation(event.target.value);
   };
 
   const modifyNode = async nodeId => {
@@ -275,8 +306,61 @@ const OneCademyCollaborationModel = () => {
   const handlePopoverClose = () => {
     setAnchorEl(null);
   };
+  console.log("render", allNodes);
+  const handleVisibileNodes = node => {
+    const _visibleNodes = visibleNodes;
+    if (_visibleNodes.includes(node.id)) {
+      _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
+    } else {
+      _visibleNodes.push(node.id);
+    }
+    setVisibleNodes(_visibleNodes);
+    console.log("visibleNodes", _visibleNodes);
+  };
+
+  const handleCloseLink = () => {
+    setOpenModifyLink(false);
+    setExplanation("");
+    setTypeLink("");
+    setSelectedLink({});
+  };
+
+  const modifyLink = async data => {
+    console.log("data", data);
+    const nodeId = data.v;
+    const childId = data.w;
+    const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
+    const nodeData = nodeDoc.data();
+    console.log("nodeData", nodeData);
+    const children = nodeData.children;
+    const child = children.find(child => child.id === childId);
+    setExplanation(child.explanation);
+    setTypeLink(child.type);
+    setSelectedLink(data);
+    setOpenModifyLink(true);
+  };
+  const handleSaveLink = async () => {
+    console.log("save link", explanation, typeLink);
+    const nodeId = selectedLink.v;
+    const childId = selectedLink.w;
+    const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
+    const nodeDoc = await nodeRef.get();
+    const nodeData = nodeDoc.data();
+    const children = nodeData.children;
+    const child = children.find(child => child.id === childId);
+    child.explanation = explanation;
+    child.type = typeLink;
+    await nodeRef.update({ children });
+    console.log(child);
+    console.log("nodeData", nodeData);
+    setOpenModifyLink(false);
+    setSelectedLink({});
+    setExplanation("");
+    setTypeLink("");
+    setLoadData(true);
+  };
   return (
-    <Box >
+    <Box>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -286,6 +370,64 @@ const OneCademyCollaborationModel = () => {
             }}
             autoFocus
           >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openModifyLink} onClose={handleCloseLink} sx={{ fontWeight: "50px" }}>
+        <DialogContent>
+          <IconButton
+            color="error"
+            aria-label="delete"
+            onClick={() => {
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteIcon />
+          </IconButton>
+          <Box
+            component="form"
+            sx={{
+              "& > :not(style)": { m: 1, width: "25ch" }
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField
+              label="Explanation"
+              variant="outlined"
+              value={explanation}
+              onChange={e => {
+                setExplanation(e.currentTarget.value);
+              }}
+            />
+            <FormControl>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={typeLink}
+                label="Type"
+                onChange={e => {
+                  setTypeLink(e.target.value);
+                }}
+                sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+              >
+                {[
+                  "Known Positive Effect",
+                  "Hypothetical Positive Effect",
+                  "Known Negative Effect",
+                  "Hypothetical Negative Effect"
+                ].map(row => (
+                  <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                    {row}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleSaveLink}>Save</Button>
+          <Button onClick={handleCloseLink} autoFocus>
             Cancel
           </Button>
         </DialogActions>
@@ -363,8 +505,43 @@ const OneCademyCollaborationModel = () => {
         </DialogActions>
       </Dialog>
       <Grid container spacing={2}>
+        <Grid item xs={2}>
+          {/* <Box sx={{ pt: "10px", width: "90%", p: 1, height: "800px" }}>
+            {allNodes.map((node, index) => (
+              <ListItem
+                key={index}
+                disablePadding
+                sx={{
+                  mb: "5px",
+                  "&$selected": {
+                    backgroundColor: "orange",
+                    zIndex: 100
+                  }
+                }}
+              >
+                <ListItemButton
+                  role={undefined}
+                  style={{ width: 500 }}
+                  onClick={() => {
+                    handleVisibileNodes(node);
+                  }}
+                >
+                  <ListItemIcon>
+                    {visibleNodes.includes(node.id) ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
+                  </ListItemIcon>
+                  <ListItemText id={node.title} primary={`${node.title}`} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </Box> */}
+          <Box elevation={3} sx={{ mt: "50px" }}>
+            <Button sx={{ ml: "30px" }} variant="contained" onClick={AddNewNode}>
+              Add New Node
+            </Button>
+          </Box>
+        </Grid>
         <Grid item xs={9}>
-          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height:"700px" }}>
+          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "700px" }}>
             <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ padding: "15px" }}></svg>
             <Box>
               <Box sx={{ display: "flex" }}>
@@ -392,22 +569,6 @@ const OneCademyCollaborationModel = () => {
             </Box>
           </Paper>
           <Box sx={{ display: "flex", marginBottom: "15px" }}></Box>
-        </Grid>
-        <Grid item xs={3}>
-          <Box sx={{ pt: "10px", width: "90%", height: "80%" }}>
-            <TextareaAutosize
-              aria-label="empty textarea"
-              placeholder="Write your explanation here..."
-              value={explanation}
-              onChange={changeExplanation}
-              style={{ width: "100%", height: "100%" }}
-            />
-          </Box>
-          <Box elevation={3} sx={{ mt: "50px" }}>
-            <Button sx={{ ml: "30px" }} variant="contained" onClick={AddNewNode}>
-              Add New Node
-            </Button>
-          </Box>
         </Grid>
       </Grid>
     </Box>
