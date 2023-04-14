@@ -994,7 +994,7 @@ const communitiesPapers = {
           }
         },
         Messaging_back_significantly_mediated_the_relationship_between_message_condition_and_vaccination_rate: {
-          stem: `18. What statistical analysis did the researchers use to explore their primary hypothesis?`,
+          stem: `18. Messaging back significantly mediated the relationship between message condition and vaccination rate?`,
           answers: ["a"],
           choices: {
             a: "True",
@@ -2116,7 +2116,8 @@ const communitiesPapers = {
   },
   UX_Research_in_Online_Communities: {
     what_motivates_online_community_contributors_to_contribute_consistently_A_case_study_on_Stackoverflow_netizens: {
-      title: "What motivates online community contributors to contribute consistently? A case study on Stackoverflow netizens?",
+      title:
+        "What motivates online community contributors to contribute consistently? A case study on Stackoverflow netizens?",
       url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FWhat-motivates-online-%20community-contributors-to-%20contribute-consistently.pdf?alt=media&token=c1b7fbc4-f9c6-4f23-942f-0107c3961ece",
       questions: {
         what_is_the_main_problem_trying_to_be_solved_tested: {
@@ -2272,7 +2273,7 @@ const communitiesPapers = {
               c: "Users become increasingly confident in their knowledge and ability to answer questions ",
               d: "Users that receive many upvotes become conscious and protective of their reputation "
             }
-          },
+          }
       }
     }
   },
