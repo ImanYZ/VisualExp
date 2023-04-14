@@ -24,6 +24,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
+import { ButtonUnstyled } from "@mui/base";
+import { Container } from "@mui/system";
 const d3 = require("d3");
 
 const legends = [
@@ -61,8 +63,9 @@ const OneCademyCollaborationModel = () => {
   const [openModifyLink, setOpenModifyLink] = useState(false);
   const [typeLink, setTypeLink] = useState("");
   const [selectedLink, setSelectedLink] = useState({});
+  const [showAll, setShowAll] = useState(false);
   const email = useRecoilValue(emailState);
-  const editor = email === "oneweb@umich.edu";
+  const editor = true; /* email === "oneweb@umich.edu" */
 
   function ColorBox(props) {
     return (
@@ -389,8 +392,24 @@ const OneCademyCollaborationModel = () => {
   const handlExplanation = e => {
     setExplanation(e.currentTarget.value);
   };
+  const showAllNodes = () => {
+    let _visibleNodes = visibleNodes;
+    if (showAll) {
+      _visibleNodes = [];
+      setShowAll(false);
+    } else {
+      for (let node of allNodes) {
+        if (!_visibleNodes.includes(node.id)) {
+          _visibleNodes.push(node.id);
+        }
+      }
+      setShowAll(true);
+    }
+    setVisibleNodes(_visibleNodes);
+    setLoadData(true);
+  };
   return (
-    <Box sx={{ overflow: "auto", height: "100hv" }}>
+    <Box>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -407,19 +426,12 @@ const OneCademyCollaborationModel = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "700px" }}>
-            <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "600px" }}>
+            <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+          </Paper>
+          <Box sx={{ ml: "14px", mt: "14px" }}>
             {openModifyLink && editor && (
-              <Box>
-                <IconButton
-                  color="error"
-                  aria-label="delete"
-                  onClick={() => {
-                    setDeleteDialogOpen(true);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+              <Box sx={{ display: "flex", flexDirection: "inline" }}>
                 <Box
                   component="form"
                   sx={{
@@ -451,6 +463,8 @@ const OneCademyCollaborationModel = () => {
                       ))}
                     </Select>
                   </FormControl>
+                </Box>
+                <Box>
                   <Button onClick={handleSaveLink}>Save</Button>
                   <Button onClick={handleCloseLink} autoFocus>
                     Cancel
@@ -460,16 +474,7 @@ const OneCademyCollaborationModel = () => {
             )}
             {openModifyLink && !editor && popoverTitle !== "" && <Typography sx={{ p: 2 }}>{popoverTitle}</Typography>}
             {openAddNode && (
-              <Box sx={{ display: "inline-block", flexDirection: "inline" }}>
-                <IconButton
-                  color="error"
-                  aria-label="delete"
-                  onClick={() => {
-                    setDeleteDialogOpen(true);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
+              <Box sx={{ display: "flex", flexDirection: "inline" }}>
                 <Box
                   component="form"
                   sx={{
@@ -521,17 +526,23 @@ const OneCademyCollaborationModel = () => {
                       ))}
                     </Select>
                   </FormControl>
-
-                  <Button sx={{ width: "50px" }} onClick={handleSave}>
-                    Save
-                  </Button>
+                </Box>
+                <Box>
+                  <Button onClick={handleSave}>Save</Button>
                   <Button onClick={handleClose} autoFocus>
                     Cancel
                   </Button>
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </Box>
               </Box>
             )}
-
             <Box>
               <Box sx={{ display: "flex" }}>
                 {[
@@ -554,18 +565,39 @@ const OneCademyCollaborationModel = () => {
                     <Typography sx={{ fontSize: "14px", color: resource.color }}> {resource.text}</Typography>
                   </div>
                 ))}
+                {editor && (
+                  <Button
+                    sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
+                    variant="contained"
+                    onClick={AddNewNode}
+                  >
+                    Add New Node
+                  </Button>
+                )}
               </Box>
             </Box>
-          </Paper>
-          <Box sx={{}}></Box>
+          </Box>
         </Grid>
         <Grid item xs={3}>
           <Box
             sx={{
-              height: "800px",
+              height: "950px",
               overflow: "auto"
             }}
           >
+            <Typography
+              sx={{
+                position: "sticky",
+                top: "0",
+                zIndex: "1",
+                backgroundColor: "white"
+              }}
+            >
+              Choose nodes to show their causal relations.
+              <br />
+              <Checkbox checked={showAll} onClick={showAllNodes} /> Show All the Nodes
+            </Typography>
+
             {allNodes.map((node, index) => (
               <ListItem
                 key={index}
@@ -589,11 +621,6 @@ const OneCademyCollaborationModel = () => {
                 </ListItemButton>
               </ListItem>
             ))}
-          </Box>
-          <Box elevation={3} sx={{ mt: "50px" }}>
-            <Button sx={{ ml: "30px" }} variant="contained" onClick={AddNewNode}>
-              Add New Node
-            </Button>
           </Box>
         </Grid>
       </Grid>
