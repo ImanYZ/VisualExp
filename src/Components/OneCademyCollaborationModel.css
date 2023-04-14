@@ -28,16 +28,4 @@ text {
   fill: transparent;
   stroke-width: 1.3px;
 }
-.dot {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background-color: #333;
-  margin-right: 5px;
-}
-.hide-btn {
-  position: absolute;
-  top: -30px;
-  right: 0;
-}
+
