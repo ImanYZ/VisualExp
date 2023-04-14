@@ -432,6 +432,14 @@ const OneCademyCollaborationModel = () => {
           <Box sx={{ ml: "14px", mt: "14px" }}>
             {openModifyLink && editor && (
               <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                <TextField
+                  label="Explanation"
+                  variant="outlined"
+                  value={explanation}
+                  onChange={handlExplanation}
+                  fullWidth
+                  sx={{ mt: "9px"}}
+                />
                 <Box
                   component="form"
                   sx={{
@@ -440,7 +448,6 @@ const OneCademyCollaborationModel = () => {
                   noValidate
                   autoComplete="off"
                 >
-                  <TextField label="Explanation" variant="outlined" value={explanation} onChange={handlExplanation} />
                   <FormControl>
                     <InputLabel>Type</InputLabel>
                     <Select
