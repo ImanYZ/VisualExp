@@ -12,6 +12,7 @@ const {
   applicationReminder
 } = require("./users");
 
+const { inviteAdministrators } = require("./emailing");
 const app = require("./app");
 
 // https://baseurl.com/api/
@@ -62,14 +63,13 @@ exports.applicationReminder = functions
 //   .timeZone(EST_TIMEZONE)
 //   .onRun(inviteInstructors);
 
-// exports.inviteAdministrators = functions
-//   .runWith({
-//     memory: "1GB",
-//     timeoutSeconds: 520
-//   })
-//   .pubsub.schedule("0 * * * *")
-//   .timeZone(EST_TIMEZONE)
-//   .onRun(inviteAdministrators);
+exports.inviteAdministrators = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("every 25 hours")
+  .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions
   .runWith({
