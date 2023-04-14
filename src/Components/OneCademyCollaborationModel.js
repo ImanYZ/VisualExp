@@ -53,7 +53,7 @@ const OneCademyCollaborationModel = () => {
   const svgRef = useRef();
   const [allNodes, setAllNodes] = useState([]);
   const [explanation, setExplanation] = useState("");
-  const [popoverTitle, setPopoverTitle] = useState("");
+  const [explanationLink, setExplanationLink] = useState("");
   const [popoverType, setPopoverType] = useState("");
   const [childrenIds, setChildrenIds] = useState([]);
   const [loadData, setLoadData] = useState(false);
@@ -65,7 +65,7 @@ const OneCademyCollaborationModel = () => {
   const [selectedLink, setSelectedLink] = useState({});
   const [showAll, setShowAll] = useState(false);
   const email = useRecoilValue(emailState);
-  const editor = true; /* email === "oneweb@umich.edu" */
+  const editor = email === "oneweb@umich.edu";
 
   function ColorBox(props) {
     return (
@@ -225,10 +225,16 @@ const OneCademyCollaborationModel = () => {
     };
   }, [nodesLoded]);
 
-  const toggleNodeVisibility = v => {};
-
   const AddNewNode = second => {
+    setTitle("");
+    setType("");
+    setChildrenIds([]);
+    setSelectedNode("");
+    setSelectedLink({});
+    setDeleteDialogOpen(false);
     setOpenAddNode(true);
+    setLoadData(true);
+    setOpenModifyLink(false);
   };
   const handleClose = () => {
     setTitle("");
@@ -316,7 +322,7 @@ const OneCademyCollaborationModel = () => {
     const nodeData = nodeDoc.data();
     const children = nodeData.children;
     const child = children.find(child => child.id === childId);
-    setPopoverTitle(child.explanation);
+    setExplanationLink(child.explanation);
     setPopoverType(child.type);
     if (child.explanation !== "") {
       setSelectedLink(data);
@@ -438,7 +444,7 @@ const OneCademyCollaborationModel = () => {
                   value={explanation}
                   onChange={handlExplanation}
                   fullWidth
-                  sx={{ mt: "9px"}}
+                  sx={{ mt: "9px" }}
                 />
                 <Box
                   component="form"
@@ -479,7 +485,9 @@ const OneCademyCollaborationModel = () => {
                 </Box>
               </Box>
             )}
-            {openModifyLink && !editor && popoverTitle !== "" && <Typography sx={{ p: 2 }}>{popoverTitle}</Typography>}
+            {openModifyLink && !editor && explanationLink !== "" && (
+              <Typography sx={{ p: 2 }}>{explanationLink}</Typography>
+            )}
             {openAddNode && (
               <Box sx={{ display: "flex", flexDirection: "inline" }}>
                 <Box
@@ -534,7 +542,7 @@ const OneCademyCollaborationModel = () => {
                     </Select>
                   </FormControl>
                 </Box>
-                <Box>
+                <Box sx={{ mt: "14px" }}>
                   <Button onClick={handleSave}>Save</Button>
                   <Button onClick={handleClose} autoFocus>
                     Cancel
@@ -592,18 +600,17 @@ const OneCademyCollaborationModel = () => {
               overflow: "auto"
             }}
           >
-            <Typography
-              sx={{
-                position: "sticky",
-                top: "0",
-                zIndex: "1",
-                backgroundColor: "white"
-              }}
-            >
-              Choose nodes to show their causal relations.
-              <br />
+            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white" }}>
+              {" "}
+              <Typography
+                sx={{
+                  fontWeight: "bold"
+                }}
+              >
+                Choose nodes to show their causal relations.
+              </Typography>
               <Checkbox checked={showAll} onClick={showAllNodes} /> Show All the Nodes
-            </Typography>
+            </Box>
 
             {allNodes.map((node, index) => (
               <ListItem
