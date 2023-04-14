@@ -353,7 +353,6 @@ const OneCademyCollaborationModel = () => {
     const children = nodeData.children;
     const child = children.find(child => child.id === childId);
     setExplanation(child.explanation);
-    console.log(child.explanation);
     setTypeLink(child.type);
     setSelectedLink(data);
     setOpenModifyLink(true);
