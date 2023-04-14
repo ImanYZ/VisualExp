@@ -54,14 +54,29 @@ const panels = [
         <p>
           Minimizing redundancy in educational materials, such as books, websites, and videos, is crucial for optimizing
           life-long learning. This challenge is exacerbated by the mass generation of content by large language models.
-          To maximize learning potential, we must eliminate overlapping content and merge all available explanations for
-          a subject into a single comprehensive chunk. This chunk should encompass various perspectives and use-cases
-          side-by-side, allowing learners to refer to it as the sole source for complete mastery of the topic.
+          To maximize learning potential, we must eliminate overlapping content and combine all explanations of a
+          concept into a single comprehensive micro-content piece. The piece should encompass various perspectives and
+          use-cases, allowing learners to refer to it as the sole source for complete mastery of the concept.
         </p>
         <p>
           Large language models can serve this purpose by digesting all available content, automatically summarizing it,
           and providing short explanations. However, determining the most effective way to represent and present these
-          small chunks (micro-content) for optimal learning remains an open question.
+          micro-content for optimal learning remains an open question.
+        </p>
+        <p>
+          The open-source software development community writes each module only once and reuses it in different
+          projects. After updating or improving the original module, all the projects that use the module get updated.
+          On the other hand, in the scientific research community, researchers define a concept or theory in an original
+          paper. Other researchers paraphrase that using various terminologies.
+        </p>
+        <p>
+          1Cademy saves time by defining reusable and unique micro-content pieces instead of paraphrasing. The wisdom of
+          the crowd improves and updates the existing definition that would populate everywhere that it was used. The
+          goal is to create a single hierarchical organization of unique concepts from among the corpus of academic
+          literature to create micro-content that combines the best descriptions of each concept. This way, each piece
+          of micro-content can be reused for a variety of different learning goals. By linking the micro-content in the
+          form of hierarchical learning pathways, a single piece covering a concept in two or more different disciplines
+          could serve as a link in each given learning pathway.
         </p>
       </div>
     )
