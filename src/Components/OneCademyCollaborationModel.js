@@ -51,7 +51,6 @@ const OneCademyCollaborationModel = () => {
   const svgRef = useRef();
   const [allNodes, setAllNodes] = useState([]);
   const [explanation, setExplanation] = useState("");
-  const [anchorEl, setAnchorEl] = useState(null);
   const [popoverTitle, setPopoverTitle] = useState("");
   const [popoverType, setPopoverType] = useState("");
   const [childrenIds, setChildrenIds] = useState([]);
@@ -63,7 +62,7 @@ const OneCademyCollaborationModel = () => {
   const [typeLink, setTypeLink] = useState("");
   const [selectedLink, setSelectedLink] = useState({});
   const email = useRecoilValue(emailState);
-  const open = Boolean(anchorEl);
+  const editor = email === "oneweb@umich.edu";
 
   function ColorBox(props) {
     return (
@@ -103,7 +102,6 @@ const OneCademyCollaborationModel = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     if (!nodesLoded) return;
-    setExplanation("");
     var g = new dagreD3.graphlib.Graph({ compound: true }).setGraph({ rankdir: "LR" }).setDefaultEdgeLabel(function () {
       return {};
     });
@@ -199,20 +197,24 @@ const OneCademyCollaborationModel = () => {
     });
     svg.call(zoom);
     const nodes = svg.selectAll("g.node");
-    nodes.on("click", function (d) {
-      modifyNode(d.target.__data__);
-    });
-    var edges = svg.selectAll("g.edgePath");
-    if (email !== "oneweb@umich.edu") {
-      edges.on("pointerdown", function (d) {
-        modifyLink(d.target.__data__);
-      });
-    } else {
-      edges.on("pointerover", function (d) {
-        showDetails(d.target.__data__);
-        handlePopoverOpen(d);
+    if (editor) {
+      nodes.on("click", function (d) {
+        modifyNode(d.target.__data__);
       });
     }
+    var edges = svg.selectAll("g.edgePath");
+
+    edges.on("pointerdown", function (d) {
+      if (editor) {
+        setSelectedLink({});
+        modifyLink(d.target.__data__);
+      } else {
+        setSelectedLink({});
+        showDetails(d.target.__data__);
+        setOpenModifyLink(true);
+        setOpenAddNode(false);
+      }
+    });
 
     setNodesLoded(false);
     return () => {
@@ -313,10 +315,10 @@ const OneCademyCollaborationModel = () => {
     const child = children.find(child => child.id === childId);
     setPopoverTitle(child.explanation);
     setPopoverType(child.type);
-  };
-  const handlePopoverOpen = event => {
-    setOpenModifyLink(true);
-    setOpenAddNode(false);
+    if (child.explanation !== "") {
+      setSelectedLink(data);
+    }
+    setLoadData(true);
   };
 
   const handleVisibileNodes = node => {
@@ -357,6 +359,7 @@ const OneCademyCollaborationModel = () => {
     setOpenAddNode(false);
     setLoadData(true);
   };
+
   const handleSaveLink = async () => {
     const nodeId = selectedLink.v;
     const childId = selectedLink.w;
@@ -383,6 +386,9 @@ const OneCademyCollaborationModel = () => {
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
   };
+  const handlExplanation = e => {
+    setExplanation(e.currentTarget.value);
+  };
   return (
     <Box sx={{ overflow: "auto", height: "100hv" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -403,7 +409,7 @@ const OneCademyCollaborationModel = () => {
         <Grid item xs={9}>
           <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "700px" }}>
             <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
-            {openModifyLink && (
+            {openModifyLink && editor && (
               <Box>
                 <IconButton
                   color="error"
@@ -422,14 +428,7 @@ const OneCademyCollaborationModel = () => {
                   noValidate
                   autoComplete="off"
                 >
-                  <TextField
-                    label="Explanation"
-                    variant="outlined"
-                    value={explanation}
-                    onChange={e => {
-                      setExplanation(e.currentTarget.value);
-                    }}
-                  />
+                  <TextField label="Explanation" variant="outlined" value={explanation} onChange={handlExplanation} />
                   <FormControl>
                     <InputLabel>Type</InputLabel>
                     <Select
@@ -459,7 +458,7 @@ const OneCademyCollaborationModel = () => {
                 </Box>
               </Box>
             )}
-            {open && email !== "oneweb@umich.edu" && { popoverTitle }}
+            {openModifyLink && !editor && popoverTitle !== "" && <Typography sx={{ p: 2 }}>{popoverTitle}</Typography>}
             {openAddNode && (
               <Box sx={{ display: "inline-block", flexDirection: "inline" }}>
                 <IconButton
