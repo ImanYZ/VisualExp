@@ -1,12 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { firebaseState } from "../store/AuthAtoms";
+import { emailState, firebaseState } from "../store/AuthAtoms";
 import Button from "@mui/material/Button";
 import dagreD3 from "dagre-d3";
 import "./OneCademyCollaborationModel.css";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import Select from "@mui/material/Select";
@@ -25,7 +24,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import Popover from "@mui/material/Popover";
 const d3 = require("d3");
 
 const legends = [
@@ -64,7 +62,9 @@ const OneCademyCollaborationModel = () => {
   const [openModifyLink, setOpenModifyLink] = useState(false);
   const [typeLink, setTypeLink] = useState("");
   const [selectedLink, setSelectedLink] = useState({});
+  const email = useRecoilValue(emailState);
   const open = Boolean(anchorEl);
+
   function ColorBox(props) {
     return (
       <Box
@@ -134,10 +134,14 @@ const OneCademyCollaborationModel = () => {
       const collabModelNode = tempNodeChange.doc.data();
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
-        const _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
-        const _arrowheadStyle =
+        let _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
+        let _arrowheadStyle =
           legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
         if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
+        if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
+          _style = "stroke: #0000ff; stroke-width: 3px;";
+          _arrowheadStyle = "fill: #0000ff";
+        }
         g.setEdge(tempNodeChange.doc.id, elementChild.id, {
           curve: d3.curveBasis,
           style: _style,
@@ -161,7 +165,6 @@ const OneCademyCollaborationModel = () => {
     render(svgGroup, g);
 
     svgGroup.selectAll("g.node").each(function (v) {
-      var node = g.node(v);
       var nodeElement = d3.select(this);
       var nodeLabel = nodeElement.select("rect");
       var nodeBBox = nodeLabel.node().getBBox();
@@ -174,24 +177,20 @@ const OneCademyCollaborationModel = () => {
         .attr("y", -nodeBBox.height / 2 - 9)
         .attr("class", "hide-button");
 
-      var buttonBody = button
-        .append("xhtml:body")
-        .style("margin", "0px") 
-        .style("padding", "0px");
+      var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
-        .style("background", "transparent") 
-        .style("color", "black") 
-        .style("border", "none") 
-        .style("font-weight", "bold") 
+        .style("background", "transparent")
+        .style("color", "black")
+        .style("border", "none")
+        .style("font-weight", "bold")
         .style("width", "100%")
         .style("height", "100%")
-        .text("X") 
+        .text("X")
         .on("click", function (e) {
-          e.stopPropagation(); 
+          e.stopPropagation();
           removeNode(v);
-          console.log("clicked", v);
         });
     });
 
@@ -204,20 +203,22 @@ const OneCademyCollaborationModel = () => {
       modifyNode(d.target.__data__);
     });
     var edges = svg.selectAll("g.edgePath");
-    // edges.on("pointerover", function (d) {
-    //   showDetails(d.target.__data__);
-    //   handlePopoverOpen(d);
-    // });
-    edges.on("pointerdown", function (d) {
-      modifyLink(d.target.__data__);
-      console.log(d.target.__data__);
-    });
+    if (email !== "oneweb@umich.edu") {
+      edges.on("pointerdown", function (d) {
+        modifyLink(d.target.__data__);
+      });
+    } else {
+      edges.on("pointerover", function (d) {
+        showDetails(d.target.__data__);
+        handlePopoverOpen(d);
+      });
+    }
+
     setNodesLoded(false);
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
     };
   }, [nodesLoded]);
-  console.log("allNodes", nodesLoded);
 
   const toggleNodeVisibility = v => {};
 
@@ -230,7 +231,9 @@ const OneCademyCollaborationModel = () => {
     setChildrenIds([]);
     setSelectedNode("");
     setOpenAddNode(false);
+    setSelectedLink({});
     setDeleteDialogOpen(false);
+    setLoadData(true);
   };
 
   const handleSave = async () => {
@@ -277,7 +280,10 @@ const OneCademyCollaborationModel = () => {
     setTitle(node.title);
     setType(node.type);
     setSelectedNode(nodeId);
+    setSelectedLink({});
     setOpenAddNode(true);
+    setOpenModifyLink(false);
+    setLoadData(true);
   };
 
   const deleteNode = async () => {
@@ -309,13 +315,9 @@ const OneCademyCollaborationModel = () => {
     setPopoverType(child.type);
   };
   const handlePopoverOpen = event => {
-    setAnchorEl(null);
-    setAnchorEl(event.currentTarget);
+    setOpenModifyLink(true);
+    setOpenAddNode(false);
   };
-  const handleClosePopover = () => {
-    setAnchorEl(null);
-  };
-  console.log("render", allNodes);
 
   const handleVisibileNodes = node => {
     const _visibleNodes = visibleNodes;
@@ -323,10 +325,14 @@ const OneCademyCollaborationModel = () => {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
     } else {
       _visibleNodes.push(node.id);
+      for (let child of node.children) {
+        if (!_visibleNodes.includes(child.id)) {
+          _visibleNodes.push(child.id);
+        }
+      }
     }
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
-    console.log("visibleNodes", _visibleNodes);
   };
 
   const handleCloseLink = () => {
@@ -334,24 +340,24 @@ const OneCademyCollaborationModel = () => {
     setExplanation("");
     setTypeLink("");
     setSelectedLink({});
+    setLoadData(true);
   };
 
   const modifyLink = async data => {
-    console.log("data", data);
     const nodeId = data.v;
     const childId = data.w;
     const nodeDoc = await firebase.firestore().collection("collabModelNodes").doc(nodeId).get();
     const nodeData = nodeDoc.data();
-    console.log("nodeData", nodeData);
     const children = nodeData.children;
     const child = children.find(child => child.id === childId);
     setExplanation(child.explanation);
     setTypeLink(child.type);
     setSelectedLink(data);
     setOpenModifyLink(true);
+    setOpenAddNode(false);
+    setLoadData(true);
   };
   const handleSaveLink = async () => {
-    console.log("save link", explanation, typeLink);
     const nodeId = selectedLink.v;
     const childId = selectedLink.w;
     const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
@@ -362,8 +368,6 @@ const OneCademyCollaborationModel = () => {
     child.explanation = explanation;
     child.type = typeLink;
     await nodeRef.update({ children });
-    console.log(child);
-    console.log("nodeData", nodeData);
     setOpenModifyLink(false);
     setSelectedLink({});
     setExplanation("");
@@ -372,9 +376,7 @@ const OneCademyCollaborationModel = () => {
   };
 
   const removeNode = nodeId => {
-    console.log("remove node", nodeId);
     const _visibleNodes = visibleNodes;
-    console.log("visibleNodes", _visibleNodes)
     if (_visibleNodes.includes(nodeId)) {
       _visibleNodes.splice(_visibleNodes.indexOf(nodeId), 1);
     }
@@ -382,28 +384,7 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
   };
   return (
-    <Box>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={handleClosePopover}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "left"
-        }}
-        elevation={1}
-      >
-        <Box
-          sx={{
-            p: 3,
-            color: "black",
-            display: "flex"
-          }}
-        >
-          Explanation : lkdzjdlkjdlkzejlkdjlkezjdklzejdklzejdlzed {popoverTitle} <br />
-        </Box>
-      </Popover>
-
+    <Box sx={{ overflow: "auto", height: "100hv" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -417,140 +398,141 @@ const OneCademyCollaborationModel = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={openModifyLink} onClose={handleCloseLink} sx={{ fontWeight: "50px" }}>
-        <DialogContent>
-          <IconButton
-            color="error"
-            aria-label="delete"
-            onClick={() => {
-              setDeleteDialogOpen(true);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <Box
-            component="form"
-            sx={{
-              "& > :not(style)": { m: 1, width: "25ch" }
-            }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              label="Explanation"
-              variant="outlined"
-              value={explanation}
-              onChange={e => {
-                setExplanation(e.currentTarget.value);
-              }}
-            />
-            <FormControl>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={typeLink}
-                label="Type"
-                onChange={e => {
-                  setTypeLink(e.target.value);
-                }}
-                sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-              >
-                {[
-                  "Known Positive Effect",
-                  "Hypothetical Positive Effect",
-                  "Known Negative Effect",
-                  "Hypothetical Negative Effect"
-                ].map(row => (
-                  <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                    {row}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSaveLink}>Save</Button>
-          <Button onClick={handleCloseLink} autoFocus>
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
 
-      <Dialog open={openAddNode} onClose={handleClose} sx={{ fontWeight: "50px" }}>
-        <DialogContent>
-          <IconButton
-            color="error"
-            aria-label="delete"
-            onClick={() => {
-              setDeleteDialogOpen(true);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <Box
-            component="form"
-            sx={{
-              "& > :not(style)": { m: 1, width: "25ch" }
-            }}
-            noValidate
-            autoComplete="off"
-          >
-            <TextField
-              label="Title"
-              variant="outlined"
-              value={title}
-              onChange={e => {
-                setTitle(e.currentTarget.value);
-              }}
-            />
-            <FormControl>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={type}
-                label="Type"
-                onChange={e => {
-                  setType(e.target.value);
-                }}
-                sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-              >
-                {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
-                  <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                    {row}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl>
-              <InputLabel>children</InputLabel>
-              <Select
-                label="children"
-                value={childrenIds}
-                multiple
-                onChange={e => {
-                  setChildrenIds(e.target.value);
-                }}
-                sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-              >
-                {allNodes.map(node => (
-                  <MenuItem key={node.id} value={node.id} sx={{ display: "center" }}>
-                    {node.title}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleSave}>Save</Button>
-          <Button onClick={handleClose} autoFocus>
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Grid container spacing={2}>
         <Grid item xs={9}>
           <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "700px" }}>
-            <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ padding: "15px" }}></svg>
+            <svg id="graphGroup" width="100%" height="100%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+            {openModifyLink && (
+              <Box>
+                <IconButton
+                  color="error"
+                  aria-label="delete"
+                  onClick={() => {
+                    setDeleteDialogOpen(true);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { m: 1, width: "25ch" }
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    label="Explanation"
+                    variant="outlined"
+                    value={explanation}
+                    onChange={e => {
+                      setExplanation(e.currentTarget.value);
+                    }}
+                  />
+                  <FormControl>
+                    <InputLabel>Type</InputLabel>
+                    <Select
+                      value={typeLink}
+                      label="Type"
+                      onChange={e => {
+                        setTypeLink(e.target.value);
+                      }}
+                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                    >
+                      {[
+                        "Known Positive Effect",
+                        "Hypothetical Positive Effect",
+                        "Known Negative Effect",
+                        "Hypothetical Negative Effect"
+                      ].map(row => (
+                        <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                          {row}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button onClick={handleSaveLink}>Save</Button>
+                  <Button onClick={handleCloseLink} autoFocus>
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
+            {open && email !== "oneweb@umich.edu" && { popoverTitle }}
+            {openAddNode && (
+              <Box sx={{ display: "inline-block", flexDirection: "inline" }}>
+                <IconButton
+                  color="error"
+                  aria-label="delete"
+                  onClick={() => {
+                    setDeleteDialogOpen(true);
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <Box
+                  component="form"
+                  sx={{
+                    "& > :not(style)": { m: 1, width: "25ch" }
+                  }}
+                  noValidate
+                  autoComplete="off"
+                >
+                  <TextField
+                    label="Title"
+                    variant="outlined"
+                    value={title}
+                    onChange={e => {
+                      setTitle(e.currentTarget.value);
+                    }}
+                  />
+                  <FormControl>
+                    <InputLabel>Type</InputLabel>
+                    <Select
+                      value={type}
+                      label="Type"
+                      onChange={e => {
+                        setType(e.target.value);
+                      }}
+                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                    >
+                      {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
+                        <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                          {row}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <FormControl>
+                    <InputLabel>children</InputLabel>
+                    <Select
+                      label="children"
+                      value={childrenIds}
+                      multiple
+                      onChange={e => {
+                        setChildrenIds(e.target.value);
+                      }}
+                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                    >
+                      {allNodes.map(node => (
+                        <MenuItem key={node.id} value={node.id} sx={{ display: "center" }}>
+                          {node.title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <Button sx={{ width: "50px" }} onClick={handleSave}>
+                    Save
+                  </Button>
+                  <Button onClick={handleClose} autoFocus>
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
+
             <Box>
               <Box sx={{ display: "flex" }}>
                 {[
@@ -576,15 +558,13 @@ const OneCademyCollaborationModel = () => {
               </Box>
             </Box>
           </Paper>
-          <Box sx={{ display: "flex", marginBottom: "15px" }}></Box>
+          <Box sx={{}}></Box>
         </Grid>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
           <Box
             sx={{
-              width: "100%",
-              p: 1,
               height: "800px",
-              overflow: "auto" // Add this line
+              overflow: "auto"
             }}
           >
             {allNodes.map((node, index) => (
@@ -592,7 +572,6 @@ const OneCademyCollaborationModel = () => {
                 key={index}
                 disablePadding
                 sx={{
-                  mb: "5px",
                   "&$selected": {
                     backgroundColor: "orange",
                     zIndex: 100
@@ -600,8 +579,6 @@ const OneCademyCollaborationModel = () => {
                 }}
               >
                 <ListItemButton
-                  role={undefined}
-                  style={{ width: 500 }}
                   onClick={() => {
                     handleVisibileNodes(node);
                   }}
