@@ -260,7 +260,7 @@ const isTimeToSendEmail = (city = "", state = "", country = "") => {
   const timezone = cityDetails?.timezone;
   if (timezone) {
     let hour = moment().tz(timezone).hour();
-    if (hour === 7 || hour === 13) {
+    if (hour >= 7 && hour <= 19) {
       return true;
     }
   }
