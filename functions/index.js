@@ -15,6 +15,10 @@ const {
 const { inviteAdministrators } = require("./emailing");
 const app = require("./app");
 
+
+const EST_TIMEZONE = "America/Detroit";
+process.env.TZ = EST_TIMEZONE;
+
 // https://baseurl.com/api/
 exports.api = functions
   .runWith({
@@ -51,7 +55,8 @@ exports.applicationReminder = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("0 * * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(applicationReminder);
 
 // exports.inviteInstructors = functions
