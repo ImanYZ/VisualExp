@@ -29,17 +29,17 @@ import { Container } from "@mui/system";
 const d3 = require("d3");
 
 const legends = [
-  { text: "Known Positive Effect", style: "stroke: #1b5e20; stroke-width: 2px;", arrowheadStyle: "fill: #1b5e20" },
+  { text: "Known Positive Effect", style: "stroke: #56E41B; stroke-width: 2px;", arrowheadStyle: "fill: #56E41B" },
   {
     text: "Hypothetical Positive Effect",
-    style: "stroke: #8bc34a; stroke-width: 2px;",
-    arrowheadStyle: "fill: #8bc34a"
+    style: "stroke: #1BBAE4; stroke-width: 2px;",
+    arrowheadStyle: "fill: #1BBAE4"
   },
-  { text: "Known Negative Effect", style: "stroke: #b71c1c; stroke-width: 2px;", arrowheadStyle: "fill: #b71c1c" },
+  { text: "Known Negative Effect", style: "stroke: #A91BE4; stroke-width: 2px;", arrowheadStyle: "fill: #A91BE4" },
   {
     text: "Hypothetical Negative Effect",
-    style: "stroke: #ef6c00; stroke-width: 2px;",
-    arrowheadStyle: "fill: #ef6c00"
+    style: "stroke: #E4451B; stroke-width: 2px;",
+    arrowheadStyle: "fill: #E4451B"
   }
 ];
 
@@ -140,8 +140,8 @@ const OneCademyCollaborationModel = () => {
           legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
         if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
         if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
-          _style = "stroke: #0000ff; stroke-width: 3px;";
-          _arrowheadStyle = "fill: #0000ff";
+          _style = "stroke: #212121; stroke-width: 3px;";
+          _arrowheadStyle = "fill: #212121";
         }
         g.setEdge(tempNodeChange.doc.id, elementChild.id, {
           curve: d3.curveBasis,
@@ -248,25 +248,52 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleSave = async () => {
-    const children = [];
-    for (let child of childrenIds) {
-      children.push({
-        id: child,
-        explanation: "",
-        type: "Hypothetical Positive Effect"
-      });
+    console.log("handleSave", selectedNode);
+    const _visibleNodes = [...visibleNodes];
+    try {
+      if (!selectedNode) {
+        const children = [];
+        for (let child of childrenIds) {
+          children.push({
+            id: child,
+            explanation: "",
+            type: "Hypothetical Positive Effect"
+          });
+          _visibleNodes.push(child);
+        }
+        const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
+        await collabModelRef.set({
+          title,
+          type: type,
+          children
+        });
+      } else {
+        const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
+        const collabModelDoc = await collabModelRef.get();
+        const collabModelNode = collabModelDoc.data();
+        const _childrenCollab = collabModelNode.children;
+        const children = [..._childrenCollab];
+        for (let child of _childrenCollab) {
+          if (!childrenIds.includes(child.id)) {
+            const indexOf = _childrenCollab.findIndex(_child => _child.id === child);
+            children.splice(indexOf, 1);
+          }
+        }
+        for (let child of childrenIds) {
+          if (children.some(_child => _child.id === child)) continue;
+          children.push({
+            id: child,
+            explanation: "",
+            type: "Hypothetical Positive Effect"
+          });
+          _visibleNodes.push(child);
+        }
+        await collabModelRef.update({ title, type, children });
+      }
+    } catch (error) {
+      console.log(error);
     }
-    if (!selectedNode) {
-      const collabModelRef = firebase.firestore().collection("collabModelNodes").doc();
-      await collabModelRef.set({
-        title,
-        type: type,
-        children
-      });
-    } else {
-      const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-      await collabModelRef.update({ title, type, children });
-    }
+    setVisibleNodes(_visibleNodes);
     setOpenAddNode(false);
     setLoadData(true);
     setTitle("");
@@ -432,8 +459,26 @@ const OneCademyCollaborationModel = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={9}>
-          <Paper elevation={3} sx={{ mt: "10px", ml: "10px", height: "600px" }}>
-            <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+          <Paper
+            elevation={3}
+            sx={{ mt: "10px", ml: "10px", height: "600px", display: "flex", justifyContent: "center" }}
+          >
+            {visibleNodes.length > 0 ? (
+              <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+            ) : (
+              <div
+                style={{
+                  padding: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Typography align="center" variant="h7">
+                  To show the nodes in the diagram, check them in the list.
+                </Typography>
+              </div>
+            )}
           </Paper>
           <Box sx={{ ml: "14px", mt: "14px" }}>
             {openModifyLink && editor && (
@@ -570,10 +615,10 @@ const OneCademyCollaborationModel = () => {
               </Box>
               <Box sx={{ display: "flex" }}>
                 {[
-                  { text: "Known Positive Effect", color: "#1b5e20" },
-                  { text: "Hypothetical Positive Effect", color: "#8bc34a" },
-                  { text: "Known Negative Effect", color: "#b71c1c" },
-                  { text: "Hypothetical Negative Effect", color: "#ef6c00" }
+                  { text: "Known Positive Effect", color: "#56E41B" },
+                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+                  { text: "Known Negative Effect", color: "#A91BE4" },
+                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
                 ].map((resource, index) => (
                   <div style={{ marginInline: "14px" }}>
                     <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
@@ -641,5 +686,4 @@ const OneCademyCollaborationModel = () => {
     </Box>
   );
 };
-
 export default OneCademyCollaborationModel;
