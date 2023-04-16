@@ -55,8 +55,7 @@ exports.applicationReminder = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("0 * * * *")
-  .timeZone(EST_TIMEZONE)
+  .pubsub.schedule("every 25 hours")
   .onRun(applicationReminder);
 
 // exports.inviteInstructors = functions
@@ -73,7 +72,8 @@ exports.inviteAdministrators = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("every 25 hours")
+  .pubsub.schedule("0 * * * *")
+  .timeZone(EST_TIMEZONE)
   .onRun(inviteAdministrators);
 
 exports.passagesNumberCorrection = functions
