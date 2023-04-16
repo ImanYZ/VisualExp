@@ -9,11 +9,11 @@ export const ProjectPointThresholds = ({ projectPoints }) => {
         <strong>Inclusion:</strong> To be an author, <span className="GreenText">in green</span>, one needs to earn at
         least:
         <ul>
-          {/* {projectPoints.onePoints && (
+          {projectPoints.onePoints && (
             <li>
               <strong>{projectPoints.onePoints}</strong> <img src={favicon} width="15.1" /> 1Cademy points and{" "}
             </li>
-          )} */}
+          )}
           {projectPoints.intellectualPoints && (
             <li>
               <strong>{projectPoints.intellectualPoints}</strong> 🎓 Intellectual activities points and
