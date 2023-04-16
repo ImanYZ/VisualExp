@@ -72,8 +72,7 @@ export const LeaderBoard = ({
 
   const markAttended = async (ev, index) => {
     try {
-      const { scheduleId } = ev.schedule;
-      console.log(ev);
+      const { scheduleId, project } = ev.schedule;
       setStarting(true);
       const participantFullname = ev.schedule.userId;
       const order = ev.schedule.order;
@@ -112,6 +111,7 @@ export const LeaderBoard = ({
       evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
       setOnGoingEvents(evs);
     } catch (err) {
+      console.log(err);
       alert("Something went wrong while marking the attendance.");
     } finally {
       setStarting(false);
