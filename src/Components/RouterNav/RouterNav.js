@@ -817,7 +817,7 @@ const RouterNav = props => {
                         rowGap: "4px"
                       }}
                     >
-                      {/* {projectPoints.onePoints ? (
+                      {projectPoints.onePoints ? (
                         <Tooltip
                           title={`You've submitted ${
                             proposalsNums[username] ? proposalsNums[username].num : ""
@@ -827,7 +827,7 @@ const RouterNav = props => {
                             # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
                           </Box>
                         </Tooltip>
-                      ) : null} */}
+                      ) : null}
 
                       {projectPoints.administratorsPoints ? (
                         <Tooltip
@@ -859,13 +859,13 @@ const RouterNav = props => {
                         rowGap: "25px"
                       }}
                     >
-                      {/* {projectPoints.onePoints ? (
+                      {projectPoints.onePoints ? (
                         <LineDiagram
                           obj={proposalsNums}
                           username={username}
                           lineDiagramTooltip={lineDiagramTooltip("proposals")}
                         ></LineDiagram>
-                      ) : null} */}
+                      ) : null}
 
                       {projectPoints.administratorsPoints ? (
                         <LineDiagram
@@ -909,7 +909,7 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {/* {projectPoints.onePoints ? (
+                    {projectPoints.onePoints ? (
                       <Tooltip
                         title={
                           <div>
@@ -946,7 +946,7 @@ const RouterNav = props => {
                           )}
                         </Button>
                       </Tooltip>
-                    ) : null} */}
+                    ) : null}
                     {projectPoints.intellectualPoints ? (
                       <Tooltip
                         title={
