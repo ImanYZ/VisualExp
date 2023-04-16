@@ -260,6 +260,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
         schedule: {
           scheduleId: schedule.docs[0].id,
           ...scheduleData,
+          project: userData.project,
           session: scheduleData.session.toDate(),
           firstname: userName,
           userId: userDocs.docs?.[0].id
