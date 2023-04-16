@@ -41,7 +41,6 @@ researchersRouter.post("/schedule", async (req, res) => {
         project,
         month,
         schedules: {},
-        scheduled: {}
       };
       
       const schedules = monthlyEntries[month];
