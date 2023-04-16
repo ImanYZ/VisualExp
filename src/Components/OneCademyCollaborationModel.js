@@ -14,18 +14,13 @@ import FormControl from "@mui/material/FormControl";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import { ButtonUnstyled } from "@mui/base";
-import { Container } from "@mui/system";
 const d3 = require("d3");
 
 const legends = [
@@ -65,7 +60,9 @@ const OneCademyCollaborationModel = () => {
   const [selectedLink, setSelectedLink] = useState({});
   const [showAll, setShowAll] = useState(false);
   const email = useRecoilValue(emailState);
-  const editor = email === "oneweb@umich.edu";
+  const [zoomState, setZoomState] = useState(null);
+
+  const editor = true;
 
   function ColorBox(props) {
     return (
@@ -197,17 +194,34 @@ const OneCademyCollaborationModel = () => {
 
     const zoom = d3.zoom().on("zoom", function (d) {
       svgGroup.attr("transform", d3.zoomTransform(this));
+      setZoomState(d3.zoomTransform(this));
     });
     svg.call(zoom);
+    if (visibleNodes.length >= 8) {
+      const svgWidth = (window.innerWidth * 70) / 100;
+      const svgHeight = 600;
+      const graphWidth = g.graph().width + 50;
+      const graphHeight = g.graph().height + 50;
+
+      const zoomScale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight);
+      const translateX = (svgWidth - graphWidth * zoomScale) / 2;
+      const translateY = (svgHeight - graphHeight * zoomScale) / 2;
+
+      svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
+    }
+
     const nodes = svg.selectAll("g.node");
     if (editor) {
       nodes.on("click", function (d) {
+        d.stopPropagation();
         modifyNode(d.target.__data__);
       });
     }
     var edges = svg.selectAll("g.edgePath");
 
-    edges.on("pointerdown", function (d) {
+    edges.on("click", function (d) {
+      console.log("d", d3.window);
+      // d.target.event.stopPropagation();
       if (editor) {
         setSelectedLink({});
         modifyLink(d.target.__data__);
@@ -222,6 +236,7 @@ const OneCademyCollaborationModel = () => {
     setNodesLoded(false);
     return () => {
       d3.select("#graphGroup").selectAll("*").remove();
+      setZoomState(null);
     };
   }, [nodesLoded]);
 
@@ -359,6 +374,7 @@ const OneCademyCollaborationModel = () => {
 
   const handleVisibileNodes = node => {
     const _visibleNodes = visibleNodes;
+    setShowAll(false);
     if (_visibleNodes.includes(node.id)) {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
     } else {
@@ -369,6 +385,14 @@ const OneCademyCollaborationModel = () => {
         }
       }
     }
+    let _showall = true;
+    for (let node of allNodes) {
+      if (!_visibleNodes.includes(node.id)) {
+        _showall = false;
+        break;
+      }
+    }
+    setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
   };
@@ -441,8 +465,9 @@ const OneCademyCollaborationModel = () => {
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
   };
+  console.log((window.innerWidth * 70) / 100);
   return (
-    <Box>
+    <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
         <DialogActions>
           <Button onClick={deleteNode}>Confirm</Button>
@@ -457,11 +482,11 @@ const OneCademyCollaborationModel = () => {
         </DialogActions>
       </Dialog>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={2} direction="row-reverse">
         <Grid item xs={9}>
           <Paper
-            elevation={3}
-            sx={{ mt: "10px", ml: "10px", height: "600px", display: "flex", justifyContent: "center" }}
+            id="graphPaper"
+            sx={{ mt: "10px", ml: "10px", height: "600px", width: "900", display: "flex", justifyContent: "center" }}
           >
             {visibleNodes.length > 0 ? (
               <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
@@ -641,11 +666,12 @@ const OneCademyCollaborationModel = () => {
         <Grid item xs={3}>
           <Box
             sx={{
-              height: "950px",
+              height: "100vh",
+              mb: "10px",
               overflow: "auto"
             }}
           >
-            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white" }}>
+            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
               {" "}
               <Typography
                 sx={{
@@ -653,8 +679,8 @@ const OneCademyCollaborationModel = () => {
                 }}
               >
                 Choose nodes to show their causal relations.
-              </Typography>
-              <Checkbox checked={showAll} onClick={showAllNodes} /> Show All the Nodes
+              </Typography>{" "}
+              Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
             </Box>
 
             {allNodes.map((node, index) => (
@@ -664,20 +690,18 @@ const OneCademyCollaborationModel = () => {
                 sx={{
                   "&$selected": {
                     backgroundColor: "orange",
-                    zIndex: 100
+                    zIndex: 100,
+                    ml: 9
                   }
                 }}
               >
-                <ListItemButton
+                <Checkbox
+                  checked={visibleNodes.includes(node.id)}
                   onClick={() => {
                     handleVisibileNodes(node);
                   }}
-                >
-                  <ListItemIcon>
-                    {visibleNodes.includes(node.id) ? <Checkbox checked={true} /> : <Checkbox checked={false} />}
-                  </ListItemIcon>
-                  <ListItemText id={node.title} primary={`${node.title}`} />
-                </ListItemButton>
+                />
+                <ListItemText id={node.title} primary={`${node.title}`} />
               </ListItem>
             ))}
           </Box>
