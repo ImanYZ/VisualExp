@@ -61,7 +61,9 @@ const OneCademyCollaborationModel = () => {
   const [showAll, setShowAll] = useState(false);
   const email = useRecoilValue(emailState);
   const [zoomState, setZoomState] = useState(null);
-
+  const [linkOrder, setLinkOrder] = useState(null);
+  const [stepLink, setStepLink] = useState(0);
+  const [maxDepth, setMaxDepth] = useState(0);
   const editor = true;
 
   function ColorBox(props) {
@@ -127,11 +129,14 @@ const OneCademyCollaborationModel = () => {
       });
     }
     setAllNodes(_allNodes);
-
+    let _maxDepth = 0;
     for (let tempNodeChange of tempNodesChanges) {
       const collabModelNode = tempNodeChange.doc.data();
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
+        if (_maxDepth < elementChild?.order) {
+          _maxDepth = elementChild?.order;
+        }
         let _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
         let _arrowheadStyle =
           legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
@@ -140,14 +145,22 @@ const OneCademyCollaborationModel = () => {
           _style = "stroke: #212121; stroke-width: 3px;";
           _arrowheadStyle = "fill: #212121";
         }
-        g.setEdge(tempNodeChange.doc.id, elementChild.id, {
-          curve: d3.curveBasis,
-          style: _style,
-          arrowheadStyle: _arrowheadStyle
-        });
+        if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
+          _style = "stroke: #9c27b0; stroke-width: 3px;";
+          _arrowheadStyle = "fill: #9c27b0";
+        }
+
+        if (parseInt(elementChild.order) <= stepLink) {
+          g.setEdge(tempNodeChange.doc.id, elementChild.id, {
+            label: elementChild.order,
+            curve: d3.curveBasis,
+            style: _style,
+            arrowheadStyle: _arrowheadStyle
+          });
+        }
       }
     }
-
+    setMaxDepth(_maxDepth);
     g.nodes().forEach(function (v) {
       var node = g.node(v);
       if (node) {
@@ -220,7 +233,6 @@ const OneCademyCollaborationModel = () => {
     var edges = svg.selectAll("g.edgePath");
 
     edges.on("click", function (d) {
-      console.log("d", d3.window);
       // d.target.event.stopPropagation();
       if (editor) {
         setSelectedLink({});
@@ -263,7 +275,6 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleSave = async () => {
-    console.log("handleSave", selectedNode);
     const _visibleNodes = [...visibleNodes];
     try {
       if (!selectedNode) {
@@ -272,7 +283,8 @@ const OneCademyCollaborationModel = () => {
           children.push({
             id: child,
             explanation: "",
-            type: "Hypothetical Positive Effect"
+            type: "Hypothetical Positive Effect",
+            order: 0
           });
           _visibleNodes.push(child);
         }
@@ -391,6 +403,7 @@ const OneCademyCollaborationModel = () => {
     setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
+    setStepLink(0);
   };
 
   const handleCloseLink = () => {
@@ -411,27 +424,42 @@ const OneCademyCollaborationModel = () => {
     setExplanation(child.explanation);
     setTypeLink(child.type);
     setSelectedLink(data);
+    setLinkOrder(child.order);
     setOpenModifyLink(true);
     setOpenAddNode(false);
     setLoadData(true);
   };
 
   const handleSaveLink = async () => {
-    const nodeId = selectedLink.v;
-    const childId = selectedLink.w;
-    const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
-    const nodeDoc = await nodeRef.get();
-    const nodeData = nodeDoc.data();
-    const children = nodeData.children;
-    const child = children.find(child => child.id === childId);
-    child.explanation = explanation;
-    child.type = typeLink;
-    await nodeRef.update({ children });
-    setOpenModifyLink(false);
-    setSelectedLink({});
-    setExplanation("");
-    setTypeLink("");
-    setLoadData(true);
+    firebase.db.runTransaction(async t => {
+      const nodeId = selectedLink.v;
+      const childId = selectedLink.w;
+      const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
+      const nodeDoc = await t.get(nodeRef);
+      const nodeData = nodeDoc.data();
+      const children = nodeData.children;
+      const child = children.find(child => child.id === childId);
+      for (let node of allNodes) {
+        const _children = node.children;
+        const childIndex = _children.findIndex(child => child.order === linkOrder);
+        if (childIndex !== -1) {
+          _children[childIndex].order = parseInt(child.order);
+          const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+          t.update(nodeRef, { children: _children });
+        }
+      }
+
+      child.explanation = explanation;
+      child.type = typeLink;
+      child.order = parseInt(linkOrder);
+      t.update(nodeRef, { children });
+      setLinkOrder(null);
+      setOpenModifyLink(false);
+      setSelectedLink({});
+      setExplanation("");
+      setTypeLink("");
+      setLoadData(true);
+    });
   };
 
   const removeNode = nodeId => {
@@ -460,8 +488,59 @@ const OneCademyCollaborationModel = () => {
     }
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
+    setStepLink(0);
   };
-  console.log((window.innerWidth * 70) / 100);
+
+  const handleInputValidation = event => {
+    const value = event.target.value;
+    const cleanedValue = value.replace(/[^0-9.]+/g, "");
+    if (parseFloat(cleanedValue) > 0) {
+      event.target.value = cleanedValue;
+      setLinkOrder(cleanedValue);
+    } else {
+      event.target.value = 0;
+      setLinkOrder("");
+    }
+  };
+
+  const nextLink = () => {
+    const _visibleNodes = [];
+    allNodes.forEach(node => {
+      node.children.forEach(child => {
+        if (stepLink + 1 >= child.order && child.order !== 0) {
+          if (!_visibleNodes.includes(child.id)) {
+            _visibleNodes.push(child.id);
+          }
+          if (!_visibleNodes.includes(node.id)) {
+            _visibleNodes.push(node.id);
+          }
+        }
+      });
+    });
+    setStepLink(prevActiveStep => (prevActiveStep + 1 < maxDepth ? prevActiveStep + 1 : maxDepth));
+    setVisibleNodes(_visibleNodes);
+    setLoadData(true);
+    setShowAll(false);
+  };
+  const previousLink = () => {
+    const _visibleNodes = [];
+    allNodes.forEach(node => {
+      node.children.forEach(child => {
+        if (stepLink - 1 >= child.order && child.order !== 0) {
+          if (!_visibleNodes.includes(child.id)) {
+            _visibleNodes.push(child.id);
+          }
+          if (!_visibleNodes.includes(node.id)) {
+            _visibleNodes.push(node.id);
+          }
+        }
+      });
+    });
+    setVisibleNodes(_visibleNodes);
+    setStepLink(prevActiveStep => (prevActiveStep - 1 > 0 ? prevActiveStep - 1 : 0));
+    setLoadData(true);
+    setShowAll(false);
+  };
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -542,6 +621,16 @@ const OneCademyCollaborationModel = () => {
                       ))}
                     </Select>
                   </FormControl>
+                  <TextField
+                    label="Order"
+                    type="number"
+                    value={linkOrder}
+                    inputProps={{
+                      min: "1",
+                      step: "1"
+                    }}
+                    onChange={handleInputValidation}
+                  />
                 </Box>
                 <Box>
                   <Button onClick={handleSaveLink}>Save</Button>
@@ -633,6 +722,22 @@ const OneCademyCollaborationModel = () => {
                 ].map((resource, index) => (
                   <ColorBox key={resource.text} text={resource.text} color={resource.color} />
                 ))}
+                <Button
+                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
+                  variant="contained"
+                  onClick={nextLink}
+                  disabled={stepLink === maxDepth}
+                >
+                  Next
+                </Button>
+                <Button
+                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
+                  variant="contained"
+                  onClick={previousLink}
+                  disabled={stepLink === 0}
+                >
+                  Previous
+                </Button>
               </Box>
               <Box sx={{ display: "flex" }}>
                 {[
