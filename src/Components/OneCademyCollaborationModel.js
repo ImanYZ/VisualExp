@@ -74,7 +74,7 @@ const OneCademyCollaborationModel = () => {
         sx={{
           bgcolor: props.color,
           color: "primary.contrastText",
-          p: 1,
+          p:0.7,
           fontSize: 14,
           borderRadius: 2,
           maxWidth: 90,
@@ -132,6 +132,7 @@ const OneCademyCollaborationModel = () => {
             : "type-DF"
       });
     }
+    _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
     setAllNodes(_allNodes);
     let _maxDepth = 0;
     for (let tempNodeChange of tempNodesChanges) {
@@ -148,10 +149,6 @@ const OneCademyCollaborationModel = () => {
         if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
           _style = "stroke: #212121; stroke-width: 3px;";
           _arrowheadStyle = "fill: #212121";
-        }
-        if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
-          _style = "stroke: #eeff41; stroke-width: 3px;";
-          _arrowheadStyle = "fill: #eeff41";
         }
         if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
           g.setEdge(tempNodeChange.doc.id, elementChild.id, {
@@ -601,7 +598,6 @@ const OneCademyCollaborationModel = () => {
     _childIds.push(child);
     setChildrenIds(_childIds);
   };
-
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -798,12 +794,14 @@ const OneCademyCollaborationModel = () => {
             <Box>
               <Box sx={{ display: "flex" }}>
                 {[
-                  { text: "Design Features", color: "#1976d2" },
+                  { text: "Input", color: "#1976d2" },
                   { text: "Positive Outcome", color: "#4caf50" },
                   { text: "Negative Outcome", color: "#cc0119" }
                 ].map((resource, index) => (
                   <ColorBox key={resource.text} text={resource.text} color={resource.color} />
                 ))}
+              </Box>
+              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <Button
                   sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
                   variant="contained"
