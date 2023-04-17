@@ -74,7 +74,7 @@ const OneCademyCollaborationModel = () => {
         sx={{
           bgcolor: props.color,
           color: "primary.contrastText",
-          p: 1,
+          p:0.7,
           fontSize: 14,
           borderRadius: 2,
           maxWidth: 90,
@@ -794,7 +794,7 @@ const OneCademyCollaborationModel = () => {
             <Box>
               <Box sx={{ display: "flex" }}>
                 {[
-                  { text: "Design Features", color: "#1976d2" },
+                  { text: "Input", color: "#1976d2" },
                   { text: "Positive Outcome", color: "#4caf50" },
                   { text: "Negative Outcome", color: "#cc0119" }
                 ].map((resource, index) => (
