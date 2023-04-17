@@ -65,6 +65,7 @@ const OneCademyCollaborationModel = () => {
   const [stepLink, setStepLink] = useState(0);
   const [maxDepth, setMaxDepth] = useState(0);
   const [ingnorOrder, setIngnorOrder] = useState(false);
+  const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
   const editor = true;
 
   function ColorBox(props) {
@@ -203,6 +204,31 @@ const OneCademyCollaborationModel = () => {
           e.stopPropagation();
           removeNode(v);
         });
+      if (selectedNode) {
+        var button2 = nodeElement
+          .append("foreignObject")
+          .attr("width", 20)
+          .attr("height", 20)
+          .attr("x", nodeBBox.x + nodeBBox.width / 2 - 10)
+          .attr("y", nodeBBox.y - 10)
+          .attr("class", "hide-button");
+
+        var buttonBody2 = button2.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+
+        buttonBody2
+          .append("xhtml:button")
+          .style("background", "transparent")
+          .style("color", "black")
+          .style("border", "none")
+          .style("font-weight", "bold")
+          .style("width", "100%")
+          .style("height", "100%")
+          .text("+")
+          .on("click", function (e) {
+            e.stopPropagation();
+            addChild(v);
+          });
+      }
     });
 
     const zoom = d3.zoom().on("zoom", function (d) {
@@ -549,6 +575,29 @@ const OneCademyCollaborationModel = () => {
     setShowAll(false);
     setIngnorOrder(false);
   };
+  const deleteLink = async () => {
+    const nodeId = selectedLink.v;
+    const childId = selectedLink.w;
+    const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
+    const nodeDoc = await nodeRef.get();
+    const nodeData = nodeDoc.data();
+    const children = nodeData.children.filter(child => child.id !== childId);
+    await nodeRef.update({ children });
+    setDeleteDialogLinkOpen(false);
+    setOpenModifyLink(false);
+    setExplanation("");
+    setTypeLink("");
+    setSelectedLink({});
+    setLoadData(true);
+    setLinkOrder(null);
+  };
+
+  const addChild = child => {
+    const _childIds = childrenIds;
+    _childIds.push(child);
+    setChildrenIds(_childIds);
+  };
+
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -557,6 +606,19 @@ const OneCademyCollaborationModel = () => {
           <Button
             onClick={() => {
               setDeleteDialogOpen(false);
+            }}
+            autoFocus
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={deleteDialogLinkOpen} onClose={handleClose}>
+        <DialogActions>
+          <Button onClick={deleteLink}>Confirm</Button>
+          <Button
+            onClick={() => {
+              setDeleteDialogLinkOpen(false);
             }}
             autoFocus
           >
@@ -645,6 +707,14 @@ const OneCademyCollaborationModel = () => {
                   <Button onClick={handleCloseLink} autoFocus>
                     Cancel
                   </Button>
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      setDeleteDialogLinkOpen(true);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </Box>
               </Box>
             )}
