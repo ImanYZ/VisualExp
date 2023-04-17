@@ -286,24 +286,20 @@ const OneCademyCollaborationModel = () => {
         const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
         const collabModelDoc = await collabModelRef.get();
         const collabModelNode = collabModelDoc.data();
-        const _childrenCollab = collabModelNode.children;
-        const children = [..._childrenCollab];
-        for (let child of _childrenCollab) {
-          if (!childrenIds.includes(child.id)) {
-            const indexOf = _childrenCollab.findIndex(_child => _child.id === child);
-            children.splice(indexOf, 1);
-          }
-        }
-        for (let child of childrenIds) {
-          if (children.some(_child => _child.id === child)) continue;
-          children.push({
-            id: child,
+        let _childrenCollab = collabModelNode.children;
+        _childrenCollab = _childrenCollab.filter(child => childrenIds.includes(child.id));
+
+        childrenIds.forEach(childId => {
+          if (_childrenCollab.some(_child => _child.id === childId)) return;
+
+          _childrenCollab.push({
+            id: childId,
             explanation: "",
             type: "Hypothetical Positive Effect"
           });
-          _visibleNodes.push(child);
-        }
-        await collabModelRef.update({ title, type, children });
+          _visibleNodes.push(childId);
+        });
+        await collabModelRef.update({ title, type, children: _childrenCollab });
       }
     } catch (error) {
       console.log(error);
