@@ -8,6 +8,9 @@ g.type-NO>rect {
 g.type-DF>rect {
   fill: #1976d2;
 }
+g.type-ST>rect {
+  fill: #3e2723;
+}
 
 
 text {
@@ -29,10 +32,3 @@ text {
   stroke-width: 1.3px;
 }
 
-.edge-label-color {
-  fill: red;
-}
-
-g.edgeLabel text {
-  fill: red;
-}
