@@ -123,7 +123,9 @@ const OneCademyCollaborationModel = () => {
       g.setNode(tempNodesChange.doc.id, {
         label: collabModelNode.title,
         class:
-          collabModelNode.type === "Negative Outcome"
+          selectedNode === tempNodesChange.doc.id
+            ? "type-ST"
+            : collabModelNode.type === "Negative Outcome"
             ? "type-NO"
             : collabModelNode.type === "Positive Outcome"
             ? "type-PO"
@@ -594,10 +596,11 @@ const OneCademyCollaborationModel = () => {
 
   const addChild = child => {
     const _childIds = childrenIds;
+    if (_childIds.includes(child)) return;
     _childIds.push(child);
     setChildrenIds(_childIds);
   };
-
+  console.log("render", childrenIds);
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
