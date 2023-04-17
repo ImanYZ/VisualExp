@@ -458,6 +458,7 @@ const OneCademyCollaborationModel = () => {
     setOpenModifyLink(true);
     setOpenAddNode(false);
     setLoadData(true);
+    setSelectedNode("");
   };
 
   const handleSaveLink = async () => {
@@ -600,7 +601,7 @@ const OneCademyCollaborationModel = () => {
     _childIds.push(child);
     setChildrenIds(_childIds);
   };
-  console.log("render", childrenIds);
+
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
