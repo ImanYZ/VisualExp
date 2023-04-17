@@ -24,18 +24,10 @@ import Checkbox from "@mui/material/Checkbox";
 const d3 = require("d3");
 
 const legends = [
-  { text: "Known Positive Effect", style: "stroke: #56E41B; stroke-width: 2px;", arrowheadStyle: "fill: #56E41B" },
-  {
-    text: "Hypothetical Positive Effect",
-    style: "stroke: #1BBAE4; stroke-width: 2px;",
-    arrowheadStyle: "fill: #1BBAE4"
-  },
-  { text: "Known Negative Effect", style: "stroke: #A91BE4; stroke-width: 2px;", arrowheadStyle: "fill: #A91BE4" },
-  {
-    text: "Hypothetical Negative Effect",
-    style: "stroke: #E4451B; stroke-width: 2px;",
-    arrowheadStyle: "fill: #E4451B"
-  }
+  { text: "Known Positive Effect", color: "#56E41B" },
+  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+  { text: "Known Negative Effect", color: "#A91BE4" },
+  { text: "Hypothetical Negative Effect", color: "#E4451B" }
 ];
 
 const OneCademyCollaborationModel = () => {
@@ -74,7 +66,7 @@ const OneCademyCollaborationModel = () => {
         sx={{
           bgcolor: props.color,
           color: "primary.contrastText",
-          p:0.7,
+          p: 0.7,
           fontSize: 14,
           borderRadius: 2,
           maxWidth: 90,
@@ -106,9 +98,11 @@ const OneCademyCollaborationModel = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
     if (!nodesLoded) return;
-    var g = new dagreD3.graphlib.Graph({ compound: true }).setGraph({ rankdir: "LR" }).setDefaultEdgeLabel(function () {
-      return {};
-    });
+    var g = new dagreD3.graphlib.Graph({ compound: true })
+      .setGraph({ rankdir: "LR", isMultigraph: true })
+      .setDefaultEdgeLabel(function () {
+        return {};
+      });
     d3.select("#graphGroup").selectAll("*").remove();
     const tempNodesChanges = [...nodesChanges];
     setNodesChanges([]);
@@ -142,12 +136,16 @@ const OneCademyCollaborationModel = () => {
         if (_maxDepth < elementChild?.order) {
           _maxDepth = elementChild?.order;
         }
-        let _style = legends.find(legend => legend.text === elementChild.type)?.style || "";
-        let _arrowheadStyle =
-          legends.find(legend => legend.text === elementChild.type)?.arrowheadStyle || "fill: #0cd894";
+        let color = legends.find(legend => legend.text === elementChild.type)?.color || "";
+        let _arrowheadStyle = `fill: ${color}`;
+        let _style = `stroke: ${color}; stroke-width: 2px;`;
+
         if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
+        if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
+          _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
+        }
         if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
-          _style = "stroke: #212121; stroke-width: 3px;";
+          _style = "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
           _arrowheadStyle = "fill: #212121";
         }
         if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
