@@ -201,7 +201,7 @@ const OneCademyCollaborationModel = () => {
           e.stopPropagation();
           removeNode(v);
         });
-      if (selectedNode) {
+      if (selectedNode || openAddNode) {
         var button2 = nodeElement
           .append("foreignObject")
           .attr("width", 20)
@@ -642,12 +642,14 @@ const OneCademyCollaborationModel = () => {
     if (_childIds.includes(child)) return;
     _childIds.push(child);
     setChildrenIds(_childIds);
+    setLoadData(true);
   };
   const removeChild = child => {
     const _childIds = childrenIds;
     if (!_childIds.includes(child)) return;
     _childIds.splice(_childIds.indexOf(child), 1);
     setChildrenIds(_childIds);
+    setLoadData(true);
   };
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
