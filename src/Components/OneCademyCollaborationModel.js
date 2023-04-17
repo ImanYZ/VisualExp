@@ -211,20 +211,35 @@ const OneCademyCollaborationModel = () => {
           .attr("class", "hide-button");
 
         var buttonBody2 = button2.append("xhtml:body").style("margin", "0px").style("padding", "0px");
-
-        buttonBody2
-          .append("xhtml:button")
-          .style("background", "transparent")
-          .style("color", "black")
-          .style("border", "none")
-          .style("font-weight", "bold")
-          .style("width", "100%")
-          .style("height", "100%")
-          .text("+")
-          .on("click", function (e) {
-            e.stopPropagation();
-            addChild(v);
-          });
+        if (childrenIds.includes(v)) {
+          buttonBody2
+            .append("xhtml:button")
+            .style("background", "transparent")
+            .style("color", "black")
+            .style("border", "none")
+            .style("font-weight", "bold")
+            .style("width", "100%")
+            .style("height", "100%")
+            .text("-")
+            .on("click", function (e) {
+              e.stopPropagation();
+              removeChild(v);
+            });
+        } else {
+          buttonBody2
+            .append("xhtml:button")
+            .style("background", "transparent")
+            .style("color", "black")
+            .style("border", "none")
+            .style("font-weight", "bold")
+            .style("width", "100%")
+            .style("height", "100%")
+            .text("+")
+            .on("click", function (e) {
+              e.stopPropagation();
+              addChild(v);
+            });
+        }
       }
     });
 
@@ -317,6 +332,7 @@ const OneCademyCollaborationModel = () => {
           type: type,
           children
         });
+        _visibleNodes.push(collabModelRef.id);
       } else {
         const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
         const collabModelDoc = await collabModelRef.get();
@@ -625,6 +641,12 @@ const OneCademyCollaborationModel = () => {
     const _childIds = childrenIds;
     if (_childIds.includes(child)) return;
     _childIds.push(child);
+    setChildrenIds(_childIds);
+  };
+  const removeChild = child => {
+    const _childIds = childrenIds;
+    if (!_childIds.includes(child)) return;
+    _childIds.splice(_childIds.indexOf(child), 1);
     setChildrenIds(_childIds);
   };
   return (
