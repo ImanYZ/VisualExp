@@ -201,7 +201,7 @@ const OneCademyCollaborationModel = () => {
           e.stopPropagation();
           removeNode(v);
         });
-      if (selectedNode) {
+      if (selectedNode || openAddNode) {
         var button2 = nodeElement
           .append("foreignObject")
           .attr("width", 20)
@@ -211,20 +211,35 @@ const OneCademyCollaborationModel = () => {
           .attr("class", "hide-button");
 
         var buttonBody2 = button2.append("xhtml:body").style("margin", "0px").style("padding", "0px");
-
-        buttonBody2
-          .append("xhtml:button")
-          .style("background", "transparent")
-          .style("color", "black")
-          .style("border", "none")
-          .style("font-weight", "bold")
-          .style("width", "100%")
-          .style("height", "100%")
-          .text("+")
-          .on("click", function (e) {
-            e.stopPropagation();
-            addChild(v);
-          });
+        if (childrenIds.includes(v)) {
+          buttonBody2
+            .append("xhtml:button")
+            .style("background", "transparent")
+            .style("color", "black")
+            .style("border", "none")
+            .style("font-weight", "bold")
+            .style("width", "100%")
+            .style("height", "100%")
+            .text("-")
+            .on("click", function (e) {
+              e.stopPropagation();
+              removeChild(v);
+            });
+        } else {
+          buttonBody2
+            .append("xhtml:button")
+            .style("background", "transparent")
+            .style("color", "black")
+            .style("border", "none")
+            .style("font-weight", "bold")
+            .style("width", "100%")
+            .style("height", "100%")
+            .text("+")
+            .on("click", function (e) {
+              e.stopPropagation();
+              addChild(v);
+            });
+        }
       }
     });
 
@@ -317,6 +332,7 @@ const OneCademyCollaborationModel = () => {
           type: type,
           children
         });
+        _visibleNodes.push(collabModelRef.id);
       } else {
         const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
         const collabModelDoc = await collabModelRef.get();
@@ -465,13 +481,52 @@ const OneCademyCollaborationModel = () => {
       const nodeData = nodeDoc.data();
       const children = nodeData.children;
       const child = children.find(child => child.id === childId);
-      if (parseInt(linkOrder) !== 0) {
-        for (let node of allNodes) {
-          if (node.id === nodeId) continue;
-          const _children = node.children;
-          const childIndex = _children.findIndex(_child => parseInt(_child.order) === parseInt(linkOrder));
-          if (childIndex !== -1) {
-            _children[childIndex].order = parseInt(child.order);
+      if (child.order !== linkOrder) {
+        if (child.order === 0) {
+          for (let node of allNodes) {
+            const _children = node.children;
+            for (let _child of _children) {
+              if (_child.order >= linkOrder) {
+                _child.order = parseInt(_child.order) + 1;
+              }
+              if (nodeId === node.id && _child.id === child.id) {
+                _child.order = linkOrder;
+                _child.explanation = explanation;
+                _child.type = typeLink;
+              }
+            }
+            const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+            t.update(nodeRef, { children: _children });
+          }
+        } else {
+          for (let node of allNodes) {
+            const _children = node.children;
+
+            if (child.order < linkOrder) {
+              for (let _child of _children) {
+                if (_child.order === 7) {
+                  debugger;
+                }
+                if (_child.order > child.order && _child.order <= linkOrder) {
+                  _child.order = parseInt(_child.order) - 1;
+                } else if (_child.order === child.order) {
+                  _child.order = linkOrder;
+                  _child.explanation = explanation;
+                  _child.type = typeLink;
+                }
+              }
+            }
+            if (linkOrder < child.order) {
+              for (let _child of _children) {
+                if (_child.order >= linkOrder && _child.order < child.order) {
+                  _child.order = parseInt(_child.order) + 1;
+                } else if (_child.order === child.order) {
+                  _child.order = linkOrder;
+                  _child.explanation = explanation;
+                  _child.type = typeLink;
+                }
+              }
+            }
             const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
             t.update(nodeRef, { children: _children });
           }
@@ -480,14 +535,6 @@ const OneCademyCollaborationModel = () => {
       if (linkOrder > stepLink) {
         setStepLink(linkOrder);
       }
-      const childIndex = children.findIndex(_child => parseInt(_child.order) === parseInt(linkOrder));
-      if (childIndex !== -1) {
-        children[childIndex].order = parseInt(child.order);
-      }
-      child.explanation = explanation;
-      child.type = typeLink;
-      child.order = parseInt(linkOrder);
-      t.update(nodeRef, { children });
       setLinkOrder(null);
       setOpenModifyLink(false);
       setSelectedLink({});
@@ -595,6 +642,14 @@ const OneCademyCollaborationModel = () => {
     if (_childIds.includes(child)) return;
     _childIds.push(child);
     setChildrenIds(_childIds);
+    setLoadData(true);
+  };
+  const removeChild = child => {
+    const _childIds = childrenIds;
+    if (!_childIds.includes(child)) return;
+    _childIds.splice(_childIds.indexOf(child), 1);
+    setChildrenIds(_childIds);
+    setLoadData(true);
   };
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
@@ -766,7 +821,7 @@ const OneCademyCollaborationModel = () => {
                       sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
                     >
                       {allNodes.map(node => (
-                        <MenuItem key={node.id} value={node.id} sx={{ display: "center" }}>
+                        <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
                           {node.title}
                         </MenuItem>
                       ))}
@@ -864,7 +919,7 @@ const OneCademyCollaborationModel = () => {
 
             {allNodes.map((node, index) => (
               <ListItem
-                key={index}
+                key={node.title + index}
                 disablePadding
                 sx={{
                   "&$selected": {
