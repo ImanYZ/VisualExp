@@ -1,6 +1,7 @@
 const { admin, db, commitBatch, batchUpdate } = require("./admin");
 const {futureEvents, pastEvents } = require("./scheduling");
 const { isToday } = require("./utils");
+const { delay } = require("./helpers/common");
 const {
   reschEventNotificationEmail,
   researcherEventNotificationEmail,
@@ -10,7 +11,6 @@ const {
 } = require("./emailing");
 const { deleteEvent } = require("./GoogleCalendar");
 const moment = require("moment");
-const { delay } = require("lodash");
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 
 
@@ -821,9 +821,14 @@ exports.remindResearchersForAvailability = async context => {
       const researcherData = researcherDoc.data();
       if ("projects" in researcherData) {
         for (const project in researcherData.projects) {
-          if (researcherData.projects[project].active && researcherData.projects[project].scheduleSessions) {
+          if (
+            researcherData.projects[project].hasOwnProperty("active") &&
+            researcherData.projects[project].active &&
+            researcherData.projects[project].hasOwnProperty("scheduleSessions") &&
+            researcherData.projects[project].scheduleSessions
+          ) {
             // month for next 10 days
-            const month = moment().utcOffset(-4).add(10, "day").format("YYYY-MM-DD");
+            const month = moment().utcOffset(-4).add(10, "day").startOf("month").format("YYYY-MM-DD");
             const resSchedules = await db
               .collection("resSchedule")
               .where("project", "==", project)
@@ -835,7 +840,7 @@ exports.remindResearchersForAvailability = async context => {
             if (resSchedules.docs.length) {
               const resSchedule = resSchedules.docs[0];
               const resScheduleData = resSchedule.data();
-              const availabilities = resScheduleData[researcherDoc.id]?.schedules || [];
+              const availabilities = resScheduleData.schedules[researcherDoc.id] || [];
               for (const availability of availabilities) {
                 const _availability = moment(availability).utcOffset(-4, true).toDate();
                 if (_availability.getTime() > lastAvailability.getTime()) {
