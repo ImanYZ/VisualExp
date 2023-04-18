@@ -66,8 +66,8 @@ const panels = [
         <p>
           The open-source software development community writes each module only once and reuses it in different
           projects. After updating or improving the original module, all the projects that use the module get updated.
-          On the other hand, in the scientific research community, researchers define a concept or theory in an original
-          paper. Other researchers paraphrase that using various terminologies.
+          On the other hand, in research and educational communities, authors define a concept or theory in an original
+          paper. Other authors paraphrase that using various terminologies.
         </p>
         <p>
           1Cademy saves time by defining reusable and unique micro-content pieces instead of paraphrasing. The wisdom of
