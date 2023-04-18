@@ -123,6 +123,14 @@ const pad2Num = number => {
   return (number < 10 ? "0" : "") + number;
 };
 
+const delay = async (time) => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
+
 module.exports = {
   strToBoolean,
   getFullname,
@@ -136,5 +144,6 @@ module.exports = {
   nextWeek,
   capitalizeFirstLetter,
   capitalizeSentence,
-  pad2Num
+  pad2Num,
+  delay
 };
