@@ -357,7 +357,7 @@ const OneCademyCollaborationModel = () => {
             id: childId,
             explanation: "",
             type: "Hypothetical Positive Effect",
-            order: 0,
+            order: 0
           });
           _visibleNodes.push(childId);
         });
@@ -403,8 +403,8 @@ const OneCademyCollaborationModel = () => {
     for (let node of allNodes) {
       const _children = node.children;
       if (node.children.includes(selectedNode)) {
-        const index = node.children.findIndex(child => child.id === selectedNode);
-        _children.splice(_children.indexOf(index), 1);
+        const index = _children.findIndex(child => child.id === selectedNode);
+        _children.splice(index, 1);
         const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
         await _nodeRef.update({ children: _children });
       }
@@ -439,6 +439,8 @@ const OneCademyCollaborationModel = () => {
     } else {
       _visibleNodes.push(node.id);
       for (let child of node.children) {
+        const indexChild = allNodes.findIndex(_node => _node.id === child.id);
+        if (indexChild === -1) continue;
         if (!_visibleNodes.includes(child.id)) {
           _visibleNodes.push(child.id);
         }
