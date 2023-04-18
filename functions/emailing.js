@@ -253,7 +253,8 @@ const isTimeToSendEmail = (city = "", state = "", country = "") => {
 
   const cityDetails = (cityTimezones.lookupViaCity(city) || []).find(detail => {
     return (
-      detail.state_ansi.toLowerCase() === state.toLowerCase() || detail.iso2.toLowerCase() === country.toLowerCase()
+      (detail.hasOwnProperty("state_ansi") && detail.state_ansi.toLowerCase() === state.toLowerCase()) ||
+      (detail.hasOwnProperty("iso2") && detail.iso2.toLowerCase() === country.toLowerCase())
     );
   });
 
