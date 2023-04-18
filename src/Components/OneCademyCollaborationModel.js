@@ -258,6 +258,9 @@ const OneCademyCollaborationModel = () => {
       setZoomState(d3.zoomTransform(this));
     });
     svg.call(zoom);
+    if (zoomState) {
+      svgGroup.attr("transform", zoomState);
+    }
     if (visibleNodes.length >= 8) {
       const svgWidth = (window.innerWidth * 70) / 100;
       const svgHeight = 600;
@@ -267,8 +270,9 @@ const OneCademyCollaborationModel = () => {
       const zoomScale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight);
       const translateX = (svgWidth - graphWidth * zoomScale) / 2;
       const translateY = (svgHeight - graphHeight * zoomScale) / 2;
-
-      svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
+      if (!zoomState) {
+        svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
+      }
     }
 
     const nodes = svg.selectAll("g.node");
@@ -455,6 +459,9 @@ const OneCademyCollaborationModel = () => {
         break;
       }
     }
+    if (_visibleNodes.length >= 10) {
+      setZoomState(null);
+    }
     setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
@@ -609,6 +616,7 @@ const OneCademyCollaborationModel = () => {
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
     setStepLink(0);
+    setZoomState(null);
   };
 
   const handleInputValidation = event => {
