@@ -508,6 +508,22 @@ const OneCademyCollaborationModel = () => {
             const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
             t.update(nodeRef, { children: _children });
           }
+        } else if (linkOrder === 0) {
+          for (let node of allNodes) {
+            const _children = node.children;
+            for (let _child of _children) {
+              if (_child.order >= child.order) {
+                _child.order = parseInt(_child.order) - 1;
+              }
+              if (nodeId === node.id && _child.id === child.id) {
+                _child.order = linkOrder;
+                _child.explanation = explanation;
+                _child.type = typeLink;
+              }
+            }
+            const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+            t.update(nodeRef, { children: _children });
+          }
         } else {
           for (let node of allNodes) {
             const _children = node.children;
@@ -541,6 +557,13 @@ const OneCademyCollaborationModel = () => {
             t.update(nodeRef, { children: _children });
           }
         }
+      } else if (child.order === linkOrder) {
+        const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
+        const _children = nodeData.children;
+        const child = _children.find(child => child.id === childId);
+        child.explanation = explanation;
+        child.type = typeLink;
+        t.update(nodeRef, { children: _children });
       }
       if (linkOrder > stepLink) {
         setStepLink(linkOrder);
