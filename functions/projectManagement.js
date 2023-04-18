@@ -822,7 +822,6 @@ exports.remindResearchersForAvailability = async context => {
       if ("projects" in researcherData) {
         for (const project in researcherData.projects) {
           if (
-            (researcherData.email === "tracycarl760@gmail.com" || researcherData.email === "ouhrac@gmail.com") &&
             researcherData.projects[project].hasOwnProperty("active") &&
             researcherData.projects[project].active &&
             researcherData.projects[project].hasOwnProperty("scheduleSessions") &&
