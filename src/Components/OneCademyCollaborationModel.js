@@ -53,7 +53,7 @@ const OneCademyCollaborationModel = () => {
   const [showAll, setShowAll] = useState(false);
   const email = useRecoilValue(emailState);
   const [zoomState, setZoomState] = useState(null);
-  const [linkOrder, setLinkOrder] = useState(null);
+  const [linkOrder, setLinkOrder] = useState(0);
   const [stepLink, setStepLink] = useState(0);
   const [maxDepth, setMaxDepth] = useState(0);
   const [ingnorOrder, setIngnorOrder] = useState(true);
@@ -357,7 +357,7 @@ const OneCademyCollaborationModel = () => {
             id: childId,
             explanation: "",
             type: "Hypothetical Positive Effect",
-            order: 0,
+            order: 0
           });
           _visibleNodes.push(childId);
         });
@@ -403,8 +403,8 @@ const OneCademyCollaborationModel = () => {
     for (let node of allNodes) {
       const _children = node.children;
       if (node.children.includes(selectedNode)) {
-        const index = node.children.findIndex(child => child.id === selectedNode);
-        _children.splice(_children.indexOf(index), 1);
+        const index = _children.findIndex(child => child.id === selectedNode);
+        _children.splice(index, 1);
         const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
         await _nodeRef.update({ children: _children });
       }
@@ -439,6 +439,8 @@ const OneCademyCollaborationModel = () => {
     } else {
       _visibleNodes.push(node.id);
       for (let child of node.children) {
+        const indexChild = allNodes.findIndex(_node => _node.id === child.id);
+        if (indexChild === -1) continue;
         if (!_visibleNodes.includes(child.id)) {
           _visibleNodes.push(child.id);
         }
@@ -463,7 +465,7 @@ const OneCademyCollaborationModel = () => {
     setTypeLink("");
     setSelectedLink({});
     setLoadData(true);
-    setLinkOrder(null);
+    setLinkOrder(0);
   };
 
   const modifyLink = async data => {
@@ -493,7 +495,7 @@ const OneCademyCollaborationModel = () => {
       const children = nodeData.children;
       const child = children.find(child => child.id === childId);
       if (child.order !== linkOrder) {
-        if (child.order === 0) {
+        if (child.order === 0 || child.order === NaN) {
           for (let node of allNodes) {
             const _children = node.children;
             for (let _child of _children) {
@@ -569,7 +571,7 @@ const OneCademyCollaborationModel = () => {
       if (linkOrder > stepLink) {
         setStepLink(linkOrder);
       }
-      setLinkOrder(null);
+      setLinkOrder(0);
       setOpenModifyLink(false);
       setSelectedLink({});
       setExplanation("");
@@ -655,13 +657,29 @@ const OneCademyCollaborationModel = () => {
     setIngnorOrder(false);
   };
   const deleteLink = async () => {
-    const nodeId = selectedLink.v;
-    const childId = selectedLink.w;
-    const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
-    const nodeDoc = await nodeRef.get();
-    const nodeData = nodeDoc.data();
-    const children = nodeData.children.filter(child => child.id !== childId);
-    await nodeRef.update({ children });
+    firebase.db.runTransaction(async t => {
+      const nodeId = selectedLink.v;
+      const childId = selectedLink.w;
+      const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
+      const nodeDoc = await nodeRef.get();
+      const nodeData = nodeDoc.data();
+      const childidx = nodeData.children.findIndex(child => child.id === childId);
+      const childp = nodeData.children[childidx];
+      for (let node of allNodes) {
+        let _children = node.children;
+        for (let _child of _children) {
+          if (_child.order > childp.order) {
+            _child.order = parseInt(_child.order) - 1;
+          }
+          if (nodeId === node.id && _child.id === childId) {
+            _children = _children.filter(child => child.id !== childId);
+          }
+        }
+        const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+        t.update(nodeRef, { children: _children });
+      }
+    });
+
     setDeleteDialogLinkOpen(false);
     setOpenModifyLink(false);
     setExplanation("");
