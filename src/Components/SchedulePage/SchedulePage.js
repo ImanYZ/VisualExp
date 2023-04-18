@@ -216,8 +216,12 @@ const SchedulePage = props => {
         ) {
           for (let attendee of event.attendees) {
             if (!researchers[attendee.email]) continue;
-            availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
-            if (duration >= 60 * 60 * 1000) {
+            if (availSessions.hasOwnProperty(startTime)) {
+              availSessions[startTime] = availSessions[startTime].filter(
+                resea => resea !== researchers[attendee.email]
+              );
+            }
+            if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
               availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
             }
           }
