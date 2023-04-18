@@ -40,7 +40,7 @@ const {
   beforeAll,
   afterAll
 } = require('@jest/globals');
-const { remindResearchersForAvailability } = require("../../../projectManagement");
+const { remindResearchersForAvailability } = require("../../../../expHome/functions/projectManagement");
 const { remindResearcherToSpecifyAvailability } = require("../../../emailing");
 const { db } = require("../../../admin");
 
