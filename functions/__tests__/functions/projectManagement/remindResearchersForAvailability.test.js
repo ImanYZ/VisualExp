@@ -92,7 +92,7 @@ describe("projectManagement.remindResearchersForAvailability", () => {
   it("don't remind researcher if their last availability is equal or greater than next 10 days", async () => {
     await resSchedulesMock.clean();
     _mockResSchedule.schedules[_mockResearchers[0].documentId].push(
-      moment().utcOffset(-4).startOf("day").add(10, "days").format("YYYY-MM-DD HH:mm:ss")
+      moment().utcOffset(-4).startOf("day").add(11, "days").format("YYYY-MM-DD HH:mm:ss")
     );
     await resSchedulesMock.populate();
     await remindResearchersForAvailability({});
