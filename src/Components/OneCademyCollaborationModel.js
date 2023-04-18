@@ -214,12 +214,17 @@ const OneCademyCollaborationModel = () => {
         if (childrenIds.includes(v)) {
           buttonBody2
             .append("xhtml:button")
-            .style("background", "transparent")
+            .style("background", "white")
             .style("color", "black")
-            .style("border", "none")
+            .style("border", "1px solid black")
+            .style("border-radius", "50%")
+            .style("width", "20px")
+            .style("height", "20px")
             .style("font-weight", "bold")
-            .style("width", "100%")
-            .style("height", "100%")
+            .style("font-size", "25px")
+            .style("line-height", "2px")
+            .style("padding", "0")
+            .style("text-align", "center")
             .text("-")
             .on("click", function (e) {
               e.stopPropagation();
@@ -228,12 +233,17 @@ const OneCademyCollaborationModel = () => {
         } else {
           buttonBody2
             .append("xhtml:button")
-            .style("background", "transparent")
+            .style("background", "white")
             .style("color", "black")
-            .style("border", "none")
+            .style("border", "1px solid black")
+            .style("border-radius", "50%")
+            .style("width", "20px")
+            .style("height", "20px")
             .style("font-weight", "bold")
-            .style("width", "100%")
-            .style("height", "100%")
+            .style("font-size", "25px")
+            .style("line-height", "2px")
+            .style("padding", "0")
+            .style("text-align", "center")
             .text("+")
             .on("click", function (e) {
               e.stopPropagation();
