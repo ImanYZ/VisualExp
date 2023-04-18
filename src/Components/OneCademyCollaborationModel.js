@@ -258,6 +258,9 @@ const OneCademyCollaborationModel = () => {
       setZoomState(d3.zoomTransform(this));
     });
     svg.call(zoom);
+    if (zoomState) {
+      svgGroup.attr("transform", zoomState);
+    }
     if (visibleNodes.length >= 8) {
       const svgWidth = (window.innerWidth * 70) / 100;
       const svgHeight = 600;
