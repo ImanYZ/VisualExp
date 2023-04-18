@@ -611,7 +611,7 @@ const OneCademyCollaborationModel = () => {
     const value = event.target.value;
     const cleanedValue = value.replace(/[^0-9.]+/g, "");
     event.target.value = cleanedValue;
-    setLinkOrder(parseInt(cleanedValue) || 0);
+    setLinkOrder(parseInt(cleanedValue));
   };
 
   const nextLink = () => {
