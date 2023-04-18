@@ -400,15 +400,17 @@ const OneCademyCollaborationModel = () => {
   const deleteNode = async () => {
     if (!selectedNode) return;
     const nodeRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-    for (let node of allNodes) {
-      const _children = node.children;
-      if (node.children.includes(selectedNode)) {
+    firebase.db.runTransaction(async t => {
+      for (let node of allNodes) {
+        const _children = node.children;
         const index = _children.findIndex(child => child.id === selectedNode);
-        _children.splice(index, 1);
-        const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-        await _nodeRef.update({ children: _children });
+        if (index !== -1) {
+          _children.splice(index, 1);
+          const _nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+          t.update(_nodeRef, { children: _children });
+        }
       }
-    }
+    });
     await nodeRef.delete();
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
