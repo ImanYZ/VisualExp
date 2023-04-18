@@ -56,7 +56,7 @@ const OneCademyCollaborationModel = () => {
   const [linkOrder, setLinkOrder] = useState(null);
   const [stepLink, setStepLink] = useState(0);
   const [maxDepth, setMaxDepth] = useState(0);
-  const [ingnorOrder, setIngnorOrder] = useState(false);
+  const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
   const editor = true;
 
@@ -356,7 +356,8 @@ const OneCademyCollaborationModel = () => {
           _childrenCollab.push({
             id: childId,
             explanation: "",
-            type: "Hypothetical Positive Effect"
+            type: "Hypothetical Positive Effect",
+            order: 0,
           });
           _visibleNodes.push(childId);
         });

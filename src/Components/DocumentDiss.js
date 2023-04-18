@@ -66,8 +66,8 @@ const panels = [
         <p>
           The open-source software development community writes each module only once and reuses it in different
           projects. After updating or improving the original module, all the projects that use the module get updated.
-          On the other hand, in the scientific research community, researchers define a concept or theory in an original
-          paper. Other researchers paraphrase that using various terminologies.
+          On the other hand, in research and educational communities, authors define a concept or theory in an original
+          paper. Other authors paraphrase that using various terminologies.
         </p>
         <p>
           1Cademy saves time by defining reusable and unique micro-content pieces instead of paraphrasing. The wisdom of
@@ -184,13 +184,13 @@ const panels = [
           <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
             1Cademy
           </a>{" "}
-          to achieve the listed objectives in large student communities. Over the past two years, 1,543 students and
-          researchers from 183 institutions have participated in a large-scale collaboration effort through{" "}
+          to achieve the listed objectives in large student communities. Over the past two years, 1,612 students and
+          researchers from 194 institutions have participated in a large-scale collaboration effort through
           <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
             1Cademy
           </a>
-          . This collaboration has resulted in the creation of 44,665 nodes and 235,674 prerequisite links between them,
-          which have been proposed through 88,167 proposals. I will also report on my smaller field trials on voluntary
+          . This collaboration has resulted in the creation of 46,958 nodes and 233,768 prerequisite links between them,
+          which have been proposed through 92,512 proposals. I will also report on my smaller field trials on voluntary
           question-generation and mapping, and Hybrid mapping as course assignments.
         </p>
       </div>
