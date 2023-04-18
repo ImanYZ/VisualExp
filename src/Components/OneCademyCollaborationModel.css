@@ -1,0 +1,34 @@
+g.type-PO>rect {
+  fill: #4caf50;
+}
+
+g.type-NO>rect {
+  fill: #cc0119;
+}
+g.type-DF>rect {
+  fill: #1976d2;
+}
+g.type-ST>rect {
+  fill: #3e2723;
+}
+
+
+text {
+  font-weight: 500;
+  fill: #fdf6f6;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+  font-size: 12px;
+}
+
+.node rect {
+  stroke: #ecf3ed;
+  fill: #fff;
+  stroke-width: 1.5px;
+}
+
+.edgePath path.path {
+  stroke: transparent;
+  fill: transparent;
+  stroke-width: 1.3px;
+}
+
