@@ -98,7 +98,6 @@ const OneCademy = (props) => {
           }
         }
       }
-      console.log({ aUsers });
       setActiveUsers(aUsers);
       setSNodesChanged(true);
     }
@@ -227,7 +226,6 @@ const OneCademy = (props) => {
         component="ul"
       >
         {Object.keys(activeUsers).map((aUId) => {
-          console.log({ color: activeUsers[aUId].color });
           return (
             <li key={aUId} style={{ margin: "4px" }}>
               <Tooltip title={activeUsers[aUId].fullname}>

@@ -16,7 +16,7 @@ const AuthConsent = props => {
   if (props.project === "StudentCoNoteSurvey") {
     authComponent = <AuthStudentCoNoteSurvey />;
   }
-  console.log(":::: ::::: AuthConsent Called ::: ");
+
   return (
     <>
       <RouterNav />
