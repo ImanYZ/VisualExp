@@ -100,9 +100,7 @@ const Activities = props => {
         setResearchersChanges(oldResearchersChanges => {
           return [...oldResearchersChanges, ...docChanges];
         });
-        console.log("researchersSnapshot");
       });
-      console.log("researchersSnapshot useEffect");
       return () => {
         setResearchers([]);
         researchersSnapshot();
@@ -234,7 +232,6 @@ const Activities = props => {
       }
       resears.sort((a, b) => b.totalPoints - a.totalPoints);
       setResearchers(resears);
-      console.log("researchersChanges useEffect");
     }
   }, [project, researchers, researchersChanges]);
 
