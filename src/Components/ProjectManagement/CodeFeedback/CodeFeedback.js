@@ -396,16 +396,26 @@ const CodeFeedback = props => {
 
   useEffect(() => {
     const func = async () => {
-      const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
-      const orderData = feedbackCodesOrderDocs.docs[0].data();
-      if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
-        await axios.post("/createTemFeedback", {
-          fullname,
-          project
-        });
+      try {
+        let response = null;
+        const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
+        const orderData = feedbackCodesOrderDocs.docs[0].data();
+        if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
+          response = await axios.post("/createTemFeedback", {
+            fullname,
+            project
+          });
+        }
+        if (response.data.message === "success") {
+          setRetrieveNext(oldValue => oldValue + 1);
+          setTimeout(() => {
+            setAllResponsesGraded(true);
+          }, 1000);
+        }
+      } catch (e) {
+        console.log(e);
       }
     };
-
     func();
   }, [retrieveNext, project]);
 
@@ -419,8 +429,7 @@ const CodeFeedback = props => {
         .where("project", "==", project)
         .get();
       const orderData = feedbackCodesOrderDocs.docs.length ? feedbackCodesOrderDocs.docs[0].data() : {};
-      if (orderData?.codeIds && !orderData?.codeIds.length) {
-        setAllResponsesGraded(true);
+      if (!orderData.hasOwnProperty("codeIds") || !orderData.codeIds.length) {
         return;
       } else {
         setAllResponsesGraded(false);

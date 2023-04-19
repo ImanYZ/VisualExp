@@ -125,7 +125,6 @@ export const retrieveEvents = async (relativeURL, firebase, availabilities) => {
     evs.sort((a, b) => b.start - a.start);
     evs.push(event);
   }
-  console.log("Done loading events.", evs);
   return evs;
 };
 
