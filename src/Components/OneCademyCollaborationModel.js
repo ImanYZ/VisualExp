@@ -77,7 +77,7 @@ const OneCademyCollaborationModel = () => {
           mb: 1,
           textAlign: "center",
           width: "100%",
-          height: "40px" 
+          height: "40px"
         }}
         key={props.text}
       >
@@ -811,69 +811,73 @@ const OneCademyCollaborationModel = () => {
           </Paper>
           <Box sx={{ ml: "14px", mt: "14px" }}>
             {openModifyLink && editor && (
-              <Box sx={{ display: "flex", flexDirection: "inline" }}>
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <TextField
                   label="Explanation"
                   variant="outlined"
                   value={explanation}
                   onChange={handlExplanation}
                   fullWidth
-                  sx={{ mt: "9px" }}
+                  multiline
+                  rows={3}
+                  sx={{ width: "95%",m: 0.5 }}
                 />
-                <Box
-                  component="form"
-                  sx={{
-                    "& > :not(style)": { m: 1, width: "25ch" }
-                  }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <FormControl>
-                    <InputLabel>Type</InputLabel>
-                    <Select
-                      value={typeLink}
-                      label="Type"
-                      onChange={e => {
-                        setTypeLink(e.target.value);
-                      }}
-                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                    >
-                      {[
-                        "Known Positive Effect",
-                        "Hypothetical Positive Effect",
-                        "Known Negative Effect",
-                        "Hypothetical Negative Effect"
-                      ].map(row => (
-                        <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                          {row}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label="Order"
-                    type="number"
-                    value={linkOrder}
-                    inputProps={{
-                      min: "1",
-                      step: "1"
+                <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                  <Box
+                    component="form"
+                    sx={{
+                      "& > :not(style)": { m: 0.5, width: "25ch" }
                     }}
-                    onChange={handleInputValidation}
-                  />
-                </Box>
-                <Box>
-                  <Button onClick={handleSaveLink}>Save</Button>
-                  <Button onClick={handleCloseLink} autoFocus>
-                    Cancel
-                  </Button>
-                  <IconButton
-                    color="error"
-                    onClick={() => {
-                      setDeleteDialogLinkOpen(true);
-                    }}
+                    noValidate
+                    autoComplete="off"
                   >
-                    <DeleteIcon />
-                  </IconButton>
+                    <FormControl>
+                      <InputLabel>Type</InputLabel>
+                      <Select
+                        value={typeLink}
+                        label="Type"
+                        onChange={e => {
+                          setTypeLink(e.target.value);
+                        }}
+                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                      >
+                        {[
+                          "Known Positive Effect",
+                          "Hypothetical Positive Effect",
+                          "Known Negative Effect",
+                          "Hypothetical Negative Effect"
+                        ].map(row => (
+                          <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                            {row}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      label="Order"
+                      type="number"
+                      value={linkOrder}
+                      inputProps={{
+                        min: "1",
+                        step: "1"
+                      }}
+                      onChange={handleInputValidation}
+                    />
+                  </Box>
+                  <Box sx={{ mt: "15px" }}>
+                    <Button onClick={handleSaveLink}>Save</Button>
+                    <Button onClick={handleCloseLink} autoFocus>
+                      Cancel
+                    </Button>
+                    <IconButton
+                      color="error"
+                      onClick={() => {
+                        setDeleteDialogLinkOpen(true);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
               </Box>
             )}
@@ -881,72 +885,76 @@ const OneCademyCollaborationModel = () => {
               <Typography sx={{ p: 2 }}>{explanationLink}</Typography>
             )}
             {openAddNode && (
-              <Box sx={{ display: "flex", flexDirection: "inline" }}>
-                <Box
-                  component="form"
-                  sx={{
-                    "& > :not(style)": { m: 1, width: "25ch" }
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <TextField
+                  label="Title"
+                  variant="outlined"
+                  value={title}
+                  fullWidth
+                  sx={{ width: "95%", m: 0.5 }}
+                  onChange={e => {
+                    setTitle(e.currentTarget.value);
                   }}
-                  noValidate
-                  autoComplete="off"
-                >
-                  <TextField
-                    label="Title"
-                    variant="outlined"
-                    value={title}
-                    onChange={e => {
-                      setTitle(e.currentTarget.value);
+                />
+                <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                  <Box
+                    component="form"
+                    sx={{
+                      "& > :not(style)": { m: 0.5, width: "25ch" }
                     }}
-                  />
-                  <FormControl>
-                    <InputLabel>Type</InputLabel>
-                    <Select
-                      value={type}
-                      label="Type"
-                      onChange={e => {
-                        setType(e.target.value);
-                      }}
-                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                    >
-                      {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
-                        <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                          {row}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <InputLabel>children</InputLabel>
-                    <Select
-                      label="children"
-                      value={childrenIds}
-                      multiple
-                      onChange={e => {
-                        setChildrenIds(e.target.value);
-                      }}
-                      sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                    >
-                      {allNodes.map(node => (
-                        <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
-                          {node.title}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-                <Box sx={{ mt: "14px" }}>
-                  <Button onClick={handleSave}>Save</Button>
-                  <Button onClick={handleClose} autoFocus>
-                    Cancel
-                  </Button>
-                  <IconButton
-                    color="error"
-                    onClick={() => {
-                      setDeleteDialogOpen(true);
-                    }}
+                    noValidate
+                    autoComplete="off"
                   >
-                    <DeleteIcon />
-                  </IconButton>
+                    <FormControl>
+                      <InputLabel>Type</InputLabel>
+                      <Select
+                        value={type}
+                        label="Type"
+                        onChange={e => {
+                          setType(e.target.value);
+                        }}
+                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                      >
+                        {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
+                          <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                            {row}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl>
+                      <InputLabel>children</InputLabel>
+                      <Select
+                        label="children"
+                        value={childrenIds}
+                        multiple
+                        onChange={e => {
+                          setChildrenIds(e.target.value);
+                        }}
+                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                      >
+                        {allNodes.map(node => (
+                          <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
+                            {node.title}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  <Box sx={{ mt: "14px" }}>
+                    <Button onClick={handleSave}>Save</Button>
+                    <Button onClick={handleClose} autoFocus>
+                      Cancel
+                    </Button>
+                    <IconButton
+                      color="error"
+                      onClick={() => {
+                        setDeleteDialogOpen(true);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </Box>
               </Box>
             )}
@@ -958,6 +966,19 @@ const OneCademyCollaborationModel = () => {
                   { text: "Negative Outcome", color: "#cc0119" }
                 ].map((resource, index) => (
                   <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                ))}
+              </Box>
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { text: "Known Positive Effect", color: "#56E41B" },
+                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+                  { text: "Known Negative Effect", color: "#A91BE4" },
+                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
+                ].map((resource, index) => (
+                  <div style={{ marginInline: "14px" }}>
+                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
+                    <Typography sx={{ fontSize: "14px", color: resource.color }}> {resource.text}</Typography>
+                  </div>
                 ))}
               </Box>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -986,19 +1007,6 @@ const OneCademyCollaborationModel = () => {
                     Add New Node
                   </Button>
                 )}
-              </Box>
-              <Box sx={{ display: "flex" }}>
-                {[
-                  { text: "Known Positive Effect", color: "#56E41B" },
-                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-                  { text: "Known Negative Effect", color: "#A91BE4" },
-                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
-                ].map((resource, index) => (
-                  <div style={{ marginInline: "14px" }}>
-                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                    <Typography sx={{ fontSize: "14px", color: resource.color }}> {resource.text}</Typography>
-                  </div>
-                ))}
               </Box>
             </Box>
           </Box>
