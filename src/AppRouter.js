@@ -57,7 +57,7 @@ import SignUpPage from "./Components/Auth/SignUpPage";
 import DissertationGantt from "./Components/DissertationGantt";
 import OneCademyCollaborationModel from "./Components/OneCademyCollaborationModel";
 import { isToday } from "./utils/DateFunctions";
-import { getFullname } from "./utils";
+
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
@@ -66,7 +66,6 @@ import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
 import GDPRPolicy from "./Components/Home/GDPRPolicy";
-import JoinUsIframe from "./Components/Home/JoinUsIframe";
 
 const AppRouter = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -233,7 +232,6 @@ const AppRouter = props => {
         }
       } else {
         // User is signed out
-        console.log("Signing out!");
         setFullname("");
         setEmail("");
         setHasScheduled(false);
@@ -467,7 +465,6 @@ const AppRouter = props => {
       <Route path="/gdpr/*" element={<GDPRPolicy />} />
       <Route path="/Iman-Dissertation-Prospectus" element={<DissertationGantt />} />
       <Route path="/OneCademyCollaborationModel" element={<OneCademyCollaborationModel />} />
-      <Route path="/JoinUsIframe/*" element={<JoinUsIframe />} />
       {fullname && emailVerified === "Verified" && (
         <>
           <Route path="/tutorial/*" element={<Tutorial />} />
