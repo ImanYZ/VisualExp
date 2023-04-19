@@ -689,6 +689,7 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
     setShowAll(false);
     setIngnorOrder(false);
+    setZoomState(null);
   };
   const previousLink = () => {
     const _visibleNodes = [];
@@ -709,6 +710,7 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
     setShowAll(false);
     setIngnorOrder(false);
+    setZoomState(null);
   };
   const deleteLink = async () => {
     firebase.db.runTransaction(async t => {
@@ -756,6 +758,27 @@ const OneCademyCollaborationModel = () => {
     _childIds.splice(_childIds.indexOf(child), 1);
     setChildrenIds(_childIds);
     setLoadData(true);
+  };
+  const resetOrder = () => {
+    const _visibleNodes = [];
+    allNodes.forEach(node => {
+      node.children.forEach(child => {
+        if (1 >= child.order && child.order !== 0) {
+          if (!_visibleNodes.includes(child.id)) {
+            _visibleNodes.push(child.id);
+          }
+          if (!_visibleNodes.includes(node.id)) {
+            _visibleNodes.push(node.id);
+          }
+        }
+      });
+    });
+    setStepLink(1);
+    setVisibleNodes(_visibleNodes);
+    setLoadData(true);
+    setShowAll(false);
+    setIngnorOrder(false);
+    setZoomState(null);
   };
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
@@ -820,7 +843,7 @@ const OneCademyCollaborationModel = () => {
                   fullWidth
                   multiline
                   rows={3}
-                  sx={{ width: "95%",m: 0.5 }}
+                  sx={{ width: "95%", m: 0.5 }}
                 />
                 <Box sx={{ display: "flex", flexDirection: "inline" }}>
                   <Box
@@ -997,6 +1020,14 @@ const OneCademyCollaborationModel = () => {
                   disabled={stepLink === maxDepth}
                 >
                   Next
+                </Button>
+                <Button
+                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
+                  variant="contained"
+                  onClick={resetOrder}
+                  disabled={stepLink === 1}
+                >
+                  Reset
                 </Button>
                 {editor && (
                   <Button
