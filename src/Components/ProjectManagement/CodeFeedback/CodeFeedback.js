@@ -50,7 +50,7 @@ const CodeFeedback = props => {
   const [submitting, setSubmitting] = useState(false);
   const [creating, setCreating] = useState(false);
   const [sentences, setSentences] = useState([]);
-  const [selectedSentences, setSelectedSentences] = useState({});
+
   const [quotesSelectedForCodes, setQuotesSelectedForCodes] = useState({});
   const [selectedSentence, setSelectedSentence] = useState(null);
   const [docId, setDocId] = useState("");
@@ -219,7 +219,14 @@ const CodeFeedback = props => {
 
         if (change.type === "added") {
           const obj = { id, ...data };
-          allCodes.push(obj);
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex === -1) {
+            allCodes.push(obj);
+          } else {
+            allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
+          }
         } else if (change.type === "modified") {
           const existingIndex = allCodes.findIndex(c => {
             return c.id === id;
@@ -254,7 +261,7 @@ const CodeFeedback = props => {
   }, [allFeedbackCodeCodes]);
 
   useEffect(() => {
-    setSentences("");
+    setSentences([]);
     setChosenCondition("");
   }, [project]);
 
@@ -293,7 +300,14 @@ const CodeFeedback = props => {
 
         if (change.type === "added") {
           const obj = { id, ...data };
-          allCodes.push(obj);
+          const existingIndex = allCodes.findIndex(c => {
+            return c.id === id;
+          });
+          if (existingIndex === -1) {
+            allCodes.push(obj);
+          } else {
+            allCodes[existingIndex] = { ...allCodes[existingIndex], ...data };
+          }
         } else if (change.type === "modified") {
           const existingIndex = allCodes.findIndex(c => {
             return c.id === id;
@@ -333,15 +347,11 @@ const CodeFeedback = props => {
     if (!approvedCodes.length) return;
     if (fromTheCell) return;
     let quotesSelectedForCode = {};
-    let sentencesSelecting = {};
     for (let sentence of sentences) {
       quotesSelectedForCode[sentence] = [];
-      sentencesSelecting[sentence] = false;
     }
-    sentencesSelecting[sentences[0]] = true;
     setSelectedSentence(sentences[0]);
     setQuotesSelectedForCodes(quotesSelectedForCode);
-    setSelectedSentences(sentencesSelecting);
   }, [retrieveNext, project, sentences]);
 
   useEffect(() => {
@@ -407,17 +417,18 @@ const CodeFeedback = props => {
           });
         }
         if (response.data.message === "success") {
-          setRetrieveNext(oldValue => oldValue + 1);
+          if (!sentences.length) {
+            setRetrieveNext(oldValue => oldValue + 1);
+          }
           setTimeout(() => {
             setAllResponsesGraded(true);
           }, 1000);
         }
       } catch (e) {
-        console.log(e);
       }
     };
     func();
-  }, [retrieveNext, project]);
+  }, [retrieveNext, project, sentences]);
 
   useEffect(() => {
     const retriveNextResponse = async () => {
@@ -449,7 +460,7 @@ const CodeFeedback = props => {
           .match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm)
           .filter(s => s.trim());
         setDocId(docID);
-        setSentences(response);
+        setSentences(response.map(s => s.trim()));
         setChosenCondition(feedbackData.choice);
         const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
         if (userData.pConditions.length > 1) {
@@ -522,11 +533,6 @@ const CodeFeedback = props => {
   };
 
   const handleSelectedSentence = async sentence => {
-    sentences.forEach(sentenc => {
-      selectedSentences[sentenc] = false;
-    });
-    selectedSentences[sentence] = true;
-    setSelectedSentences(selectedSentences);
     setSelectedSentence(sentence);
   };
   const handleCodesSelected = value => () => {
@@ -570,7 +576,7 @@ const CodeFeedback = props => {
         project
       });
       setRetrieveNext(oldValue => oldValue + 1);
-      setSentences("");
+      setSentences([]);
       setChosenCondition("");
       setSnackbarMessage("Your evaluation was submitted successfully.");
       setSubmitting(false);
@@ -956,9 +962,9 @@ const CodeFeedback = props => {
     const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
     const userData = userDoc.data();
     const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
-    const response = (feedbackData.explanation || "").split(".").filter(w => w.trim());
+    const response = (feedbackData.explanation || "").match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm).filter(s => s.trim());
     setDocId(docID);
-    setSentences(response);
+    setSentences(response.map(s => s.trim()));
     setChosenCondition(feedbackData.choice);
     const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
     if (userData.pConditions.length > 1) {
@@ -986,16 +992,9 @@ const CodeFeedback = props => {
         }
       }
     }
-
-    let sentencesSelecting = {};
     for (let sentence in _quotesSelectedForCodes) {
-      if (Object.keys(sentencesSelecting).length === 0) {
-        sentencesSelecting[sentence.trim()] = true;
-      } else {
-        sentencesSelecting[sentence.trim()] = false;
-      }
+      _quotesSelectedForCodes[sentence.trim()] = _quotesSelectedForCodes[sentence];
     }
-    setSelectedSentences(sentencesSelecting);
     setSelectedSentence(response[0] || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
@@ -1094,7 +1093,6 @@ const CodeFeedback = props => {
                       <ListItem
                         key={index}
                         disablePadding
-                        selected={selectedSentences[sentence]}
                         sx={{
                           mb: "5px",
                           "&$selected": {
@@ -1109,15 +1107,26 @@ const CodeFeedback = props => {
                           onClick={() => {
                             handleSelectedSentence(sentence);
                           }}
+                          sx={{
+                            mb: "5px",
+                            backgroundColor: selectedSentence.trim() === sentence.trim() ? "#e0f7fa" : "transparent",
+                            zIndex: selectedSentence.trim() === sentence.trim() ? 100 : "auto",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            paddingRight: "10px"
+                          }}
                         >
-                          <ListItemIcon>
-                            {quotesSelectedForCodes[sentence] && quotesSelectedForCodes[sentence].length !== 0 ? (
-                              <Checkbox checked={true} />
-                            ) : (
-                              <></>
-                            )}
-                          </ListItemIcon>
-                          <ListItemText id={sentence} primary={`${sentence}`} />
+                          <div style={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+                            <ListItemIcon>
+                              {quotesSelectedForCodes[sentence] && quotesSelectedForCodes[sentence].length !== 0 ? (
+                                <Checkbox checked={true} />
+                              ) : (
+                                <></>
+                              )}
+                            </ListItemIcon>
+                            <ListItemText id={sentence} primary={`${sentence}`} />
+                          </div>
                         </ListItemButton>
 
                         <Button
