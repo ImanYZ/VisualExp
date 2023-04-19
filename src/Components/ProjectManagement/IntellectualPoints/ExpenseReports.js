@@ -120,7 +120,6 @@ const ExpenseReports = (props) => {
 
   useEffect(() => {
     if (firebase && project) {
-      console.log("fetched activities Data");
       const activitiesQuery = firebase.db
         .collection("activities")
         .where("project", "==", project);
@@ -133,7 +132,6 @@ const ExpenseReports = (props) => {
         //we track whichever is loaded to started loading the next one after
         //that.
         setActivitiesLoaded(true);
-        console.log("fetched activities Data onSnapshot");
       });
       return () => {
         setActivitiesLoaded(false);
@@ -153,7 +151,6 @@ const ExpenseReports = (props) => {
         setVotesChanges((oldVotesChanges) => {
           return [...oldVotesChanges, ...docChanges];
         });
-        console.log("fetch votes snapshot");
       });
       return () => {
         setVotesChanges([]);
@@ -164,7 +161,6 @@ const ExpenseReports = (props) => {
   }, [firebase, project, activitiesLoaded]);
 
   useEffect(() => {
-    console.log("activitiesChanges");
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];
       setActivitiesChanges([]);

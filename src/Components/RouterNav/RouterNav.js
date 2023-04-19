@@ -294,14 +294,11 @@ const RouterNav = props => {
           const userDocs = await firebaseOne.db.collection("users").where("userId", "==", uid).get();
           if (userDocs.docs.length > 0) {
             // Sign in and signed up:
-            console.log("Signing in!");
             setUsername(userDocs.docs[0].id);
           } else {
-            console.log("User not found!");
             setUsername("");
           }
         } else {
-          console.log("Signing out!");
           setUsername("");
         }
       });
@@ -641,7 +638,6 @@ const RouterNav = props => {
   }, [notAResearcher, oneCademyPoints, oneCademyUpvotes, firebase, fullname, project]);
 
   const signOut = async event => {
-    console.log("Signing out!");
     setEmail("");
     setUsername("");
     setFullname("");
@@ -675,9 +671,6 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
-    if (!notAResearcher) {
-      navigateTo("/");
-    }
   };
 
   const changeProject = (event, index) => {

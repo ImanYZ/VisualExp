@@ -48,7 +48,7 @@ const SelectSessions = props => {
 
       let hasAllSessions = false;
 
-      console.log(orderedSch, "orderedSch")
+
 
       for(const scheduleItem of orderedSch) {
         let sessionsFound = true;
