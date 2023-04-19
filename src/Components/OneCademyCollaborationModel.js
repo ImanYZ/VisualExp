@@ -64,6 +64,9 @@ const OneCademyCollaborationModel = () => {
     return (
       <Box
         sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           bgcolor: props.color,
           color: "primary.contrastText",
           p: 0.7,
@@ -72,7 +75,9 @@ const OneCademyCollaborationModel = () => {
           maxWidth: 90,
           mr: 1,
           mb: 1,
-          textAlign: "center"
+          textAlign: "center",
+          width: "100%",
+          height: "40px" 
         }}
         key={props.text}
       >
@@ -81,14 +86,14 @@ const OneCademyCollaborationModel = () => {
     );
   }
   function addPencilButton(edgeElement, edgeData, pencilButtonsGroup) {
-    var edgeLabel = edgeElement.select("path");
-    var edgeBBox = edgeLabel.node().getBBox();
-    var edgePath = edgeLabel.node();
-    var pathLength = edgePath.getTotalLength();
-    var positionRatio = 0.7; 
-    var point = edgePath.getPointAtLength(pathLength * positionRatio);
+    let edgeLabel = edgeElement.select("path");
+    let edgeBBox = edgeLabel.node().getBBox();
+    let edgePath = edgeLabel.node();
+    let pathLength = edgePath.getTotalLength();
+    let positionRatio = 0.7;
+    let point = edgePath.getPointAtLength(pathLength * positionRatio);
 
-    var button = pencilButtonsGroup
+    let button = pencilButtonsGroup
       .append("foreignObject")
       .attr("width", 20)
       .attr("height", 20)
@@ -97,7 +102,7 @@ const OneCademyCollaborationModel = () => {
       .attr("class", "pencil-button")
       .style("z-index", "19999");
 
-    var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+    let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
     buttonBody
       .append("xhtml:button")
@@ -209,11 +214,11 @@ const OneCademyCollaborationModel = () => {
     render(svgGroup, g);
 
     svgGroup.selectAll("g.node").each(function (v) {
-      var nodeElement = d3.select(this);
-      var nodeLabel = nodeElement.select("rect");
-      var nodeBBox = nodeLabel.node().getBBox();
+      let nodeElement = d3.select(this);
+      let nodeLabel = nodeElement.select("rect");
+      let nodeBBox = nodeLabel.node().getBBox();
 
-      var button = nodeElement
+      let button = nodeElement
         .append("foreignObject")
         .attr("width", 20)
         .attr("height", 20)
@@ -221,7 +226,7 @@ const OneCademyCollaborationModel = () => {
         .attr("y", -nodeBBox.height / 2 - 9)
         .attr("class", "hide-button");
 
-      var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+      let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
@@ -237,7 +242,7 @@ const OneCademyCollaborationModel = () => {
           removeNode(v);
         });
       if (selectedNode || openAddNode) {
-        var button2 = nodeElement
+        let button2 = nodeElement
           .append("foreignObject")
           .attr("width", 20)
           .attr("height", 20)
