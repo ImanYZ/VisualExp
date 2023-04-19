@@ -1334,14 +1334,12 @@ exports.createTemFeedback = async (req, res) => {
             researcher: fullname,
             codeIds: []
           };
-      console.log("feedbackCodeIds", feedbackCodeIds);
-      const codeIds = Array.from(new Set([...feedbackCodeIds, ...feedbackCodeData.codeIds]));
+      const codeIds = Array.from(new Set([...feedbackCodeIds, ...(feedbackCodeData.codeIds || [])]));
 
       if (codeIds.length <= 2) {
         for (let participant in feedbackCodesByParticipant) {
           for (const feedbackCode of feedbackCodesByParticipant[participant]) {
             const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
-            console.log(explanationWords);
             if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {
               continue;
             }
@@ -1364,7 +1362,7 @@ exports.createTemFeedback = async (req, res) => {
       }
 
       await batch.commit();
-    
+    res.status(200).send({ message: "success" });
   } catch (error) {
     console.log({ error }, "error----------");
   }

@@ -338,7 +338,6 @@ const IntellectualPoints = (props) => {
   };
 
   useEffect(() => {
-    console.log("activitiesChanges");
     if(!Object.keys(reseachers).length) return ;
     if (activitiesChanges.length > 0) {
       const tempActivitiesChanges = [...activitiesChanges];

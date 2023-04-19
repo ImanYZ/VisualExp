@@ -123,6 +123,7 @@ const Auth = props => {
     const checkEmailInstitution = async () => {
       try {
         const domainName = email.match("@(.+)$")?.[0];
+        if(!domainName) return;
         const institutionDoc = await dbOne
           .collection("institutions")
           .where("domains", "array-contains", domainName)
@@ -130,7 +131,6 @@ const Auth = props => {
           .get();
         if (institutionDoc && institutionDoc.docs.length > 0) {
           const institutionData = institutionDoc.docs[0].data();
-          console.log("institutionData", institutionData);
           setNameFromInstitutionSelected(institutionData);
           return institutionData;
         } else {

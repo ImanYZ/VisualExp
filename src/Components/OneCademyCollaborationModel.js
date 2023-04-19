@@ -1025,7 +1025,7 @@ const OneCademyCollaborationModel = () => {
                   sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
                   variant="contained"
                   onClick={resetOrder}
-                  disabled={stepLink === 1}
+                  disabled={stepLink <= 1}
                 >
                   Reset
                 </Button>

@@ -34,7 +34,6 @@ tomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDat
 
 const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
-    console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
   }
 };
