@@ -58,7 +58,7 @@ const OneCademyCollaborationModel = () => {
   const [maxDepth, setMaxDepth] = useState(0);
   const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
-  const editor = true;
+  const editor = email === "oneweb@umich.edu";
 
   function ColorBox(props) {
     return (
@@ -80,6 +80,41 @@ const OneCademyCollaborationModel = () => {
       </Box>
     );
   }
+  function addPencilButton(edgeElement, edgeData, pencilButtonsGroup) {
+    var edgeLabel = edgeElement.select("path");
+    var edgeBBox = edgeLabel.node().getBBox();
+    var edgePath = edgeLabel.node();
+    var pathLength = edgePath.getTotalLength();
+    var positionRatio = 0.7; 
+    var point = edgePath.getPointAtLength(pathLength * positionRatio);
+
+    var button = pencilButtonsGroup
+      .append("foreignObject")
+      .attr("width", 20)
+      .attr("height", 20)
+      .attr("x", point.x - 10)
+      .attr("y", point.y - 10)
+      .attr("class", "pencil-button")
+      .style("z-index", "19999");
+
+    var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+
+    buttonBody
+      .append("xhtml:button")
+      .style("background", "transparent")
+      .style("color", "black")
+      .style("border", "none")
+      .style("font-weight", "bold")
+      .style("width", "100%")
+      .style("height", "100%")
+      .text("✏️")
+      .on("click", function (e) {
+        e.stopPropagation();
+        setSelectedLink({});
+        modifyLink(edgeData);
+      });
+  }
+
   useEffect(() => {
     const collabModelNodesQuery = firebase.db.collection("collabModelNodes");
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
@@ -253,13 +288,16 @@ const OneCademyCollaborationModel = () => {
       }
     });
 
+    const pencilButtonsGroup = svg.append("g");
     const zoom = d3.zoom().on("zoom", function (d) {
       svgGroup.attr("transform", d3.zoomTransform(this));
+      pencilButtonsGroup.attr("transform", d3.zoomTransform(this));
       setZoomState(d3.zoomTransform(this));
     });
     svg.call(zoom);
     if (zoomState) {
       svgGroup.attr("transform", zoomState);
+      pencilButtonsGroup.attr("transform", zoomState);
     }
     if (visibleNodes.length >= 8) {
       const svgWidth = (window.innerWidth * 70) / 100;
@@ -283,19 +321,20 @@ const OneCademyCollaborationModel = () => {
       });
     }
     var edges = svg.selectAll("g.edgePath");
-
-    edges.on("click", function (d) {
-      // d.target.event.stopPropagation();
-      if (editor) {
-        setSelectedLink({});
-        modifyLink(d.target.__data__);
-      } else {
+    if (editor) {
+      edges.each(function (edgeData) {
+        var edgeElement = d3.select(this);
+        addPencilButton(edgeElement, edgeData, pencilButtonsGroup);
+      });
+    }
+    if (!editor) {
+      edges.on("click", function (d) {
         setSelectedLink({});
         showDetails(d.target.__data__);
         setOpenModifyLink(true);
         setOpenAddNode(false);
-      }
-    });
+      });
+    }
 
     setNodesLoded(false);
     return () => {
