@@ -854,28 +854,30 @@ const OneCademyCollaborationModel = () => {
                 onClick={handleOpenSidBar}
               />
             )}
-            <Box sx={{ display: "flex" }}>
-              {[
-                { text: "Input", color: "#1976d2" },
-                { text: "Positive Outcome", color: "#4caf50" },
-                { text: "Negative Outcome", color: "#cc0119" }
-              ].map((resource, index) => (
-                <ColorBox key={resource.text} text={resource.text} color={resource.color} />
-              ))}
-              {[
-                { text: "Known Positive Effect", color: "#56E41B" },
-                { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-                { text: "Known Negative Effect", color: "#A91BE4" },
-                { text: "Hypothetical Negative Effect", color: "#E4451B" }
-              ].map((resource, index) => (
-                <Box style={{ marginInline: "14px" }}>
-                  <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                  <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
-                    {resource.text}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+            {visibleNodes.length > 0 && (
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { text: "Input", color: "#1976d2" },
+                  { text: "Positive Outcome", color: "#4caf50" },
+                  { text: "Negative Outcome", color: "#cc0119" }
+                ].map((resource, index) => (
+                  <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                ))}
+                {[
+                  { text: "Known Positive Effect", color: "#56E41B" },
+                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+                  { text: "Known Negative Effect", color: "#A91BE4" },
+                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
+                ].map((resource, index) => (
+                  <Box style={{ marginInline: "14px" }}>
+                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
+                    <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
+                      {resource.text}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Paper>
           <Box sx={{ ml: "14px", mt: "14px" }}>
             {openModifyLink && editor && (
