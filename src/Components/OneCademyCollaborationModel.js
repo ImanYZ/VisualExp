@@ -58,12 +58,15 @@ const OneCademyCollaborationModel = () => {
   const [maxDepth, setMaxDepth] = useState(0);
   const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
-  const editor = true;
+  const editor = email === "oneweb@umich.edu";
 
   function ColorBox(props) {
     return (
       <Box
         sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           bgcolor: props.color,
           color: "primary.contrastText",
           p: 0.7,
@@ -72,7 +75,9 @@ const OneCademyCollaborationModel = () => {
           maxWidth: 90,
           mr: 1,
           mb: 1,
-          textAlign: "center"
+          textAlign: "center",
+          width: "100%",
+          height: "40px" 
         }}
         key={props.text}
       >
@@ -80,6 +85,41 @@ const OneCademyCollaborationModel = () => {
       </Box>
     );
   }
+  function addPencilButton(edgeElement, edgeData, pencilButtonsGroup) {
+    let edgeLabel = edgeElement.select("path");
+    let edgeBBox = edgeLabel.node().getBBox();
+    let edgePath = edgeLabel.node();
+    let pathLength = edgePath.getTotalLength();
+    let positionRatio = 0.7;
+    let point = edgePath.getPointAtLength(pathLength * positionRatio);
+
+    let button = pencilButtonsGroup
+      .append("foreignObject")
+      .attr("width", 20)
+      .attr("height", 20)
+      .attr("x", point.x - 10)
+      .attr("y", point.y - 10)
+      .attr("class", "pencil-button")
+      .style("z-index", "19999");
+
+    let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+
+    buttonBody
+      .append("xhtml:button")
+      .style("background", "transparent")
+      .style("color", "black")
+      .style("border", "none")
+      .style("font-weight", "bold")
+      .style("width", "100%")
+      .style("height", "100%")
+      .text("✏️")
+      .on("click", function (e) {
+        e.stopPropagation();
+        setSelectedLink({});
+        modifyLink(edgeData);
+      });
+  }
+
   useEffect(() => {
     const collabModelNodesQuery = firebase.db.collection("collabModelNodes");
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
@@ -174,11 +214,11 @@ const OneCademyCollaborationModel = () => {
     render(svgGroup, g);
 
     svgGroup.selectAll("g.node").each(function (v) {
-      var nodeElement = d3.select(this);
-      var nodeLabel = nodeElement.select("rect");
-      var nodeBBox = nodeLabel.node().getBBox();
+      let nodeElement = d3.select(this);
+      let nodeLabel = nodeElement.select("rect");
+      let nodeBBox = nodeLabel.node().getBBox();
 
-      var button = nodeElement
+      let button = nodeElement
         .append("foreignObject")
         .attr("width", 20)
         .attr("height", 20)
@@ -186,7 +226,7 @@ const OneCademyCollaborationModel = () => {
         .attr("y", -nodeBBox.height / 2 - 9)
         .attr("class", "hide-button");
 
-      var buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
+      let buttonBody = button.append("xhtml:body").style("margin", "0px").style("padding", "0px");
 
       buttonBody
         .append("xhtml:button")
@@ -202,7 +242,7 @@ const OneCademyCollaborationModel = () => {
           removeNode(v);
         });
       if (selectedNode || openAddNode) {
-        var button2 = nodeElement
+        let button2 = nodeElement
           .append("foreignObject")
           .attr("width", 20)
           .attr("height", 20)
@@ -253,13 +293,16 @@ const OneCademyCollaborationModel = () => {
       }
     });
 
+    const pencilButtonsGroup = svg.append("g");
     const zoom = d3.zoom().on("zoom", function (d) {
       svgGroup.attr("transform", d3.zoomTransform(this));
+      pencilButtonsGroup.attr("transform", d3.zoomTransform(this));
       setZoomState(d3.zoomTransform(this));
     });
     svg.call(zoom);
     if (zoomState) {
       svgGroup.attr("transform", zoomState);
+      pencilButtonsGroup.attr("transform", zoomState);
     }
     if (visibleNodes.length >= 8) {
       const svgWidth = (window.innerWidth * 70) / 100;
@@ -283,19 +326,20 @@ const OneCademyCollaborationModel = () => {
       });
     }
     var edges = svg.selectAll("g.edgePath");
-
-    edges.on("click", function (d) {
-      // d.target.event.stopPropagation();
-      if (editor) {
-        setSelectedLink({});
-        modifyLink(d.target.__data__);
-      } else {
+    if (editor) {
+      edges.each(function (edgeData) {
+        var edgeElement = d3.select(this);
+        addPencilButton(edgeElement, edgeData, pencilButtonsGroup);
+      });
+    }
+    if (!editor) {
+      edges.on("click", function (d) {
         setSelectedLink({});
         showDetails(d.target.__data__);
         setOpenModifyLink(true);
         setOpenAddNode(false);
-      }
-    });
+      });
+    }
 
     setNodesLoded(false);
     return () => {
