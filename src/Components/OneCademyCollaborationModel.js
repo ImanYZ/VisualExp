@@ -170,8 +170,7 @@ const OneCademyCollaborationModel = () => {
     _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
     setAllNodes(_allNodes);
     let _maxDepth = 0;
-    for (let tempNodeChange of tempNodesChanges) {
-      const collabModelNode = tempNodeChange.doc.data();
+    for (let collabModelNode of _allNodes) {
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
         if (_maxDepth < elementChild?.order) {
@@ -181,16 +180,16 @@ const OneCademyCollaborationModel = () => {
         let _arrowheadStyle = `fill: ${color}`;
         let _style = `stroke: ${color}; stroke-width: 2px;`;
 
-        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
+        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(collabModelNode.id)) continue;
         if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
           _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
         }
-        if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
+        if (selectedLink.v === collabModelNode.id && selectedLink.w === elementChild.id) {
           _style = "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
           _arrowheadStyle = "fill: #212121";
         }
         if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
-          g.setEdge(tempNodeChange.doc.id, elementChild.id, {
+          g.setEdge(collabModelNode.id, elementChild.id, {
             label: elementChild.order,
             curve: d3.curveBasis,
             style: _style,
@@ -449,7 +448,7 @@ const OneCademyCollaborationModel = () => {
   const deleteNode = async () => {
     if (!selectedNode) return;
     const nodeRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       for (let node of allNodes) {
         const _children = node.children;
         const index = _children.findIndex(child => child.id === selectedNode);
@@ -464,6 +463,7 @@ const OneCademyCollaborationModel = () => {
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
     setLoadData(true);
+    setSelectedNode("");
   };
 
   const showDetails = async data => {
@@ -540,7 +540,7 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleSaveLink = async () => {
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       const nodeId = selectedLink.v;
       const childId = selectedLink.w;
       const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
@@ -711,15 +711,16 @@ const OneCademyCollaborationModel = () => {
     setShowAll(false);
     setIngnorOrder(false);
   };
+
   const deleteLink = async () => {
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       const nodeId = selectedLink.v;
       const childId = selectedLink.w;
       const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
       const nodeDoc = await nodeRef.get();
       const nodeData = nodeDoc.data();
-      const childidx = nodeData.children.findIndex(child => child.id === childId);
-      const childp = nodeData.children[childidx];
+      const childIdx = nodeData.children.findIndex(child => child.id === childId);
+      const childp = nodeData.children[childIdx];
       for (let node of allNodes) {
         let _children = node.children;
         for (let _child of _children) {
@@ -740,8 +741,8 @@ const OneCademyCollaborationModel = () => {
     setExplanation("");
     setTypeLink("");
     setSelectedLink({});
-    setLoadData(true);
     setLinkOrder(null);
+    setLoadData(true);
   };
 
   const addChild = child => {
@@ -783,6 +784,7 @@ const OneCademyCollaborationModel = () => {
     setOpenSideBar(old => !old);
     setZoomState(null);
   };
+
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -819,7 +821,7 @@ const OneCademyCollaborationModel = () => {
               mt: "10px",
               mr: "9px",
               height: "750px",
-              width: "900",
+              width: "600",
               display: "flex",
               justifyContent: "center",
               flexDirection: "column"
