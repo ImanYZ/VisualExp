@@ -285,7 +285,7 @@ const CodeFeedback = props => {
   useEffect(() => {
     if (firebase && fullname) {
       (async () => {
-        const recentParticipants = await fetchRecentParticipants(fullname);
+        const recentParticipants = await fetchRecentParticipants(fullname, project);
         setRecentParticipants(recentParticipants);
       })();
     }
