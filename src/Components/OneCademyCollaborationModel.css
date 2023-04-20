@@ -32,3 +32,6 @@ text {
   stroke-width: 1.3px;
 }
 
+text.custom-text-color {
+  fill: #000000; 
+}
