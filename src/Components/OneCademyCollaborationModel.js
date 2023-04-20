@@ -18,9 +18,11 @@ import { Typography } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+import MenuIcon from "@mui/icons-material/Menu";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 const d3 = require("d3");
 
 const legends = [
@@ -56,6 +58,7 @@ const OneCademyCollaborationModel = () => {
   const [linkOrder, setLinkOrder] = useState(0);
   const [stepLink, setStepLink] = useState(0);
   const [maxDepth, setMaxDepth] = useState(0);
+  const [openSideBar, setOpenSideBar] = useState(false);
   const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
   const editor = email === "oneweb@umich.edu";
@@ -69,12 +72,11 @@ const OneCademyCollaborationModel = () => {
           alignItems: "center",
           bgcolor: props.color,
           color: "primary.contrastText",
-          p: 0.7,
-          fontSize: 14,
+          fontSize: 13,
           borderRadius: 2,
           maxWidth: 90,
-          mr: 1,
-          mb: 1,
+          mr: 0.5,
+          mb: 0.5,
           textAlign: "center",
           width: "100%",
           height: "40px"
@@ -87,7 +89,6 @@ const OneCademyCollaborationModel = () => {
   }
   function addPencilButton(edgeElement, edgeData, pencilButtonsGroup) {
     let edgeLabel = edgeElement.select("path");
-    let edgeBBox = edgeLabel.node().getBBox();
     let edgePath = edgeLabel.node();
     let pathLength = edgePath.getTotalLength();
     let positionRatio = 0.7;
@@ -169,8 +170,7 @@ const OneCademyCollaborationModel = () => {
     _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
     setAllNodes(_allNodes);
     let _maxDepth = 0;
-    for (let tempNodeChange of tempNodesChanges) {
-      const collabModelNode = tempNodeChange.doc.data();
+    for (let collabModelNode of _allNodes) {
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
         if (_maxDepth < elementChild?.order) {
@@ -180,16 +180,16 @@ const OneCademyCollaborationModel = () => {
         let _arrowheadStyle = `fill: ${color}`;
         let _style = `stroke: ${color}; stroke-width: 2px;`;
 
-        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(tempNodeChange.doc.id)) continue;
+        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(collabModelNode.id)) continue;
         if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
           _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
         }
-        if (selectedLink.v === tempNodeChange.doc.id && selectedLink.w === elementChild.id) {
+        if (selectedLink.v === collabModelNode.id && selectedLink.w === elementChild.id) {
           _style = "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
           _arrowheadStyle = "fill: #212121";
         }
         if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
-          g.setEdge(tempNodeChange.doc.id, elementChild.id, {
+          g.setEdge(collabModelNode.id, elementChild.id, {
             label: elementChild.order,
             curve: d3.curveBasis,
             style: _style,
@@ -448,7 +448,7 @@ const OneCademyCollaborationModel = () => {
   const deleteNode = async () => {
     if (!selectedNode) return;
     const nodeRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       for (let node of allNodes) {
         const _children = node.children;
         const index = _children.findIndex(child => child.id === selectedNode);
@@ -463,6 +463,7 @@ const OneCademyCollaborationModel = () => {
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
     setLoadData(true);
+    setSelectedNode("");
   };
 
   const showDetails = async data => {
@@ -539,7 +540,7 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleSaveLink = async () => {
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       const nodeId = selectedLink.v;
       const childId = selectedLink.w;
       const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
@@ -689,7 +690,6 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
     setShowAll(false);
     setIngnorOrder(false);
-    setZoomState(null);
   };
   const previousLink = () => {
     const _visibleNodes = [];
@@ -710,17 +710,17 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
     setShowAll(false);
     setIngnorOrder(false);
-    setZoomState(null);
   };
+
   const deleteLink = async () => {
-    firebase.db.runTransaction(async t => {
+    await firebase.db.runTransaction(async t => {
       const nodeId = selectedLink.v;
       const childId = selectedLink.w;
       const nodeRef = firebase.firestore().collection("collabModelNodes").doc(nodeId);
       const nodeDoc = await nodeRef.get();
       const nodeData = nodeDoc.data();
-      const childidx = nodeData.children.findIndex(child => child.id === childId);
-      const childp = nodeData.children[childidx];
+      const childIdx = nodeData.children.findIndex(child => child.id === childId);
+      const childp = nodeData.children[childIdx];
       for (let node of allNodes) {
         let _children = node.children;
         for (let _child of _children) {
@@ -741,8 +741,8 @@ const OneCademyCollaborationModel = () => {
     setExplanation("");
     setTypeLink("");
     setSelectedLink({});
-    setLoadData(true);
     setLinkOrder(null);
+    setLoadData(true);
   };
 
   const addChild = child => {
@@ -780,6 +780,11 @@ const OneCademyCollaborationModel = () => {
     setIngnorOrder(false);
     setZoomState(null);
   };
+  const handleOpenSidBar = () => {
+    setOpenSideBar(old => !old);
+    setZoomState(null);
+  };
+
   return (
     <Box sx={{ height: "100vh", overflow: "auto" }}>
       <Dialog open={deleteDialogOpen} onClose={handleClose}>
@@ -808,12 +813,20 @@ const OneCademyCollaborationModel = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Grid container spacing={2} direction="row-reverse">
-        <Grid item xs={9}>
+        <Grid item xs={openSideBar ? 9 : 12}>
           <Paper
             id="graphPaper"
-            sx={{ mt: "10px", ml: "10px", height: "600px", width: "900", display: "flex", justifyContent: "center" }}
+            sx={{
+              mt: "10px",
+              mr: "9px",
+              height: "750px",
+              width: "600",
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column"
+            }}
+            elevation={4}
           >
             {visibleNodes.length > 0 ? (
               <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
@@ -830,6 +843,42 @@ const OneCademyCollaborationModel = () => {
                   To show the nodes in the diagram, check them in the list.
                 </Typography>
               </div>
+            )}
+            {!openSideBar && (
+              <MenuIcon
+                sx={{
+                  position: "absolute",
+                  top: "3%",
+                  left: "10px",
+                  zIndex: "1000",
+                  transform: "translateY(-50%)"
+                }}
+                onClick={handleOpenSidBar}
+              />
+            )}
+            {visibleNodes.length > 0 && (
+              <Box sx={{ display: "flex" }}>
+                {[
+                  { text: "Input", color: "#1976d2" },
+                  { text: "Positive Outcome", color: "#4caf50" },
+                  { text: "Negative Outcome", color: "#cc0119" }
+                ].map((resource, index) => (
+                  <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                ))}
+                {[
+                  { text: "Known Positive Effect", color: "#56E41B" },
+                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+                  { text: "Known Negative Effect", color: "#A91BE4" },
+                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
+                ].map((resource, index) => (
+                  <Box style={{ marginInline: "14px" }}>
+                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
+                    <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
+                      {resource.text}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             )}
           </Paper>
           <Box sx={{ ml: "14px", mt: "14px" }}>
@@ -982,28 +1031,6 @@ const OneCademyCollaborationModel = () => {
               </Box>
             )}
             <Box>
-              <Box sx={{ display: "flex" }}>
-                {[
-                  { text: "Input", color: "#1976d2" },
-                  { text: "Positive Outcome", color: "#4caf50" },
-                  { text: "Negative Outcome", color: "#cc0119" }
-                ].map((resource, index) => (
-                  <ColorBox key={resource.text} text={resource.text} color={resource.color} />
-                ))}
-              </Box>
-              <Box sx={{ display: "flex" }}>
-                {[
-                  { text: "Known Positive Effect", color: "#56E41B" },
-                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-                  { text: "Known Negative Effect", color: "#A91BE4" },
-                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
-                ].map((resource, index) => (
-                  <div style={{ marginInline: "14px" }}>
-                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                    <Typography sx={{ fontSize: "14px", color: resource.color }}> {resource.text}</Typography>
-                  </div>
-                ))}
-              </Box>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <Button
                   sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
@@ -1031,7 +1058,7 @@ const OneCademyCollaborationModel = () => {
                 </Button>
                 {editor && (
                   <Button
-                    sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
+                    sx={{ mr: "30px", ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
                     variant="contained"
                     onClick={AddNewNode}
                   >
@@ -1042,48 +1069,71 @@ const OneCademyCollaborationModel = () => {
             </Box>
           </Box>
         </Grid>
-        <Grid item xs={3}>
-          <Box
-            sx={{
-              height: "100vh",
-              mb: "10px",
-              overflow: "auto"
-            }}
-          >
-            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
-              {" "}
-              <Typography
-                sx={{
-                  fontWeight: "bold"
-                }}
-              >
-                Choose nodes to show their causal relations.
-              </Typography>{" "}
-              Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-            </Box>
-
-            {allNodes.map((node, index) => (
-              <ListItem
-                key={node.title + index}
-                disablePadding
-                sx={{
-                  "&$selected": {
-                    backgroundColor: "orange",
-                    zIndex: 100,
-                    ml: 9
-                  }
-                }}
-              >
-                <Checkbox
-                  checked={visibleNodes.includes(node.id)}
-                  onClick={() => {
-                    handleVisibileNodes(node);
+        <Grid item xs={openSideBar ? 3 : 0}>
+          {openSideBar && (
+            <Paper
+              sx={{
+                height: "100vh",
+                mb: "10px",
+                overflow: "auto",
+                direction: "rtl",
+                "&::-webkit-scrollbar": {
+                  width: "10px"
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(0, 0, 0, 0.2)",
+                  borderRadius: "5px"
+                }
+              }}
+            >
+              {openSideBar && (
+                <ArrowBackIosNewIcon
+                  sx={{
+                    position: "absolute",
+                    top: "3%",
+                    zIndex: "1000",
+                    transform: "translateY(-50%)"
                   }}
+                  onClick={handleOpenSidBar}
                 />
-                <ListItemText id={node.title} primary={`${node.title}`} />
-              </ListItem>
-            ))}
-          </Box>
+              )}
+              <Box sx={{ direction: "ltr" }}>
+                <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
+                  {" "}
+                  <Typography
+                    sx={{
+                      fontWeight: "bold"
+                    }}
+                  >
+                    Choose nodes to show their causal relations.
+                  </Typography>{" "}
+                  Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
+                </Box>
+
+                {allNodes.map((node, index) => (
+                  <ListItem
+                    key={node.title + index}
+                    disablePadding
+                    sx={{
+                      "&$selected": {
+                        backgroundColor: "orange",
+                        zIndex: 100,
+                        ml: 9
+                      }
+                    }}
+                  >
+                    <Checkbox
+                      checked={visibleNodes.includes(node.id)}
+                      onClick={() => {
+                        handleVisibileNodes(node);
+                      }}
+                    />
+                    <ListItemText id={node.title} primary={`${node.title}`} />
+                  </ListItem>
+                ))}
+              </Box>
+            </Paper>
+          )}
         </Grid>
       </Grid>
     </Box>
