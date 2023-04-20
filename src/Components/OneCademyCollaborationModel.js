@@ -397,9 +397,6 @@ const OneCademyCollaborationModel = () => {
         const collabModelRef = firebase.firestore().collection("collabModelNodes").doc(selectedNode);
         const collabModelDoc = await collabModelRef.get();
         const collabModelNode = collabModelDoc.data();
-        let _childrenCollab = collabModelNode.children;
-        _childrenCollab = _childrenCollab.filter(child => childrenIds.includes(child.id));
-
         for (let childId of childrenIds) {
           const idex = collabModelNode.children.findIndex(_child => _child.id === childId);
           if (idex === -1) {
@@ -414,7 +411,7 @@ const OneCademyCollaborationModel = () => {
           }
           _visibleNodes.push(childId);
         }
-        await collabModelRef.update({ title, type, children: _childrenCollab });
+        await collabModelRef.update({ title, type, children: collabModelNode.children });
       }
     } catch (error) {
       console.log(error);
