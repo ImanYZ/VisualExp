@@ -182,7 +182,7 @@ const FreeRecallGrading = props => {
   const loadedRecallGrades = async () => {
     setProcessing(true);
 
-    const recentParticipants = await fetchRecentParticipants(fullname);
+    const recentParticipants = await fetchRecentParticipants(fullname, project);
     setRecentParticipants(recentParticipants);
 
     let recallGradesQ = firebase.db.collection("recallGradesV2");
