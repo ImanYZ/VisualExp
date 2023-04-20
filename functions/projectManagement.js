@@ -828,27 +828,24 @@ exports.remindResearchersForAvailability = async context => {
             researcherData.projects[project].scheduleSessions
           ) {
             // month for next 10 days
-            const month = moment().utcOffset(-4).add(10, "day").startOf("month").format("YYYY-MM-DD");
-            const resSchedules = await db
-              .collection("resSchedule")
-              .where("project", "==", project)
-              .where("researchers", "array-contains", researcherDoc.id)
-              .where("month", "==", month)
-              .get();
-
+            const scheduleMonths = [
+              moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD"),
+              moment().utcOffset(-4).startOf("month").add(1, "months").format("YYYY-MM-DD")
+            ];
+            const resSchedules = await db.collection("resSchedule").where("month", "in", scheduleMonths).get();
             let lastAvailability = new Date();
             if (resSchedules.docs.length) {
-              const resSchedule = resSchedules.docs[0];
-              const resScheduleData = resSchedule.data();
-              const availabilities = resScheduleData.schedules[researcherDoc.id] || [];
-              for (const availability of availabilities) {
-                const _availability = moment(availability).utcOffset(-4, true).toDate();
-                if (_availability.getTime() > lastAvailability.getTime()) {
-                  lastAvailability = _availability;
+              for (let resScheduleDoc of resSchedules.docs) {
+                const resScheduleData = resScheduleDoc.data();
+                const availabilities = resScheduleData.schedules[researcherDoc.id] || [];
+                for (const availability of availabilities) {
+                  const _availability = moment(availability).utcOffset(-4, true).toDate();
+                  if (_availability.getTime() > lastAvailability.getTime()) {
+                    lastAvailability = _availability;
+                  }
                 }
               }
             }
-
             let tenDaysLater = new Date();
             tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
             if (lastAvailability.getTime() < tenDaysLater.getTime()) {
