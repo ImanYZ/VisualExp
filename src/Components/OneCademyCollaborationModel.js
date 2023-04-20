@@ -306,19 +306,19 @@ const OneCademyCollaborationModel = () => {
       svgGroup.attr("transform", zoomState);
       pencilButtonsGroup.attr("transform", zoomState);
     }
-    if (visibleNodes.length >= 8) {
-      const svgWidth = (window.innerWidth * 70) / 100;
-      const svgHeight = 600;
-      const graphWidth = g.graph().width + 50;
-      const graphHeight = g.graph().height + 50;
 
-      const zoomScale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight);
-      const translateX = (svgWidth - graphWidth * zoomScale) / 2;
-      const translateY = (svgHeight - graphHeight * zoomScale) / 2;
-      if (!zoomState) {
-        svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
-      }
+    const svgWidth = (window.innerWidth * 70) / 100;
+    const svgHeight = 600;
+    const graphWidth = g.graph().width + 50;
+    const graphHeight = g.graph().height + 50;
+
+    const zoomScale = Math.min(svgWidth / graphWidth, svgHeight / graphHeight);
+    const translateX = (svgWidth - graphWidth * zoomScale) / 2;
+    const translateY = (svgHeight - graphHeight * zoomScale) / 2;
+    if (!zoomState) {
+      svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
     }
+
 
     const nodes = svg.selectAll("g.node");
     if (editor) {
@@ -518,9 +518,7 @@ const OneCademyCollaborationModel = () => {
         break;
       }
     }
-    if (_visibleNodes.length >= 10) {
-      setZoomState(null);
-    }
+    // setZoomState(null);
     setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
@@ -793,7 +791,6 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
     setShowAll(false);
     setIngnorOrder(false);
-    setZoomState(null);
   };
   const handleOpenSidBar = () => {
     setOpenSideBar(old => !old);
