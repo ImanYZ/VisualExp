@@ -380,7 +380,7 @@ const App = () => {
       const resScheduleData = resSchedule.data();
       const attendedSessions = resScheduleData.attendedSessions || {};
       for (let _researcher in attendedSessions) {
-        if (attendedSessions[_researcher].hasOwnProperty(fullname)) {
+        if (attendedSessions[_researcher].hasOwnProperty(fullname) && attendedSessions[_researcher][fullname].includes(session)) {
           researcher = _researcher;
           break;
         }
