@@ -87,7 +87,7 @@ const OneCademyCollaborationModel = () => {
       </Box>
     );
   }
-  function addPencilButton(edgeElement, edgeData, pencilButtonsGroup) {
+  function addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order) {
     let edgeLabel = edgeElement.select("path");
     let edgePath = edgeLabel.node();
     let pathLength = edgePath.getTotalLength();
@@ -119,6 +119,14 @@ const OneCademyCollaborationModel = () => {
         setSelectedLink({});
         modifyLink(edgeData);
       });
+    pencilButtonsGroup
+      .append("text")
+      .attr("class", "custom-text-color")
+      .attr("x", point.x)
+      .attr("y", point.y + 14)
+      .attr("font-family", "Arial, sans-serif")
+      .attr("font-size", "15px")
+      .text(order);
   }
 
   useEffect(() => {
@@ -192,7 +200,6 @@ const OneCademyCollaborationModel = () => {
         }
         if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
           g.setEdge(collabModelNode.id, elementChild.id, {
-            label: elementChild.order,
             curve: d3.curveBasis,
             style: _style,
             arrowheadStyle: _arrowheadStyle
@@ -319,7 +326,6 @@ const OneCademyCollaborationModel = () => {
       svg.call(zoom.transform, d3.zoomIdentity.translate(translateX, translateY).scale(zoomScale));
     }
 
-
     const nodes = svg.selectAll("g.node");
     if (editor) {
       nodes.on("click", function (d) {
@@ -331,7 +337,10 @@ const OneCademyCollaborationModel = () => {
     if (editor) {
       edges.each(function (edgeData) {
         var edgeElement = d3.select(this);
-        addPencilButton(edgeElement, edgeData, pencilButtonsGroup);
+        const nodeIdx = _allNodes.findIndex(node => node.id === edgeData.v);
+        const childIdx = _allNodes[nodeIdx].children.findIndex(child => child.id === edgeData.w);
+        const order = _allNodes[nodeIdx].children[childIdx].order;
+        addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order);
       });
     }
     if (!editor) {
