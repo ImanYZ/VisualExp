@@ -378,20 +378,11 @@ const App = () => {
     if (resSchedules.docs.length) {
       const resSchedule = resSchedules.docs[0];
       const resScheduleData = resSchedule.data();
-      const scheduled = resScheduleData.scheduled || {};
-      for (const _researcher in scheduled) {
-        const participants = Object.keys(scheduled[_researcher] || {});
-        if (participants.includes(fullname)) {
-          // this will help us during testing App.js flow
-          if (!researcher) {
-            researcher = _researcher;
-          }
-          const currentDate = moment().utcOffset(-4).format("YYYY-MM-DD");
-          const scheduledDate = moment(scheduled[_researcher][fullname][0]).utcOffset(-4, true).format("YYYY-MM-DD");
-          if (currentDate === scheduledDate) {
-            researcher = _researcher;
-            break;
-          }
+      const attendedSessions = resScheduleData.attendedSessions || {};
+      for (let _researcher in attendedSessions) {
+        if (attendedSessions[_researcher].hasOwnProperty(fullname) && attendedSessions[_researcher][fullname].includes(session)) {
+          researcher = _researcher;
+          break;
         }
       }
     }
