@@ -420,6 +420,11 @@ const OneCademyCollaborationModel = () => {
           }
           _visibleNodes.push(childId);
         }
+        for (let child of collabModelNode.children) {
+          if (!childrenIds.some(childId => childId === child.id)) {
+            child.deleted = true;
+          }
+        }
         await collabModelRef.update({ title, type, children: collabModelNode.children });
       }
     } catch (error) {
