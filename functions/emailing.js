@@ -296,7 +296,8 @@ exports.inviteAdministrators = async context => {
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
         administratorData.howToAddress &&
-        isTimeToSendEmail(administratorData.city, administratorData.stateInfo, administratorData.country)
+        isTimeToSendEmail(administratorData.city, administratorData.stateInfo, administratorData.country) &&
+        !administratorData.explanation.includes("This is ")
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
