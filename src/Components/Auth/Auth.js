@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import { firebaseOne } from "../../Components/firebase/firebase";
+import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, institutionsState } from "../../store/AuthAtoms";
@@ -22,7 +23,7 @@ import { isEmail } from "../../utils";
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
-import AppConfig from "../../AppConfig";
+
 
 const Auth = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -60,6 +61,8 @@ const Auth = props => {
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
 
   const institutions = useRecoilValue(institutionsState);
+
+  const navigateTo = useNavigate();
 
   useEffect(() => {
     const getCourses = async () => {

@@ -16,7 +16,6 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import DialogTitle from "@mui/material/DialogTitle";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
@@ -38,6 +37,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import arrayToChunks from "../../../utils/arrayToChunks";
 import { fetchRecentParticipants } from "../../../utils/researcher";
 import Select from "@mui/material/Select";
+import Tooltip from "@mui/material/Tooltip";
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -192,7 +192,8 @@ const CodeFeedback = props => {
       renderCell: cellValues => {
         return <GridCellToolTip isLink={false} cellValues={cellValues} />;
       }
-    }
+    },
+    { field: "date", headerName: "Submitted Answer Date", type: "dateTime", width: 190 }
   ];
   useEffect(() => {
     if (firebase) {
@@ -255,7 +256,8 @@ const CodeFeedback = props => {
       return {
         id: c.id,
         explanation: c.explanation,
-        choice: c.choice
+        choice: c.choice,
+        date: new Date(c.createdAt.toDate())
       };
     });
   }, [allFeedbackCodeCodes]);
@@ -344,17 +346,6 @@ const CodeFeedback = props => {
   }, [allExperimentCodes]);
 
   useEffect(() => {
-    if (!approvedCodes.length) return;
-    if (fromTheCell) return;
-    let quotesSelectedForCode = {};
-    for (let sentence of sentences) {
-      quotesSelectedForCode[sentence] = [];
-    }
-    setSelectedSentence(sentences[0]);
-    setQuotesSelectedForCodes(quotesSelectedForCode);
-  }, [retrieveNext, project, sentences]);
-
-  useEffect(() => {
     if (!sentences.length) return;
     let _choiceConditions = {};
     for (let sentence of sentences) {
@@ -407,15 +398,15 @@ const CodeFeedback = props => {
   useEffect(() => {
     const func = async () => {
       try {
-        let response = null;
+        let response = { data: { message: "success" } };
         const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
         const orderData = feedbackCodesOrderDocs.docs[0].data();
-        if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
-          response = await axios.post("/createTemFeedback", {
-            fullname,
-            project
-          });
-        }
+        // if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
+        response = await axios.post("/createTemFeedback", {
+          fullname,
+          project
+        });
+        // }
         if (response.data.message === "success") {
           if (!sentences.length) {
             setRetrieveNext(oldValue => oldValue + 1);
@@ -424,11 +415,10 @@ const CodeFeedback = props => {
             setAllResponsesGraded(true);
           }, 1000);
         }
-      } catch (e) {
-      }
+      } catch (e) {}
     };
     func();
-  }, [retrieveNext, project, sentences]);
+  }, [retrieveNext, project]);
 
   useEffect(() => {
     const retriveNextResponse = async () => {
@@ -449,9 +439,6 @@ const CodeFeedback = props => {
       if (docID) {
         const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
         const feedbackData = feedbackCodesDoc.data();
-        setFeedbackCode(feedbackData);
-
-        setChosenCondition(feedbackData.choice);
         const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
         const userData = userDoc.data();
 
@@ -459,18 +446,23 @@ const CodeFeedback = props => {
         const response = (feedbackData.explanation || "")
           .match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm)
           .filter(s => s.trim());
-        setDocId(docID);
         setSentences(response.map(s => s.trim()));
-        setChosenCondition(feedbackData.choice);
+        setSelectedSentence(response[0]);
         const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
         if (userData.pConditions.length > 1) {
           const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
           cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
         }
+        let quotesSelectedForCode = {};
+        for (let sentence of response) {
+          quotesSelectedForCode[sentence] = [];
+        }
+        setQuotesSelectedForCodes(quotesSelectedForCode);
+        setFeedbackCode(feedbackData);
+        setChosenCondition(feedbackData.choice);
+        setDocId(docID);
+        setChosenCondition(feedbackData.choice);
         setConditionsOrder(cOrders);
-
-        //we check if the authenticated reserchers have aleardy casted his vote
-        //if so we get all his recorded past choices
       }
       setSubmitting(false);
     };
@@ -925,7 +917,7 @@ const CodeFeedback = props => {
         });
       }
 
-      setSnackbarMessage(`Quote Saved successfully !`);
+      setSnackbarMessage(`Quote "${quote}" has been Saved successfully !`);
     } catch (error) {
       setSnackbarMessage("There is some error while saving the Quote ,please try after some time!");
     } finally {
@@ -958,23 +950,17 @@ const CodeFeedback = props => {
     let docID = clickedCell.id;
     const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
     const feedbackData = feedbackCodesDoc.data();
-    setFeedbackCode(feedbackData);
     const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
     const userData = userDoc.data();
     const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
     const response = (feedbackData.explanation || "").match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm).filter(s => s.trim());
-    setDocId(docID);
-    setSentences(response.map(s => s.trim()));
-    setChosenCondition(feedbackData.choice);
     const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
     if (userData.pConditions.length > 1) {
       const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
       cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
     }
-    setConditionsOrder(cOrders);
     const myCodes = Object.keys(feedbackData.codersChoices[fullname]).sort();
     const newCodes = approvedCodes.filter(codeData => !myCodes.includes(codeData.code));
-    setApprovedNewCodes(newCodes);
     const __quotesSelectedForCode = {};
     for (let code of myCodes) {
       __quotesSelectedForCode[code] = feedbackData.codersChoices[fullname][code];
@@ -995,14 +981,35 @@ const CodeFeedback = props => {
     for (let sentence in _quotesSelectedForCodes) {
       _quotesSelectedForCodes[sentence.trim()] = _quotesSelectedForCodes[sentence];
     }
+    setFeedbackCode(feedbackData);
+    setApprovedNewCodes(newCodes);
+    setConditionsOrder(cOrders);
+    setDocId(docID);
+    setChosenCondition(feedbackData.choice);
+    setSentences(response.map(s => s.trim()));
     setSelectedSentence(response[0] || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 1000);
   };
-  if (!choiceConditions[selectedSentence] && sentences.length) return null;
+  if (!choiceConditions[selectedSentence] && sentences.length)
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh" 
+        }}
+      >
+        <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
+      </div>
+    );
   return (
-    <>
+    <Box id="get-this">
       {sentences.length ? (
         <>
           <Alert severity="warning" sx={{ mt: "15px", mb: "15px" }}>
@@ -1129,16 +1136,18 @@ const CodeFeedback = props => {
                           </div>
                         </ListItemButton>
 
-                        <Button
-                          mode="outlined"
-                          disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
-                          onClick={saveQuote(sentence)}
-                          variant="contained"
-                          sx={{ mr: "5px" }}
-                        >
-                          <BookmarkIcon />
-                          Save As A Quote
-                        </Button>
+                        <Paper sx={{ backgroundColor: "#2196f3", ml: "5px", mr: "5px" }}>
+                          <ListItemButton
+                            disabled={!enableSaveQuote[sentences.indexOf(sentence)]}
+                            onClick={saveQuote(sentence)}
+                            variant="outlined"
+                            sx={{ mr: "5px" }}
+                          >
+                            <Tooltip title="Save as a quote">
+                              <BookmarkIcon />
+                            </Tooltip>
+                          </ListItemButton>
+                        </Paper>
                       </ListItem>
                     ))}
                   </List>
@@ -1193,13 +1202,15 @@ const CodeFeedback = props => {
                   If the code you're looking for does not exist in the list above, add it below:
                   <br />
                 </Alert>
-
-                <TextareaAutosize
-                  style={{ width: "80%", alignItems: "center" }}
-                  minRows={7}
-                  placeholder={"Add your code here."}
-                  onChange={event => setNewCode(event.currentTarget.value)}
+                <TextField
+                  label="Add your code here."
+                  variant="outlined"
                   value={newCode}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  sx={{ width: "95%", m: 0.5 }}
+                  onChange={event => setNewCode(event.currentTarget.value)}
                 />
                 <Box>
                   <Button
@@ -1232,7 +1243,7 @@ const CodeFeedback = props => {
         </>
       ) : allResponsesGraded ? (
         <Alert severity="info" variant="outlined" className="VoteActivityAlert">
-          unfortunately there is no new responses for you to grade{" "}
+          unfortunately there is no new responses for you to Code{" "}
         </Alert>
       ) : (
         <div
@@ -1400,7 +1411,7 @@ const CodeFeedback = props => {
           </DialogActions>
         </Dialog>
       </>
-    </>
+    </Box>
   );
 };
 export default CodeFeedback;

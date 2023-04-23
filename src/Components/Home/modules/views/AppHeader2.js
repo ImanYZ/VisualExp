@@ -75,7 +75,7 @@ const MenuBar = ({ items, onCloseMenu, selectedSectionId, onSwitchSection, preUr
   const navigate = useNavigate();
 
   const signUpHandler = () => {
-    navigate("/auth");
+    navigate("/Activities");
   };
 
   return (
@@ -275,7 +275,7 @@ const AppHeader = ({ sections, selectedSectionId, onSwitchSection, preUrl = "" }
   );
 
   const signUpHandler = () => {
-    navigateTo("/auth");
+    navigateTo("/Activities");
   };
 
   const onSwitchSectionByMenu = id => {

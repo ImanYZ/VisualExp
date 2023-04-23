@@ -16,6 +16,8 @@ import Switch from "@mui/material/Switch";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SchemaIcon from "@mui/icons-material/Schema";
 
 import { firebaseState, fullnameState, isAdminState, emailState } from "../../store/AuthAtoms";
 
@@ -123,7 +125,8 @@ const RouterNav = props => {
   const [nodesLoaded, setNodesLoaded] = useState(false);
   const [userNodesChanges, setUserNodesChanges] = useState([]);
   const [userNodes, setUserNodes] = useState([]);
-
+  const [otherPagesMenuOpen, setOtherPagesMenuOpen] = useState(null);
+  const isOtherPagesMenuOpen = Boolean(otherPagesMenuOpen);
   const projectPoints = projectSpecs?.points || {};
 
   useEffect(() => {
@@ -671,6 +674,7 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
+    navigateTo("/Activities");
   };
 
   const changeProject = (event, index) => {
@@ -687,28 +691,12 @@ const RouterNav = props => {
   const handleProfileMenuClose = () => {
     setProfileMenuOpen(null);
   };
-
-  const handleProjectMenuOpen = event => {
-    setProjectMenuOpen(event.currentTarget);
+  const handleOtherPagesMenuOpen = event => {
+    setOtherPagesMenuOpen(event.currentTarget);
   };
-
-  const handleProjectMenuClose = () => {
-    setProjectMenuOpen(null);
+  const handleOtherPagesMenuClose = () => {
+    setOtherPagesMenuOpen(null);
   };
-
-  const renderProjectsMenu = (
-    <Menu id="ProjectsMenu" anchorEl={projectMenuOpen} open={isProjectMenuOpen} onClose={handleProjectMenuClose}>
-      {projects.map((proj, index) => (
-        <MenuItem
-          key={`${proj}MenuItem`}
-          selected={index === projectIndex}
-          onClick={event => changeProject(event, index)}
-        >
-          {proj}
-        </MenuItem>
-      ))}
-    </Menu>
-  );
 
   const renderProfileMenu = (
     <Menu
@@ -742,6 +730,34 @@ const RouterNav = props => {
       {/* <MenuItem sx={{ flexGrow: 3 }}>Schema Generation Tool</MenuItem> */}
       <MenuItem sx={{ flexGrow: 3 }} onClick={signOut}>
         <LogoutIcon /> <span id="LogoutText">Logout</span>
+      </MenuItem>
+    </Menu>
+  );
+
+  const renderOtherPagesMenu = (
+    <Menu
+      anchorEl={otherPagesMenuOpen}
+      open={isOtherPagesMenuOpen}
+      onClose={handleOtherPagesMenuClose}
+      onClick={handleOtherPagesMenuClose}
+      transformOrigin={{ horizontal: "right", vertical: "top" }}
+      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+    >
+      <MenuItem
+        onClick={() => {
+          navigate("/Activities/ResearcherPassage");
+        }}
+      >
+        <MenuBookIcon sx={{ m: "5px" }} />
+        Experiment Passages
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          navigate("/Activities/SchemaGeneration");
+        }}
+      >
+        <SchemaIcon sx={{ m: "5px" }} />
+        Schema Generation
       </MenuItem>
     </Menu>
   );
@@ -1117,35 +1133,14 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {/* {projectPoints.BooleanExpressionGenerationPoints ? (
-                      <Tooltip title={"Schema Generation Tool"}>
-                        <Button
-                          id="SchemaGenerationTool"
-                          className={activePage === "SchemaGenerationTool" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/SchemaGeneration")}
-                        >
-                          🤖 {roundNum(positiveBooleanExpPionts)}
-                          <br />❌ {roundNum(negativeBooleanExpPionts)}
-                        </Button>
+                    {projectPoints.commentsPoints ? (
+                      <Tooltip title="Additional Resources">
+                      
+                        <IconButton >
+                          <ArrowDropDownIcon onClick={handleOtherPagesMenuOpen} />
+                        </IconButton>
                       </Tooltip>
-                    ) : null} */}
-                    {/* <Box sx={{ minWidth: "130px", textAlign: "center" }}>
-                    <div id="ProjectLabel">Project</div>
-                    <Tooltip title="Current Project">
-                      <Button
-                        size="large"
-                        edge="end"
-                        aria-haspopup="true"
-                        id="ProjectSelector"
-                        aria-controls="lock-menu"
-                        aria-label="Current Project"
-                        aria-expanded={isProjectMenuOpen ? "true" : undefined}
-                        onClick={handleProjectMenuOpen}
-                      >
-                        {project} <ArrowDropDownIcon />
-                      </Button>
-                    </Tooltip>
-                  </Box> */}
+                    ) : null}
                   </>
                 )}
 
@@ -1170,6 +1165,7 @@ const RouterNav = props => {
           </AppBar>
           {/* {projects.length > 0 && renderProjectsMenu} */}
           {fullname && renderProfileMenu}
+          {fullname && renderOtherPagesMenu}
         </Box>
       )}
       <Outlet />
