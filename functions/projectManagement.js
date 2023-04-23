@@ -1,6 +1,6 @@
 const { admin, db, commitBatch, batchUpdate } = require("./admin");
 const {futureEvents, pastEvents } = require("./scheduling");
-const { isToday } = require("./utils");
+const { isToday , fetchRecentParticipants} = require("./utils");
 const { delay } = require("./helpers/common");
 const {
   reschEventNotificationEmail,
@@ -1252,6 +1252,8 @@ exports.createTemFeedback = async (req, res) => {
   try {
 
       const { fullname, project } = req.body;
+      const recentParticipants = await fetchRecentParticipants(fullname, project)
+      console.log(recentParticipants);
       if (!fullname || !project) {
         return res.status(500).send({
           message: "some parameters are missing"
@@ -1261,12 +1263,12 @@ exports.createTemFeedback = async (req, res) => {
       const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
 
       const previousIds = [];
-      const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get();
+      const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get(); 
+
       for (let feedbackCodeOrder of feedbackCodesOrders.docs) {
         const feedbackCodeOrderData = feedbackCodeOrder.data();
         previousIds.concat(feedbackCodeOrderData.codeIds);
       }
-
       const batch = db.batch();
 
       const approvedCodes = new Set();
@@ -1301,8 +1303,9 @@ exports.createTemFeedback = async (req, res) => {
       const feedbackCodesByParticipant = {};
 
       for (const feedbackCode of feedbackCodes.docs) {
-        if (previousIds.includes(feedbackCode.id)) continue;
         const feedbackCodeData = feedbackCode.data();
+        if (previousIds.includes(feedbackCode.id) && !Object.keys(recentParticipants).includes(feedbackCodeData.fullname)) continue;
+        if(feedbackCodeData.coders.includes(fullname)) continue;
         if (!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
           feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
         }
@@ -1312,6 +1315,10 @@ exports.createTemFeedback = async (req, res) => {
           explanation: feedbackCodeData.explanation || ""
         });
       }
+
+      const sortedFeedbackCodesByParticipant = Object.keys(feedbackCodesByParticipant).sort(participant =>
+        Object.keys(recentParticipants).includes(participant) ? -1 : 1
+      );
       const feedbackCodeIds = [];
       const feedbackCodeOrders = await db
         .collection("feedbackCodeOrderV2")
@@ -1334,7 +1341,7 @@ exports.createTemFeedback = async (req, res) => {
       const codeIds = Array.from(new Set([...feedbackCodeIds, ...(feedbackCodeData.codeIds || [])]));
 
       if (codeIds.length <= 2) {
-        for (let participant in feedbackCodesByParticipant) {
+        for (let participant of sortedFeedbackCodesByParticipant) {
           for (const feedbackCode of feedbackCodesByParticipant[participant]) {
             const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
             if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {

@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import MenuIcon from "@mui/icons-material/Menu";
 // import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import BiotechIcon from "@mui/icons-material/Biotech";
@@ -18,27 +17,15 @@ import CloseIcon from "@mui/icons-material/Close";
 // import Brightness4Icon from "@mui/icons-material/Brightness4";
 // import Brightness7Icon from "@mui/icons-material/Brightness7";
 
-import {
-  firebaseState,
-  emailState,
-  fullnameState,
-  resumeUrlState,
-  transcriptUrlState,
-  applicationsSubmittedState,
-  colorModeState,
-  leadingState
-} from "../../../../store/AuthAtoms";
+import { firebaseState, emailState, fullnameState, colorModeState, leadingState } from "../../../../store/AuthAtoms";
 import { notAResearcherState } from "../../../../store/ProjectAtoms";
-import { hasScheduledState, completedExperimentState } from "../../../../store/ExperimentAtoms";
-
-import AppBar from "../components/AppBar";
+import { completedExperimentState } from "../../../../store/ExperimentAtoms";
 
 import sectionsOrder from "./sectionsOrder";
-import { getFullname } from "../../../../utils";
 
 import LogoDarkMode from "../../../../assets/1Cademy-head.svg";
-import { Link, Toolbar } from "@mui/material";
-import { borderColor, Stack, textTransform } from "@mui/system";
+import { Link } from "@mui/material";
+import { Stack } from "@mui/system";
 import AppFooter from "./AppFooter";
 
 const LinkTab = props => {
@@ -57,10 +44,10 @@ const LinkTab = props => {
   );
 };
 
-const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
-  const [completedExperiment, /* setCompletedExperiment */] = useRecoilState(completedExperimentState);
+const MenuBar = ({ items, switchSection, thisPage, tutorial }) => {
+  const [completedExperiment /* setCompletedExperiment */] = useRecoilState(completedExperimentState);
   const leading = useRecoilValue(leadingState);
-  const [fullname, /* setFullname */] = useRecoilState(fullnameState);
+  const [fullname /* setFullname */] = useRecoilState(fullnameState);
 
   return (
     <Stack
@@ -91,28 +78,28 @@ const MenuBar = ({ items, switchSection,thisPage,tutorial }) => {
             </Tooltip>
           );
         })}
-           {(leading || thisPage) && (
-                <Tooltip title={thisPage}>
-                  <Link
-                    onClick={switchSection(5)}
-                    sx={{ color: "common.white", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
-                  >
-                    {thisPage}
-                  </Link>
-                </Tooltip>
-              )}
-              {fullname && !tutorial && completedExperiment && (
-                <Tooltip title="1Cademy Tutorial">
-                  <Link
-                    href="/tutorial"
-                    target="_blank"
-                    color="inherit"
-                    sx={{ color: "common.white", textDecoration: "none" }}
-                  >
-                    Tutorial
-                  </Link>
-                </Tooltip>
-              )}
+        {(leading || thisPage) && (
+          <Tooltip title={thisPage}>
+            <Link
+              onClick={switchSection(5)}
+              sx={{ color: "common.white", textDecoration: "none", borderBottom: "solid 2px #EF7E2B" }}
+            >
+              {thisPage}
+            </Link>
+          </Tooltip>
+        )}
+        {fullname && !tutorial && completedExperiment && (
+          <Tooltip title="1Cademy Tutorial">
+            <Link
+              href="/tutorial"
+              target="_blank"
+              color="inherit"
+              sx={{ color: "common.white", textDecoration: "none" }}
+            >
+              Tutorial
+            </Link>
+          </Tooltip>
+        )}
       </Stack>
       <AppFooter />
     </Stack>
@@ -123,80 +110,15 @@ const AppAppBar2 = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
-  const setHasScheduled = useSetRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
-  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
-  const setResumeUrl = useSetRecoilState(resumeUrlState);
-  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const completedExperiment = useRecoilValue(completedExperimentState);
   const leading = useRecoilValue(leadingState);
-  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const notAResearcher = useRecoilValue(notAResearcherState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
-  const [colorMode, setColorMode] = useRecoilState(colorModeState);
+  const setColorMode = useSetRecoilState(colorModeState);
   const [openMenu, setOpenMenu] = useState(false);
 
   const navigateTo = useNavigate();
-  useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async user => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uEmail = user.email.toLowerCase();
-        const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
-        if (userDocs.docs.length > 0) {
-          setEmail(uEmail.toLowerCase());
-          const userData = userDocs.docs[0].data();
-          if (!userData.firstname || !userData.lastname) {
-            window.location.href = "/";
-          }
-          setFullname(userDocs.docs[0].id);
-          if (userData.applicationsSubmitted) {
-            setApplicationsSubmitted(userData.applicationsSubmitted);
-          }
-          if ("Resume" in userData) {
-            setResumeUrl(userData["Resume"]);
-          }
-          if ("Transcript" in userData) {
-            setTranscriptUrl(userData["Transcript"]);
-          }
-          if ("projectDone" in userData && userData.projectDone) {
-            setHasScheduled(true);
-            setCompletedExperiment(true);
-          } else {
-            const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
-            const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
-            let allPassed = true;
-            if (scheduleDocs.docs.length >= 3) {
-              let scheduledSessions = 0;
-              for (let scheduleDoc of scheduleDocs.docs) {
-                const scheduleData = scheduleDoc.data();
-                if (scheduleData.order) {
-                  scheduledSessions += 1;
-                  if (scheduleData.session >= nowTimestamp) {
-                    allPassed = false;
-                  }
-                }
-              }
-              if (scheduledSessions >= 3) {
-                setHasScheduled(true);
-                if (allPassed) {
-                  setCompletedExperiment(true);
-                }
-              }
-            }
-          }
-        }
-      } else {
-        // User is signed out
-        console.log("Signing out!");
-        setFullname("");
-        setEmail("");
-        setHasScheduled(false);
-        setCompletedExperiment(false);
-        setApplicationsSubmitted({});
-      }
-    });
-  }, [firebase]);
 
   const signOut = async event => {
     setEmail("");
@@ -245,13 +167,13 @@ const AppAppBar2 = props => {
     </Menu>
   );
   const signUpHandler = () => {
-    navigateTo("/auth");
+    navigateTo("/Activities");
   };
   return (
     <>
       <Box
         sx={{
-          background:  "rgba(0,0,0,.72)" ,
+          background: "rgba(0,0,0,.72)",
           backdropFilter: "saturate(180%) blur(20px)",
           position: "sticky",
           top: "0",
@@ -346,7 +268,7 @@ const AppAppBar2 = props => {
               </IconButton>
             </Box> */}
             {/* !props.tutorial && !props.joinNowSec && !props.communities && */}
-            {!fullname&&
+            {!fullname && (
               <Tooltip title="Apply to join 1Cademy">
                 <Button
                   variant="contained"
@@ -364,7 +286,7 @@ const AppAppBar2 = props => {
                   Apply
                 </Button>
               </Tooltip>
-            }
+            )}
             {fullname ? (
               <Tooltip title="Account">
                 <IconButton
@@ -411,7 +333,14 @@ const AppAppBar2 = props => {
         </Stack>
         {fullname && renderProfileMenu}
       </Box>
-      {openMenu && <MenuBar items={[0, 1, 2, 3, 4]} switchSection={props.switchSection} thisPage={props.thisPage} tutorial={props.tutorial} />}
+      {openMenu && (
+        <MenuBar
+          items={[0, 1, 2, 3, 4]}
+          switchSection={props.switchSection}
+          thisPage={props.thisPage}
+          tutorial={props.tutorial}
+        />
+      )}
     </>
   );
 };

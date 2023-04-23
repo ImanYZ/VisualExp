@@ -156,7 +156,7 @@ const SelectSessions = props => {
         }
       }
       if(dtFirstSchedule) {
-        let availableResearchers = props.availableSessions[dtFirstSchedule.toLocaleString()];
+        let availableResearchers = props.availableSessions[dtFirstSchedule.toLocaleString()] || [];
         for(const availableSession in props.availableSessions) {
           if(moment(availableSession).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
             if(moment(dtFirstSchedule).add(30, "minutes").toDate().toLocaleString() === moment(availableSession).toDate().toLocaleString()) {
