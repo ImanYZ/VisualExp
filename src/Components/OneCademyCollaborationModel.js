@@ -23,6 +23,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import LegendToggleIcon from "@mui/icons-material/LegendToggle";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import Drawer from "@mui/material/Drawer";
 const d3 = require("d3");
 
 const legends = [
@@ -61,9 +66,12 @@ const OneCademyCollaborationModel = () => {
   const [openSideBar, setOpenSideBar] = useState(false);
   const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
+  const [openLegend, setOpenLegend] = useState(false);
   const editor = email === "oneweb@umich.edu";
 
-  function ColorBox(props) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const ColorBox = props => {
     return (
       <Box
         sx={{
@@ -75,6 +83,7 @@ const OneCademyCollaborationModel = () => {
           fontSize: 13,
           borderRadius: 2,
           maxWidth: 90,
+          ml: 0.9,
           mr: 0.5,
           mb: 0.5,
           textAlign: "center",
@@ -86,7 +95,7 @@ const OneCademyCollaborationModel = () => {
         {props.text}
       </Box>
     );
-  }
+  };
   function addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order) {
     let edgeLabel = edgeElement.select("path");
     let edgePath = edgeLabel.node();
@@ -810,358 +819,519 @@ const OneCademyCollaborationModel = () => {
     setOpenSideBar(old => !old);
     setZoomState(null);
   };
-
+  const handleLegend = () => {
+    setOpenLegend(old => !old);
+  };
   return (
-    <Box sx={{ height: "100vh", overflow: "auto" }}>
-      <Dialog open={deleteDialogOpen} onClose={handleClose}>
-        <DialogActions>
-          <Button onClick={deleteNode}>Confirm</Button>
-          <Button
-            onClick={() => {
-              setDeleteDialogOpen(false);
-            }}
-            autoFocus
-          >
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={deleteDialogLinkOpen} onClose={handleClose}>
-        <DialogActions>
-          <Button onClick={deleteLink}>Confirm</Button>
-          <Button
-            onClick={() => {
-              setDeleteDialogLinkOpen(false);
-            }}
-            autoFocus
-          >
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Grid container spacing={2} direction="row-reverse">
-        <Grid item xs={openSideBar ? 9 : 12}>
-          <Paper
-            id="graphPaper"
+    <Box>
+      <Box>
+        <Drawer
+          PaperProps={{
+            style: {
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0
+            }
+          }}
+          open={openSideBar && isMobile}
+        >
+          {" "}
+          <CloseIcon
             sx={{
-              mt: "10px",
-              mr: "9px",
-              height: "750px",
-              width: "600",
-              display: "flex",
-              justifyContent: "center",
-              flexDirection: "column"
+              position: "fixed",
+              top: "3%",
+              right: "3%",
+              zIndex: "1000"
             }}
-            elevation={4}
-          >
-            {visibleNodes.length > 0 ? (
-              <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
-            ) : (
-              <div
-                style={{
-                  padding: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center"
+            onClick={handleOpenSidBar}
+          />
+          <Box sx={{ direction: "ltr" }}>
+            <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
+              {" "}
+              <Typography
+                sx={{
+                  fontWeight: "bold"
                 }}
               >
-                <Typography align="center" variant="h7">
-                  To show the nodes in the diagram, check them in the list.
-                </Typography>
-              </div>
-            )}
-            {!openSideBar && (
-              <MenuIcon
+                Choose nodes to show their causal relations.
+              </Typography>{" "}
+              Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
+            </Box>
+
+            {allNodes.map((node, index) => (
+              <ListItem
+                key={node.title + index}
+                disablePadding
                 sx={{
-                  position: "absolute",
-                  top: "3%",
-                  left: "10px",
-                  zIndex: "1000",
-                  transform: "translateY(-50%)"
+                  "&$selected": {
+                    backgroundColor: "orange",
+                    zIndex: 100,
+                    ml: 9
+                  }
                 }}
-                onClick={handleOpenSidBar}
-              />
-            )}
-            {visibleNodes.length > 0 && (
-              <Box sx={{ display: "flex" }}>
-                {[
-                  { text: "Input", color: "#1976d2" },
-                  { text: "Positive Outcome", color: "#4caf50" },
-                  { text: "Negative Outcome", color: "#cc0119" }
-                ].map((resource, index) => (
-                  <ColorBox key={resource.text} text={resource.text} color={resource.color} />
-                ))}
-                {[
-                  { text: "Known Positive Effect", color: "#56E41B" },
-                  { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
-                  { text: "Known Negative Effect", color: "#A91BE4" },
-                  { text: "Hypothetical Negative Effect", color: "#E4451B" }
-                ].map((resource, index) => (
-                  <Box style={{ marginInline: "14px" }}>
-                    <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
-                    <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
-                      {resource.text}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
-          </Paper>
-          <Box sx={{ ml: "14px", mt: "14px" }}>
-            {openModifyLink && editor && (
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <TextField
-                  label="Explanation"
-                  variant="outlined"
-                  value={explanation}
-                  onChange={handlExplanation}
-                  fullWidth
-                  multiline
-                  rows={3}
-                  sx={{ width: "95%", m: 0.5 }}
-                />
-                <Box sx={{ display: "flex", flexDirection: "inline" }}>
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": { m: 0.5, width: "25ch" }
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <FormControl>
-                      <InputLabel>Type</InputLabel>
-                      <Select
-                        value={typeLink}
-                        label="Type"
-                        onChange={e => {
-                          setTypeLink(e.target.value);
-                        }}
-                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                      >
-                        {[
-                          "Known Positive Effect",
-                          "Hypothetical Positive Effect",
-                          "Known Negative Effect",
-                          "Hypothetical Negative Effect"
-                        ].map(row => (
-                          <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                            {row}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <TextField
-                      label="Order"
-                      type="number"
-                      value={linkOrder}
-                      inputProps={{
-                        min: "1",
-                        step: "1"
-                      }}
-                      onChange={handleInputValidation}
-                    />
-                  </Box>
-                  <Box sx={{ mt: "15px" }}>
-                    <Button onClick={handleSaveLink}>Save</Button>
-                    <Button onClick={handleCloseLink} autoFocus>
-                      Cancel
-                    </Button>
-                    <IconButton
-                      color="error"
-                      onClick={() => {
-                        setDeleteDialogLinkOpen(true);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              </Box>
-            )}
-            {openModifyLink && !editor && explanationLink !== "" && (
-              <Typography sx={{ p: 2 }}>{explanationLink}</Typography>
-            )}
-            {openAddNode && (
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <TextField
-                  label="Title"
-                  variant="outlined"
-                  value={title}
-                  fullWidth
-                  sx={{ width: "95%", m: 0.5 }}
-                  onChange={e => {
-                    setTitle(e.currentTarget.value);
+              >
+                <Checkbox
+                  checked={visibleNodes.includes(node.id)}
+                  onClick={() => {
+                    handleVisibileNodes(node);
                   }}
                 />
-                <Box sx={{ display: "flex", flexDirection: "inline" }}>
-                  <Box
-                    component="form"
-                    sx={{
-                      "& > :not(style)": { m: 0.5, width: "25ch" }
-                    }}
-                    noValidate
-                    autoComplete="off"
-                  >
-                    <FormControl>
-                      <InputLabel>Type</InputLabel>
-                      <Select
-                        value={type}
-                        label="Type"
-                        onChange={e => {
-                          setType(e.target.value);
-                        }}
-                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                      >
-                        {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
-                          <MenuItem key={row} value={row} sx={{ display: "center" }}>
-                            {row}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormControl>
-                      <InputLabel>children</InputLabel>
-                      <Select
-                        label="children"
-                        value={childrenIds}
-                        multiple
-                        onChange={e => {
-                          setChildrenIds(e.target.value);
-                        }}
-                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                      >
-                        {allNodes.map(node => (
-                          <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
-                            {node.title}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-                  <Box sx={{ mt: "14px" }}>
-                    <Button onClick={handleSave}>Save</Button>
-                    <Button onClick={handleClose} autoFocus>
-                      Cancel
-                    </Button>
-                    <IconButton
-                      color="error"
-                      onClick={() => {
-                        setDeleteDialogOpen(true);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              </Box>
-            )}
-            <Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button
-                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
-                  variant="contained"
-                  onClick={previousLink}
-                  disabled={stepLink === 0}
-                >
-                  Previous
-                </Button>
-                <Button
-                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
-                  variant="contained"
-                  onClick={nextLink}
-                  disabled={stepLink === maxDepth}
-                >
-                  Next
-                </Button>
-                <Button
-                  sx={{ ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
-                  variant="contained"
-                  onClick={resetOrder}
-                  disabled={stepLink <= 1}
-                >
-                  Reset
-                </Button>
-                {editor && (
-                  <Button
-                    sx={{ mr: "30px", ml: "30px", mb: "20px", display: "flex", justifyContent: "flex-end" }}
-                    variant="contained"
-                    onClick={AddNewNode}
-                  >
-                    Add New Node
-                  </Button>
-                )}
-              </Box>
-            </Box>
+                <ListItemText id={node.title} primary={`${node.title}`} />
+              </ListItem>
+            ))}
           </Box>
-        </Grid>
-        <Grid item xs={openSideBar ? 3 : 0}>
-          {openSideBar && (
-            <Paper
-              sx={{
-                height: "100vh",
-                mb: "10px",
-                overflow: "auto",
-                direction: "rtl",
-                "&::-webkit-scrollbar": {
-                  width: "10px"
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  backgroundColor: "rgba(0, 0, 0, 0.2)",
-                  borderRadius: "5px"
-                }
+        </Drawer>
+        <Drawer open={openLegend}>
+          <CloseIcon
+            sx={{
+              position: "fixed",
+              top: "3%",
+              right: "3%",
+              zIndex: "1000"
+            }}
+            onClick={handleLegend}
+          />
+          <Grid container spacing={1} sx={{ mt: "50px", ml: "30px" }}>
+            {[
+              { text: "Input", color: "#1976d2" },
+              { text: "Positive Outcome", color: "#4caf50" },
+              { text: "Negative Outcome", color: "#cc0119" }
+            ].map((resource, index) => (
+              <Grid item xs={12} sm={4} md={3}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    bgcolor: resource.color,
+                    color: "primary.contrastText",
+                    fontSize: 13,
+                    borderRadius: 2,
+                    maxWidth: 90,
+                    mr: 0.5,
+                    mb: 0.5,
+                    textAlign: "center",
+                    width: "100%",
+                    height: "40px"
+                  }}
+                  key={resource.text}
+                >
+                  {resource.text}
+                </Box>
+              </Grid>
+            ))}
+            {[
+              { text: "Known Positive Effect", color: "#56E41B" },
+              { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+              { text: "Known Negative Effect", color: "#A91BE4" },
+              { text: "Hypothetical Negative Effect", color: "#E4451B" }
+            ].map((resource, index) => (
+              <Grid item xs={12} sm={6} md={3} style={{ marginInline: "14px" }}>
+                <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
+                <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
+                  {resource.text}
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
+        </Drawer>
+      </Box>
+
+      <Box /* sx={{ height: "calc(100vh - 10px)", overflow: "auto" }} */>
+        <Dialog open={deleteDialogOpen} onClose={handleClose}>
+          <DialogActions>
+            <Button onClick={deleteNode}>Confirm</Button>
+            <Button
+              onClick={() => {
+                setDeleteDialogOpen(false);
               }}
+              autoFocus
             >
-              {openSideBar && (
-                <ArrowBackIosNewIcon
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog open={deleteDialogLinkOpen} onClose={handleClose}>
+          <DialogActions>
+            <Button onClick={deleteLink}>Confirm</Button>
+            <Button
+              onClick={() => {
+                setDeleteDialogLinkOpen(false);
+              }}
+              autoFocus
+            >
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Grid container spacing={2} direction="row-reverse">
+          <Grid item xs={openSideBar && !isMobile ? 9 : 12}>
+            <Paper
+              id="graphPaper"
+              sx={{
+                mt: "10px",
+                mr: "9px",
+                ml: isMobile ? "9px" : "",
+                height: isMobile ? "530px" : "90vh",
+                width: "600",
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column"
+              }}
+              elevation={4}
+            >
+              {visibleNodes.length > 0 ? (
+                <svg id="graphGroup" width="100%" height="98%" ref={svgRef} style={{ marginTop: "15px" }}></svg>
+              ) : (
+                <div
+                  style={{
+                    padding: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
+                >
+                  <Typography align="center" variant="h7">
+                    To show the nodes in the diagram, check them in the list.
+                  </Typography>
+                </div>
+              )}
+              {!openSideBar && (
+                <MenuIcon
                   sx={{
                     position: "absolute",
-                    top: "3%",
+                    top: "5%",
+                    left: "10px",
                     zIndex: "1000",
                     transform: "translateY(-50%)"
                   }}
                   onClick={handleOpenSidBar}
                 />
               )}
-              <Box sx={{ direction: "ltr" }}>
-                <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
-                  {" "}
-                  <Typography
-                    sx={{
-                      fontWeight: "bold"
-                    }}
-                  >
-                    Choose nodes to show their causal relations.
-                  </Typography>{" "}
-                  Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
-                </Box>
 
-                {allNodes.map((node, index) => (
-                  <ListItem
-                    key={node.title + index}
-                    disablePadding
-                    sx={{
-                      "&$selected": {
-                        backgroundColor: "orange",
-                        zIndex: 100,
-                        ml: 9
-                      }
-                    }}
-                  >
-                    <Checkbox
-                      checked={visibleNodes.includes(node.id)}
-                      onClick={() => {
-                        handleVisibileNodes(node);
-                      }}
-                    />
-                    <ListItemText id={node.title} primary={`${node.title}`} />
-                  </ListItem>
-                ))}
-              </Box>
+              {!openLegend && isMobile && (
+                <LegendToggleIcon
+                  sx={{
+                    position: "absolute",
+                    top: "1%",
+                    right: "10px",
+                    zIndex: "1000",
+                    transform: "translateX(-50%)"
+                  }}
+                  onClick={handleLegend}
+                />
+              )}
+              {visibleNodes.length > 0 && !isMobile && (
+                <Box sx={{ display: "flex" }}>
+                  {[
+                    { text: "Input", color: "#1976d2" },
+                    { text: "Positive Outcome", color: "#4caf50" },
+                    { text: "Negative Outcome", color: "#cc0119" }
+                  ].map((resource, index) => (
+                    <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                  ))}
+                  {[
+                    { text: "Known Positive Effect", color: "#56E41B" },
+                    { text: "Hypothetical Positive Effect", color: "#1BBAE4" },
+                    { text: "Known Negative Effect", color: "#A91BE4" },
+                    { text: "Hypothetical Negative Effect", color: "#E4451B" }
+                  ].map((resource, index) => (
+                    <Box style={{ marginInline: "14px" }}>
+                      <TrendingFlatIcon style={{ fontSize: "40px", color: resource.color }} />
+                      <Typography sx={{ fontSize: "14px", color: resource.color, marginTop: "-10px" }}>
+                        {resource.text}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
             </Paper>
-          )}
+            <Box sx={{ ml: "14px", mt: "14px" }}>
+              {openModifyLink && editor && (
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                  <TextField
+                    label="Explanation"
+                    variant="outlined"
+                    value={explanation}
+                    onChange={handlExplanation}
+                    fullWidth
+                    multiline
+                    rows={3}
+                    sx={{ width: "95%", m: 0.5 }}
+                  />
+                  <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                    <Box
+                      component="form"
+                      sx={{
+                        "& > :not(style)": { m: 0.5, width: "25ch" }
+                      }}
+                      noValidate
+                      autoComplete="off"
+                    >
+                      <FormControl>
+                        <InputLabel>Type</InputLabel>
+                        <Select
+                          value={typeLink}
+                          label="Type"
+                          onChange={e => {
+                            setTypeLink(e.target.value);
+                          }}
+                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                        >
+                          {[
+                            "Known Positive Effect",
+                            "Hypothetical Positive Effect",
+                            "Known Negative Effect",
+                            "Hypothetical Negative Effect"
+                          ].map(row => (
+                            <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                              {row}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <TextField
+                        label="Order"
+                        type="number"
+                        value={linkOrder}
+                        inputProps={{
+                          min: "1",
+                          step: "1"
+                        }}
+                        onChange={handleInputValidation}
+                      />
+                    </Box>
+                    <Box sx={{ mt: "15px" }}>
+                      <Button onClick={handleSaveLink}>Save</Button>
+                      <Button onClick={handleCloseLink} autoFocus>
+                        Cancel
+                      </Button>
+                      <IconButton
+                        color="error"
+                        onClick={() => {
+                          setDeleteDialogLinkOpen(true);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+              {openModifyLink && !editor && explanationLink !== "" && (
+                <Typography sx={{ p: 2 }}>{explanationLink}</Typography>
+              )}
+              {openAddNode && (
+                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                  <TextField
+                    label="Title"
+                    variant="outlined"
+                    value={title}
+                    fullWidth
+                    sx={{ width: "95%", m: 0.5 }}
+                    onChange={e => {
+                      setTitle(e.currentTarget.value);
+                    }}
+                  />
+                  <Box sx={{ display: "flex", flexDirection: "inline" }}>
+                    <Box
+                      component="form"
+                      sx={{
+                        "& > :not(style)": { m: 0.5, width: "25ch" }
+                      }}
+                      noValidate
+                      autoComplete="off"
+                    >
+                      <FormControl>
+                        <InputLabel>Type</InputLabel>
+                        <Select
+                          value={type}
+                          label="Type"
+                          onChange={e => {
+                            setType(e.target.value);
+                          }}
+                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                        >
+                          {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
+                            <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                              {row}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <FormControl>
+                        <InputLabel>children</InputLabel>
+                        <Select
+                          label="children"
+                          value={childrenIds}
+                          multiple
+                          onChange={e => {
+                            setChildrenIds(e.target.value);
+                          }}
+                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                        >
+                          {allNodes.map(node => (
+                            <MenuItem key={node.id + node.title} value={node.id} sx={{ display: "center" }}>
+                              {node.title}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                    <Box sx={{ mt: "14px" }}>
+                      <Button onClick={handleSave}>Save</Button>
+                      <Button onClick={handleClose} autoFocus>
+                        Cancel
+                      </Button>
+                      <IconButton
+                        color="error"
+                        onClick={() => {
+                          setDeleteDialogOpen(true);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+              <Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <Button
+                    sx={{
+                      ml: ["15px", "30px"],
+                      mb: "20px",
+                      flexGrow: 1,
+                      justifyContent: "center"
+                    }}
+                    variant="contained"
+                    onClick={previousLink}
+                    disabled={stepLink === 0}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    sx={{
+                      ml: ["15px", "30px"],
+                      mb: "20px",
+                      flexGrow: 1,
+                      justifyContent: "center"
+                    }}
+                    variant="contained"
+                    onClick={nextLink}
+                    disabled={stepLink === maxDepth}
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    sx={{
+                      ml: ["15px", "30px"],
+                      mb: "20px",
+                      mr: "30px",
+                      flexGrow: 1,
+                      justifyContent: "center"
+                    }}
+                    variant="contained"
+                    onClick={resetOrder}
+                    disabled={stepLink <= 1}
+                  >
+                    Reset
+                  </Button>
+                  {editor && (
+                    <Button
+                      sx={{
+                        mr: "30px",
+                        ml: ["15px", "30px"],
+                        mb: "20px",
+                        flexGrow: 1,
+                        justifyContent: "center"
+                      }}
+                      variant="contained"
+                      onClick={AddNewNode}
+                    >
+                      Add New Node
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={openSideBar && !isMobile ? 3 : 0}>
+            {openSideBar && (
+              <Paper
+                sx={{
+                  height: "100vh",
+                  mb: "10px",
+                  overflow: "auto",
+                  direction: "rtl",
+                  "&::-webkit-scrollbar": {
+                    width: "10px"
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "rgba(0, 0, 0, 0.2)",
+                    borderRadius: "5px"
+                  }
+                }}
+              >
+                {openSideBar && !isMobile && (
+                  <ArrowBackIosNewIcon
+                    sx={{
+                      position: "absolute",
+                      top: "3%",
+                      zIndex: "1000",
+                      transform: "translateY(-50%)"
+                    }}
+                    onClick={handleOpenSidBar}
+                  />
+                )}
+                <Box sx={{ direction: "ltr" }}>
+                  <Box sx={{ position: "sticky", top: "0", zIndex: "1", backgroundColor: "white", p: 1, ml: "5px" }}>
+                    {" "}
+                    <Typography
+                      sx={{
+                        fontWeight: "bold"
+                      }}
+                    >
+                      Choose nodes to show their causal relations.
+                    </Typography>{" "}
+                    Show All the Nodes <Checkbox checked={showAll} onClick={showAllNodes} />
+                  </Box>
+
+                  {allNodes.map((node, index) => (
+                    <ListItem
+                      key={node.title + index}
+                      disablePadding
+                      sx={{
+                        "&$selected": {
+                          backgroundColor: "orange",
+                          zIndex: 100,
+                          ml: 9
+                        }
+                      }}
+                    >
+                      <Checkbox
+                        checked={visibleNodes.includes(node.id)}
+                        onClick={() => {
+                          handleVisibileNodes(node);
+                        }}
+                      />
+                      <ListItemText id={node.title} primary={`${node.title}`} />
+                    </ListItem>
+                  ))}
+                </Box>
+              </Paper>
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </Box>
   );
 };
