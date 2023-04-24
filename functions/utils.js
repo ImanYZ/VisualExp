@@ -131,6 +131,20 @@ const delay = async (time) => {
   });
 };
 
+const fetchRecentParticipants = async (researcher, project) => {
+  // logic to fetch recently participants names by current researcher
+  const recentParticipants = {};
+  const resSchedules = await db.collection("resSchedule").where("project", "==", project).get();
+  for (const resSchedule of resSchedules.docs) {
+    const resScheduleData = resSchedule.data();
+    const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
+    for (const participant in attendedSessions) {
+      recentParticipants[participant] = attendedSessions[participant];
+    }
+  }
+  return recentParticipants;
+};
+
 module.exports = {
   strToBoolean,
   getFullname,
@@ -145,5 +159,6 @@ module.exports = {
   capitalizeFirstLetter,
   capitalizeSentence,
   pad2Num,
-  delay
+  delay,
+  fetchRecentParticipants
 };
