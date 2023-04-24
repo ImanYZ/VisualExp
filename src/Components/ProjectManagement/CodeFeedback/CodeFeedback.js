@@ -447,7 +447,7 @@ const CodeFeedback = props => {
           .match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm)
           .filter(s => s.trim());
         setSentences(response.map(s => s.trim()));
-        setSelectedSentence(response[0]);
+        setSelectedSentence(response[0].trim());
         const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
         if (userData.pConditions.length > 1) {
           const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
@@ -525,7 +525,7 @@ const CodeFeedback = props => {
   };
 
   const handleSelectedSentence = async sentence => {
-    setSelectedSentence(sentence);
+    setSelectedSentence(sentence.trim());
   };
   const handleCodesSelected = value => () => {
     quotesSelectedForCodes[selectedSentence] = quotesSelectedForCodes[selectedSentence] || [];
@@ -987,7 +987,7 @@ const CodeFeedback = props => {
     setDocId(docID);
     setChosenCondition(feedbackData.choice);
     setSentences(response.map(s => s.trim()));
-    setSelectedSentence(response[0] || "");
+    setSelectedSentence(response[0].trim() || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
     setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
     setSubmitting(false);
@@ -995,7 +995,8 @@ const CodeFeedback = props => {
       window.scrollTo(0, 0);
     }, 1000);
   };
-  if (!choiceConditions[selectedSentence] && sentences.length)
+
+  if (!choiceConditions[selectedSentence] || !sentences.length)
     return (
       <div
         style={{
