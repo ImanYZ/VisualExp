@@ -435,7 +435,7 @@ const AppRouter = props => {
     //   });
   }, [duringAnExperiment]);
 
-  console.log(notAResearcher);
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />
