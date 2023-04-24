@@ -40,7 +40,7 @@ import {
   allTagsState,
   allActivitiesState,
   othersActivitiesState,
-  otherActivityState,
+  otherActivityState
 } from "../../../store/ProjectAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
@@ -51,7 +51,7 @@ import {
   ActivityInfoAlert,
   ActivityInstructionsAlert,
   CalendarVisualizationAlert,
-  IntellectualActivitiesAlert,
+  IntellectualActivitiesAlert
 } from "./Alerts";
 
 import "./IntellectualPoints.css";
@@ -64,9 +64,9 @@ const othersActivitiesColumns = [
     headerName: "Description",
     width: 400,
     filterable: false,
-    renderCell: (cellValues) => {
+    renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-    },
+    }
   },
   {
     field: "upVotes",
@@ -74,12 +74,12 @@ const othersActivitiesColumns = [
     type: "number",
     filterable: false,
     width: 70,
-    valueFormatter: (params) => {
+    valueFormatter: params => {
       return `${params.value} 👍`;
-    },
+    }
   },
   { field: "approved", headerName: "Approved", width: 100 },
-  { field: "paid", headerName: "Paid", width: 70 },
+  { field: "paid", headerName: "Paid", width: 70 }
 ];
 
 const ITEM_HEIGHT = 48;
@@ -88,17 +88,15 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
+      width: 250
+    }
+  }
 };
 
-const ExpenseReports = (props) => {
+const ExpenseReports = props => {
   const firebase = useRecoilValue(firebaseState);
   const project = useRecoilValue(projectState);
-  const [othersActivities, setOthersActivities] = useRecoilState(
-    othersActivitiesState
-  );
+  const [othersActivities, setOthersActivities] = useRecoilState(othersActivitiesState);
 
   const [activitiesChanges, setActivitiesChanges] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -120,12 +118,10 @@ const ExpenseReports = (props) => {
 
   useEffect(() => {
     if (firebase && project) {
-      const activitiesQuery = firebase.db
-        .collection("activities")
-        .where("project", "==", project);
-      const activitiesSnapshot = activitiesQuery.onSnapshot((snapshot) => {
+      const activitiesQuery = firebase.db.collection("activities").where("project", "==", project);
+      const activitiesSnapshot = activitiesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setActivitiesChanges((oldActivitiesChanges) => {
+        setActivitiesChanges(oldActivitiesChanges => {
           return [...oldActivitiesChanges, ...docChanges];
         });
         //we don't want to create multiple sockets at the same time. That's why
@@ -146,9 +142,9 @@ const ExpenseReports = (props) => {
         .collection("votes")
         .where("voter", "==", "Iman YeckehZaare")
         .where("project", "==", project);
-      const votesSnapshot = votesQuery.onSnapshot((snapshot) => {
+      const votesSnapshot = votesQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
-        setVotesChanges((oldVotesChanges) => {
+        setVotesChanges(oldVotesChanges => {
           return [...oldVotesChanges, ...docChanges];
         });
       });
@@ -167,9 +163,9 @@ const ExpenseReports = (props) => {
 
       let oActivities = [...othersActivities];
       const oResearchers = [...researchers];
-      for (let change of tempActivitiesChanges) {
+      tempActivitiesChanges.forEach(change => {
         if (change.type === "removed") {
-          oActivities = oActivities.filter((acti) => acti.id !== change.doc.id);
+          oActivities = oActivities.filter(acti => acti.id !== change.doc.id);
         } else {
           const activityData = change.doc.data();
           let isIncluded = true;
@@ -193,27 +189,25 @@ const ExpenseReports = (props) => {
             upVotes: activityData.upVotes,
             paid: activityData.paid ? "PAID" : "",
             id: change.doc.id,
-            isIncluded,
+            isIncluded
           };
-          const activityIdx = oActivities.findIndex(
-            (acti) => acti.id === change.doc.id
-          );
+          const activityIdx = oActivities.findIndex(acti => acti.id === change.doc.id);
           if (activityIdx !== -1) {
             oActivities[activityIdx] = {
               ...oActivities[activityIdx],
-              ...newActivity,
+              ...newActivity
             };
           } else {
             oActivities.push({
               ...newActivity,
-              approved: "◻",
+              approved: "◻"
             });
           }
           if (!oResearchers.includes(activityData.fullname)) {
             oResearchers.push(activityData.fullname);
           }
         }
-      }
+      });
       setOthersActivities(oActivities);
       setResearchers(oResearchers);
       setOnlyResearchers(oResearchers);
@@ -222,11 +216,9 @@ const ExpenseReports = (props) => {
       const tempVotesChanges = [...votesChanges];
       setVotesChanges([]);
       let oActivities = [...othersActivities];
-      for (let change of tempVotesChanges) {
+      tempVotesChanges.forEach(change => {
         const voteData = change.doc.data();
-        const activityIdx = oActivities.findIndex(
-          (acti) => acti.id === voteData.activity
-        );
+        const activityIdx = oActivities.findIndex(acti => acti.id === voteData.activity);
 
         if (change.type === "removed") {
           oActivities[activityIdx].approved = "◻";
@@ -234,7 +226,7 @@ const ExpenseReports = (props) => {
           if (activityIdx !== -1) {
             oActivities[activityIdx] = {
               ...oActivities[activityIdx],
-              approved: voteData.upVote ? "✅" : "◻",
+              approved: voteData.upVote ? "✅" : "◻"
             };
           } else {
             oActivities.push({
@@ -244,11 +236,11 @@ const ExpenseReports = (props) => {
               start: new Date(),
               tags: " ",
               upVotes: 0,
-              id: voteData.activity,
+              id: voteData.activity
             });
           }
         }
-      }
+      });
 
       setOthersActivities(oActivities);
     }
@@ -261,16 +253,15 @@ const ExpenseReports = (props) => {
     activityDateFrom,
     activityDateTo,
     onlyApproved,
-    onlyUnpaid,
+    onlyUnpaid
   ]);
 
   useEffect(() => {
     const rActivities = {};
     const oActivities = [];
-    for (let oActivity of othersActivities) {
+    othersActivities.forEach(oActivity => {
       if (
-        (onlyResearchers.length === researchers.length ||
-          onlyResearchers.includes(oActivity.fullname)) &&
+        (onlyResearchers.length === researchers.length || onlyResearchers.includes(oActivity.fullname)) &&
         (!onlyApproved || oActivity.approved === "✅") &&
         (!onlyUnpaid || oActivity.paid === "") &&
         (!activityDateFrom || oActivity.start >= activityDateFrom) &&
@@ -283,11 +274,11 @@ const ExpenseReports = (props) => {
           rActivities[oActivity.fullname] = 1;
         }
       }
-    }
+    });
     setResearcherActivities(
-      Object.keys(rActivities).map((researcher) => ({
+      Object.keys(rActivities).map(researcher => ({
         researcher,
-        num: rActivities[researcher],
+        num: rActivities[researcher]
       }))
     );
     setShownActivities(oActivities);
@@ -301,15 +292,7 @@ const ExpenseReports = (props) => {
     ) {
       setShowAll(false);
     }
-  }, [
-    othersActivities,
-    onlyResearchers,
-    researchers,
-    onlyApproved,
-    onlyUnpaid,
-    activityDateFrom,
-    activityDateTo,
-  ]);
+  }, [othersActivities, onlyResearchers, researchers, onlyApproved, onlyUnpaid, activityDateFrom, activityDateTo]);
 
   const markPaid = async () => {
     if (!isSubmitting) {
@@ -320,31 +303,29 @@ const ExpenseReports = (props) => {
         setSnackbarMessage("You successfully marked these activities as paid!");
         setIsSubmitting(false);
       } catch (err) {
-        setSnackbarMessage(
-          "Your request was not successfully saved! Please try again!"
-        );
+        setSnackbarMessage("Your request was not successfully saved! Please try again!");
       }
     }
   };
 
-  const handleOnlyResearchers = (event) => {
+  const handleOnlyResearchers = event => {
     const {
-      target: { value },
+      target: { value }
     } = event;
     // On autofill we get a stringified value.
     const oResearchers = typeof value === "string" ? value.split(",") : value;
     setOnlyResearchers(oResearchers);
   };
 
-  const handleOnlyApproved = (event) => {
+  const handleOnlyApproved = event => {
     setOnlyApproved(event.target.checked);
   };
 
-  const handleOnlyUnpaid = (event) => {
+  const handleOnlyUnpaid = event => {
     setOnlyUnpaid(event.target.checked);
   };
 
-  const handleShowAll = (event) => {
+  const handleShowAll = event => {
     if (event.target.checked) {
       setActivityDateFrom(null);
       setActivityDateTo(null);
@@ -355,12 +336,12 @@ const ExpenseReports = (props) => {
     }
   };
 
-  const handleActivityDateFrom = (newValue) => {
+  const handleActivityDateFrom = newValue => {
     setActivityDateFrom(newValue);
     const oActivities = [];
   };
 
-  const handleActivityDateTo = (newValue) => {
+  const handleActivityDateTo = newValue => {
     setActivityDateTo(newValue);
   };
 
@@ -370,9 +351,7 @@ const ExpenseReports = (props) => {
       <Paper sx={{ m: "13px", p: "19px 19px 0px 19px" }}>
         <Stack direction="row" spacing={2}>
           <FormControl sx={{ width: 280 }}>
-            <InputLabel id="multiple-researcher-label">
-              Researcher(s)
-            </InputLabel>
+            <InputLabel id="multiple-researcher-label">Researcher(s)</InputLabel>
             <Select
               labelId="multiple-researcher-label"
               id="multiple-researcher"
@@ -382,7 +361,7 @@ const ExpenseReports = (props) => {
               input={<OutlinedInput label="Researcher(s)" />}
               MenuProps={MenuProps}
             >
-              {researchers.map((researcher) => (
+              {researchers.map(researcher => (
                 <MenuItem key={researcher} value={researcher}>
                   {researcher}
                 </MenuItem>
@@ -394,7 +373,7 @@ const ExpenseReports = (props) => {
               label="Activities Since"
               value={activityDateFrom}
               onChange={handleActivityDateFrom}
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={params => <TextField {...params} />}
             />
           </LocalizationProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -402,7 +381,7 @@ const ExpenseReports = (props) => {
               label="Activities Until"
               value={activityDateTo}
               onChange={handleActivityDateTo}
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={params => <TextField {...params} />}
             />
           </LocalizationProvider>
         </Stack>
@@ -429,36 +408,26 @@ const ExpenseReports = (props) => {
           />
           <FormControlLabel
             control={
-              <Switch
-                checked={showAll}
-                onChange={handleShowAll}
-                inputProps={{ "aria-label": "Clear all filters" }}
-              />
+              <Switch checked={showAll} onChange={handleShowAll} inputProps={{ "aria-label": "Clear all filters" }} />
             }
             label="Show All"
           />
         </FormGroup>
         <Table sx={{ m: "25px 0px 0px 0px", width: 550 }} aria-label="Expenses">
           <TableBody>
-            {researcherActivities.map((rObj) => {
+            {researcherActivities.map(rObj => {
               return (
                 <TableRow key={rObj.researcher}>
                   <TableCell>{rObj.researcher}</TableCell>
-                  <TableCell>
-                    {(rObj.num / 2).toLocaleString()} hrs x $20
-                  </TableCell>
+                  <TableCell>{(rObj.num / 2).toLocaleString()} hrs x $20</TableCell>
                   <TableCell>= ${(rObj.num * 10).toLocaleString()}</TableCell>
                 </TableRow>
               );
             })}
             <TableRow>
               <TableCell sx={{ fontSize: "19px" }}>Total</TableCell>
-              <TableCell sx={{ fontSize: "19px" }}>
-                {(shownActivities.length / 2).toLocaleString()} hrs x $20
-              </TableCell>
-              <TableCell sx={{ fontSize: "19px" }}>
-                = ${amount.toLocaleString()}
-              </TableCell>
+              <TableCell sx={{ fontSize: "19px" }}>{(shownActivities.length / 2).toLocaleString()} hrs x $20</TableCell>
+              <TableCell sx={{ fontSize: "19px" }}>= ${amount.toLocaleString()}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
@@ -489,10 +458,7 @@ const ExpenseReports = (props) => {
           loading={!activitiesLoaded}
         />
       </Paper>
-      <SnackbarComp
-        newMessage={snackbarMessage}
-        setNewMessage={setSnackbarMessage}
-      />
+      <SnackbarComp newMessage={snackbarMessage} setNewMessage={setSnackbarMessage} />
     </>
   );
 };

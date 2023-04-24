@@ -36,7 +36,7 @@ const AppHeader = ({
   const [showMenu, setShowMenu] = useState(false);
 
   const signUpHandler = () => {
-    navigateTo("/auth");
+    navigateTo("/Activities");
   };
 
   const showRigthOptionInMobile = isMobile && !enableMenu;
