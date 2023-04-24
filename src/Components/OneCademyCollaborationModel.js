@@ -823,7 +823,7 @@ const OneCademyCollaborationModel = () => {
     setOpenLegend(old => !old);
   };
   return (
-    <Box>
+    <Box sx={{ height: "100vh", overflowY: "scroll" }}>
       <Box>
         <Drawer
           PaperProps={{
