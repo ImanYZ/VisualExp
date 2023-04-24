@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 // import IconButton from "@mui/material/IconButton";
@@ -10,7 +10,7 @@ import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import BiotechIcon from "@mui/icons-material/Biotech";
@@ -26,27 +26,23 @@ import {
   transcriptUrlState,
   applicationsSubmittedState,
   colorModeState,
-  leadingState,
+  leadingState
 } from "../../../../store/AuthAtoms";
 import { notAResearcherState } from "../../../../store/ProjectAtoms";
-import {
-  hasScheduledState,
-  completedExperimentState,
-} from "../../../../store/ExperimentAtoms";
+import { completedExperimentState } from "../../../../store/ExperimentAtoms";
 
 import AppBar from "../components/AppBar";
 import Toolbar from "../components/Toolbar";
 
 import sectionsOrder from "./sectionsOrder";
-import { getFullname } from "../../../../utils";
 
 import LogoDarkMode from "../../../../assets/DarkModeLogo.svg";
 
-const LinkTab = (props) => {
+const LinkTab = props => {
   return (
     <Tooltip title={props.titl}>
       <Tab
-        onClick={(event) => {
+        onClick={event => {
           event.preventDefault();
           props.onClick(event);
         }}
@@ -57,96 +53,19 @@ const LinkTab = (props) => {
   );
 };
 
-const AppAppBar = (props) => {
+const AppAppBar = props => {
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
-  const setHasScheduled = useSetRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(
-    completedExperimentState
-  );
-  const setApplicationsSubmitted = useSetRecoilState(
-    applicationsSubmittedState
-  );
-  const setResumeUrl = useSetRecoilState(resumeUrlState);
-  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
+  const completedExperiment = useRecoilValue(completedExperimentState);
   const leading = useRecoilValue(leadingState);
-  const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
+  const notAResearcher = useRecoilValue(notAResearcherState);
   const [profileMenuOpen, setProfileMenuOpen] = useState(null);
   const isProfileMenuOpen = Boolean(profileMenuOpen);
   const [colorMode, setColorMode] = useRecoilState(colorModeState);
   const navigateTo = useNavigate();
-  useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uEmail = user.email.toLowerCase();
-        const userDocs = await firebase.db
-          .collection("users")
-          .where("email", "==", uEmail)
-          .get();
-        if (userDocs.docs.length > 0) {
-          setEmail(uEmail.toLowerCase());
-          const userData = userDocs.docs[0].data();
-          if (!userData.firstname || !userData.lastname) {
-            window.location.href = "/";
-          }
-          setFullname(userDocs.docs[0].id);
-          if (userData.applicationsSubmitted) {
-            setApplicationsSubmitted(userData.applicationsSubmitted);
-          }
-          if ("Resume" in userData) {
-            setResumeUrl(userData["Resume"]);
-          }
-          if ("Transcript" in userData) {
-            setTranscriptUrl(userData["Transcript"]);
-          }
-          if ("projectDone" in userData && userData.projectDone) {
-            setHasScheduled(true);
-            setCompletedExperiment(true);
-          } else {
-            const scheduleDocs = await firebase.db
-              .collection("schedule")
-              .where("email", "==", uEmail)
-              .get();
-            const nowTimestamp = firebase.firestore.Timestamp.fromDate(
-              new Date()
-            );
-            let allPassed = true;
-            if (scheduleDocs.docs.length >= 3) {
-              let scheduledSessions = 0;
-              for (let scheduleDoc of scheduleDocs.docs) {
-                const scheduleData = scheduleDoc.data();
-                if (scheduleData.order) {
-                  scheduledSessions += 1;
-                  if (scheduleData.session >= nowTimestamp) {
-                    allPassed = false;
-                  }
-                }
-              }
-              if (scheduledSessions >= 3) {
-                setHasScheduled(true);
-                if (allPassed) {
-                  setCompletedExperiment(true);
-                }
-              }
-            }
-          }
-        }
-      } else {
-        // User is signed out
-        console.log("Signing out!");
-        setFullname("");
-        setEmail("");
-        setHasScheduled(false);
-        setCompletedExperiment(false);
-        setApplicationsSubmitted({});
-      }
-    });
-  }, [firebase]);
-  
-  const signOut = async (event) => {
+
+  const signOut = async event => {
     console.log("Signing out!");
     setEmail("");
     setFullname("");
@@ -160,11 +79,11 @@ const AppAppBar = (props) => {
       navigateTo("/Activities/experiment");
     }
   };
-  const toggleColorMode = (event) => {
-    setColorMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  const toggleColorMode = event => {
+    setColorMode(prevMode => (prevMode === "light" ? "dark" : "light"));
   };
 
-  const handleProfileMenuOpen = (event) => {
+  const handleProfileMenuOpen = event => {
     setProfileMenuOpen(event.currentTarget);
   };
 
@@ -173,17 +92,9 @@ const AppAppBar = (props) => {
   };
 
   const renderProfileMenu = (
-    <Menu
-      id="ProfileMenu"
-      anchorEl={profileMenuOpen}
-      open={isProfileMenuOpen}
-      onClose={handleProfileMenuClose}
-    >
+    <Menu id="ProfileMenu" anchorEl={profileMenuOpen} open={isProfileMenuOpen} onClose={handleProfileMenuClose}>
       {fullname && email && (
-        <MenuItem
-          disabled
-          sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}
-        >
+        <MenuItem disabled sx={{ flexGrow: 3, color: "black", opacity: "1 !important" }}>
           {fullname}
         </MenuItem>
       )}
@@ -202,8 +113,8 @@ const AppAppBar = (props) => {
     </Menu>
   );
   const signUpHandler = () => {
-    navigateTo("/auth");
-  }
+    navigateTo("/Activities");
+  };
   return (
     <div>
       <AppBar>
@@ -217,7 +128,7 @@ const AppAppBar = (props) => {
               sx={{
                 fontSize: 24,
                 margin: "7px 19px 0px -10px",
-                cursor: "pointer",
+                cursor: "pointer"
               }}
             >
               <img src={LogoDarkMode} alt="logo" width="52px" />
@@ -233,17 +144,17 @@ const AppAppBar = (props) => {
               marginLeft: "auto",
               fontWeight: 400,
               "& .MuiTab-root": {
-                color: "#AAAAAA",
+                color: "#AAAAAA"
               },
               "& .MuiTab-root.Mui-selected": {
-                color: "common.white",
+                color: "common.white"
               },
               "& .MuiTabs-indicator": {
-                backgroundColor: "secondary.main",
-              },
+                backgroundColor: "secondary.main"
+              }
             }}
           >
-            {[0, 1, 2, 3, 4].map((idx) => {
+            {[0, 1, 2, 3, 4].map(idx => {
               return (
                 <LinkTab
                   key={"Key" + idx}
@@ -254,21 +165,11 @@ const AppAppBar = (props) => {
               );
             })}
             {(leading || props.thisPage) && (
-              <LinkTab
-                onClick={props.switchSection(5)}
-                label={props.thisPage}
-                titl={props.thisPage}
-              />
+              <LinkTab onClick={props.switchSection(5)} label={props.thisPage} titl={props.thisPage} />
             )}
             {fullname && !props.tutorial && completedExperiment && (
               <Tooltip title="1Cademy Tutorial">
-                <Tab
-                  component="a"
-                  href="/tutorial"
-                  target="_blank"
-                  label="Tutorial"
-                  color="inherit"
-                />
+                <Tab component="a" href="/tutorial" target="_blank" label="Tutorial" color="inherit" />
               </Tooltip>
             )}
           </Tabs>
@@ -308,7 +209,7 @@ const AppAppBar = (props) => {
                     fontSize: 16,
                     color: "common.white",
                     ml: 2.5,
-                    borderRadius: 40,
+                    borderRadius: 40
                   }}
                 >
                   Apply!

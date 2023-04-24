@@ -7,8 +7,8 @@ import {
   emailState,
   emailVerifiedState,
   fullnameState,
-  themeState,
-  themeOSState,
+  /*   themeState,
+  themeOSState, */
   leadingState,
   institutionsState,
   isAdminState,
@@ -53,11 +53,9 @@ import InstructorLater from "./Components/Home/InstructorLater";
 import AdministratorNo from "./Components/Home/AdministratorNo";
 import AdministratorLater from "./Components/Home/AdministratorLater";
 import QuizFeedBack from "./Components/Home/QuizFeedBack";
-import SignUpPage from "./Components/Auth/SignUpPage";
 import DissertationGantt from "./Components/DissertationGantt";
 import OneCademyCollaborationModel from "./Components/OneCademyCollaborationModel";
 import { isToday } from "./utils/DateFunctions";
-
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
@@ -73,35 +71,35 @@ const AppRouter = props => {
   const navigateTo = useNavigate();
 
   // selected theme for authenticated user (dark mode/light mode)
-  const [theme, setTheme] = useRecoilState(themeState);
-  const [themeOS, setThemeOS] = useRecoilState(themeOSState);
+  // const [theme, setTheme] = useRecoilState(themeState);
+  // const [themeOS, setThemeOS] = useRecoilState(themeOSState);
 
   const [duringAnExperiment, setDuringAnExperiment] = useState(false);
   const [startedSession, setStartedSession] = useRecoilState(startedSessionState);
   const [startedByResearcher, setStartedByResearcher] = useState(false);
 
   const [notAResearcher, setNotAResearcher] = useRecoilState(notAResearcherState);
-  const [isAdmin, setIsAdmin] = useRecoilState(isAdminState);
-  const [projects, setProjects] = useRecoilState(projectsState);
+  const setIsAdmin = useSetRecoilState(isAdminState);
+  const setProjects = useSetRecoilState(projectsState);
 
-  const [showSignInorUp, setShowSignInorUp] = useRecoilState(showSignInorUpState);
+  const setShowSignInorUp = useSetRecoilState(showSignInorUpState);
   const [leading, setLeading] = useRecoilState(leadingState);
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
   const [fullname, setFullname] = useRecoilState(fullnameState);
-  const [phase, setPhase] = useRecoilState(phaseState);
-  const [step, setStep] = useRecoilState(stepState);
-  const [passage, setPassage] = useRecoilState(passageState);
-  const [condition, setCondition] = useRecoilState(conditionState);
-  const [nullPassage, setNullPassage] = useRecoilState(nullPassageState);
-  const [choices, setChoices] = useRecoilState(choicesState);
-  const [project, setProject] = useRecoilState(projectState);
-  const [institutions, setInstitutions] = useRecoilState(institutionsState);
-  const [hasScheduled, setHasScheduled] = useRecoilState(hasScheduledState);
-  const [completedExperiment, setCompletedExperiment] = useRecoilState(completedExperimentState);
-  const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(applicationsSubmittedState);
-  const [resumeUrl, setResumeUrl] = useRecoilState(resumeUrlState);
-  const [transcriptUrl, setTranscriptUrl] = useRecoilState(transcriptUrlState);
+  const setPhase = useSetRecoilState(phaseState);
+  const setStep = useSetRecoilState(stepState);
+  const setPassage = useSetRecoilState(passageState);
+  const setCondition = useSetRecoilState(conditionState);
+  const setNullPassage = useSetRecoilState(nullPassageState);
+  const setChoices = useSetRecoilState(choicesState);
+  const setProject = useSetRecoilState(projectState);
+  const setInstitutions = useSetRecoilState(institutionsState);
+  const setHasScheduled = useSetRecoilState(hasScheduledState);
+  const setCompletedExperiment = useSetRecoilState(completedExperimentState);
+  const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
+  const setResumeUrl = useSetRecoilState(resumeUrlState);
+  const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
 
   const processAuth = async user => {
     const { db } = firebase;
@@ -123,6 +121,45 @@ const AppRouter = props => {
     } else {
       fullName = users.docs[0].id;
       userData = users.docs[0].data();
+      setEmail(uEmail.toLowerCase());
+      if (!userData.firstname || !userData.lastname) {
+        window.location.href = "/";
+      }
+      if (userData.applicationsSubmitted) {
+        setApplicationsSubmitted(userData.applicationsSubmitted);
+      }
+      if ("Resume" in userData) {
+        setResumeUrl(userData["Resume"]);
+      }
+      if ("Transcript" in userData) {
+        setTranscriptUrl(userData["Transcript"]);
+      }
+      if ("projectDone" in userData && userData.projectDone) {
+        setHasScheduled(true);
+        setCompletedExperiment(true);
+      } else {
+        const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
+        const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
+        let allPassed = true;
+        if (scheduleDocs.docs.length >= 3) {
+          let scheduledSessions = 0;
+          for (let scheduleDoc of scheduleDocs.docs) {
+            const scheduleData = scheduleDoc.data();
+            if (scheduleData.order) {
+              scheduledSessions += 1;
+              if (scheduleData.session >= nowTimestamp) {
+                allPassed = false;
+              }
+            }
+          }
+          if (scheduledSessions >= 3) {
+            setHasScheduled(true);
+            if (allPassed) {
+              setCompletedExperiment(true);
+            }
+          }
+        }
+      }
     }
 
     if (!userData) return; // if user document doesn't exists
@@ -181,68 +218,6 @@ const AppRouter = props => {
   };
 
   useEffect(() => {
-    return firebase.auth.onAuthStateChanged(async user => {
-      if (user) {
-        // User is signed in, see docs for a list of available properties
-        // https://firebase.google.com/docs/reference/js/firebase.User
-        const uEmail = user.email.toLowerCase();
-        const userDocs = await firebase.db.collection("users").where("email", "==", uEmail).get();
-        if (userDocs.docs.length > 0) {
-          setEmail(uEmail.toLowerCase());
-          const userData = userDocs.docs[0].data();
-          if (!userData.firstname || !userData.lastname) {
-            window.location.href = "/";
-          }
-          setFullname(userDocs.docs[0].id);
-          if (userData.applicationsSubmitted) {
-            setApplicationsSubmitted(userData.applicationsSubmitted);
-          }
-          if ("Resume" in userData) {
-            setResumeUrl(userData["Resume"]);
-          }
-          if ("Transcript" in userData) {
-            setTranscriptUrl(userData["Transcript"]);
-          }
-          if ("projectDone" in userData && userData.projectDone) {
-            setHasScheduled(true);
-            setCompletedExperiment(true);
-          } else {
-            const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
-            const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
-            let allPassed = true;
-            if (scheduleDocs.docs.length >= 3) {
-              let scheduledSessions = 0;
-              for (let scheduleDoc of scheduleDocs.docs) {
-                const scheduleData = scheduleDoc.data();
-                if (scheduleData.order) {
-                  scheduledSessions += 1;
-                  if (scheduleData.session >= nowTimestamp) {
-                    allPassed = false;
-                  }
-                }
-              }
-              if (scheduledSessions >= 3) {
-                setHasScheduled(true);
-                if (allPassed) {
-                  setCompletedExperiment(true);
-                }
-              }
-            }
-          }
-        }
-      } else {
-        // User is signed out
-        setFullname("");
-        setEmail("");
-        setHasScheduled(false);
-        setCompletedExperiment(false);
-        setApplicationsSubmitted({});
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firebase, fullname]);
-
-  useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
       if (user) {
         // sign in logic
@@ -274,9 +249,14 @@ const AppRouter = props => {
         setNullPassage("");
         setProject(AppConfig.defaultProject);
         setChoices([]);
+        setEmail("");
+        setHasScheduled(false);
+        setCompletedExperiment(false);
+        setApplicationsSubmitted({});
       }
     });
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebase, fullname]);
 
   useEffect(() => {
     (async () => {
@@ -455,6 +435,7 @@ const AppRouter = props => {
     //   });
   }, [duringAnExperiment]);
 
+  console.log(notAResearcher);
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -500,62 +481,78 @@ const AppRouter = props => {
       <Route path={"/interestedFacultyLater/:instructorId"} element={<InstructorLater />} />
       <Route path={"/notInterestedAdministrator/:administratorId"} element={<AdministratorNo />} />
       <Route path={"/interestedAdministratorLater/:administratorId"} element={<AdministratorLater />} />
-      <Route path="auth" element={<SignUpPage />} />
       {fullname && email && emailVerified === "Verified" ? (
         <>
           {duringAnExperiment ? (
             <>
               {startedByResearcher ? (
-                <Route path="Activities/Experiment" element={<App />} />
+                <Route path="Activities/*" element={<App />} />
               ) : (
-                <Route path="Activities/Experiment" element={<WaitingForSessionStart />} />
+                <Route path="Activities/*" element={<WaitingForSessionStart />} />
               )}
             </>
           ) : (
             <>
-              <Route path="Activities/Experiments" element={<Activities activityName="Experiments" />} />
-              <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
-              <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
-              <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
-              <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
-              <Route
-                path="Activities/FreeRecallGrading"
-                element={<Activities activityName="FreeRecallGrading" hideLeaderBoard={true} />}
-              />
-              <Route
-                path="Activities/SchemaGeneration"
-                element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />}
-              />
-              <Route
-                path="Activities/ResearcherPassage"
-                element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
-              />
-              <Route path="Activities/*" element={<Activities activityName="Intellectual" />} />
-              <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
-              <Route
-                path="LifeLog"
-                element={
-                  email === "oneweb@umich.edu" ? (
-                    <LifeLogger />
-                  ) : (
-                    <div className="Error">You don't have permission to open this page!</div>
-                  )
-                }
-              />
-              {/* Everything else, including /schedule goes to this one. */}
-              <Route
-                path="Activities/Experiment"
-                element={
-                  startedSession === 1 ? (
-                    <div className="Error">
-                      At this point, you cannot change your scheduled sessions! Please convey your questions or concerns
-                      to Iman Yeckehzaare at oneweb@umich.edu
-                    </div>
-                  ) : (
-                    <SchedulePage />
-                  )
-                }
-              />
+              <>
+                <Route
+                  path="Activities/*"
+                  element={
+                    !notAResearcher ? (
+                      <Activities activityName="Intellectual" />
+                    ) : startedSession === 1 ? (
+                      <div className="Error">
+                        At this point, you cannot change your scheduled sessions! Please convey your questions or
+                        concerns to Iman Yeckehzaare at oneweb@umich.edu
+                      </div>
+                    ) : (
+                      <SchedulePage />
+                    )
+                  }
+                />
+
+                <Route
+                  path="Activities/Experiments"
+                  element={
+                    !notAResearcher ? (
+                      <Activities activityName="Experiments" />
+                    ) : startedSession === 1 ? (
+                      <div className="Error">
+                        At this point, you cannot change your scheduled sessions! Please convey your questions or
+                        concerns to Iman Yeckehzaare at oneweb@umich.edu
+                      </div>
+                    ) : (
+                      <SchedulePage />
+                    )
+                  }
+                />
+                <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
+                <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
+                <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
+                <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
+                <Route
+                  path="Activities/FreeRecallGrading"
+                  element={<Activities activityName="FreeRecallGrading" hideLeaderBoard={true} />}
+                />
+                <Route
+                  path="Activities/SchemaGeneration"
+                  element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />}
+                />
+                <Route
+                  path="Activities/ResearcherPassage"
+                  element={<Activities hideLeaderBoard={true} activityName="ResearcherPassage" />}
+                />
+                <Route path="Activities/CodeFeedback" element={<Activities activityName="CodeFeedback" />} />
+                <Route
+                  path="LifeLog"
+                  element={
+                    email === "oneweb@umich.edu" ? (
+                      <LifeLogger />
+                    ) : (
+                      <div className="Error">You don't have permission to open this page!</div>
+                    )
+                  }
+                />
+              </>
             </>
           )}
         </>
@@ -566,7 +563,6 @@ const AppRouter = props => {
           <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
           <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
           <Route path="Activities/*" element={<AuthConsent />} />
-          <Route path="*" element={<SignUpPage />} />
         </>
       )}
     </Routes>
