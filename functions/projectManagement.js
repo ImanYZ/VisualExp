@@ -1216,19 +1216,23 @@ exports.passagesNumberCorrection = async context => {
           const { project } = userData;
           const { passage, condition } = cond;
   
-          if (!passageNumberOfParticipant[passage]) {
+          if (!passageNumberOfParticipant.hasOwnProperty(passage)) {
             passageNumberOfParticipant[passage] = {};
           }
   
-          if (!passageNumberOfParticipant[passage][project]) {
+          if (!passageNumberOfParticipant[passage].hasOwnProperty(project)) {
             passageNumberOfParticipant[passage][project] = {};
           }
   
-          if (!passageNumberOfParticipant[passage][project][condition]) {
+          if (
+            !passageNumberOfParticipant[passage][project].hasOwnProperty(
+              condition
+            )
+          ) {
             passageNumberOfParticipant[passage][project][condition] = 0;
           }
   
-          passageNumberOfParticipant[passage][project][condition]++;
+          passageNumberOfParticipant[passage][project][condition] += 1;
         });
       }
     });
@@ -1236,6 +1240,13 @@ exports.passagesNumberCorrection = async context => {
       const passageRef = db.collection("passages").doc(passage);
       const passageData = (await passageRef.get()).data();
       const projects = passageData.projects || {};
+      for (const project in projects) {
+        if (project === "H1L2" || project === "H2K2") {
+          for (let condition in projects[project]) {
+            projects[project][condition] = 0;
+          }
+        }
+      }
       for (const project in passageNumberOfParticipant[passage]) {
         projects[project] = passageNumberOfParticipant[passage][project];
       }
