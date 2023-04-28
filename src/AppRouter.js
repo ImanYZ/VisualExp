@@ -260,15 +260,13 @@ const AppRouter = props => {
 
   useEffect(() => {
     (async () => {
-      dbOne
-        .collection("institutions")
-        .where("usersNum", ">=", 1)
-        .onSnapshot(snapshot => {
-          setInstitutions(insitutions => {
-            let _insitutions = [...insitutions];
-            const docChanges = snapshot.docChanges();
-            for (const docChange of docChanges) {
-              const institutionData = docChange.doc.data();
+      dbOne.collection("institutions").onSnapshot(snapshot => {
+        setInstitutions(insitutions => {
+          let _insitutions = [...insitutions];
+          const docChanges = snapshot.docChanges();
+          for (const docChange of docChanges) {
+            const institutionData = docChange.doc.data();
+            if (institutionData.usersNum >= 1 || institutionData.country === "United States") {
               if (docChange.type === "added") {
                 _insitutions.push(institutionData);
                 continue;
@@ -280,9 +278,10 @@ const AppRouter = props => {
                 _insitutions.splice(idx, 1);
               }
             }
-            return _insitutions;
-          });
+          }
+          return _insitutions;
         });
+      });
     })();
   }, []);
 

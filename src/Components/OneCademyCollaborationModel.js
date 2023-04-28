@@ -427,11 +427,33 @@ const OneCademyCollaborationModel = () => {
           } else if (idex !== -1 && collabModelNode.children[idex].deleted) {
             collabModelNode.children[idex].deleted = false;
           }
-          _visibleNodes.push(childId);
+          if (_visibleNodes.includes(childId) && !collabModelNode.children[idex].deleted) {
+            _visibleNodes.push(childId);
+          }
         }
         for (let child of collabModelNode.children) {
           if (!childrenIds.some(childId => childId === child.id)) {
+            for (let _child of collabModelNode.children) {
+              if (_child.id === child.id) continue;
+              if (_child.order > child.order && child.order !== 0) {
+                _child.order = parseInt(_child.order) - 1;
+              }
+            }
+            if (child.order > 0) {
+              for (let node of allNodes) {
+                if (node.id === selectedNode) continue;
+                const _children = node.children;
+                for (let _child of _children) {
+                  if (_child.order >= child.order) {
+                    _child.order = parseInt(_child.order) - 1;
+                  }
+                }
+                const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
+                nodeRef.update({ children: _children });
+              }
+            }
             child.deleted = true;
+            child.order = 0;
           }
         }
         await collabModelRef.update({ title, type, children: collabModelNode.children });
