@@ -2279,8 +2279,8 @@ const communitiesPapers = {
   },
 
   ADHD_and_autism: {
-    what_motivates_online_community_contributors_to_contribute_consistently_A_case_study_on_Stackoverflow_netizens: {
-      title: `ADHD and Autism`,
+    Hyperfocus_the_forgotten_frontier_of_attention: {
+      title: `Hyperfocus: the forgotten frontier of attention`,
       url: `https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2Fthe%20forgotten%20frontier%20of%20attention.pdf?alt=media&token=e4660e8a-0f6c-4d01-a972-a8c4d51a73ba`,
       questions: {
         official_definition_hyperfocus: {
