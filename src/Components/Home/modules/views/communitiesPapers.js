@@ -2277,6 +2277,107 @@ const communitiesPapers = {
       }
     }
   },
+
+  ADHD_and_autism: {
+    Hyperfocus_the_forgotten_frontier_of_attention: {
+      title: `Hyperfocus: the forgotten frontier of attention`,
+      url: `https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2Fthe%20forgotten%20frontier%20of%20attention.pdf?alt=media&token=e4660e8a-0f6c-4d01-a972-a8c4d51a73ba`,
+      questions: {
+        official_definition_hyperfocus: {
+          stem: `1. What’s the official definition of “hyperfocus”? Choose one answer.`,
+          answers: [`c`],
+          choices: {
+            a: `An intense and unbreakable state of concentration.`,
+            b: `A symptom of ADHD, ASD, and Schizophrenia where one is so immersed in a task that they become unaware of surrounding stimulus.`,
+            c: `There is no official definition, and many papers leave it undefined and rely on the assumption that the reader inherently knows what it entails.`
+          }
+        },
+        general_criteria_hyperfocus: {
+          stem: `2. What are the four general criteria for hyperfocus that are consistently reported?`,
+          answers: [`a`, `c`, `d`, `e`],
+          choices: {
+            a: `Hyperfocus is characterized by an intense state of concentration/focus.`,
+            b: `The person hyperfocusing is diagnosed with or shows signs of ADHD/ASD/Schizophrenia`,
+            c: `When engaged in hyperfocus, unrelated external stimuli do not appear to be consciously perceived; sometimes reported as a diminished perception of the environment.`,
+            d: `To engage in hyperfocus, the task has to be fun or interesting.`,
+            e: `During a hyperfocus state, task performance improves.`
+          }
+        },
+        hyperfocus_forgotten_reasons: {
+          stem: `3. Why has hyperfocus been “forgotten” when it comes to research and clinical literature?`,
+          answers: [`b`, `c`, `d`],
+          choices: {
+            a: `Because most people who want to research it have ADHD and forget to conduct the experiments.`,
+            b: `There is no clear general or operational definition of hyperfocus in the literature.`,
+            c: `It is very difficult to experimentally manipulate a subject into a hyperfocus state.`,
+            d: `Some studies do not refer to hyperfocus by name, but describe processes that appear to be related, such as “in the zone” and “flow”.`
+          }
+        },
+        ultimate_purpose_article: {
+          stem: `4. What is the ULTIMATE purpose of this article?`,
+          answers: [`a`],
+          choices: {
+            a: `To provide a common baseline for researchers of the hyperfocus phenomenon.`,
+            b: `To propose an operational definition of hyperfocus.`,
+            c: `To analyze all literature currently written about hyperfocusing.`,
+            d: `To discuss hyperfocus in ADHD vs ASD vs Schizophrenia.`
+          }
+        },
+        hyperfocus_flow_exclusivity: {
+          stem: `5. True or False: Only people with attentional disorders such as ADHD, ASD, or Schizophrenia report experiencing hyperfocus-like states/states of “flow”.`,
+          answers: [`b`],
+          choices: {
+            a: `True`,
+            b: `False`
+          }
+        },
+        weber_et_al_theoretical_framework: {
+          stem: `6. What was Weber et al’s (2009) theoretical framework regarding neural correlates of “flow”?`,
+          answers: [`a`],
+          choices: {
+            a: `That flow states are due to synchronization of attentional networks and reward networks, creating a particularly efficient information processing method.`,
+            b: `That flow is associated with suppression of activity in the explicit system, specifically the frontal and prefrontal cortex—referred to as “transient hypofrontality”.`,
+            c: `That flow states are induced by certain sensory stimuli such as music, after looking at neuroimaging of the somatosensory cortex and prefrontal cortex.`
+          }
+        },
+        What_is_the_gradual_continuous_performance_task: {
+          stem: `7. What is the gradual continuous performance task? (grad CPT)?`,
+          answers: [`a`, `c`],
+          choices: {
+            a: `Mechanic created by Esterman et al. (2012) to assess moment to moment fluctuations in sustained attention performance.`,
+            b: `A test where participants had to continually perform in front of researchers after gradually learning a script in order to assess if theater could be used to get people “in the zone”.`,
+            c: `A test with slowly shifting images of either city scenes or mountain scenes where participants had to respond to city scenes and withhold responses to mountain scenes.`
+          }
+        },
+        in_the_zone_not_hyperfocus: {
+          stem: `8. Why does being “in the zone” not qualify as a state of hyperfocus in the experiments outlined in this paper?`,
+          answers: [`a`, `b`],
+          choices: {
+            a: `The activity is not particularly fun or engaging beyond being a psychology experiment.`,
+            b: `The variance time condition doesn’t have a baseline condition, so it’s unclear if task performance is actually enhanced or if it’s simply unimpaired.`,
+            c: `The experiment was faulty because they selected from a pool of undergraduate psychology majors.`
+          }
+        },
+        hyperfocus_same_adhd_asd_schizophrenia: {
+          stem: `9. Did the authors conclude that hyperfocus seems to be the same in ADHD, ASD, and Schizophrenia?`,
+          answers: [`a`, `c`],
+          choices: {
+            a: `The version of hyperfocus described in the paper and anecdotal evidence occurs in both ADHD and ASD, but it is unclear if it appears in Schizophrenia due to a severe lack of literature about the subject.`,
+            b: `The version of hyperfocus described in the paper and anecdotal evidence appears equally in all three disorders.`,
+            c: `The version of hyperfocus described in the paper occurs in ASD but is often incorrectly used to refer to stereotypic and self-stimulatory behavior.`
+          }
+        },
+        flow_experience_exams: {
+          stem: `10. True or False: It was noted that the paper about “flow experience” and exams did not specify if the flow state occurred during class lectures or only during the exam itself.`,
+          answers: [`a`],
+          choices: {
+            a: `True`,
+            b: `False`
+          }
+        }
+      }
+    }
+  },
   Liaison_Librarians: {}
 };
 export default communitiesPapers;
