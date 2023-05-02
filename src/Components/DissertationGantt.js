@@ -139,7 +139,7 @@ const DissertationGantt = () => {
             resource.resDepencies = [];
             for (let dependency of resource.dependencies) {
               for (let rIdex = 0; rIdex < resources.length; rIdex++) {
-                if (resources[rIdex].itemIds.includes(dependency)) {
+                if (resources[rIdex].itemIds?.includes(dependency)) {
                   resource.resDepencies.push(rIdex);
                 }
               }
@@ -253,6 +253,15 @@ const DissertationGantt = () => {
     try {
       if (selectedDoc) {
         const dissertationRef = firebase.db.collection("dissertationTimeLine").doc(selectedDoc);
+        const docs = await firebase.db.collection("dissertationTimeLine").get();
+        for (let doc of docs.docs) {
+          const dependencies = doc.data().dependencies;
+          if (dependencies.includes(selectedDoc)) {
+            await doc.ref.update({
+              dependencies: dependencies.replace(selectedDoc, "").replace(",,", ",").replace(/^,|,$/g, "")
+            });
+          }
+        }
         await dissertationRef.delete();
       }
       setOpen(false);
@@ -279,7 +288,7 @@ const DissertationGantt = () => {
       if (!svg) return;
       let ganttGroups = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
       for (let i = 0; i < ganttGroups.length; i++) {
-        const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "").trim();
+        const text = ganttGroups[i]?.innerHTML.replace(/<[^>]+>/g, "").trim();
         const _index = dt.filter(
           d => typeof d[1] === "string" && d[1].replace(/\s/g, "") === text.replace(/\s/g, "")
         )[0];
@@ -298,7 +307,7 @@ const DissertationGantt = () => {
     if (!ganttGroups) return;
     for (let i = 0; i < ganttGroups.length; i++) {
       if (ganttGroups[i].getElementsByTagName("tspan").length > 0) continue;
-      const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "");
+      const text = ganttGroups[i]?.innerHTML.replace(/<[^>]+>/g, "");
       let s2 = [];
       let s1 = [];
       ganttGroups[i].setAttribute("x", "0");
@@ -315,8 +324,9 @@ const DissertationGantt = () => {
         }
         s1 = text.substr(0, middle);
         s2 = text.substr(middle + 1);
-
-        ganttGroups[i].innerHTML = `<tspan dy="-0.5em">${s1.trim()}</tspan><tspan  x="0" dy="1em">${s2}</tspan>`;
+        if (ganttGroups[i]?.innerHTML) {
+          ganttGroups[i].innerHTML = `<tspan dy="-0.5em">${s1.trim()}</tspan><tspan  x="0" dy="1em">${s2}</tspan>`;
+        }
       }
     }
   };
@@ -498,82 +508,84 @@ const DissertationGantt = () => {
                     <ColorBox key={resource} text={resource} color={colors[resource]} />
                   ))}
                 </Box>
+                {dt.length > 1 && (
+                  <div id="chart_div">
+                    <Chart
+                      chartType="Gantt"
+                      data={dt}
+                      height={1600}
+                      options={options}
+                      chartEvents={[
+                        {
+                          eventName: "select",
+                          callback: e => {
+                            if (email !== "oneweb@umich.edu") return;
+                            handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
+                          }
+                        },
+                        {
+                          eventName: "ready",
+                          callback: ({ chartWrapper }) => {
+                            let container = document.getElementById("chart_div");
+                            let svg = container.getElementsByTagName("svg")[0];
+                            let ganttGroups = svg.getElementsByTagName("g")[1]?.getElementsByTagName("text");
+                            const date = new Date();
+                            const currenYear = new Date().getFullYear();
+                            const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                            const formattedDat = new Date(formattedDate + ` ${currenYear}`);
+                            let x = 0;
+                            let dateP;
+                            let index = 0;
+                            for (let i = 0; i < ganttGroups.length; i++) {
+                              const text = ganttGroups[i]?.innerHTML.replace(/<[^>]+>/g, "").trim();
+                              const textDat = new Date(text + ` ${currenYear}`);
+                              if (!new Date(textDat).getTime()) continue;
+                              index = i + 1;
+                              x = ganttGroups[i]?.getAttribute("x");
+                              dateP = textDat;
+                              if (formattedDat.getTime() <= textDat.getTime()) {
+                                break;
+                              }
+                            }
+                            if (formattedDat.getTime() !== dateP.getTime()) {
+                              let xi = ganttGroups[index]?.getAttribute("x");
+                              let texti = ganttGroups[index]?.innerHTML.replace(/<[^>]+>/g, "").trim();
+                              if (texti?.includes(currenYear)) {
+                                index += 1;
+                              }
+                              xi = ganttGroups[index]?.getAttribute("x");
+                              texti = ganttGroups[index]?.innerHTML.replace(/<[^>]+>/g, "").trim();
+                              const textDat1 = new Date(texti + ` ${currenYear}`);
+                              const timestamp = new Date().getTime() - new Date(dateP).getTime();
+                              const timestamp1 = new Date(textDat1).getTime() - new Date(dateP).getTime();
+                              const ratio = (xi - x) / timestamp1;
+                              if (timestamp) {
+                                x = parseInt(x) + timestamp * ratio;
+                              }
+                            }
+                            let ganttGroupsText = svg.getElementsByTagName("g")[7]?.getElementsByTagName("text");
+                            const height = parseInt(ganttGroupsText[ganttGroupsText.length - 1].getAttribute("y")) + 90;
+                            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
 
-                <div id="chart_div">
-                  <Chart
-                    chartType="Gantt"
-                    data={dt}
-                    height={1600}
-                    options={options}
-                    chartEvents={[
-                      {
-                        eventName: "select",
-                        callback: e => {
-                          if (email !== "oneweb@umich.edu") return;
-                          handleClickOpen(dt[e.chartWrapper.getChart().getSelection()[0].row + 1]);
-                        }
-                      },
-                      {
-                        eventName: "ready",
-                        callback: ({ chartWrapper }) => {
-                          let container = document.getElementById("chart_div");
-                          let svg = container.getElementsByTagName("svg")[0];
-                          let ganttGroups = svg.getElementsByTagName("g")[1]?.getElementsByTagName("text");
-                          const date = new Date();
-                          const currenYear = new Date().getFullYear();
-                          const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-                          const formattedDat = new Date(formattedDate + ` ${currenYear}`);
-                          let x = 0;
-                          let dateP;
-                          let index = 0;
-                          for (let i = 0; i < ganttGroups.length; i++) {
-                            const text = ganttGroups[i].innerHTML.replace(/<[^>]+>/g, "").trim();
-                            const textDat = new Date(text + ` ${currenYear}`);
-                            if (!new Date(textDat).getTime()) continue;
-                            index = i + 1;
-                            x = ganttGroups[i].getAttribute("x");
-                            dateP = textDat;
-                            if (formattedDat.getTime() <= textDat.getTime()) {
-                              break;
-                            }
+                            line.setAttribute("x1", x || 0);
+                            line.setAttribute("x2", x || 0);
+                            line.setAttribute("y1", 0);
+                            line.setAttribute("y2", height);
+                            line.setAttribute("stroke", "#9e9e9e");
+                            line.setAttribute("stroke-dasharray", "5,5");
+                            line.setAttribute("stroke-width", 3.5);
+                            text.setAttribute("x", x - 20);
+                            text.setAttribute("y", height + 20);
+                            text.textContent = "Today";
+                            svg.appendChild(text);
+                            svg.appendChild(line);
                           }
-                          if(formattedDat.getTime()!==dateP.getTime()) {
-                            let xi = ganttGroups[index].getAttribute("x");
-                            let texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
-                            if(texti.includes(currenYear)) {
-                              index += 1;
-                            }
-                            xi = ganttGroups[index].getAttribute("x");
-                            texti = ganttGroups[index].innerHTML.replace(/<[^>]+>/g, "").trim();
-                            const textDat1 = new Date(texti + ` ${currenYear}`);
-                            const timestamp = new Date().getTime() - new Date(dateP).getTime();
-                            const timestamp1 = new Date(textDat1).getTime() - new Date(dateP).getTime();
-                            const ratio  = (xi-x)/ timestamp1;            
-                            if (timestamp) {
-                              x = parseInt(x)+(timestamp * ratio);
-                            }
-                          }
-              
-                          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                          const height = parseFloat(svg.getAttribute("height"));
-                          line.setAttribute("x1", x);
-                          line.setAttribute("x2", x);
-                          line.setAttribute("y1", 0);
-                          line.setAttribute("y2", height - 150);
-                          line.setAttribute("stroke", "#9e9e9e");
-                          line.setAttribute("stroke-dasharray", "5,5");
-                          line.setAttribute("stroke-width", 3.5);
-                          text.setAttribute("x", x - 20);
-                          text.setAttribute("y", height - 130);
-                          text.textContent = "Today";
-                          svg.appendChild(text);
-                          svg.appendChild(line);
                         }
-                      }
-                    ]}
-                  />
-                </div>
+                      ]}
+                    />
+                  </div>
+                )}
               </AccordionDetails>
             </Accordion>
           </div>
