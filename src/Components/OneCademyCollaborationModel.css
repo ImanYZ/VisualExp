@@ -12,13 +12,12 @@ g.type-ST>rect {
   fill: #3e2723;
 }
 
-
-/* text {
-  font-weight: 500;
-  fill: #fdf6f6;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
-  font-size: 12px;
-} */
+.type-ST text,
+.type-NO text,
+.type-PO text,
+.type-DF text {
+  fill: white;
+}
 
 .node rect {
   stroke: #ecf3ed;
