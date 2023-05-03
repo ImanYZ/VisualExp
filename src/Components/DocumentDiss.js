@@ -25,19 +25,18 @@ const panels = [
         </p>
         <ul>
           <li>
-            <strong>Representation</strong>: how should we structure the network of micro-content in a knowledge graph,
-            including optimal representation and size of nodes and links, to improve reading comprehension? How should
-            we design collaboration mechanisms to generate, evaluate, and improve such a representation at scale?
+            <strong>Representation and Presentation</strong>: how should we structure the network of micro-content in a knowledge graph,
+            including optimal representation and size of nodes and links, to improve reading comprehension? And how should we display and navigate the relationships among the micro-content?
           </li>
           <li>
-            <strong>Presentation</strong>: how should we display and navigate the relationships among the micro-content?
+            <strong>Collaboration</strong>: how should we design collaboration mechanisms to generate, evaluate, and improve such a representation at scale?
           </li>
           <li>
             <strong>Scheduling</strong>: how should we plan for studying/practicing the micro-content to optimize their
             retention?
           </li>
         </ul>
-        <p>
+        {/* <p>
           How can we optimize life-long learning? Studying any book is a very time-consuming activity, as it may take
           months to complete. While instructors choose textbooks for us in school, after graduation, we must rely on
           search engines to select books, courses, and other resources. This can result in uncertainty about whether we
@@ -77,7 +76,7 @@ const panels = [
           of micro-content can be reused for a variety of different learning goals. By linking the micro-content in the
           form of hierarchical learning pathways, a single piece covering a concept in two or more different disciplines
           could serve as a link in each given learning pathway.
-        </p>
+        </p> */}
       </div>
     )
   },
