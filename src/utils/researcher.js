@@ -1,4 +1,3 @@
-
 import { firebase } from "../Components/firebase/firebase";
 
 export const fetchRecentParticipants = async (researcher, project) => {
@@ -9,7 +8,10 @@ export const fetchRecentParticipants = async (researcher, project) => {
     const resScheduleData = resSchedule.data();
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
     for (const participant in attendedSessions) {
-      recentParticipants[participant] = attendedSessions[participant];
+      if (!recentParticipants.hasOwnProperty(participant)) {
+        recentParticipants[participant] = [];
+      }
+      recentParticipants[participant] = [...attendedSessions[participant], ...recentParticipants[participant]];
     }
   }
   return recentParticipants;
