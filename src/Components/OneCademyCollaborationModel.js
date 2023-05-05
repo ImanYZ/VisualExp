@@ -424,10 +424,10 @@ const OneCademyCollaborationModel = () => {
               type: "Hypothetical Positive Effect",
               order: 0
             });
-          } else if (idex !== -1 && collabModelNode.children[idex].deleted) {
+          } else if (idex !== -1 && collabModelNode.children[idex].hasOwnProperty("deleted") &&  collabModelNode.children[idex]?.deleted) {
             collabModelNode.children[idex].deleted = false;
           }
-          if (_visibleNodes.includes(childId) && !collabModelNode.children[idex].deleted) {
+          if (_visibleNodes.includes(childId) && !collabModelNode.children[idex]?.deleted) {
             _visibleNodes.push(childId);
           }
         }
@@ -499,14 +499,14 @@ const OneCademyCollaborationModel = () => {
       if (node.id === selectedNode) {
         node.deleted = true;
       }
-      const index = node.children.findIndex(child => child.id === selectedNode && !child.deleted);
+      const index = node.children.findIndex(child => child.id === selectedNode && !child?.deleted);
       if (index !== -1) {
         const oldOrder = node.children[index].order;
         node.children[index].deleted = true;
         node.children[index].order = 0;
         for (let node of _allnodes) {
           for (let _child of node.children) {
-            if (_child.order > oldOrder && !_child.deleted) {
+            if (_child.order > oldOrder && !_child?.deleted) {
               _child.order = parseInt(_child.order) - 1;
             }
           }
@@ -516,7 +516,7 @@ const OneCademyCollaborationModel = () => {
     await firebase.db.runTransaction(async t => {
       for (let node of _allnodes) {
         const nodeRef = firebase.firestore().collection("collabModelNodes").doc(node.id);
-        t.update(nodeRef, { children: node.children, deleted: node.deleted || false });
+        t.update(nodeRef, { children: node.children, deleted: node?.deleted || false });
       }
     });
     setOpenAddNode(false);
