@@ -33,7 +33,13 @@ participantsRouter.post("/schedule", async (req, res) => {
     const researcherDocs = await db.collection("researchers").get();
     for (let researcherDoc of researcherDocs.docs) {
       const researcherData = researcherDoc.data();
+      if (
+        "projects" in researcherData &&
+        project in researcherData.projects &&
+        researcherData.projects[project].active
+      ) {
       researchers[researcherData.email] = researcherDoc.id;
+      }
     }
 
     const events = await futureEvents(40);
@@ -74,7 +80,7 @@ participantsRouter.post("/schedule", async (req, res) => {
           if(!availSessions[_scheduleSlot]) {
             availSessions[_scheduleSlot] = [];
           }
-          if(availSessions[_scheduleSlot].includes(researcherFullname)){
+          if(Object.values(researchers).includes(researcherFullname)){
             availSessions[_scheduleSlot].push(researcherFullname)
           }
         }
