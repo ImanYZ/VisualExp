@@ -136,6 +136,11 @@ module.exports = async (req, res) => {
             } else {
               researcherUpdates.projects[calulatedProject].positiveCodingPoints = positiveCodingPoints;
             }
+            if ("codingNum" in researcherUpdates.projects[calulatedProject]) {
+              researcherUpdates.projects[calulatedProject].codingNum += 1;
+            } else {
+              researcherUpdates.projects[calulatedProject].codingNum = 1;
+            }
             transactionWrites.push({
               type: "update",
               refObj: researcherRef,
