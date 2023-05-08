@@ -63,6 +63,9 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
   if (type === "grading") {
     return (key === uname ? "You've graded" : "Graded") + ` ${obj[key].num} free-recall responses.`;
   }
+  if(type === "coding"){
+    return (key === uname ? "You've coded" : "Coded") + ` ${obj[key].num} explanations.`;
+  }
 };
 
 const RouterNav = props => {
@@ -113,6 +116,7 @@ const RouterNav = props => {
   const [dayOneUpVotes, setDayOneUpVotes] = useState(0);
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
+  const [codingNums, setCodingNums] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
   const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
@@ -148,6 +152,7 @@ const RouterNav = props => {
         const graNums = {};
         const instruNums = {};
         const adminNums = {};
+        const codNums = {};
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
@@ -231,6 +236,9 @@ const RouterNav = props => {
             if ("administratorsNum" in theProject) {
               adminNums[change.doc.id] = theProject.administratorsNum;
             }
+            if ("codingNum" in theProject) {
+              codNums[change.doc.id] = theProject.codingNum;
+            }
           }
         }
         setGradingNums(oGraNums => {
@@ -270,6 +278,19 @@ const RouterNav = props => {
           }
           return oldAdminNums;
         });
+        console.log(codNums);
+        setCodingNums(oCodingNums => {
+          const oldCodingNums = { ...oCodingNums };
+          for (let researcher in codNums) {
+            oldCodingNums[researcher] = { num: codNums[researcher] };
+          }
+          const maxInstruNum = Math.max(...Object.values(oldCodingNums).map(({ num }) => num));
+          for (let researcher in oldCodingNums) {
+            oldCodingNums[researcher].percent =
+              Math.round(((oldCodingNums[researcher].num * 100.0) / maxInstruNum) * 100) / 100;
+          }
+          return oldCodingNums;
+        });
       });
       return () => {
         setIntellectualPoints(0);
@@ -285,6 +306,7 @@ const RouterNav = props => {
         setGradingNums({});
         setNegativeGradingPoints(0);
         researcherSnapshot();
+        setCodingNums({});
       };
     }
   }, [firebase, fullname, notAResearcher, project]);
@@ -745,7 +767,7 @@ const RouterNav = props => {
     >
       <MenuItem
         onClick={() => {
-          navigate("/Activities/ResearcherPassage");
+          window.open("/Activities/ResearcherPassage", "blank");
         }}
       >
         <MenuBookIcon sx={{ m: "5px" }} />
@@ -753,7 +775,7 @@ const RouterNav = props => {
       </MenuItem>
       <MenuItem
         onClick={() => {
-          navigate("/Activities/SchemaGeneration");
+          window.open("/Activities/SchemaGeneration", "blank");
         }}
       >
         <SchemaIcon sx={{ m: "5px" }} />
@@ -765,7 +787,8 @@ const RouterNav = props => {
   const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
   const navigate = useNavigate();
-
+  console.log(codingNums[fullname]);
+  console.log(gradingNums);
   return (
     <>
       {!props.duringAnExperiment && (
@@ -826,27 +849,33 @@ const RouterNav = props => {
                         rowGap: "4px"
                       }}
                     >
-                      {projectPoints.onePoints ? (
+                      {projectPoints.commentsPoints ? (
+                        <Tooltip
+                          title={`You've coded ${codingNums[fullname]?.num || 0} explanations.Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                        >
+                          <Box># of 💬 :</Box>
+                        </Tooltip>
+                      ) : projectPoints.onePoints ? (
                         <Tooltip
                           title={`You've submitted ${
                             proposalsNums[username] ? proposalsNums[username].num : ""
                           } proposals on 1Cademy. Note that your 1Cademy score is determined based on the # of votes, not this number.`}
                         >
                           <Box>
-                            # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} />:
+                            # of <img src={favicon} width="15.1" style={{ margin: "0px 4px 0px 4px" }} alt=""/>:
                           </Box>
                         </Tooltip>
                       ) : null}
 
                       {projectPoints.administratorsPoints ? (
                         <Tooltip
-                          title={`You've collected ${administratorsNum[username]} school administrators' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
+                          title={`You've collected ${administratorsNum[fullname]?.num || 0} school administrators' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
                         >
                           <Box># of 💼:</Box>
                         </Tooltip>
                       ) : projectPoints.instructorsPoints ? (
                         <Tooltip
-                          title={`You've collected ${instructorsNum[username]} instructors' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
+                          title={`You've collected ${instructorsNum[fullname]?.num || 0} instructors' information. Note that your score is determined based on the # of times your collected information was approved by other researchers, not this number.`}
                         >
                           <Box># of 👨‍🏫:</Box>
                         </Tooltip>
@@ -854,7 +883,7 @@ const RouterNav = props => {
 
                       {projectPoints.gradingPoints ? (
                         <Tooltip
-                          title={`You've graded ${gradingNums[username]} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
+                          title={`You've graded ${gradingNums[fullname]?.num || 0} free-recall responses. Note that your score is determined based on the # of times your grades agreed with three other researchers, not this number.`}
                         >
                           <Box># of 🧠:</Box>
                         </Tooltip>
@@ -868,7 +897,13 @@ const RouterNav = props => {
                         rowGap: "25px"
                       }}
                     >
-                      {projectPoints.onePoints ? (
+                      {projectPoints.commentsPoints ? (
+                        <LineDiagram
+                          obj={codingNums}
+                          username={fullname}
+                          lineDiagramTooltip={lineDiagramTooltip("coding")}
+                        ></LineDiagram>
+                      ) : projectPoints.onePoints ? (
                         <LineDiagram
                           obj={proposalsNums}
                           username={username}
@@ -1133,14 +1168,12 @@ const RouterNav = props => {
                         </Button>
                       </Tooltip>
                     ) : null}
-                    {projectPoints.commentsPoints ? (
-                      <Tooltip title="Additional Resources">
-                      
-                        <IconButton >
-                          <ArrowDropDownIcon onClick={handleOtherPagesMenuOpen} />
-                        </IconButton>
-                      </Tooltip>
-                    ) : null}
+
+                    <Tooltip title="Additional Resources">
+                      <IconButton>
+                        <ArrowDropDownIcon onClick={handleOtherPagesMenuOpen} />
+                      </IconButton>
+                    </Tooltip>
                   </>
                 )}
 

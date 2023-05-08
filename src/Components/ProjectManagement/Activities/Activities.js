@@ -352,13 +352,6 @@ const Activities = props => {
         </span>
       );
     }
-    if (projectPoints.BooleanExpressionGenerationPoints) {
-      content.push(
-        <span className={resear.booleanExpPionts >= projectPoints.BooleanExpressionGenerationPoints ? "GreenText" : ""}>
-          {"🤖 " + formatPoints(resear.booleanExpPionts)}
-        </span>
-      );
-    }
     return content.map((item, index) => {
       // if not last one append a " - "
       return content.length - 1 !== index ? (

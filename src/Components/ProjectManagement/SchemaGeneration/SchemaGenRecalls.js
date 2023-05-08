@@ -582,15 +582,15 @@ export const SchemaGenRecalls = props => {
 
   if (!selectedRecall) return <></>;
   return (
-    <div className="schema-generation">
-      <div className="section">
-        <div className="blocks search-box">
-          <div className="query-block">
+    <Box className="schema-generation">
+      <Box className="section">
+        <Box className="blocks search-box">
+          <Box className="query-block">
             <Alert severity="warning">
               For every upvote you receives from others on your proposed Boolean expressions, you should receive a point.
               For every downvote, you will lose a point towards free-recall grading activity points.
             </Alert>
-            <div>
+            <Box>
               <Box
                 sx={{
                   display: "flex",
@@ -606,7 +606,7 @@ export const SchemaGenRecalls = props => {
                   the Boolean schema the phrase does not satify the response . Do you want to change your vote or propose
                   a new schema that satifys the Response ?
                 </Alert>
-                <div>
+                <Box>
                   <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
                     <Box sx={{ display: "inline", mr: "19px" }}>
                       NO
@@ -615,9 +615,9 @@ export const SchemaGenRecalls = props => {
                     </Box>
                     <Box sx={{ display: "inline" }}>{selectedPhrase}</Box>
                   </Paper>
-                </div>
+                </Box>
               </Box>
-            </div>
+            </Box>
             <Box sx={{}}>
               <Button onClick={handleNext} className="Button" variant="contained" color="success" disabled={false} id="schema-recall-submit">
                 {submitButtonLoader ? (
@@ -638,7 +638,7 @@ export const SchemaGenRecalls = props => {
               / {wrongRecallVotes.length}
             </Box>
             {schemasBoolean?.length > 0 && (
-              <Typography variant="h6" component="div" align="left">
+              <Typography variant="h6" component="Box" align="left">
                 Previous Proposals:
               </Typography>
             )}
@@ -646,28 +646,28 @@ export const SchemaGenRecalls = props => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div key={index} className="query-container" style={{ marginBottom: "30px" }}>
+                  <Box key={index} className="query-container" style={{ marginBottom: "30px" }}>
                     <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
-                    <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
-                          <div>
+                    <Box style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
+                      <Box style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
+                        <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <Box>
                             <IconButton component="label" onClick={() => upVote(schemaE)} size="small" color="success">
                               {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
                             </IconButton>
-                          </div>
-                          <div style={{ marginTop: "7px" }}>{schemaE.upVotes}</div>
-                        </div>
-                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
-                          <div>
+                          </Box>
+                          <Box style={{ marginTop: "7px" }}>{schemaE.upVotes}</Box>
+                        </Box>
+                        <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <Box>
                             <IconButton color="secondary" onClick={() => downVote(schemaE)} size="small">
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
                             </IconButton>
-                          </div>
-                          <div style={{ marginTop: "5px" }}>{schemaE.downVotes}</div>
-                        </div>
-                      </div>
-                      <div
+                          </Box>
+                          <Box style={{ marginTop: "5px" }}>{schemaE.downVotes}</Box>
+                        </Box>
+                      </Box>
+                      <Box
                         style={{
                           paddingTop: "10px",
                           paddingBottom: "20px"
@@ -677,9 +677,9 @@ export const SchemaGenRecalls = props => {
                           variant="outlined"
                           onClick={() => QuerySearching(schemaE.schema)}
                         >{`Try it out `}</Button>
-                      </div>
-                    </div>
-                  </div>
+                      </Box>
+                    </Box>
+                  </Box>
                 );
               })}
             <QueryBuilder
@@ -690,9 +690,9 @@ export const SchemaGenRecalls = props => {
               handleSubmit={handleSubmit}
               readOnly={false}
             />
-          </div>
-        </div>
-        <div className="blocks result-box">
+          </Box>
+        </Box>
+        <Box className="blocks result-box">
           <Box sx={{ padding: "15px" }}>
             <span className="header">All Responses</span>
             <br />
@@ -700,7 +700,7 @@ export const SchemaGenRecalls = props => {
               The highlighted sentences satisfy your keyword rules and the bold words are the keywords you entered
             </span>
           </Box>
-          <div
+          <Box
             style={{
               overflow: "auto",
               paddingLeft: "15px",
@@ -719,15 +719,15 @@ export const SchemaGenRecalls = props => {
               ) : searching ? (
                 <CircularProgress color="warning" size="50px" />
               ) : (
-                <Typography variant="h6" component="div" align="center">
+                <Typography variant="h6" component="Box" align="center">
                   No data Found!
                 </Typography>
               )}
             </Box>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
