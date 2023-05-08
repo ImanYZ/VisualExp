@@ -74,7 +74,9 @@ participantsRouter.post("/schedule", async (req, res) => {
           if(!availSessions[_scheduleSlot]) {
             availSessions[_scheduleSlot] = [];
           }
-          availSessions[_scheduleSlot].push(researcherFullname)
+          if(availSessions[_scheduleSlot].includes(researcherFullname)){
+            availSessions[_scheduleSlot].push(researcherFullname)
+          }
         }
       }
       // date time already booked by participants
