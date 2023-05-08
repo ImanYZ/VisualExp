@@ -90,7 +90,24 @@ const CodeFeedback = props => {
   const handleCloseAdminAddModal = () => setOpenAddAdminModal(false);
   const handleOpenDeleteModalAdmin = () => setOpenDeleteModalAdmin(true);
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
+  const [record, setRecord] = useState({});
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(async () => {
+    let completed = 0;
+    let remaining = 0;
+    const feedbackcode = await firebase.db.collection("feedbackCode").get();
+    for (let feedback of feedbackcode.docs) {
+      if (feedback.data().project === project && feedback.data().coders.includes(fullname)) {
+        completed += 1;
+      }
+      if (feedback.data().coders.length < 3) {
+        remaining += 1;
+      }
+    }
+    setRecord({ completed, remaining });
+  }, [firebase, project, fullname]);
+  console.log(record);
   const codesColumn = [
     {
       field: "code",
@@ -252,16 +269,19 @@ const CodeFeedback = props => {
     }
   }, [codeBooksChanges]);
   const feedBackCodesChoices = useMemo(() => {
-    return allFeedbackCodeCodes.map(c => {
-      return {
-        id: c.id,
-        explanation: c.explanation,
-        choice: c.choice,
-        date: new Date(c.createdAt.toDate())
-      };
-    });
-  }, [allFeedbackCodeCodes]);
-
+    return allFeedbackCodeCodes
+      .map(c => {
+        return {
+          id: c.id,
+          explanation: c.explanation,
+          choice: c.choice,
+          date: new Date(c.createdAt.toDate()),
+          project: c.project
+        };
+      })
+      .filter(c => c.project === project);
+  }, [allFeedbackCodeCodes, project]);
+  console.log(project);
   useEffect(() => {
     setSentences([]);
     setChosenCondition("");
@@ -1003,7 +1023,7 @@ const CodeFeedback = props => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh" 
+          height: "100vh"
         }}
       >
         <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
@@ -1077,7 +1097,6 @@ const CodeFeedback = props => {
           ) : (
             <span />
           )}
-
           <Paper elevation={3} sx={{ width: "100%", ml: "5px" }}>
             <Box
               sx={{
