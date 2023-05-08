@@ -107,7 +107,7 @@ const CodeFeedback = props => {
     }
     setRecord({ completed, remaining });
   }, [firebase, project, fullname]);
-  console.log(record);
+
   const codesColumn = [
     {
       field: "code",
@@ -281,7 +281,7 @@ const CodeFeedback = props => {
       })
       .filter(c => c.project === project);
   }, [allFeedbackCodeCodes, project]);
-  console.log(project);
+
   useEffect(() => {
     setSentences([]);
     setChosenCondition("");
@@ -1001,6 +1001,10 @@ const CodeFeedback = props => {
     for (let sentence in _quotesSelectedForCodes) {
       _quotesSelectedForCodes[sentence.trim()] = _quotesSelectedForCodes[sentence];
     }
+    const _choiceConditions = feedbackData.codersChoiceConditions[fullname];
+    for (let sentence in _choiceConditions) {
+      _choiceConditions[sentence?.trim()] = _choiceConditions[sentence];
+    }
     setFeedbackCode(feedbackData);
     setApprovedNewCodes(newCodes);
     setConditionsOrder(cOrders);
@@ -1009,14 +1013,13 @@ const CodeFeedback = props => {
     setSentences(response.map(s => s.trim()));
     setSelectedSentence(response[0].trim() || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
-    setChoiceConditions(feedbackData.codersChoiceConditions[fullname]);
+    setChoiceConditions(_choiceConditions);
     setSubmitting(false);
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 1000);
   };
-
-  if (!choiceConditions[selectedSentence] || !sentences.length)
+  if (!choiceConditions[selectedSentence?.trim()] || !sentences.length)
     return (
       <div
         style={{
@@ -1274,7 +1277,7 @@ const CodeFeedback = props => {
             height: "100vh" // to cover the entire viewport height
           }}
         >
-          <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
+          {/* <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" /> */}
         </div>
       )}
       <Alert severity="warning" className="VoteActivityAlert">
