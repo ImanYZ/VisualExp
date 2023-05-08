@@ -162,7 +162,9 @@ const SchedulePage = props => {
             if(!availSessions[_scheduleSlot]) {
               availSessions[_scheduleSlot] = [];
             }
-            availSessions[_scheduleSlot].push(researcherFullname)
+            if(Object.values(researchers).includes(researcherFullname)){
+              availSessions[_scheduleSlot].push(researcherFullname)
+            }
           }
         }
 
