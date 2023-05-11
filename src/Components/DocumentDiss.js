@@ -167,9 +167,10 @@ const panels = [
           For collaborative note-taking to optimize life-long learning at scale, I proposed a scalable prerequisite
           knowledge graph of mutually exclusive micro-content, where each entry covers a unique topic. However, creators
           may consider these entries trivial and put less effort into ensuring coherence with other entries.  */}
-        <p>In this
-          chapter, I explore alternative design elements and social mechanisms that can improve coherence in the
-          scalable prerequisite knowledge graph. I rationalize the scalable collaborative mechanisms to generate, evaluate, and improve the large knowledge graph that:
+        <p>
+          In this chapter, I explore alternative design elements and social mechanisms that can improve coherence in the
+          scalable prerequisite knowledge graph. I rationalize the scalable collaborative mechanisms to generate, evaluate, 
+          and improve the large knowledge graph that:
         </p>
         <ul>
           <li>Is understandable to newcomers and readers from different disciplines</li>
