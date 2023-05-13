@@ -324,6 +324,7 @@ module.exports = async (req, res) => {
           createdAt: Timestamp.fromDate(new Date()),
           researcher: fullname,
           points: gradingNum,
+          project: recallGradeData.project,
         }
       });
 
