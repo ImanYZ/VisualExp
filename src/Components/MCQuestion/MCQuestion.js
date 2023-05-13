@@ -17,6 +17,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
 // import LiveHelp from "@mui/icons-material/LiveHelp";
 
 import { choicesState } from "../../store/ExperimentAtoms";
@@ -292,13 +293,15 @@ const MCQuestion = props => {
           {props.explanations && props.explanations.length > 0 && !selectCodes ? (
             <>
               <h3>Why do you think so?</h3>
-              <TextareaAutosize
-                id="ExplanantionTextArea"
-                aria-label="Explanation text box"
-                minRows={7}
-                placeholder={"Please Explain Why?"}
-                onChange={explanationsChange}
+              <TextField
+                label="Please Explain Why?"
+                variant="outlined"
                 value={props.explanations[props.currentQIdx].explanation}
+                onChange={explanationsChange}
+                fullWidth
+                multiline
+                rows={5}
+                sx={{ width: "95%", m: 0.5 }}
               />
             </>
           ) : null}
@@ -343,16 +346,20 @@ const MCQuestion = props => {
                     );
                   })}
                 </List>
-                <TextareaAutosize
-                  id="ExplanantionTextArea"
-                  aria-label="Explanantion text box"
-                  minRows={5}
-                  placeholder={
-                    "If what you are looking for does not exist among the options above, you can enter them here, only one per textbox."
-                  }
-                  onChange={codeChange}
-                  value={newCode}
-                />
+
+              <TextField
+                label=""
+                variant="outlined"
+                value={newCode}
+                placeholder={
+                  "If what you are looking for does not exist among the options above, you can enter them here, only one per textbox."
+                }
+                onChange={codeChange}
+                fullWidth
+                multiline
+                rows={5}
+                sx={{ width: "95%", m: 0.5 }}
+              />
               </FormControl>
               <Box sx={{ m: "10px 600px 0px 0px" }}>
                 {[5, 19].includes(props.step) && selectCodes && (

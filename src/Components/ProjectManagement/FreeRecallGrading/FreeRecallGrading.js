@@ -249,7 +249,7 @@ const FreeRecallGrading = props => {
       return loadedRecallGrades();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firebase]);
+  }, [firebase, project, fullname]);
 
   useEffect(() => {
     (async () => {
@@ -387,6 +387,7 @@ const FreeRecallGrading = props => {
       </Box>
     );
   }
+
   return !recallGrades || !recallGrades.length || recallGrades.length <= recallGradeIdx ? (
     <Alert severity="info" size="large">
       <AlertTitle>Info</AlertTitle>

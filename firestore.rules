@@ -253,5 +253,13 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+    match /recallGradesLogs/{recallGradesLogId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+    match /feedbackCodeLogs/{feedbackCodeLogId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
   }
 }
