@@ -171,6 +171,7 @@ module.exports = async (req, res) => {
           createdAt: Timestamp.fromDate(new Date()),
           researcher: fullname,
           points: 1,
+          project,
         }
       });
       const { fullname: participant, project: _project, session } = feedbackCodeData;

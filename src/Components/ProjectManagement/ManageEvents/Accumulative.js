@@ -40,6 +40,28 @@ const Accumulative = props => {
       const activitiesVotesDocs = await firebase.db.collection("votes").where("project", "==", project).get();
       const administratorsDocs = await firebase.db.collection("administrators").where("project", "==", project).get();
       const instructorsDocs = await firebase.db.collection("instructors").where("project", "==", project).get();
+      const feedbackCodeLogsDocs = await firebase.db
+        .collection("feedbackCodeLogs")
+        .where("project", "==", project)
+        .get();
+      const recallGradeLogsDocs = await firebase.db.collection("recallGradeLogs").where("project", "==", project).get();
+
+      [...recallGradeLogsDocs.docs, ...feedbackCodeLogsDocs.docs].forEach(logDoc => {
+        const logData = logDoc.data();
+        if (Object.values(researcherMap).includes(logData.researcher)) {
+          const logDate = moment(logData.createdAt.toDate()).format("YYYY-MM-DD");
+          if (_accumulatePoints.hasOwnProperty(logData.researcher)) {
+            if (_accumulatePoints[logData.researcher].hasOwnProperty(logDate)) {
+              _accumulatePoints[logData.researcher][logDate] += logData.points;
+            } else {
+              _accumulatePoints[logData.researcher][logDate] = logData.points;
+            }
+          } else {
+            _accumulatePoints[logData.researcher] = {};
+            _accumulatePoints[logData.researcher][logDate] = logData.points;
+          }
+        }
+      });
 
       [...administratorsDocs.docs, ...instructorsDocs.docs].forEach(adminInst => {
         const adminInstData = adminInst.data();
