@@ -26,6 +26,7 @@ import AddAdministrator from "../AddAdministrator/AddAdministrator";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 import CodeFeedback from "../CodeFeedback/CodeFeedback";
+import Accumulative from "../ManageEvents/Accumulative";
 import { LeaderBoard, ProjectPointThresholds } from "./components";
 import { formatPoints } from "../../../utils";
 import ResearcherPassage from "../Passage-Research/ResearcherPassage";
@@ -38,7 +39,8 @@ const ShowLeaderBoardForAdmin = ["1Cademy", "AddInstructor", "AddAdministrator",
 const AdminAccessPages = [
   { page: "Intellectual", view: <ExpenseReports /> },
   { page: "Experiments", view: <ManageEvents /> },
-  { page: "RecallForIman", view: <RecallForIman /> }
+  { page: "RecallForIman", view: <RecallForIman /> },
+  { page: "Accumulative", view: <Accumulative /> }
 ];
 
 const CommonPages = [
@@ -50,7 +52,7 @@ const CommonPages = [
   { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
   { page: "CodeFeedback", view: <CodeFeedback /> },
   { page: "ResearcherPassage", view: <ResearcherPassage /> },
-  { page: "SchemaGenerationTool", view: <SchemaGeneration /> },
+  { page: "SchemaGenerationTool", view: <SchemaGeneration /> }
 ];
 
 const Activities = props => {
