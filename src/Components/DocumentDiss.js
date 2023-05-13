@@ -156,7 +156,7 @@ const panels = [
     ),
     details: (
       <div>
-        <p>
+        {/* <p>
           The coherence of a knowledge entry is directly related to the effort put into its creation, as creators who
           invest little effort are less likely to ensure coherence with other entries. Social media platforms like
           Twitter and TikTok are examples of where many entries on the same topic can be found with little coherence
@@ -166,9 +166,11 @@ const panels = [
         <p>
           For collaborative note-taking to optimize life-long learning at scale, I proposed a scalable prerequisite
           knowledge graph of mutually exclusive micro-content, where each entry covers a unique topic. However, creators
-          may consider these entries trivial and put less effort into ensuring coherence with other entries. In this
-          chapter, I explore alternative design elements and social mechanisms that can improve coherence in the
-          scalable prerequisite knowledge graph that:
+          may consider these entries trivial and put less effort into ensuring coherence with other entries.  */}
+        <p>
+          In this chapter, I explore alternative design elements and social mechanisms that can improve coherence in the
+          scalable prerequisite knowledge graph. I rationalize the scalable collaborative mechanisms to generate, evaluate, 
+          and improve the large knowledge graph that:
         </p>
         <ul>
           <li>Is understandable to newcomers and readers from different disciplines</li>
