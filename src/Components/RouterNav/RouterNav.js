@@ -400,7 +400,14 @@ const RouterNav = props => {
   }, [firebaseOne, notAResearcher, email]);
 
   useEffect(() => {
-    if (firebaseOne && !notAResearcher && username && haveProjectSpecs) {
+    if (
+      firebaseOne &&
+      !notAResearcher &&
+      username &&
+      haveProjectSpecs &&
+      haveProjectSpecs.hasOwnProperty("deTag") &&
+      projectSpecs.deTag.node
+    ) {
       const versionsSnapshots = [];
       const nodeTypes = ["Concept", "Relation", "Reference", "Idea"];
       let nodeTypeIdx = 0;
