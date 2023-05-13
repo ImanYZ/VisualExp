@@ -1,5 +1,6 @@
 const { db } = require("../../admin");
 const { getNonSatisfiedPhrasesByPassageTitle } = require("../../helpers/passage");
+const { Timestamp } = require("firebase-admin/firestore");
 
 const {assignExpPoints} = require("../../helpers/assignExpPoints");
 
@@ -315,6 +316,17 @@ module.exports = async (req, res) => {
           updateObj: userUpdates
         });
       }
+      const recallGradeLogRef = db.collection("recallGradesLogs").doc();
+      transactionWrites.push({
+        type: "set",
+        refObj: recallGradeLogRef,
+        updateObj: {
+          createdAt: Timestamp.fromDate(new Date()),
+          researcher: fullname,
+          points: viewedPhrases.length,
+          project: recallGradeData.project,
+        }
+      });
 
       let readyRecalls = true;
       for (let recall of recallGradeData.sessions[session]) {
