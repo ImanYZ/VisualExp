@@ -507,13 +507,6 @@ export const SchemaGenRecalls = props => {
     }
     
     if (notSatisfiedRecalls.length) {
-      // TODO: need to rewrite it according new structure
-      const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
-      recallGradesLogsRef.set({
-        wrongRecallGrades: notSatisfiedRecalls,
-        recallGrade: recallGrade
-      });
-
       setSatisfiedRecalls(satisfiedRecalls);
       setWrongRecallVotes(notSatisfiedRecalls);
       // setSelectedPhrase(notSatisfiedRecalls[0].data.phrase);
@@ -553,11 +546,6 @@ export const SchemaGenRecalls = props => {
       setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
       setSelectedPhrase(wrongRecallVotes[indexOFthis + 1]?.phrase)
     }
-    const recallGradesLogsRef = firebase.db.collection("recallGradesLogs").doc(fullname);
-    recallGradesLogsRef.set({
-      wrongRecallGrades: wrongRecallVotes,
-      recallGrade
-    });
   };
 
   const searchResultsRD = useMemo(() => {

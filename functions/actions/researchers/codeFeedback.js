@@ -1,5 +1,6 @@
 const { db } = require("../../admin");
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
+const { Timestamp } = require("firebase-admin/firestore");
 
 module.exports = async (req, res) => {
   try {
@@ -160,6 +161,17 @@ module.exports = async (req, res) => {
         type: "update",
         refObj: feedbackOrderRef,
         updateObj: feedOrderData
+      });
+
+      const recallGradeLogRef = db.collection("feedbackCodeLogs").doc();
+      transactionWrites.push({
+        type: "set",
+        refObj: recallGradeLogRef,
+        updateObj: {
+          createdAt: Timestamp.fromDate(new Date()),
+          researcher: fullname,
+          points: 1,
+        }
       });
       const { fullname: participant, project: _project, session } = feedbackCodeData;
       // to assign points to researcher for session if feedback coding and recall grading is done
