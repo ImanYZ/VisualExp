@@ -323,7 +323,7 @@ module.exports = async (req, res) => {
         updateObj: {
           createdAt: Timestamp.fromDate(new Date()),
           researcher: fullname,
-          points: gradingNum,
+          points: viewedPhrases.length,
           project: recallGradeData.project,
         }
       });

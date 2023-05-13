@@ -14,10 +14,12 @@ const Accumulative = props => {
   const [accumulatePoints, setAccumulatePoints] = useState({});
   const project = useRecoilValue(projectState);
   const [selectResearcher, setSelectResearcher] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const retrievePoints = async () => {
       setAccumulatePoints({});
+      setLoading(true);
       const _accumulatePoints = {};
       const researcherMap = {};
       const researchersDocs = await firebase.db.collection("researchers").get();
@@ -44,7 +46,7 @@ const Accumulative = props => {
         .collection("feedbackCodeLogs")
         .where("project", "==", project)
         .get();
-      const recallGradeLogsDocs = await firebase.db.collection("recallGradeLogs").where("project", "==", project).get();
+      const recallGradeLogsDocs = await firebase.db.collection("recallGradesLogs").where("project", "==", project).get();
 
       [...recallGradeLogsDocs.docs, ...feedbackCodeLogsDocs.docs].forEach(logDoc => {
         const logData = logDoc.data();
@@ -150,6 +152,7 @@ const Accumulative = props => {
       });
       setSelectResearcher(Object.keys(_accumulatePoints)[0]);
       setAccumulatePoints(_accumulatePoints);
+      setLoading(false);
     };
     if (firebase) {
       retrievePoints();
@@ -169,7 +172,7 @@ const Accumulative = props => {
     return _accumulateData;
   }, [accumulatePoints, selectResearcher]);
 
-  if (!accumulatePoints[selectResearcher])
+  if (loading)
     return (
       <div
         style={{
@@ -180,6 +183,21 @@ const Accumulative = props => {
         }}
       >
         <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
+      </div>
+    );
+
+  if (!accumulatePoints[selectResearcher])
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh"
+        }}
+      >
+        There is no data for the project{" "}
+        <strong style={{ color: "green", fontSize: "16.5px", marginLeft: "5px" }}>{project} </strong>
       </div>
     );
   return (
