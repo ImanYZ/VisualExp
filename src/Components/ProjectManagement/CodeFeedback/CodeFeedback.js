@@ -26,7 +26,6 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import LoadingButton from "@mui/lab/LoadingButton";
-import SaveIcon from "@mui/icons-material/Save";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
@@ -1040,22 +1039,21 @@ const CodeFeedback = props => {
       codesByCategory[code.category].push(code);
     }
 
-
     // create a card for each category
     const cards = Object.entries(codesByCategory).map(([category, codes]) => (
-      <Card key={category} sx={{ mb: 2 }}>
+      <Card key={category} sx={{ mb: 1 }}>
         <CardHeader
           title={
-            <Typography variant="h5" component="h2">
+            <Typography variant="h6" component="h2">
               {category}
             </Typography>
           }
           sx={{ bgcolor: "grey.300" }}
         />
-        <CardContent>
+        <CardContent sx={{ p: 0 }}>
           {codes.map(codeData => (
-            <ListItem key={codeData.id} disablePadding>
-              <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)}>
+            <ListItem key={codeData.id} disablePadding >
+              <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)} sx={{ p: 0 }}>
                 {quotesSelectedForCodes[selectedSentence] &&
                 quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
                   <Checkbox checked={true} color="success" />
@@ -1149,7 +1147,7 @@ const CodeFeedback = props => {
           ) : (
             <span />
           )}
-          <Paper elevation={3} sx={{ width: "100%", ml: "5px" }}>
+          <Paper elevation={3} sx={{ width: "100%" }}>
             <Box
               sx={{
                 display: "flex",
@@ -1160,12 +1158,11 @@ const CodeFeedback = props => {
             >
               <Box>
                 <h2 style={{ alignSelf: "center" }}>Participant's response in sentences</h2>
-                <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                <Sheet variant="outlined" sx={{ overflow: "auto", width: "100%" }}>
                   <List
                     sx={{
-                      paddingBlock: 1,
-                      width: 800,
-                      height: 500
+                      height: 600,
+                      p: 0
                     }}
                   >
                     {sentences.map((sentence, index) => (
@@ -1227,14 +1224,11 @@ const CodeFeedback = props => {
               </Box>
               <Box>
                 <h2 style={{ display: "flex", alignItems: "center" }}>The Codebook</h2>
-                <Sheet variant="outlined" sx={{ overflow: "auto" }}>
+                <Sheet variant="outlined" sx={{ overflow: "auto", width: "100%" }}>
                   <List
                     sx={{
-                      paddingBlock: 1,
-                      maxWidth: 500,
-                      height: 500,
-                      "--List-decorator-width": "48px",
-                      "--List-item-paddingLeft": "1.5rem"
+                      height: 600,
+                      p: 0
                     }}
                   >
                     <CodeList codes={approvedCodes} />
