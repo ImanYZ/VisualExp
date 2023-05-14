@@ -38,6 +38,7 @@ import arrayToChunks from "../../../utils/arrayToChunks";
 import { fetchRecentParticipants } from "../../../utils/researcher";
 import Select from "@mui/material/Select";
 import Tooltip from "@mui/material/Tooltip";
+import { Card, CardHeader, CardContent } from "@mui/material";
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -90,23 +91,7 @@ const CodeFeedback = props => {
   const handleCloseAdminAddModal = () => setOpenAddAdminModal(false);
   const handleOpenDeleteModalAdmin = () => setOpenDeleteModalAdmin(true);
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
-  const [record, setRecord] = useState({});
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    let completed = 0;
-    let remaining = 0;
-    const feedbackcode = await firebase.db.collection("feedbackCode").get();
-    for (let feedback of feedbackcode.docs) {
-      if (feedback.data().project === project && feedback.data().coders.includes(fullname)) {
-        completed += 1;
-      }
-      if (feedback.data().coders.length < 3) {
-        remaining += 1;
-      }
-    }
-    setRecord({ completed, remaining });
-  }, [firebase, project, fullname]);
+  const [category, setCategory] = useState("");
 
   const codesColumn = [
     {
@@ -160,6 +145,15 @@ const CodeFeedback = props => {
       }
     },
     {
+      field: "category",
+      width: "300",
+      headerName: "Category",
+      renderCell: cellValues => {
+        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+      }
+    },
+
+    {
       field: "action",
       headerName: "Action",
       renderCell: cellValues => {
@@ -171,6 +165,7 @@ const CodeFeedback = props => {
               aria-label="edit"
               onClick={() => {
                 setCode(cellValues.row.code);
+                setCategory(cellValues.row.category || "");
                 setAdminCodeData(cellValues.row);
                 handleOpenAdminEditModal();
               }}
@@ -359,7 +354,7 @@ const CodeFeedback = props => {
     const filtered = allExperimentCodes.filter(c => {
       let exist = codeMap[c.code] || false;
       codeMap[c.code] = true;
-      return c.approved && !exist;
+      return c.approved && !exist && c.hasOwnProperty("category");
     });
 
     return filtered.sort((a, b) => a.code - b.code);
@@ -399,6 +394,7 @@ const CodeFeedback = props => {
         code: c.code,
         coder: c.coder,
         addedBy: c.addedBy,
+        category: c.category,
         title: c?.title || "",
         question: c.question,
         approved: c.approved ? "✅" : "◻",
@@ -409,24 +405,14 @@ const CodeFeedback = props => {
     return orderBy(mapped, ["coder", "code"], ["asc", "asc"]);
   }, [allExperimentCodes]);
 
-  const unApprovedCodes = useMemo(() => {
-    return allExperimentCodes.filter(c => {
-      return c?.coder === fullname && !c.approved;
-    });
-  }, [allExperimentCodes]);
-
   useEffect(() => {
     const func = async () => {
       try {
         let response = { data: { message: "success" } };
-        const feedbackCodesOrderDocs = await firebase.db.collection("feedbackCodeOrderV2").get();
-        const orderData = feedbackCodesOrderDocs.docs[0].data();
-        // if (project && fullname && approvedCodes && (!orderData[fullname] || orderData[fullname].length <= 2)) {
         response = await axios.post("/createTemFeedback", {
           fullname,
           project
         });
-        // }
         if (response.data.message === "success") {
           if (!sentences.length) {
             setRetrieveNext(oldValue => oldValue + 1);
@@ -726,26 +712,37 @@ const CodeFeedback = props => {
       setSubmittingUpdate(true);
       if (adminCodeData?.code && adminCodeData?.title) {
         const experimentCodes = [...allExperimentCodes];
-
-        // check if the code already exists in approvedCode or unapprovedCode
-        const codes = experimentCodes.filter(elem => elem.code === code);
-        if (codes.length >= 2) {
-          setSnackbarMessage("This code already exists 2 or more times, please try some other code");
-          return;
-        }
-        // update the document based on selected code
-        const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
         const updatefeedbackCodeBooksDoc = await firebase.db
           .collection("feedbackCodeBooks")
           .where("code", "==", adminCodeData.code)
           .get();
+        // check if the code already exists in approvedCode or unapprovedCode
+        const codes = experimentCodes.filter(elem => elem.code === code);
+        if (codes.length >= 2) {
+          const codeUpdate = {
+            category
+          };
+          const ref = updatefeedbackCodeBooksDoc.docs[0].ref;
+          await ref.update(codeUpdate);
+          setSnackbarMessage("Uptaded successful!");
+          setCode("");
+          setCategory("");
+          setAdminCodeData({});
+          handleCloseAdminEditModal();
+          setOpenEditAdminModal(false);
+          setSubmittingUpdate(false);
+          return;
+        }
+        // update the document based on selected code
+        const feedbackCodeDocs = await firebase.db.collection("feedbackCode").get();
 
         const tWriteOperations = [];
         for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
           const codeData = feedbackCodeDoc.data();
           const codeUpdate = {
             ...codeData,
-            code: code
+            code: code,
+            category
           };
 
           tWriteOperations.push({
@@ -1032,6 +1029,58 @@ const CodeFeedback = props => {
         <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
       </div>
     );
+
+  function CodeList({ codes }) {
+    // group the codes by category
+    const codesByCategory = {};
+    for (const code of codes) {
+      if (!codesByCategory[code.category]) {
+        codesByCategory[code.category] = [];
+      }
+      codesByCategory[code.category].push(code);
+    }
+
+
+    // create a card for each category
+    const cards = Object.entries(codesByCategory).map(([category, codes]) => (
+      <Card key={category} sx={{ mb: 2 }}>
+        <CardHeader
+          title={
+            <Typography variant="h5" component="h2">
+              {category}
+            </Typography>
+          }
+          sx={{ bgcolor: "grey.300" }}
+        />
+        <CardContent>
+          {codes.map(codeData => (
+            <ListItem key={codeData.id} disablePadding>
+              <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)}>
+                {quotesSelectedForCodes[selectedSentence] &&
+                quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
+                  <Checkbox checked={true} color="success" />
+                ) : (
+                  <Checkbox checked={false} />
+                )}
+
+                <Box sx={{ display: "inline" }}>{codeData.code}</Box>
+              </ListItemButton>
+
+              {project === "H2K2" ? "H2" : "H1"}
+              {["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
+                <Switch checked={true} onChange={event => changeChoices(event, codeData.code)} color="warning" />
+              ) : (
+                <Switch checked={false} onChange={event => changeChoices(event, codeData.code)} color="warning" />
+              )}
+              {project === "H2K2" ? "K2" : "L2"}
+            </ListItem>
+          ))}
+        </CardContent>
+      </Card>
+    ));
+
+    return <div>{cards}</div>;
+  }
   return (
     <Box id="get-this">
       {sentences.length ? (
@@ -1188,36 +1237,7 @@ const CodeFeedback = props => {
                       "--List-item-paddingLeft": "1.5rem"
                     }}
                   >
-                    {approvedCodes.map(codeData => (
-                      <ListItem key={codeData.id} disablePadding>
-                        <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)}>
-                          {quotesSelectedForCodes[selectedSentence] &&
-                          quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
-                            <Checkbox checked={true} color="success" />
-                          ) : (
-                            <Checkbox checked={false} />
-                          )}
-
-                          <Box sx={{ display: "inline" }}>{codeData.code}</Box>
-                        </ListItemButton>
-
-                        {project === "H2K2" ? "H2" : "H1"}
-                        {["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
-                          <Switch
-                            checked={true}
-                            onChange={event => changeChoices(event, codeData.code)}
-                            color="warning"
-                          />
-                        ) : (
-                          <Switch
-                            checked={false}
-                            onChange={event => changeChoices(event, codeData.code)}
-                            color="warning"
-                          />
-                        )}
-                        {project === "H2K2" ? "K2" : "L2"}
-                      </ListItem>
-                    ))}
+                    <CodeList codes={approvedCodes} />
                   </List>
                 </Sheet>
 
@@ -1333,12 +1353,22 @@ const CodeFeedback = props => {
               margin="dense"
               id="code"
               label="Update the code here."
-              type="email"
               fullWidth
               variant="standard"
               value={code}
               width="100%"
-              onChange={event => setCode(event.currentTarget.value)}
+              onChange={event => setCode(event.target.value)}
+            />
+            <TextField
+              autoFocus
+              margin="dense"
+              id="category"
+              label="category"
+              fullWidth
+              variant="standard"
+              value={category}
+              width="100%"
+              onChange={event => setCategory(event.target.value)}
             />
           </DialogContent>
           <DialogActions>
@@ -1346,7 +1376,6 @@ const CodeFeedback = props => {
               loading={submittingUpdate}
               disabled={submittingUpdate}
               onClick={handleAdminEdit}
-              startIcon={<SaveIcon />}
               loadingPosition="start"
               variant="outlined"
             >
