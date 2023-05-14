@@ -38,6 +38,7 @@ import { fetchRecentParticipants } from "../../../utils/researcher";
 import Select from "@mui/material/Select";
 import Tooltip from "@mui/material/Tooltip";
 import { Card, CardHeader, CardContent } from "@mui/material";
+import MenuItem from "@mui/material/MenuItem";
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -358,6 +359,16 @@ const CodeFeedback = props => {
 
     return filtered.sort((a, b) => a.code - b.code);
   }, [allExperimentCodes]);
+
+  const categories = useMemo(() => {
+    const _categories = [];
+    for (let code of approvedCodes) {
+      if (!_categories.includes(code.category)) {
+        _categories.push(code.category);
+      }
+    }
+    return _categories;
+  }, [approvedCodes]);
 
   useEffect(() => {
     if (!sentences.length) return;
@@ -721,8 +732,11 @@ const CodeFeedback = props => {
           const codeUpdate = {
             category
           };
-          const ref = updatefeedbackCodeBooksDoc.docs[0].ref;
-          await ref.update(codeUpdate);
+          for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
+            const ref = feedbackCodeDoc.ref;
+            await ref.update(codeUpdate);
+          }
+
           setSnackbarMessage("Uptaded successful!");
           setCode("");
           setCategory("");
@@ -811,7 +825,6 @@ const CodeFeedback = props => {
 
     if (feedbackCodeTitle === "Participant") {
       // iteration to add total number of questions for same code
-      let questionArray = [1, 2];
 
       // check if the code already exists in approvedCode or unapprovedCode
       const checkIfItHasSameCode = experimentCodes.filter(elem => elem.code === code);
@@ -819,54 +832,36 @@ const CodeFeedback = props => {
         setSnackbarMessage("This code already exists 2 or more times, please try some other code");
         return;
       }
-      if (checkIfItHasSameCode.length === 1) {
-        //if it exists it will iterate only once
-        questionArray = [1];
-      }
-
-      const getQuestionNo = index => {
-        if (checkIfItHasSameCode.length === 1) {
-          return checkIfItHasSameCode[0].question === 1 ? 2 : 1;
-        }
-        return index + 1;
-      };
       try {
-        questionArray.map(async (x, index) => {
-          const docRef = await feedbackCodeBooksRef.add({
-            project,
-            approved: true,
-            addedBy: "Researcher",
+        const docRef = await feedbackCodeBooksRef.add({
+          project,
+          approved: true,
+          addedBy: "Researcher",
+          code: code,
+          coder: fullname,
+          title: feedbackCodeTitle,
+          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+        });
+        if (docRef.id) {
+          const experimentCode = {
+            id: docRef.id,
             code: code,
+            addedBy: "Researcher",
             coder: fullname,
             title: feedbackCodeTitle,
-            question: getQuestionNo(index),
-            createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-          });
-          if (docRef.id) {
-            const experimentCode = {
-              id: docRef.id,
-              code: code,
-              addedBy: "Researcher",
-              coder: fullname,
-              title: feedbackCodeTitle,
-              question: getQuestionNo(index),
-              checked: "✅"
-            };
-            experimentCodes.push(experimentCode);
-          }
-          if (index + 1 === questionArray.length) {
-            setCode("");
-            setFeedbackCodeTitle("");
-            setAdminCodeData({});
-            handleCloseAdminAddModal();
-            // setAllExperimentCodes(experimentCodes);
-            const msg =
-              checkIfItHasSameCode.length === 1
-                ? `Code Added for Question ${getQuestionNo(index)}!`
-                : `Code Add to both Questions!`;
-            setSnackbarMessage(msg);
-          }
-        });
+            checked: "✅"
+          };
+          experimentCodes.push(experimentCode);
+        }
+
+        setCode("");
+        setFeedbackCodeTitle("");
+        setAdminCodeData({});
+        handleCloseAdminAddModal();
+        // setAllExperimentCodes(experimentCodes);
+        const msg =
+          checkIfItHasSameCode.length === 1 ? `Code Added for Both Questions !` : `Code Add to both Questions!`;
+        setSnackbarMessage(msg);
       } catch (error) {
         console.error("Error adding document: ", error);
       }
@@ -1052,7 +1047,7 @@ const CodeFeedback = props => {
         />
         <CardContent sx={{ p: 0 }}>
           {codes.map(codeData => (
-            <ListItem key={codeData.id} disablePadding >
+            <ListItem key={codeData.id} disablePadding>
               <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)} sx={{ p: 0 }}>
                 {quotesSelectedForCodes[selectedSentence] &&
                 quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
@@ -1079,6 +1074,9 @@ const CodeFeedback = props => {
 
     return <div>{cards}</div>;
   }
+  const handlChange = event => {
+    setCategory(event.target.value);
+  };
   return (
     <Box id="get-this">
       {sentences.length ? (
@@ -1353,17 +1351,12 @@ const CodeFeedback = props => {
               width="100%"
               onChange={event => setCode(event.target.value)}
             />
-            <TextField
-              autoFocus
-              margin="dense"
-              id="category"
-              label="category"
-              fullWidth
-              variant="standard"
-              value={category}
-              width="100%"
-              onChange={event => setCategory(event.target.value)}
-            />
+            <>Category : </>
+            <Select value={category} onChange={handlChange} label="category" id="category">
+              {categories.map(researcher => {
+                return <MenuItem value={researcher}>{researcher}</MenuItem>;
+              })}
+            </Select>
           </DialogContent>
           <DialogActions>
             <LoadingButton
