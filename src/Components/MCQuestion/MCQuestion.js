@@ -59,11 +59,10 @@ const MCQuestion = props => {
     const experimentCodeDocs = await firebase.db
       .collection("feedbackCodeBooks")
       .where("approved", "==", true)
-      .where("question", "==", curQuestion)
       .get();
-    const codesHere = experimentCodeDocs.docs.map(doc => doc.data().code);
+    const _codes = experimentCodeDocs.docs.map(doc => doc.data().code);
 
-    setCodes(codesHere);
+    setCodes(_codes);
   };
 
   useEffect(() => {
