@@ -244,7 +244,11 @@ const ResearcherPassage = () => {
         for (let session in sessions) {
           for (let conditionItem of sessions[session]) {
             if (conditionItem.passage === passageDoc.docs[0].id) {
-              if (conditionItem.phrases[selectedPhrase].researchers.length > 0) {
+              if (
+                conditionItem.phrases.hasOwnProperty(selectedPhrase) &&
+                conditionItem.phrases[selectedPhrase].hasOwnProperty("researchers") &&
+                conditionItem.phrases[selectedPhrase].researchers.length > 0
+              ) {
                 if (!updateDocuments.includes(recallDoc.id)) {
                   updateDocuments.push(recallDoc.id);
                 }
@@ -288,7 +292,7 @@ const ResearcherPassage = () => {
             }
           }
         }
-        if(needUpdate){
+        if (needUpdate) {
           await recallRef.update({ sessions: updateSessions });
         }
       }
