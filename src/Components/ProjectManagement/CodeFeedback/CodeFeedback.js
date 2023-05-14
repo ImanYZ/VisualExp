@@ -728,7 +728,7 @@ const CodeFeedback = props => {
           .get();
         // check if the code already exists in approvedCode or unapprovedCode
         const codes = experimentCodes.filter(elem => elem.code === code);
-        if (codes.length >= 2) {
+        if (codes.length >= 1) {
           const codeUpdate = {
             category
           };
