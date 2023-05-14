@@ -732,11 +732,8 @@ const CodeFeedback = props => {
           const codeUpdate = {
             category
           };
-          for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
-            const ref = feedbackCodeDoc.ref;
-            await ref.update(codeUpdate);
-          }
-
+          const ref = updatefeedbackCodeBooksDoc.docs[0].ref;
+          await ref.update(codeUpdate);
           setSnackbarMessage("Uptaded successful!");
           setCode("");
           setCategory("");
