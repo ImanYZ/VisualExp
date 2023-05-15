@@ -1,46 +1,23 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
+
+import PassageComponent from "./PassageComponent";
+
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Paper from "@mui/material/Paper";
-import AddIcon from "@mui/icons-material/Add";
-import Checkbox from "@mui/material/Checkbox";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3
-};
 const ResearcherPassage = () => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -60,7 +37,6 @@ const ResearcherPassage = () => {
   const [selectedPhrase, setSelectedPhrase] = useState("");
   const [passagTitle, setPassagTitle] = useState("");
   const handleOpenEditModal = () => setOpenEditModal(true);
-  const handleCloseEditModal = () => setOpenEditModal(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const handleOpenDeleteModal = () => setOpenDeleteModal(true);
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
@@ -79,8 +55,10 @@ const ResearcherPassage = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const email = useRecoilValue(emailState);
 
+  const editor = email === "oneweb@umich.edu";
+
   useEffect(() => {
-    if (firebase) {
+    if (firebase && !passagesLoaded) {
       const passagesQuery = firebase.db.collection("passages");
 
       const passagesSnapshot = passagesQuery.onSnapshot(snapshot => {
@@ -183,6 +161,7 @@ const ResearcherPassage = () => {
 
   const hundleUpdatePhrase = async event => {
     try {
+      setUpdatingPhrase(true);
       const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
       const passageRef = firebase.db.collection("passages").doc(passageDoc.docs[0].id);
       const passageUpdate = passageDoc.docs[0].data();
@@ -194,24 +173,31 @@ const ResearcherPassage = () => {
         .get();
 
       recallGradesDoc.docs.forEach(async recallDoc => {
+        let needUpdate = false;
         const recallData = recallDoc.data();
         let sessions = recallData.sessions;
 
         for (let session in sessions) {
-          sessions[session].forEach(conditionItem => {
+          for (let conditionItem of sessions[session]) {
             for (let phraseItem of conditionItem.phrases) {
+              needUpdate = true;
               if (phraseItem.phrase === selectedPhrase) {
                 phraseItem.phrase = newPhrase;
+                if (phraseItem.hasOwnProperty("GPT-4-Mentioned")) {
+                  delete phraseItem["GPT-4-Mentioned"];
+                  conditionItem.doneGPT4Mentioned = false;
+                }
               }
             }
-          });
+          }
         }
 
         const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
-
-        await recallRef.update({
-          sessions
-        });
+        if (needUpdate) {
+          await recallRef.update({
+            sessions
+          });
+        }
       });
 
       await passageRef.update(passageUpdate);
@@ -227,6 +213,7 @@ const ResearcherPassage = () => {
   };
 
   const handleDeletePhrase = async event => {
+    setDeletingPhrase(true);
     let updateDocuments = [];
     const passageDoc = await firebase.db.collection("passages").where("title", "==", passagTitle).get();
     let allowDelete = true;
@@ -244,10 +231,14 @@ const ResearcherPassage = () => {
         for (let session in sessions) {
           for (let conditionItem of sessions[session]) {
             if (conditionItem.passage === passageDoc.docs[0].id) {
+              const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
+              if (phraseIndex !== -1 && conditionItem.phrases[phraseIndex].hasOwnProperty("researchers")) {
+                console.log("researchers", conditionItem.phrases[phraseIndex].researchers);
+              }
               if (
-                conditionItem.phrases.hasOwnProperty(selectedPhrase) &&
-                conditionItem.phrases[selectedPhrase].hasOwnProperty("researchers") &&
-                conditionItem.phrases[selectedPhrase].researchers.length > 0
+                phraseIndex !== -1 &&
+                conditionItem.phrases[phraseIndex].hasOwnProperty("researchers") &&
+                conditionItem.phrases[phraseIndex].researchers.length > 0
               ) {
                 if (!updateDocuments.includes(recallDoc.id)) {
                   updateDocuments.push(recallDoc.id);
@@ -260,7 +251,6 @@ const ResearcherPassage = () => {
         }
       }
     }
-
     setNumberRecorded(numberRecord);
 
     const oldPhrase = selectedPhrase;
@@ -283,12 +273,10 @@ const ResearcherPassage = () => {
         let needUpdate = false;
         for (let session in updateSessions) {
           for (let conditionItem of updateSessions[session]) {
-            if (conditionItem.passage === passageDoc.docs[0].id && conditionItem.phrases.hasOwnProperty(oldPhrase)) {
+            const phraseIndex = conditionItem.phrases.findIndex(p => p.phrase === selectedPhrase);
+            if (conditionItem.passage === passageDoc.docs[0].id && phraseIndex !== -1) {
               needUpdate = true;
-              conditionItem.phrases.splice(
-                conditionItem.phrases.findIndex(_phrase => _phrase.phrase === oldPhrase),
-                1
-              );
+              conditionItem.phrases.splice(phraseIndex, 1);
             }
           }
         }
@@ -315,17 +303,21 @@ const ResearcherPassage = () => {
       .get();
 
     for (let recallDoc of recallGradesDoc.docs) {
+      let needUpdate = false;
       const recallRef = firebase.db.collection("recallGradesV2").doc(recallDoc.id);
       const recallData = recallDoc.data();
       let updateSessions = recallData.sessions;
       for (let session in updateSessions) {
         for (let conditionItem of recallData.sessions[session]) {
+          needUpdate = true;
           if (conditionItem.passage === passageDoc.docs[0].id) {
             conditionItem.phrases.push({ phrase: newPhraseAdded, researchers: [], grades: [] });
           }
         }
       }
-      await recallRef.update({ sessions: updateSessions });
+      if (needUpdate) {
+        await recallRef.update({ sessions: updateSessions });
+      }
     }
     await passageRef.update(passageUpdate);
     handleCloseAddPhraseModal();
@@ -361,524 +353,163 @@ const ResearcherPassage = () => {
     passageRef.update(passageUpdate);
   };
 
+  const handlNewPharse = event => {
+    setNewPhrase(event.target.value);
+  };
+
+  const handlEditPharse = event => {
+    setNewPhraseAdded(event.target.value);
+  };
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setNewPhrase("");
+    setUpdatingPhrase(false);
+  };
   return (
     <Paper sx={{ m: "10px 10px 100px 10px" }}>
-      <Modal
-        open={openEditModal}
-        onClose={handleCloseEditModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            ...modalStyle,
-            width: "500px",
-            height: "250px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-          }}
-        >
-          <Typography variant="h6" margin-bottom="20px">
-            Update the phrase below:
-          </Typography>
-          <Box>
-            <TextareaAutosize
-              style={{ width: "90%" }}
-              minRows={5}
-              value={newPhrase}
-              placeholder={"Update the Phrase here."}
-              onChange={event => setNewPhrase(event.currentTarget.value)}
-            />
-            <Box sx={{ textAlign: "center" }}>
-              <LoadingButton
-                loading={updatingPhrase}
-                className="Button"
-                variant="contained"
-                onClick={() => {
-                  hundleUpdatePhrase();
-                  setUpdatingPhrase(true);
-                }}
-              >
-                Update
-              </LoadingButton>
-              <Button
-                variant="contained"
-                className="Button Red"
-                onClick={() => {
-                  setNewPhrase("");
-                  handleCloseEditModal();
-                  setUpdatingPhrase(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Modal>
+      <Dialog open={openEditModal} onClose={handleCloseEditModal}>
+        <DialogTitle sx={{ fontSize: "15px" }}> Update the phrase below:</DialogTitle>
+        <DialogContent sx={{ width: "500px", mt: "5px" }}>
+          <TextField
+            label="Update the Phrase here."
+            variant="outlined"
+            value={newPhrase}
+            onChange={handlNewPharse}
+            fullWidth
+            multiline
+            rows={3}
+            sx={{ width: "95%", m: 0.5 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton loading={updatingPhrase} variant="contained" onClick={hundleUpdatePhrase}>
+            Update
+          </LoadingButton>
+          <Button onClick={handleCloseEditModal}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
 
-      <Modal
-        open={openDeleteModal}
-        onClose={handleCloseDeleteModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={{ ...modalStyle }}>
+      <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
+        <DialogTitle sx={{ fontSize: "15px" }}>Delete phrase : {selectedPhrase}</DialogTitle>
+        <DialogContent sx={{ width: "500px", mt: "5px" }}>
           <Alert severity={numberRecorded !== 0 ? "error" : "warning"}>
-            Are you sure, you want to delete phrase ?
+            Are you sure, you want to delete this phrase ?
             <br />
             {numberRecorded !== 0 && `there are ${numberRecorded} already graded records for this phrase.`}
             <br />
           </Alert>
-          <Box sx={{ textAlign: "center" }}>
-            <LoadingButton
-              loading={deletingPhrase}
-              variant="contained"
-              className="Button Red"
-              onClick={() => {
-                handleDeletePhrase();
-                setDeletingPhrase(true);
-              }}
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton loading={deletingPhrase} onClick={handleDeletePhrase}>
+            Delete
+          </LoadingButton>
+          <Button
+            onClick={() => {
+              setSelectedPhrase("");
+              setNumberRecorded(0);
+              handleCloseDeleteModal();
+              setDeletingPhrase(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openAddPhraseModal} onClose={handleCloseAddPhraseModal}>
+        <DialogTitle sx={{ fontSize: "15px" }}>Your phrase will be added to the passage bellow</DialogTitle>
+        <DialogContent sx={{ width: "500px" }}>
+          <TextField
+            label="New Phrase"
+            variant="outlined"
+            value={newPhraseAdded}
+            onChange={handlEditPharse}
+            fullWidth
+            multiline
+            rows={3}
+            sx={{ width: "95%", m: 0.5 }}
+          />
+          <Box sx={{ display: "flex", alignItems: "center", mt: "15px" }}>
+            Add phrase for:
+            <Select
+              sx={{ ml: "15px" }}
+              value={chosenPassage}
+              onChange={event => setChosenPassage(event.target.value || "")}
             >
-              Delete
-            </LoadingButton>
-            <Button
-              className="Button"
-              variant="contained"
-              onClick={() => {
-                setSelectedPhrase("");
-                setNumberRecorded(0);
-                handleCloseDeleteModal();
-                setDeletingPhrase(false);
-              }}
-            >
-              Cancel
-            </Button>
+              <MenuItem value={passage1.title}>{passage1.title}</MenuItem>
+              <MenuItem value={passage2.title}>{passage2.title}</MenuItem>
+            </Select>
           </Box>
+        </DialogContent>
+        <DialogActions>
+          <LoadingButton
+            disabled={!newPhraseAdded || !chosenPassage}
+            variant="contained"
+            loading={submtingNewPhrase}
+            onClick={() => {
+              handleAddNewPhrase();
+              setSubmtingNewPhrase(true);
+            }}
+          >
+            Add
+          </LoadingButton>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setNewPhraseAdded("");
+              setChosenPassage("");
+              handleCloseAddPhraseModal();
+            }}
+          >
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Box style={{ background: "#e2e2e2" }}>
+        <Box style={{ display: "flex", height: "100%" }}>
+          <PassageComponent
+            editor={editor}
+            passage={passage1}
+            handleTypeOfQuestion={handleTypeOfQuestion}
+            handleOpenddPhraseModal={handleOpenddPhraseModal}
+            handleOpenEditModal={handleOpenEditModal}
+            handlePassageChange={handlePassageChange}
+            setChosenPassage={setChosenPassage}
+            passages={passages}
+            optionsConditions={optionsConditions}
+            pConURL={pConURL}
+            passageCondition={passageCondition}
+            handlePassageConditionChange={handlePassageConditionChange}
+            userCondition={userCondition}
+            setPassagTitle={setPassagTitle}
+            setNewPhrase={setNewPhrase}
+            setSelectedPhrase={setSelectedPhrase}
+            handleOpenDeleteModal={handleOpenDeleteModal}
+            handleTypeOfPhrase={handleTypeOfPhrase}
+          />
+          <PassageComponent
+            editor={editor}
+            passage={passage2}
+            handleTypeOfQuestion={handleTypeOfQuestion}
+            handleOpenddPhraseModal={handleOpenddPhraseModal}
+            handleOpenEditModal={handleOpenEditModal}
+            handlePassageChange={handlePassageChange2}
+            setChosenPassage={setChosenPassage}
+            passages={passages}
+            optionsConditions={optionsConditions}
+            pConURL={pConURL2}
+            passageCondition={passageCondition2}
+            handlePassageConditionChange={handlePassageConditionChange2}
+            userCondition={userCondition2}
+            setPassagTitle={setPassagTitle}
+            setNewPhrase={setNewPhrase}
+            setSelectedPhrase={setSelectedPhrase}
+            handleOpenDeleteModal={handleOpenDeleteModal}
+            handleTypeOfPhrase={handleTypeOfPhrase}
+          />
         </Box>
-      </Modal>
-
-      <Modal
-        open={openAddPhraseModal}
-        onClose={handleCloseAddPhraseModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            ...modalStyle,
-            width: "500px",
-            height: "350px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between"
-          }}
-        >
-          <Typography variant="h6">Your Phrase will be added to the passage bellow</Typography>
-          <Box>
-            <TextareaAutosize
-              style={{ width: "90%", marginBottom: "10px" }}
-              minRows={5}
-              value={newPhraseAdded}
-              placeholder={"Add the Phrase here."}
-              onChange={event => setNewPhraseAdded(event.currentTarget.value)}
-            />
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Typography variant="h6" sx={{ mr: "10px" }}>
-                Add Phrase for:
-              </Typography>
-              <Select
-                native
-                value={chosenPassage}
-                input={<OutlinedInput label="Title" id="demo-dialog-native" />}
-                onChange={event => setChosenPassage(event.target.value || "")}
-              >
-                <option value={passage1.title}>{passage1.title}</option>
-                <option value={passage2.title}>{passage2.title}</option>
-              </Select>
-            </Box>
-            <Box sx={{ textAlign: "center" }}>
-              <LoadingButton
-                disabled={!newPhraseAdded || !chosenPassage}
-                className="Button"
-                variant="contained"
-                loading={submtingNewPhrase}
-                onClick={() => {
-                  handleAddNewPhrase();
-                  setSubmtingNewPhrase(true);
-                }}
-              >
-                Add
-              </LoadingButton>
-              <Button
-                className="Button Red"
-                variant="contained"
-                onClick={() => {
-                  setNewPhraseAdded("");
-                  setChosenPassage("");
-                  handleCloseAddPhraseModal();
-                }}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </Modal>
-
-      <div style={{ background: "#e2e2e2" }}>
-        <div style={{ display: "flex", height: "100%" }}>
-          <div style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
-            <div style={{ display: "flex" }}>
-              <div style={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-                <Typography variant="h6" component="div">
-                  Passage
-                </Typography>
-
-                <Select id="demo-simple-select-helper" value={userCondition} onChange={handlePassageChange}>
-                  {passages &&
-                    passages?.length > 0 &&
-                    passages.map(doc => <MenuItem value={doc.title}>{doc.title}</MenuItem>)}
-                </Select>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="h6" component="div">
-                  Passage Condition
-                </Typography>
-                <Select id="demo-simple-select-helper" value={passageCondition} onChange={handlePassageConditionChange}>
-                  {optionsConditions.map(option => {
-                    return (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </div>
-            </div>
-            <iframe id="PassageFrame" frameBorder="0" src={pConURL}></iframe>
-            <Typography variant="h5" gutterBottom component="div">
-              Questions and Answers
-            </Typography>
-            {passage1 &&
-              passage1?.questions?.length > 0 &&
-              passage1.questions.map((question, index) => {
-                return (
-                  <Accordion key={index}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography variant="h6" component="div">
-                        {`${index + 1}. ${question.stem}`}
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <ol id="sortable" type="a" start="1">
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.a}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.b}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.c}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.d}
-                          </Typography>
-                        </li>
-                      </ol>
-                      <Typography variant="h6" gutterBottom component="div" mb={2}>
-                        Answer: <mark>{question[question.answer]}</mark>
-                      </Typography>
-                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
-                        <List>
-                          {["Inference", "memory"].map(type => (
-                            <ListItem disablePadding>
-                              <ListItemButton
-                                onClick={() => {
-                                  handleTypeOfQuestion(type, passage1.title, index);
-                                }}
-                                dense
-                              >
-                                <ListItemIcon>
-                                  <Checkbox edge="start" checked={question.type === type} disableRipple />
-                                </ListItemIcon>
-                                <ListItemText id={type} primary={`${type}`} />
-                              </ListItemButton>
-                            </ListItem>
-                          ))}
-                        </List>
-                      )}
-                    </AccordionDetails>
-                  </Accordion>
-                );
-              })}
-            {passage1?.phrases?.length > 0 && (
-              <>
-                <Typography variant="h5" gutterBottom component="div">
-                  Phrases
-                </Typography>
-
-                {email === "oneweb@umich.edu" && (
-                  <Button
-                    onClick={() => {
-                      handleOpenddPhraseModal();
-                      setChosenPassage(passage1.title);
-                    }}
-                  >
-                    <AddIcon /> add New Phrase
-                  </Button>
-                )}
-              </>
-            )}
-            <div>
-              {passage1 &&
-                passage1?.phrases?.length > 0 &&
-                passage1?.phrases?.map((phrase, index) => (
-                  <ul key={index}>
-                    <li>
-                      <div>{phrase}</div>
-                      {email === "oneweb@umich.edu" && (
-                        <div>
-                          <IconButton
-                            edge="end"
-                            aria-label="edit"
-                            onClick={() => {
-                              setPassagTitle(passage1.title);
-                              setNewPhrase(phrase);
-                              setSelectedPhrase(phrase);
-                              handleOpenEditModal(phrase);
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={() => {
-                              setPassagTitle(passage1.title);
-                              setSelectedPhrase(phrase);
-                              handleOpenDeleteModal();
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                          <List>
-                            {["Inference", "memory"].map(type => (
-                              <ListItem disablePadding>
-                                <ListItemButton
-                                  onClick={() => {
-                                    handleTypeOfPhrase(type, passage1.title, index);
-                                  }}
-                                  dense
-                                >
-                                  <ListItemIcon>
-                                    <Checkbox
-                                      edge="start"
-                                      checked={passage1.phrasesTypes && passage1?.phrasesTypes[index] === type}
-                                      disableRipple
-                                    />
-                                  </ListItemIcon>
-                                  <ListItemText id={type} primary={`${type}`} />
-                                </ListItemButton>
-                              </ListItem>
-                            ))}
-                          </List>
-                        </div>
-                      )}
-                    </li>
-                  </ul>
-                ))}
-            </div>
-          </div>
-          <div style={{ width: "70%", margin: "15px 0px 0px 20px", overflow: "scroll", height: "90vh" }}>
-            <div style={{ display: "flex" }}>
-              <div style={{ display: "flex", flexDirection: "column", marginRight: "20px" }}>
-                <Typography variant="h6" component="div">
-                  Passage
-                </Typography>
-                <Select id="demo-simple-select-helper" value={userCondition2} onChange={handlePassageChange2}>
-                  {passages &&
-                    passages?.length > 0 &&
-                    passages?.map(doc => <MenuItem value={doc.title}>{doc.title}</MenuItem>)}
-                </Select>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="h6" component="div">
-                  Passage Condition
-                </Typography>
-                <Select
-                  id="demo-simple-select-helper"
-                  value={passageCondition2}
-                  onChange={handlePassageConditionChange2}
-                >
-                  {optionsConditions.map(option => {
-                    return <MenuItem value={option}>{option}</MenuItem>;
-                  })}
-                </Select>
-              </div>
-            </div>
-            <iframe id="PassageFrame" frameBorder="0" src={pConURL2}></iframe>
-            <Typography variant="h5" gutterBottom component="div">
-              Questions and Answers
-            </Typography>
-            {passage2 &&
-              passage2?.questions?.length > 0 &&
-              passage2?.questions.map((question, index) => {
-                return (
-                  <Accordion key={index}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography variant="h6" component="div">
-                        {`${index + 1}. ${question.stem}`}
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <ul>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.a}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.b}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.c}
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography variant="h6" component="div">
-                            {question.d}
-                          </Typography>
-                        </li>
-                      </ul>
-                      <Typography variant="h6" gutterBottom component="div" mb={2}>
-                        Answer: <mark>{question[question.answer]}</mark>
-                      </Typography>
-
-                      {(email === "oneweb@umich.edu" || email === "tirdad.barghi@gmail.com") && (
-                        <List>
-                          {["Inference", "memory"].map(type => (
-                            <ListItem disablePadding>
-                              <ListItemButton
-                                onClick={() => {
-                                  handleTypeOfQuestion(type, passage2.title, index);
-                                }}
-                                dense
-                              >
-                                <ListItemIcon>
-                                  <Checkbox edge="start" checked={question.type === type} disableRipple />
-                                </ListItemIcon>
-                                <ListItemText id={type} primary={`${type}`} />
-                              </ListItemButton>
-                            </ListItem>
-                          ))}
-                        </List>
-                      )}
-                    </AccordionDetails>
-                  </Accordion>
-                );
-              })}
-            {passage2?.phrases?.length > 0 && (
-              <>
-                <Typography variant="h5" gutterBottom component="div">
-                  Phrases
-                </Typography>
-
-                {email === "oneweb@umich.edu" && (
-                  <Button
-                    onClick={() => {
-                      handleOpenddPhraseModal();
-                      setChosenPassage(passage2.title);
-                    }}
-                  >
-                    <AddIcon /> add New Phrase
-                  </Button>
-                )}
-              </>
-            )}
-
-            <Box>
-              {passage2 &&
-                passage2?.phrases?.length > 0 &&
-                passage2.phrases.map((phrase, index) => (
-                  <ul key={index}>
-                    <li>
-                      <div style={{ userselect: true }}>{phrase}</div>
-                      {email === "oneweb@umich.edu" && (
-                        <>
-                          <IconButton
-                            edge="end"
-                            aria-label="edit"
-                            onClick={() => {
-                              setPassagTitle(passage2.title);
-                              setNewPhrase(phrase);
-                              setSelectedPhrase(phrase);
-                              handleOpenEditModal(phrase);
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={() => {
-                              setPassagTitle(passage2.title);
-                              setSelectedPhrase(phrase);
-                              handleOpenDeleteModal();
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-
-                          <List>
-                            {["Inference", "memory"].map(type => (
-                              <ListItem disablePadding>
-                                <ListItemButton
-                                  onClick={() => {
-                                    handleTypeOfPhrase(type, passage2.title, index);
-                                  }}
-                                  dense
-                                >
-                                  <ListItemIcon>
-                                    <Checkbox
-                                      edge="start"
-                                      checked={passage2.phrasesTypes && passage2?.phrasesTypes[index] === type}
-                                      disableRipple
-                                    />
-                                  </ListItemIcon>
-                                  <ListItemText id={type} primary={`${type}`} />
-                                </ListItemButton>
-                              </ListItem>
-                            ))}
-                          </List>
-                        </>
-                      )}
-                    </li>
-                  </ul>
-                ))}
-            </Box>
-          </div>
-        </div>
-      </div>
+      </Box>
     </Paper>
   );
 };
