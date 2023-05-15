@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { useRecoilValue, useRecoilState } from "recoil";
 
-import { firebaseState, fullnameState , emailState} from "./store/AuthAtoms";
+import { firebaseState, fullnameState, emailState } from "./store/AuthAtoms";
 import {
   phaseState,
   stepState,
@@ -238,6 +238,7 @@ const App = () => {
       .where("project", "==", userData.project)
       .get();
     let recallGradeRef = firebase.db.collection("recallGradesV2").doc();
+    const passages = [userData.pConditions[0].passage, userData.pConditions[1].passage];
     let recallGradeData = {
       sessions: {
         [session]: []
@@ -248,6 +249,7 @@ const App = () => {
       user: fullname,
       priority: 0,
       email,
+      passages
     };
     if (recallGrades.docs.length) {
       recallGradeRef = firebase.db.collection("recallGradesV2").doc(recallGrades.docs[0].id);
@@ -380,7 +382,10 @@ const App = () => {
       const resScheduleData = resSchedule.data();
       const attendedSessions = resScheduleData.attendedSessions || {};
       for (let _researcher in attendedSessions) {
-        if (attendedSessions[_researcher].hasOwnProperty(fullname) && attendedSessions[_researcher][fullname].includes(session)) {
+        if (
+          attendedSessions[_researcher].hasOwnProperty(fullname) &&
+          attendedSessions[_researcher][fullname].includes(session)
+        ) {
           researcher = _researcher;
           break;
         }
@@ -472,7 +477,7 @@ const App = () => {
       }
     }
 
-    if(codeIds.length) {
+    if (codeIds.length) {
       const feedbackCodeOrders = await firebase.db
         .collection("feedbackCodeOrderV2")
         .where("project", "==", userData.project)
@@ -496,7 +501,6 @@ const App = () => {
       }
     }
 
-  
     await firebase.commitBatch();
     pConditions[0] = {
       ...pConditions[0],
@@ -628,7 +632,7 @@ const App = () => {
         break;
       case 4:
         setTimer(30 * 60);
-        await setUserStep(userRef, { postQsStart: currentTime ,explanations }, 5);
+        await setUserStep(userRef, { postQsStart: currentTime, explanations }, 5);
         break;
       case 5:
         await submitFeedbackCode(currentTime, 5 * 60 - timer, userRef, userData, {}, 6);
