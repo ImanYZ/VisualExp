@@ -563,38 +563,13 @@ const IntellectualPoints = (props) => {
       startTime,
       endTime
     );
-    {
-      // let invActivity = false;
-      // const activityStartedEarlierDocs = await firebase.db
-      //   .collection("activities")
-      //   .where("fullname", "==", fullname)
-      //   .where("date", "==", activityDate)
-      //   .where("startTime", "<=", endTimeStamp)
-      //   .get();
-      // const activityEntedLaterDocs = await firebase.db
-      //   .collection("activities")
-      //   .where("fullname", "==", fullname)
-      //   .where("date", "==", activityDate)
-      //   .where("endTime", ">=", startTimeStamp)
-      //   .get();
-      // if (
-      //   activityStartedEarlierDocs.docs.length > 0 &&
-      //   activityEntedLaterDocs.docs.length > 0
-      // ) {
-      //   for (let activityStartedEarlierDoc of activityStartedEarlierDocs.docs) {
-      //     for (let activityEntedLaterDoc of activityEntedLaterDocs.docs) {
-      //       if (activityStartedEarlierDoc.id === activityEntedLaterDoc.id) {
-      //         invActivity = true;
-      //       }
-      //     }
-      //   }
-      // }
-      // if (invActivity) {
-      //   setInvalidActivity(
-      //     "You previously reported an activity overlappig this one."
-      //   );
-      // } else {
-    }
+    const reseachersDoc = await firebase.db.collection("researchers").doc(fullname).get();
+    const researcherData = reseachersDoc.data();
+    const num = researcherData.projects[project].intellectualNum || 0;
+    researcherData.projects[project].intellectualNum = num + 1;
+    await firebase.batchUpdate(reseachersDoc.ref, {
+      projects: researcherData.projects,
+    });
     const currentTime = firebase.firestore.Timestamp.fromDate(new Date());
     for (let sTag of selectedTags) {
       const tagDoc = await firebase.db.collection("tags").doc(sTag).get();
@@ -674,6 +649,7 @@ const IntellectualPoints = (props) => {
   };
 
   const deleteActivity = async (clickedCell) => {
+    console.log(clickedCell.field === "deleteButton",  clickedCell.id);
     if (clickedCell.field === "deleteButton") {
       try {
         let aActivities = [...allActivities];
@@ -684,7 +660,7 @@ const IntellectualPoints = (props) => {
           activityIdx !== -1 &&
           aActivities[activityIdx][clickedCell.field] !== "O"
         ) {
-          aActivities[activityIdx][clickedCell.field] = "O";
+          aActivities.splice(activityIdx, 1);
           setAllActivities(aActivities);
           await firebase.idToken();
           await axios.post("/deleteActivity", {
@@ -846,13 +822,13 @@ const IntellectualPoints = (props) => {
           onCellClick={voteOthersActivities}
         />
       </div>
-      {/* {!isAdmin && ( */}
+
       <>
         <h2>Your Intellectual Activities:</h2>
         <IntellectualActivitiesAlert />
         <h3>
           You're reporting your activities for project{" "}
-          <strong>{project}</strong>.
+          <strong style={{color:"green"}}>{project}</strong>.
         </h3>
         <div className="Columns40_60">
           <ActivityInstructionsAlert />

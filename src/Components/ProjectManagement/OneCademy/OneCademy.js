@@ -47,7 +47,7 @@ const OneCademy = (props) => {
   const [sNodesChanged, setSNodesChanged] = useState(false);
 
   useEffect(() => {
-    if (firebase && !notAResearcher && username && haveProjectSpecs) {
+    if (firebase && !notAResearcher && username && haveProjectSpecs && projectSpecs.deTag) {
       const usersQuery = firebase.db.collection("users").where("deTag", "==", projectSpecs.deTag);
       const usersSnapshot = usersQuery.onSnapshot((snapshot) => {
         const docChanges = snapshot.docChanges();
