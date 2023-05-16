@@ -308,12 +308,14 @@ exports.deleteActivity = async (req, res) => {
                   ...voterUpdate.voterUpdateData
                 });
               }
+              const intellectualNum = researcherData.projects[activityData.project].intellectualNum - 1 ; 
               const pointsUpdate = {
                 projects: {
                   ...researcherData.projects,
                   [activityData.project]: {
                     ...researcherData.projects[activityData.project],
-                    points: researcherData.projects[activityData.project].points - activityData.upVotes
+                    points: researcherData.projects[activityData.project].points - activityData.upVotes,
+                    intellectualNum: intellectualNum > 0 ? intellectualNum : 0,
                   }
                 }
               };
