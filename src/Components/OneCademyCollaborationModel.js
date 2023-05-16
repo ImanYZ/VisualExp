@@ -78,7 +78,7 @@ const OneCademyCollaborationModel = () => {
   const [listOfDiagrams, setListOfDiagrams] = useState([]);
   const [selectedDiagrams, setSelectedDiagrams] = useState([]);
   const [editingDiagram, setEditingDiagram] = useState(false);
-  const [allNodesDiagram, setAllNodesDiagram] = useState([]);
+  const [selectingSideNodes, setSelectingSideNodes] = useState(false);
 
   const editor = email === "oneweb@umich.edu";
 
@@ -226,9 +226,7 @@ const OneCademyCollaborationModel = () => {
     let _visibleNodes = [];
     let _maxDepth = 0;
     for (let collabModelNode of _allNodes) {
-      if (showAll) {
-        _visibleNodes.push(collabModelNode.id);
-      } else if (selectedDiagram === "no-diagram") {
+      if (selectedDiagram === "no-diagram") {
         if (!collabModelNode.hasOwnProperty("diagrams")) {
           _visibleNodes.push(collabModelNode.id);
         }
@@ -264,7 +262,9 @@ const OneCademyCollaborationModel = () => {
         }
       }
     }
-    setVisibleNodes(_visibleNodes);
+    if (!selectingSideNodes) {
+      setVisibleNodes(_visibleNodes);
+    }
     setMaxDepth(_maxDepth);
     g.nodes().forEach(function (v) {
       var node = g.node(v);
@@ -597,6 +597,7 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleVisibileNodes = node => {
+    setSelectingSideNodes(true);
     const _visibleNodes = visibleNodes;
     setShowAll(false);
     setIngnorOrder(true);
@@ -901,6 +902,7 @@ const OneCademyCollaborationModel = () => {
     setOpenLegend(old => !old);
   };
   const handlChangeDiagram = event => {
+    setSelectingSideNodes(false);
     setSelectedDiagram(event.target.value);
     const _visibleNodes = [];
 
@@ -915,6 +917,19 @@ const OneCademyCollaborationModel = () => {
         }
       }
     }
+
+    let _showall = true;
+    for (let node of allNodes) {
+      if (!_visibleNodes.includes(node.id)) {
+        _showall = false;
+        break;
+      }
+    }
+
+    const filter = allNodes.filter(node => !_visibleNodes.includes(node.id));
+    console.log(filter);
+
+    setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
     setShowAll(false);
     setNodesLoded(false);
@@ -1491,7 +1506,7 @@ const OneCademyCollaborationModel = () => {
                       Add New Diagram
                     </Button>
                   )}
-                  {editor && selectedDiagram !== "no-diagram" && !openModifyLink && !openAddNode && (
+                  {editor && selectedDiagram && selectedDiagram !== "no-diagram" && !openModifyLink && !openAddNode && (
                     <EditIcon
                       sx={{
                         mb: "20px",
