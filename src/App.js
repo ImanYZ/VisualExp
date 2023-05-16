@@ -698,7 +698,8 @@ const App = () => {
               gender: gender === "Not listed (Please specify)" ? genderOtherValue : gender,
               ethnicity: ethnicityArray,
               major: major.Major,
-              demoQsEnded: currentTime
+              demoQsEnded: currentTime,
+              phase: 0
             },
             10
           );
@@ -731,6 +732,21 @@ const App = () => {
         setTimer(5 * 60);
         break;
       case 13:
+        console.log("first", condition ,pConditions)
+        let pendingCondition;
+        if (startedSession === 2) {
+          console.log("second")
+          const pendingconditionIdx = pConditions.findIndex(
+            pCon => !(pCon.hasOwnProperty("recall3DaysreText")) 
+          );
+          pendingCondition = pConditions[pendingconditionIdx];
+        } else if (startedSession === 3) {
+          const pendingConditionnInd = pConditions.findIndex(
+            pCon => !(pCon.hasOwnProperty("recall1WeekreText"))
+          );
+          pendingCondition = pConditions[pendingConditionnInd];
+        }
+       console.log(pendingCondition)
         await submitAnswers(
           currentTime,
           5 * 60 - timer,
@@ -739,8 +755,8 @@ const App = () => {
           {
             phase: 1,
             currentPCon: {
-              passage: pConditions[1].passage,
-              condition: pConditions[1].condition
+              passage: pendingCondition.passage,
+              condition: pendingCondition.condition
             }
           },
           14
@@ -958,6 +974,14 @@ const App = () => {
       }, 400);
     }
   };
+
+  useEffect(() => {
+    if (step === 10 && startedSession === 2) {
+      const userRef = firebase.db.collection("users").doc(fullname);
+      setUserStep(userRef, {}, 11);
+    }
+  }, [step, fullname, startedSession, firebase]);
+
   return (
     fullname &&
     passage &&
