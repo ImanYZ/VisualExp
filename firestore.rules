@@ -261,5 +261,9 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+    match /diagramsModelNodes/{diagramsModelNodeId} {
+       allow read: if  true;
+       allow write: if true;
+    }
   }
 }
