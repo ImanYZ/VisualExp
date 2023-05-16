@@ -136,6 +136,23 @@ const lineDiagramTooltip = type => (obj, key, uname) => {
       </>
     );
   }
+  if (type === "intellectual") {
+    return (
+      <>
+        {key === uname ? (
+          "You've added"
+        ) : uname === "Iman YeckehZaare" ? (
+          <>
+            <strong style={{ color: "green", fontSize: "15.5px" }}>{key} </strong> Coded
+          </>
+        ) : (
+          "Coded"
+        )}
+
+        {` ${obj[key].num} intellectual activities.`}
+      </>
+    );
+  }
 };
 
 const RouterNav = props => {
@@ -187,6 +204,7 @@ const RouterNav = props => {
   const [gradingPoints, setGradingPoints] = useState(0);
   const [gradingNums, setGradingNums] = useState({});
   const [codingNums, setCodingNums] = useState({});
+  const [intellectualNum, setIntellectualNum] = useState({});
   const [negativeGradingPoints, setNegativeGradingPoints] = useState(0);
   const [positiveCodesPoints, setPositiveCodesPoints] = useState(0);
   const [negativeCodesPionts, setNegativeCodesPionts] = useState(0);
@@ -223,6 +241,7 @@ const RouterNav = props => {
         const instruNums = {};
         const adminNums = {};
         const codNums = {};
+        const intellectualNums = {};
         const docChanges = snapshot.docChanges();
         for (let change of docChanges) {
           const researcherData = change.doc.data();
@@ -309,8 +328,12 @@ const RouterNav = props => {
             if ("codingNum" in theProject) {
               codNums[change.doc.id] = theProject.codingNum;
             }
+            if ("intellectualNum" in theProject) {
+              intellectualNums[change.doc.id] = theProject.intellectualNum;
+            }
           }
         }
+
         setGradingNums(oGraNums => {
           const oldGraNums = { ...oGraNums };
           for (let researcher in graNums) {
@@ -360,6 +383,21 @@ const RouterNav = props => {
           }
           return oldCodingNums;
         });
+
+        setIntellectualNum(oIntellectualNum => {
+          const oldIntellectualNum = { ...oIntellectualNum };
+          console.log(intellectualNums);
+          for (let researcher in intellectualNums) {
+            oldIntellectualNum[researcher] = { num: intellectualNums[researcher] };
+          }
+          const maxInstruNum = Math.max(...Object.values(oldIntellectualNum).map(({ num }) => num)) || 0;
+          for (let researcher in oldIntellectualNum) {
+            oldIntellectualNum[researcher].percent =
+              Math.round(((oldIntellectualNum[researcher].num * 100.0) / maxInstruNum) * 100) / 100 || 0;
+          }
+          console.log(oldIntellectualNum);
+          return oldIntellectualNum;
+        });
       });
       return () => {
         setIntellectualPoints(0);
@@ -379,7 +417,7 @@ const RouterNav = props => {
       };
     }
   }, [firebase, fullname, notAResearcher, project]);
-
+  console.log({ intellectualNum });
   useEffect(() => {
     if (!notAResearcher) {
       return firebaseOne.auth.onAuthStateChanged(async user => {
@@ -863,6 +901,7 @@ const RouterNav = props => {
   const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
   const navigate = useNavigate();
+  console.log(username);
   return (
     <>
       {!props.duringAnExperiment && (
@@ -970,6 +1009,16 @@ const RouterNav = props => {
                           <Box># of 🧠:</Box>
                         </Tooltip>
                       ) : null}
+                      {projectPoints.intellectualPoints &&
+                      (project === "Autograding" || project === "OnlineCommunities") ? (
+                        <Tooltip
+                          title={`You've added ${
+                            intellectualNum[fullname]?.num || 0
+                          } intellectual activities. Note that your score is determined based on the # of times you vote on the other researchers activities and vice versa , not this number.`}
+                        >
+                          <Box># of 🎓:</Box>
+                        </Tooltip>
+                      ) : null}
                     </Box>
                     <Box
                       sx={{
@@ -985,7 +1034,9 @@ const RouterNav = props => {
                           username={fullname}
                           lineDiagramTooltip={lineDiagramTooltip("coding")}
                         ></LineDiagram>
-                      ) : projectPoints.onePoints ? (
+                      ) : null}
+
+                      {projectPoints.onePoints && !projectPoints.commentsPoints && project === "OnlineCommunities" ? (
                         <LineDiagram
                           obj={proposalsNums}
                           username={username}
@@ -1014,243 +1065,251 @@ const RouterNav = props => {
                           lineDiagramTooltip={lineDiagramTooltip("grading")}
                         ></LineDiagram>
                       ) : null}
+                      {projectPoints.intellectualPoints &&
+                      (project === "Autograding" || project === "OnlineCommunities") ? (
+                        <LineDiagram
+                          obj={intellectualNum}
+                          username={fullname}
+                          lineDiagramTooltip={lineDiagramTooltip("intellectual")}
+                        ></LineDiagram>
+                      ) : null}
                     </Box>
-                    {projectPoints.expPoints ? (
-                      <Tooltip
-                        title={
-                          <div>
-                            <div>You've earned {roundNum(expPoints)} points from running experiments.</div>
-                          </div>
-                        }
-                      >
-                        <Button
-                          id="ExperimentPoints"
-                          className={activePage === "Experiments" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/Experiments")}
-                          style={{ marginLeft: "19px" }}
-                        >
-                          <div>
-                            <span id="ExpPointsLabel">👨‍🔬 {roundNum(expPoints)}</span>
-                          </div>
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                    {projectPoints.onePoints ? (
-                      <Tooltip
-                        title={
-                          <div>
+                    <Box sx={{ ml: "19px" }}>
+                      {projectPoints.expPoints ? (
+                        <Tooltip
+                          title={
                             <div>
-                              You've earned {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)} total 1Cademy points,
-                              including {roundNum(oneCademyPoints)} from others' votes and {roundNum(dayOneUpVotes)}{" "}
-                              points for casting 25 upvotes per day on others' proposals.
+                              <div>You've earned {roundNum(expPoints)} points from running experiments.</div>
                             </div>
-                            <div>
-                              You cast {roundNum(proposalUpvotesToday)} / 25 up-votes today on others' 1Cademy
-                              proposals.
-                            </div>
-                          </div>
-                        }
-                      >
-                        <Button
-                          id="OneCademyPoints"
-                          className={activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/1Cademy")}
+                          }
                         >
-                          {username ? (
+                          <Button
+                            id="ExperimentPoints"
+                            className={activePage === "Experiments" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/Experiments")}
+                          >
                             <div>
-                              <img src={favicon} width="15.1" /> {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)}
-                              <br />✔ {roundNum(oneCademyPoints)}
+                              <span id="ExpPointsLabel">👨‍🔬 {roundNum(expPoints)}</span>
+                            </div>
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                      {projectPoints.onePoints ? (
+                        <Tooltip
+                          title={
+                            <div>
+                              <div>
+                                You've earned {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)} total 1Cademy
+                                points, including {roundNum(oneCademyPoints)} from others' votes and{" "}
+                                {roundNum(dayOneUpVotes)} points for casting 25 upvotes per day on others' proposals.
+                              </div>
+                              <div>
+                                You cast {roundNum(proposalUpvotesToday)} / 25 up-votes today on others' 1Cademy
+                                proposals.
+                              </div>
+                            </div>
+                          }
+                        >
+                          <Button
+                            id="OneCademyPoints"
+                            className={activePage === "1Cademy" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/1Cademy")}
+                          >
+                            {username ? (
+                              <div>
+                                <img src={favicon} width="15.1" /> {roundNum(oneCademyPoints) + roundNum(dayOneUpVotes)}
+                                <br />✔ {roundNum(oneCademyPoints)}
+                                <br />
+                                <span>🌞 {roundNum(proposalUpvotesToday)} / 25</span>
+                              </div>
+                            ) : (
+                              <div>
+                                Click here to log <br />
+                                in to 1Cademy to <br />
+                                show your points.
+                              </div>
+                            )}
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                      {projectPoints.intellectualPoints ? (
+                        <Tooltip
+                          title={
+                            <div>
+                              <div>
+                                You've earned {roundNum(intellectualPoints)} intellectual points from others' votes and{" "}
+                                {upVotedDays} points for casting 25 upvotes per day on others' activities.
+                              </div>
+                              <div>You cast {roundNum(upVotedToday)} / 25 up-votes today on others' activities.</div>
+                            </div>
+                          }
+                        >
+                          <Button
+                            id="IntellectualPoints"
+                            className={activePage === "Intellectual" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/Intellectual")}
+                          >
+                            <div>
+                              <span>
+                                🎓 {roundNum(intellectualPoints)}
+                                <br />✔ {roundNum(upVotedDays)}
+                              </span>
                               <br />
-                              <span>🌞 {roundNum(proposalUpvotesToday)} / 25</span>
+                              <span>🌞 {roundNum(upVotedToday)} / 25</span>
                             </div>
-                          ) : (
-                            <div>
-                              Click here to log <br />
-                              in to 1Cademy to <br />
-                              show your points.
-                            </div>
-                          )}
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                    {projectPoints.intellectualPoints ? (
-                      <Tooltip
-                        title={
-                          <div>
-                            <div>
-                              You've earned {roundNum(intellectualPoints)} intellectual points from others' votes and{" "}
-                              {upVotedDays} points for casting 25 upvotes per day on others' activities.
-                            </div>
-                            <div>You cast {roundNum(upVotedToday)} / 25 up-votes today on others' activities.</div>
-                          </div>
-                        }
-                      >
-                        <Button
-                          id="IntellectualPoints"
-                          className={activePage === "Intellectual" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/Intellectual")}
-                        >
-                          <div>
-                            <span>
-                              🎓 {roundNum(intellectualPoints)}
-                              <br />✔ {roundNum(upVotedDays)}
-                            </span>
-                            <br />
-                            <span>🌞 {roundNum(upVotedToday)} / 25</span>
-                          </div>
-                        </Button>
-                      </Tooltip>
-                    ) : null}
+                          </Button>
+                        </Tooltip>
+                      ) : null}
 
-                    {projectPoints.instructorsPoints ? (
-                      <Tooltip
-                        title={
-                          projectPoints.dayInstructorUpVotes ? (
-                            <div>
+                      {projectPoints.instructorsPoints ? (
+                        <Tooltip
+                          title={
+                            projectPoints.dayInstructorUpVotes ? (
                               <div>
-                                You've earned {roundNum(instructorPoints)} instructor points from others' votes and{" "}
-                                {roundNum(dayInstructorUpVotes)} points for casting 16 upvotes per day on others'
-                                collected data.
+                                <div>
+                                  You've earned {roundNum(instructorPoints)} instructor points from others' votes and{" "}
+                                  {roundNum(dayInstructorUpVotes)} points for casting 16 upvotes per day on others'
+                                  collected data.
+                                </div>
+                                <div>
+                                  You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected
+                                  instructors' data.
+                                </div>
                               </div>
+                            ) : (
                               <div>
-                                You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected
-                                instructors' data.
+                                <div>
+                                  You've earned {roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)} total
+                                  points, including {instructorPoints} points for collecting instructors' contact info
+                                  and {dayInstructorUpVotes} points for casting 16 up-voting per day on other's
+                                  collected data.
+                                </div>
+                                <div>You collected {roundNum(instructorsToday)} / 7 instructors' info today.</div>
+                                <div>
+                                  You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected
+                                  instructors' data.
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <div>
-                                You've earned {roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)} total
-                                points, including {instructorPoints} points for collecting instructors' contact info and{" "}
-                                {dayInstructorUpVotes} points for casting 16 up-voting per day on other's collected
-                                data.
-                              </div>
-                              <div>You collected {roundNum(instructorsToday)} / 7 instructors' info today.</div>
-                              <div>
-                                You cast {roundNum(upvotedInstructorsToday)} / 16 up-votes today on others' collected
-                                instructors' data.
-                              </div>
-                            </div>
-                          )
-                        }
-                      >
-                        <Button
-                          id="InstructorPoints"
-                          className={activePage === "AddInstructor" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/AddInstructor")}
+                            )
+                          }
                         >
-                          👨‍🏫{" "}
-                          {projectPoints.dayInstructorUpVotes
-                            ? roundNum(instructorPoints)
-                            : roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)}{" "}
-                          <br />{" "}
-                          {projectPoints.dayInstructorUpVotes
-                            ? "✔ " + roundNum(dayInstructorUpVotes)
-                            : "🌞 " + instructorsToday + " / 7"}
-                          <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"} {roundNum(upvotedInstructorsToday)}{" "}
-                          / 16
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                    {projectPoints.administratorsPoints ? (
-                      <Tooltip
-                        title={
-                          projectPoints.dayAdministratorUpVotes ? (
-                            <div>
+                          <Button
+                            id="InstructorPoints"
+                            className={activePage === "AddInstructor" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/AddInstructor")}
+                          >
+                            👨‍🏫{" "}
+                            {projectPoints.dayInstructorUpVotes
+                              ? roundNum(instructorPoints)
+                              : roundNum(instructorPoints) + roundNum(dayInstructorUpVotes)}{" "}
+                            <br />{" "}
+                            {projectPoints.dayInstructorUpVotes
+                              ? "✔ " + roundNum(dayInstructorUpVotes)
+                              : "🌞 " + instructorsToday + " / 7"}
+                            <br /> {projectPoints.dayInstructorUpVotes ? "🌞" : "✅"}{" "}
+                            {roundNum(upvotedInstructorsToday)} / 16
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                      {projectPoints.administratorsPoints ? (
+                        <Tooltip
+                          title={
+                            projectPoints.dayAdministratorUpVotes ? (
                               <div>
-                                You've earned {roundNum(administratorPoints)} administrator points from others' votes
-                                and {roundNum(dayAdministratorUpVotes)} points for casting 16 upvotes per day on others'
-                                collected data.
+                                <div>
+                                  You've earned {roundNum(administratorPoints)} administrator points from others' votes
+                                  and {roundNum(dayAdministratorUpVotes)} points for casting 16 upvotes per day on
+                                  others' collected data.
+                                </div>
+                                <div>
+                                  You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others'
+                                  collected administrators' data.
+                                </div>
                               </div>
+                            ) : (
                               <div>
-                                You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others' collected
-                                administrators' data.
+                                <div>
+                                  You've earned {roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)}{" "}
+                                  total points, including {roundNum(administratorPoints)} points for collecting
+                                  administrators' contact info and {dayAdministratorUpVotes} points for casting 16
+                                  up-voting per day on other's collected data.
+                                </div>
+                                <div>You collected {roundNum(administratorsToday)} / 7 administrators' info today.</div>
+                                <div>
+                                  You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others'
+                                  collected administrators' data.
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <div>
-                                You've earned {roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)} total
-                                points, including {roundNum(administratorPoints)} points for collecting administrators'
-                                contact info and {dayAdministratorUpVotes} points for casting 16 up-voting per day on
-                                other's collected data.
-                              </div>
-                              <div>You collected {roundNum(administratorsToday)} / 7 administrators' info today.</div>
-                              <div>
-                                You cast {roundNum(upvotedAdministratorsToday)} / 16 up-votes today on others' collected
-                                administrators' data.
-                              </div>
-                            </div>
-                          )
-                        }
-                      >
-                        <Button
-                          id="AdministratorPoints"
-                          className={activePage === "AddAdministrator" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/AddAdministrator")}
+                            )
+                          }
                         >
-                          💼{" "}
-                          {projectPoints.dayAdministratorUpVotes
-                            ? roundNum(administratorPoints)
-                            : roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)}{" "}
-                          <br />{" "}
-                          {projectPoints.dayAdministratorUpVotes
-                            ? "✔ " + roundNum(dayAdministratorUpVotes)
-                            : "🌞 " + roundNum(administratorsToday) + " / 7"}
-                          <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"}{" "}
-                          {roundNum(upvotedAdministratorsToday)} / 16
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                    {projectPoints.gradingPoints ? (
-                      <Tooltip
-                        title={
-                          <div>
-                            <div>You've earned {roundNum(gradingPoints)} total 🧠 free-recall grading points.</div>
+                          <Button
+                            id="AdministratorPoints"
+                            className={activePage === "AddAdministrator" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/AddAdministrator")}
+                          >
+                            💼{" "}
+                            {projectPoints.dayAdministratorUpVotes
+                              ? roundNum(administratorPoints)
+                              : roundNum(administratorPoints) + roundNum(dayAdministratorUpVotes)}{" "}
+                            <br />{" "}
+                            {projectPoints.dayAdministratorUpVotes
+                              ? "✔ " + roundNum(dayAdministratorUpVotes)
+                              : "🌞 " + roundNum(administratorsToday) + " / 7"}
+                            <br /> {projectPoints.dayAdministratorUpVotes ? "🌞" : "✅"}{" "}
+                            {roundNum(upvotedAdministratorsToday)} / 16
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                      {projectPoints.gradingPoints ? (
+                        <Tooltip
+                          title={
                             <div>
-                              From that total, we've already excluded your negative {roundNum(negativeGradingPoints)} ❌
-                              points.
+                              <div>You've earned {roundNum(gradingPoints)} total 🧠 free-recall grading points.</div>
+                              <div>
+                                From that total, we've already excluded your negative {roundNum(negativeGradingPoints)}{" "}
+                                ❌ points.
+                              </div>
+                              <div>
+                                This means, 2 X {roundNum(gradingPoints) + roundNum(negativeGradingPoints)} times at
+                                least 3 other researchers have agreed with you on existance or non-existance of a
+                                specific phrase in a free-recall response. Also, 2 x {roundNum(negativeGradingPoints)}{" "}
+                                times exactly 3 out of 4 researchers agreed with each other on existance (non-existance)
+                                of a specific key phrase in a free-recall response by a participant, BUT you opposed
+                                their majority of votes. So, you got a 0.5 ❌ negative point for each of those cases.
+                              </div>
                             </div>
+                          }
+                        >
+                          <Button
+                            id="FreeRecallGrading"
+                            className={activePage === "FreeRecallGrading" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/FreeRecallGrading")}
+                          >
+                            🧠 {roundNum(gradingPoints)} <br /> ❌ {roundNum(negativeGradingPoints)}
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                      {projectPoints.commentsPoints ? (
+                        <Tooltip
+                          title={
                             <div>
-                              This means, 2 X {roundNum(gradingPoints) + roundNum(negativeGradingPoints)} times at least
-                              3 other researchers have agreed with you on existance or non-existance of a specific
-                              phrase in a free-recall response. Also, 2 x {roundNum(negativeGradingPoints)} times
-                              exactly 3 out of 4 researchers agreed with each other on existance (non-existance) of a
-                              specific key phrase in a free-recall response by a participant, BUT you opposed their
-                              majority of votes. So, you got a 0.5 ❌ negative point for each of those cases.
+                              You've earned {roundNum(positiveCodesPoints)} total 💬 coding participants responses and{" "}
+                              {roundNum(negativeCodesPionts)} ❌ negative point.
                             </div>
-                          </div>
-                        }
-                      >
-                        <Button
-                          id="FreeRecallGrading"
-                          className={activePage === "FreeRecallGrading" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/FreeRecallGrading")}
+                          }
                         >
-                          🧠 {roundNum(gradingPoints)} <br /> ❌ {roundNum(negativeGradingPoints)}
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-                    {projectPoints.commentsPoints ? (
-                      <Tooltip
-                        title={
-                          <div>
-                            You've earned {roundNum(positiveCodesPoints)} total 💬 coding participants responses and{" "}
-                            {roundNum(negativeCodesPionts)} ❌ negative point.
-                          </div>
-                        }
-                      >
-                        <Button
-                          id="CodeFeedback"
-                          className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
-                          onClick={event => navigate("/Activities/CodeFeedback")}
-                        >
-                          💬 {roundNum(positiveCodesPoints)}
-                          <br /> ❌ {roundNum(negativeCodesPionts)}
-                        </Button>
-                      </Tooltip>
-                    ) : null}
-
+                          <Button
+                            id="CodeFeedback"
+                            className={activePage === "CodeFeedback" ? "ActiveNavLink" : "NavLink"}
+                            onClick={event => navigate("/Activities/CodeFeedback")}
+                          >
+                            💬 {roundNum(positiveCodesPoints)}
+                            <br /> ❌ {roundNum(negativeCodesPionts)}
+                          </Button>
+                        </Tooltip>
+                      ) : null}
+                    </Box>
                     <Tooltip title="Additional Resources">
                       <IconButton>
                         <ArrowDropDownIcon onClick={handleOtherPagesMenuOpen} />
