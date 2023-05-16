@@ -39,6 +39,11 @@ module.exports = async (req, res) => {
       const recallGradeRef = db.collection("recallGradesV2").doc(sessionRecallGrade.docId);
       const recallGrade = await t.get(recallGradeRef);
       const recallGradeData = recallGrade.data();
+      if(voterProject ==="Autograding" && researcher.projects.hasOwnProperty(recallGradeData.project)){
+        const researcherProject = researcher.projects[recallGradeData.project];
+        researcher.projects[voterProject].gradingNum = researcherProject?.gradingNum || 0 + viewedPhrases.length;
+      }
+
       const conditionIdx = recallGradeData.sessions[session].findIndex((conditionItem) => conditionItem.condition === condition);
       if(conditionIdx === -1) {
         throw new Error("unknown condition supplied")

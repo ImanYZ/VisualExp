@@ -186,7 +186,7 @@ const FreeRecallGrading = props => {
     setRecentParticipants(recentParticipants);
 
     let recallGradesQ = firebase.db.collection("recallGradesV2");
-    if (fullname !== gptResearcher) {
+    if (project !== "Autograding") {
       recallGradesQ = recallGradesQ.where("project", "==", project).where("done", "==", false);
     }
 
