@@ -412,28 +412,7 @@ const AppRouter = props => {
         }
       });
     }
-    // if (
-    //   window.matchMedia &&
-    //   window.matchMedia("(prefers-color-scheme: light)").matches
-    // ) {
-    //   // Light mode
-    //   setTheme("Light");
-    //   setThemeOS("Light");
-    // }
-    // window
-    //   .matchMedia("(prefers-color-scheme: dark)")
-    //   .addEventListener("change", (e) => {
-    //     const newColorScheme = e.matches ? "Dark" : "Light";
-    //     if (newColorScheme === "Dark") {
-    //       setTheme("Dark");
-    //       setThemeOS("Dark");
-    //     } else {
-    //       setTheme("Light");
-    //       setThemeOS("Light");
-    //     }
-    //   });
   }, [duringAnExperiment]);
-
 
   return (
     <Routes>
@@ -508,7 +487,6 @@ const AppRouter = props => {
                     )
                   }
                 />
-
                 <Route
                   path="Activities/Experiments"
                   element={
@@ -524,6 +502,7 @@ const AppRouter = props => {
                     )
                   }
                 />
+                <Route path="Activities/Intellectual" element={<Activities activityName="Intellectual" />} />
                 <Route path="Activities/AddInstructor" element={<Activities activityName="AddInstructor" />} />
                 <Route path="Activities/AddAdministrator" element={<Activities activityName="AddAdministrator" />} />
                 <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
