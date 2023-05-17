@@ -267,7 +267,9 @@ const AppRouter = props => {
   useEffect(() => {
     setTimeout(() => {
       if (projectSpecs.hasOwnProperty("points") && Object.keys(projectSpecs.points).includes("intellectualPoints")) {
-        navigateTo("Activities/Intellectual");
+        if (!window.location.href.includes("ResearcherPassage") && !window.location.href.includes("SchemaGeneration")) {
+          navigateTo("Activities/Intellectual");
+        }
       }
     }, 1000);
   }, [project]);
