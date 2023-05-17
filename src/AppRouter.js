@@ -59,7 +59,13 @@ import { isToday } from "./utils/DateFunctions";
 
 import "./App.css";
 import WaitingForSessionStart from "./Components/WaitingForSessionStart";
-import { CURRENT_PROJ_LOCAL_S_KEY, notAResearcherState, projectsState, projectState } from "./store/ProjectAtoms";
+import {
+  CURRENT_PROJ_LOCAL_S_KEY,
+  notAResearcherState,
+  projectsState,
+  projectState,
+  projectSpecsState
+} from "./store/ProjectAtoms";
 import { showSignInorUpState } from "./store/GlobalAtoms";
 import { firebaseOne } from "./Components/firebase/firebase";
 import AppConfig from "./AppConfig";
@@ -93,14 +99,14 @@ const AppRouter = props => {
   const setCondition = useSetRecoilState(conditionState);
   const setNullPassage = useSetRecoilState(nullPassageState);
   const setChoices = useSetRecoilState(choicesState);
-  const setProject = useSetRecoilState(projectState);
+  const [project, setProject] = useRecoilState(projectState);
   const setInstitutions = useSetRecoilState(institutionsState);
   const setHasScheduled = useSetRecoilState(hasScheduledState);
   const setCompletedExperiment = useSetRecoilState(completedExperimentState);
   const setApplicationsSubmitted = useSetRecoilState(applicationsSubmittedState);
   const setResumeUrl = useSetRecoilState(resumeUrlState);
   const setTranscriptUrl = useSetRecoilState(transcriptUrlState);
-
+  const projectSpecs = useRecoilValue(projectSpecsState);
   const processAuth = async user => {
     const { db } = firebase;
     // const uid = user.uid;
@@ -257,6 +263,14 @@ const AppRouter = props => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase, fullname]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (projectSpecs.hasOwnProperty("points") && Object.keys(projectSpecs.points).includes("intellectualPoints")) {
+        navigateTo("Activities/Intellectual");
+      }
+    }, 1000);
+  }, [project]);
 
   useEffect(() => {
     (async () => {
@@ -508,10 +522,7 @@ const AppRouter = props => {
                 <Route path="Activities/RecallForIman" element={<Activities activityName="RecallForIman" />} />
                 <Route path="Activities/Accumulative" element={<Activities activityName="Accumulative" />} />
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
-                <Route
-                  path="Activities/FreeRecallGrading"
-                  element={<Activities activityName="FreeRecallGrading" hideLeaderBoard={true} />}
-                />
+                <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
                 <Route
                   path="Activities/SchemaGeneration"
                   element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />}

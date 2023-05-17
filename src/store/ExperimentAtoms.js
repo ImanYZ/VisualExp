@@ -58,3 +58,7 @@ export const personalInfoProcessChoicesState = atom({
     submitEnabled: false
   }
 })
+export const hideLeaderBoardState = atom({
+  key: "hideLeaderBoard",
+  default: false
+})
