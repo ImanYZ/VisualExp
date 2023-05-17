@@ -15,6 +15,8 @@ import {
   notAResearcherState
 } from "../../../store/ProjectAtoms";
 
+import { hideLeaderBoardState } from "../../../store/ExperimentAtoms";
+
 import IntellectualPoints from "../IntellectualPoints/IntellectualPoints";
 import ExpenseReports from "../IntellectualPoints/ExpenseReports";
 import RecallForIman from "../FreeRecallGrading/RecallForIman";
@@ -71,6 +73,7 @@ const Activities = props => {
   const [researchersChanges, setResearchersChanges] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [onGoingEvents, setOnGoingEvents] = useState([]);
+  const hideLeaderBoard = useRecoilValue(hideLeaderBoardState);
 
   useEffect(() => {
     const getOngoingResearcherEvent = async () => {
@@ -403,7 +406,7 @@ const Activities = props => {
           margin: activePage === "SchemaGenerationTool" && 0
         }}
       >
-        {showLeaderBoard && project !== "Autograding" && (
+        {showLeaderBoard && !hideLeaderBoard &&  (
           <div className="Columns40_60">
             <Alert severity="warning">
               <ProjectPointThresholds projectPoints={projectPoints} />
