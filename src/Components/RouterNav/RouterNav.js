@@ -386,7 +386,6 @@ const RouterNav = props => {
 
         setIntellectualNum(oIntellectualNum => {
           const oldIntellectualNum = { ...oIntellectualNum };
-          console.log(intellectualNums);
           for (let researcher in intellectualNums) {
             oldIntellectualNum[researcher] = { num: intellectualNums[researcher] };
           }
@@ -395,7 +394,6 @@ const RouterNav = props => {
             oldIntellectualNum[researcher].percent =
               Math.round(((oldIntellectualNum[researcher].num * 100.0) / maxInstruNum) * 100) / 100 || 0;
           }
-          console.log(oldIntellectualNum);
           return oldIntellectualNum;
         });
       });
@@ -417,7 +415,6 @@ const RouterNav = props => {
       };
     }
   }, [firebase, fullname, notAResearcher, project]);
-  console.log({ intellectualNum });
   useEffect(() => {
     if (!notAResearcher) {
       return firebaseOne.auth.onAuthStateChanged(async user => {
@@ -901,7 +898,6 @@ const RouterNav = props => {
   const roundNum = num => Number(Number.parseFloat(Number(num).toFixed(2)));
 
   const navigate = useNavigate();
-  console.log(username);
   return (
     <>
       {!props.duringAnExperiment && (
