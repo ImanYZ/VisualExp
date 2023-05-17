@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 import axios from "axios";
 
@@ -16,6 +16,7 @@ import withRoot from "../../Home/modules/withRoot";
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 
 import { projectState } from "../../../store/ProjectAtoms";
+import { hideLeaderBoardState } from "../../../store/ExperimentAtoms";
 
 import SnackbarComp from "../../SnackbarComp";
 
@@ -67,6 +68,8 @@ const FreeRecallGrading = props => {
   const [recentParticipants, setRecentParticipants] = useState([]);
 
   const [showTheSchemaGen, setShowTheSchemaGen] = useState(false);
+
+  const [hideLeaderBoard, setHideLeaderBoard] = useRecoilState(hideLeaderBoardState);
 
   const QuerySearching = schemaEp => {
     const text = recallGrades?.[recallGradeIdx]?.response;
@@ -199,10 +202,12 @@ const FreeRecallGrading = props => {
         let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
 
         // sorting researcher's related participants first
-        if (Object.keys(recentParticipants).length > 0 ) {
+        if (Object.keys(recentParticipants).length > 0) {
           _recallGrades.sort((g1, g2) => {
-            const p1 = Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session) ;
-            const p2 = Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
+            const p1 =
+              Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
+            const p2 =
+              Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
             if (p1 && p2) return 0;
             return p1 && !p2 ? -1 : 1;
           });
@@ -311,7 +316,11 @@ const FreeRecallGrading = props => {
       // setRecallGradeIdx(recallGradeIdx + 1);
       setSnackbarMessage("You successfully submitted your evaluation!");
       setShowTheSchemaGen(false);
+      setHideLeaderBoard(false);
     } catch (err) {
+      setHideLeaderBoard(false);
+      setShowTheSchemaGen(false);
+      setSubmitting(false);
       console.error(err);
       setSnackbarMessage("Your evaluation is NOT submitted! Please try again. If the issue persists, contact Iman!");
     }
@@ -360,11 +369,12 @@ const FreeRecallGrading = props => {
 
     if (hasNotSatisfiedPhrases) {
       setShowTheSchemaGen(true);
+      setHideLeaderBoard(true);
     } else {
       gradeIt([]);
     }
   };
-
+   console.log(hideLeaderBoard);
   if (showTheSchemaGen && fullname !== gptResearcher)
     return (
       <SchemaGenRecalls
@@ -387,6 +397,8 @@ const FreeRecallGrading = props => {
       </Box>
     );
   }
+
+  console.log(recallGrades[recallGradeIdx]?.user, randomizedPhrases.length);
 
   return !recallGrades || !recallGrades.length || recallGrades.length <= recallGradeIdx ? (
     <Alert severity="info" size="large">
@@ -440,7 +452,14 @@ const FreeRecallGrading = props => {
       <Paper style={{ paddingBottom: "19px" }}>
         <p>1- Carefully read this free-recall response:</p>
         <Paper
-          style={{ position: "sticky", top: "0",backgroundColor:"#e0e0e0",  zIndex:"1", padding: "10px 19px 10px 19px", margin: "19px" }}
+          style={{
+            position: "sticky",
+            top: "0",
+            backgroundColor: "#e0e0e0",
+            zIndex: "1",
+            padding: "10px 19px 10px 19px",
+            margin: "19px"
+          }}
           id="recall-response"
         >
           {recallGrades[recallGradeIdx]?.response}
