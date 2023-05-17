@@ -264,15 +264,15 @@ const AppRouter = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firebase, fullname]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      if (projectSpecs.hasOwnProperty("points") && Object.keys(projectSpecs.points).includes("intellectualPoints")) {
-        if (!window.location.href.includes("ResearcherPassage") && !window.location.href.includes("SchemaGeneration")) {
-          navigateTo("Activities/Intellectual");
-        }
-      }
-    }, 1000);
-  }, [project]);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (projectSpecs.hasOwnProperty("points") && Object.keys(projectSpecs.points).includes("intellectualPoints")) {
+  //       if (!window.location.href.includes("ResearcherPassage") && !window.location.href.includes("SchemaGeneration")) {
+  //         navigateTo("Activities/Intellectual");
+  //       }
+  //     }
+  //   }, 1000);
+  // }, [project]);
 
   useEffect(() => {
     (async () => {
