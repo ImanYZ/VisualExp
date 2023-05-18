@@ -78,7 +78,7 @@ const OneCademyCollaborationModel = () => {
   const [listOfDiagrams, setListOfDiagrams] = useState([]);
   const [editingDiagram, setEditingDiagram] = useState(false);
 
-  const editor = true; /* email === "oneweb@umich.edu" */
+  const editor = email === "oneweb@umich.edu";
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -962,7 +962,7 @@ const OneCademyCollaborationModel = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button disabled={false /* editingDiagram */} variant="contained" onClick={handleEditDiagram}>
+          <Button disabled={editingDiagram} variant="contained" onClick={handleEditDiagram}>
             Update
           </Button>
           <Button onClick={handleCloseEditModal}>Cancel</Button>
