@@ -163,6 +163,7 @@ export const SchemaGeneration = ({}) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
+    setSchemasBoolean([]);
     let schemas = [...schemasBoolean];
     if (!(selectedPhrase === selectedPhrase1)) {
       schemas = [];
@@ -202,10 +203,16 @@ export const SchemaGeneration = ({}) => {
   };
 
   const handleSubmit = () => {
+    const _schema = [];
+    for (let sc of schema) {
+      if (sc.keyword !== "") {
+        _schema.push(sc);
+      }
+    }
     const newbooleanScratch = {
       email,
       fullname,
-      schema: schema,
+      schema: _schema,
       createdAt: new Date(),
       phrase: selectedPhrase,
       passage: selectedPassage.title,
@@ -555,10 +562,10 @@ export const SchemaGeneration = ({}) => {
   }, [searchResules]);
 
   return (
-    <div className="schema-generation">
-      <div>
-        <div className={classes.passageBox}>
-          <div>
+    <Box className="schema-generation">
+      <Box>
+        <Box className={classes.passageBox}>
+          <Box>
             <Button
               variant="text"
               disabled={selectedPassage === passages[0]}
@@ -567,7 +574,7 @@ export const SchemaGeneration = ({}) => {
             >
               {`< Previous Passage`}
             </Button>
-          </div>
+          </Box>
           <Box sx={{ width: "55%" }}>
             <Select
               id="demo-simple-select-helper"
@@ -584,7 +591,7 @@ export const SchemaGeneration = ({}) => {
                 ))}
             </Select>
           </Box>
-          <div>
+          <Box>
             <Button
               variant="text"
               disabled={selectedPassage === passages[passages.length - 1]}
@@ -593,13 +600,13 @@ export const SchemaGeneration = ({}) => {
             >
               {` Next Passage >`}
             </Button>
-          </div>
-        </div>
-      </div>
-      <div className="section">
-        <div className="blocks search-box">
-          <div className="phrases-box">
-            {/* <div> */}
+          </Box>
+        </Box>
+      </Box>
+      <Box className="section">
+        <Box className="blocks search-box">
+          <Box className="phrases-box">
+            {/* <Box> */}
             <Button
               sx={{ color: "black", alignItems: "center" }}
               variant="text"
@@ -608,7 +615,7 @@ export const SchemaGeneration = ({}) => {
             >
               {`< Prev `}
             </Button>
-            {/* </div> */}
+            {/* </Box> */}
             <Box
               sx={{
                 display: "flex",
@@ -636,18 +643,18 @@ export const SchemaGeneration = ({}) => {
                 sx={{ mb: "16px" }}
               />
             </Box>
-            <div style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
+            <Box style={{ display: "center", marginTop: "20px", marginRight: "100px" }}>
               <Button
                 sx={{ color: "black", border: "none" }}
                 variant="text"
                 disabled={phrases.indexOf(selectedPhrase) === phrases.length - 1}
                 onClick={nextPhrase}
               >{`NEXT >`}</Button>
-            </div>
-          </div>
-          <div className="query-block">
+            </Box>
+          </Box>
+          <Box className="query-block">
             {schemasBoolean?.length > 0 && (
-              <Typography variant="h6" component="div" align="left">
+              <Typography variant="h6" component="Box" align="left">
                 Previous Proposals:
               </Typography>
             )}
@@ -655,12 +662,12 @@ export const SchemaGeneration = ({}) => {
             {schemasBoolean?.length > 0 &&
               schemasBoolean.map((schemaE, index) => {
                 return (
-                  <div key={index} className="query-container" style={{ marginBottom: "30px" }}>
+                  <Box key={index} className="query-container" style={{ marginBottom: "30px" }}>
                     <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
-                    <div style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
-                          <div>
+                    <Box style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
+                      <Box style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
+                        <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <Box>
                             <IconButton
                               sx={{ color: "#00bcd4" }}
                               component="label"
@@ -669,19 +676,19 @@ export const SchemaGeneration = ({}) => {
                             >
                               {schemaE.upVoters.includes(fullname) ? <ThumbUpAltIcon /> : <ThumbUpOffAltIcon />}
                             </IconButton>
-                          </div>
-                          <div style={{ marginTop: "7px" }}>{schemaE.upVotes}</div>
-                        </div>
-                        <div style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
-                          <div>
+                          </Box>
+                          <Box style={{ marginTop: "7px" }}>{schemaE.upVotes}</Box>
+                        </Box>
+                        <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
+                          <Box>
                             <IconButton sx={{ color: "red" }} onClick={() => downVote(schemaE)} size="small">
                               {schemaE.downVoters.includes(fullname) ? <ThumbDownAltIcon /> : <ThumbDownOffAltIcon />}{" "}
                             </IconButton>
-                          </div>
-                          <div style={{ marginTop: "5px" }}>{schemaE.downVotes}</div>
-                        </div>
-                      </div>
-                      <div
+                          </Box>
+                          <Box style={{ marginTop: "5px" }}>{schemaE.downVotes}</Box>
+                        </Box>
+                      </Box>
+                      <Box
                         style={{
                           paddingTop: "10px",
                           paddingBottom: "20px"
@@ -691,11 +698,14 @@ export const SchemaGeneration = ({}) => {
                           variant="outlined"
                           onClick={() => QuerySearching(schemaE.schema)}
                         >{`Try it out `}</Button>
-                      </div>
-                    </div>
-                  </div>
+                      </Box>
+                    </Box>
+                  </Box>
                 );
               })}
+            <Typography variant="h6" component="Box" align="left" sx={{color:"#4dabf5"}}>
+              Propose a new boolean expression:
+            </Typography>
             <QueryBuilder
               query={schema}
               onQueryChange={q => {
@@ -705,9 +715,9 @@ export const SchemaGeneration = ({}) => {
               QuerySearching={QuerySearching}
               readOnly={false}
             />
-          </div>
-        </div>
-        <div className="blocks result-box">
+          </Box>
+        </Box>
+        <Box className="blocks result-box">
           <Box sx={{ padding: "15px" }}>
             <span className="header">All Responses</span>
             <br />
@@ -715,7 +725,7 @@ export const SchemaGeneration = ({}) => {
               The highlighted sentences satisfy your keyword rules and the bold words are the keywords you entered
             </span>
           </Box>
-          <div
+          <Box
             style={{
               overflow: "auto",
               marginBottom: "90px",
@@ -735,15 +745,15 @@ export const SchemaGeneration = ({}) => {
               ) : searching ? (
                 <CircularProgress color="warning" size="50px" />
               ) : (
-                <Typography variant="h6" component="div" align="center">
+                <Typography variant="h6" component="Box" align="center">
                   No data Found!
                 </Typography>
               )}
             </Box>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 
