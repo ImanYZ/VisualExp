@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { emailState, firebaseState, fullnameState } from "../store/AuthAtoms";
+import { emailState, firebaseState } from "../store/AuthAtoms";
 import Button from "@mui/material/Button";
 import dagreD3 from "dagre-d3";
 import "./OneCademyCollaborationModel.css";
@@ -151,32 +151,71 @@ const OneCademyCollaborationModel = () => {
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
     const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
-
     const diagramsListcSnapshot = diagramsListQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
       for (let change of changes) {
-        if (change.type === "added" || change.type === "modified") {
-          if (listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id) === -1) {
+        if (change.type === "added") {
+          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
+          if (findIndex === -1) {
             _listOfDiagrams.push({ ...change.doc.data(), id: change.doc.id });
+          } else {
+            _listOfDiagrams[findIndex] = { ...change.doc.data(), id: change.doc.id };
           }
+        } else if (change.type === "modified") {
+          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
+          _listOfDiagrams[findIndex] = {
+            ...change.doc.data(),
+            id: change.doc.id
+          };
+          setVisibleNodes(change.doc.data().nodes);
         }
       }
       setListOfDiagrams(_listOfDiagrams);
-      setSelectedDiagram(_listOfDiagrams[0]?.name || "");
-      setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
+      if (selectedDiagram) {
+        const _indexD = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
+        setVisibleNodes(_listOfDiagrams[_indexD]?.nodes || []);
+      } else {
+        setSelectedDiagram(_listOfDiagrams[0]?.name || "");
+        setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
+      }
     });
     return () => {
       diagramsListcSnapshot();
     };
-  }, [firebase]);
+  }, []);
 
   useEffect(() => {
     let collabModelNodesQuery = firebase.db.collection("collabModelNodes");
+    const _allNodes = [...allNodes];
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
+
+      for (let change of changes) {
+        const data = change.doc.data();
+        if (change.type === "added") {
+          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+          if (findIndex === -1) {
+            _allNodes.push({ id: change.doc.id, ...data });
+          } else {
+            _allNodes[findIndex] = { id: change.doc.id, ...data };
+          }
+        } else if (change.type === "modified") {
+          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+          if (findIndex !== -1) {
+            _allNodes[findIndex] = { id: change.doc.id, ...data };
+          }
+        } else if (change.type === "removed") {
+          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+          if (findIndex !== -1) {
+            _allNodes.splice(findIndex, 1);
+          }
+        }
+      }
       setNodesChanges(oldChanges => [...oldChanges, ...changes]);
       setNodesLoded(true);
       setLoadData(false);
+      _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
+      setAllNodes(_allNodes);
     });
     return () => {
       collabModelNodesSnapshot();
@@ -187,9 +226,7 @@ const OneCademyCollaborationModel = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(async () => {
-    if (!nodesLoded) return;
-    setAllNodes([]);
-
+    if (!allNodes.length) return;
     const researchersDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
     if (researchersDoc.docs.length) {
       const resData = researchersDoc.docs[0].data();
@@ -202,34 +239,28 @@ const OneCademyCollaborationModel = () => {
         return {};
       });
     d3.select("#graphGroup").selectAll("*").remove();
-    const tempNodesChanges = [...nodesChanges];
     setNodesChanges([]);
-    const _allNodes = [];
-    for (let tempNodesChange of tempNodesChanges) {
-      const collabModelNode = tempNodesChange.doc.data();
-      if (_allNodes.findIndex(node => node.id === tempNodesChange.doc.id) === -1 && !collabModelNode.deleted) {
-        _allNodes.push({ id: tempNodesChange.doc.id, ...collabModelNode });
+    for (let collabModelNode of allNodes) {
+      if (
+        visibleNodes.includes(collabModelNode.id) &&
+        !collabModelNode.deleted &&
+        !g.nodes().includes(collabModelNode.id)
+      ) {
+        g.setNode(collabModelNode.id, {
+          label: collabModelNode.title,
+          class:
+            selectedNode === collabModelNode.id
+              ? "type-ST"
+              : collabModelNode.type === "Negative Outcome"
+              ? "type-NO"
+              : collabModelNode.type === "Positive Outcome"
+              ? "type-PO"
+              : "type-DF"
+        });
       }
-      if (g.nodes().some(node => node === tempNodesChange.doc.id)) continue;
-      if (!visibleNodes.includes(tempNodesChange.doc.id)) continue;
-      if (collabModelNode.deleted) continue;
-      g.setNode(tempNodesChange.doc.id, {
-        label: collabModelNode.title,
-        class:
-          selectedNode === tempNodesChange.doc.id
-            ? "type-ST"
-            : collabModelNode.type === "Negative Outcome"
-            ? "type-NO"
-            : collabModelNode.type === "Positive Outcome"
-            ? "type-PO"
-            : "type-DF"
-      });
     }
-    _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
-
-    setAllNodes(_allNodes);
     let _maxDepth = 0;
-    for (let collabModelNode of _allNodes) {
+    for (let collabModelNode of allNodes) {
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
         if (elementChild.deleted) continue;
@@ -387,9 +418,9 @@ const OneCademyCollaborationModel = () => {
     if (editor) {
       edges.each(function (edgeData) {
         var edgeElement = d3.select(this);
-        const nodeIdx = _allNodes.findIndex(node => node.id === edgeData.v);
-        const childIdx = _allNodes[nodeIdx].children.findIndex(child => child.id === edgeData.w);
-        const order = _allNodes[nodeIdx].children[childIdx].order;
+        const nodeIdx = allNodes.findIndex(node => node.id === edgeData.v);
+        const childIdx = allNodes[nodeIdx].children.findIndex(child => child.id === edgeData.w);
+        const order = allNodes[nodeIdx].children[childIdx].order;
         addPencilButton(edgeElement, edgeData, pencilButtonsGroup, order);
       });
     }
@@ -407,7 +438,7 @@ const OneCademyCollaborationModel = () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded, editor]);
+  }, [nodesLoded, allNodes, visibleNodes]);
 
   const AddNewNode = second => {
     setTitle("");
@@ -591,7 +622,6 @@ const OneCademyCollaborationModel = () => {
     const _listOfDiagrams = [...listOfDiagrams];
     const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
     const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
-    console.log(_diagram);
 
     if (_visibleNodes.includes(node.id)) {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
@@ -610,11 +640,9 @@ const OneCademyCollaborationModel = () => {
       }
     }
     if (_diagram !== -1 && editor) {
-      console.log("updated");
       _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
       await diagramRef.update({ nodes: _visibleNodes });
     }
-    console.log({ allNodes });
     setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
