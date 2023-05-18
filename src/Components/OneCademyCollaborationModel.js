@@ -148,7 +148,7 @@ const OneCademyCollaborationModel = () => {
     //   .attr("font-size", "15px")
     //   .text(order);
   }
-  console.log(listOfDiagrams);
+
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
     const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
