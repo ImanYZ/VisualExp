@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { emailState, firebaseState } from "../store/AuthAtoms";
+import { emailState, firebaseState, fullnameState } from "../store/AuthAtoms";
 import Button from "@mui/material/Button";
 import dagreD3 from "dagre-d3";
 import "./OneCademyCollaborationModel.css";
@@ -77,8 +77,7 @@ const OneCademyCollaborationModel = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [listOfDiagrams, setListOfDiagrams] = useState([]);
   const [editingDiagram, setEditingDiagram] = useState(false);
-
-  const editor = email === "oneweb@umich.edu";
+  const [editor, setEditor] = useState(true);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -190,6 +189,13 @@ const OneCademyCollaborationModel = () => {
   useEffect(async () => {
     if (!nodesLoded) return;
     setAllNodes([]);
+
+    const researchersDoc = await firebase.db.collection("researchers").where("email", "==", email).get();
+    if (researchersDoc.docs.length) {
+      const resData = researchersDoc.docs[0].data();
+      setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
+    }
+
     var g = new dagreD3.graphlib.Graph({ compound: true })
       .setGraph({ rankdir: "LR", isMultigraph: true })
       .setDefaultEdgeLabel(function () {
@@ -401,7 +407,7 @@ const OneCademyCollaborationModel = () => {
       d3.select("#graphGroup").selectAll("*").remove();
       setZoomState(null);
     };
-  }, [nodesLoded]);
+  }, [nodesLoded, editor]);
 
   const AddNewNode = second => {
     setTitle("");
@@ -579,26 +585,23 @@ const OneCademyCollaborationModel = () => {
   };
 
   const handleVisibileNodes = async node => {
-    const _visibleNodes = visibleNodes;
+    let _visibleNodes = visibleNodes;
     setShowAll(false);
     setIngnorOrder(true);
     const _listOfDiagrams = [...listOfDiagrams];
     const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
-    const diagramRef = await firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
+    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
     console.log(_diagram);
 
     if (_visibleNodes.includes(node.id)) {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
     } else {
       _visibleNodes.push(node.id);
-      for (let child of node.children) {
-        const indexChild = allNodes.findIndex(_node => _node.id === child.id);
-        if (indexChild === -1) continue;
-        if (!_visibleNodes.includes(child.id)) {
-          _visibleNodes.push(child.id);
-        }
-      }
+      const childrens = node.children.filter(child => !child?.deleted);
+      const parents = allNodes.filter(_node => _node.children.some(child => child.id === node.id && !child?.deleted));
+      _visibleNodes = [..._visibleNodes, ...childrens.map(child => child.id), ...parents.map(parent => parent.id)];
     }
+
     let _showall = true;
     for (let node of allNodes) {
       if (!_visibleNodes.includes(node.id)) {
@@ -606,10 +609,12 @@ const OneCademyCollaborationModel = () => {
         break;
       }
     }
-    if (_diagram !== -1) {
+    if (_diagram !== -1 && editor) {
+      console.log("updated");
       _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
       await diagramRef.update({ nodes: _visibleNodes });
     }
+    console.log({ allNodes });
     setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
@@ -750,8 +755,11 @@ const OneCademyCollaborationModel = () => {
   const handlExplanation = e => {
     setExplanation(e.currentTarget.value);
   };
-  const showAllNodes = () => {
+  const showAllNodes = async () => {
     let _visibleNodes = visibleNodes;
+    const _listOfDiagrams = [...listOfDiagrams];
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
+    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
     if (showAll) {
       _visibleNodes = [];
       setShowAll(false);
@@ -763,6 +771,8 @@ const OneCademyCollaborationModel = () => {
       }
       setShowAll(true);
     }
+    _listOfDiagrams[_diagram].nodes = _visibleNodes;
+    await diagramRef.update({ nodes: _visibleNodes });
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
     setStepLink(0);
