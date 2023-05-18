@@ -1055,14 +1055,16 @@ const CodeFeedback = props => {
 
                 <Box sx={{ display: "inline" }}>{codeData.code}</Box>
               </ListItemButton>
-
-              {project === "H2K2" ? "H2" : "H1"}
-              {["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
-                <Switch checked={true} onChange={event => changeChoices(event, codeData.code)} color="warning" />
-              ) : (
-                <Switch checked={false} onChange={event => changeChoices(event, codeData.code)} color="warning" />
-              )}
-              {project === "H2K2" ? "K2" : "L2"}
+              <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto" , mr:"4px"}}>
+                {" "}
+                {project === "H2K2" ? "H2" : "H1"}
+                {["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
+                  <Switch checked={true} onChange={event => changeChoices(event, codeData.code)} color="warning" />
+                ) : (
+                  <Switch checked={false} onChange={event => changeChoices(event, codeData.code)} color="warning" />
+                )}
+                {project === "H2K2" ? "K2" : "L2"}
+              </Box>
             </ListItem>
           ))}
         </CardContent>

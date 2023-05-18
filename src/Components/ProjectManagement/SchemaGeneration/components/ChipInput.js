@@ -84,36 +84,38 @@ const ChipInput = ({ ...props }) => {
           });
           return (
             <div className="">
-              <TextField
-                className={classes.inputChip}
-                InputProps={{
-                  startAdornment: selectedItem.map(item => (
-                    <>
-                      {readOnly ? (
-                        <Chip key={item} tabIndex={-1} label={item} className={classes.innerChip} />
-                      ) : (
-                        <Chip
-                          key={item}
-                          tabIndex={-1}
-                          label={item}
-                          disabled={readOnly}
-                          className={classes.innerChip}
-                          onDelete={handleDelete(item)}
-                        />
-                      )}
-                    </>
-                  )),
-                  onBlur,
-                  onChange: event => {
-                    handleInputChange(event);
-                    onChange(event);
-                  },
-                  onFocus
-                }}
-                {...other}
-                {...inputProps}
-                disabled={props.readOnly}
-              />
+              {(selectedItem.length > 0 || !readOnly) && (
+                <TextField
+                  className={classes.inputChip}
+                  InputProps={{
+                    startAdornment: selectedItem.map(item => (
+                      <>
+                        {readOnly ? (
+                          <Chip key={item} tabIndex={-1} label={item} className={classes.innerChip} />
+                        ) : (
+                          <Chip
+                            key={item}
+                            tabIndex={-1}
+                            label={item}
+                            disabled={readOnly}
+                            className={classes.innerChip}
+                            onDelete={handleDelete(item)}
+                          />
+                        )}
+                      </>
+                    )),
+                    onBlur,
+                    onChange: event => {
+                      handleInputChange(event);
+                      onChange(event);
+                    },
+                    onFocus
+                  }}
+                  {...other}
+                  {...inputProps}
+                  disabled={props.readOnly}
+                />
+              )}
             </div>
           );
         }}
