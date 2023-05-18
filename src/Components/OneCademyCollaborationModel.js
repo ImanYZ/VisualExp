@@ -76,9 +76,7 @@ const OneCademyCollaborationModel = () => {
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [listOfDiagrams, setListOfDiagrams] = useState([]);
-  const [selectedDiagrams, setSelectedDiagrams] = useState([]);
   const [editingDiagram, setEditingDiagram] = useState(false);
-  const [selectingSideNodes, setSelectingSideNodes] = useState(false);
 
   const editor = email === "oneweb@umich.edu";
 
@@ -153,19 +151,22 @@ const OneCademyCollaborationModel = () => {
 
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
-    const diagramsListQuery = firebase.db.collection("diagramsModelNodes");
+    const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
 
     const diagramsListcSnapshot = diagramsListQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
       for (let change of changes) {
         if (change.type === "added" || change.type === "modified") {
           if (!_listOfDiagrams.includes(change.doc.data().name)) {
-            _listOfDiagrams.push(change.doc.data().name);
+            if (listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id) === -1) {
+              _listOfDiagrams.push({ ...change.doc.data(), id: change.doc.id });
+            }
           }
         }
       }
       setListOfDiagrams(_listOfDiagrams);
-      setSelectedDiagram(_listOfDiagrams[0]);
+      setSelectedDiagram(_listOfDiagrams[0]?.name || "");
+      setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
     });
     return () => {
       diagramsListcSnapshot();
@@ -223,18 +224,8 @@ const OneCademyCollaborationModel = () => {
     _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
 
     setAllNodes(_allNodes);
-    let _visibleNodes = [];
     let _maxDepth = 0;
     for (let collabModelNode of _allNodes) {
-      if (selectedDiagram === "no-diagram") {
-        if (!collabModelNode.hasOwnProperty("diagrams")) {
-          _visibleNodes.push(collabModelNode.id);
-        }
-      } else {
-        if (collabModelNode.hasOwnProperty("diagrams") && collabModelNode.diagrams.includes(selectedDiagram)) {
-          _visibleNodes.push(collabModelNode.id);
-        }
-      }
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
         if (elementChild.deleted) continue;
@@ -261,9 +252,6 @@ const OneCademyCollaborationModel = () => {
           });
         }
       }
-    }
-    if (!selectingSideNodes) {
-      setVisibleNodes(_visibleNodes);
     }
     setMaxDepth(_maxDepth);
     g.nodes().forEach(function (v) {
@@ -421,7 +409,6 @@ const OneCademyCollaborationModel = () => {
     setTitle("");
     setType("");
     setChildrenIds([]);
-    setSelectedDiagrams([]);
     setSelectedNode("");
     setSelectedLink({});
     setDeleteDialogOpen(false);
@@ -434,7 +421,6 @@ const OneCademyCollaborationModel = () => {
     setTitle("");
     setType("");
     setChildrenIds([]);
-    setSelectedDiagrams([]);
     setSelectedNode("");
     setOpenAddNode(false);
     setSelectedLink({});
@@ -460,8 +446,7 @@ const OneCademyCollaborationModel = () => {
         await collabModelRef.set({
           title,
           type: type,
-          children,
-          diagrams: selectedDiagrams
+          children
         });
         _visibleNodes.push(collabModelRef.id);
       } else {
@@ -513,7 +498,7 @@ const OneCademyCollaborationModel = () => {
             child.order = 0;
           }
         }
-        await collabModelRef.update({ title, type, children: collabModelNode.children, diagrams: selectedDiagrams });
+        await collabModelRef.update({ title, type, children: collabModelNode.children });
       }
     } catch (error) {}
     setVisibleNodes(_visibleNodes);
@@ -538,7 +523,6 @@ const OneCademyCollaborationModel = () => {
       }
     }
     setChildrenIds(_children);
-    setSelectedDiagrams(node.diagrams || []);
     setTitle(node.title);
     setType(node.type);
     setSelectedNode(nodeId);
@@ -596,11 +580,15 @@ const OneCademyCollaborationModel = () => {
     setLoadData(true);
   };
 
-  const handleVisibileNodes = node => {
-    setSelectingSideNodes(true);
+  const handleVisibileNodes = async node => {
     const _visibleNodes = visibleNodes;
     setShowAll(false);
     setIngnorOrder(true);
+    const _listOfDiagrams = [...listOfDiagrams];
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
+    const diagramRef = await firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
+    console.log(_diagram);
+
     if (_visibleNodes.includes(node.id)) {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
     } else {
@@ -620,6 +608,11 @@ const OneCademyCollaborationModel = () => {
         break;
       }
     }
+    if (_diagram !== -1) {
+      _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
+      await diagramRef.update({ nodes: _visibleNodes });
+    }
+    setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
     setVisibleNodes(_visibleNodes);
@@ -902,35 +895,9 @@ const OneCademyCollaborationModel = () => {
     setOpenLegend(old => !old);
   };
   const handlChangeDiagram = event => {
-    setSelectingSideNodes(false);
     setSelectedDiagram(event.target.value);
-    const _visibleNodes = [];
-
-    for (let node of allNodes) {
-      if (event.target.value === "no-diagram") {
-        if (!node.hasOwnProperty("diagrams")) {
-          _visibleNodes.push(node.id);
-        }
-      } else {
-        if (node.hasOwnProperty("diagrams") && node.diagrams.includes(event.target.value)) {
-          _visibleNodes.push(node.id);
-        }
-      }
-    }
-
-    let _showall = true;
-    for (let node of allNodes) {
-      if (!_visibleNodes.includes(node.id)) {
-        _showall = false;
-        break;
-      }
-    }
-
-    const filter = allNodes.filter(node => !_visibleNodes.includes(node.id));
-    console.log(filter);
-
-    setShowAll(_showall);
-    setVisibleNodes(_visibleNodes);
+    const _diagram = listOfDiagrams.find(diagram => diagram.name === event.target.value);
+    setVisibleNodes(_diagram.nodes);
     setShowAll(false);
     setNodesLoded(false);
   };
@@ -939,24 +906,9 @@ const OneCademyCollaborationModel = () => {
     try {
       setEditingDiagram(true);
       const _listOfDiagrams = [...listOfDiagrams];
-      const index = _listOfDiagrams.indexOf(selectedDiagram);
-      _listOfDiagrams[index] = newDiagramName;
-
-      const collabNodes = await firebase.db
-        .collection("collabModelNodes")
-        .where("diagrams", "array-contains", selectedDiagram)
-        .get();
-
-      const diagramDoc = await firebase.db.collection("diagramsModelNodes").where("name", "==", selectedDiagram).get();
-
-      for (let node of collabNodes.docs) {
-        const nodeData = node.data();
-        let index = nodeData.diagrams.indexOf(selectedDiagram);
-        if (index !== -1) {
-          nodeData.diagrams[index] = newDiagramName;
-        }
-        node.ref.update({ diagrams: nodeData.diagrams });
-      }
+      const index = _listOfDiagrams.findIndex(d => d.name === selectedDiagram);
+      _listOfDiagrams[index].name = newDiagramName;
+      const diagramDoc = await firebase.db.collection("collabModelDiagrams").where("name", "==", selectedDiagram).get();
       await diagramDoc.docs[0].ref.update({ name: newDiagramName });
       setListOfDiagrams(_listOfDiagrams);
       setSelectedDiagram(newDiagramName);
@@ -984,9 +936,10 @@ const OneCademyCollaborationModel = () => {
   const handleCloseAddModal = () => setOpenAddModal(false);
 
   const handleAddDiagram = () => {
-    const ref = firebase.db.collection("diagramsModelNodes").doc();
+    const ref = firebase.db.collection("collabModelDiagrams").doc();
     ref.set({
-      name: newDiagramName
+      name: newDiagramName,
+      nodes: []
     });
     setNewDiagramName("");
     setOpenAddModal(false);
@@ -1392,24 +1345,6 @@ const OneCademyCollaborationModel = () => {
                           ))}
                         </Select>
                       </FormControl>
-                      <FormControl>
-                        <InputLabel>diagrams</InputLabel>
-                        <Select
-                          label="diagrams"
-                          value={selectedDiagrams}
-                          multiple
-                          onChange={e => {
-                            setSelectedDiagrams(e.target.value);
-                          }}
-                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
-                        >
-                          {listOfDiagrams.map(diagram => (
-                            <MenuItem key={diagram} value={diagram} sx={{ display: "center" }}>
-                              {diagram}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
                     </Box>
                     <Box sx={{ mt: "14px" }}>
                       <Button onClick={handleSave}>Save</Button>
@@ -1506,7 +1441,7 @@ const OneCademyCollaborationModel = () => {
                       Add New Diagram
                     </Button>
                   )}
-                  {editor && selectedDiagram && selectedDiagram !== "no-diagram" && !openModifyLink && !openAddNode && (
+                  {editor && selectedDiagram && selectedDiagram !== "" && !openModifyLink && !openAddNode && (
                     <EditIcon
                       sx={{
                         mb: "20px",
@@ -1516,7 +1451,7 @@ const OneCademyCollaborationModel = () => {
                     />
                   )}
 
-                  {!openModifyLink && !openAddNode && (
+                  {!openModifyLink && !openAddNode && listOfDiagrams.length > 0 && (
                     <FormControl
                       sx={{
                         ml: ["15px", "30px"],
@@ -1533,9 +1468,9 @@ const OneCademyCollaborationModel = () => {
                         onChange={handlChangeDiagram}
                         sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
                       >
-                        {["no-diagram", ...listOfDiagrams].map(diagram => (
-                          <MenuItem key={diagram} value={diagram} sx={{ display: "center" }}>
-                            {diagram}
+                        {[...listOfDiagrams].map(diagram => (
+                          <MenuItem key={diagram.id} value={diagram.name} sx={{ display: "center" }}>
+                            {diagram.name}
                           </MenuItem>
                         ))}
                       </Select>
