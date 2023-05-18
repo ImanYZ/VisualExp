@@ -148,7 +148,7 @@ const OneCademyCollaborationModel = () => {
     //   .attr("font-size", "15px")
     //   .text(order);
   }
-
+  console.log(listOfDiagrams);
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
     const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
@@ -157,10 +157,8 @@ const OneCademyCollaborationModel = () => {
       const changes = snapshot.docChanges();
       for (let change of changes) {
         if (change.type === "added" || change.type === "modified") {
-          if (!_listOfDiagrams.includes(change.doc.data().name)) {
-            if (listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id) === -1) {
-              _listOfDiagrams.push({ ...change.doc.data(), id: change.doc.id });
-            }
+          if (listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id) === -1) {
+            _listOfDiagrams.push({ ...change.doc.data(), id: change.doc.id });
           }
         }
       }
@@ -936,11 +934,13 @@ const OneCademyCollaborationModel = () => {
   const handleCloseAddModal = () => setOpenAddModal(false);
 
   const handleAddDiagram = () => {
-    const ref = firebase.db.collection("collabModelDiagrams").doc();
-    ref.set({
-      name: newDiagramName,
-      nodes: []
-    });
+    if (listOfDiagrams.findIndex(d => d.name === newDiagramName) === -1) {
+      const ref = firebase.db.collection("collabModelDiagrams").doc();
+      ref.set({
+        name: newDiagramName,
+        nodes: []
+      });
+    }
     setNewDiagramName("");
     setOpenAddModal(false);
   };
