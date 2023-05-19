@@ -162,10 +162,17 @@ const OneCademyCollaborationModel = () => {
           }
         } else if (change.type === "modified") {
           const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
-          _listOfDiagrams[findIndex] = {
-            ...change.doc.data(),
-            id: change.doc.id
-          };
+          if (findIndex !== -1) {
+            _listOfDiagrams[findIndex] = {
+              ...change.doc.data(),
+              id: change.doc.id
+            };
+          }
+        } else if (change.type === "removed") {
+          const findIndex = _listOfDiagrams.findIndex(diagram => diagram.id === change.doc.id);
+          if (findIndex !== -1) {
+            _listOfDiagrams.splice(findIndex, 1);
+          }
         }
       }
       setListOfDiagrams(_listOfDiagrams);
@@ -186,7 +193,8 @@ const OneCademyCollaborationModel = () => {
     return () => {
       diagramsListcSnapshot();
     };
-  }, [firebase]);
+  }, [firebase, selectedDiagram]);
+
   useEffect(() => {
     let collabModelNodesQuery = firebase.db.collection("collabModelNodes");
     const _allNodes = [...allNodes];
@@ -248,6 +256,8 @@ const OneCademyCollaborationModel = () => {
     if (researchersDoc.docs.length) {
       const resData = researchersDoc.docs[0].data();
       setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
+    } else {
+      setEditor(true);
     }
 
     var g = new dagreD3.graphlib.Graph({ compound: true })
@@ -561,7 +571,13 @@ const OneCademyCollaborationModel = () => {
         }
         await collabModelRef.update({ title, type, children: collabModelNode.children });
       }
+      const _listOfDiagrams = [...listOfDiagrams];
+      const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
+      const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
+      _listOfDiagrams[_diagram].nodes = [...new Set(_visibleNodes)];
+      await diagramRef.update({ nodes: _listOfDiagrams[_diagram].nodes });
     } catch (error) {}
+
     setVisibleNodes([...new Set(_visibleNodes)]);
     setOpenAddNode(false);
     setLoadData(true);
@@ -1022,11 +1038,13 @@ const OneCademyCollaborationModel = () => {
         name: newDiagramName,
         nodes: []
       });
+      const _listOfDiagrams = [...listOfDiagrams];
+      _listOfDiagrams.push({ id: ref.id, name: newDiagramName, nodes: [] });
+      setListOfDiagrams(_listOfDiagrams);
     }
     setNewDiagramName("");
     setOpenAddModal(false);
   };
-
   return (
     <Box sx={{ height: "100vh", overflowY: "scroll" }}>
       <Dialog open={openEditModal} onClose={handleCloseEditModal}>
