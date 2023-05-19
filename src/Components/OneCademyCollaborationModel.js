@@ -660,7 +660,7 @@ const OneCademyCollaborationModel = () => {
     setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
-    setVisibleNodes(setVisibleNodes([...new Set(_visibleNodes)]));
+    setVisibleNodes([...new Set(_visibleNodes)])
     setLoadData(true);
     setStepLink(0);
   };
@@ -786,12 +786,18 @@ const OneCademyCollaborationModel = () => {
     });
   };
 
-  const removeNode = nodeId => {
+  const removeNode = async (nodeId) => {
     const _visibleNodes = visibleNodes;
+    const _listOfDiagrams = [...listOfDiagrams];
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
+    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
     if (_visibleNodes.includes(nodeId)) {
       _visibleNodes.splice(_visibleNodes.indexOf(nodeId), 1);
     }
-    setVisibleNodes(_visibleNodes);
+    if (editor && _diagram !== -1) {
+      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
+    }
+    setVisibleNodes([...new Set(_visibleNodes)]);
     setLoadData(true);
   };
   const handlExplanation = e => {
