@@ -71,7 +71,7 @@ const OneCademyCollaborationModel = () => {
   const [ingnorOrder, setIngnorOrder] = useState(true);
   const [deleteDialogLinkOpen, setDeleteDialogLinkOpen] = useState(false);
   const [openLegend, setOpenLegend] = useState(false);
-  const [selectedDiagram, setSelectedDiagram] = useState("");
+  const [selectedDiagram, setSelectedDiagram] = useState({});
   const [newDiagramName, setNewDiagramName] = useState("");
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -147,7 +147,6 @@ const OneCademyCollaborationModel = () => {
     //   .attr("font-size", "15px")
     //   .text(order);
   }
-
   useEffect(() => {
     const _listOfDiagrams = [...listOfDiagrams];
     const diagramsListQuery = firebase.db.collection("collabModelDiagrams");
@@ -167,23 +166,27 @@ const OneCademyCollaborationModel = () => {
             ...change.doc.data(),
             id: change.doc.id
           };
-          setVisibleNodes(change.doc.data().nodes);
         }
       }
       setListOfDiagrams(_listOfDiagrams);
-      if (selectedDiagram) {
-        const _indexD = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
-        setVisibleNodes(_listOfDiagrams[_indexD]?.nodes || []);
+      if (Object.keys(selectedDiagram).length > 0) {
+        const _indexD = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
+        if (_indexD !== -1) {
+          setVisibleNodes(_listOfDiagrams[_indexD]?.nodes || []);
+          setSelectedDiagram(listOfDiagrams[_indexD] || {});
+        } else {
+          setSelectedDiagram(_listOfDiagrams[0] || {});
+          setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
+        }
       } else {
-        setSelectedDiagram(_listOfDiagrams[0]?.name || "");
+        setSelectedDiagram(_listOfDiagrams[0] || {});
         setVisibleNodes(_listOfDiagrams[0]?.nodes || []);
       }
     });
     return () => {
       diagramsListcSnapshot();
     };
-  }, []);
-
+  }, [firebase]);
   useEffect(() => {
     let collabModelNodesQuery = firebase.db.collection("collabModelNodes");
     const _allNodes = [...allNodes];
@@ -192,6 +195,7 @@ const OneCademyCollaborationModel = () => {
 
       for (let change of changes) {
         const data = change.doc.data();
+        if (data.deleted) continue;
         if (change.type === "added") {
           const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
           if (findIndex === -1) {
@@ -216,6 +220,7 @@ const OneCademyCollaborationModel = () => {
       setLoadData(false);
       _allNodes.sort((a, b) => (a.title > b.title ? 1 : -1));
       setAllNodes(_allNodes);
+      setShowAll(_allNodes.length === visibleNodes.length);
     });
     return () => {
       collabModelNodesSnapshot();
@@ -263,28 +268,37 @@ const OneCademyCollaborationModel = () => {
     for (let collabModelNode of allNodes) {
       if (!collabModelNode.children || !collabModelNode.children.length) continue;
       for (let elementChild of collabModelNode.children) {
-        if (elementChild.deleted) continue;
         if (_maxDepth < elementChild?.order) {
           _maxDepth = elementChild?.order;
         }
-        let color = legends.find(legend => legend.text === elementChild.type)?.color || "";
-        let _arrowheadStyle = `fill: ${color}`;
-        let _style = `stroke: ${color}; stroke-width: 2px;`;
-
-        if (!visibleNodes.includes(elementChild.id) || !visibleNodes.includes(collabModelNode.id)) continue;
-        // if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
-        //   _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
-        // }
-        if (selectedLink.v === collabModelNode.id && selectedLink.w === elementChild.id) {
-          _style = "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
-          _arrowheadStyle = "fill: #212121";
-        }
-        if (ingnorOrder || showAll || (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)) {
-          g.setEdge(collabModelNode.id, elementChild.id, {
-            curve: d3.curveBasis,
-            style: _style,
-            arrowheadStyle: _arrowheadStyle
-          });
+        if (
+          !elementChild.deleted &&
+          visibleNodes.includes(elementChild.id) &&
+          visibleNodes.includes(collabModelNode.id) &&
+          !collabModelNode.deleted
+        ) {
+          let color = legends.find(legend => legend.text === elementChild.type)?.color || "";
+          let _arrowheadStyle = `fill: ${color}`;
+          let _style = `stroke: ${color}; stroke-width: 2px;`;
+          // if (parseInt(elementChild.order) === stepLink && stepLink !== 0) {
+          //   _style = `stroke:${color}; stroke-width: 3px;filter: drop-shadow(3px 3px 5px ${color}); stroke-width: 2.7px;`;
+          // }
+          if (selectedLink.v === collabModelNode.id && selectedLink.w === elementChild.id) {
+            _style =
+              "stroke: #212121; stroke-width: 3px; filter: drop-shadow(3px 3px 5px #212121); stroke-width: 2.7px;";
+            _arrowheadStyle = "fill: #212121";
+          }
+          if (
+            ingnorOrder ||
+            showAll ||
+            (parseInt(elementChild.order) > 0 && parseInt(elementChild.order) <= stepLink)
+          ) {
+            g.setEdge(collabModelNode.id, elementChild.id, {
+              curve: d3.curveBasis,
+              style: _style,
+              arrowheadStyle: _arrowheadStyle
+            });
+          }
         }
       }
     }
@@ -536,7 +550,7 @@ const OneCademyCollaborationModel = () => {
         await collabModelRef.update({ title, type, children: collabModelNode.children });
       }
     } catch (error) {}
-    setVisibleNodes(_visibleNodes);
+    setVisibleNodes([...new Set(_visibleNodes)]);
     setOpenAddNode(false);
     setLoadData(true);
     setTitle("");
@@ -620,8 +634,8 @@ const OneCademyCollaborationModel = () => {
     setShowAll(false);
     setIngnorOrder(true);
     const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
-    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
+    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
 
     if (_visibleNodes.includes(node.id)) {
       _visibleNodes.splice(_visibleNodes.indexOf(node.id), 1);
@@ -641,12 +655,12 @@ const OneCademyCollaborationModel = () => {
     }
     if (_diagram !== -1 && editor) {
       _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
-      await diagramRef.update({ nodes: _visibleNodes });
+      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
     }
     setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
-    setVisibleNodes(_visibleNodes);
+    setVisibleNodes(setVisibleNodes([...new Set(_visibleNodes)]));
     setLoadData(true);
     setStepLink(0);
   };
@@ -786,7 +800,7 @@ const OneCademyCollaborationModel = () => {
   const showAllNodes = async () => {
     let _visibleNodes = visibleNodes;
     const _listOfDiagrams = [...listOfDiagrams];
-    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.name === selectedDiagram);
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
     const diagramRef = firebase.db.collection("collabModelDiagrams").doc(listOfDiagrams[_diagram].id);
     if (showAll) {
       _visibleNodes = [];
@@ -800,7 +814,9 @@ const OneCademyCollaborationModel = () => {
       setShowAll(true);
     }
     _listOfDiagrams[_diagram].nodes = _visibleNodes;
-    await diagramRef.update({ nodes: _visibleNodes });
+    if (editor && _diagram !== -1) {
+      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
+    }
     setVisibleNodes(_visibleNodes);
     setLoadData(true);
     setStepLink(0);
@@ -931,8 +947,8 @@ const OneCademyCollaborationModel = () => {
     setOpenLegend(old => !old);
   };
   const handlChangeDiagram = event => {
-    setSelectedDiagram(event.target.value);
     const _diagram = listOfDiagrams.find(diagram => diagram.name === event.target.value);
+    setSelectedDiagram(_diagram);
     setVisibleNodes(_diagram.nodes);
     setShowAll(false);
     setNodesLoded(false);
@@ -942,12 +958,12 @@ const OneCademyCollaborationModel = () => {
     try {
       setEditingDiagram(true);
       const _listOfDiagrams = [...listOfDiagrams];
-      const index = _listOfDiagrams.findIndex(d => d.name === selectedDiagram);
+      const index = _listOfDiagrams.findIndex(d => d.id === selectedDiagram.id);
       _listOfDiagrams[index].name = newDiagramName;
-      const diagramDoc = await firebase.db.collection("collabModelDiagrams").where("name", "==", selectedDiagram).get();
-      await diagramDoc.docs[0].ref.update({ name: newDiagramName });
+      const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
+      await diagramRef.update({ name: newDiagramName });
       setListOfDiagrams(_listOfDiagrams);
-      setSelectedDiagram(newDiagramName);
+      setSelectedDiagram(_listOfDiagrams[index]);
       setOpenEditModal(false);
       setEditingDiagram(false);
       setNewDiagramName("");
@@ -961,7 +977,7 @@ const OneCademyCollaborationModel = () => {
     setNewDiagramName(event.target.value);
   };
   const editDiagram = () => {
-    setNewDiagramName(selectedDiagram);
+    setNewDiagramName(selectedDiagram.name);
     setOpenEditModal(true);
   };
 
@@ -1066,7 +1082,7 @@ const OneCademyCollaborationModel = () => {
 
             {allNodes.map((node, index) => (
               <ListItem
-                key={node.title + index}
+                key={node.id}
                 disablePadding
                 sx={{
                   "&$selected": {
@@ -1120,7 +1136,7 @@ const OneCademyCollaborationModel = () => {
                     width: "100%",
                     height: "40px"
                   }}
-                  key={resource.text}
+                  key={resource.text + index}
                 >
                   {resource.text}
                 </Box>
@@ -1234,7 +1250,7 @@ const OneCademyCollaborationModel = () => {
                     { text: "Positive Outcome", color: "#4caf50" },
                     { text: "Negative Outcome", color: "#cc0119" }
                   ].map((resource, index) => (
-                    <ColorBox key={resource.text} text={resource.text} color={resource.color} />
+                    <ColorBox key={resource.text + index} text={resource.text} color={resource.color} />
                   ))}
                   {[
                     { text: "Known Positive Effect", color: "#56E41B" },
@@ -1289,8 +1305,8 @@ const OneCademyCollaborationModel = () => {
                             "Hypothetical Positive Effect",
                             "Known Negative Effect",
                             "Hypothetical Negative Effect"
-                          ].map(row => (
-                            <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                          ].map((row, index) => (
+                            <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
                               {row}
                             </MenuItem>
                           ))}
@@ -1358,8 +1374,8 @@ const OneCademyCollaborationModel = () => {
                           }}
                           sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
                         >
-                          {["Positive Outcome", "Negative Outcome", "Design Features"].map(row => (
-                            <MenuItem key={row} value={row} sx={{ display: "center" }}>
+                          {["Positive Outcome", "Negative Outcome", "Design Features"].map((row, index) => (
+                            <MenuItem key={row + index} value={row} sx={{ display: "center" }}>
                               {row}
                             </MenuItem>
                           ))}
@@ -1479,7 +1495,7 @@ const OneCademyCollaborationModel = () => {
                       Add New Diagram
                     </Button>
                   )}
-                  {editor && selectedDiagram && selectedDiagram !== "" && !openModifyLink && !openAddNode && (
+                  {editor && Object.keys(selectedDiagram).length > 0 && !openModifyLink && !openAddNode && (
                     <EditIcon
                       sx={{
                         mb: "20px",
@@ -1489,31 +1505,34 @@ const OneCademyCollaborationModel = () => {
                     />
                   )}
 
-                  {!openModifyLink && !openAddNode && listOfDiagrams.length > 0 && (
-                    <FormControl
-                      sx={{
-                        ml: ["15px", "30px"],
-                        mr: ["15px", "30px"],
-                        mb: "20px",
-                        flexGrow: 1,
-                        justifyContent: "center"
-                      }}
-                    >
-                      <InputLabel>diagram</InputLabel>
-                      <Select
-                        label="diagram"
-                        value={selectedDiagram}
-                        onChange={handlChangeDiagram}
-                        sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                  {!openModifyLink &&
+                    !openAddNode &&
+                    Object.keys(selectedDiagram).length > 0 &&
+                    listOfDiagrams.length > 0 && (
+                      <FormControl
+                        sx={{
+                          ml: ["15px", "30px"],
+                          mr: ["15px", "30px"],
+                          mb: "20px",
+                          flexGrow: 1,
+                          justifyContent: "center"
+                        }}
                       >
-                        {[...listOfDiagrams].map(diagram => (
-                          <MenuItem key={diagram.id} value={diagram.name} sx={{ display: "center" }}>
-                            {diagram.name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  )}
+                        <InputLabel>diagram</InputLabel>
+                        <Select
+                          label="diagram"
+                          value={selectedDiagram.name}
+                          onChange={handlChangeDiagram}
+                          sx={{ width: "100%", color: "black", border: "1px", borderColor: "white" }}
+                        >
+                          {[...listOfDiagrams].map(diagram => (
+                            <MenuItem key={diagram.id} value={diagram.name} sx={{ display: "center" }}>
+                              {diagram.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
                 </Box>
               </Box>
             </Box>
