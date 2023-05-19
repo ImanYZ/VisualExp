@@ -381,6 +381,8 @@ const FreeRecallGrading = props => {
         recallGrade={recallGrades?.[recallGradeIdx]}
         notSatisfiedPhrases={notSatisfiedSelections}
         gradeIt={gradeIt}
+        selectedPassageId={recallGrades?.[recallGradeIdx]?.passage}
+        projectParticipant={recallGrades?.[recallGradeIdx].project}
       />
     );
 
