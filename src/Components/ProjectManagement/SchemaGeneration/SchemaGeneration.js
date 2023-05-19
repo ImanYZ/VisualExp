@@ -47,8 +47,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-// eslint-disable-next-line no-empty-pattern
-export const SchemaGeneration = ({}) => {
+export const SchemaGeneration = () => {
   const classes = useStyles();
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -56,7 +55,6 @@ export const SchemaGeneration = ({}) => {
   const [phrases, setSelectedPhrases] = useState([]);
   const [selectedPassage, setSelectedPassage] = useState({});
   const [selectedPhrase, setSelectedPhrase] = useState(null);
-  const [selectedPhrase1, setSelectedPhrase1] = useState(null);
   const [schema, setSchema] = useState(temp_schema);
   const email = useRecoilValue(emailState);
   const [schemasBoolean, setSchemasBoolean] = useState([]);
@@ -67,73 +65,79 @@ export const SchemaGeneration = ({}) => {
   const [searching, setSearching] = useState(false);
   const project = useRecoilValue(projectState);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (firebase && selectedPassage) {
+  useEffect(() => {
+    const retrieveResponses = async () => {
       setSearching(true);
-      const usersDoc = await firebase.db.collection("users").get();
+      const recallGradesDocs = await firebase.db
+        .collection("recallGradesV2")
+        .where("passages", "array-contains", selectedPassage.id)
+        .get();
       const recallTexts = [];
       const temp_results = [];
-      for (let userDoc of usersDoc.docs) {
-        const userData = userDoc.data();
-        if (userData.pConditions) {
-          for (let pCon of userData.pConditions) {
-            for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
-              if (
-                pCon[recall] &&
-                pCon[recall] !== "" &&
-                !recallTexts.includes(pCon[recall]) &&
-                selectedPassage?.id === pCon?.passage
-              ) {
-                recallTexts.push(pCon[recall]);
-                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [] });
-                setSearchResules(temp_results);
-                setRecallResponses(recallTexts);
-              }
+      for (let recallDoc of recallGradesDocs.docs) {
+        const recallData = recallDoc.data();
+        const updateSessions = recallData.sessions;
+        for (let session in updateSessions) {
+          for (let conditionItem of updateSessions[session]) {
+            console.log("conditionItem.passage", conditionItem.passage);
+            if (conditionItem.passage === selectedPassage.id) {
+              recallTexts.push(conditionItem.response);
+              temp_results.push({ text: conditionItem.response, sentences: [], highlightedWords: [] });
             }
           }
         }
       }
+      console.log("recallTexts", recallTexts);
+      setSearchResules(temp_results);
+      setRecallResponses(recallTexts);
       setSearching(false);
+    };
+    if (firebase && selectedPassage) {
+      retrieveResponses();
     }
   }, [firebase, selectedPassage]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    const passagesDocs = await firebase.db.collection("passages").get();
-    // const passageData = passagesDoc.data();
-    let passages = [];
-    passages = passagesDocs.docs
-      .map(x => {
-        const data = x.data();
-        if (data?.phrases?.length > 0) {
-          return { ...data, id: x.id };
-        }
-        return null;
-      })
-      .filter(x => x !== null);
-    setPassages(passages);
-    const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
-    if (booleanLogsDoc.exists) {
-      const booleanLogsData = booleanLogsDoc.data();
-      const passage = passages.find(elem => elem.title === booleanLogsData.passage);
-      setSelectedPassage(passage);
-      const phrases = passage.phrases;
-      setSelectedPhrases(phrases);
-      setSelectedPhrase(booleanLogsData.selectedPhrase);
-      setSchema(booleanLogsData.schema);
-    } else {
-      setSelectedPassage(passages[0]);
-      const phrases = passages[0].phrases;
-      setSelectedPhrases([...phrases]);
-      setSelectedPhrase(phrases[0]);
+  useEffect(() => {
+    const retrievePassages = async () => {
+      const passagesDocs = await firebase.db.collection("passages").get();
+      let passages = [];
+      passages = passagesDocs.docs
+        .map(x => {
+          const data = x.data();
+          if (data?.phrases?.length > 0) {
+            return { ...data, id: x.id };
+          }
+          return null;
+        })
+        .filter(x => x !== null);
+      setPassages(passages);
+      const booleanLogsDoc = await firebase.db.collection("booleanScratchLogs").doc(fullname).get();
+      if (booleanLogsDoc.exists) {
+        const booleanLogsData = booleanLogsDoc.data();
+        const passage = passages.find(elem => elem.title === booleanLogsData.passage);
+        setSelectedPassage(passage);
+        const phrases = passage.phrases;
+        setSelectedPhrases(phrases);
+        setSelectedPhrase(booleanLogsData.selectedPhrase);
+        setSchema(booleanLogsData.schema);
+      } else {
+        setSelectedPassage(passages[0]);
+        const phrases = passages[0].phrases;
+        setSelectedPhrases([...phrases]);
+        setSelectedPhrase(phrases[0]);
+      }
+    };
+    if (firebase && fullname) {
+      retrievePassages();
     }
-  }, [firebase.db, fullname]);
+  }, [firebase, fullname]);
 
   useEffect(() => {
     if (selectedPhrase && selectedPassage) {
       const logsRef = firebase.db.collection("booleanScratchLogs").doc(fullname);
       const logsData = {
+        passageId: selectedPassage.id,
         passage: selectedPassage.title,
         selectedPhrase: selectedPhrase,
         email,
@@ -142,7 +146,7 @@ export const SchemaGeneration = ({}) => {
       logsRef.set(logsData);
     }
     return () => {};
-  }, [selectedPhrase, selectedPassage, schema]);
+  }, [firebase, selectedPhrase, selectedPassage, schema]);
 
   useEffect(() => {
     if (firebase && selectedPhrase) {
@@ -161,14 +165,9 @@ export const SchemaGeneration = ({}) => {
     }
   }, [firebase, selectedPhrase]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
+  useEffect(() => {
     setSchemasBoolean([]);
     let schemas = [...schemasBoolean];
-    if (!(selectedPhrase === selectedPhrase1)) {
-      schemas = [];
-    }
-
     const tempSchemaChanges = [...schmaChanges];
     setSchmaChanges([]);
 
@@ -185,7 +184,6 @@ export const SchemaGeneration = ({}) => {
     schemas.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
     setSchemasBoolean(schemas);
     setSchmaLoadedUse(false);
-    setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
 
   const handlePassageChange = async event => {

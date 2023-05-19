@@ -47,9 +47,7 @@ export const SchemaGenRecalls = props => {
   const project = useRecoilValue(projectState);
 
   useEffect(() => {
-    console.log("first useEffect", "retrieveResponses", selectedPassageId);
     const retrieveResponses = async () => {
-      console.log("second useEffect", "retrieveResponses", selectedPassageId);
       setSearching(true);
       const recallGradesDocs = await firebase.db
         .collection("recallGradesV2")
@@ -101,7 +99,7 @@ export const SchemaGenRecalls = props => {
 
   useEffect(() => {
     if (!schmaLoadedUse) return;
-    let schemas = [];
+    let schemas = [...schemasBoolean];
     const tempSchemaChanges = [...schmaChanges];
     setSchmaChanges([]);
 
@@ -115,6 +113,7 @@ export const SchemaGenRecalls = props => {
         schemas[index] = { id: change.doc.id, ...shemaData };
       }
     }
+    schemas.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
     setSchemasBoolean(schemas);
     setSchmaLoadedUse(false);
   }, [firebase, schmaLoadedUse]);
