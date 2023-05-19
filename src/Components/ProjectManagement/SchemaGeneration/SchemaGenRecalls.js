@@ -19,8 +19,6 @@ import QueryBuilder from "./components/QueryBuilder";
 import { uuidv4 } from "../../../utils";
 import "./SchemaGeneration.css";
 
-
-
 const temp_schema = [
   { id: uuidv4(), not: false, keyword: "", alternatives: [] },
   { id: uuidv4(), not: true, keyword: "", alternatives: [] }
@@ -28,13 +26,10 @@ const temp_schema = [
 
 // eslint-disable-next-line no-empty-pattern
 export const SchemaGenRecalls = props => {
-
-  const {notSatisfiedPhrases, recallGrade, gradeIt} = props;
+  const { notSatisfiedPhrases, recallGrade, gradeIt, selectedPassageId, projectParticipant } = props;
 
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  const [selectedPhrase, setSelectedPhrase] = useState(null);
-  const [selectedPhrase1, setSelectedPhrase1] = useState(null);
   const [schema, setSchema] = useState(temp_schema);
   const email = useRecoilValue(emailState);
   const [schemasBoolean, setSchemasBoolean] = useState([]);
@@ -46,57 +41,49 @@ export const SchemaGenRecalls = props => {
   const [wrongRecallVotes, setWrongRecallVotes] = useState([]);
   const [selectedRecall, setSelectedRecall] = useState();
 
-  const [selectedPassageId, setSelectedPassageId] = useState("");
   const [satisfiedRecalls, setSatisfiedRecalls] = useState([]);
 
   const [submitButtonLoader, setSubmitButtonLoader] = useState(false);
   const project = useRecoilValue(projectState);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (!selectedPhrase) return;
-    const passageDoc = await firebase.db
-      .collection("passages")
-      .where("phrases", "array-contains", selectedPhrase)
-      .get();
-    if (!passageDoc.docs[0]) return;
-    setSelectedPassageId(passageDoc.docs[0].id);
-  }, [firebase, selectedPhrase]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    if (firebase && selectedPassageId) {
+  useEffect(() => {
+    console.log("first useEffect", "retrieveResponses", selectedPassageId);
+    const retrieveResponses = async () => {
+      console.log("second useEffect", "retrieveResponses", selectedPassageId);
       setSearching(true);
-      const usersDoc = await firebase.db.collection("users").get();
+      const recallGradesDocs = await firebase.db
+        .collection("recallGradesV2")
+        .where("passages", "array-contains", selectedPassageId)
+        .get();
       const recallTexts = [];
       const temp_results = [];
-      for (let userDoc of usersDoc.docs) {
-        const userData = userDoc.data();
-        if (userData.pConditions) {
-          for (let pCon of userData.pConditions) {
-            for (let recall of ["recallreText", "recall3DaysreText", "recall1WeekreText"]) {
-              if (
-                pCon[recall] &&
-                pCon[recall] !== "" &&
-                !recallTexts.includes(pCon[recall]) &&
-                selectedPassageId === pCon?.passage
-              ) {
-                recallTexts.push(pCon[recall]);
-                temp_results.push({ text: pCon[recall], sentences: [], highlightedWords: [] });
-              }
+      for (let recallDoc of recallGradesDocs.docs) {
+        const recallData = recallDoc.data();
+        if (recallData.project !== projectParticipant) continue;
+        const updateSessions = recallData.sessions;
+        for (let session in updateSessions) {
+          for (let conditionItem of updateSessions[session]) {
+            console.log("conditionItem.passage", conditionItem.passage);
+            if (conditionItem.passage === selectedPassageId) {
+              recallTexts.push(conditionItem.response);
+              temp_results.push({ text: conditionItem.response, sentences: [], highlightedWords: [] });
             }
           }
         }
       }
+      console.log("recallTexts", recallTexts);
       setSearchResules(temp_results);
       setRecallResponses(recallTexts);
       setSearching(false);
+    };
+    if (firebase && selectedPassageId) {
+      retrieveResponses();
     }
-  }, [firebase, selectedPassageId]);
+  }, [firebase, selectedPassageId, selectedRecall]);
 
   useEffect(() => {
-    if (firebase && selectedPhrase) {
-      const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedPhrase);
+    if (selectedRecall) {
+      const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedRecall.phrase);
       const schmaSnapshot = schmaQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setSchmaChanges(oldSchmasChanges => {
@@ -107,17 +94,14 @@ export const SchemaGenRecalls = props => {
       return () => {
         setSchmaChanges([]);
         schmaSnapshot();
+        setSchmaLoadedUse(false);
       };
     }
-  }, [firebase, selectedPhrase]);
+  }, [firebase, selectedRecall]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(async () => {
-    let schemas = [...schemasBoolean];
-    if (!(selectedPhrase === selectedPhrase1)) {
-      schemas = [];
-    }
-
+  useEffect(() => {
+    if (!schmaLoadedUse) return;
+    let schemas = [];
     const tempSchemaChanges = [...schmaChanges];
     setSchmaChanges([]);
 
@@ -133,7 +117,6 @@ export const SchemaGenRecalls = props => {
     }
     setSchemasBoolean(schemas);
     setSchmaLoadedUse(false);
-    setSelectedPhrase1(selectedPhrase);
   }, [firebase, schmaLoadedUse]);
 
   const handleSubmit = () => {
@@ -142,7 +125,7 @@ export const SchemaGenRecalls = props => {
       fullname,
       schema: schema,
       createdAt: new Date(),
-      phrase: selectedPhrase,
+      phrase: selectedRecall.phrase,
       passage: selectedPassageId,
       upVotes: 0,
       downVotes: 0,
@@ -293,31 +276,22 @@ export const SchemaGenRecalls = props => {
       await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
-
-  useEffect(() => {
-    if (!recallGrade?.phrases?.length) return;
-    setSelectedPhrase(recallGrade?.phrases?.[0]?.phrase);
-  }, [recallGrade]);
-
   const renderResponses = (response, highlightMap) => {
     const highlightedWords = response.highlightedWords || [];
 
     const { sentences } = response;
     const words = [];
-    
+
     const margin = {
       marginRight: "3px"
     };
 
-    if(sentences && sentences.length) {
-      for(const sentence of sentences) {
-        const _words = sentence
-          .toString()
-          .trim()
-          .split(" ");
-        for(const word of _words) {
+    if (sentences && sentences.length) {
+      for (const sentence of sentences) {
+        const _words = sentence.toString().trim().split(" ");
+        for (const word of _words) {
           const _word = String(word).toLowerCase();
-          if(highlightMap[_word]) {
+          if (highlightMap[_word]) {
             words.push(
               <span key={words.length} style={margin}>
                 <mark>
@@ -328,7 +302,7 @@ export const SchemaGenRecalls = props => {
             continue;
           }
           // for memo
-          if(highlightedWords.includes(_word)) {
+          if (highlightedWords.includes(_word)) {
             highlightMap[_word] = true;
           } else {
             words.push(
@@ -363,18 +337,18 @@ export const SchemaGenRecalls = props => {
     // exclude response texts if not keywords matching
     const notKeywords = [];
     const notSchemas = schema?.filter(x => x.not && x.keyword !== "");
-    for(const notSchema of notSchemas) {
+    for (const notSchema of notSchemas) {
       notKeywords.push(String(notSchema.keyword).toLowerCase());
       const alternatives = notSchema.alternatives || [];
-      if(alternatives.length) {
-        notKeywords.push(...alternatives.filter((keyword) => String(keyword).trim() !== ""))
+      if (alternatives.length) {
+        notKeywords.push(...alternatives.filter(keyword => String(keyword).trim() !== ""));
       }
     }
     if (notKeywords.length > 0) {
-      responses = responses.filter((str) => {
+      responses = responses.filter(str => {
         const _str = str.toLowerCase();
-        for(const notKeyword of notKeywords) {
-          if(_str.includes(notKeyword)) {
+        for (const notKeyword of notKeywords) {
+          if (_str.includes(notKeyword)) {
             return false;
           }
         }
@@ -390,12 +364,12 @@ export const SchemaGenRecalls = props => {
           keywords.push(schemaE.keyword);
         }
 
-        if(keywords.length) {
+        if (keywords.length) {
           // and operation
-          responses = responses.filter((str) => {
+          responses = responses.filter(str => {
             const _str = str.toLowerCase();
             return keywords.some(element => _str.includes(element.toLowerCase()));
-          })
+          });
         }
 
         keys.push(...keywords);
@@ -410,7 +384,10 @@ export const SchemaGenRecalls = props => {
       const _tempSearchResult = responses.map(elm => {
         return {
           text: elm,
-          sentences: elm.split(".").filter(w => w && w !== "").map(x => x.trim()),
+          sentences: elm
+            .split(".")
+            .filter(w => w && w !== "")
+            .map(x => x.trim()),
           highlightedWords: []
         };
       });
@@ -418,8 +395,6 @@ export const SchemaGenRecalls = props => {
       setSearching(false);
       return;
     }
-
-    // The format of text messaging was originally invented by two German men in the nineties. Texts were originally held to a 160 character maximum and were intended for quick communication. The text has been a major force in American culture in novels, film, and advertising. Digital messaging allows for a record of communication and historians view texts much like letters. This passage used the Revolutionary War as an example of a time when speedy communication was vital and letters have provided a record for our understanding of the events. Although texting is criticized for diminishing clarity of communication and the human experience, it allows people to connect in many more ways than their ancestors were able. Overall, it is an integral part of our culture today.
 
     // building list of highlights
     for (let text of responses) {
@@ -429,15 +404,6 @@ export const SchemaGenRecalls = props => {
         .filter(w => w && w !== "")
         .map(x => x.trim());
       const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-      /* const sentences = [];
-      for (let sentence of filtered) {
-        const sentenceContainsWord = keys.some(element => sentence.toLowerCase().includes(element.toLowerCase()));
-        if (sentenceContainsWord) {
-          sentences.push(sentence);
-        }
-      }
-      console.log(sentences, "sentences")
-      */
       if (containsWord) {
         if (keys.length > 0) {
           const textSplit = text.split(" ");
@@ -467,23 +433,17 @@ export const SchemaGenRecalls = props => {
         }
         searchRes.push({ text, sentences: filtered, highlightedWords });
       }
-      //else {
-      //   const sentences = [];
-      //   filtered.map(sentence => sentences.push(sentence));
-      //   searchRes.push({ text, sentences, highlightedWords });
-      // }
     }
     setSearchResules(searchRes);
     setSearching(false);
   };
 
   useEffect(() => {
-    if (selectedPhrase && recallResponses.length > 0 && !searching) {
+    if (selectedRecall && recallResponses.length > 0 && !searching) {
       QuerySearching(schema);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema, selectedPhrase, recallResponses, searching]);
-
+  }, [schema, selectedRecall, recallResponses, searching]);
 
   useEffect(() => {
     if (!notSatisfiedPhrases.length) return;
@@ -493,7 +453,7 @@ export const SchemaGenRecalls = props => {
     const seenPhrases = [];
     const phrases = recallGrade?.phrases || [];
     for (const phrase of phrases) {
-      if(seenPhrases.includes(phrase.phrase)) {
+      if (seenPhrases.includes(phrase.phrase)) {
         continue;
       }
 
@@ -505,11 +465,9 @@ export const SchemaGenRecalls = props => {
 
       seenPhrases.push(phrase.phrase);
     }
-    
     if (notSatisfiedRecalls.length) {
       setSatisfiedRecalls(satisfiedRecalls);
       setWrongRecallVotes(notSatisfiedRecalls);
-      // setSelectedPhrase(notSatisfiedRecalls[0].data.phrase);
       setSelectedRecall(notSatisfiedRecalls[0]);
     }
   }, [recallGrade, notSatisfiedPhrases]);
@@ -523,12 +481,11 @@ export const SchemaGenRecalls = props => {
     if (_index !== -1) {
       const researchers = [...(_wrongRecallVotes[_index].researchers || [])];
       const researcherIdx = researchers.indexOf(fullname);
-      if(researcherIdx !== -1) {
+      if (researcherIdx !== -1) {
         _wrongRecallVotes[_index].grades[researcherIdx] = !_checked;
       }
       _wrongRecallVotes[_index].grade = !_checked;
       setWrongRecallVotes(_wrongRecallVotes);
-      //setSelectedPhrase(wrongRecallVotes[_index].data.phrase);
       setSelectedRecall(_wrongRecallVotes[_index]);
     }
   };
@@ -544,7 +501,6 @@ export const SchemaGenRecalls = props => {
       setSubmitButtonLoader(true);
     } else {
       setSelectedRecall(wrongRecallVotes[indexOFthis + 1]);
-      setSelectedPhrase(wrongRecallVotes[indexOFthis + 1]?.phrase)
     }
   };
 
@@ -566,17 +522,23 @@ export const SchemaGenRecalls = props => {
         </Paper>
       );
     });
-  }, [searchResules])
-
+  }, [searchResules]);
   if (!selectedRecall) return <></>;
+
   return (
     <Box className="schema-generation">
       <Box className="section">
-        <Box className="blocks search-box">
+        <Box
+          sx={{
+            width: "60%",
+            height: "100%",
+            overflow: "auto"
+          }}
+        >
           <Box className="query-block">
             <Alert severity="warning">
-              For every upvote you receives from others on your proposed Boolean expressions, you should receive a point.
-              For every downvote, you will lose a point towards free-recall grading activity points.
+              For every upvote you receives from others on your proposed Boolean expressions, you should receive a
+              point. For every downvote, you will lose a point towards free-recall grading activity points.
             </Alert>
             <Box>
               <Box
@@ -591,8 +553,8 @@ export const SchemaGenRecalls = props => {
                 <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>{recallGrade.response}</Paper>
                 <Alert severity="warning">
                   You checked this phrase as "YES" and that belongs to the participant response above ; but according to
-                  the Boolean schema the phrase does not satify the response . Do you want to change your vote or propose
-                  a new schema that satifys the Response ?
+                  the Boolean schema the phrase does not satify the response . Do you want to change your vote or
+                  propose a new schema that satifys the Response ?
                 </Alert>
                 <Box>
                   <Paper sx={{ p: "4px 19px 4px 19px", m: "4px 19px 6px 19px" }}>
@@ -601,13 +563,20 @@ export const SchemaGenRecalls = props => {
                       <Switch checked={selectedRecall.grade} onChange={changeTheVote} color="secondary" />
                       YES
                     </Box>
-                    <Box sx={{ display: "inline" }}>{selectedPhrase}</Box>
+                    <Box sx={{ display: "inline" }}>{selectedRecall.phrase}</Box>
                   </Paper>
                 </Box>
               </Box>
             </Box>
             <Box sx={{}}>
-              <Button onClick={handleNext} className="Button" variant="contained" color="success" disabled={false} id="schema-recall-submit">
+              <Button
+                onClick={handleNext}
+                className="Button"
+                variant="contained"
+                color="success"
+                disabled={false}
+                id="schema-recall-submit"
+              >
                 {submitButtonLoader ? (
                   <CircularProgress color="warning" size="15px" />
                 ) : wrongRecallVotes.findIndex(object => {
@@ -635,7 +604,7 @@ export const SchemaGenRecalls = props => {
               schemasBoolean.map((schemaE, index) => {
                 return (
                   <Box key={index} className="query-container" style={{ marginBottom: "30px" }}>
-                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedPhrase} readOnly={true} />
+                    <QueryBuilder query={schemaE.schema} selectedPhrase={selectedRecall.phrase} readOnly={true} />
                     <Box style={{ display: "flex", width: "95%", marginTop: "10px", justifyContent: "space-between" }}>
                       <Box style={{ display: "flex", width: "100px", justifyContent: "space-between" }}>
                         <Box style={{ display: "flex", width: "45px", justifyContent: "space-between" }}>
