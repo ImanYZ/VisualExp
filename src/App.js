@@ -721,10 +721,18 @@ const App = () => {
         await setUserStep(
           userRef,
           {
+            phase: 0,
+            currentPCon: {
+              passage: pConditions[0].passage,
+              condition: pConditions[0].condition
+            }, 
             pConditions
           },
           12
         );
+        setPassage(pConditions[0].passage);
+        setCondition(pConditions[0].condition);
+        setPhase(0);
         setTimer(5 * 60);
         break;
       case 12:
@@ -732,21 +740,7 @@ const App = () => {
         setTimer(5 * 60);
         break;
       case 13:
-        console.log("first", condition ,pConditions)
-        let pendingCondition;
-        if (startedSession === 2) {
-          console.log("second")
-          const pendingconditionIdx = pConditions.findIndex(
-            pCon => !(pCon.hasOwnProperty("recall3DaysreText")) 
-          );
-          pendingCondition = pConditions[pendingconditionIdx];
-        } else if (startedSession === 3) {
-          const pendingConditionnInd = pConditions.findIndex(
-            pCon => !(pCon.hasOwnProperty("recall1WeekreText"))
-          );
-          pendingCondition = pConditions[pendingConditionnInd];
-        }
-       console.log(pendingCondition)
+
         await submitAnswers(
           currentTime,
           5 * 60 - timer,
@@ -755,8 +749,8 @@ const App = () => {
           {
             phase: 1,
             currentPCon: {
-              passage: pendingCondition.passage,
-              condition: pendingCondition.condition
+              passage:pConditions[1].passage,
+              condition: pConditions[1].condition,
             }
           },
           14
@@ -764,6 +758,7 @@ const App = () => {
         setTimer(15 * 60);
         setPhase(1);
         setPassage(pConditions[1].passage);
+        setCondition(pConditions[1].condition);
         setReText("");
         break;
       case 14:
