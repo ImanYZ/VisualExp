@@ -192,21 +192,33 @@ const OneCademyCollaborationModel = () => {
     const _allNodes = [...allNodes];
     const collabModelNodesSnapshot = collabModelNodesQuery.onSnapshot(snapshot => {
       const changes = snapshot.docChanges();
-
       for (let change of changes) {
         const data = change.doc.data();
-        if (data.deleted) continue;
         if (change.type === "added") {
-          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-          if (findIndex === -1) {
-            _allNodes.push({ id: change.doc.id, ...data });
-          } else {
-            _allNodes[findIndex] = { id: change.doc.id, ...data };
+          if (!data.deleted) {
+            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+            if (findIndex === -1) {
+              _allNodes.push({ id: change.doc.id, ...data });
+            } else {
+              _allNodes[findIndex] = { id: change.doc.id, ...data };
+            }
+          } else if (data.deleted) {
+            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+            if (findIndex !== -1) {
+              _allNodes.splice(findIndex, 1);
+            }
           }
         } else if (change.type === "modified") {
-          const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
-          if (findIndex !== -1) {
-            _allNodes[findIndex] = { id: change.doc.id, ...data };
+          if (!data.deleted) {
+            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+            if (findIndex !== -1) {
+              _allNodes[findIndex] = { id: change.doc.id, ...data };
+            }
+          } else if (data.deleted) {
+            const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
+            if (findIndex !== -1) {
+              _allNodes.splice(findIndex, 1);
+            }
           }
         } else if (change.type === "removed") {
           const findIndex = _allNodes.findIndex(node => node.id === change.doc.id);
@@ -584,6 +596,10 @@ const OneCademyCollaborationModel = () => {
   const deleteNode = async () => {
     if (!selectedNode) return;
     const _allnodes = [...allNodes];
+    const _listOfDiagrams = [...listOfDiagrams];
+    const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
+    const diagramRef = firebase.db.collection("collabModelDiagrams").doc(selectedDiagram.id);
+    let _visibleNodes = [...visibleNodes];
     for (let node of _allnodes) {
       if (node.id === selectedNode) {
         node.deleted = true;
@@ -608,6 +624,12 @@ const OneCademyCollaborationModel = () => {
         t.update(nodeRef, { children: node.children, deleted: node?.deleted || false });
       }
     });
+    _visibleNodes = _visibleNodes.filter(node => node !== selectedNode);
+    if (_diagram !== -1 && editor) {
+      _listOfDiagrams[_diagram].nodes = [..._visibleNodes];
+      await diagramRef.update({ nodes: [...new Set(_visibleNodes)] });
+    }
+    setVisibleNodes(_visibleNodes);
     setOpenAddNode(false);
     setDeleteDialogOpen(false);
     setLoadData(true);
@@ -660,7 +682,7 @@ const OneCademyCollaborationModel = () => {
     setListOfDiagrams(_listOfDiagrams);
     // setZoomState(null);
     setShowAll(_showall);
-    setVisibleNodes([...new Set(_visibleNodes)])
+    setVisibleNodes([...new Set(_visibleNodes)]);
     setLoadData(true);
     setStepLink(0);
   };
@@ -786,7 +808,7 @@ const OneCademyCollaborationModel = () => {
     });
   };
 
-  const removeNode = async (nodeId) => {
+  const removeNode = async nodeId => {
     const _visibleNodes = visibleNodes;
     const _listOfDiagrams = [...listOfDiagrams];
     const _diagram = _listOfDiagrams.findIndex(diagram => diagram.id === selectedDiagram.id);
