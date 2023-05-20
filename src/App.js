@@ -954,19 +954,18 @@ const App = () => {
   }
 
   const changePConURL = () => {
-    let tempURL;
+    const iframe = document.getElementById("PassageFrame");
     if (step === 3) {
-      tempURL = pConURL;
-      setPConURL(" ");
+      iframe.src = "";
       setTimeout(() => {
-        setPConURL(tempURL);
-      }, 400);
+        iframe.src = pConURL;
+      }, 500);
     } else {
-      tempURL = nullPConURL;
-      setNullPConURL(" ");
+      iframe.src = "";
+
       setTimeout(() => {
-        setNullPConURL(tempURL);
-      }, 400);
+        iframe.src = nullPConURL;
+      }, 500);
     }
   };
 
