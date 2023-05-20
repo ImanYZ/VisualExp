@@ -77,7 +77,6 @@ const FreeRecallGrading = props => {
       const { keyword, alternatives, not } = rule;
       const keywords = [keyword, ...alternatives];
       keywords.filter(kw => kw !== "");
-      console.log("keywords", keywords);
       const match = keywords.some(kw => paragraph.toLowerCase().includes(kw.toLowerCase()));
       return (match && !not) || (!match && not);
     });
@@ -94,6 +93,7 @@ const FreeRecallGrading = props => {
     const booleanHashMap = {};
     for (let booleanDoc of booleanScratchDoc.docs) {
       const booleanData = booleanDoc.data();
+      if (booleanData.deleted) continue;
       if (booleanHashMap.hasOwnProperty(booleanData.phrase)) {
         booleanHashMap[booleanData.phrase].push(booleanData);
       } else {
@@ -155,15 +155,9 @@ const FreeRecallGrading = props => {
 
   const loadedRecallGrades = async () => {
     setProcessing(true);
-
     const recentParticipants = await fetchRecentParticipants(fullname, project);
     setRecentParticipants(recentParticipants);
-
     let recallGradesQ = firebase.db.collection("recallGradesV2");
-    if (project !== "Autograding") {
-      recallGradesQ = recallGradesQ.where("project", "==", project).where("done", "==", false);
-    }
-
     return recallGradesQ.onSnapshot(snapshot => {
       const changedDocs = snapshot.docChanges();
 
@@ -171,7 +165,9 @@ const FreeRecallGrading = props => {
 
       setRecallGrades(recallGrades => {
         let _recallGrades = consumeRecallGradesChanges(changedDocs, recallGrades, fullname, gptResearcher);
-
+        if (project !== "Autograding") {
+          _recallGrades = _recallGrades.filter(g => g.project === project);
+        }
         // sorting researcher's related participants first
         if (Object.keys(recentParticipants).length > 0) {
           _recallGrades.sort((g1, g2) => {
@@ -209,9 +205,9 @@ const FreeRecallGrading = props => {
         setRecallGradeSId(`${_recallGrades?.[0]?.docId}-${_recallGrades?.[0]?.session}-${_recallGrades?.[0]?.passage}`);
         return _recallGrades;
       });
-
       setRecallGradeIdx(0);
       setSubmitting(false);
+      setProcessing(false);
     });
   };
 
@@ -345,7 +341,6 @@ const FreeRecallGrading = props => {
       gradeIt([]);
     }
   };
-   console.log(hideLeaderBoard);
   if (showTheSchemaGen && fullname !== gptResearcher)
     return (
       <SchemaGenRecalls
@@ -370,8 +365,6 @@ const FreeRecallGrading = props => {
       </Box>
     );
   }
-
-  console.log(recallGrades[recallGradeIdx]?.user, randomizedPhrases.length);
 
   return !recallGrades || !recallGrades.length || recallGrades.length <= recallGradeIdx ? (
     <Alert severity="info" size="large">
