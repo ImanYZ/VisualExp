@@ -248,19 +248,21 @@ module.exports = async (req, res) => {
           }
 
           for (const upVoteResearcher of upVoteResearchers) {
-            let gradingPoints =
-              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
-            let negativeGradingPoints =
-              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
-            gradingPoints += upVotePoint;
-            // -ve
-            if (upVotePoint < 0) {
-              negativeGradingPoints += Math.abs(upVotePoint);
-            }
+            if (researchersUpdates[upVoteResearcher].projects.hasOwnProperty(recallGradeData.project)) {
+              let gradingPoints =
+                researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
+              let negativeGradingPoints =
+                researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
+              gradingPoints += upVotePoint;
+              // -ve
+              if (upVotePoint < 0) {
+                negativeGradingPoints += Math.abs(upVotePoint);
+              }
 
-            researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
-            researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
-              negativeGradingPoints;
+              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
+              researchersUpdates[upVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
+                negativeGradingPoints;
+            }
             if (researchersUpdates[upVoteResearcher].projects.hasOwnProperty("Autograding")) {
               let gradingPoints = researchersUpdates[upVoteResearcher].projects["Autograding"].gradingPoints || 0;
               let negativeGradingPoints =
@@ -277,20 +279,21 @@ module.exports = async (req, res) => {
           }
 
           for (const downVoteResearcher of downVoteResearchers) {
-            let gradingPoints =
-              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
-            let negativeGradingPoints =
-              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
-            gradingPoints += downVotePoint;
-            // -ve
-            if (downVotePoint < 0) {
-              negativeGradingPoints += Math.abs(downVotePoint);
+            if (researchersUpdates[downVoteResearcher].projects.hasOwnProperty(recallGradeData.project)) {
+              let gradingPoints =
+                researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints || 0;
+              let negativeGradingPoints =
+                researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints || 0;
+              gradingPoints += downVotePoint;
+
+              if (downVotePoint < 0) {
+                negativeGradingPoints += Math.abs(downVotePoint);
+              }
+
+              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
+              researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
+                negativeGradingPoints;
             }
-
-            researchersUpdates[downVoteResearcher].projects[recallGradeData.project].gradingPoints = gradingPoints;
-            researchersUpdates[downVoteResearcher].projects[recallGradeData.project].negativeGradingPoints =
-              negativeGradingPoints;
-
             if (researchersUpdates[downVoteResearcher].projects.hasOwnProperty("Autograding")) {
               let gradingPoints = researchersUpdates[downVoteResearcher].projects["Autograding"].gradingPoints || 0;
               let negativeGradingPoints =
@@ -357,7 +360,7 @@ module.exports = async (req, res) => {
         });
       }
 
-      // updating participant points if required 
+      // updating participant points if required
       if (userUpdated) {
         const userRef = db.collection("users").doc(recallGradeData.user);
         transactionWrites.push({
