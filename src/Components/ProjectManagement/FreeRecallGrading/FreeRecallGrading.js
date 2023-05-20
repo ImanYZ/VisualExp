@@ -93,6 +93,7 @@ const FreeRecallGrading = props => {
     const booleanHashMap = {};
     for (let booleanDoc of booleanScratchDoc.docs) {
       const booleanData = booleanDoc.data();
+      if (booleanData.deleted) continue;
       if (booleanHashMap.hasOwnProperty(booleanData.phrase)) {
         booleanHashMap[booleanData.phrase].push(booleanData);
       } else {
