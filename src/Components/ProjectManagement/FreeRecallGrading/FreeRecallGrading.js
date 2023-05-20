@@ -168,6 +168,10 @@ const FreeRecallGrading = props => {
         if (project !== "Autograding") {
           _recallGrades = _recallGrades.filter(g => g.project === project);
         }
+        _recallGrades.forEach(g => {
+          g.phrases = g.phrases.filter(p => !p.deleted);
+        });
+
         // sorting researcher's related participants first
         if (Object.keys(recentParticipants).length > 0) {
           _recallGrades.sort((g1, g2) => {
