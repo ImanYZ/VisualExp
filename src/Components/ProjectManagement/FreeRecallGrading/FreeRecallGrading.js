@@ -84,6 +84,7 @@ const FreeRecallGrading = props => {
 
   const searchAnyBooleanExpression = async () => {
     const recallGrade = recallGrades?.[recallGradeIdx];
+    recallGrade.phrases = recallGrade.phrases.filter(p => !p.deleted);
     const passageData = passages?.[recallGrade?.passage];
     if (!passageData.title) return;
     const booleanScratchDoc = await firebase.db
