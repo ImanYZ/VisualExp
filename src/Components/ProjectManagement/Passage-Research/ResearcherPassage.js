@@ -82,15 +82,12 @@ const ResearcherPassage = () => {
       const tempPassagesChanges = [...passagesChanges];
       setPassagesChanges([]);
       let titls = titles;
-      const userDoc = await firebase.db.collection("researchers").doc(fullname).get();
-      const userData = userDoc.data();
-      let userProjects = ["H2K2",...Object.keys(userData.projects)];
 
       for (let change of tempPassagesChanges) {
         const pasageData = change.doc.data();
         let passageProjects = Object.keys(pasageData.projects);
         if (passageProjects.length !== 0) {
-          if (passageProjects.find(element => userProjects.includes(element)) ) {
+
             if (change.type === "modified") {
               passags[titls.indexOf(pasageData.title)] = { ...pasageData };
             } else {
@@ -98,7 +95,7 @@ const ResearcherPassage = () => {
                 ...pasageData
               });
               titls.push(pasageData.title);
-            }
+            
           }
         }
       }

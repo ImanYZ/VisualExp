@@ -878,7 +878,7 @@ const RouterNav = props => {
     >
       <MenuItem
         onClick={() => {
-          window.open("/Activities/ResearcherPassage", "blank");
+          window.open("/Activities/ResearcherPassage", "_blank");
         }}
       >
         <MenuBookIcon sx={{ m: "5px" }} />
@@ -886,7 +886,7 @@ const RouterNav = props => {
       </MenuItem>
       <MenuItem
         onClick={() => {
-          window.open("/Activities/SchemaGeneration", "blank");
+          window.open("/Activities/SchemaGeneration", "_blank");
         }}
       >
         <SchemaIcon sx={{ m: "5px" }} />
