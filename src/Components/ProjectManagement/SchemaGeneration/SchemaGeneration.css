@@ -21,12 +21,12 @@
 }
 
 .section .blocks.search-box {
-  width: 60%;
+  width: 50%;
   height: 99%;
 }
 
 .section .blocks.result-box {
-  width: 40%;
+  width: 50%;
   margin-right: 10px;
   display: flex;
   flex-direction: column;

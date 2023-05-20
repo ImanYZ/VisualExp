@@ -71,45 +71,16 @@ const FreeRecallGrading = props => {
 
   const [hideLeaderBoard, setHideLeaderBoard] = useRecoilState(hideLeaderBoardState);
 
-  const QuerySearching = schemaEp => {
-    const text = recallGrades?.[recallGradeIdx]?.response;
-
-    if (!text) return;
-    let keys = {};
-
-    // building list for included and excluded keywords
-    let notKeywords = [];
-    for (let schemaE of schemaEp) {
-      if (!schemaE.not) {
-        let keywords = [...schemaE.alternatives];
-        keywords = keywords.filter(x => x && x !== "");
-        if (schemaE.keyword !== "") {
-          keys[schemaE.keyword] = keywords;
-        }
-      } else {
-        const noKeywords = [...schemaE.alternatives];
-        if (schemaE.keyword !== "") {
-          noKeywords.push(schemaE.keyword);
-        }
-        notKeywords = [...notKeywords, ...noKeywords];
-      }
-    }
-    notKeywords = notKeywords.filter(x => x && x !== "");
-
-    let containsWord = true;
-    const notContainsWord = notKeywords.some(element => text.toLowerCase().includes(element.toLowerCase()));
-    for (let key in keys) {
-      const containsKeys = [key, ...keys[key]];
-      containsWord = containsKeys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-      if (!containsWord) {
-        break;
-      }
-    }
-    if (!notContainsWord && containsWord) {
-      return true;
-    } else {
-      return false;
-    }
+  const filterPhrases = rules => {
+    const paragraph = recallGrades?.[recallGradeIdx]?.response;
+    return rules.every(rule => {
+      const { keyword, alternatives, not } = rule;
+      const keywords = [keyword, ...alternatives];
+      keywords.filter(kw => kw !== "");
+      console.log("keywords", keywords);
+      const match = keywords.some(kw => paragraph.toLowerCase().includes(kw.toLowerCase()));
+      return (match && !not) || (!match && not);
+    });
   };
 
   const searchAnyBooleanExpression = async () => {
@@ -147,7 +118,7 @@ const FreeRecallGrading = props => {
         const schemaE = booleanHashMap[phrase.phrase].sort((a, b) =>
           a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1
         )[0].schema;
-        if (!QuerySearching(schemaE)) {
+        if (!filterPhrases(schemaE)) {
           nonSatisfiedPhrases.push(phrase.phrase);
         }
       } else {
