@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
@@ -18,6 +19,8 @@ import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbDownOffAltIcon from "@mui/icons-material/ThumbDownOffAlt";
 import ThumbDownAltIcon from "@mui/icons-material/ThumbDownAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Tooltip from "@mui/material/Tooltip";
 
 import QueryBuilder from "./components/QueryBuilder";
 import { uuidv4 } from "../../../utils";
@@ -71,30 +74,16 @@ export const SchemaGeneration = () => {
 
   useEffect(() => {
     const retrieveResponses = async () => {
-      setSearching(true);
-      const _all = {};
-      const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-      for (let recallDoc of recallGradesDocs.docs) {
-        const recallData = recallDoc.data();
-        const updateSessions = recallData.sessions;
-        for (let session in updateSessions) {
-          for (let conditionItem of updateSessions[session]) {
-            if (conditionItem.response !== "") {
-              if (_all.hasOwnProperty(conditionItem.passage)) {
-                _all[conditionItem.passage].push(conditionItem.response);
-              } else {
-                _all[conditionItem.passage] = [conditionItem.response];
-              }
-            }
-          }
-        }
+      try {
+        setSearching(true);
+        const response = await axios.get("/lodResponses");
+        setAllTheResponses(response.data.responses);
+      } catch (error) {
+        console.log(error);
       }
-      setAllTheResponses(_all);
     };
-    if (firebase) {
-      retrieveResponses();
-    }
-  }, [firebase]);
+    retrieveResponses();
+  }, []);
 
   useEffect(() => {
     if (Object.keys(allTheResponses).length === 0) return;
@@ -188,12 +177,17 @@ export const SchemaGeneration = () => {
     setSchmaChanges([]);
     for (let change of tempSchemaChanges) {
       const shemaData = change.doc.data();
-
       if (change.type === "added") {
-        schemas.push({ id: change.doc.id, ...shemaData });
+        if (!shemaData.deleted) {
+          schemas.push({ id: change.doc.id, ...shemaData });
+        }
       } else if (change.type === "modified") {
         const index = schemas.indexOf(elm => elm.id === change.doc.id);
-        schemas[index] = { id: change.doc.id, ...shemaData };
+        if (shemaData.deleted) {
+          schemas.splice(index, 1);
+        } else {
+          schemas[index] = { id: change.doc.id, ...shemaData };
+        }
       }
     }
     schemas.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
@@ -430,10 +424,8 @@ export const SchemaGeneration = () => {
     setSearching(true);
     setSearchResules([]);
     const responses = [...recallResponses];
-    console.log(responses);
     const reponsefilteres = filterParagraphs(responses, schemaEp);
     const notSatisfied = responses.filter(r => !reponsefilteres.includes(r));
-    console.log("notSatisfied", notSatisfied);
     setNotSatisfiedResponses(notSatisfied);
     setSearchResules(reponsefilteres);
     setSearching(false);
@@ -446,7 +438,6 @@ export const SchemaGeneration = () => {
     return paragraph.replace(pattern, '<span style="background-color: yellow;">$1</span>');
   };
 
-  console.log({ notSatisfiedResponses });
   const searchResultsRD = useMemo(() => {
     return (searchResules || []).map((respon, index) => {
       return (
@@ -465,6 +456,20 @@ export const SchemaGeneration = () => {
       );
     });
   }, [searchResules]);
+
+  const deleteSchema = async id => {
+    try {
+      window.confirm("Are you sure you want to delete this schema?");
+      const booleanRef = firebase.db.collection("booleanScratch").doc(id);
+      booleanRef.update({
+        deleted: true
+      });
+    } catch (error) {}
+  };
+
+  const handleCopy = schema => {
+    setSchema(schema);
+  };
 
   return (
     <Box className="schema-generation">
@@ -598,6 +603,25 @@ export const SchemaGeneration = () => {
                           paddingBottom: "20px"
                         }}
                       >
+                        {fullname === schemaE.fullname && (
+                          <Tooltip title="Delete this boolean expression">
+                            <IconButton
+                              sx={{ color: "red", mr: "25px" }}
+                              onClick={() => deleteSchema(schemaE.id)}
+                              size="small"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        <Tooltip title="This will popolate the new schema at the bottom">
+                          <Button
+                            variant="outlined"
+                            onClick={() => handleCopy(schemaE.schema)}
+                            sx={{ mr: "15px" }}
+                          >{`Copy`}</Button>
+                        </Tooltip>
+
                         <Button
                           variant="outlined"
                           onClick={() => QuerySearching(schemaE.schema)}
@@ -671,7 +695,7 @@ export const SchemaGeneration = () => {
                   borderRadius: "10px",
                   overflow: "auto",
                   padding: "15px",
-                  height: "50%",
+                  height: "50%"
                 }}
               >
                 {notSatisfiedResponses.map((response, index) => {
@@ -684,7 +708,7 @@ export const SchemaGeneration = () => {
                         display: "flex",
                         flexWrap: "wrap",
                         p: "10px",
-                        mb: isLastElement ? "200px" : "10px",
+                        mb: isLastElement ? "200px" : "10px"
                       }}
                     >
                       {response}
