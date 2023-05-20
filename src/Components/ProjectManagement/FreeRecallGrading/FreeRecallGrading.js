@@ -121,8 +121,6 @@ const FreeRecallGrading = props => {
         if (!filterPhrases(schemaE)) {
           nonSatisfiedPhrases.push(phrase.phrase);
         }
-      } else {
-        nonSatisfiedPhrases.push(phrase.phrase);
       }
     }
 
