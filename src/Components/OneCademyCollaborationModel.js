@@ -257,7 +257,7 @@ const OneCademyCollaborationModel = () => {
       const resData = researchersDoc.docs[0].data();
       setEditor(resData.hasOwnProperty("isEditor") && resData.isEditor);
     } else {
-      setEditor(true);
+      setEditor(false);
     }
 
     var g = new dagreD3.graphlib.Graph({ compound: true })
