@@ -34,7 +34,6 @@ export const SchemaGenRecalls = props => {
   const email = useRecoilValue(emailState);
   const [schemasBoolean, setSchemasBoolean] = useState([]);
   const [schmaChanges, setSchmaChanges] = useState([]);
-  const [schmaLoadedUse, setSchmaLoadedUse] = useState(false);
   const [recallResponses, setRecallResponses] = useState([]);
   const [searchResules, setSearchResules] = useState([]);
   const [searching, setSearching] = useState(false);
@@ -42,8 +41,11 @@ export const SchemaGenRecalls = props => {
   const [selectedRecall, setSelectedRecall] = useState();
 
   const [satisfiedRecalls, setSatisfiedRecalls] = useState([]);
-
+  const [schmaLoaded, setSchmaLoaded] = useState(false);
   const [submitButtonLoader, setSubmitButtonLoader] = useState(false);
+  const [highlightedWords, setHighlightedWords] = useState([]);
+  const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
+
   const project = useRecoilValue(projectState);
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export const SchemaGenRecalls = props => {
         .where("passages", "array-contains", selectedPassageId)
         .get();
       const recallTexts = [];
-      const temp_results = [];
+      console.log(recallGradesDocs.docs.length);
       for (let recallDoc of recallGradesDocs.docs) {
         const recallData = recallDoc.data();
         if (recallData.project !== projectParticipant) continue;
@@ -64,13 +66,11 @@ export const SchemaGenRecalls = props => {
             console.log("conditionItem.passage", conditionItem.passage);
             if (conditionItem.passage === selectedPassageId) {
               recallTexts.push(conditionItem.response);
-              temp_results.push({ text: conditionItem.response, sentences: [], highlightedWords: [] });
             }
           }
         }
       }
-      console.log("recallTexts", recallTexts);
-      setSearchResules(temp_results);
+      setSearchResules(recallTexts);
       setRecallResponses(recallTexts);
       setSearching(false);
     };
@@ -79,33 +79,36 @@ export const SchemaGenRecalls = props => {
     }
   }, [firebase, selectedPassageId, selectedRecall]);
 
+  console.log("searchResules :: :: ", searchResules, selectedPassageId);
+
   useEffect(() => {
-    if (selectedRecall) {
+    setHighlightedWords([]);
+    setNotSatisfiedResponses([]);
+    setSchemasBoolean([]);
+    if (firebase && selectedRecall) {
       const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedRecall.phrase);
       const schmaSnapshot = schmaQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setSchmaChanges(oldSchmasChanges => {
           return [...oldSchmasChanges, ...docChanges];
         });
-        setSchmaLoadedUse(true);
+        setSchmaLoaded(true);
       });
       return () => {
+        setSchmaLoaded(false);
         setSchmaChanges([]);
         schmaSnapshot();
-        setSchmaLoadedUse(false);
       };
     }
   }, [firebase, selectedRecall]);
 
   useEffect(() => {
-    if (!schmaLoadedUse) return;
+    if (!schmaLoaded) return;
     let schemas = [...schemasBoolean];
     const tempSchemaChanges = [...schmaChanges];
     setSchmaChanges([]);
-
     for (let change of tempSchemaChanges) {
       const shemaData = change.doc.data();
-
       if (change.type === "added") {
         schemas.push({ id: change.doc.id, ...shemaData });
       } else if (change.type === "modified") {
@@ -115,8 +118,11 @@ export const SchemaGenRecalls = props => {
     }
     schemas.sort((a, b) => (a.upVotes - a.downVotes > b.upVotes - b.downVotes ? -1 : 1));
     setSchemasBoolean(schemas);
-    setSchmaLoadedUse(false);
-  }, [firebase, schmaLoadedUse]);
+    setSchmaLoaded(false);
+    setHighlightedWords([]);
+  }, [firebase, schmaLoaded]);
+
+  console.log("schemasBoolean", schemasBoolean, selectedRecall);
 
   const handleSubmit = () => {
     const newbooleanScratch = {
@@ -275,174 +281,36 @@ export const SchemaGenRecalls = props => {
       await researcherRef.update(researcherUpdate);
     } catch (error) {}
   };
-  const renderResponses = (response, highlightMap) => {
-    const highlightedWords = response.highlightedWords || [];
-
-    const { sentences } = response;
-    const words = [];
-
-    const margin = {
-      marginRight: "3px"
-    };
-
-    if (sentences && sentences.length) {
-      for (const sentence of sentences) {
-        const _words = sentence.toString().trim().split(" ");
-        for (const word of _words) {
-          const _word = String(word).toLowerCase();
-          if (highlightMap[_word]) {
-            words.push(
-              <span key={words.length} style={margin}>
-                <mark>
-                  <strong>{word}</strong>
-                </mark>
-              </span>
-            );
-            continue;
-          }
-          // for memo
-          if (highlightedWords.includes(_word)) {
-            highlightMap[_word] = true;
-          } else {
-            words.push(
-              <span key={words.length} style={margin}>
-                {word}
-              </span>
-            );
-            continue;
-          }
-
-          words.push(
-            <span key={words.length} style={margin}>
-              <mark>
-                <strong>{word}</strong>
-              </mark>
-            </span>
-          );
-        }
-      }
-    }
-
-    return words;
+  const filterParagraphs = (paragraphs, rules) => {
+    return paragraphs.filter(paragraph => {
+      return rules.every(rule => {
+        const { keyword, alternatives, not } = rule;
+        const keywords = [keyword, ...alternatives].filter(kw => kw !== "");
+        const match = keywords.some(kw => paragraph.toLowerCase().includes(kw.toLowerCase()));
+        return (match && !not) || (!match && not);
+      });
+    });
   };
 
   const QuerySearching = schemaEp => {
+    console.log(schemaEp);
+    let keywords = [];
+    schemaEp.forEach(rule => {
+      const { keyword, alternatives, not } = rule;
+      if (!not) {
+        keywords = [...keywords, keyword, ...alternatives];
+      }
+    });
     setSearching(true);
-    setSearchResules([]);
-    const searchRes = [];
-    let keys = [];
-    let responses = [...recallResponses];
-
-    // exclude response texts if not keywords matching
-    const notKeywords = [];
-    const notSchemas = schema?.filter(x => x.not && x.keyword !== "");
-    for (const notSchema of notSchemas) {
-      notKeywords.push(String(notSchema.keyword).toLowerCase());
-      const alternatives = notSchema.alternatives || [];
-      if (alternatives.length) {
-        notKeywords.push(...alternatives.filter(keyword => String(keyword).trim() !== ""));
-      }
-    }
-    if (notKeywords.length > 0) {
-      responses = responses.filter(str => {
-        const _str = str.toLowerCase();
-        for (const notKeyword of notKeywords) {
-          if (_str.includes(notKeyword)) {
-            return false;
-          }
-        }
-        return true;
-      });
-    }
-
-    // building list of keywords to match responses
-    for (let schemaE of schemaEp) {
-      if (!schemaE.not) {
-        const keywords = [...schemaE.alternatives];
-        if (schemaE.keyword !== "") {
-          keywords.push(schemaE.keyword);
-        }
-
-        if (keywords.length) {
-          // and operation
-          responses = responses.filter(str => {
-            const _str = str.toLowerCase();
-            return keywords.some(element => _str.includes(element.toLowerCase()));
-          });
-        }
-
-        keys.push(...keywords);
-      }
-    }
-
-    // removing empty keywords
-    keys = keys.filter(x => x && String(x).trim() !== "");
-
-    // if keywords or keys list is empty
-    if (notKeywords.length === 0 && keys.length === 0) {
-      const _tempSearchResult = responses.map(elm => {
-        return {
-          text: elm,
-          sentences: elm
-            .split(".")
-            .filter(w => w && w !== "")
-            .map(x => x.trim()),
-          highlightedWords: []
-        };
-      });
-      setSearchResules(_tempSearchResult);
-      setSearching(false);
-      return;
-    }
-
-    // building list of highlights
-    for (let text of responses) {
-      let highlightedWords = [];
-      const filtered = text
-        .split(".")
-        .filter(w => w && w !== "")
-        .map(x => x.trim());
-      const containsWord = keys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-      if (containsWord) {
-        if (keys.length > 0) {
-          const textSplit = text.split(" ");
-          textSplit.forEach(str => {
-            const replacedString = str.replace("\n", " ");
-            const strLowerCase = replacedString.toLowerCase();
-            const ifExistingHighLighted = highlightedWords.indexOf(strLowerCase) >= 0;
-            if (!ifExistingHighLighted) {
-              keys.forEach(element => {
-                if (strLowerCase.includes(element.toLowerCase())) {
-                  const removeUnusedCharacters = strLowerCase.split(" ");
-                  if (removeUnusedCharacters.length > 1) {
-                    const fWord = removeUnusedCharacters.find(x => x.toLowerCase().includes(element.toLowerCase()));
-                    const ifExist = highlightedWords.indexOf(fWord) >= 0;
-                    if (!ifExist && fWord) {
-                      const UWord = fWord?.includes(".") ? fWord?.replace(".", "") : fWord;
-                      highlightedWords.push(UWord);
-                    }
-                  } else if (removeUnusedCharacters.length === 1) {
-                    const UWord = strLowerCase?.includes(".") ? strLowerCase?.replace(".", "") : strLowerCase;
-                    highlightedWords.push(UWord);
-                  }
-                }
-              });
-            }
-          });
-        }
-        searchRes.push({ text, sentences: filtered, highlightedWords });
-      }
-    }
-    setSearchResules(searchRes);
+    const responses = [...recallResponses];
+    console.log(responses);
+    const reponsefilteres = filterParagraphs(responses, schemaEp);
+    const notSatisfied = responses.filter(r => !reponsefilteres.includes(r));
+    setNotSatisfiedResponses(notSatisfied);
+    setSearchResules(reponsefilteres);
     setSearching(false);
+    setHighlightedWords(keywords);
   };
-
-  useEffect(() => {
-    if (selectedRecall && recallResponses.length > 0 && !searching) {
-      QuerySearching(schema);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [schema, selectedRecall, recallResponses, searching]);
 
   useEffect(() => {
     if (!notSatisfiedPhrases.length) return;
@@ -490,6 +358,8 @@ export const SchemaGenRecalls = props => {
   };
 
   const handleNext = () => {
+    setHighlightedWords([]);
+    setSearchResules(recallResponses);
     const indexOFthis = wrongRecallVotes.findIndex(object => {
       return selectedRecall.phrase === object.phrase;
     });
@@ -503,8 +373,13 @@ export const SchemaGenRecalls = props => {
     }
   };
 
+  const renderResponses = paragraph => {
+    if (!paragraph) return null;
+    const pattern = new RegExp(`(${highlightedWords.join("|")})`, "gi");
+    return paragraph.replace(pattern, '<span style="background-color: yellow;">$1</span>');
+  };
+
   const searchResultsRD = useMemo(() => {
-    const highlightMap = {};
     return (searchResules || []).map((respon, index) => {
       return (
         <Paper
@@ -517,7 +392,7 @@ export const SchemaGenRecalls = props => {
             p: "10px"
           }}
         >
-          {renderResponses(respon, highlightMap)}
+          <div dangerouslySetInnerHTML={{ __html: renderResponses(respon) }} />
         </Paper>
       );
     });
@@ -529,7 +404,7 @@ export const SchemaGenRecalls = props => {
       <Box className="section">
         <Box
           sx={{
-            width: "60%",
+            width: "50%",
             height: "100%",
             overflow: "auto"
           }}
@@ -644,32 +519,39 @@ export const SchemaGenRecalls = props => {
                 setSchema(q);
               }}
               handleSubmit={handleSubmit}
+              QuerySearching={QuerySearching}
               readOnly={false}
             />
           </Box>
         </Box>
         <Box className="blocks result-box">
           <Box sx={{ padding: "15px" }}>
-            <span className="header">All Responses</span>
+            {notSatisfiedResponses.length > 0 ? (
+              <span className="header">Response that satify the Boolean expression </span>
+            ) : (
+              <span className="header">All Responses</span>
+            )}
             <br />
-            <span className="subtitle">
-              The highlighted sentences satisfy your keyword rules and the bold words are the keywords you entered
-            </span>
+            <span className="subtitle">The highlighted sentences satisfy your keyword rules</span>
           </Box>
           <Box
             style={{
-              overflow: "auto",
-              paddingLeft: "15px",
-              paddingRight: "15px",
-              paddingTop: "15px",
-              background: "#F8F8F8",
-              borderRadius: "10px",
               display: "flex",
-              flex: "1",
+              flexDirection: "column",
               minHeight: "0px"
             }}
           >
-            <Box>
+            <Box
+              style={{
+                flex: "1",
+                background: "#F8F8F8",
+                borderRadius: "10px",
+                overflow: "auto",
+                padding: "15px",
+                marginBottom: "15px",
+                height: "50%"
+              }}
+            >
               {searchResules.length > 0 ? (
                 searchResultsRD
               ) : searching ? (
@@ -680,6 +562,40 @@ export const SchemaGenRecalls = props => {
                 </Typography>
               )}
             </Box>
+            {notSatisfiedResponses.length > 0 ? (
+              <Box sx={{ padding: "15px" }}>
+                <span className="header">Responses that do not satisfy the Boolean expression </span>
+                <br />
+              </Box>
+            ) : null}
+            {notSatisfiedResponses.length > 0 ? (
+              <Box
+                style={{
+                  background: "#F8F8F8",
+                  borderRadius: "10px",
+                  overflow: "auto",
+                  padding: "15px",
+                  height: "50%"
+                }}
+              >
+                {notSatisfiedResponses.map((response, index) => {
+                  return (
+                    <Paper
+                      key={index}
+                      elevation={3}
+                      sx={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        mb: "20px",
+                        p: "10px"
+                      }}
+                    >
+                      {response}
+                    </Paper>
+                  );
+                })}
+              </Box>
+            ) : null}
           </Box>
         </Box>
       </Box>
