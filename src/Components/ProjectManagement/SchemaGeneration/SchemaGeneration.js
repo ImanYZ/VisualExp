@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
 import { useRecoilValue } from "recoil";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
@@ -73,30 +74,16 @@ export const SchemaGeneration = () => {
 
   useEffect(() => {
     const retrieveResponses = async () => {
-      setSearching(true);
-      const _all = {};
-      const recallGradesDocs = await firebase.db.collection("recallGradesV2").get();
-      for (let recallDoc of recallGradesDocs.docs) {
-        const recallData = recallDoc.data();
-        const updateSessions = recallData.sessions;
-        for (let session in updateSessions) {
-          for (let conditionItem of updateSessions[session]) {
-            if (conditionItem.response !== "") {
-              if (_all.hasOwnProperty(conditionItem.passage)) {
-                _all[conditionItem.passage].push(conditionItem.response);
-              } else {
-                _all[conditionItem.passage] = [conditionItem.response];
-              }
-            }
-          }
-        }
+      try {
+        setSearching(true);
+        const response = await axios.get("/lodResponses");
+        setAllTheResponses(response.data.responses);
+      } catch (error) {
+        console.log(error);
       }
-      setAllTheResponses(_all);
     };
-    if (firebase) {
-      retrieveResponses();
-    }
-  }, [firebase]);
+    retrieveResponses();
+  }, []);
 
   useEffect(() => {
     if (Object.keys(allTheResponses).length === 0) return;
@@ -477,8 +464,7 @@ export const SchemaGeneration = () => {
       booleanRef.update({
         deleted: true
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const handleCopy = schema => {

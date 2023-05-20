@@ -1384,3 +1384,30 @@ exports.createTemFeedback = async (req, res) => {
     console.log({ error }, "error----------");
   }
 };
+
+//post lodResponses 
+exports.lodResponses = async (req, res) => { 
+  try {
+    const _all = {};
+    const recallGradesDocs = await db.collection("recallGradesV2").get();
+    recallGradesDocs.docs.map(async recallDoc => {
+      const recallData = recallDoc.data();
+      Object.values(recallData.sessions)
+        .flat()
+        .map(async conditionItem => {
+          if (conditionItem.response !== "") {
+            if (_all.hasOwnProperty(conditionItem.passage)) {
+              _all[conditionItem.passage].push(conditionItem.response);
+            } else {
+              _all[conditionItem.passage] = [conditionItem.response];
+            }
+          }
+        });
+    });
+    console.log("_all",_all);
+    res.status(200).send({ message: "success", responses : _all });
+  } catch (error) {
+    res.status(500).send({ message: "error", data : error });
+    console.log(error);
+  }
+ }
