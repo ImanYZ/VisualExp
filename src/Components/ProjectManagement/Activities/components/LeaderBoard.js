@@ -110,6 +110,7 @@ export const LeaderBoard = ({
       const evs = [...onGoingEvents];
       evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
       setOnGoingEvents(evs);
+      alert("You have successfully marked the attendance.");
     } catch (err) {
       console.log(err);
       alert("Something went wrong while marking the attendance.");
