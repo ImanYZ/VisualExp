@@ -882,7 +882,7 @@ const getUserDocsfromEmail = async email => {
   }
 
   if (userDocs.docs.length === 0) {
-    userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", email.toLowerCase()).get();
+    userDocs = await db.collection("usersSurvey").where("email", "==", email.toLowerCase()).get();
   }
 
   return userDocs;

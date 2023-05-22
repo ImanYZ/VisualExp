@@ -233,6 +233,7 @@ const RouterNav = props => {
     // update project settings
   }, [firebase, project]);
 
+
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
       const researcherQuery = firebase.db.collection("researchers");

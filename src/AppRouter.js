@@ -118,11 +118,11 @@ const AppRouter = props => {
     let fullName = null;
 
     if (!users.docs.length) {
-      const usersStudentSurvey = await db.collection("usersStudentCoNoteSurvey").where("email", "==", uEmail).get();
-      if (usersStudentSurvey.docs.length) {
+      const usersSurvey = await db.collection("usersSurvey").where("email", "==", uEmail).get();
+      if (usersSurvey.docs.length) {
         isSurvey = true;
-        fullName = usersStudentSurvey.docs[0].id;
-        userData = usersStudentSurvey.docs[0].data();
+        fullName = usersSurvey.docs[0].id;
+        userData = usersSurvey.docs[0].data();
       }
     } else {
       fullName = users.docs[0].id;
@@ -210,19 +210,9 @@ const AppRouter = props => {
         setProject(myProjects[0]);
       }
     }
-
     setNotAResearcher(!isResearcher);
-
-    // if redirects required
-    const nonAuthUrls = ["/auth", "/InstructorCoNoteSurvey", "/StudentCoNoteSurvey"];
-    for (const nonAuthUrl of nonAuthUrls) {
-      if (String(window.location.pathname).startsWith(nonAuthUrl)) {
-        navigateTo("/");
-        break;
-      }
-    }
   };
-
+  console.log("project", project);
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
       if (user) {
@@ -503,6 +493,8 @@ const AppRouter = props => {
                     )
                   }
                 />
+
+                <Route path="InstructorCoNoteSurvey/*" element={<SchedulePage />} />
                 <Route
                   path="Activities/Experiments"
                   element={

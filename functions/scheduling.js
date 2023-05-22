@@ -238,7 +238,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
 
       if (userDocs.docs.length === 0) {
         userDocs = await db
-          .collection("usersStudentCoNoteSurvey")
+          .collection("usersSurvey")
           .where("email", "==", participantEmail.toLowerCase())
           .get();
       }

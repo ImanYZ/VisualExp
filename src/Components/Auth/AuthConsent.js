@@ -8,6 +8,7 @@ import Auth from "./Auth";
 import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
 import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
+import AuthInstructorCoNoteSurvey from "./AuthInstructorCoNoteSurvey";
 import RouterNav from "../../Components/RouterNav/RouterNav";
 import "./ConsentDocument.css";
 
@@ -15,6 +16,9 @@ const AuthConsent = props => {
   let authComponent = <Auth {...props} />;
   if (props.project === "StudentCoNoteSurvey") {
     authComponent = <AuthStudentCoNoteSurvey />;
+  }
+  if (props.project === "InstructorCoNoteSurvey") {
+    authComponent = <AuthInstructorCoNoteSurvey />;
   }
 
   return (
@@ -49,6 +53,8 @@ const AuthConsent = props => {
             }}
           >
             {props.project && props.project === "StudentCoNoteSurvey" ? (
+              <ConsentStudentCoNoteSurvey />
+            ) : props.project && props.project === "InstructorCoNoteSurvey" ? (
               <ConsentStudentCoNoteSurvey />
             ) : (
               <ConsentDocument />

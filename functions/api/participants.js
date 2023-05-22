@@ -16,8 +16,8 @@ participantsRouter.use(isParticipant);
 // POST /api/participants/schedule
 participantsRouter.post("/schedule", async (req, res) => {
   try {
-    let { sessions, project } = req.body;
-
+    let { sessions, project} = req.body;
+     console.log("sessions",req.userData);
 
 
     const {email } = req.userData;

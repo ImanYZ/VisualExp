@@ -102,7 +102,7 @@ const SchedulePage = props => {
       let userDoc = await firebase.db.collection("users").doc(fullname).get();
 
       if (!userDoc.exists) {
-        userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname).get();
+        userDoc = await firebase.db.collection("usersSurvey").doc(fullname).get();
         isSurvey = true;
       }
       const userData = userDoc.data();
@@ -135,16 +135,17 @@ const SchedulePage = props => {
       let availSessions = {};
 
       const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-      const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
-      if(!scheduleMonths.includes(scheduleEnd)) {
+      const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD");
+      if (!scheduleMonths.includes(scheduleEnd)) {
         scheduleMonths.push(scheduleEnd);
       }
 
       // Retrieve all the researchers' avaialbilities in this project.
-      const resScheduleDocs = await firebase.db.collection("resSchedule")
+      const resScheduleDocs = await firebase.db
+        .collection("resSchedule")
         .where("month", "in", scheduleMonths)
-        .where("project", "==", project).get();
-
+        .where("project", "==", project)
+        .get();
 
       for (let resScheduleDoc of resScheduleDocs.docs) {
         const resScheduleData = resScheduleDoc.data();
@@ -152,18 +153,18 @@ const SchedulePage = props => {
         // date time flagged by researchers as available by them
         let _schedules = resScheduleData.schedules || {};
         for (const researcherFullname in _schedules) {
-          for(const scheduleSlot of _schedules[researcherFullname]) {
+          for (const scheduleSlot of _schedules[researcherFullname]) {
             const slotDT = moment(scheduleSlot).utcOffset(-4, true).toDate();
             // if availability is expired already
-            if(slotDT.getTime() < new Date().getTime()) {
+            if (slotDT.getTime() < new Date().getTime()) {
               continue;
             }
             const _scheduleSlot = slotDT.toLocaleString();
-            if(!availSessions[_scheduleSlot]) {
+            if (!availSessions[_scheduleSlot]) {
               availSessions[_scheduleSlot] = [];
             }
-            if(Object.values(researchers).includes(researcherFullname)){
-              availSessions[_scheduleSlot].push(researcherFullname)
+            if (Object.values(researchers).includes(researcherFullname)) {
+              availSessions[_scheduleSlot].push(researcherFullname);
             }
           }
         }
@@ -248,10 +249,15 @@ const SchedulePage = props => {
         ) {
           sch.push(session);
           const sessionIdx = parseInt(scheduleData.order.replace(/[^0-9]+/g, "")) - 1;
-          if(!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
+          if (!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
             const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
-            for(let i = 1; i < slotCounts; i++) {
-              sch.push(moment(session).utcOffset(-4).add(30 * i, "minutes").toDate());
+            for (let i = 1; i < slotCounts; i++) {
+              sch.push(
+                moment(session)
+                  .utcOffset(-4)
+                  .add(30 * i, "minutes")
+                  .toDate()
+              );
             }
           }
         }
@@ -289,7 +295,7 @@ const SchedulePage = props => {
       let userDoc = await userRef.get();
 
       if (!userDoc.exists) {
-        const userRef = firebase.db.collection("usersStudentCoNoteSurvey").doc(fullname);
+        const userRef = firebase.db.collection("usersSurvey").doc(fullname);
         userDoc = await userRef.get();
       }
 
@@ -309,7 +315,7 @@ const SchedulePage = props => {
         await firebase.idToken();
         responseObj = await axios.post("/participants/schedule", {
           sessions,
-          project: userData.project,
+          project: userData.project
         });
         errorAlert(responseObj.data);
 
@@ -318,7 +324,9 @@ const SchedulePage = props => {
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
-      alert("Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu");
+      alert(
+        "Something went wrong! Please resubmit your availability and if it still doesn't work, please contact us at oneweb@umich.edu"
+      );
     }
   };
 
@@ -376,33 +384,33 @@ const SchedulePage = props => {
   if (isSubmitting) return <LoadingPage />;
   return (
     <>
-    <RouterNav/>
-    <div id="SchedulePageContainer">
-
-      {submitted ? (
-        <div className="DateDescription">
-          <p>
-            Based on your specified availability, we just matched you with one of our UX researchers for each session
-            and sent you three Google Calendar invitations. Please accept them as soon as possible. If any of the
-            sessions do not work for you, you can return to this page to reschedule them only before your first session.
-          </p>
-          <p>
-            For accepting the Google Calendar invites, please open each invitation email, scroll all the way down to
-            find the options to respond to the Calendar invite, and click "Yes."
-          </p>
-          <p>
-            Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject
-            the invitation through the Yes/No links at the bottom of the Google Calendar invitation email.
-          </p>
-        </div>
-      ) : participatedBefore ? (
-        <Alert severity="error">
-          You've participated in this study before or have scheduled a session and cannot participate again or change
-          the scheduled sessions! Please convey your questions or concerns to Iman Yeckehzaare at oneweb@umich.edu
-        </Alert>
-      ) : (
-        <>
-          {/* <div className="DateDescription">
+      <RouterNav />
+      <div id="SchedulePageContainer">
+        {submitted ? (
+          <div className="DateDescription">
+            <p>
+              Based on your specified availability, we just matched you with one of our UX researchers for each session
+              and sent you three Google Calendar invitations. Please accept them as soon as possible. If any of the
+              sessions do not work for you, you can return to this page to reschedule them only before your first
+              session.
+            </p>
+            <p>
+              For accepting the Google Calendar invites, please open each invitation email, scroll all the way down to
+              find the options to respond to the Calendar invite, and click "Yes."
+            </p>
+            <p>
+              Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject
+              the invitation through the Yes/No links at the bottom of the Google Calendar invitation email.
+            </p>
+          </div>
+        ) : participatedBefore ? (
+          <Alert severity="error">
+            You've participated in this study before or have scheduled a session and cannot participate again or change
+            the scheduled sessions! Please convey your questions or concerns to Iman Yeckehzaare at oneweb@umich.edu
+          </Alert>
+        ) : (
+          <>
+            {/* <div className="DateDescription">
               In the table below, please specify as many time slots as possible
               in your timezone. 
             </div>
@@ -421,92 +429,91 @@ const SchedulePage = props => {
                 </li>
               </ul>
             </div> */}
-          <Alert severity="warning">
-            <ul id="WarningPoints">
-              <li>
-                Please specify your availability for our three UX experiment sessions <strong>in your timezone</strong>{" "}
-                to satisfy the following criteria:
-                <ul>{renderInformation()}</ul>
-              </li>
-              <li>
-                As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
-                will indicate your sessions. You should click the SCHEDULE button and get the confirmation message,
-                otherwise, your sessions will not be scheduled.
-              </li>
-              <li>
-                There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take the
-                light blue ones.
-              </li>
-            </ul>
-          </Alert>
-          {schedule.length > 0 && !submitable && (
-            <Alert severity="error">
+            <Alert severity="warning">
               <ul id="WarningPoints">
-                <li>You have not specified enough of your availability to satisfy the above criteria.</li>
                 <li>
-                  If you don't have enough availability in the next two weeks, please return to this page in the
-                  following days to specify your available time slots.
+                  Please specify your availability for our three UX experiment sessions{" "}
+                  <strong>in your timezone</strong> to satisfy the following criteria:
+                  <ul>{renderInformation()}</ul>
+                </li>
+                <li>
+                  As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
+                  will indicate your sessions. You should click the SCHEDULE button and get the confirmation message,
+                  otherwise, your sessions will not be scheduled.
+                </li>
+                <li>
+                  There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take the
+                  light blue ones.
                 </li>
               </ul>
             </Alert>
-          )}
-          {scheduleLoaded ? (
-            <>
-              <div id="ScheduleSelectorContainer">
-                <SelectSessions
-                  startDate={tomorrow}
-                  numDays={16}
-                  schedule={schedule}
-                  setSchedule={setSchedule}
-                  selectedSession={selectedSession}
-                  setSelectedSession={setSelectedSession}
-                  availableSessions={availableSessions}
-                  setSubmitable={setSubmitable}
-                  numberOfSessions={projectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
-                  hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
-                  sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
-                  daysLater={projectSpecs.daysLater || AppConfig.daysLater}
-                />
-              </div>
-              <div id="SignBtnContainer">
-                <Button
-                  onClick={confirmClickOpen}
-                  className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-                  variant="contained"
-                  disabled={submitable && !isSubmitting ? null : true}
-                >
-                  Schedule
-                </Button>
-              </div>
-            </>
-          ) : (
-            <Box sx={{ width: "100%" }}>
-              <LinearProgress />
-            </Box>
-          )}
-        </>
-      )}
-      <Dialog
-        open={openConfirm}
-        onClose={confirmClose()}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Please Confirm!"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">{renderConfirmation()}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={confirmClose("Cancelled")}>Cancel</Button>
-          <Button onClick={confirmClose("Confirmed")} autoFocus>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+            {schedule.length > 0 && !submitable && (
+              <Alert severity="error">
+                <ul id="WarningPoints">
+                  <li>You have not specified enough of your availability to satisfy the above criteria.</li>
+                  <li>
+                    If you don't have enough availability in the next two weeks, please return to this page in the
+                    following days to specify your available time slots.
+                  </li>
+                </ul>
+              </Alert>
+            )}
+            {scheduleLoaded ? (
+              <>
+                <div id="ScheduleSelectorContainer">
+                  <SelectSessions
+                    startDate={tomorrow}
+                    numDays={16}
+                    schedule={schedule}
+                    setSchedule={setSchedule}
+                    selectedSession={selectedSession}
+                    setSelectedSession={setSelectedSession}
+                    availableSessions={availableSessions}
+                    setSubmitable={setSubmitable}
+                    numberOfSessions={projectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+                    hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+                    sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+                    daysLater={projectSpecs.daysLater || AppConfig.daysLater}
+                  />
+                </div>
+                <div id="SignBtnContainer">
+                  <Button
+                    onClick={confirmClickOpen}
+                    className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+                    variant="contained"
+                    disabled={submitable && !isSubmitting ? null : true}
+                  >
+                    Schedule
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <Box sx={{ width: "100%" }}>
+                <LinearProgress />
+              </Box>
+            )}
+          </>
+        )}
+        <Dialog
+          open={openConfirm}
+          onClose={confirmClose()}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Please Confirm!"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">{renderConfirmation()}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={confirmClose("Cancelled")}>Cancel</Button>
+            <Button onClick={confirmClose("Confirmed")} autoFocus>
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </>
   );
 };
 
 export default SchedulePage;
-
