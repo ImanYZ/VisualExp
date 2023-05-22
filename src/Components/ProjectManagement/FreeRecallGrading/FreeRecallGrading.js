@@ -167,7 +167,7 @@ const FreeRecallGrading = props => {
           _recallGrades = _recallGrades.filter(g => g.project === project);
         }
         _recallGrades.forEach(g => {
-          g.phrases = g.phrases.filter(p => !p.deleted);
+          g.phrases = g.phrases.filter(p => !p.deleted || p.researchers.includes(fullname));
         });
 
         // sorting researcher's related participants first
