@@ -71,6 +71,7 @@ export const SchemaGeneration = () => {
   const [allTheResponses, setAllTheResponses] = useState({});
   const [highlightedWords, setHighlightedWords] = useState([]);
   const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
+  const [tryout, setTryout] = useState(false);
 
   useEffect(() => {
     const retrieveResponses = async () => {
@@ -153,6 +154,7 @@ export const SchemaGeneration = () => {
     setHighlightedWords([]);
     setNotSatisfiedResponses([]);
     setSchemasBoolean([]);
+    setTryout(false);
     if (firebase && selectedPhrase) {
       const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedPhrase);
       const schmaSnapshot = schmaQuery.onSnapshot(snapshot => {
@@ -430,6 +432,7 @@ export const SchemaGeneration = () => {
     setSearchResules(reponsefilteres);
     setSearching(false);
     setHighlightedWords(keywords);
+    setTryout(true);
   };
 
   const renderResponses = paragraph => {
@@ -452,17 +455,20 @@ export const SchemaGeneration = () => {
           }}
         >
           <div dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              handleResponse(r, "yes");
-            }}
-            sx={{
-              mt: "15px",
-              backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "#91ff35" : "",
-              color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "white" : ""
-            }}
-          >{`YES `}</Button>
+
+          {tryout && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                handleResponse(r, "yes");
+              }}
+              sx={{
+                mt: "15px",
+                backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "#91ff35" : "",
+                color: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "white" : ""
+              }}
+            >{`YES `}</Button>
+          )}
         </Paper>
       );
     });
@@ -487,9 +493,19 @@ export const SchemaGeneration = () => {
       const _searchResules = [...searchResules];
       const _notSatisfiedResponses = [...notSatisfiedResponses];
       const _recallResponses = [...recallResponses];
-      const indexNotSatisfied = _notSatisfiedResponses.findIndex(r => r.response === response.response);
-      const indexSatisfied = _searchResules.findIndex(r => r.response === response.response) || -1;
-      const indexAll = _recallResponses.findIndex(r => r.response === response.response) || -1;
+
+      const indexAll = _recallResponses.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
+      const indexNotSatisfied = _notSatisfiedResponses.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
+      const indexSatisfied = _searchResules.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
       const updateResponse = _recallResponses[indexAll];
       if (indexAll === -1) return;
       if (updateResponse.votes[selectedPhrase].vote === null) {

@@ -84,7 +84,7 @@ const QueryBuilder = ({ ...props }) => {
   })();
 
   return (
-    <div className="query-container" onClick={props.onClick}>
+    <Box className="query-container" onClick={props.onClick}>
       <QueryBox
         className={"query-builder"}
         readOnly={props.readOnly}
@@ -132,15 +132,10 @@ const QueryBuilder = ({ ...props }) => {
         />
       )}
       {props.handleSubmit && (
-        <>
-          <div className="query-container footer">
-            <div className="content">
-              <div style={{ marginRight: "15px" }}>
-                <span className="result-text">
-                  Check what the result will look like on the right side, before you submit.
-                </span>
-              </div>
-              <div>
+        <Box>
+          <Box className="query-container footer" sx={{ display: "flex", justifyContent: "left" }}>
+            <Box >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Button
                   sx={{ mt: 1, mr: 1, mb: 1, backgroundColor: "#ff9800", color: "common.white" }}
                   variant="contained"
@@ -150,19 +145,17 @@ const QueryBuilder = ({ ...props }) => {
                   Submit
                 </Button>
                 <Button variant="outlined" onClick={() => props.QuerySearching(schema)}>{`Try it out `}</Button>
-              </div>
-            </div>
-          </div>
-          <div
-            style={{
-              marginLeft: "550px",
-              paddingTop: "10px",
-              paddingBottom: "20px"
-            }}
-          ></div>
-        </>
+              </Box>
+              <Box style={{ marginRight: "15px" }}>
+                <span className="result-text">
+                  Check what the result will look like on the right side before you submit.
+                </span>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 
