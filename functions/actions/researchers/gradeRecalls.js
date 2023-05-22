@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
 
       const researchers = await t.get(db.collection("researchers"));
       let researchersUpdates = {};
-      let updatedResearcers = [];
+      let updatedResearchers = [];
       for (const researcher of researchers.docs) {
         const researcherData = researcher.data();
         researchersUpdates[researcher.id] = researcherData;
@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
       // adding gradingNum
 
       researchersUpdates[researcher.docId].projects = researcher.projects;
-      updatedResearcers.push(researcher.docId);
+      updatedResearchers.push(researcher.docId);
 
       // loading user data from recall grade document
       const user = await t.get(db.collection("users").doc(recallGradeData.user));
@@ -309,7 +309,7 @@ module.exports = async (req, res) => {
             }
           }
 
-          updatedResearcers.push(...votesOfPhrase.researchers);
+          updatedResearchers.push(...votesOfPhrase.researchers);
         }
       }
 
@@ -348,7 +348,7 @@ module.exports = async (req, res) => {
 
       // updating points for researchers if required
       for (const researcherId in researchersUpdates) {
-        if (!updatedResearcers.includes(researcherId)) {
+        if (!updatedResearchers.includes(researcherId)) {
           continue;
         }
 
