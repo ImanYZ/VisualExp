@@ -1386,28 +1386,48 @@ exports.createTemFeedback = async (req, res) => {
 };
 
 //post lodResponses 
-exports.lodResponses = async (req, res) => { 
+exports.lodResponses = async (req, res) => {
   try {
     const _all = {};
     const recallGradesDocs = await db.collection("recallGradesV2").get();
     recallGradesDocs.docs.map(async recallDoc => {
       const recallData = recallDoc.data();
-      Object.values(recallData.sessions)
-        .flat()
-        .map(async conditionItem => {
+      Object.entries(recallData.sessions).map(async ([session, conditionItems]) => {
+        conditionItems.forEach(conditionItem => {
           if (conditionItem.response !== "") {
+            const votes = {};
+            conditionItem.phrases.forEach(phrase => {
+              votes[phrase.phrase] = {
+                no: phrase.hasOwnProperty("no") ? phrase.no : null,
+                yes: phrase.hasOwnProperty("yes") ? phrase.yes : null
+              };
+            });
             if (_all.hasOwnProperty(conditionItem.passage)) {
-              _all[conditionItem.passage].push(conditionItem.response);
+              _all[conditionItem.passage].push({
+                response: conditionItem.response.trim(),
+                documentId: recallDoc.id,
+                session,
+                condition: conditionItem.condition,
+                votes
+              });
             } else {
-              _all[conditionItem.passage] = [conditionItem.response];
+              _all[conditionItem.passage] = [
+                {
+                  response: conditionItem.response.trim(),
+                  documentId: recallDoc.id,
+                  session,
+                  condition: conditionItem.condition,
+                  votes
+                }
+              ];
             }
           }
         });
+      });
     });
-    console.log("_all",_all);
-    res.status(200).send({ message: "success", responses : _all });
+    res.status(200).send({ message: "success", responses: _all });
   } catch (error) {
-    res.status(500).send({ message: "error", data : error });
+    res.status(500).send({ message: "error", data: error });
     console.log(error);
   }
- }
+};
