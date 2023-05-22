@@ -1,6 +1,6 @@
 const { admin, db, commitBatch, batchUpdate } = require("./admin");
-const {futureEvents, pastEvents } = require("./scheduling");
-const { isToday , fetchRecentParticipants} = require("./utils");
+const { futureEvents, pastEvents } = require("./scheduling");
+const { isToday, fetchRecentParticipants } = require("./utils");
 const { delay } = require("./helpers/common");
 const {
   reschEventNotificationEmail,
@@ -12,7 +12,6 @@ const {
 const { deleteEvent } = require("./GoogleCalendar");
 const moment = require("moment");
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
-
 
 const voteFn = async (voter, activity, vote) => {
   try {
@@ -308,14 +307,14 @@ exports.deleteActivity = async (req, res) => {
                   ...voterUpdate.voterUpdateData
                 });
               }
-              const intellectualNum = researcherData.projects[activityData.project].intellectualNum - 1 ; 
+              const intellectualNum = researcherData.projects[activityData.project].intellectualNum - 1;
               const pointsUpdate = {
                 projects: {
                   ...researcherData.projects,
                   [activityData.project]: {
                     ...researcherData.projects[activityData.project],
                     points: researcherData.projects[activityData.project].points - activityData.upVotes,
-                    intellectualNum: intellectualNum > 0 ? intellectualNum : 0,
+                    intellectualNum: intellectualNum > 0 ? intellectualNum : 0
                   }
                 }
               };
@@ -873,7 +872,6 @@ exports.remindResearchersForAvailability = async context => {
   }
 };
 
-
 const getUserDocsfromEmail = async email => {
   let userDocs = await db.collection("users").where("email", "==", email.toLowerCase()).get();
 
@@ -1203,37 +1201,30 @@ exports.passagesNumberCorrection = async context => {
   try {
     const passageNumberOfParticipant = {};
     const usersDocs = await db.collection("users").get();
-  
-    usersDocs.forEach((userDoc) => {
+
+    usersDocs.forEach(userDoc => {
       const userData = userDoc.data();
-  
+
       const hasRequiredData =
-        userData.explanations &&
-        userData.explanations1Week &&
-        userData.explanations3Days &&
-        !userData.damagedDocument;
-  
+        userData.explanations && userData.explanations1Week && userData.explanations3Days && !userData.damagedDocument;
+
       if (hasRequiredData) {
-        userData.pConditions.forEach((cond) => {
+        userData.pConditions.forEach(cond => {
           const { project } = userData;
           const { passage, condition } = cond;
-  
+
           if (!passageNumberOfParticipant.hasOwnProperty(passage)) {
             passageNumberOfParticipant[passage] = {};
           }
-  
+
           if (!passageNumberOfParticipant[passage].hasOwnProperty(project)) {
             passageNumberOfParticipant[passage][project] = {};
           }
-  
-          if (
-            !passageNumberOfParticipant[passage][project].hasOwnProperty(
-              condition
-            )
-          ) {
+
+          if (!passageNumberOfParticipant[passage][project].hasOwnProperty(condition)) {
             passageNumberOfParticipant[passage][project][condition] = 0;
           }
-  
+
           passageNumberOfParticipant[passage][project][condition] += 1;
         });
       }
@@ -1263,40 +1254,39 @@ exports.passagesNumberCorrection = async context => {
 
 exports.createTemFeedback = async (req, res) => {
   try {
+    const { fullname, project } = req.body;
+    const recentParticipants = await fetchRecentParticipants(fullname, project);
+    console.log(recentParticipants);
+    if (!fullname || !project) {
+      return res.status(500).send({
+        message: "some parameters are missing"
+      });
+    }
 
-      const { fullname, project } = req.body;
-      const recentParticipants = await fetchRecentParticipants(fullname, project)
-      console.log(recentParticipants);
-      if (!fullname || !project) {
-        return res.status(500).send({
-          message: "some parameters are missing"
-        });
+    const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
+
+    const previousIds = [];
+    const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get();
+
+    for (let feedbackCodeOrder of feedbackCodesOrders.docs) {
+      const feedbackCodeOrderData = feedbackCodeOrder.data();
+      previousIds.concat(feedbackCodeOrderData.codeIds);
+    }
+    const batch = db.batch();
+
+    const approvedCodes = new Set();
+    for (let codeDoc of feedbackCodesBooksDocs.docs) {
+      const codeData = codeDoc.data();
+      if (codeData.approved && !approvedCodes.has(codeData.code)) {
+        approvedCodes.add(codeData.code);
       }
-
-      const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
-
-      const previousIds = [];
-      const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get(); 
-
-      for (let feedbackCodeOrder of feedbackCodesOrders.docs) {
-        const feedbackCodeOrderData = feedbackCodeOrder.data();
-        previousIds.concat(feedbackCodeOrderData.codeIds);
-      }
-      const batch = db.batch();
-
-      const approvedCodes = new Set();
-      for (let codeDoc of feedbackCodesBooksDocs.docs) {
-        const codeData = codeDoc.data();
-        if (codeData.approved && !approvedCodes.has(codeData.code)) {
-          approvedCodes.add(codeData.code);
-        }
-      }
-      const passages = await db.collection("passages").where("projects", "array-contains", project).get();
-      const passagesMap = {};
-      for (const passage of passages.docs) {
-        passagesMap[passage.id] = passage.data();
-      }
-      /* const passagesInH2K2 = [
+    }
+    const passages = await db.collection("passages").where("projects", "array-contains", project).get();
+    const passagesMap = {};
+    for (const passage of passages.docs) {
+      passagesMap[passage.id] = passage.data();
+    }
+    /* const passagesInH2K2 = [
         "zlS4Gh2AXaLZV7HM2oXd",
         "lmGQvzSit4LBTj1Zptot",
         "97D6P4unPYqzkpVeUY2c",
@@ -1308,87 +1298,90 @@ exports.createTemFeedback = async (req, res) => {
         "s1oo3G4n3jeE8fJQRs3g"
       ]; */
 
-      const feedbackCodes = await db
-        .collection("feedbackCode")
-        .where("project", "==", project)
-        .where("approved", "==", false)
-        .get();
-      const feedbackCodesByParticipant = {};
+    const feedbackCodes = await db
+      .collection("feedbackCode")
+      .where("project", "==", project)
+      .where("approved", "==", false)
+      .get();
+    const feedbackCodesByParticipant = {};
 
-      for (const feedbackCode of feedbackCodes.docs) {
-        const feedbackCodeData = feedbackCode.data();
-        if (previousIds.includes(feedbackCode.id) && !Object.keys(recentParticipants).includes(feedbackCodeData.fullname)) continue;
-        if(feedbackCodeData.coders.includes(fullname)) continue;
-        if (!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
-          feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
-        }
-        feedbackCodesByParticipant[feedbackCodeData.fullname].push({
-          docId: feedbackCode.id,
-          session: feedbackCodeData.session,
-          explanation: feedbackCodeData.explanation || ""
-        });
+    for (const feedbackCode of feedbackCodes.docs) {
+      const feedbackCodeData = feedbackCode.data();
+      if (previousIds.includes(feedbackCode.id) && !Object.keys(recentParticipants).includes(feedbackCodeData.fullname))
+        continue;
+      if (feedbackCodeData.coders.includes(fullname)) continue;
+      if (!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
+        feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
       }
+      feedbackCodesByParticipant[feedbackCodeData.fullname].push({
+        docId: feedbackCode.id,
+        session: feedbackCodeData.session,
+        explanation: feedbackCodeData.explanation || ""
+      });
+    }
 
-      const sortedFeedbackCodesByParticipant = Object.keys(feedbackCodesByParticipant).sort(participant =>
-        Object.keys(recentParticipants).includes(participant) ? -1 : 1
-      );
-      const feedbackCodeIds = [];
-      const feedbackCodeOrders = await db
-        .collection("feedbackCodeOrderV2")
-        .where("project", "==", project)
-        .where("researcher", "==", fullname)
-        .get();
-      let feedbackCodeOrderRef;
-      if (!feedbackCodeOrders.docs.length) {
-        feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc();
-      } else {
-        feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-      }
-      const feedbackCodeData = feedbackCodeOrders.docs.length
-        ? feedbackCodeOrders.docs[0].data()
-        : {
-            project: project.trim(),
-            researcher: fullname,
-            codeIds: []
-          };
-      const codeIds = Array.from(new Set([...feedbackCodeIds, ...(feedbackCodeData.codeIds || [])]));
+    const sortedFeedbackCodesByParticipant = Object.keys(feedbackCodesByParticipant).sort(participant =>
+      Object.keys(recentParticipants).includes(participant) ? -1 : 1
+    );
+    const feedbackCodeIds = [];
+    const feedbackCodeOrders = await db
+      .collection("feedbackCodeOrderV2")
+      .where("project", "==", project)
+      .where("researcher", "==", fullname)
+      .get();
+    let feedbackCodeOrderRef;
+    if (!feedbackCodeOrders.docs.length) {
+      feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc();
+    } else {
+      feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
+    }
+    const feedbackCodeData = feedbackCodeOrders.docs.length
+      ? feedbackCodeOrders.docs[0].data()
+      : {
+          project: project.trim(),
+          researcher: fullname,
+          codeIds: []
+        };
+    const codeIds = Array.from(new Set([...feedbackCodeIds, ...(feedbackCodeData.codeIds || [])]));
 
-      if (codeIds.length <= 2) {
-        for (let participant of sortedFeedbackCodesByParticipant) {
-          for (const feedbackCode of feedbackCodesByParticipant[participant]) {
-            const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
-            if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {
-              continue;
-            }
-            codeIds.push(feedbackCode.docId);
-            if (codeIds.length > 5) {
-              break;
-            }
+    if (codeIds.length <= 2) {
+      for (let participant of sortedFeedbackCodesByParticipant) {
+        for (const feedbackCode of feedbackCodesByParticipant[participant]) {
+          const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
+          if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {
+            continue;
           }
+          codeIds.push(feedbackCode.docId);
           if (codeIds.length > 5) {
             break;
           }
         }
+        if (codeIds.length > 5) {
+          break;
+        }
       }
-      feedbackCodeData.codeIds = codeIds;
+    }
+    feedbackCodeData.codeIds = codeIds;
 
-      if (feedbackCodeOrders.docs.length) {
-        batch.update(feedbackCodeOrderRef, feedbackCodeData);
-      } else {
-        batch.set(feedbackCodeOrderRef, feedbackCodeData);
-      }
+    if (feedbackCodeOrders.docs.length) {
+      batch.update(feedbackCodeOrderRef, feedbackCodeData);
+    } else {
+      batch.set(feedbackCodeOrderRef, feedbackCodeData);
+    }
 
-      await batch.commit();
+    await batch.commit();
     res.status(200).send({ message: "success" });
   } catch (error) {
     console.log({ error }, "error----------");
   }
 };
 
-//post lodResponses 
+//post lodResponses
 exports.lodResponses = async (req, res) => {
   try {
     const _all = {};
+    const { researcher } = req.body;
+    console.log(researcher);
     const recallGradesDocs = await db.collection("recallGradesV2").get();
     recallGradesDocs.docs.map(async recallDoc => {
       const recallData = recallDoc.data();
@@ -1397,9 +1390,9 @@ exports.lodResponses = async (req, res) => {
           if (conditionItem.response !== "") {
             const votes = {};
             conditionItem.phrases.forEach(phrase => {
+              const resIdx = phrase.researchers.indexOf(researcher);
               votes[phrase.phrase] = {
-                no: phrase.hasOwnProperty("no") ? phrase.no : null,
-                yes: phrase.hasOwnProperty("yes") ? phrase.yes : null
+                vote: resIdx !== -1 ? phrase.grades[resIdx] : null
               };
             });
             if (_all.hasOwnProperty(conditionItem.passage)) {
@@ -1428,6 +1421,137 @@ exports.lodResponses = async (req, res) => {
     res.status(200).send({ message: "success", responses: _all });
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
+    console.log(error);
+  }
+};
+
+const updateGradingPoints = (
+  upVoteResearchers,
+  downVoteResearchers,
+  recallData,
+  upVotePoint,
+  downVotePoint,
+  researchersUpdates
+) => {
+  const updatePoints = (researcher, project, votePoint) => {
+    if (researchersUpdates[researcher].projects.hasOwnProperty(project)) {
+      let { gradingPoints = 0, negativeGradingPoints = 0 } = researchersUpdates[researcher].projects[project];
+      gradingPoints += votePoint;
+      if (votePoint < 0) {
+        negativeGradingPoints += Math.abs(votePoint);
+      }
+      researchersUpdates[researcher].projects[project].gradingPoints = gradingPoints;
+      researchersUpdates[researcher].projects[project].negativeGradingPoints = negativeGradingPoints;
+    }
+  };
+
+  upVoteResearchers.forEach(researcher => {
+    updatePoints(researcher, recallData.project, upVotePoint);
+    updatePoints(researcher, "Autograding", upVotePoint);
+  });
+
+  downVoteResearchers.forEach(researcher => {
+    updatePoints(researcher, recallData.project, downVotePoint);
+    updatePoints(researcher, "Autograding", downVotePoint);
+  });
+};
+
+exports.voteOnSingleRecall = async (req, res) => {
+  try {
+    console.log("voteOnSingleRecall",req.body);
+    const { session, condition, phrase, documentId } = req.body;
+    const gptResearcher = "Iman YeckehZaare";
+    await db.runTransaction(async t => {
+      let transactionWrites = [];
+      const recallRef = db.collection("recallGradesV2").doc(documentId);
+      const recallDoc = await t.get(recallRef);
+      const researchers = await t.get(db.collection("researchers"));
+      let researchersUpdates = {};
+      for (const researcher of researchers.docs) {
+        const researcherData = researcher.data();
+        researchersUpdates[researcher.id] = researcherData;
+      }
+      const recallData = recallDoc.data();
+      const conditionItems = recallData.sessions[session];
+      const conditionItem = conditionItems.find(item => item.condition === condition);
+      const phraseItem = conditionItem.phrases.find(item => item.phrase === phrase);
+      const researcherIndex = phraseItem.researchers.indexOf(req.body.researcher);
+      const docResearchers = [...phraseItem.researchers];
+      const docGrades = [...phraseItem.grades];
+      const gptIdx = docResearchers.indexOf(gptResearcher);
+      if (gptIdx !== -1) {
+        docResearchers.splice(gptIdx, 1);
+        docGrades.splice(gptIdx, 1);
+      }
+      if (researcherIndex === -1) {
+        phraseItem.researchers.push(req.body.researcher);
+        phraseItem.grades.push(req.body.grade);
+        docGrades.push(req.body.grade);
+        docResearchers.push(req.body.researcher);
+        const previousGrades = {
+          // sum of previous up votes from all researchers
+          upVotes: docGrades.reduce((c, g) => c + (g === true ? 1 : 0), 0),
+          // sum of previous up votes from all researchers
+          downVotes: docGrades.reduce((c, g) => c + (g === false ? 1 : 0), 0)
+        };
+        if (previousGrades.upVotes >= 3 || previousGrades.downVotes >= 3) {
+          phraseItem.previousGrades = previousGrades;
+          const upVoteResearchers = [];
+          const downVoteResearchers = [];
+          for (let r = 0; r < docGrades.length; r++) {
+            if (docResearchers[r] === gptResearcher) {
+              continue;
+            }
+            if (docGrades[r]) {
+              upVoteResearchers.push(docResearchers[r]);
+            } else {
+              downVoteResearchers.push(docResearchers[r]);
+            }
+          }
+          let upVotePoint = 0.5;
+          let downVotePoint = -0.5;
+          if (previousGrades.upVotes < previousGrades.downVotes) {
+            upVotePoint = -0.5;
+            downVotePoint = 0.5;
+          }
+          updateGradingPoints(
+            upVoteResearchers,
+            downVoteResearchers,
+            recallData,
+            upVotePoint,
+            downVotePoint,
+            researchersUpdates
+          );
+          for (const researcherId in researchersUpdates) {
+            const researcherRef = db.collection("researchers").doc(researcherId);
+            transactionWrites.push({
+              type: "update",
+              refObj: researcherRef,
+              updateObj: researchersUpdates[researcherId]
+            });
+          }
+        }
+      } else {
+        phraseItem.grades[researcherIndex] = req.body.grade;
+      }
+      transactionWrites.push({
+        type: "update",
+        refObj: recallRef,
+        updateObj: { sessions: recallData.sessions }
+      });
+
+      for (const transactionWrite of transactionWrites) {
+        if (transactionWrite.type === "update") {
+          t.update(transactionWrite.refObj, transactionWrite.updateObj);
+        } else if (transactionWrite.type === "set") {
+          t.set(transactionWrite.refObj, transactionWrite.updateObj);
+        } else if (transactionWrite.type === "delete") {
+          t.delete(transactionWrite.refObj);
+        }
+      }
+    });
+    res.status(200).send({ message: "success" });
+  } catch (error) {
     console.log(error);
   }
 };
