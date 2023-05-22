@@ -23,7 +23,8 @@ const {
   markPaidEndpoint,
   passagesNumberCorrection,
   createTemFeedback,
-  lodResponses
+  lodResponses,
+  voteOnSingleRecall
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -128,8 +129,9 @@ app.post("/signUp", signUp);
 app.use("/researchers", researchersRouter);
 app.use("/participants", participantsRouter);
 app.post("/recallUpload", recallUpload);
-app.use("/admin",adminRouter);
-app.get("/lodResponses", lodResponses);
+app.post("/lodResponses", lodResponses);
+app.post("/voteOnSingleRecall", voteOnSingleRecall);
+app.use("/admin", adminRouter);
 // Knowledge endpoints
 
 // Misinformation Experiment
