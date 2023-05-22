@@ -13,8 +13,7 @@ chai.use(chaiHttp);
 describe("POST /api/signUp", () => {
   const collects = [
     new MockData([], "users"),
-    new MockData([], "usersStudentCoNoteSurvey"),
-    new MockData([], "usersInstructorCoNoteSurvey"),
+    new MockData([], "usersSurvey"),
     new MockData([], "userLogs"),
     mockProjectSpecs,
     mockPassages,
@@ -23,7 +22,6 @@ describe("POST /api/signUp", () => {
 
   const email = "test@test.com";
   const email2 = "test2@test.com";
-  const email3 = "test3@test.com";
   const password = "password";
 
 
@@ -62,7 +60,7 @@ describe("POST /api/signUp", () => {
     expect(response.status).toEqual(500)
   })
 
-  it("should be able to register as survey student", async () => {
+  it("should be able to register as survey student or instructor", async () => {
     const response = await chai.request(server).post("/api/signUp").send({
       email: email2,
       password,
@@ -73,22 +71,7 @@ describe("POST /api/signUp", () => {
       surveyType: "student"
     });
     expect(response.status).toEqual(201)
-    const userDoc = await db.collection("usersStudentCoNoteSurvey").doc("mock name ").get()
-    expect(userDoc.exists).toBeTruthy();
-  })
-
-  it("should be able to register as survey instructor", async () => {
-    const response = await chai.request(server).post("/api/signUp").send({
-      email: email3,
-      password,
-      firstName: "mock",
-      lastName: "name",
-      institutionName: "University of Michigan - Ann Arbor",
-      projectName: "H1L2",
-      surveyType: "instructor"
-    });
-    expect(response.status).toEqual(201)
-    const userDoc = await db.collection("usersInstructorCoNoteSurvey").doc("mock name  ").get()
+    const userDoc = await db.collection("usersSurvey").doc("mock name ").get()
     expect(userDoc.exists).toBeTruthy();
   })
 })

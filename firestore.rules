@@ -12,12 +12,7 @@ service cloud.firestore {
                     && (fullname == request.auth.token.name || 
                     exists(/databases/$(database)/documents/researchers/$(request.auth.token.name)));
     }
-    match /usersStudentCoNoteSurvey/{fullname} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null
-                    && (fullname == request.auth.token.name);
-    }
-    match /usersInstructorCoNoteSurvey/{fullname} {
+    match /usersSurvey/{fullname} {
       allow read: if request.auth != null;
       allow write: if request.auth != null
                     && (fullname == request.auth.token.name);

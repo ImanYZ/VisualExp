@@ -19,7 +19,6 @@ import "./ManageEvents.css";
 
 const errorAlert = data => {
   if (("done" in data && !data.done) || ("events" in data && !data.events)) {
-    console.log({ data });
     alert("Something went wrong! Please submit your availability again!");
   }
 };
@@ -212,7 +211,7 @@ const ManageEvents = props => {
 
       const userDocs = await firebase.db.collection("users").get();
       const surveyInstructors = await firebase.db.collection("instructors").get();
-      const surveyUsers = await firebase.db.collection("usersStudentCoNoteSurvey").get();
+      const surveyUsers = await firebase.db.collection("usersSurvey").get();
       for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...userDocs.docs]) {
         const userData = userDoc.data();
         if ("createdAt" in userData && userData.createdAt.toDate() > new Date("1-14-2022")) {
@@ -303,7 +302,7 @@ const ManageEvents = props => {
     const theRow = clickedRow.row;
     try {
       if (theRow.participant) {
-        console.log("theRow.participant: ", theRow)
+
         const email = theRow.participant;
         setParticipant(email);
         setScheduleLoaded(false);
@@ -313,7 +312,7 @@ const ManageEvents = props => {
           userDoc = await firebase.db.collection("instructors").doc(theRow.fullname).get();
         }
         if (!userDoc.exists) {
-          userDoc = await firebase.db.collection("usersStudentCoNoteSurvey").doc(theRow.fullname).get();
+          userDoc = await firebase.db.collection("usersSurvey").doc(theRow.fullname).get();
         }
 
         const userData = userDoc.data();
@@ -436,7 +435,6 @@ const ManageEvents = props => {
         let sStart = new Date();
         for (let scheduleDoc of scheduleDocs.docs) {
           const scheduleData = scheduleDoc.data();
-          console.log(":: :: scheduleData :: :: ", scheduleData);
           if (!scheduleData.order || !scheduleData.id || scheduleData.attended) continue;
           const session = scheduleData.session.toDate();
           // We should only show the availble timeslots that are:

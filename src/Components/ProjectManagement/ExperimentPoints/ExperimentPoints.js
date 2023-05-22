@@ -209,9 +209,11 @@ const ExperimentPoints = props => {
         // scheduled
         const { schedules: resSchedules } = resScheduleData;
         const _schedules = resSchedules[fullname] || [];
+        console.log("resSchedules", fullname, _schedules)
         schedules = schedules.concat(_schedules)
       }
 
+      // console.log(schedules);
       // const _scheduled = scheduled[fullname] || {};
       // const scheduledFullnames = Object.keys(_scheduled);
       // const scheduledSlots = [];

@@ -56,14 +56,12 @@ export const SchemaGenRecalls = props => {
         .where("passages", "array-contains", selectedPassageId)
         .get();
       const recallTexts = [];
-      console.log(recallGradesDocs.docs.length);
       for (let recallDoc of recallGradesDocs.docs) {
         const recallData = recallDoc.data();
         if (recallData.project !== projectParticipant) continue;
         const updateSessions = recallData.sessions;
         for (let session in updateSessions) {
           for (let conditionItem of updateSessions[session]) {
-            console.log("conditionItem.passage", conditionItem.passage);
             if (conditionItem.passage === selectedPassageId) {
               recallTexts.push(conditionItem.response);
             }
@@ -79,7 +77,7 @@ export const SchemaGenRecalls = props => {
     }
   }, [firebase, selectedPassageId, selectedRecall]);
 
-  console.log("searchResules :: :: ", searchResules, selectedPassageId);
+
 
   useEffect(() => {
     setHighlightedWords([]);
@@ -122,7 +120,7 @@ export const SchemaGenRecalls = props => {
     setHighlightedWords([]);
   }, [firebase, schmaLoaded]);
 
-  console.log("schemasBoolean", schemasBoolean, selectedRecall);
+
 
   const handleSubmit = () => {
     const newbooleanScratch = {
@@ -293,7 +291,6 @@ export const SchemaGenRecalls = props => {
   };
 
   const QuerySearching = schemaEp => {
-    console.log(schemaEp);
     let keywords = [];
     schemaEp.forEach(rule => {
       const { keyword, alternatives, not } = rule;
@@ -303,7 +300,6 @@ export const SchemaGenRecalls = props => {
     });
     setSearching(true);
     const responses = [...recallResponses];
-    console.log(responses);
     const reponsefilteres = filterParagraphs(responses, schemaEp);
     const notSatisfied = responses.filter(r => !reponsefilteres.includes(r));
     setNotSatisfiedResponses(notSatisfied);
