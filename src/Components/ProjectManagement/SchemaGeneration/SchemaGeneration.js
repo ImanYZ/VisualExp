@@ -402,12 +402,12 @@ export const SchemaGeneration = () => {
     setSelectedPassageTitle(passage.title);
   };
 
-  const filterParagraphs = (paragraphs, rules) => {
-    return paragraphs.filter(paragraph => {
+  const filterParagraphs = (responses, rules) => {
+    return responses.filter(r => {
       return rules.every(rule => {
         const { keyword, alternatives, not } = rule;
         const keywords = [keyword, ...alternatives].filter(kw => kw !== "");
-        const match = keywords.some(kw => paragraph.toLowerCase().includes(kw.toLowerCase()));
+        const match = keywords.some(kw => r.response.toLowerCase().includes(kw.toLowerCase()));
         return (match && !not) || (!match && not);
       });
     });
@@ -425,7 +425,7 @@ export const SchemaGeneration = () => {
     setSearchResules([]);
     const responses = [...recallResponses];
     const reponsefilteres = filterParagraphs(responses, schemaEp);
-    const notSatisfied = responses.filter(r => !reponsefilteres.includes(r));
+    const notSatisfied = responses.filter(r => !reponsefilteres.find(r1 => r1.response === r.response));
     setNotSatisfiedResponses(notSatisfied);
     setSearchResules(reponsefilteres);
     setSearching(false);
@@ -439,7 +439,7 @@ export const SchemaGeneration = () => {
   };
 
   const searchResultsRD = useMemo(() => {
-    return (searchResules || []).map((respon, index) => {
+    return (searchResules || []).map((r, index) => {
       return (
         <Paper
           key={index}
@@ -451,7 +451,18 @@ export const SchemaGeneration = () => {
             p: "10px"
           }}
         >
-          <div dangerouslySetInnerHTML={{ __html: renderResponses(respon) }} />
+          <div dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
+          <Button
+            variant="outlined"
+            onClick={() => {
+              handleResponse(r, "yes");
+            }}
+            sx={{
+              mt: "15px",
+              backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "#91ff35" : "",
+              color: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "white" : ""
+            }}
+          >{`YES `}</Button>
         </Paper>
       );
     });
@@ -469,6 +480,70 @@ export const SchemaGeneration = () => {
 
   const handleCopy = schema => {
     setSchema(schema);
+  };
+
+  const handleResponse = async (response, vote) => {
+    try {
+      const recallDoc = await firebase.db.collection("recallGradesV2").doc(response.documentId).get();
+      const recallData = recallDoc.data();
+      const updateSessions = recallData.sessions;
+      const conditionIdx = updateSessions[response.session].findIndex(c => c.condition === response.condition);
+      const phraseIndex = updateSessions[response.session][conditionIdx].phrases.findIndex(
+        p => p.phrase === selectedPhrase
+      );
+      const _searchResules = [...searchResules];
+      const _notSatisfiedResponses = [...notSatisfiedResponses];
+      const _recallResponses = [...recallResponses];
+      const indexNotSatisfied = _notSatisfiedResponses.findIndex(r => r.response === response.response);
+      const indexSatisfied = _searchResules.findIndex(r => r.response === response.response) || -1;
+      const indexAll = _recallResponses.findIndex(r => r.response === response.response) || -1;
+      const updateResponse = _recallResponses[indexAll];
+      if (indexAll === -1) return;
+      if (phraseIndex === -1) return;
+      if (vote === "yes") {
+        if (updateResponse.votes[selectedPhrase][vote]) {
+          updateResponse.votes[selectedPhrase][vote] = false;
+        } else {
+          updateResponse.votes[selectedPhrase][vote] = true;
+        }
+        updateResponse.votes[selectedPhrase]["no"] = false;
+      }
+      if (vote === "no") {
+        if (updateResponse.votes[selectedPhrase][vote]) {
+          updateResponse.votes[selectedPhrase][vote] = false;
+        } else {
+          updateResponse.votes[selectedPhrase][vote] = true;
+        }
+        updateResponse.votes[selectedPhrase]["yes"] = false;
+      }
+      updateSessions[response.session][conditionIdx].phrases[phraseIndex]["yes"] =
+        updateResponse.votes[selectedPhrase]["yes"];
+      updateSessions[response.session][conditionIdx].phrases[phraseIndex]["no"] =
+        updateResponse.votes[selectedPhrase]["no"];
+      if (indexNotSatisfied !== -1) {
+        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase]["yes"] =
+          updateResponse.votes[selectedPhrase]["yes"];
+        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase]["no"] =
+          updateResponse.votes[selectedPhrase]["no"];
+      }
+      if (indexSatisfied !== -1) {
+        _searchResules[indexSatisfied]["yes"] = updateResponse.votes[selectedPhrase]["yes"];
+        _searchResules[indexSatisfied]["no"] = updateResponse.votes[selectedPhrase]["no"];
+      }
+      if (indexAll !== -1) {
+        _recallResponses[indexAll]["yes"] = updateResponse.votes[selectedPhrase]["yes"];
+        _recallResponses[indexAll]["no"] = updateResponse.votes[selectedPhrase]["no"];
+      }
+
+      setSearchResules(_searchResules);
+      setNotSatisfiedResponses(_notSatisfiedResponses);
+      setRecallResponses(_recallResponses);
+      await recallDoc.ref.update({
+        sessions: updateSessions
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -698,7 +773,7 @@ export const SchemaGeneration = () => {
                   height: "50%"
                 }}
               >
-                {notSatisfiedResponses.map((response, index) => {
+                {notSatisfiedResponses.map((r, index) => {
                   const isLastElement = index === notSatisfiedResponses.length - 1;
                   return (
                     <Paper
@@ -711,7 +786,18 @@ export const SchemaGeneration = () => {
                         mb: isLastElement ? "200px" : "10px"
                       }}
                     >
-                      {response}
+                      {r.response}
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          handleResponse(r, "no");
+                        }}
+                        sx={{
+                          mt: "15px",
+                          backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].no ? "red" : "",
+                          color: r.votes[selectedPhrase] && r.votes[selectedPhrase].no ? "white" : ""
+                        }}
+                      >{`NO `}</Button>
                     </Paper>
                   );
                 })}
