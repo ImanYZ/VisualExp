@@ -460,12 +460,12 @@ export const SchemaGeneration = () => {
             <Button
               variant="outlined"
               onClick={() => {
-                handleResponse(r, "yes");
+                handleResponse(r, true);
               }}
               sx={{
                 mt: "15px",
-                backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "#91ff35" : "",
-                color: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "white" : ""
+                backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "#91ff35" : "",
+                color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "white" : ""
               }}
             >{`YES `}</Button>
           )}
@@ -506,22 +506,16 @@ export const SchemaGeneration = () => {
         r =>
           r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
       );
-      const updateResponse = _recallResponses[indexAll];
+
       if (indexAll === -1) return;
-      if (updateResponse.votes[selectedPhrase].vote === null) {
-        updateResponse.votes[selectedPhrase].vote = vote === "yes" ? true : false;
-      } else {
-        updateResponse.votes[selectedPhrase].vote = !updateResponse.votes[selectedPhrase].vote;
-      }
       if (indexNotSatisfied !== -1) {
-        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase].vote =
-          updateResponse.votes[selectedPhrase].vote;
+        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase].vote = vote;
       }
       if (indexSatisfied !== -1) {
-        _searchResules[indexSatisfied].votes[selectedPhrase].vote = updateResponse.votes[selectedPhrase].vote;
+        _searchResules[indexSatisfied].votes[selectedPhrase].vote = vote;
       }
       if (indexAll !== -1) {
-        _recallResponses[indexAll].votes[selectedPhrase].vote = updateResponse.votes[selectedPhrase].vote;
+        _recallResponses[indexAll].votes[selectedPhrase].vote = vote;
       }
       setSearchResules(_searchResules);
       setNotSatisfiedResponses(_notSatisfiedResponses);
@@ -532,7 +526,7 @@ export const SchemaGeneration = () => {
         researcher: fullname,
         phrase: selectedPhrase,
         documentId: response.documentId,
-        grade: vote === "yes" ? true : false
+        grade: vote ,
       });
     } catch (error) {
       console.log(error);
@@ -783,12 +777,17 @@ export const SchemaGeneration = () => {
                       <Button
                         variant="outlined"
                         onClick={() => {
-                          handleResponse(r, "no");
+                          handleResponse(r, false);
                         }}
                         sx={{
                           mt: "15px",
-                          backgroundColor: r.votes[selectedPhrase] && !r.votes[selectedPhrase].vote ? "red" : "",
-                          color: r.votes[selectedPhrase] && !r.votes[selectedPhrase].vote ? "white" : ""
+                          backgroundColor:
+                            r.votes[selectedPhrase] &&
+                            r.votes[selectedPhrase].vote !== null &&
+                            !r.votes[selectedPhrase].vote
+                              ? "red"
+                              : "",
+                          color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote !== null ? "white" : ""
                         }}
                       >{`NO `}</Button>
                     </Paper>
