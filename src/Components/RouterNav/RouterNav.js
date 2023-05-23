@@ -233,7 +233,6 @@ const RouterNav = props => {
     // update project settings
   }, [firebase, project]);
 
-
   useEffect(() => {
     if (firebase && fullname && !notAResearcher && project) {
       const researcherQuery = firebase.db.collection("researchers");
@@ -808,7 +807,12 @@ const RouterNav = props => {
     setGradingNums({});
     setNegativeGradingPoints(0);
     await firebase.logout();
-    navigateTo("/Activities");
+    console.log("project Sign out", project);
+    if (project === "OnlineCommunities") {
+      navigateTo("/InstructorCoNoteSurvey");
+    } else {
+      navigateTo("/Activities");
+    }
   };
 
   const changeProject = (event, index) => {

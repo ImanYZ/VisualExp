@@ -9,6 +9,7 @@ import AuthStudentCoNoteSurvey from "./AuthStudentCoNoteSurvey";
 import ConsentDocument from "./ConsentDocument";
 import ConsentStudentCoNoteSurvey from "./ConsentStudentCoNoteSurvey";
 import AuthInstructorCoNoteSurvey from "./AuthInstructorCoNoteSurvey";
+import ConsentInstructorsCoNoteSurvey from "./ConsentInstructorsCoNoteSurvey";
 import RouterNav from "../../Components/RouterNav/RouterNav";
 import "./ConsentDocument.css";
 
@@ -55,7 +56,7 @@ const AuthConsent = props => {
             {props.project && props.project === "StudentCoNoteSurvey" ? (
               <ConsentStudentCoNoteSurvey />
             ) : props.project && props.project === "InstructorCoNoteSurvey" ? (
-              <ConsentStudentCoNoteSurvey />
+              <ConsentInstructorsCoNoteSurvey />
             ) : (
               <ConsentDocument />
             )}

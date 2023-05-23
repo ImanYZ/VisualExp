@@ -243,16 +243,24 @@ const SelectSessions = props => {
 };
 
 export default React.memo(SelectSessions, (prevProps, nextProps) => {
+  // Deep comparison of schedule arrays
+  const scheduleChanged = arraysEqual(prevProps.schedule, nextProps.schedule);
+
   return (
-    // Because React does not do a deep comparison, we need to take a proxy.
-    // Since it is very unlikely that a session gets removed and at the same
-    // time another session gets selescted, it is reasonable to assume that
-    // any change in the schedule would impact its length.
-    // So, we only rerender this component if the length of schedule changes
-    // or any of the other props get changed.
-    prevProps.schedule.length === nextProps.schedule.length &&
+    scheduleChanged &&
     prevProps.selectedSession.length === nextProps.selectedSession.length &&
     prevProps.startDate === nextProps.startDate &&
     prevProps.numDays === nextProps.numDays
   );
 });
+
+// Helper function to compare arrays
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (JSON.stringify(a[i]) !== JSON.stringify(b[i])) return false;
+  }
+  return true;
+}

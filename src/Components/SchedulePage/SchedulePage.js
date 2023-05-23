@@ -87,7 +87,7 @@ const SchedulePage = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [globalProject, setGlobalProject] = useRecoilState(projectState);
+  const [project, setProject] = useRecoilState(projectState);
   const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(projectState);
   const navigate = useNavigate();
   const projectSpecs = useRecoilValue(projectSpecsState);
@@ -108,7 +108,7 @@ const SchedulePage = props => {
       const userData = userDoc.data();
       const project = userData.project;
       if (isSurvey) {
-        setGlobalProject(project);
+        setProject(project);
         setGlobalCurrentProject(project);
       }
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
@@ -250,7 +250,7 @@ const SchedulePage = props => {
           sch.push(session);
           const sessionIdx = parseInt(scheduleData.order.replace(/[^0-9]+/g, "")) - 1;
           if (!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
-            const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
+            const slotCounts = project === "OnlineCommunities" ? 1 : projectSpecs?.sessionDuration?.[sessionIdx];
             for (let i = 1; i < slotCounts; i++) {
               sch.push(
                 moment(session)
@@ -272,7 +272,7 @@ const SchedulePage = props => {
     if (fullname && isEmail(email)) {
       loadSchedule();
     }
-  }, [fullname, email]);
+  }, [fullname, email, projectSpecs]);
 
   const confirmClickOpen = event => {
     setOpenConfirm(true);
@@ -382,6 +382,7 @@ const SchedulePage = props => {
   };
 
   if (isSubmitting) return <LoadingPage />;
+  console.log(projectSpecs.numberOfSessions);
   return (
     <>
       <RouterNav />
@@ -389,14 +390,26 @@ const SchedulePage = props => {
         {submitted ? (
           <div className="DateDescription">
             <p>
-              Based on your specified availability, we just matched you with one of our UX researchers for each session
-              and sent you three Google Calendar invitations. Please accept them as soon as possible. If any of the
-              sessions do not work for you, you can return to this page to reschedule them only before your first
-              session.
+              Based on your specified availability, we just matched you with one of our UX researchers for{" "}
+              {projectSpecs.numberOfSessions === 1 ? `the session ` : `each session `}
+              and sent you{" "}
+              {projectSpecs.numberOfSessions === 1
+                ? `a Google Calendar invitation`
+                : `three Google Calendar invitations`}
+              . Please accept {projectSpecs.numberOfSessions === 1 ? `it` : `them`} as soon as possible. If
+              {projectSpecs.numberOfSessions === 1 ? ` it doesn't work ` : ` any of the sessions do not work`} for you,
+              you can return to this page to reschedule{" "}
+              {projectSpecs.numberOfSessions === 1
+                ? `the session.`
+                : ` them only before your first
+              session.`}
             </p>
             <p>
-              For accepting the Google Calendar invites, please open each invitation email, scroll all the way down to
-              find the options to respond to the Calendar invite, and click "Yes."
+              For accepting the Google Calendar
+              {projectSpecs.numberOfSessions === 1
+                ? `invitation please open the invitation email`
+                : ` invites  please open each invitation email`}{" "}
+              ,scroll all the way down to find the options to respond to the Calendar invite, and click "Yes."
             </p>
             <p>
               Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject
@@ -430,22 +443,34 @@ const SchedulePage = props => {
               </ul>
             </div> */}
             <Alert severity="warning">
-              <ul id="WarningPoints">
-                <li>
-                  Please specify your availability for our three UX experiment sessions{" "}
+              {projectSpecs.numberOfSessions === 1 ? (
+                <ul id="WarningPoints">
+                  <li> Please specify your availability for our UX experiment session . </li>
                   <strong>in your timezone</strong> to satisfy the following criteria:
-                  <ul>{renderInformation()}</ul>
-                </li>
-                <li>
-                  As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
-                  will indicate your sessions. You should click the SCHEDULE button and get the confirmation message,
-                  otherwise, your sessions will not be scheduled.
-                </li>
-                <li>
-                  There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take the
-                  light blue ones.
-                </li>
-              </ul>
+                  <li>One timeslot for 30 minutes.</li>
+                  <li>
+                    There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take
+                    the light blue ones.
+                  </li>
+                </ul>
+              ) : (
+                <ul id="WarningPoints">
+                  <li>
+                    Please specify your availability for our three UX experiment sessions{" "}
+                    <strong>in your timezone</strong> to satisfy the following criteria:
+                    <ul>{renderInformation()}</ul>
+                  </li>
+                  <li>
+                    As soon as you meet all the criteria, the SCHEDULE button will be enabled and the time slots with ✅
+                    will indicate your sessions. You should click the SCHEDULE button and get the confirmation message,
+                    otherwise, your sessions will not be scheduled.
+                  </li>
+                  <li>
+                    There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take
+                    the light blue ones.
+                  </li>
+                </ul>
+              )}
             </Alert>
             {schedule.length > 0 && !submitable && (
               <Alert severity="error">
