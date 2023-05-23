@@ -6,28 +6,29 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import { useParams } from "react-router-dom";
 
 import axios from "axios";
-import { firebaseState, emailState, emailVerifiedState } from "../../store/AuthAtoms";
-
+import { firebaseState, emailState, emailVerifiedState, institutionsState } from "../../store/AuthAtoms";
+import { firebaseOne } from "../../Components/firebase/firebase";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
 import ValidatedInput from "../ValidatedInput/ValidatedInput";
-
+import { Autocomplete, TextField } from "@mui/material";
 import { isEmail } from "../../utils";
 
 import "./ConsentDocument.css";
 import SwitchAccountIcon from "@mui/icons-material/SwitchAccount";
 import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
-
+import Checkbox from "@mui/material/Checkbox";
 
 const AuthStudentCoNoteSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
+  const { db: dbOne } = firebaseOne;
   const [email, setEmail] = useRecoilState(emailState);
   const [emailVerified, setEmailVerified] = useRecoilState(emailVerifiedState);
-
 
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -50,10 +51,14 @@ const AuthStudentCoNoteSurvey = props => {
   const [signInSubmitable, setSignInSubmitable] = useState(false);
   const [signUpSubmitable, setSignUpSubmitable] = useState(false);
   const [submitable, setSubmitable] = useState(false);
+  const [noRetaineData, setNoRetaineData] = useState(false);
   const [validPasswordResetEmail, setValidPasswordResetEmail] = useState(false);
   const projectSpecs = useRecoilValue(projectSpecsState);
   const haveProjectSpecs = Object.keys(projectSpecs).length > 0;
+  const institutions = useRecoilValue(institutionsState);
+  const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const navigate = useNavigate();
+  const instructorId = useParams()["*"];
 
   useEffect(() => {
     setParticipatedBefore(false);
@@ -151,7 +156,7 @@ const AuthStudentCoNoteSurvey = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
-      navigate("/");
+      navigate("/Activities");
     } catch (err) {
       console.log({ err });
       // err.message is "There is no user record corresponding to this identifier. The user may have been deleted."
@@ -168,9 +173,11 @@ const AuthStudentCoNoteSurvey = props => {
             password,
             firstName: firstname,
             lastName: lastname,
-            institutionName: "",
+            institutionName: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
             projectName: "OnlineCommunities",
-            surveyType: "instructor"
+            surveyType: "instructor",
+            instructorId: instructorId ? instructorId : "",
+            noRetaineData: noRetaineData
           });
           await firebase.login(loweredEmail, password);
         }
@@ -201,6 +208,33 @@ const AuthStudentCoNoteSurvey = props => {
     }
   };
 
+  const retaineDataChange = () => {
+    setNoRetaineData(oldValue => !oldValue);
+  };
+  useEffect(() => {
+    const checkEmailInstitution = async () => {
+      try {
+        const domainName = email.match("@(.+)$")?.[0];
+        if (!domainName) return;
+        const institutionDoc = await dbOne
+          .collection("institutions")
+          .where("domains", "array-contains", domainName)
+          .limit(1)
+          .get();
+        if (institutionDoc && institutionDoc.docs.length > 0) {
+          const institutionData = institutionDoc.docs[0].data();
+          setNameFromInstitutionSelected(institutionData);
+          return institutionData;
+        } else {
+          setNameFromInstitutionSelected({});
+        }
+      } catch (err) {
+        console.log("err", err);
+      }
+    };
+    checkEmailInstitution();
+  }, [email]);
+
   return (
     <div id="Auth">
       {/* <img
@@ -223,15 +257,22 @@ const AuthStudentCoNoteSurvey = props => {
         </div>
       ) : (
         <>
-          <h2>Sign the Consent Form to Get Started!</h2>
-          <p>
-            Please read the consent form on the left carefully. By creating and account or signing into this website,
-            you sign the consent form and allow us to analyze your data collected throughout this study.
-          </p>
-          <Alert severity="error">
-            Please only use your Gmail address to create an account. You can also use your school email address, only if
-            your school email is provided by Google.
-          </Alert>
+          <>
+            <h2>Sign the Consent Form to Get Started!</h2>
+            <p>
+              <div>
+                If you would like to participate in this study, click the button below to sign up to schedule a
+                demo/interview session with us. Remember, your participation is entirely voluntary, and you are free to
+                withdraw at any time. By clicking the button below, you agree to participate in this research study and
+                for your data to be used for research purposes only.
+              </div>
+            </p>
+            <Alert severity="error">
+              Please only use your Gmail address to create an account. You can also use your school email address, only
+              if your school email is provided by Google.
+            </Alert>
+          </>
+
           <Box sx={{ width: "100%" }}>
             <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
               <Tabs value={isSignUp} onChange={switchSignUp} aria-label="basic tabs" variant="fullWidth">
@@ -288,6 +329,24 @@ const AuthStudentCoNoteSurvey = props => {
                 errorMessage={validEmail ? null : "Please enter your valid email address!"}
                 onKeyPress={onKeyPress}
               />
+              <Autocomplete
+                id="institution"
+                value={nameFromInstitutionSelected}
+                options={institutions}
+                onChange={(_, value) => setNameFromInstitutionSelected(value || null)}
+                renderInput={params => (
+                  <TextField {...params} value={nameFromInstitutionSelected} label="Institution" />
+                )}
+                getOptionLabel={option => (option.name ? option.name : "")}
+                renderOption={(props, option) => (
+                  <li key={option.id} {...props}>
+                    {option.name}
+                  </li>
+                )}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                fullWidth
+                sx={{ mb: "16px" }}
+              />
               <ValidatedInput
                 className="PleaseSpecify"
                 onChange={passwordChange}
@@ -340,6 +399,16 @@ const AuthStudentCoNoteSurvey = props => {
             {participatedBefore && (
               <div className="Error">You've participated in this study before and cannot participate again!</div>
             )}
+            {isSignUp === 1 && (
+              <Box style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <Checkbox onClick={retaineDataChange} checked={noRetaineData} />
+                <label style={{ marginRight: "auto" }}>
+                  If you would like to participate but do not want your data to be retained for future study, please
+                  check this box and then continue.
+                </label>
+              </Box>
+            )}
+
             <div id="SignButtonContainer">
               <Button
                 id="SignButton"

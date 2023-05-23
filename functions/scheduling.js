@@ -17,13 +17,16 @@ const { toOrdinal } = require("number-to-words");
 
 const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs) => {
   const isAnnotating = projectSpecs.numberOfSessions === 1;
-  const summary = isAnnotating ? "1Cademy Introduction" : "1Cademy UX Research Experiment - " + order + " Session";
+  const summary = isAnnotating
+    ? "[1Cademy] Introduction Session"
+    : "1Cademy UX Research Experiment - " + order + " Session";
   const description =
     "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +
     email.toLowerCase() +
     " credentials before entering this session. If you have logged in using your other email addresses, Google Meet will not let you in!</u></strong></p>" +
     isAnnotating
-      ? ""
+      ? "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
+        "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>"
       : "<p>This is your " +
         order +
         " session of the UX Research experiment.</p>" +
@@ -112,7 +115,14 @@ exports.scheduleSingleSession = async (req, res) => {
       const end = new Date(
         start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[req.body.sessionIndex] || 1) * 60000
       );
-      const eventCreated = await createExperimentEvent(email, researcherData.email, order, start, end, projectSpecsData);
+      const eventCreated = await createExperimentEvent(
+        email,
+        researcherData.email,
+        order,
+        start,
+        end,
+        projectSpecsData
+      );
       return res.status(200).json({ events: [eventCreated] });
     }
   } catch (err) {
@@ -213,7 +223,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     const end = moment().utcOffset(0).add(10, "hours").toDate();
 
     const events = await getEvents(start, end, "UTC");
-    
+
     const filteredEvents = (events || []).filter(event => {
       return event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
     });
@@ -237,10 +247,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
       }
 
       if (userDocs.docs.length === 0) {
-        userDocs = await db
-          .collection("usersSurvey")
-          .where("email", "==", participantEmail.toLowerCase())
-          .get();
+        userDocs = await db.collection("usersSurvey").where("email", "==", participantEmail.toLowerCase()).get();
       }
       if (userDocs.docs.length === 0) continue;
       const userData = userDocs.docs?.[0]?.data();

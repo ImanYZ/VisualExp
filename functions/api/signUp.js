@@ -36,7 +36,10 @@ module.exports = async (req, res) => {
       lastName,
       institutionName,
       projectName,
-      surveyType
+      surveyType,
+      instructorId,
+      noRetaineData,
+
     } = req.body;
 
     const batch = db.batch();
@@ -62,7 +65,8 @@ module.exports = async (req, res) => {
       password,
       displayName: fullName
     })
-  
+
+
     let userData = {
       uid: user.uid,
       email,
@@ -70,7 +74,6 @@ module.exports = async (req, res) => {
       lastname: lastName,
       project: projectName,
       institution: institutionName,
-      title : surveyType
     };
     
     if(!surveyType) {
@@ -144,6 +147,12 @@ module.exports = async (req, res) => {
         createdAt: new Date()
       }
     } else {
+      userData = {
+        ...userData,
+        surveyType,
+        noRetaineData,
+        instructorId,
+      }
       await auth.setCustomUserClaims(user.uid, {
         ...user.customClaims,
         survey: true

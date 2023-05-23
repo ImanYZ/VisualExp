@@ -944,7 +944,7 @@ export default {
               Note that on top of this page, we asked you:{" "}
               <strong>
                 Before moving forward, please create an account on{" "}
-                <a href="https://1cademy.com/" target="_blank">
+                <a href="https://1cademy.com/" target="_blank" rel="noreferrer">
                   1Cademy web app
                 </a>
                 , which is different from the account you created before on this web app.
