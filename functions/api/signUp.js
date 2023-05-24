@@ -4,7 +4,7 @@ const { Timestamp } = require("firebase-admin/firestore");
 const { shuffleArray } = require("../helpers");
 
 const getAvailableFullname = async (fullname) => {
-  const userCollections = ["users", "usersStudentCoNoteSurvey", "usersInstructorCoNoteSurvey"];
+  const userCollections = ["users", "usersSurvey"];
 
   let _fullname = fullname;
   while(true) {
@@ -36,7 +36,10 @@ module.exports = async (req, res) => {
       lastName,
       institutionName,
       projectName,
-      surveyType
+      surveyType,
+      instructorId,
+      noRetaineData,
+
     } = req.body;
 
     const batch = db.batch();
@@ -44,10 +47,8 @@ module.exports = async (req, res) => {
     const fullName = await getAvailableFullname(`${firstName} ${lastName}`);
   
     let collectionName = "users";
-    if(surveyType === "student") {
-      collectionName = "usersStudentCoNoteSurvey";
-    } else if(surveyType === "instructor") {
-      collectionName = "usersInstructorCoNoteSurvey";
+    if(surveyType === "student" || surveyType === "instructor") {
+      collectionName = "usersSurvey";
     }
     
     const auth = getAuth(admin);
@@ -64,14 +65,15 @@ module.exports = async (req, res) => {
       password,
       displayName: fullName
     })
-  
+
+
     let userData = {
       uid: user.uid,
       email,
       firstname: firstName,
       lastname: lastName,
       project: projectName,
-      institution: institutionName
+      institution: institutionName,
     };
     
     if(!surveyType) {
@@ -117,16 +119,11 @@ module.exports = async (req, res) => {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
       nullPassage = passagesDocs[passIdx]?.id || "";
-      let questions;
       for (let { condition, passage } of minPConditions) {
         // eslint-disable-next-line no-loop-func
         await db.runTransaction(async t => {
           const conditionRef = db.collection("conditions").doc(condition);
           const conditionDoc = await t.get(conditionRef);
-          const passageRef = db.collection("passages").doc(passage);
-          const passageDoc = await t.get(passageRef);
-          const passageData = passageDoc.data();
-  
           if (conditionDoc.exists) {
             const conditionData = conditionDoc.data();
             t.update(conditionRef, {
@@ -134,10 +131,6 @@ module.exports = async (req, res) => {
             });
           } else {
             t.set(conditionRef, { [projectName]: 1 });
-          }
-  
-          if (!questions) {
-            questions = passageData.questions;
           }
         });
       }
@@ -153,17 +146,18 @@ module.exports = async (req, res) => {
         choices: initChoices,
         createdAt: new Date()
       }
-    } else if(surveyType === "student") {
+    } else {
+      userData = {
+        ...userData,
+        surveyType,
+        noRetaineData,
+        instructorId,
+      }
       await auth.setCustomUserClaims(user.uid, {
         ...user.customClaims,
-        studentSurvey: true
+        survey: true
       })
-    } else if(surveyType === "instructor") {
-      await auth.setCustomUserClaims(user.uid, {
-        ...user.customClaims,
-        instructorSurvey: true
-      })
-    }
+    } 
   
     const userRef = db.collection(collectionName).doc(fullName);
     batch.set(userRef, userData);

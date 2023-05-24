@@ -16,8 +16,8 @@ participantsRouter.use(isParticipant);
 // POST /api/participants/schedule
 participantsRouter.post("/schedule", async (req, res) => {
   try {
-    let { sessions, project } = req.body;
-
+    let { sessions, project} = req.body;
+     console.log("sessions",req.userData);
 
 
     const {email } = req.userData;
@@ -194,7 +194,8 @@ participantsRouter.post("/schedule", async (req, res) => {
         email: email.toLowerCase(),
         session: Timestamp.fromDate(start.toDate()),
         order: toOrdinal(i + 1),
-        id: eventCreated.data.id
+        id: eventCreated.data.id, 
+        project,
       });
     }
 

@@ -880,7 +880,7 @@ const getUserDocsfromEmail = async email => {
   }
 
   if (userDocs.docs.length === 0) {
-    userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", email.toLowerCase()).get();
+    userDocs = await db.collection("usersSurvey").where("email", "==", email.toLowerCase()).get();
   }
 
   return userDocs;
@@ -1252,125 +1252,48 @@ exports.passagesNumberCorrection = async context => {
   }
 };
 
-exports.createTemFeedback = async (req, res) => {
+exports.retreiveFeedbackcodes = async (req, res) => {
   try {
-    const { fullname, project } = req.body;
-    const recentParticipants = await fetchRecentParticipants(fullname, project);
-    console.log(recentParticipants);
-    if (!fullname || !project) {
+    const { fullname } = req.body;
+    const codeIds = {};
+    const recentParticipants = await fetchRecentParticipants(fullname);
+    if (!fullname) {
       return res.status(500).send({
         message: "some parameters are missing"
       });
     }
-
-    const feedbackCodesBooksDocs = await db.collection("feedbackCodeBooks").get();
-
-    const previousIds = [];
-    const feedbackCodesOrders = await db.collection("feedbackCodeOrderV2").where("project", "==", project).get();
-
-    for (let feedbackCodeOrder of feedbackCodesOrders.docs) {
-      const feedbackCodeOrderData = feedbackCodeOrder.data();
-      previousIds.concat(feedbackCodeOrderData.codeIds);
-    }
-    const batch = db.batch();
-
-    const approvedCodes = new Set();
-    for (let codeDoc of feedbackCodesBooksDocs.docs) {
-      const codeData = codeDoc.data();
-      if (codeData.approved && !approvedCodes.has(codeData.code)) {
-        approvedCodes.add(codeData.code);
-      }
-    }
-    const passages = await db.collection("passages").where("projects", "array-contains", project).get();
-    const passagesMap = {};
-    for (const passage of passages.docs) {
-      passagesMap[passage.id] = passage.data();
-    }
-    /* const passagesInH2K2 = [
-        "zlS4Gh2AXaLZV7HM2oXd",
-        "lmGQvzSit4LBTj1Zptot",
-        "97D6P4unPYqzkpVeUY2c",
-        "zbcUNl5593vOeChp1G8O",
-        "UowdqbVHYMJ9Hhh5zNY3",
-        "qOO4Yn9oyUthKaifSIl1",
-        "6rc4k1su3txN6ZK4CJ0h",
-        "xuNQUYbAEFfTD1PHuLGV",
-        "s1oo3G4n3jeE8fJQRs3g"
-      ]; */
-
-    const feedbackCodes = await db
-      .collection("feedbackCode")
-      .where("project", "==", project)
-      .where("approved", "==", false)
-      .get();
-    const feedbackCodesByParticipant = {};
-
+    const feedbackCodes = await db.collection("feedbackCode").where("approved", "==", false).get();
     for (const feedbackCode of feedbackCodes.docs) {
       const feedbackCodeData = feedbackCode.data();
-      if (previousIds.includes(feedbackCode.id) && !Object.keys(recentParticipants).includes(feedbackCodeData.fullname))
-        continue;
-      if (feedbackCodeData.coders.includes(fullname)) continue;
-      if (!feedbackCodesByParticipant[feedbackCodeData.fullname]) {
-        feedbackCodesByParticipant[feedbackCodeData.fullname] = [];
+      if (!feedbackCodeData.coders.includes(fullname)) {
+        const explanationWords = feedbackCodeData.explanation.split(" ").filter(w => w.trim());
+        if (
+          explanationWords.length < 4 &&
+          (!recentParticipants.hasOwnProperty(feedbackCodeData.project) ||
+            !Object.keys(recentParticipants[feedbackCodeData.project]).includes(feedbackCode.fullname))
+        ) {
+          continue;
+        }
+        if (codeIds.hasOwnProperty(feedbackCodeData.project)) {
+          codeIds[feedbackCodeData.project].push({ ...feedbackCodeData, docId: feedbackCode.id });
+        } else {
+          codeIds[feedbackCodeData.project] = [{ ...feedbackCodeData, docId: feedbackCode.id }];
+        }
       }
-      feedbackCodesByParticipant[feedbackCodeData.fullname].push({
-        docId: feedbackCode.id,
-        session: feedbackCodeData.session,
-        explanation: feedbackCodeData.explanation || ""
+    }
+    for (let project in codeIds) {
+      const recent = recentParticipants[project];
+      codeIds[project].sort((g1, g2) => {
+        return g1.coders.length > g2.coders.length ? -1 : 1;
+      });
+      codeIds[project].sort((g1, g2) => {
+        const p1 = Object.keys(recent).includes(g1.fullname) && recent[g1?.fullname].includes(g1.session);
+        const p2 = Object.keys(recent).includes(g2.fullname) && recent[g2?.fullname].includes(g2.session);
+        if (p1 && p2) return 0;
+        return p1 && !p2 ? -1 : 1;
       });
     }
-
-    const sortedFeedbackCodesByParticipant = Object.keys(feedbackCodesByParticipant).sort(participant =>
-      Object.keys(recentParticipants).includes(participant) ? -1 : 1
-    );
-    const feedbackCodeIds = [];
-    const feedbackCodeOrders = await db
-      .collection("feedbackCodeOrderV2")
-      .where("project", "==", project)
-      .where("researcher", "==", fullname)
-      .get();
-    let feedbackCodeOrderRef;
-    if (!feedbackCodeOrders.docs.length) {
-      feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc();
-    } else {
-      feedbackCodeOrderRef = db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-    }
-    const feedbackCodeData = feedbackCodeOrders.docs.length
-      ? feedbackCodeOrders.docs[0].data()
-      : {
-          project: project.trim(),
-          researcher: fullname,
-          codeIds: []
-        };
-    const codeIds = Array.from(new Set([...feedbackCodeIds, ...(feedbackCodeData.codeIds || [])]));
-
-    if (codeIds.length <= 2) {
-      for (let participant of sortedFeedbackCodesByParticipant) {
-        for (const feedbackCode of feedbackCodesByParticipant[participant]) {
-          const explanationWords = feedbackCode.explanation.split(" ").filter(w => w.trim());
-          if (explanationWords.length < 4 || codeIds.includes(feedbackCode.docId)) {
-            continue;
-          }
-          codeIds.push(feedbackCode.docId);
-          if (codeIds.length > 5) {
-            break;
-          }
-        }
-        if (codeIds.length > 5) {
-          break;
-        }
-      }
-    }
-    feedbackCodeData.codeIds = codeIds;
-
-    if (feedbackCodeOrders.docs.length) {
-      batch.update(feedbackCodeOrderRef, feedbackCodeData);
-    } else {
-      batch.set(feedbackCodeOrderRef, feedbackCodeData);
-    }
-
-    await batch.commit();
-    res.status(200).send({ message: "success" });
+    res.status(200).send({ message: "success", codeIds });
   } catch (error) {
     console.log({ error }, "error----------");
   }
