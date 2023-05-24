@@ -369,28 +369,6 @@ const App = () => {
       ...userUpdates,
       pConditions
     };
-    const scheduleMonth = moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD");
-    let researcher = "";
-    const resSchedules = await firebase.db
-      .collection("resSchedule")
-      .where("month", "==", scheduleMonth)
-      .where("project", "==", userData.project)
-      .get();
-    // detecting researcher's name
-    if (resSchedules.docs.length) {
-      const resSchedule = resSchedules.docs[0];
-      const resScheduleData = resSchedule.data();
-      const attendedSessions = resScheduleData.attendedSessions || {};
-      for (let _researcher in attendedSessions) {
-        if (
-          attendedSessions[_researcher].hasOwnProperty(fullname) &&
-          attendedSessions[_researcher][fullname].includes(session)
-        ) {
-          researcher = _researcher;
-          break;
-        }
-      }
-    }
 
     // Only in the third session, after making sure that the user has submitted
     // all the recall responses for all their passages in all the three
@@ -402,6 +380,7 @@ const App = () => {
     let codesVotes = {};
     for (let feedbackCodeBooksDoc of feedbackCodeBooksdocs.docs) {
       const data = feedbackCodeBooksDoc.data();
+      if (data.project === "OnlineCommunities") continue;
       if (!approvedCodes.has(data.code)) {
         codesVotes[data.code] = [];
         approvedCodes.add(data.code);
@@ -422,7 +401,7 @@ const App = () => {
       // code block
     }
 
-    let codeIds = [];
+
 
     for (let index of [0, 1]) {
       if (userData[explan] && userData[explan][index] !== "") {
@@ -466,41 +445,10 @@ const App = () => {
             updatedAt: new Date()
           };
           const feedbackCodeRef = firebase.db.collection("feedbackCode").doc();
-
-          // updating feedback code order
-          if (researcher) {
-            codeIds.push(feedbackCodeRef.id);
-          }
-
           await firebase.batchSet(feedbackCodeRef, newFeedbackDdoc);
         }
       }
     }
-
-    if (codeIds.length) {
-      const feedbackCodeOrders = await firebase.db
-        .collection("feedbackCodeOrderV2")
-        .where("project", "==", userData.project)
-        .where("researcher", "==", researcher)
-        .get();
-      if (feedbackCodeOrders.docs.length) {
-        const _codeIds = feedbackCodeOrders.docs[0].data()?.codeIds || [];
-        codeIds = Array.from(new Set([...codeIds, ..._codeIds]));
-        const feedbackOrderRef = firebase.db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-        await firebase.batchUpdate(feedbackOrderRef, {
-          codeIds,
-          updatedAt: new Date()
-        });
-      } else {
-        await firebase.batchSet(firebase.db.collection("feedbackCodeOrderV2").doc(), {
-          project: userData.project,
-          researcher,
-          codeIds,
-          createdAt: new Date()
-        });
-      }
-    }
-
     await firebase.commitBatch();
     pConditions[0] = {
       ...pConditions[0],
@@ -725,7 +673,7 @@ const App = () => {
             currentPCon: {
               passage: pConditions[0].passage,
               condition: pConditions[0].condition
-            }, 
+            },
             pConditions
           },
           12
@@ -740,7 +688,6 @@ const App = () => {
         setTimer(5 * 60);
         break;
       case 13:
-
         await submitAnswers(
           currentTime,
           5 * 60 - timer,
@@ -749,8 +696,8 @@ const App = () => {
           {
             phase: 1,
             currentPCon: {
-              passage:pConditions[1].passage,
-              condition: pConditions[1].condition,
+              passage: pConditions[1].passage,
+              condition: pConditions[1].condition
             }
           },
           14

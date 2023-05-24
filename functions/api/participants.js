@@ -194,7 +194,8 @@ participantsRouter.post("/schedule", async (req, res) => {
         email: email.toLowerCase(),
         session: Timestamp.fromDate(start.toDate()),
         order: toOrdinal(i + 1),
-        id: eventCreated.data.id
+        id: eventCreated.data.id, 
+        project,
       });
     }
 
