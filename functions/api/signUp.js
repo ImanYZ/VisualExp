@@ -119,7 +119,7 @@ module.exports = async (req, res) => {
         passIdx = Math.floor(Math.random() * passagesDocs.length);
       }
       nullPassage = passagesDocs[passIdx]?.id || "";
-      for (let { condition, passage } of minPConditions) {
+      for (let {condition} of minPConditions) {
         // eslint-disable-next-line no-loop-func
         await db.runTransaction(async t => {
           const conditionRef = db.collection("conditions").doc(condition);
