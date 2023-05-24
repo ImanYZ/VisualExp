@@ -75,10 +75,11 @@ const SelectSessions = props => {
           const duration = requiredSlots[requiredSlotDate];
           for(let i = 1; i < duration; i++) {
             const _scheduleIdx = orderedSch.findIndex(
+              // eslint-disable-next-line no-loop-func
               (schedule, idx) => {
                 const availableSession = props.availableSessions[new Date(schedule).toLocaleString()];
                 const r = idx > scheduleIdx &&
-                moment(schedule).utcOffset(-4).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).utcOffset(-4).add(30 * i, "minutes").format("YYYY-MM-DD HH:mm") &&
+                moment(schedule).utcOffset(-4).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).utcOffset(-4).add((60 / props.hourlyChunks) * i, "minutes").format("YYYY-MM-DD HH:mm") &&
                 availableSession.filter((researcher) => researchers.indexOf(researcher) !== -1).length;
 
                 // only calculate intersaction if current slot coming up consectively and has common researcher
@@ -121,18 +122,13 @@ const SelectSessions = props => {
   // every time the user makes any changes to the schedule.
   const renderDateCell = (datetime, selected, refSetter) => {
     const datetimeStr = datetime.toLocaleString();
-    // We should enable the sessions for the user to select only
-    // if they are in props.availableSessions and there is at
-    // least one researcher available to take them.
     const availableSess = datetimeStr in props.availableSessions && props.availableSessions[datetimeStr].length > 0;
-    // If the session satisfies all the criteria for first, second,
-    // or third sessions, we check-mark it to show the user which
-    // sessions they are going to attend.
-
     let scheduledSession = false;
+  
     if (availableSess) {
+      console.log(props.selectedSession);
       for (let i = 0; i < props.selectedSession.length; ++i) {
-        const sess = props.selectedSession[i];
+        const sess = props.selectedSession[i];//
         for (let j = 0; j < props.sessionDuration[i]; ++j) {
           const minsToSubtract = (60 / props.hourlyChunks) * j;
           const check = sess.getTime() === new Date(datetime.getTime() - minsToSubtract * 60000).getTime();
@@ -141,64 +137,52 @@ const SelectSessions = props => {
             break;
           }
         }
-        //stopping loop from executing further
         if (scheduledSession) break;
       }
     }
-
+  
     let isSelectable = false;
-    if(!selected && availableSess) {
-      let dtFirstSchedule = null;
-      for(const dt of props.schedule) {
-        if(moment(dt).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
-          dtFirstSchedule = moment(dt).toDate();
-          break;
-        }
-      }
-      if(dtFirstSchedule) {
-        let availableResearchers = props.availableSessions[dtFirstSchedule.toLocaleString()] || [];
-        for(const availableSession in props.availableSessions) {
-          if(moment(availableSession).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
-            if(moment(dtFirstSchedule).add(30, "minutes").toDate().toLocaleString() === moment(availableSession).toDate().toLocaleString()) {
-              for(const researcher of props.availableSessions[availableSession]) {
-                if(availableResearchers.includes(researcher)) {
+  
+    if (!selected && availableSess) {
+      const dtFirstSchedule = props.schedule.find((dt) => moment(dt).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD"));
+  
+      if (dtFirstSchedule) {
+        const availableResearchers = props.availableSessions[dtFirstSchedule.toLocaleString()] || [];
+  
+        for (const availableSession in props.availableSessions) {
+          if (moment(availableSession).format("YYYY-MM-DD") === moment(datetime).format("YYYY-MM-DD")) {
+            if (
+              moment(dtFirstSchedule).add(30, "minutes").toDate().toLocaleString() ===
+              moment(availableSession).toDate().toLocaleString()
+            ) {
+              for (const researcher of props.availableSessions[availableSession]) {
+                if (availableResearchers.includes(researcher)) {
                   isSelectable = true;
                   break;
                 }
-                if(isSelectable) {
-                  break;
-                }
               }
-              break;
+              if (isSelectable) break;
             }
           }
         }
       }
     }
-    
-    if(isSelectable) {
-      // console.log("isSelectable");
-    }
-
+  
+    const cellClassName = `ScheduleCell ${!availableSess ? "UnavailableCell" : selected ? "SelectedCell" : isSelectable ? "SelectableCell" : "UnselectedCell"}`;
+  
+    const cellContent = !availableSess ? "UNAVBL" : scheduledSession ? "✅" : datetime.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  
     return (
-      <div
-        className={
-          "ScheduleCell " + (!availableSess ? "UnavailableCell" : selected ? "SelectedCell" : (isSelectable ? "SelectableCell" : "UnselectedCell"))
-        }
-        ref={refSetter}
-      >
-        {!availableSess
-          ? "UNAVBL"
-          : scheduledSession
-          ? "✅"
-          : datetime.toLocaleTimeString("en-US", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false
-            })}
+      <div className={cellClassName} ref={refSetter}>
+        {cellContent}
       </div>
     );
   };
+  
 
   // Every time the user makes any changes, ScheduleSelector calls this function
   // with the new value for the schedule array.
@@ -233,7 +217,7 @@ const SelectSessions = props => {
       numDays={props.numDays}
       minTime={start}
       maxTime={end}
-      hourlyChunks={props.hourlyChunks || 2}
+      hourlyChunks={props.hourlyChunks || 4}
       dateFormat="ddd MM/DD"
       timeFormat="hh:mma"
       onChange={scheduleChange}

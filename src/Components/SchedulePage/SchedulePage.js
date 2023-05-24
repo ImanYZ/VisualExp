@@ -250,12 +250,12 @@ const SchedulePage = props => {
           sch.push(session);
           const sessionIdx = parseInt(scheduleData.order.replace(/[^0-9]+/g, "")) - 1;
           if (!isNaN(sessionIdx) && projectSpecs?.sessionDuration?.[sessionIdx]) {
-            const slotCounts = project === "OnlineCommunities" ? 1 : projectSpecs?.sessionDuration?.[sessionIdx];
+            const slotCounts = projectSpecs?.sessionDuration?.[sessionIdx];
             for (let i = 1; i < slotCounts; i++) {
               sch.push(
                 moment(session)
                   .utcOffset(-4)
-                  .add(30 * i, "minutes")
+                  .add((60 / projectSpecs.hourlyChunks) * i, "minutes")
                   .toDate()
               );
             }
@@ -382,7 +382,7 @@ const SchedulePage = props => {
   };
 
   if (isSubmitting) return <LoadingPage />;
-  console.log(projectSpecs.numberOfSessions);
+
   return (
     <>
       <RouterNav />
@@ -390,11 +390,11 @@ const SchedulePage = props => {
         {submitted ? (
           <div className="DateDescription">
             <p>
-              Based on your specified availability, we just matched you with one of our UX researchers for{" "}
-              {projectSpecs.numberOfSessions === 1 ? `the session ` : `each session `}
+              Based on your specified availability, we just matched you with one of our {" "}
+              {projectSpecs.numberOfSessions === 1 ? ` researchers for the session ` : `UX researchers for each session `}
               and sent you{" "}
               {projectSpecs.numberOfSessions === 1
-                ? `a Google Calendar invitation`
+                ? `a Google Calendar invitation `
                 : `three Google Calendar invitations`}
               . Please accept {projectSpecs.numberOfSessions === 1 ? `it` : `them`} as soon as possible. If
               {projectSpecs.numberOfSessions === 1 ? ` it doesn't work ` : ` any of the sessions do not work`} for you,
@@ -407,7 +407,7 @@ const SchedulePage = props => {
             <p>
               For accepting the Google Calendar
               {projectSpecs.numberOfSessions === 1
-                ? `invitation please open the invitation email`
+                ? ` invitation please open the invitation email`
                 : ` invites  please open each invitation email`}{" "}
               ,scroll all the way down to find the options to respond to the Calendar invite, and click "Yes."
             </p>
@@ -445,11 +445,10 @@ const SchedulePage = props => {
             <Alert severity="warning">
               {projectSpecs.numberOfSessions === 1 ? (
                 <ul id="WarningPoints">
-                  <li> Please specify your availability for our UX experiment session . </li>
-                  <strong>in your timezone</strong> to satisfy the following criteria:
-                  <li>One timeslot for 30 minutes.</li>
+                  <li> Please specify your availability for a 45-minute (3 consecutive slots) introduction and interview session 
+                  <strong> in your timezone</strong>.</li>
                   <li>
-                    There is no UX researcher available to take the time slots labeled with UNAVBL! You can only take
+                    There is no researcher available to take the time slots labeled with UNAVBL! You can only take
                     the light blue ones.
                   </li>
                 </ul>
