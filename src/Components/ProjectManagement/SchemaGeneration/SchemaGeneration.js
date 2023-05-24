@@ -71,12 +71,13 @@ export const SchemaGeneration = () => {
   const [allTheResponses, setAllTheResponses] = useState({});
   const [highlightedWords, setHighlightedWords] = useState([]);
   const [notSatisfiedResponses, setNotSatisfiedResponses] = useState([]);
+  const [tryout, setTryout] = useState(false);
 
   useEffect(() => {
     const retrieveResponses = async () => {
       try {
         setSearching(true);
-        const response = await axios.get("/lodResponses");
+        const response = await axios.post("/lodResponses", { researcher: fullname });
         setAllTheResponses(response.data.responses);
       } catch (error) {
         console.log(error);
@@ -153,6 +154,7 @@ export const SchemaGeneration = () => {
     setHighlightedWords([]);
     setNotSatisfiedResponses([]);
     setSchemasBoolean([]);
+    setTryout(false);
     if (firebase && selectedPhrase) {
       const schmaQuery = firebase.db.collection("booleanScratch").where("phrase", "==", selectedPhrase);
       const schmaSnapshot = schmaQuery.onSnapshot(snapshot => {
@@ -430,6 +432,7 @@ export const SchemaGeneration = () => {
     setSearchResules(reponsefilteres);
     setSearching(false);
     setHighlightedWords(keywords);
+    setTryout(true);
   };
 
   const renderResponses = paragraph => {
@@ -452,17 +455,20 @@ export const SchemaGeneration = () => {
           }}
         >
           <div dangerouslySetInnerHTML={{ __html: renderResponses(r.response) }} />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              handleResponse(r, "yes");
-            }}
-            sx={{
-              mt: "15px",
-              backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "#91ff35" : "",
-              color: r.votes[selectedPhrase] && r.votes[selectedPhrase].yes ? "white" : ""
-            }}
-          >{`YES `}</Button>
+
+          {tryout && (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                handleResponse(r, true);
+              }}
+              sx={{
+                mt: "15px",
+                backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "#91ff35" : "",
+                color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote ? "white" : ""
+              }}
+            >{`YES `}</Button>
+          )}
         </Paper>
       );
     });
@@ -484,62 +490,43 @@ export const SchemaGeneration = () => {
 
   const handleResponse = async (response, vote) => {
     try {
-      const recallDoc = await firebase.db.collection("recallGradesV2").doc(response.documentId).get();
-      const recallData = recallDoc.data();
-      const updateSessions = recallData.sessions;
-      const conditionIdx = updateSessions[response.session].findIndex(c => c.condition === response.condition);
-      const phraseIndex = updateSessions[response.session][conditionIdx].phrases.findIndex(
-        p => p.phrase === selectedPhrase
-      );
       const _searchResules = [...searchResules];
       const _notSatisfiedResponses = [...notSatisfiedResponses];
       const _recallResponses = [...recallResponses];
-      const indexNotSatisfied = _notSatisfiedResponses.findIndex(r => r.response === response.response);
-      const indexSatisfied = _searchResules.findIndex(r => r.response === response.response) || -1;
-      const indexAll = _recallResponses.findIndex(r => r.response === response.response) || -1;
-      const updateResponse = _recallResponses[indexAll];
+
+      const indexAll = _recallResponses.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
+      const indexNotSatisfied = _notSatisfiedResponses.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
+      const indexSatisfied = _searchResules.findIndex(
+        r =>
+          r.documentId === response.documentId && r.session === response.session && r.condition === response.condition
+      );
+
       if (indexAll === -1) return;
-      if (phraseIndex === -1) return;
-      if (vote === "yes") {
-        if (updateResponse.votes[selectedPhrase][vote]) {
-          updateResponse.votes[selectedPhrase][vote] = false;
-        } else {
-          updateResponse.votes[selectedPhrase][vote] = true;
-        }
-        updateResponse.votes[selectedPhrase]["no"] = false;
-      }
-      if (vote === "no") {
-        if (updateResponse.votes[selectedPhrase][vote]) {
-          updateResponse.votes[selectedPhrase][vote] = false;
-        } else {
-          updateResponse.votes[selectedPhrase][vote] = true;
-        }
-        updateResponse.votes[selectedPhrase]["yes"] = false;
-      }
-      updateSessions[response.session][conditionIdx].phrases[phraseIndex]["yes"] =
-        updateResponse.votes[selectedPhrase]["yes"];
-      updateSessions[response.session][conditionIdx].phrases[phraseIndex]["no"] =
-        updateResponse.votes[selectedPhrase]["no"];
       if (indexNotSatisfied !== -1) {
-        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase]["yes"] =
-          updateResponse.votes[selectedPhrase]["yes"];
-        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase]["no"] =
-          updateResponse.votes[selectedPhrase]["no"];
+        _notSatisfiedResponses[indexNotSatisfied].votes[selectedPhrase].vote = vote;
       }
       if (indexSatisfied !== -1) {
-        _searchResules[indexSatisfied]["yes"] = updateResponse.votes[selectedPhrase]["yes"];
-        _searchResules[indexSatisfied]["no"] = updateResponse.votes[selectedPhrase]["no"];
+        _searchResules[indexSatisfied].votes[selectedPhrase].vote = vote;
       }
       if (indexAll !== -1) {
-        _recallResponses[indexAll]["yes"] = updateResponse.votes[selectedPhrase]["yes"];
-        _recallResponses[indexAll]["no"] = updateResponse.votes[selectedPhrase]["no"];
+        _recallResponses[indexAll].votes[selectedPhrase].vote = vote;
       }
-
       setSearchResules(_searchResules);
       setNotSatisfiedResponses(_notSatisfiedResponses);
       setRecallResponses(_recallResponses);
-      await recallDoc.ref.update({
-        sessions: updateSessions
+      await axios.post("/voteOnSingleRecall", {
+        session: response.session,
+        condition: response.condition,
+        researcher: fullname,
+        phrase: selectedPhrase,
+        documentId: response.documentId,
+        grade: vote ,
       });
     } catch (error) {
       console.log(error);
@@ -790,12 +777,17 @@ export const SchemaGeneration = () => {
                       <Button
                         variant="outlined"
                         onClick={() => {
-                          handleResponse(r, "no");
+                          handleResponse(r, false);
                         }}
                         sx={{
                           mt: "15px",
-                          backgroundColor: r.votes[selectedPhrase] && r.votes[selectedPhrase].no ? "red" : "",
-                          color: r.votes[selectedPhrase] && r.votes[selectedPhrase].no ? "white" : ""
+                          backgroundColor:
+                            r.votes[selectedPhrase] &&
+                            r.votes[selectedPhrase].vote !== null &&
+                            !r.votes[selectedPhrase].vote
+                              ? "red"
+                              : "",
+                          color: r.votes[selectedPhrase] && r.votes[selectedPhrase].vote !== null ? "white" : ""
                         }}
                       >{`NO `}</Button>
                     </Paper>
