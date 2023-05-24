@@ -55,7 +55,7 @@ adminRouter.post("/manageevents", async (req, res) => {
     }
 
     if (userDocs.docs.length === 0) {
-      userDocs = await db.collection("usersStudentCoNoteSurvey").where("email", "==", participant).get();
+      userDocs = await db.collection("usersSurvey").where("email", "==", participant).get();
     }
 
     if (userDocs.docs.length === 0) {

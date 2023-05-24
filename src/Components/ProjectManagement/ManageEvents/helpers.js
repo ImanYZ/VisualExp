@@ -27,11 +27,11 @@ export const retrieveEvents = async (relativeURL, firebase, availabilities) => {
 
   const usersHash = {};
   const instructorsHash = {};
-  const usersStudentCoNoteSurveyHash = {};
+  const usersSurveyHash = {};
 
   const usersDocs = await firebase.db.collection("users").get();
   const instructorsDocs = await firebase.db.collection("instructors").get();
-  const usersStudentCoNoteSurveyDocs = await firebase.db.collection("usersStudentCoNoteSurvey").get();
+  const usersSurveyDocs = await firebase.db.collection("usersSurvey").get();
   usersDocs.forEach(userDoc => {
     usersHash[userDoc.data().email] = { ...userDoc.data(), id: userDoc.id };
   });
@@ -42,8 +42,8 @@ export const retrieveEvents = async (relativeURL, firebase, availabilities) => {
       id: instructorDoc.data().firstname + " " + instructorDoc.data().lastname
     };
   });
-  usersStudentCoNoteSurveyDocs.forEach(userStudentCoNoteSurveyDoc => {
-    usersStudentCoNoteSurveyHash[userStudentCoNoteSurveyDoc.data().email] = {
+  usersSurveyDocs.forEach(userStudentCoNoteSurveyDoc => {
+    usersSurveyHash[userStudentCoNoteSurveyDoc.data().email] = {
       ...userStudentCoNoteSurveyDoc.data(),
       id: userStudentCoNoteSurveyDoc.id
     };
@@ -94,8 +94,8 @@ export const retrieveEvents = async (relativeURL, firebase, availabilities) => {
         userData = usersHash[event.participant];
       } else if (instructorsHash.hasOwnProperty(event.participant)) {
         userData = instructorsHash[event.participant];
-      } else if (usersStudentCoNoteSurveyHash.hasOwnProperty(event.participant)) {
-        userData = usersStudentCoNoteSurveyHash[event.participant];
+      } else if (usersSurveyHash.hasOwnProperty(event.participant)) {
+        userData = usersSurveyHash[event.participant];
       }
 
       if (Object.keys(userData).length > 0 > 0) {

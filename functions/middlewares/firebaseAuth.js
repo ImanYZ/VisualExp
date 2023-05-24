@@ -8,11 +8,11 @@ const firebaseAuth = async (req, res, next) => {
     if (!decodedToken) return res.status(401).send({ error: "Unauthorized" });
     req.user = decodedToken;
 
-    const userCollections = ["users", "usersStudentCoNoteSurvey", "usersInstructorCoNoteSurvey"];
+    const userCollections = ["users", "usersSurvey"];
 
-    for(const userCollection of userCollections) {
-      const users = await db.collection("users").where("email", "==", decodedToken.email).get();
-      if(users.docs.length) {
+    for (const userCollection of userCollections) {
+      const users = await db.collection(userCollection).where("email", "==", decodedToken.email).get();
+      if (users.docs.length) {
         req.userType = userCollection;
         req.userData = users.docs[0].data();
         req.userData.fullname = users.docs[0].id;
@@ -21,7 +21,7 @@ const firebaseAuth = async (req, res, next) => {
     }
 
     const researchers = await db.collection("researchers").where("email", "==", req.user.email).get();
-    if(researchers.docs.length) {
+    if (researchers.docs.length) {
       req.researcher = researchers.docs[0].data();
       req.researcher.docId = researchers.docs[0].id;
     }

@@ -22,7 +22,7 @@ const {
   // updateNotTakenSessions,
   markPaidEndpoint,
   passagesNumberCorrection,
-  createTemFeedback,
+  retreiveFeedbackcodes,
   lodResponses,
   voteOnSingleRecall
 } = require("./projectManagement");
@@ -110,7 +110,7 @@ app.post("/voteInstructor", voteInstructorEndpoint);
 app.post("/voteInstructorReset", voteInstructorReset);
 app.post("/voteActivityReset", voteActivityReset);
 app.post("/deleteActivity", deleteActivity);
-app.post("/createTemFeedback", createTemFeedback);
+app.post("/retreiveFeedbackcodes", retreiveFeedbackcodes);
 app.post("/checkEmailInstitution", checkEmailInstitution);
 // Emailing
 app.post("/sendEventNotificationEmail", sendEventNotificationEmail);

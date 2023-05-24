@@ -123,7 +123,7 @@ const pad2Num = number => {
   return (number < 10 ? "0" : "") + number;
 };
 
-const delay = async (time) => {
+const delay = async time => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(true);
@@ -131,15 +131,18 @@ const delay = async (time) => {
   });
 };
 
-const fetchRecentParticipants = async (researcher, project) => {
+const fetchRecentParticipants = async researcher => {
   // logic to fetch recently participants names by current researcher
   const recentParticipants = {};
-  const resSchedules = await db.collection("resSchedule").where("project", "==", project).get();
+  const resSchedules = await db.collection("resSchedule").get();
   for (const resSchedule of resSchedules.docs) {
     const resScheduleData = resSchedule.data();
+    if (!recentParticipants.hasOwnProperty(resScheduleData.project)) {
+      recentParticipants[resScheduleData.project] = {};
+    }
     const attendedSessions = resScheduleData?.attendedSessions?.[researcher] || {};
     for (const participant in attendedSessions) {
-      recentParticipants[participant] = attendedSessions[participant];
+      recentParticipants[resScheduleData.project][participant] = attendedSessions[participant];
     }
   }
   return recentParticipants;

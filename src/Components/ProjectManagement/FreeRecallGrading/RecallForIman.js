@@ -73,7 +73,6 @@ const RecallForIman = props => {
       for (let recallDoc of recallGradesDocs.docs) {
         const recallData = recallDoc.data();
 
-        console.log(i++);
         for (let session in recallData.sessions) {
           for (let conditionItem of recallData.sessions[session]) {
             const conditionIndex = recallData.sessions[session].indexOf(conditionItem);
@@ -174,7 +173,6 @@ const RecallForIman = props => {
     if (indexOfmajorityDifferentThanBot === majorityDifferentThanBot.length - 1)
       return setIndexOfmajorityDifferentThanBot(0);
     setIndexOfmajorityDifferentThanBot(indexBot => indexBot + 1);
-    console.log(majorityDifferentThanBot[indexOfmajorityDifferentThanBot + 1]);
   };
   const previousPhrase = () => {
     if (indexOfmajorityDifferentThanBot === 0) return setIndexOfmajorityDifferentThanBot(0);
@@ -228,7 +226,6 @@ const RecallForIman = props => {
       console.log("error", error);
     }
   };
-  console.log(doneProcessing);
   if (doneProcessing && !majorityDifferentThanBot.length) {
     return (
       <Box sx={{ display: "flex", alignItems: "center" }}>
