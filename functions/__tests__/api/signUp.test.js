@@ -60,15 +60,17 @@ describe("POST /api/signUp", () => {
     expect(response.status).toEqual(500)
   })
 
-  it("should be able to register as survey student or instructor", async () => {
+  it("should be able to register as survey  instructor", async () => {
     const response = await chai.request(server).post("/api/signUp").send({
       email: email2,
       password,
       firstName: "mock",
       lastName: "name",
+      instructorId: "lkdjqsdmaplDLSKFdsmml",
       institutionName: "University of Michigan - Ann Arbor",
-      projectName: "H1L2",
-      surveyType: "student"
+      projectName: "OnlineCommunities",
+      surveyType: "instructor",
+      noRetaineData: true
     });
     expect(response.status).toEqual(201)
     const userDoc = await db.collection("usersSurvey").doc("mock name ").get()
