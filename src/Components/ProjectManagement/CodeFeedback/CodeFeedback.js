@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
-import GridCellToolTip from "../../GridCellToolTip";
 
 import axios from "axios";
 import List from "@mui/material/List";
@@ -21,7 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
+
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -31,14 +30,16 @@ import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+
 import arrayToChunks from "../../../utils/arrayToChunks";
 import { fetchRecentParticipants } from "../../../utils/researcher";
 import Select from "@mui/material/Select";
 import Tooltip from "@mui/material/Tooltip";
 import { Card, CardHeader, CardContent } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
+
+import { codesColumn, feedBackCodesColumns } from "./Columns";
+
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
@@ -63,7 +64,6 @@ const CodeFeedback = props => {
   const [submittingDelete, setSubmittingDelete] = useState(false);
   const [allResponsesGraded, setAllResponsesGraded] = useState(false);
   // const isAdmin = useRecoilValue(isAdminState);
-  const [selectedCode, setSelectedCode] = useState({});
   const [allExperimentCodes, setAllExperimentCodes] = useState([]);
   const [allFeedbackCodeCodes, setAllFeedbackCodeCodes] = useState([]);
   const [approvedNewCodes, setApprovedNewCodes] = useState([]);
@@ -85,6 +85,8 @@ const CodeFeedback = props => {
 
   const [choiceConditions, setChoiceConditions] = useState({});
 
+  const [explanationIdsList, setExplanationIdsList] = useState({});
+
   const handleOpenAdminEditModal = () => setOpenEditAdminModal(true);
   const handleCloseAdminEditModal = () => setOpenEditAdminModal(false);
   const handleOpenAdminAddModal = () => setOpenAddAdminModal(true);
@@ -92,121 +94,9 @@ const CodeFeedback = props => {
   const handleOpenDeleteModalAdmin = () => setOpenDeleteModalAdmin(true);
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
   const [category, setCategory] = useState("");
+  const online = project === "OnlineCommunities";
+  const projectRef = useRef(project);
 
-  const codesColumn = [
-    {
-      field: "code",
-      headerName: "Code",
-      width: "500",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "approved",
-      headerName: "Approved/UnApproved",
-      renderCell: cellValues => {
-        return <div style={{ width: "100%", textAlign: "center", cursor: "pointer" }}>{cellValues.value}</div>;
-      }
-    },
-    {
-      field: "rejected",
-      headerName: "Reject",
-      renderCell: cellValues => {
-        return <div style={{ width: "100%", textAlign: "center", cursor: "pointer" }}>{cellValues.value}</div>;
-      }
-    },
-    {
-      field: "coder",
-      headerName: "Coder",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "question",
-      headerName: "Question",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "title",
-      headerName: "Added For",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "addedBy",
-      headerName: "Added By",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "category",
-      width: "300",
-      headerName: "Category",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-
-    {
-      field: "action",
-      headerName: "Action",
-      renderCell: cellValues => {
-        return (
-          <>
-            <IconButton
-              sx={{ mR: "10px" }}
-              edge="end"
-              aria-label="edit"
-              onClick={() => {
-                setCode(cellValues.row.code);
-                setCategory(cellValues.row.category || "");
-                setAdminCodeData(cellValues.row);
-                handleOpenAdminEditModal();
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              edge="end"
-              aria-label="delete"
-              onClick={() => {
-                setAdminCodeData(cellValues.row);
-                handleOpenDeleteModalAdmin();
-              }}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </>
-        );
-      }
-    }
-  ];
-
-  const feedBackCodesColumns = [
-    {
-      field: "explanation",
-      headerName: "Explanation",
-      width: "900",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    {
-      field: "choice",
-      headerName: "The participant choice",
-      width: "500",
-      renderCell: cellValues => {
-        return <GridCellToolTip isLink={false} cellValues={cellValues} />;
-      }
-    },
-    { field: "date", headerName: "Submitted Answer Date", type: "dateTime", width: 190 }
-  ];
   useEffect(() => {
     if (firebase) {
       const feedbackCodeQuery = firebase.db.collection("feedbackCode").where("coders", "array-contains", fullname);
@@ -221,6 +111,24 @@ const CodeFeedback = props => {
       };
     }
   }, [firebase]);
+
+  useEffect(() => {
+    projectRef.current = project;
+    setExplanationIdsList({});
+    const func = async () => {
+      try {
+        let response = { data: { message: "success" } };
+        response = await axios.post("/retreiveFeedbackcodes", {
+          fullname,
+          project
+        });
+        if (response.data.message === "success") {
+          setExplanationIdsList(response.data.codeIds);
+        }
+      } catch (e) {}
+    };
+    func();
+  }, [project]);
 
   useEffect(() => {
     const func = async () => {
@@ -285,8 +193,7 @@ const CodeFeedback = props => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (firebase) {
-      const CodeBooksQuery = firebase.db.collection("feedbackCodeBooks");
-
+      let CodeBooksQuery = firebase.db.collection("feedbackCodeBooks");
       const passagesSnapshot = CodeBooksQuery.onSnapshot(snapshot => {
         const docChanges = snapshot.docChanges();
         setCodeBooksChanges([...docChanges]);
@@ -297,7 +204,7 @@ const CodeFeedback = props => {
         passagesSnapshot();
       };
     }
-  }, [firebase]);
+  }, [firebase, project]);
 
   useEffect(() => {
     if (firebase && fullname) {
@@ -354,11 +261,15 @@ const CodeFeedback = props => {
     const filtered = allExperimentCodes.filter(c => {
       let exist = codeMap[c.code] || false;
       codeMap[c.code] = true;
-      return c.approved && !exist && c.hasOwnProperty("category");
+      if (online) {
+        return c.approved && !exist && c.hasOwnProperty("category") && c.project === "OnlineCommunities";
+      } else {
+        return c.approved && !exist && c.hasOwnProperty("category") && c.project !== "OnlineCommunities";
+      }
     });
 
     return filtered.sort((a, b) => a.code - b.code);
-  }, [allExperimentCodes]);
+  }, [allExperimentCodes, project]);
 
   const categories = useMemo(() => {
     const _categories = [];
@@ -399,94 +310,90 @@ const CodeFeedback = props => {
 
   const adminCodes = useMemo(() => {
     const mapped = allExperimentCodes.map(c => {
-      return {
-        id: c.id,
-        code: c.code,
-        coder: c.coder,
-        addedBy: c.addedBy,
-        category: c.category,
-        title: c?.title || "",
-        question: c.question,
-        approved: c.approved ? "✅" : "◻",
-        rejected: c.rejected ? "❌" : "◻"
-      };
+      if (online) {
+        if (c.project === "OnlineCommunities") {
+          return {
+            id: c.id,
+            code: c.code,
+            coder: c.coder,
+            addedBy: c.addedBy,
+            category: c.category,
+            title: c?.title || "",
+            question: c.question,
+            approved: c.approved ? "✅" : "◻",
+            rejected: c.rejected ? "❌" : "◻"
+          };
+        }
+      } else {
+        if (c.project !== "OnlineCommunities") {
+          return {
+            id: c.id,
+            code: c.code,
+            coder: c.coder,
+            addedBy: c.addedBy,
+            category: c.category,
+            title: c?.title || "",
+            question: c.question,
+            approved: c.approved ? "✅" : "◻",
+            rejected: c.rejected ? "❌" : "◻"
+          };
+        }
+      }
+      return {};
     });
 
-    return orderBy(mapped, ["coder", "code"], ["asc", "asc"]);
-  }, [allExperimentCodes]);
-
-  useEffect(() => {
-    const func = async () => {
-      try {
-        let response = { data: { message: "success" } };
-        response = await axios.post("/createTemFeedback", {
-          fullname,
-          project
-        });
-        if (response.data.message === "success") {
-          if (!sentences.length) {
-            setRetrieveNext(oldValue => oldValue + 1);
-          }
-          setTimeout(() => {
-            setAllResponsesGraded(true);
-          }, 1000);
-        }
-      } catch (e) {}
-    };
-    func();
-  }, [retrieveNext, project]);
+    return orderBy(
+      mapped.filter(row => row.id),
+      ["coder", "code"],
+      ["asc", "asc"]
+    );
+  }, [allExperimentCodes, project]);
 
   useEffect(() => {
     const retriveNextResponse = async () => {
       setFromTheCell(false);
-      let docID;
-      const feedbackCodesOrderDocs = await firebase.db
-        .collection("feedbackCodeOrderV2")
-        .where("researcher", "==", fullname)
-        .where("project", "==", project)
-        .get();
-      const orderData = feedbackCodesOrderDocs.docs.length ? feedbackCodesOrderDocs.docs[0].data() : {};
-      if (!orderData.hasOwnProperty("codeIds") || !orderData.codeIds.length) {
+      const explanationsDocs = explanationIdsList[project];
+      if (!explanationsDocs || explanationsDocs.length === 0) {
+        setAllResponsesGraded(true);
         return;
       } else {
         setAllResponsesGraded(false);
       }
-      docID = orderData.codeIds[0];
-      if (docID) {
-        const feedbackCodesDoc = await firebase.db.collection("feedbackCode").doc(docID).get();
-        const feedbackData = feedbackCodesDoc.data();
-        const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
-        const userData = userDoc.data();
 
-        const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
-        const response = (feedbackData.explanation || "")
-          .match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm)
-          .filter(s => s.trim());
-        setSentences(response.map(s => s.trim()));
-        setSelectedSentence(response[0].trim());
-        const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
-        if (userData.pConditions.length > 1) {
-          const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
-          cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
-        }
-        let quotesSelectedForCode = {};
-        for (let sentence of response) {
-          quotesSelectedForCode[sentence] = [];
-        }
-        setQuotesSelectedForCodes(quotesSelectedForCode);
-        setFeedbackCode(feedbackData);
-        setChosenCondition(feedbackData.choice);
-        setDocId(docID);
-        setChosenCondition(feedbackData.choice);
-        setConditionsOrder(cOrders);
+      let feedbackData = explanationsDocs[0];
+      if (!feedbackData) {
+        setAllResponsesGraded(true);
+        return;
       }
+      const userDoc = await firebase.db.collection("users").doc(feedbackData.fullname).get();
+      const userData = userDoc.data();
+      const firstPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[0].passage).get();
+      const response = (feedbackData.explanation || "").match(/[^\.(]+([\(][^)]+[\)])?[^)\.]?/gm).filter(s => s.trim());
+      setSentences(response.map(s => s.trim()));
+      setSelectedSentence(response[0].trim());
+      const cOrders = ["1st: " + userData.pConditions[0].condition + " - " + firstPassageDoc.data().title];
+      if (userData.pConditions.length > 1) {
+        const secondPassageDoc = await firebase.db.collection("passages").doc(userData.pConditions[1].passage).get();
+        cOrders.push("2nd: " + userData.pConditions[1].condition + " - " + secondPassageDoc.data().title);
+      }
+      let quotesSelectedForCode = {};
+      for (let sentence of response) {
+        quotesSelectedForCode[sentence] = [];
+      }
+      setQuotesSelectedForCodes(quotesSelectedForCode);
+      setFeedbackCode(feedbackData);
+      setChosenCondition(feedbackData.choice);
+      setDocId(feedbackData.docId);
+      setChosenCondition(feedbackData.choice);
+      setConditionsOrder(cOrders);
+
       setSubmitting(false);
     };
     retriveNextResponse();
     return () => {
       return;
     };
-  }, [retrieveNext, project]);
+  }, [retrieveNext, project, explanationIdsList]);
 
   // add new code to the database
   const handleAddNewCode = async () => {
@@ -583,6 +490,13 @@ const CodeFeedback = props => {
         approvedCodes,
         project
       });
+
+      const _explanationIdsList = { ...explanationIdsList };
+      const idx = (_explanationIdsList[project] || []).findIndex(f => f.docId === docId);
+      if (idx !== -1) {
+        _explanationIdsList[project].splice(idx, 1);
+      }
+      setExplanationIdsList(_explanationIdsList);
       setRetrieveNext(oldValue => oldValue + 1);
       setSentences([]);
       setChosenCondition("");
@@ -819,78 +733,31 @@ const CodeFeedback = props => {
   const handleAdminAddNewCode = async () => {
     const experimentCodes = [...allExperimentCodes];
     const feedbackCodeBooksRef = firebase.db.collection("feedbackCodeBooks");
-
-    if (feedbackCodeTitle === "Participant") {
-      // iteration to add total number of questions for same code
-
-      // check if the code already exists in approvedCode or unapprovedCode
-      const checkIfItHasSameCode = experimentCodes.filter(elem => elem.code === code);
-      if (checkIfItHasSameCode.length >= 4) {
-        setSnackbarMessage("This code already exists 2 or more times, please try some other code");
-        return;
-      }
-      try {
-        const docRef = await feedbackCodeBooksRef.add({
-          project,
-          approved: true,
-          addedBy: "Researcher",
-          code: code,
-          coder: fullname,
-          title: feedbackCodeTitle,
-          createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-        });
-        if (docRef.id) {
-          const experimentCode = {
-            id: docRef.id,
-            code: code,
-            addedBy: "Researcher",
-            coder: fullname,
-            title: feedbackCodeTitle,
-            checked: "✅"
-          };
-          experimentCodes.push(experimentCode);
-        }
-
-        setCode("");
-        setFeedbackCodeTitle("");
-        setAdminCodeData({});
-        handleCloseAdminAddModal();
-        // setAllExperimentCodes(experimentCodes);
-        const msg =
-          checkIfItHasSameCode.length === 1 ? `Code Added for Both Questions !` : `Code Add to both Questions!`;
-        setSnackbarMessage(msg);
-      } catch (error) {
-        console.error("Error adding document: ", error);
-      }
-    } else {
-      const docRef = await feedbackCodeBooksRef.add({
-        project,
-        approved: true,
-        addedBy: "Researcher",
+    const docRef = await feedbackCodeBooksRef.add({
+      project,
+      approved: true,
+      addedBy: "Admin",
+      code: code,
+      coder: fullname,
+      createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+    });
+    if (docRef.id) {
+      const experimentCode = {
+        id: docRef.id,
         code: code,
+        addedBy: "Admin",
         coder: fullname,
-        title: feedbackCodeTitle,
-        createdAt: firebase.firestore.Timestamp.fromDate(new Date())
-      });
-      if (docRef.id) {
-        const experimentCode = {
-          id: docRef.id,
-          code: code,
-          addedBy: "Researcher",
-          coder: fullname,
-          title: feedbackCodeTitle,
-          checked: "✅"
-        };
-        experimentCodes.push(experimentCode);
-      }
-      setCode("");
-      setFeedbackCodeTitle("");
-      setAdminCodeData({});
-      handleCloseAdminAddModal();
-      // setAllExperimentCodes(experimentCodes);
-      const msg = `Code Add to both Questions!`;
-      setSnackbarMessage(msg);
+        checked: "✅",
+        project: project
+      };
+      experimentCodes.push(experimentCode);
     }
+    setCode("");
+    setFeedbackCodeTitle("");
+    setAdminCodeData({});
+    handleCloseAdminAddModal();
+    const msg = `Code Added successfully!`;
+    setSnackbarMessage(msg);
   };
 
   const saveQuote = quote => async event => {
@@ -993,6 +860,7 @@ const CodeFeedback = props => {
     for (let sentence in _choiceConditions) {
       _choiceConditions[sentence?.trim()] = _choiceConditions[sentence];
     }
+    setChoiceConditions(_choiceConditions);
     setFeedbackCode(feedbackData);
     setApprovedNewCodes(newCodes);
     setConditionsOrder(cOrders);
@@ -1001,13 +869,13 @@ const CodeFeedback = props => {
     setSentences(response.map(s => s.trim()));
     setSelectedSentence(response[0].trim() || "");
     setQuotesSelectedForCodes(_quotesSelectedForCodes);
-    setChoiceConditions(_choiceConditions);
     setSubmitting(false);
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 1000);
   };
-  if (!choiceConditions[selectedSentence?.trim()] || !sentences.length)
+
+  if ((!choiceConditions[selectedSentence?.trim()] || !sentences.length) && !allResponsesGraded)
     return (
       <div
         style={{
@@ -1046,7 +914,8 @@ const CodeFeedback = props => {
           {codes.map(codeData => (
             <ListItem key={codeData.id} disablePadding>
               <ListItemButton value={codeData.code} onClick={handleCodesSelected(codeData.code)} sx={{ p: 0 }}>
-                {quotesSelectedForCodes[selectedSentence] &&
+                {choiceConditions.hasOwnProperty(selectedSentence) &&
+                quotesSelectedForCodes[selectedSentence] &&
                 quotesSelectedForCodes[selectedSentence].includes(codeData.code) ? (
                   <Checkbox checked={true} color="success" />
                 ) : (
@@ -1055,10 +924,11 @@ const CodeFeedback = props => {
 
                 <Box sx={{ display: "inline" }}>{codeData.code}</Box>
               </ListItemButton>
-              <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto" , mr:"4px"}}>
+              <Box sx={{ display: "flex", alignItems: "center", marginLeft: "auto", mr: "4px" }}>
                 {" "}
                 {project === "H2K2" ? "H2" : "H1"}
-                {["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
+                {choiceConditions.hasOwnProperty(selectedSentence) &&
+                ["K2", "L2"].includes(choiceConditions[selectedSentence][codeData.code]) ? (
                   <Switch checked={true} onChange={event => changeChoices(event, codeData.code)} color="warning" />
                 ) : (
                   <Switch checked={false} onChange={event => changeChoices(event, codeData.code)} color="warning" />
@@ -1076,6 +946,7 @@ const CodeFeedback = props => {
   const handlChange = event => {
     setCategory(event.target.value);
   };
+
   return (
     <Box id="get-this">
       {sentences.length ? (
@@ -1182,8 +1053,8 @@ const CodeFeedback = props => {
                           }}
                           sx={{
                             mb: "5px",
-                            backgroundColor: selectedSentence.trim() === sentence.trim() ? "#e0f7fa" : "transparent",
-                            zIndex: selectedSentence.trim() === sentence.trim() ? 100 : "auto",
+                            backgroundColor: selectedSentence?.trim() === sentence?.trim() ? "#e0f7fa" : "transparent",
+                            zIndex: selectedSentence?.trim() === sentence?.trim() ? 100 : "auto",
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
@@ -1398,21 +1269,6 @@ const CodeFeedback = props => {
               value={code}
               onChange={event => setCode(event.currentTarget.value)}
             />
-            <Typography variant="h7" sx={{ mr: "10px", pt: "50px" }}>
-              Add code for:
-            </Typography>
-            <Select
-              native
-              value={feedbackCodeTitle}
-              input={<OutlinedInput label="Title" id="demo-dialog-native" />}
-              onChange={event => setFeedbackCodeTitle(event.target.value || "")}
-            >
-              <option disabled value={""}>
-                Select Title
-              </option>
-              <option value={"Participant"}>Participant</option>
-              <option value={"Researcher"}>Researcher</option>
-            </Select>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleAdminAddNewCode}>Add</Button>

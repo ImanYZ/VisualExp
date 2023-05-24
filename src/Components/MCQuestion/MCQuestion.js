@@ -56,12 +56,9 @@ const MCQuestion = props => {
   const postQuestion = props.questions[props.currentQIdx];
 
   const retrieveFeedbackcodes = async () => {
-    const experimentCodeDocs = await firebase.db
-      .collection("feedbackCodeBooks")
-      .where("approved", "==", true)
-      .get();
-    const _codes = experimentCodeDocs.docs.map(doc => doc.data().code);
-
+    const experimentCodeDocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
+    let _codes = experimentCodeDocs.docs.map(doc => doc.data().code);
+    _codes = _codes.filter(code => !code.hasOwnProperty("project") || code.project !== "OnlineCommunities");
     setCodes(_codes);
   };
 
@@ -346,19 +343,19 @@ const MCQuestion = props => {
                   })}
                 </List>
 
-              <TextField
-                label=""
-                variant="outlined"
-                value={newCode}
-                placeholder={
-                  "If what you are looking for does not exist among the options above, you can enter them here, only one per textbox."
-                }
-                onChange={codeChange}
-                fullWidth
-                multiline
-                rows={5}
-                sx={{ width: "95%", m: 0.5 }}
-              />
+                <TextField
+                  label=""
+                  variant="outlined"
+                  value={newCode}
+                  placeholder={
+                    "If what you are looking for does not exist among the options above, you can enter them here, only one per textbox."
+                  }
+                  onChange={codeChange}
+                  fullWidth
+                  multiline
+                  rows={5}
+                  sx={{ width: "95%", m: 0.5 }}
+                />
               </FormControl>
               <Box sx={{ m: "10px 600px 0px 0px" }}>
                 {[5, 19].includes(props.step) && selectCodes && (
@@ -399,7 +396,10 @@ const MCQuestion = props => {
               className={!nextAvailable || (allowNextForQC && selectCodes) ? "Button Disabled" : "Button"}
               variant="contained"
               sx={{
-                display: !selectCodes && !props.showSubmit && (!nextAvailable || (allowNextForQC && selectCodes)) ? "none" : "flex"
+                display:
+                  !selectCodes && !props.showSubmit && (!nextAvailable || (allowNextForQC && selectCodes))
+                    ? "none"
+                    : "flex"
               }}
             >
               {selectCodes ? "Next" : "Submit"}
