@@ -93,6 +93,7 @@ const CodeFeedback = props => {
   const handleCloseAdminAddModal = () => setOpenAddAdminModal(false);
   const handleOpenDeleteModalAdmin = () => setOpenDeleteModalAdmin(true);
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
+  const [doneLoding, setDoneLoading] = useState(false);
   const [category, setCategory] = useState("");
   const online = project === "OnlineCommunities";
   const projectRef = useRef(project);
@@ -117,18 +118,20 @@ const CodeFeedback = props => {
     setExplanationIdsList({});
     const func = async () => {
       try {
+        setDoneLoading(false);
+        setAllResponsesGraded(true);
         let response = { data: { message: "success" } };
         response = await axios.post("/retreiveFeedbackcodes", {
-          fullname,
-          project
+          fullname
         });
         if (response.data.message === "success") {
           setExplanationIdsList(response.data.codeIds);
+          setDoneLoading(true);
         }
       } catch (e) {}
     };
     func();
-  }, [project]);
+  }, []);
 
   useEffect(() => {
     const func = async () => {
@@ -875,7 +878,7 @@ const CodeFeedback = props => {
     }, 1000);
   };
 
-  if ((!choiceConditions[selectedSentence?.trim()] || !sentences.length) && !allResponsesGraded)
+  if ((!choiceConditions[selectedSentence?.trim()] || !sentences.length) && !doneLoding)
     return (
       <div
         style={{
