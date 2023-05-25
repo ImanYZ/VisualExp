@@ -694,7 +694,7 @@ export default [
   // },
   {
     id: "UX_Research_in_Online_Communities",
-    link: "ux-research-in-online-communities",
+    link: "education-and-psychology-research",
     tags: [
       {
         title: "Online Communities",
@@ -704,7 +704,7 @@ export default [
     allTime: [],
     weekly: [],
     url: "/static/Communities/Online_Communities.jpg",
-    title: "UX Research in Online Communities",
+    title: "Education and Psychology Research",
     width: "50%",
     leaders: [
       {
