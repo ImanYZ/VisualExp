@@ -292,69 +292,6 @@ const communitiesPapers = {
       }
     }
   },
-  Educational_Organizational_Psychology: {
-    The_psychology_of_task_management_The_smaller_tasks_trap: {
-      title: "The Psychology of Task Management: The Smaller Tasks Trap",
-      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
-      questions: {
-        What_is_this_article_about: {
-          stem: "1. What is this article about?",
-          answers: ["a"],
-          choices: {
-            a: "Task Management",
-            b: "Procrastination",
-            c: "Multitasking"
-          }
-        },
-        When_is_this_article_published: {
-          stem: "2. When is this article published?",
-          answers: ["a"],
-          choices: {
-            a: "2020",
-            b: "2017",
-            c: "2014",
-            d: "2008"
-          }
-        },
-        When_confronted_with_multiple_tasks_what_is_the_normative_approach: {
-          stem: "3. When confronted with multiple tasks, what is the normative approach?",
-          answers: ["b"],
-          choices: {
-            a: "Complete the smallest tasks first.",
-            b: "Rely on a cost-benefit analysis to schedule them.",
-            c: "Complete the task with the soonest deadline first."
-          }
-        },
-        The_goal_of_the_first_study_is_to: {
-          stem: "4. The goal of the first study is to:",
-          answers: ["c"],
-          choices: {
-            a: "Examine whether participants were able to meet the deadlines of their assigned tasks.",
-            b: "Explore if participants preferred quantitative or qualitative tasks more.",
-            c: "Examine whether participants were prone to the small tasks trap bias."
-          }
-        },
-        The_goal_of_the_second_study_is_to: {
-          stem: "5. The goal of the second study is to:",
-          answers: ["a"],
-          choices: {
-            a: "Examine the impact of starting with a smaller or larger task on overall performance.",
-            b: "Determine whether starting with smaller or larger tasks was better for quality of work completed.",
-            c: "Examine if starting with smaller tasks sped up the rate of completion of more tasks."
-          }
-        },
-        What_are_the_findings_of_these_studies: {
-          stem: "6. What are the findings of these studies?",
-          answers: ["c"],
-          choices: {
-            a: "Starting with smaller tasks leads to faster completion and better quality of work overall.",
-            b: "The smaller task trap can delay the completion of sub-goals but can make achieving larger tasks easier.",
-            c: "The smaller task trap can lead to the completion of sub-goals but impede achieving the larger, more beneficial goal."
-          }
-        }
-      }
-    }
-  },
   Clinical_Psychology: {
     Clinical_Psychology_Reading_Test: {
       title: "Definition and Training of Clinical Psychology",
@@ -2274,6 +2211,67 @@ const communitiesPapers = {
               d: "Users that receive many upvotes become conscious and protective of their reputation "
             }
           }
+      }
+    },
+    The_psychology_of_task_management_The_smaller_tasks_trap: {
+      title: "The Psychology of Task Management: The Smaller Tasks Trap",
+      url: "https://firebasestorage.googleapis.com/v0/b/visualexp-a7d2c.appspot.com/o/Papers%2FThe%20psychology%20of%20task%20management%20Article.pdf?alt=media&token=18c2f69f-2812-49e6-a2d3-24c9f93cc911",
+      questions: {
+        What_is_this_article_about: {
+          stem: "1. What is this article about?",
+          answers: ["a"],
+          choices: {
+            a: "Task Management",
+            b: "Procrastination",
+            c: "Multitasking"
+          }
+        },
+        When_is_this_article_published: {
+          stem: "2. When is this article published?",
+          answers: ["a"],
+          choices: {
+            a: "2020",
+            b: "2017",
+            c: "2014",
+            d: "2008"
+          }
+        },
+        When_confronted_with_multiple_tasks_what_is_the_normative_approach: {
+          stem: "3. When confronted with multiple tasks, what is the normative approach?",
+          answers: ["b"],
+          choices: {
+            a: "Complete the smallest tasks first.",
+            b: "Rely on a cost-benefit analysis to schedule them.",
+            c: "Complete the task with the soonest deadline first."
+          }
+        },
+        The_goal_of_the_first_study_is_to: {
+          stem: "4. The goal of the first study is to:",
+          answers: ["c"],
+          choices: {
+            a: "Examine whether participants were able to meet the deadlines of their assigned tasks.",
+            b: "Explore if participants preferred quantitative or qualitative tasks more.",
+            c: "Examine whether participants were prone to the small tasks trap bias."
+          }
+        },
+        The_goal_of_the_second_study_is_to: {
+          stem: "5. The goal of the second study is to:",
+          answers: ["a"],
+          choices: {
+            a: "Examine the impact of starting with a smaller or larger task on overall performance.",
+            b: "Determine whether starting with smaller or larger tasks was better for quality of work completed.",
+            c: "Examine if starting with smaller tasks sped up the rate of completion of more tasks."
+          }
+        },
+        What_are_the_findings_of_these_studies: {
+          stem: "6. What are the findings of these studies?",
+          answers: ["c"],
+          choices: {
+            a: "Starting with smaller tasks leads to faster completion and better quality of work overall.",
+            b: "The smaller task trap can delay the completion of sub-goals but can make achieving larger tasks easier.",
+            c: "The smaller task trap can lead to the completion of sub-goals but impede achieving the larger, more beneficial goal."
+          }
+        }
       }
     }
   },
