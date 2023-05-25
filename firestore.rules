@@ -260,7 +260,7 @@ service cloud.firestore {
        allow read: if  true;
        allow write: if true;
     }
-    match /surveyConversation/{surveyConversationId} {
+    match /transcript/{transcriptId} {
        allow read: if  true;
        allow write: if true;
     }
