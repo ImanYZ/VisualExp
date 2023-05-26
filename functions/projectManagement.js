@@ -849,12 +849,19 @@ exports.remindResearchersForAvailability = async context => {
             }
             let tenDaysLater = new Date();
             tenDaysLater = new Date(tenDaysLater.getTime() + 10 * 24 * 60 * 60 * 1000);
-            if (lastAvailability.getTime() < tenDaysLater.getTime()) {
+            let sevenDaysLater = new Date();
+            sevenDaysLater = new Date(sevenDaysLater.getTime() + 7 * 24 * 60 * 60 * 1000);
+            if (
+              (lastAvailability.getTime() < tenDaysLater.getTime() && project !== "OnlineCommunities") ||
+              (lastAvailability.getTime() < sevenDaysLater.getTime() && project === "OnlineCommunities")
+            ) {
+              const days = project === "OnlineCommunities" ? "seven" : "ten";
+              console.log(researcherData.email, researcherDoc.id, project);
               // Increase waitTime by a random integer between 1 to 4 seconds.
               const waitTime = 1000 * (1 + Math.floor(Math.random() * 4));
               // Send a reminder email to a researcher that they have not specified
               // their availability for the next ten days and ask them to specify it.
-              await remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, "ten");
+              await remindResearcherToSpecifyAvailability(researcherData.email, researcherDoc.id, days, project);
               await delay(waitTime);
             }
           }
@@ -1381,7 +1388,7 @@ const updateGradingPoints = (
 
 exports.voteOnSingleRecall = async (req, res) => {
   try {
-    console.log("voteOnSingleRecall",req.body);
+    console.log("voteOnSingleRecall", req.body);
     const { session, condition, phrase, documentId } = req.body;
     const gptResearcher = "Iman YeckehZaare";
     await db.runTransaction(async t => {
