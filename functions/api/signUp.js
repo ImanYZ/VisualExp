@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
       const projectSpecs = projectSpecsDoc.data();
       const conditions = shuffleArray([...projectSpecs.conditions]);
 
-      const passages = await db.collection("passages").get();
+      const passages = await db.collection("passages").where("projectIds", "array-contains", projectName).get();
       // passages that contains the current project
       let passagesDocs = passages.docs.filter(p => projectName in p.data()?.projects);
   
