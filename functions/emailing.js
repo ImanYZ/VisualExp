@@ -1225,17 +1225,22 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
   }
 };
 
-exports.remindResearcherToSpecifyAvailability = async (email, fullname, days) => {
+exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, project) => {
   try {
     const nameString = await getNameFormatted(email, fullname);
     const mailOptions = {
       from: "onecademy@umich.edu",
       to: email,
-      subject: "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
+      subject:
+        project === "OnlineCommunities"
+          ? "[1Cademy] Please Specify Your Availability to Interview Participants!"
+          : "[1Cademy] Please Specify Your Availability to Run Experiment Sessions!",
       html:
         `${nameString}
         <p></p>
-        <p>This is an auto-generated email to remind you that you have not specified your availability for the next 16 days.</p>
+        <p>This is an auto-generated email to remind you that you have not specified your availability for ${
+          project === "OnlineCommunities" ? "at least one week." : "the next 16 days."
+        }</p>
         <p>We need to specify as much of our availability as possible, so that we get more participants who schedule only for the sessions that they can really attend.</p>
         <p>Please open <a href="https://1cademy.us/Activities/Experiments" target='_blank'>our experiments scheduling page</a> and specify your availability in the next ${days} days.</p>
         <p></p>
