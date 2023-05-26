@@ -185,7 +185,7 @@ const ExperimentPoints = props => {
     if (!(project && fullname)) {
       return;
     }
-
+    setScheduleLoaded(false)
     const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
     const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
     if(!scheduleMonths.includes(scheduleEnd)) {
