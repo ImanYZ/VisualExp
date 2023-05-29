@@ -223,6 +223,16 @@ const SchedulePage = props => {
                 resea => resea !== researchers[attendee.email]
               );
             }
+            if (project === "OnlineCommunities") {
+              let _endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+              if(availSessions.hasOwnProperty(_endTime)){
+                availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+              }
+              _endTime = new Date(new Date(event.end.dateTime) - 15 * 60 * 1000).toLocaleString();
+              if(availSessions.hasOwnProperty(_endTime)){
+                availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+              }
+            }
             if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
               availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
             }
@@ -381,7 +391,7 @@ const SchedulePage = props => {
     );
   };
 
-  if (isSubmitting) return <LoadingPage />;
+  if (isSubmitting) return <LoadingPage project={project} />;
 
   return (
     <>
@@ -390,8 +400,10 @@ const SchedulePage = props => {
         {submitted ? (
           <div className="DateDescription">
             <p>
-              Based on your specified availability, we just matched you with one of our {" "}
-              {projectSpecs.numberOfSessions === 1 ? ` researchers for the session ` : `UX researchers for each session `}
+              Based on your specified availability, we just matched you with one of our{" "}
+              {projectSpecs.numberOfSessions === 1
+                ? ` researchers for the session `
+                : `UX researchers for each session `}
               and sent you{" "}
               {projectSpecs.numberOfSessions === 1
                 ? `a Google Calendar invitation `
@@ -445,11 +457,15 @@ const SchedulePage = props => {
             <Alert severity="warning">
               {projectSpecs.numberOfSessions === 1 ? (
                 <ul id="WarningPoints">
-                  <li> Please specify your availability for a 45-minute (3 consecutive slots) introduction and interview session 
-                  <strong> in your timezone</strong>.</li>
                   <li>
-                    There is no researcher available to take the time slots labeled with UNAVBL! You can only take
-                    the light blue ones.
+                    {" "}
+                    Please specify your availability for a 45-minute (3 consecutive slots) introduction and interview
+                    session
+                    <strong> in your timezone</strong>.
+                  </li>
+                  <li>
+                    There is no researcher available to take the time slots labeled with UNAVBL! You can only take the
+                    light blue ones.
                   </li>
                 </ul>
               ) : (
