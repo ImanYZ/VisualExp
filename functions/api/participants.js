@@ -121,6 +121,16 @@ participantsRouter.post("/schedule", async (req, res) => {
           if(availSessions.hasOwnProperty(startTime)){
             availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
           }
+          if (project === "OnlineCommunities") {
+            let _endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
+            if(availSessions.hasOwnProperty(_endTime)){
+              availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+            }
+            _endTime = new Date(new Date(event.end.dateTime) - 15 * 60 * 1000).toLocaleString();
+            if(availSessions.hasOwnProperty(_endTime)){
+              availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+            }
+          }
           if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
             availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
           }
