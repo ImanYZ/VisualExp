@@ -1,7 +1,7 @@
 import React from "react";
 import Typography from "@mui/material/Typography";
 
-const LoadingPage = () => {
+const LoadingPage = ({ project }) => {
   return (
     <div
       style={{
@@ -14,7 +14,7 @@ const LoadingPage = () => {
       }}
     >
       <Typography align="center" variant="h5">
-        Please Wait! we are scheduling your sessions...
+        Please Wait! we are scheduling your {project === "OnlineCommunities" ? "sessions" : "session"}...
       </Typography>
     </div>
   );
