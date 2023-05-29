@@ -809,7 +809,7 @@ const RouterNav = props => {
     await firebase.logout();
     console.log("project Sign out", project);
     if (project === "OnlineCommunities") {
-      navigateTo("/InstructorCoNoteSurvey");
+      navigateTo("/survey");
     } else {
       navigateTo("/Activities");
     }
