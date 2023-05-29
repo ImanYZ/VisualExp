@@ -126,7 +126,6 @@ const SelectSessions = props => {
     let scheduledSession = false;
   
     if (availableSess) {
-      console.log(props.selectedSession);
       for (let i = 0; i < props.selectedSession.length; ++i) {
         const sess = props.selectedSession[i];//
         for (let j = 0; j < props.sessionDuration[i]; ++j) {
