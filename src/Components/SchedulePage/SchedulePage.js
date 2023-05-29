@@ -27,6 +27,7 @@ import { isEmail } from "../../utils";
 
 import "./SchedulePage.css";
 import AppConfig from "../../AppConfig";
+import { gridPreferencePanelStateSelector } from "@mui/x-data-grid";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -230,12 +231,16 @@ const SchedulePage = props => {
             }
             if (project === "OnlineCommunities") {
               let _endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
-              if(availSessions.hasOwnProperty(_endTime)){
-                availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+              if (availSessions.hasOwnProperty(_endTime)) {
+                availSessions[_endTime] = availSessions[_endTime].filter(
+                  resea => resea !== researchers[attendee.email]
+                );
               }
               _endTime = new Date(new Date(event.end.dateTime) - 15 * 60 * 1000).toLocaleString();
-              if(availSessions.hasOwnProperty(_endTime)){
-                availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
+              if (availSessions.hasOwnProperty(_endTime)) {
+                availSessions[_endTime] = availSessions[_endTime].filter(
+                  resea => resea !== researchers[attendee.email]
+                );
               }
             }
             if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
@@ -306,17 +311,17 @@ const SchedulePage = props => {
     try {
       setIsSubmitting(true);
 
-      const userRef = firebase.db.collection("users").doc(fullname);
-      let userDoc = await userRef.get();
+      const userQuery = firebase.db.collection("users").where("email", "==", email.toLowerCase());
+      let userDoc = await userQuery.get();
 
-      if (!userDoc.exists) {
-        const userRef = firebase.db.collection("usersSurvey").doc(fullname);
-        userDoc = await userRef.get();
+      if (!userDoc.docs.length) {
+        const userQuery = firebase.db.collection("usersSurvey").where("email", "==", email.toLowerCase());
+        userDoc = await userQuery.get();
       }
 
       let responseObj = null;
-      if (userDoc.exists) {
-        const userData = userDoc.data();
+      if (userDoc.docs.length > 0) {
+        const userData = userDoc.docs[0].data();
         if (userData.projectDone) {
           setParticipatedBefore(true);
           setIsSubmitting(false);
@@ -395,7 +400,7 @@ const SchedulePage = props => {
       </>
     );
   };
-
+  console.log("project", project, email);
   if (isSubmitting) return <LoadingPage project={project} />;
 
   return (
