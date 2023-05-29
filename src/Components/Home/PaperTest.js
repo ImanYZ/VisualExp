@@ -27,6 +27,7 @@ import {
   applicationsSubmittedState,
 } from "../../store/AuthAtoms";
 
+import { projectState } from "../../store/ProjectAtoms";
 import SnackbarComp from "../SnackbarComp";
 import PagesNavbar from "./PagesNavbar";
 import Typography from "./modules/components/Typography";
@@ -49,6 +50,7 @@ const PaperTest = (props) => {
   const [applicationsSubmitted, setApplicationsSubmitted] = useRecoilState(
     applicationsSubmittedState
   );
+ const project = useRecoilValue(projectState);
 
   const [papers, setPapers] = useState([]);
   const [questions, setQuestions] = useState({});
@@ -353,7 +355,10 @@ const PaperTest = (props) => {
         setApplicationsSubmitted((oldApplicatonsSubmitted) => {
           return { ...oldApplicatonsSubmitted, [props.communiId]: true };
         });
-        const userRef = firebase.db.collection("users").doc(fullname);
+        let userRef = firebase.db.collection("users").doc(fullname);
+        if (project === "OnlineCommunities") {
+          userRef = firebase.db.collection("usersSurvey").doc(fullname);
+        }
         await userRef.update({
           applicationsSubmitted: {
             ...applicationsSubmitted,
