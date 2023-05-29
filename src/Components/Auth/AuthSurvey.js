@@ -59,7 +59,7 @@ const AuthSurvey = props => {
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const navigate = useNavigate();
   const instructorId = useParams()["*"];
-  console.log(instructorId);
+
   useEffect(() => {
     setParticipatedBefore(false);
     setInvalidAuth(false);

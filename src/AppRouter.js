@@ -212,7 +212,6 @@ const AppRouter = props => {
     }
     setNotAResearcher(!isResearcher);
   };
-  console.log("project", project);
   useEffect(() => {
     firebase.auth.onAuthStateChanged(async user => {
       if (user) {
