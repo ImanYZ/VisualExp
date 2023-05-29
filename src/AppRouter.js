@@ -494,7 +494,7 @@ const AppRouter = props => {
                   }
                 />
 
-                <Route path="InstructorCoNoteSurvey/*" element={<SchedulePage />} />
+                <Route path="survey/*" element={<SchedulePage />} />
                 <Route
                   path="Activities/Experiments"
                   element={
@@ -544,7 +544,7 @@ const AppRouter = props => {
         <>
           <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
           <Route path="ScheduleAdministratorSurvey/:administratorId" element={<ScheduleAdministratorPage />} />
-          <Route path="InstructorCoNoteSurvey/*" element={<AuthConsent project="InstructorCoNoteSurvey" />} />
+          <Route path="survey/*" element={<AuthConsent project="OnlineCommunities" />} />
           <Route path="StudentCoNoteSurvey/*" element={<AuthConsent project="StudentCoNoteSurvey" />} />
           <Route path="/*" element={<AuthConsent />} />
         </>

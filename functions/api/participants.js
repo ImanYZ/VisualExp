@@ -194,9 +194,18 @@ participantsRouter.post("/schedule", async (req, res) => {
         email: email.toLowerCase(),
         session: Timestamp.fromDate(start.toDate()),
         order: toOrdinal(i + 1),
-        id: eventCreated.data.id, 
-        project,
+        id: eventCreated.data.id,
+        project
       });
+
+      if (project === "OnlineCommunities") {
+        const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
+        if (instructorsDocs.docs.length > 0) {
+          batch.update(instructorsDocs.docs[0].ref, {
+            scheduled: true
+          });
+        }
+      }
     }
 
     await batch.commit();
