@@ -99,13 +99,13 @@ const SchedulePage = props => {
       let isSurvey = false;
       // We need to first retrieve which project this user belongs to.
 
-      let userDoc = await firebase.db.collection("users").doc(fullname).get();
+      let userDoc = await firebase.db.collection("users").where("email", "==", email).get();
 
-      if (!userDoc.exists) {
-        userDoc = await firebase.db.collection("usersSurvey").doc(fullname).get();
+      if (!userDoc.docs.length) {
+        userDoc = await firebase.db.collection("usersSurvey").where("email", "==", email).get();
         isSurvey = true;
       }
-      const userData = userDoc.data();
+      const userData = userDoc.docs[0].data();
       const project = userData.project;
       if (isSurvey) {
         setProject(project);
@@ -186,8 +186,13 @@ const SchedulePage = props => {
             event.attendees.length > 0 &&
             event.attendees.findIndex(attendee => attendee.email === email) !== -1
           ) {
-            setParticipatedBefore(true);
-            return;
+            if (
+              (project === "OnlineCommunities" && event.colorId === "5") ||
+              (project !== "OnlineCommunities" && event.colorId !== "5")
+            ) {
+              setParticipatedBefore(true);
+              return;
+            }
           }
         }
         // Only future events
