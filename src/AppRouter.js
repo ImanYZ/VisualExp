@@ -382,7 +382,7 @@ const AppRouter = props => {
         reloadIfNotLoadedToday();
       }, 3600000);
     }
-    if (firebase && email && fullname) {
+    if (firebase && email && fullname && project !=="OnlineCommunities") {
       areTheyDuringAnExperimentSession();
     }
   }, [firebase, email, fullname]);
