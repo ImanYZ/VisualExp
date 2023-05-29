@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 
 import axios from "axios";
 import { firebaseState, emailState, emailVerifiedState, institutionsState } from "../../store/AuthAtoms";
-import { firebaseOne } from "../../Components/firebase/firebase";
+import { firebaseOne } from "../firebase/firebase";
 import { projectSpecsState } from "../../store/ProjectAtoms";
 
 import { TabPanel, a11yProps } from "../TabPanel/TabPanel";
@@ -24,7 +24,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
 import Checkbox from "@mui/material/Checkbox";
 
-const AuthStudentCoNoteSurvey = props => {
+const AuthSurvey = props => {
   const firebase = useRecoilValue(firebaseState);
   const { db: dbOne } = firebaseOne;
   const [email, setEmail] = useRecoilState(emailState);
@@ -59,7 +59,7 @@ const AuthStudentCoNoteSurvey = props => {
   const [nameFromInstitutionSelected, setNameFromInstitutionSelected] = useState("");
   const navigate = useNavigate();
   const instructorId = useParams()["*"];
-
+  console.log(instructorId);
   useEffect(() => {
     setParticipatedBefore(false);
     setInvalidAuth(false);
@@ -175,7 +175,7 @@ const AuthStudentCoNoteSurvey = props => {
             lastName: lastname,
             institutionName: nameFromInstitutionSelected.name ? nameFromInstitutionSelected.name : "",
             projectName: "OnlineCommunities",
-            surveyType: "instructor",
+            surveyType: instructorId === "student" ? "student" : "instructor",
             instructorId: instructorId ? instructorId : "",
             noRetaineData: noRetaineData
           });
@@ -459,4 +459,4 @@ const AuthStudentCoNoteSurvey = props => {
   );
 };
 
-export default AuthStudentCoNoteSurvey;
+export default AuthSurvey;
