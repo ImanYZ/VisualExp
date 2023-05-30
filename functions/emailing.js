@@ -545,7 +545,9 @@ exports.inviteInstructors = async context => {
             from: process.env.EMAIL,
             to: instructorData.email,
             subject: `Boosting Learning Through Nonprofit and Open-Source 1Cademy for ${instructorData.interestedTopic}`,
-            html: `<p>We are a research group at the University of Michigan, School of Information who have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and study.</p>
+            html: `
+            <p>Hello ${instructorData.prefix + ". " + capitalizeFirstLetter(instructorData.lastname)},</p>
+            <p>We are a research group at the University of Michigan, School of Information who have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and study.</p>
               <p>Through integrating a knowledge graph, AI assistance, and personalized practice, 1Cademy helps instructors in engaging their students and improving their learning. Over the past two years, our platform has garnered participation from 1,612 students representing 194 institutions.</p>
               <p>To optimize your teaching, 1Cademy provides free access to the knowledge graph. By incorporating core concepts from your course into the knowledge graph, the AI assistant can utilize this information, combined with large language models, to provide personalized learning pathways, answer student questions, and personalize practice questions. Although some initial work is required on your part to create the knowledge graph, this investment promises to enrich learning.</p>
               <p>Along with offering a demo of 1Cademy we would like to have an interview with you to discuss your teaching experiences and the challenges you face. This information would be used to further improve 1Cademy features.</P>
@@ -879,14 +881,20 @@ exports.researcherEventNotificationEmail = async (
             " Which Will Begin in " +
             hoursLeft +
             "!"
-          : "Please Accept Your " + (project === "OnlineCommunities" ? "" : order) + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"),
+          : "Please Accept Your " +
+            (project === "OnlineCommunities" ? "" : order) +
+            " Session with " +
+            participant +
+            " Which Will Begin in " +
+            hoursLeft +
+            "!"),
       html:
         `${nameString}
       <p></p>
       ${
         declined
           ? "<p>This is an auto-generated email to inform you that you have declined your " +
-          (project === "OnlineCommunities" ? "" : order) +
+            (project === "OnlineCommunities" ? "" : order) +
             " session with " +
             participant +
             " which will begin in " +
