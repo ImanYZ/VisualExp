@@ -400,7 +400,7 @@ const SchedulePage = props => {
       </>
     );
   };
-  console.log("project", project, email);
+  
   if (isSubmitting) return <LoadingPage project={project} />;
 
   return (
