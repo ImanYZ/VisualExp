@@ -17,10 +17,9 @@ participantsRouter.use(isParticipant);
 participantsRouter.post("/schedule", async (req, res) => {
   try {
     let { sessions, project} = req.body;
-     console.log("sessions",req.userData);
 
 
-    const {email } = req.userData;
+    const { email , surveyType} = req.userData;
     const batch = db.batch();
     
     sessions.sort((a, b) => a < b ? -1 : 1); // asc sorting
@@ -137,7 +136,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         }
       }
     }
-
+    console.log("availSessions",sessions, "availSessions", availSessions);
     // DELETE previous schedule : if any
     const previousSchedules = await db.collection("schedule").where("email", "==", email.toLowerCase()).get();
     for (let scheduleDoc of previousSchedules.docs) {
@@ -156,7 +155,7 @@ participantsRouter.post("/schedule", async (req, res) => {
       let availableResearchers = availSessions[start] || [];
       const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2); //[2,1,1]
       for(let j = 0; j < sessionDuration; j++) {
-       const  availableSlot = moment(sessions[i]).add(j * 30, "minutes").utcOffset(-4, true).toDate().toLocaleString();
+       const  availableSlot = moment(sessions[i]).add(j * 60/projectSpecsData.hourlyChunks, "minutes").utcOffset(-4, true).toDate().toLocaleString();
         availableResearchers = availableResearchers.filter((availableResearcher) => (availSessions[availableSlot] || []).includes(availableResearcher))
       }
       researchersBySession[start] = availableResearchers;
@@ -195,7 +194,8 @@ participantsRouter.post("/schedule", async (req, res) => {
         toOrdinal(i + 1),
         start,
         end,
-        projectSpecsData
+        projectSpecsData, 
+        surveyType
       );
       events.push(eventCreated);
 
@@ -214,6 +214,27 @@ participantsRouter.post("/schedule", async (req, res) => {
           batch.update(instructorsDocs.docs[0].ref, {
             scheduled: true
           });
+        }
+        const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
+        console.log("usersServeyDocs.docs.length ::: ",usersServeyDocs.docs.length);
+        if (usersServeyDocs.docs.length === 0) {
+          const usersDocs = await db.collection("users").where("email", "==", email).get();
+          if (usersDocs.docs.length > 0) {
+            const userSurevyRef = db.collection("usersSurvey").doc(usersDocs.docs[0].id);
+            const userData = usersDocs.docs[0].data();
+            batch.set(userSurevyRef, {
+              email: email,
+              project,
+              scheduled: true,
+              institution: userData.institution,
+              instructorId: "student",
+              firstname: userData.firstname,
+              uid: userData.uid,
+              surveyType: "student",
+              lastname: userData.lastname,
+              noRetaineData: false
+            });
+          }
         }
       }
     }

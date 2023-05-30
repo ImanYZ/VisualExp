@@ -89,7 +89,6 @@ const SchedulePage = props => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [project, setProject] = useRecoilState(projectState);
-  const [globalCurrentProject, setGlobalCurrentProject] = useRecoilState(projectState);
   const navigate = useNavigate();
   const projectSpecs = useRecoilValue(projectSpecsState);
 
@@ -104,13 +103,16 @@ const SchedulePage = props => {
 
       if (!userDoc.docs.length) {
         userDoc = await firebase.db.collection("usersSurvey").where("email", "==", email).get();
-        isSurvey = true;
       }
       const userData = userDoc.docs[0].data();
-      const project = userData.project;
-      if (isSurvey) {
-        setProject(project);
-        setGlobalCurrentProject(project);
+      let project = userData.project;
+
+      if (userData.projectDone && !userData.surveyType) {
+        setParticipatedBefore(true);
+      }
+      if (userData.survey) {
+        setProject("OnlineCommunities");
+        project = "OnlineCommunities";
       }
       // researchers = an object of fullnames as keys and the corresponding email addresses as values.
       const researchers = {};
@@ -311,18 +313,22 @@ const SchedulePage = props => {
     try {
       setIsSubmitting(true);
 
-      const userQuery = firebase.db.collection("users").where("email", "==", email.toLowerCase());
-      let userDoc = await userQuery.get();
+       let userDoc = await firebase.db.collection("users").where("email", "==", email).get();
 
       if (!userDoc.docs.length) {
-        const userQuery = firebase.db.collection("usersSurvey").where("email", "==", email.toLowerCase());
-        userDoc = await userQuery.get();
+        userDoc = await firebase.db.collection("usersSurvey").where("email", "==", email).get();
       }
+      const userData = userDoc.docs[0].data();
+      let project = userData.project;
 
+      if (userData.surveyType) {
+        setProject("OnlineCommunities");
+        project = "OnlineCommunities";
+      }
       let responseObj = null;
       if (userDoc.docs.length > 0) {
         const userData = userDoc.docs[0].data();
-        if (userData.projectDone) {
+        if (userData.projectDone && !userData.survey) {
           setParticipatedBefore(true);
           setIsSubmitting(false);
           return;
@@ -335,7 +341,7 @@ const SchedulePage = props => {
         await firebase.idToken();
         responseObj = await axios.post("/participants/schedule", {
           sessions,
-          project: userData.project
+          project: project
         });
         errorAlert(responseObj.data);
 
@@ -400,7 +406,7 @@ const SchedulePage = props => {
       </>
     );
   };
-  console.log("project", project, email);
+
   if (isSubmitting) return <LoadingPage project={project} />;
 
   return (
