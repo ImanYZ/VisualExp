@@ -18,7 +18,8 @@ const { toOrdinal } = require("number-to-words");
 const createExperimentEvent = async (email, researcher, order, start, end, projectSpecs, surveyType) => {
   const isAnnotating = projectSpecs.numberOfSessions === 1;
   const summary = isAnnotating
-    ? "[1Cademy] Introduction Session" + (surveyType === "student" ? " for student" : " for professor")
+    ? "[1Cademy] Introduction Session" +
+      (surveyType === "student" ? " for student" : surveyType === "instructor" ? " for professor" : " ")
     : "1Cademy UX Research Experiment - " + order + " Session";
   const description =
     "<div><p><strong><u>IMPORTANT: On your Internet browser, please log in to Gmail using your " +

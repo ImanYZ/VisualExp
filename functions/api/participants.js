@@ -136,7 +136,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         }
       }
     }
-    console.log("availSessions",sessions, "availSessions", availSessions);
+
     // DELETE previous schedule : if any
     const previousSchedules = await db.collection("schedule").where("email", "==", email.toLowerCase()).get();
     for (let scheduleDoc of previousSchedules.docs) {
@@ -216,7 +216,7 @@ participantsRouter.post("/schedule", async (req, res) => {
           });
         }
         const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
-        console.log("usersServeyDocs.docs.length ::: ",usersServeyDocs.docs.length);
+
         if (usersServeyDocs.docs.length === 0) {
           const usersDocs = await db.collection("users").where("email", "==", email).get();
           if (usersDocs.docs.length > 0) {
