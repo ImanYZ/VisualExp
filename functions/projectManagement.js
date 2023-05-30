@@ -960,7 +960,8 @@ exports.remindCalendarInvitations = async context => {
                   participant.email,
                   hoursLeft,
                   order,
-                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
+                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
+                  schedule[ev.id].project
                 );
               }, waitTime);
               // Increase waitTime by a random integer between 1 to 4 seconds.
@@ -1045,7 +1046,8 @@ exports.remindCalendarInvitations = async context => {
                         "",
                         order,
                         false,
-                        true
+                        true,
+                        userData.project
                       );
                     }, waitTime);
                     // Increase waitTime by a random integer between 1 to 4 seconds.
