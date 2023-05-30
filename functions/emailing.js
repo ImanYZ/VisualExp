@@ -793,7 +793,7 @@ const eventNotificationEmail = async (
           ? "We Are Waiting for You in the Session!"
           : declined
           ? "You Have Declined Your " +
-            (project === "OnlineCommunities" ? "" : order) +
+            (project === "OnlineCommunities" ? " " : order) +
             " Session Which Will Begin in " +
             hoursLeft +
             "!"
