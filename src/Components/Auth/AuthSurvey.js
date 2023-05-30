@@ -156,6 +156,12 @@ const AuthSurvey = props => {
     const loweredEmail = email.toLowerCase();
     try {
       await firebase.login(loweredEmail, password);
+      const userDoc = await firebase.db("users").where("email", "==", loweredEmail).get();
+      if (userDoc.docs.length > 0) {
+        userDoc.docs[0].ref.update({
+          survey: true
+        });
+      }
       navigate("/Activities");
     } catch (err) {
       console.log({ err });

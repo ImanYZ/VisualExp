@@ -182,7 +182,7 @@ exports.sendPersonalInvitations = async (req, res) => {
                 }
                 <p></p>
                 <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare</div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Isabella Griesmaier<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+                 ${signatureHTML}
               <img src="https://1cademy.us/api/loadImage/individual/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -344,7 +344,7 @@ exports.inviteAdministrators = async context => {
               <p>Reply to this email if you have any questions or concerns.</p>
               <p></p>
               <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare</div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Isabella Griesmaier<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+              ${signatureHTML}
               <img src="https://1cademy.us/api/loadImage/administrator/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -511,6 +511,7 @@ exports.inviteInstructors = async context => {
         // They have not already clicked any of the options in their email.
         !instructorData.yes &&
         !instructorData.no &&
+        !instructorData.scheduled &&
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
         !instructorData.inviteStudents &&
@@ -543,13 +544,14 @@ exports.inviteInstructors = async context => {
           const mailOptions = {
             from: process.env.EMAIL,
             to: instructorData.email,
-            subject: `Boosting Learning Through 1Cademy’s Knowledge Graph, AI Assistant, and Personalized Practice`,
-            html: `<p>We, a research group at the University of Michigan, School of Information, have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and study.</p>
+            subject: `Boosting Learning Through Nonprofit and Open-Source 1Cademy for ${instructorData.interestedTopic}`,
+            html: `<p>We are a research group at the University of Michigan, School of Information who have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and study.</p>
+              <p>Through integrating a knowledge graph, AI assistance, and personalized practice, 1Cademy helps instructors in engaging their students and improving their learning. Over the past two years, our platform has garnered participation from 1,612 students representing 194 institutions.</p>
               <p>To optimize your teaching, 1Cademy provides free access to the knowledge graph. By incorporating core concepts from your course into the knowledge graph, the AI assistant can utilize this information, combined with large language models, to provide personalized learning pathways, answer student questions, and personalize practice questions. Although some initial work is required on your part to create the knowledge graph, this investment promises to enrich learning.</p>
-              <p>Along with offering a demo of 1Cademy we would like to have an interview with you to discuss your teaching experiences and the challenges you face. This information would be used to further improve 1Cademy features.</p>
+              <p>Along with offering a demo of 1Cademy we would like to have an interview with you to discuss your teaching experiences and the challenges you face. This information would be used to further improve 1Cademy features.</P>
               <p>If this is of interest to you, we'd be delighted to have a meeting with you to interview you and learn about your course needs. To schedule an appointment, please click one of the following links or directly reply to this email.</p>
               <ul>
-                <li><a href="http://localhost:3000/InstructorCoNoteSurvey/${
+                <li><a href="https://1cademy.us/survey/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank">Yes, let's schedule.</a></li>
@@ -562,10 +564,9 @@ exports.inviteInstructors = async context => {
                   instructorDoc.id
                 }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
               </ul>
-              <p>Reply to this email if you have any questions or concerns.</p>
               <p></p>
               <p>Best regards,</p>
-              <br>-- <br><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><a href="https://1cademy.us/" target="_blank"><img data-aii="CiExZF9WX1hhNEhEcWJqZklROFc5VVlpemp1VUpzTE5DZjU" alt="https://1cademy.us/" src="https://ci3.googleusercontent.com/mail-sig/AIorK4yd1KQE25Vzzkh1hSXZ4j61mcGdvSN1-q2FG67-n09jKmG2O-rHKNgoWiH4fBW0ZJGPnqZCjJw" data-os="https://lh3.googleusercontent.com/d/1d_V_Xa4HDqbjfIQ8W9UYizjuUJsLNCf5" width="96" height="96"></a>&nbsp;<span style="color: rgb(0, 0, 0); --darkreader-inline-color: #e8e6e3;" data-darkreader-inline-color=""><a href="https://node.1cademy.us/" target="_blank">Collaboratively Learn, Research, Summarize, Visualize, and Evaluate</a></span></div><div><div><a href="https://1cademy.us/community/UX_Research_in_Online_Communities" target="_blank"><b>UX Research in Online Communities</b></a> - Ben Brown, Iman YeckehZaare, Lily DiBartolomeo<br></div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank"></a></b><a href="https://1cademy.us/community/Cognitive_Psychology" target="_blank"><b>UX Research in Cognitive Psychology of Learning</b></a> - Iman YeckehZaare</div><div><b><a href="https://1cademy.us/community/Social_Psychology" target="_blank">Social/Political Psychology</a></b> - Alex Nikolaidis Konstas, Iman YeckehZaare</div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b>Health Psychology</b></a> - Carson James Clark, Isabella Griesmaier<b><br></b><div><a href="https://1cademy.us/community/Health_Psychology" target="_blank"><b></b></a><a href="https://1cademy.us/community/Disability_Studies" target="_blank"><b>Disability Studies</b></a> - Katherine Wells, Renee Kessler<br><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank"></a><a href="https://1cademy.us/community/Deep_Learning" target="_blank"><b>Natural Language Processing</b></a> - Ge Zhang<br></div><div><div><div><div><div><b><a href="https://1cademy.us/community/Clinical_Psychology" target="_blank">Clinical Psychology</a></b> - Liza Shokhrin</div></div><div><div><div><b><a href="https://1cademy.us/community/Liaison_Librarians" target="_blank">Liaison Librarians</a> </b>- Ben Brown</div><a href="https://www.youtube.com/channel/UCKBqMjvnUrxOhfbH1F1VIdQ/videos" target="_blank">YouTube Channel</a></div></div></div></div></div><div>
+              ${signatureHTML}
               <img src="https://1cademy.us/api/loadImage/professor/${
                 // For tracking when they open their email.
                 // Note that the email clients that cache emails like those on iPad or Outlook open the content
@@ -776,7 +777,8 @@ const eventNotificationEmail = async (
   hangoutLink,
   order,
   httpReq,
-  declined
+  declined,
+  project
 ) => {
   try {
     const nameString = await getNameFormatted(email, firstname);
@@ -790,7 +792,11 @@ const eventNotificationEmail = async (
         (weAreWaiting
           ? "We Are Waiting for You in the Session!"
           : declined
-          ? "You Have Declined Your " + order + " Session Which Will Begin in " + hoursLeft + "!"
+          ? "You Have Declined Your " +
+            (project === "OnlineCommunities" ? " " : order) +
+            " Session Which Will Begin in " +
+            hoursLeft +
+            "!"
           : "Your Session Will Begin in " + hoursLeft + "!"),
       html:
         `${nameString}
@@ -807,17 +813,20 @@ const eventNotificationEmail = async (
               : "")
           : declined
           ? "<p>This is an auto-generated email to inform you that you have declined your " +
-            order +
-            " session, which will begin in " +
-            hoursLeft +
-            "!</p>" +
-            `<p>Please respond to this email with only one of the following options to proceed with:</p>
+              (project === "OnlineCommunities" ? "" : order) +
+              " session, which will begin in " +
+              hoursLeft +
+              "!</p>" +
+              `<p>Please respond to this email with only one of the following options to proceed with:</p>
           <ul>
             <li>Withdraw your application</li>
             <li>Reschedule your session for another time on the same day to be able to continue with your application</li>
-          </ul>
-          <p>Note that because this is a 30-minute, ${order} session, our experiment protocol does not allow us to move it to another day. We can only reschedule it on the same day.</p>
-          <p>Please reply to this email if you have any questions or concerns.</p>`
+          </ul>` +
+              project ===
+            "OnlineCommunities"
+            ? ``
+            : `<p>Note that because this is a 30-minute, ${order} session, our experiment protocol does not allow us to move it to another day. We can only reschedule it on the same day.</p>` +
+              `<p>Please reply to this email if you have any questions or concerns.</p>`
           : "<p>This is an auto-generated email to inform you that your session will begin in " +
             hoursLeft +
             "," +
@@ -834,19 +843,10 @@ const eventNotificationEmail = async (
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
         console.log({ error });
-        if (httpReq) {
-          return res.status(500).json({ error });
-        }
-      }
-      if (httpReq) {
-        return res.status(200).json({ done: true });
       }
     });
   } catch (err) {
     console.log({ err });
-    if (httpReq) {
-      return res.status(500).json({ err });
-    }
   }
 };
 exports.eventNotificationEmail = eventNotificationEmail;
@@ -854,7 +854,15 @@ exports.eventNotificationEmail = eventNotificationEmail;
 // Sends a reminder email to a researcher that they have not accepted
 // or even declined the Google Calendar invitation and asks them to
 // accept it or ask someone else to take it.
-exports.researcherEventNotificationEmail = async (email, fullname, participant, hoursLeft, order, declined) => {
+exports.researcherEventNotificationEmail = async (
+  email,
+  fullname,
+  participant,
+  hoursLeft,
+  order,
+  declined,
+  project
+) => {
   try {
     const nameString = await getNameFormatted(email, fullname);
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
@@ -864,15 +872,21 @@ exports.researcherEventNotificationEmail = async (email, fullname, participant, 
       subject:
         "[1Cademy] " +
         (declined
-          ? "You've Declined Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"
-          : "Please Accept Your " + order + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"),
+          ? "You've Declined Your " +
+            (project === "OnlineCommunities" ? "" : order) +
+            " Session with " +
+            participant +
+            " Which Will Begin in " +
+            hoursLeft +
+            "!"
+          : "Please Accept Your " + (project === "OnlineCommunities" ? "" : order) + " Session with " + participant + " Which Will Begin in " + hoursLeft + "!"),
       html:
         `${nameString}
       <p></p>
       ${
         declined
           ? "<p>This is an auto-generated email to inform you that you have declined your " +
-            order +
+          (project === "OnlineCommunities" ? "" : order) +
             " session with " +
             participant +
             " which will begin in " +
@@ -899,19 +913,10 @@ exports.researcherEventNotificationEmail = async (email, fullname, participant, 
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
         console.log({ error });
-        if (httpReq) {
-          return res.status(500).json({ error });
-        }
-      }
-      if (httpReq) {
-        return res.status(200).json({ done: true });
       }
     });
   } catch (err) {
     console.log({ err });
-    if (httpReq) {
-      return res.status(500).json({ err });
-    }
   }
 };
 
@@ -945,19 +950,10 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
     return transporter.sendMail(mailOptions, (error, data) => {
       if (error) {
         console.log({ error });
-        if (httpReq) {
-          return res.status(500).json({ error });
-        }
-      }
-      if (httpReq) {
-        return res.status(200).json({ done: true });
       }
     });
   } catch (err) {
     console.log({ err });
-    if (httpReq) {
-      return res.status(500).json({ err });
-    }
   }
 };
 
@@ -1213,12 +1209,18 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
       if (error) {
         console.log({ error });
       }
-      const userRef = db.collection("users").doc(fullname);
-      const userDoc = await userRef.get();
-      await userRef.update({
-        reminders: reminders + 1,
-        reminder: Timestamp.fromDate(nWeek)
-      });
+      const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
+      let userDoc = await userQuery.get();
+      if (!userDoc.docs.length) {
+        const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
+        userDoc = await userQuery.get();
+      }
+      if (userDoc.docs.length > 0) {
+        await userDoc.docs[0].ref.update({
+          reminders: reminders + 1,
+          reminder: Timestamp.fromDate(nWeek)
+        });
+      }
     });
   } catch (err) {
     console.log({ err });

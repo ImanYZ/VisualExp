@@ -143,6 +143,11 @@ const AppRouter = props => {
       if ("projectDone" in userData && userData.projectDone) {
         setHasScheduled(true);
         setCompletedExperiment(true);
+        if (!userData.surveyType) {
+          await users.docs[0].ref.update({
+            surveyType: "student"
+          });
+        }
       } else {
         const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", uEmail).get();
         const nowTimestamp = firebase.firestore.Timestamp.fromDate(new Date());
@@ -190,7 +195,11 @@ const AppRouter = props => {
     setEmail(uEmail);
 
     if (!isResearcher) {
-      setProject(userData.project);
+      if (!userData?.survey) {
+        setProject(userData.project);
+      } else {
+        setProject("OnlineCommunities");
+      }
     } else {
       // if current user a researcher
       const researcherData = researcherDoc.data();
@@ -382,7 +391,7 @@ const AppRouter = props => {
         reloadIfNotLoadedToday();
       }, 3600000);
     }
-    if (firebase && email && fullname && project !=="OnlineCommunities") {
+    if (firebase && email && fullname && project !== "OnlineCommunities") {
       areTheyDuringAnExperimentSession();
     }
   }, [firebase, email, fullname]);
