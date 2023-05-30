@@ -110,7 +110,7 @@ const SchedulePage = props => {
       if (userData.projectDone && !userData.surveyType) {
         setParticipatedBefore(true);
       }
-      if (userData.survey) {
+      if (userData.surveyType) {
         setProject("OnlineCommunities");
         project = "OnlineCommunities";
       }
