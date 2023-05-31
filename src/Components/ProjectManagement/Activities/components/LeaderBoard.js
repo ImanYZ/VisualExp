@@ -72,41 +72,11 @@ export const LeaderBoard = ({
 
   const markAttended = async (ev, index) => {
     try {
-      const { scheduleId, project } = ev.schedule;
       setStarting(true);
-      const participantFullname = ev.schedule.userId;
-      const order = ev.schedule.order;
-      const session = ev.schedule.session;
-      const month = moment(session).utcOffset(-4).startOf("month").format("YYYY-MM-DD");
-      const resScheduleDocs = await firebase.db
-        .collection("resSchedule")
-        .where("month", "==", month)
-        .where("project", "==", project)
-        .get();
-      let resScheduleData = {};
-      if (resScheduleDocs.docs.length > 0) {
-        resScheduleData = resScheduleDocs.docs[0].data();
-        if (!resScheduleData.hasOwnProperty("attendedSessions")) {
-          resScheduleData.attendedSessions = {};
-        }
-        const attendedSessions = resScheduleData.attendedSessions;
-        if (!attendedSessions.hasOwnProperty(fullname)) {
-          attendedSessions[fullname] = {};
-        }
-        if (attendedSessions.hasOwnProperty(fullname)) {
-          const startedSessionsByUser = attendedSessions[fullname];
-          if (startedSessionsByUser.hasOwnProperty(participantFullname)) {
-            if (!startedSessionsByUser[participantFullname].includes(order)) {
-              startedSessionsByUser[participantFullname].push(order);
-            }
-          } else {
-            startedSessionsByUser[participantFullname] = [order];
-          }
-        }
-      }
-      const resScheduleRef = firebase.db.collection("resSchedule").doc(resScheduleDocs.docs[0].id);
-      await resScheduleRef.update({ attendedSessions: resScheduleData.attendedSessions });
-      await firebase.db.collection("schedule").doc(scheduleId).update({ attended: true });
+      await axios.post("/markAttended", {
+        ev,
+        fullname
+      });
       const evs = [...onGoingEvents];
       evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
       setOnGoingEvents(evs);

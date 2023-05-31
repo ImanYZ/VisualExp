@@ -268,7 +268,6 @@ exports.getOngoingResearcherEvent = async (req, res) => {
         schedule: {
           scheduleId: schedule.docs[0].id,
           ...scheduleData,
-          project: userData.project,
           session: scheduleData.session.toDate(),
           firstname: userName,
           userId: userDocs.docs?.[0].id
@@ -283,6 +282,53 @@ exports.getOngoingResearcherEvent = async (req, res) => {
   }
 };
 
+exports.markAttended = async (req, res) => {
+  try {
+    const { ev, fullname } = req.body;
+    const { scheduleId, project } = ev.schedule;
+    const participantFullname = ev.schedule.userId;
+    const order = ev.schedule.order;
+    const session = ev.schedule.session;
+    const month = moment(session).utcOffset(-4).startOf("month").format("YYYY-MM-DD");
+    const resScheduleDocs = await db
+      .collection("resSchedule")
+      .where("month", "==", month)
+      .where("project", "==", project)
+      .get();
+    let resScheduleData = {};
+    if (resScheduleDocs.docs.length > 0) {
+      resScheduleData = resScheduleDocs.docs[0].data();
+      if (!resScheduleData.hasOwnProperty("attendedSessions")) {
+        resScheduleData.attendedSessions = {};
+      }
+      const attendedSessions = resScheduleData.attendedSessions;
+      if (!attendedSessions.hasOwnProperty(fullname)) {
+        attendedSessions[fullname] = {};
+      }
+      if (attendedSessions.hasOwnProperty(fullname)) {
+        const startedSessionsByUser = attendedSessions[fullname];
+        if (startedSessionsByUser.hasOwnProperty(participantFullname)) {
+          if (!startedSessionsByUser[participantFullname].includes(order)) {
+            startedSessionsByUser[participantFullname].push(order);
+          }
+        } else {
+          startedSessionsByUser[participantFullname] = [order];
+        }
+      }
+    }
+    const resScheduleRef = db.collection("resSchedule").doc(resScheduleDocs.docs[0].id);
+    await resScheduleRef.update({ attendedSessions: resScheduleData.attendedSessions });
+    await db.collection("schedule").doc(scheduleId).update({ attended: true });
+    console.log("project", project);
+    if (project === "OnlineCommunities") {
+      const userRef = db.collection("usersSurvey").doc(participantFullname);
+      await userRef.update({ projectDone: true });
+    }
+    res.status(200).send({ message: "seccess" });
+  } catch (error) {
+    res.status(500).send({ message: "Something went wrong", error });
+  }
+};
 // Get all the ongoing events.
 exports.ongoingEvents = async (req, res) => {
   try {
