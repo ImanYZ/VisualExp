@@ -82,7 +82,7 @@ const ManageEvents = props => {
           nextReminder: administratorData.nextReminder ? administratorData.nextReminder.toDate() : "",
           id: adminstratorDoc.id,
           votes: administratorData.upVotes - administratorData.downVotes,
-          scheduled: administratorData.yes ? "✅ " : "NO RESPONSE",
+          scheduled: administratorData?.scheduled ? "✅ " : "NO RESPONSE",
           inviteStudents: administratorData.inviteStudents ? "✅ " : "NO RESPONSE",
           emailstatus: administratorData.openedEmail ? "Opened" : "Not Opened",
           rescheduled: administratorData.later ? "✅ " : "NO RESPONSE",
