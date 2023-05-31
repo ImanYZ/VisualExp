@@ -880,17 +880,9 @@ exports.remindResearchersForAvailability = async context => {
 };
 
 const getUserDocsfromEmail = async email => {
-  let userDocs = await db.collection("users").where("email", "==", email.toLowerCase()).get();
-
-  if (userDocs.docs.length === 0) {
-    userDocs = await db.collection("instructors").where("email", "==", email.toLowerCase()).get();
-  }
-
-  if (userDocs.docs.length === 0) {
-    userDocs = await db.collection("usersSurvey").where("email", "==", email.toLowerCase()).get();
-  }
-
-  return userDocs;
+  let userDocs = await db.collection("users").where("email", "==", email).get();
+  const usersSurveyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
+  return [...userDocs.docs, ...usersSurveyDocs.docs];
 };
 exports.getUserDocsfromEmail = getUserDocsfromEmail;
 
@@ -903,6 +895,7 @@ exports.getUserDocsfromEmail = getUserDocsfromEmail;
 // - Reschedule if they have missed or declined them.
 exports.remindCalendarInvitations = async context => {
   try {
+    console.log("remindCalendarInvitations");
     // researchers = an object of emails as keys and the corresponding fullnames as values.
     const researchers = {};
     const researcherDocs = await db.collection("researchers").get();
@@ -919,9 +912,7 @@ exports.remindCalendarInvitations = async context => {
     const schedule = {};
     for (let scheduleDoc of scheduleDocs.docs) {
       const scheduleData = scheduleDoc.data();
-      const scheduleEventId = scheduleData.id;
-      delete scheduleData.id;
-      schedule[scheduleEventId] = {
+      schedule[scheduleData.id] = {
         ...scheduleData,
         schId: scheduleDoc.id
       };
@@ -930,13 +921,13 @@ exports.remindCalendarInvitations = async context => {
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
     let waitTime = 0;
-    const allEvents = await futureEvents(40);
+    const _futureEvents = await futureEvents(40);
     const currentTime = new Date().getTime();
     // Each Google Calendar event has {start, end, attendees}.
     // Each attendee has {email, responseStatus}
     // attendee.responseStatus can take one of these possible values:
     // 'accepted', 'needsAction', 'tentative', 'declined'
-    for (let ev of allEvents) {
+    for (let ev of _futureEvents) {
       const startTime = new Date(ev.start.dateTime).getTime();
       const hoursLeft = (startTime - currentTime) / (60 * 60 * 1000);
       // Find the scheduled session corresponding to this event.
@@ -974,122 +965,125 @@ exports.remindCalendarInvitations = async context => {
               // sessions they have completed so far, ... is through "users"
               const userDocs = await getUserDocsfromEmail(attendee.email.toLowerCase());
 
-              if (userDocs.docs.length > 0) {
-                const userData = userDocs.docs[0].data();
-                participant.firstname = userData.firstname;
-                if (userData.course) {
-                  participant.courseName = userData.course;
-                } else {
-                  participant.courseName = "";
-                }
-                // If the user has answered postQ2Choice it means they have
-                // completed the 1st session.
-                if (userData.postQ2Choice) {
-                  participant.firstDone = true;
-                } else {
-                  participant.firstDone = false;
-                }
-                // If the user has answered post3DaysQ2Choice it means they have
-                // completed the 2nd session.
-                if (userData.post3DaysQ2Choice) {
-                  participant.secondDone = true;
-                } else {
-                  participant.secondDone = false;
-                }
-                // If the user has completed all the experiment sessions, then
-                // projectDone should be true.
-                if (userData.projectDone) {
-                  participant.thirdDone = true;
-                } else {
-                  participant.thirdDone = false;
-                }
-                const participantAttendedFirstSession =
-                participant.project === "OnlineCommunities" ? schedule.attended : participant.firstDone;
-                // We consider "declined" and "tentative" responses as declined.
-                if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
-                  // If they have declined the 1st session, but they are not done
-                  // with the 1st session:
-                  if (order === "1st" && !participantAttendedFirstSession) {
-                    // Then, we delete all their sessions from Google Calendar and
-                    // schedule them, send them an email asking them to reschedule
-                    // all their sessions.
-                    setTimeout(() => {
-                      reschEventNotificationEmail(
-                        participant.email,
-                        participant.firstname,
-                        false,
-                        participant.courseName,
-                        hoursLeft,
-                        false,
-                        true,
-                        true,
-                        null
-                      );
-                    }, waitTime);
-                    // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
-                  } else if (
-                    (order === "2nd" && !participant.secondDone) ||
-                    (order === "3rd" && !participant.thirdDone)
-                  ) {
-                    // If the session is 2nd/3rd, but they have not completed the
-                    // corresponding session:
-                    // Then, we send them an email asking them to reschedule
-                    // their 2nd/3rd session on the same day, otherwise their
-                    // application would be withdrawn.
-                    setTimeout(() => {
-                      eventNotificationEmail(
-                        participant.email,
-                        participant.firstname,
-                        false,
-                        participant.courseName,
-                        hoursLeft,
-                        false,
-                        "",
-                        order,
-                        false,
-                        true,
-                        userData.project
-                      );
-                    }, waitTime);
-                    // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
-                  }
-                } else if (
-                  // If they have not declined, but did not accept either, and
-                  // less than 25 hours is left to the start of their experiment session:
-                  hoursLeft <= 25
-                ) {
-                  // If it's their 3rd session, but they did not complete their 2nd session:
-                  if (order === "3rd" && !participant.secondDone) {
-                    // Delete the 3rd session, because logically they should not go through
-                    // the 3rd session without completing the 2nd one.
-                    await deleteEvent(ev.id);
-                    // Also, remove the Calendar event id and order from their schedule doc.
-                    const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
-                    await scheduleRef.update({
-                      id: FieldValue.delete(),
-                      order: FieldValue.delete()
-                    });
+              if (userDocs.length > 0) {
+                for (let userDoc of userDocs) {
+                  const userData = userDoc.data();
+                  if (userData.project !== participant.project) continue;
+                  participant.firstname = userData.firstname;
+                  if (userData.course) {
+                    participant.courseName = userData.course;
                   } else {
-                    setTimeout(() => {
-                      // Email every four hours to remind them that they need to accept the
-                      // Google Calendar invite for whichever session they have not accepted yet.
-                      eventNotificationEmail(
-                        participant.email,
-                        participant.firstname,
-                        false,
-                        participant.courseName,
-                        hoursLeft,
-                        false,
-                        "",
-                        order,
-                        false,
-                        false
-                      );
-                    }, waitTime);
-                    // Increase waitTime by a random integer between 1 to 4 seconds.
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                    participant.courseName = "";
+                  }
+                  // If the user has answered postQ2Choice it means they have
+                  // completed the 1st session.
+                  if (userData.postQ2Choice) {
+                    participant.firstDone = true;
+                  } else {
+                    participant.firstDone = false;
+                  }
+                  // If the user has answered post3DaysQ2Choice it means they have
+                  // completed the 2nd session.
+                  if (userData.post3DaysQ2Choice) {
+                    participant.secondDone = true;
+                  } else {
+                    participant.secondDone = false;
+                  }
+                  // If the user has completed all the experiment sessions, then
+                  // projectDone should be true.
+                  if (userData.projectDone) {
+                    participant.thirdDone = true;
+                  } else {
+                    participant.thirdDone = false;
+                  }
+                  const participantAttendedFirstSession =
+                    participant.project === "OnlineCommunities" ? schedule[ev.id].attended : participant.firstDone;
+                  // We consider "declined" and "tentative" responses as declined.
+                  if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
+                    // If they have declined the 1st session, but they are not done
+                    // with the 1st session:
+                    if (order === "1st" && !participantAttendedFirstSession) {
+                      // Then, we delete all their sessions from Google Calendar and
+                      // schedule them, send them an email asking them to reschedule
+                      // all their sessions.
+                      setTimeout(() => {
+                        reschEventNotificationEmail(
+                          participant.email,
+                          participant.firstname,
+                          false,
+                          participant.courseName,
+                          hoursLeft,
+                          false,
+                          true,
+                          true,
+                          null
+                        );
+                      }, waitTime);
+                      // Increase waitTime by a random integer between 1 to 4 seconds.
+                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                    } else if (
+                      (order === "2nd" && !participant.secondDone) ||
+                      (order === "3rd" && !participant.thirdDone)
+                    ) {
+                      // If the session is 2nd/3rd, but they have not completed the
+                      // corresponding session:
+                      // Then, we send them an email asking them to reschedule
+                      // their 2nd/3rd session on the same day, otherwise their
+                      // application would be withdrawn.
+                      setTimeout(() => {
+                        eventNotificationEmail(
+                          participant.email,
+                          participant.firstname,
+                          false,
+                          participant.courseName,
+                          hoursLeft,
+                          false,
+                          "",
+                          order,
+                          false,
+                          true,
+                          userData.project
+                        );
+                      }, waitTime);
+                      // Increase waitTime by a random integer between 1 to 4 seconds.
+                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                    }
+                  } else if (
+                    // If they have not declined, but did not accept either, and
+                    // less than 25 hours is left to the start of their experiment session:
+                    hoursLeft <= 25
+                  ) {
+                    // If it's their 3rd session, but they did not complete their 2nd session:
+                    if (order === "3rd" && !participant.secondDone) {
+                      // Delete the 3rd session, because logically they should not go through
+                      // the 3rd session without completing the 2nd one.
+                      await deleteEvent(ev.id);
+                      // Also, remove the Calendar event id and order from their schedule doc.
+                      const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
+                      await scheduleRef.update({
+                        id: FieldValue.delete(),
+                        order: FieldValue.delete()
+                      });
+                    } else {
+                      setTimeout(() => {
+                        // Email every four hours to remind them that they need to accept the
+                        // Google Calendar invite for whichever session they have not accepted yet.
+                        eventNotificationEmail(
+                          participant.email,
+                          participant.firstname,
+                          false,
+                          participant.courseName,
+                          hoursLeft,
+                          false,
+                          "",
+                          order,
+                          false,
+                          false
+                        );
+                      }, waitTime);
+                      // Increase waitTime by a random integer between 1 to 4 seconds.
+                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                    }
                   }
                 }
               }
@@ -1099,8 +1093,8 @@ exports.remindCalendarInvitations = async context => {
       }
     }
     // Look into all Google Calendar sessions in the past 40 days:
-    const pastEvs = await pastEvents(40);
-    for (let ev of pastEvs) {
+    const _pastEvents = await pastEvents(40);
+    for (let ev of _pastEvents) {
       const startTime = new Date(ev.start.dateTime);
       // Because some people may spend more time in their sessions,
       // we should consider the fact that while someone has not ended their session yet,
@@ -1116,7 +1110,8 @@ exports.remindCalendarInvitations = async context => {
       ) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase()
+          email: schedule[ev.id].email.toLowerCase(),
+          project: schedule[ev.id].project
         };
         const order = schedule[ev.id].order;
         for (let attendee of ev.attendees) {
@@ -1126,75 +1121,75 @@ exports.remindCalendarInvitations = async context => {
             // The only way to get the user data, like their firstname, which
             // sessions they have completed so far, ... is through "users"
             const userDocs = await getUserDocsfromEmail(attendee.email.toLowerCase());
+            if (userDocs.length > 0) {
+              for (let userDoc of userDocs) {
+                const userData = userDoc.data();
+                if (userData.project !== participant.project) continue;
+                participant.firstname = userData.firstname;
+                if (userData.course) {
+                  participant.courseName = userData.course;
+                } else {
+                  participant.courseName = "";
+                }
+                if (userData.postQ2Choice) {
+                  participant.firstDone = true;
+                } else {
+                  participant.firstDone = false;
+                }
+                if (userData.post3DaysQ2Choice) {
+                  participant.secondDone = true;
+                } else {
+                  participant.secondDone = false;
+                }
+                if (userData.post1WeekQ2Choice) {
+                  participant.thirdDone = true;
+                } else {
+                  participant.thirdDone = false;
+                }
 
-            if (userDocs.docs.length > 0) {
-              const userData = userDocs.docs[0].data();
-              participant.firstname = userData.firstname;
-              if (userData.course) {
-                participant.courseName = userData.course;
-              } else {
-                participant.courseName = "";
-              }
-              if (userData.postQ2Choice) {
-                participant.firstDone = true;
-              } else {
-                participant.firstDone = false;
-              }
-              if (userData.post3DaysQ2Choice) {
-                participant.secondDone = true;
-              } else {
-                participant.secondDone = false;
-              }
-              if (userData.post1WeekQ2Choice) {
-                participant.thirdDone = true;
-              } else {
-                participant.thirdDone = false;
-              }
-
-              // For project Annotating (survey) we will not have firstDone field in the participant
-              // So if they missed they attended the first session that that means
-              // the schedule object should have a hasStarted field
-
-              const participantAttendedFirstSession =
-               participant.project === "OnlineCommunities" ? schedule.attended : participant.firstDone;
-
-              if (order === "1st" && !participantAttendedFirstSession) {
-                // Then, we delete all their sessions from Google Calendar and
-                // schedule then, send them an email asking them to reschedule
-                // all their sessions.
-                setTimeout(() => {
-                  reschEventNotificationEmail(
-                    participant.email,
-                    participant.firstname,
-                    false,
-                    participant.courseName,
-                    hoursLeft,
-                    false,
-                    attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
-                    null
-                  );
-                }, waitTime);
-                waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
-              } else if (order === "3rd" && !participant.secondDone) {
-                // If it's their 3rd session, but they did not complete their 2nd session:
-                // Delete the 3rd session, because logically they should not go through
-                // the 3rd session without completing the 2nd one .
-                await deleteEvent(ev.id);
-                // Also, remove the Calendar event id and order from their schedule doc.
-                const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
-                await scheduleRef.update({
-                  id: FieldValue.delete(),
-                  order: FieldValue.delete()
-                });
-              } else if (isToday(startTime)) {
-                // Only if it is a 2nd/3rd session that was scheduled today, but they
-                // missed it, we email them to reschedule their session on the same day;
-                // otherwise, we will withdraw their application.
-                if ((order === "2nd" && !participant.secondDone) || (order === "3rd" && !participant.thirdDone)) {
+                // For project OnlineCommunities (survey) we will not have firstDone field in the participant
+                // So if they missed they attended the first session  that means
+                // the schedule object should have a attended field
+                const participantAttendedFirstSession =
+                  participant.project === "OnlineCommunities" ? schedule[ev.id].attended : participant.firstDone;
+                if (order === "1st" && !participantAttendedFirstSession) {
+                  // Then, we delete all their sessions from Google Calendar and
+                  // schedule then, send them an email asking them to reschedule
+                  // all their sessions.
                   setTimeout(() => {
-                    notAttendedEmail(participant.email, participant.firstname, false, participant.courseName, order);
+                    reschEventNotificationEmail(
+                      participant.email,
+                      participant.firstname,
+                      false,
+                      participant.courseName,
+                      hoursLeft,
+                      false,
+                      attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
+                      null
+                    );
                   }, waitTime);
                   waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                } else if (order === "3rd" && !participant.secondDone) {
+                  // If it's their 3rd session, but they did not complete their 2nd session:
+                  // Delete the 3rd session, because logically they should not go through
+                  // the 3rd session without completing the 2nd one .
+                  await deleteEvent(ev.id);
+                  // Also, remove the Calendar event id and order from their schedule doc.
+                  const scheduleRef = db.collection("schedule").doc(schedule[ev.id].schId);
+                  await scheduleRef.update({
+                    id: FieldValue.delete(),
+                    order: FieldValue.delete()
+                  });
+                } else if (isToday(startTime)) {
+                  // Only if it is a 2nd/3rd session that was scheduled today, but they
+                  // missed it, we email them to reschedule their session on the same day;
+                  // otherwise, we will withdraw their application.
+                  if ((order === "2nd" && !participant.secondDone) || (order === "3rd" && !participant.thirdDone)) {
+                    setTimeout(() => {
+                      notAttendedEmail(participant.email, participant.firstname, false, participant.courseName, order);
+                    }, waitTime);
+                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                  }
                 }
               }
             }
