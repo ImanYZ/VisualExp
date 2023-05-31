@@ -261,6 +261,7 @@ export const LeaderBoard = ({
                   variant="outlined"
                   color={color}
                   style={{ margin: "5px" }}
+                  disabled={ev?.schedule?.attended}
                   onClick={() => sendEventNotificationEmail(ev, index)}
                 />
                 {!ev?.schedule?.hasStarted && (
@@ -277,6 +278,7 @@ export const LeaderBoard = ({
                     label="Mark Attended"
                     color={color}
                     style={{ margin: "5px" }}
+                    disabled={ev?.schedule?.attended}
                     onClick={() => markAttended(ev, index)}
                   />
                 )}
