@@ -41,7 +41,7 @@ const createExperimentEvent = async (email, researcher, order, start, end, proje
         "<p><strong><u>Please confirm your attendance in this session by accepting the invitation on Google Calendar or through the link at the bottom of the invitation email.</u></strong></p>" +
         "<p><strong><u>Note that accepting the invitation through Microsoft Outlook does not work!</u></strong></p><div>";
   const colorId = isAnnotating ? "5" : order === "1st" ? "4" : "3";
-  const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
+  const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }, {email : "ouhrac@gmail.com"}], colorId);
   return eventCreated;
 };
 exports.createExperimentEvent = createExperimentEvent;
