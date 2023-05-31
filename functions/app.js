@@ -50,7 +50,8 @@ const {
   deleteEvent,
   scheduleLifeLog,
   getOngoingResearcherEvent,
-  ongoingEvents
+  ongoingEvents,
+  markAttended
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
@@ -121,6 +122,7 @@ app.post("/schedule", schedule);
 app.post("/scheduleSingleSession", scheduleSingleSession);
 app.post("/allEvents", allEvents);
 app.post("/getOngoingResearcherEvent", getOngoingResearcherEvent);
+app.post("/markAttended", markAttended);
 app.post("/ongoingEvents", ongoingEvents);
 app.post("/deleteEvent", deleteEvent);
 app.post("/scheduleLifeLog", scheduleLifeLog);
