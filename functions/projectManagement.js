@@ -943,7 +943,8 @@ exports.remindCalendarInvitations = async context => {
       if (ev.id in schedule && "attendees" in ev && Array.isArray(ev.attendees)) {
         // Get the participant's email and order through the scheduled session.
         const participant = {
-          email: schedule[ev.id].email.toLowerCase()
+          email: schedule[ev.id].email.toLowerCase(),
+          project: schedule[ev.id].project
         };
         const order = schedule[ev.id].order;
         for (let attendee of ev.attendees) {
@@ -1002,12 +1003,13 @@ exports.remindCalendarInvitations = async context => {
                 } else {
                   participant.thirdDone = false;
                 }
-
+                const participantAttendedFirstSession =
+                participant.project === "OnlineCommunities" ? schedule.attended : participant.firstDone;
                 // We consider "declined" and "tentative" responses as declined.
                 if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
                   // If they have declined the 1st session, but they are not done
                   // with the 1st session:
-                  if (order === "1st" && !participant.firstDone) {
+                  if (order === "1st" && !participantAttendedFirstSession) {
                     // Then, we delete all their sessions from Google Calendar and
                     // schedule them, send them an email asking them to reschedule
                     // all their sessions.
@@ -1154,7 +1156,7 @@ exports.remindCalendarInvitations = async context => {
               // the schedule object should have a hasStarted field
 
               const participantAttendedFirstSession =
-                userData.project === "OnlineCommunities" ? schedule.attended : participant.firstDone;
+               participant.project === "OnlineCommunities" ? schedule.attended : participant.firstDone;
 
               if (order === "1st" && !participantAttendedFirstSession) {
                 // Then, we delete all their sessions from Google Calendar and
