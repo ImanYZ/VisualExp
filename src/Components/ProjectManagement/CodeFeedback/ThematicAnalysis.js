@@ -317,7 +317,7 @@ const ThematicAnalysis = props => {
           sx={{ bgcolor: "grey.300" }}
         />
         <CardContent sx={{ p: 0 }}>
-          {[...new Set(conv.sentence.split(".").filter(x => x.trim()))].map(sentence => (
+          {[...new Set(conv.sentence.replace(/"/g, '').split(".").filter(x => x.trim()))].map(sentence => (
             <ListItem key={sentence} disablePadding>
               <ListItemButton
                 value={sentence}
