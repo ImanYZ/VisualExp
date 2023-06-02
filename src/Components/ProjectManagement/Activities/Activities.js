@@ -28,6 +28,7 @@ import AddAdministrator from "../AddAdministrator/AddAdministrator";
 import OneCademy from "../OneCademy/OneCademy";
 import FreeRecallGrading from "../FreeRecallGrading/FreeRecallGrading";
 import CodeFeedback from "../CodeFeedback/CodeFeedback";
+import ThematicAnalysis from "../CodeFeedback/ThematicAnalysis";
 import Accumulative from "../ManageEvents/Accumulative";
 import { LeaderBoard, ProjectPointThresholds } from "./components";
 import { formatPoints } from "../../../utils";
@@ -43,18 +44,6 @@ const AdminAccessPages = [
   { page: "Experiments", view: <ManageEvents /> },
   { page: "RecallForIman", view: <RecallForIman /> },
   { page: "Accumulative", view: <Accumulative /> }
-];
-
-const CommonPages = [
-  { page: "Intellectual", view: <IntellectualPoints /> },
-  { page: "Experiments", view: <ExperimentPoints /> },
-  { page: "AddInstructor", view: <AddInstructor /> },
-  { page: "AddAdministrator", view: <AddAdministrator /> },
-  { page: "1Cademy", view: <OneCademy /> },
-  { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
-  { page: "CodeFeedback", view: <CodeFeedback /> },
-  { page: "ResearcherPassage", view: <ResearcherPassage /> },
-  { page: "SchemaGenerationTool", view: <SchemaGeneration /> }
 ];
 
 const Activities = props => {
@@ -75,6 +64,17 @@ const Activities = props => {
   const [onGoingEvents, setOnGoingEvents] = useState([]);
   const hideLeaderBoard = useRecoilValue(hideLeaderBoardState);
 
+  const CommonPages = [
+    { page: "Intellectual", view: <IntellectualPoints /> },
+    { page: "Experiments", view: <ExperimentPoints /> },
+    { page: "AddInstructor", view: <AddInstructor /> },
+    { page: "AddAdministrator", view: <AddAdministrator /> },
+    { page: "1Cademy", view: <OneCademy /> },
+    { page: "FreeRecallGrading", view: <FreeRecallGrading /> },
+    { page: "CodeFeedback", view: project === "OnlineCommunities" ? <ThematicAnalysis /> : <CodeFeedback /> },
+    { page: "ResearcherPassage", view: <ResearcherPassage /> },
+    { page: "SchemaGenerationTool", view: <SchemaGeneration /> }
+  ];
   useEffect(() => {
     const getOngoingResearcherEvent = async () => {
       try {
