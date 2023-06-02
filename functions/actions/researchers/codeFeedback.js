@@ -2,6 +2,7 @@ const { db } = require("../../admin");
 const { assignExpPoints } = require("../../helpers/assignExpPoints");
 const { Timestamp } = require("firebase-admin/firestore");
 
+
 module.exports = async (req, res) => {
   try {
     const { fullname, docId, quotesSelectedForCodes, choiceConditions, approvedCodes, project } = req.body;
@@ -16,13 +17,6 @@ module.exports = async (req, res) => {
       let transactionWrites = [];
 
       const feedbackCodeRef = db.collection("feedbackCode").doc(docId);
-      const feedbackCodeOrders = await t.get(
-        db.collection("feedbackCodeOrderV2").where("project", "==", project).where("researcher", "==", fullname)
-      );
-      const feedbackOrderRef = db.collection("feedbackCodeOrderV2").doc(feedbackCodeOrders.docs[0].id);
-
-      const feedOrderData = feedbackCodeOrders.docs[0].data();
-      feedOrderData.codeIds.splice(feedOrderData.codeIds.indexOf(docId), 1);
       const feedbackCodeDoc = await t.get(feedbackCodeRef);
       const feedbackCodeData = feedbackCodeDoc.data();
       let codesVotes = {};
@@ -155,12 +149,6 @@ module.exports = async (req, res) => {
         type: "update",
         refObj: feedbackCodeRef,
         updateObj: feedbackCodeUpdate
-      });
-
-      transactionWrites.push({
-        type: "update",
-        refObj: feedbackOrderRef,
-        updateObj: feedOrderData
       });
 
       const recallGradeLogRef = db.collection("feedbackCodeLogs").doc();
