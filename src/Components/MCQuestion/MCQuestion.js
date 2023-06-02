@@ -57,8 +57,15 @@ const MCQuestion = props => {
 
   const retrieveFeedbackcodes = async () => {
     const experimentCodeDocs = await firebase.db.collection("feedbackCodeBooks").where("approved", "==", true).get();
-    let _codes = experimentCodeDocs.docs.map(doc => doc.data().code);
-    _codes = _codes.filter(code => !code.hasOwnProperty("project") || code.project !== "OnlineCommunities");
+    let _codes = experimentCodeDocs.docs
+      .map(doc => {
+        if (doc.data().project !== "OnlineCommunities") {
+          return doc.data().code;
+        } else {
+          return null;
+        }
+      })
+      .filter(code => code);
     setCodes(_codes);
   };
 
