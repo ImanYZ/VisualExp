@@ -36,8 +36,10 @@ import Select from "@mui/material/Select";
 import Tooltip from "@mui/material/Tooltip";
 import { Card, CardHeader, CardContent } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-
-import { codesColumn, feedBackCodesColumns } from "./Columns";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { _codesColumn, feedBackCodesColumns } from "./Columns";
 
 const CodeFeedback = props => {
   const firebase = useRecoilValue(firebaseState);
@@ -97,6 +99,44 @@ const CodeFeedback = props => {
   const online = project === "OnlineCommunities";
   const projectRef = useRef(project);
 
+  const codesColumn = [
+    ..._codesColumn,
+    {
+      field: "action",
+      headerName: "Action",
+      renderCell: cellValues => {
+        return (
+          <>
+            <IconButton
+              sx={{ mR: "10px" }}
+              edge="end"
+              aria-label="edit"
+              onClick={() => {
+                console.log("first");
+                setCode(cellValues.row.code);
+                setCategory(cellValues.row.category || "");
+                setAdminCodeData(cellValues.row);
+                handleOpenAdminEditModal();
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => {
+                console.log("first");
+                setAdminCodeData(cellValues.row);
+                handleOpenDeleteModalAdmin();
+              }}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </>
+        );
+      }
+    }
+  ];
   useEffect(() => {
     if (firebase) {
       const feedbackCodeQuery = firebase.db.collection("feedbackCode").where("coders", "array-contains", fullname);
@@ -1184,7 +1224,7 @@ const CodeFeedback = props => {
         </Paper>
       </Box>
 
-      {email === "oneweb@umich.edu" && (
+      {email === "ouhrac@gmail.com" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
