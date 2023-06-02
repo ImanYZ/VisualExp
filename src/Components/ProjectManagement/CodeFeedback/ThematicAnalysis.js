@@ -722,7 +722,7 @@ const ThematicAnalysis = props => {
             />
           </Paper>
         </Box>
-        {email === "ouhrac@gmail.com" && (
+        {email === "oneweb@umich.edu" && (
           <Box sx={{ mb: "50px" }}>
             {openAdminEditModal && (
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "15px", justifyContent: "center" }}>
