@@ -313,7 +313,7 @@ const SchedulePage = props => {
     try {
       setIsSubmitting(true);
 
-       let userDoc = await firebase.db.collection("users").where("email", "==", email).get();
+      let userDoc = await firebase.db.collection("users").where("email", "==", email).get();
 
       if (!userDoc.docs.length) {
         userDoc = await firebase.db.collection("usersSurvey").where("email", "==", email).get();
@@ -475,8 +475,9 @@ const SchedulePage = props => {
                 <ul id="WarningPoints">
                   <li>
                     {" "}
-                    Please specify your availability for a 45-minute (3 consecutive slots) introduction and interview
-                    session
+                    Please specify your availability {" "}
+                    {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[0], 0)} introduction and
+                    interview session
                     <strong> in your timezone</strong>.
                   </li>
                   <li>
