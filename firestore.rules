@@ -264,5 +264,9 @@ service cloud.firestore {
        allow read: if  true;
        allow write: if true;
     }
+    match /thematicAnalysis/{thematicAnalysisId} {
+       allow read: if  true;
+       allow write: if true;
+    }
   }
 }
