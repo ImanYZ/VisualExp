@@ -24,7 +24,8 @@ const {
   passagesNumberCorrection,
   retreiveFeedbackcodes,
   lodResponses,
-  voteOnSingleRecall
+  voteOnSingleRecall,
+  lodRecallGrades
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -134,6 +135,7 @@ app.post("/recallUpload", recallUpload);
 app.post("/lodResponses", lodResponses);
 app.post("/voteOnSingleRecall", voteOnSingleRecall);
 app.use("/admin", adminRouter);
+app.post("/lodRecallGrades", lodRecallGrades);
 // Knowledge endpoints
 
 // Misinformation Experiment

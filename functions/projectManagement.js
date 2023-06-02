@@ -1484,3 +1484,60 @@ exports.voteOnSingleRecall = async (req, res) => {
     console.log(error);
   }
 };
+
+const getRecallConditionsByRecallGrade = (recallGradeDoc, fullname) => {
+  const gptResearcher = "Iman YeckehZaare";
+  const recallGradeData = recallGradeDoc.data();
+  const _conditionItems = [];
+  Object.entries(recallGradeData.sessions).map(async ([session, conditionItems]) => {
+    conditionItems.forEach(conditionItem => {
+      const filtered = (conditionItem.response || "")
+        .replace(/[\.,]/g, " ")
+        .split(" ")
+        .filter(w => w.trim());
+      if (
+        recallGradeData.user !== fullname &&
+        !conditionItem.researchers.includes(fullname) &&
+        conditionItem.researchers.filter(researcher => researcher !== gptResearcher).length < 4 &&
+        filtered.length > 2
+      ) {
+        conditionItem.phrases = conditionItem.phrases.filter(p => !p.deleted && !p.researchers.includes(fullname));
+        _conditionItems.push({
+          docId: recallGradeDoc.id,
+          session,
+          user: recallGradeData.user,
+          project: recallGradeData.project,
+          ...conditionItem
+        });
+      }
+    });
+  });
+
+  return _conditionItems;
+};
+
+const consumeRecallGradesChanges = (recallGradesDocs, fullname) => {
+  let recallGrades = {};
+  for (const recallGradeDoc of recallGradesDocs) {
+    const recallGradeDaa = recallGradeDoc.data();
+    const _recallGrades = getRecallConditionsByRecallGrade(recallGradeDoc, fullname);
+    if (recallGrades.hasOwnProperty(recallGradeDaa.project)) {
+      recallGrades[recallGradeDaa.project] = [...recallGrades[recallGradeDaa.project], ..._recallGrades];
+    } else {
+      recallGrades[recallGradeDaa.project] = [..._recallGrades];
+    }
+  }
+  return recallGrades;
+};
+exports.lodRecallGrades = async (req, res) => {
+  try {
+    const { fullname } = req.body;
+    console.log("fullname", fullname);
+    let recallGradesDocs = await db.collection("recallGradesV2").get();
+    let _recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
+    res.status(200).send(_recallGrades);
+  } catch (error) {
+    res.status(500).send({ message: "error", data: error });
+    console.log(error);
+  }
+};
