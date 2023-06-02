@@ -627,8 +627,8 @@ const ThematicAnalysis = props => {
 
     if (_newCategory !== "" && !categories.includes(_newCategory)) {
       categories.push(_newCategory);
+      setCategory(_newCategory);
     }
-
     setNewCategory("");
   };
 

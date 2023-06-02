@@ -1,43 +1,18 @@
 const { db } = require("../admin");
 
-const validateBooleanExpression = (schemaEp, response) => {
-  const text = response;
-  if (!text) return false;
-  let keys = {};
-  let notKeywords = [];
-  for (let schemaE of schemaEp) {
-    if (!schemaE.not) {
-      let keywords = [...schemaE.alternatives];
-      keywords = keywords.filter(x => x && x !== "");
-      if (schemaE.keyword !== "") {
-        keys[schemaE.keyword] = keywords;
-      }
-    } else {
-      const noKeywords = [...schemaE.alternatives];
-      if (schemaE.keyword !== "") {
-        noKeywords.push(schemaE.keyword);
-      }
-      notKeywords = [...notKeywords, ...noKeywords];
-    }
-  }
 
-  notKeywords = notKeywords.filter(x => x && x !== "");
-  let containsWord = true;
-  const notContainsWord = notKeywords.some(element => text.toLowerCase().includes(element.toLowerCase()));
-  for (let key in keys) {
-    const containsKeys = [key, ...keys[key]];
-    containsWord = containsKeys.some(element => text.toLowerCase().includes(element.toLowerCase()));
-    if (!containsWord) {
-      break;
+const validateBooleanExpression = (rules, response) => {
+  return rules.every(rule => {
+    const { keyword, alternatives, not } = rule;
+    let keywords = [keyword];
+    if (alternatives && alternatives.length && alternatives.length > 0) {
+      keywords = [keyword, ...alternatives];
     }
-  }
-  if (!notContainsWord && containsWord) {
-    return true;
-  } else {
-    return false;
-  }
+    keywords.filter(kw => kw !== "");
+    const match = keywords.some(kw => response.toLowerCase().includes(kw.toLowerCase()));
+    return (match && !not) || (!match && not);
+  });
 };
-
 exports.getNonSatisfiedPhrasesByPassageTitle = async (passageTitle, response, phrases) => {
   const booleanScratchDoc = await db.collection("booleanScratch")
     .where("passage", "==", passageTitle)
