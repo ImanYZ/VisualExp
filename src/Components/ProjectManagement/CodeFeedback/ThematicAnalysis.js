@@ -637,7 +637,7 @@ const ThematicAnalysis = props => {
       <Box sx={{ ml: "15px", mr: "15px", mt: "15px" }}>
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
-            <h2 style={{ alignSelf: "center" }}> Converstation : </h2>
+            <h2 style={{ alignSelf: "center" }}> Conversation : </h2>
             <Box height={600} overflow="auto">
               {converstaion.length > 0 ? (
                 <ConversationList />
