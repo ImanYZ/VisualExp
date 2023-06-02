@@ -25,7 +25,6 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import LoadingButton from "@mui/lab/LoadingButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
