@@ -74,6 +74,6 @@ researchersRouter.post("/schedule", async (req, res) => {
 
 // POST /api/researchers/gradeRecalls
 researchersRouter.post("/gradeRecalls", gradeRecalls);
-researchersRouter.post("/codeFeedback",codeFeedback);
+researchersRouter.post("/codeFeedback", codeFeedback);
 
 module.exports = researchersRouter;
