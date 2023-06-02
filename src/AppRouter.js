@@ -525,6 +525,7 @@ const AppRouter = props => {
                 <Route path="Activities/Accumulative" element={<Activities activityName="Accumulative" />} />
                 <Route path="Activities/1Cademy" element={<Activities activityName="1Cademy" />} />
                 <Route path="Activities/FreeRecallGrading" element={<Activities activityName="FreeRecallGrading" />} />
+                <Route path="Activities/ThematicAnalysis" element={<Activities activityName="ThematicAnalysis" />} />
                 <Route
                   path="Activities/SchemaGeneration"
                   element={<Activities hideLeaderBoard activityName="SchemaGenerationTool" />}
