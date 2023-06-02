@@ -556,7 +556,7 @@ const ThematicAnalysis = props => {
           />
         </Paper>
       </Box>
-      {email === "ouhracs@gmail.com" && (
+      {email === "oneweb@umich.edu" && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <DataGrid
