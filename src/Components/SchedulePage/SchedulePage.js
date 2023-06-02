@@ -96,7 +96,6 @@ const SchedulePage = props => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      let isSurvey = false;
       // We need to first retrieve which project this user belongs to.
 
       let userDoc = await firebase.db.collection("users").where("email", "==", email).get();
@@ -328,7 +327,7 @@ const SchedulePage = props => {
       let responseObj = null;
       if (userDoc.docs.length > 0) {
         const userData = userDoc.docs[0].data();
-        if (userData.projectDone && !userData.survey) {
+        if (userData.projectDone && !userData.surveyType) {
           setParticipatedBefore(true);
           setIsSubmitting(false);
           return;
@@ -475,7 +474,7 @@ const SchedulePage = props => {
                 <ul id="WarningPoints">
                   <li>
                     {" "}
-                    Please specify your availability {" "}
+                    Please specify your availability{" "}
                     {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[0], 0)} introduction and
                     interview session
                     <strong> in your timezone</strong>.
