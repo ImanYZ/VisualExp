@@ -73,6 +73,7 @@ const ThematicAnalysis = props => {
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
   const [code, setCode] = useState("");
   const [submittingDelete, setSubmittingDelete] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
   const [listOfTranscript, setListOfTranscript] = useState([]);
 
@@ -96,7 +97,6 @@ const ThematicAnalysis = props => {
               edge="end"
               aria-label="edit"
               onClick={() => {
-                console.log("first");
                 setCode(cellValues.row.code);
                 setCategory(cellValues.row.category || "");
                 setAdminCodeData(cellValues.row);
@@ -109,7 +109,6 @@ const ThematicAnalysis = props => {
               edge="end"
               aria-label="delete"
               onClick={() => {
-                console.log("first");
                 setAdminCodeData(cellValues.row);
                 handleOpenDeleteModalAdmin();
               }}
@@ -361,8 +360,8 @@ const ThematicAnalysis = props => {
   const ConversationList = ({ codes }) => {
     // group the codes by category
     // create a card for each category
-    const cards = converstaion.map(conv => (
-      <Card key={conv.sentence} sx={{ mb: 1 }}>
+    const cards = converstaion.map((conv, index) => (
+      <Card key={conv.sentence + index} sx={{ mb: 1 }}>
         <CardHeader
           title={
             <Typography variant="h6" component="h2">
@@ -606,7 +605,7 @@ const ThematicAnalysis = props => {
       setSubmittingDelete(false);
     }
   };
-  const categories = useMemo(() => {
+  let categories = useMemo(() => {
     const _categories = [];
     for (let code of approvedCodes) {
       if (!_categories.includes(code.category)) {
@@ -615,50 +614,26 @@ const ThematicAnalysis = props => {
     }
     return _categories;
   }, [approvedCodes]);
+  const handleChange = event => {
+    setCategory(event.target.value);
+  };
+
+  const handleInputChange = event => {
+    setNewCategory(event.target.value);
+  };
+
+  const handleNewCategory = () => {
+    const _newCategory = newCategory.trim();
+
+    if (_newCategory !== "" && !categories.includes(_newCategory)) {
+      categories.push(_newCategory);
+    }
+
+    setNewCategory("");
+  };
 
   return (
     <>
-      <Dialog open={openAdminEditModal} onClose={handleCloseAdminEditModal}>
-        <DialogTitle sx={{ fontsize: "10px" }}>Update the code</DialogTitle>
-        <DialogContent sx={{ width: "500px" }}>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="code"
-            label="Update the code here."
-            fullWidth
-            variant="standard"
-            value={code}
-            width="100%"
-            onChange={event => setCode(event.target.value)}
-          />
-          <>Category : </>
-          <Select value={category} onChange={handlChange} label="category" id="category">
-            {categories.map(researcher => {
-              return <MenuItem value={researcher}>{researcher}</MenuItem>;
-            })}
-          </Select>
-        </DialogContent>
-        <DialogActions>
-          <LoadingButton
-            loading={submittingUpdate}
-            disabled={submittingUpdate}
-            onClick={handleAdminEdit}
-            loadingPosition="start"
-            variant="outlined"
-          >
-            {submittingUpdate ? `Updating...` : `Update`}
-          </LoadingButton>
-          <Button
-            onClick={() => {
-              setCode("");
-              handleCloseAdminEditModal();
-            }}
-          >
-            cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
       <Box sx={{ ml: "15px", mr: "15px", mt: "15px" }}>
         <Grid container spacing={0.5}>
           <Grid item xs={6}>
@@ -747,8 +722,59 @@ const ThematicAnalysis = props => {
             />
           </Paper>
         </Box>
-        {email === "oneweb@umich.edu" && (
+        {email === "ouhrac@gmail.com" && (
           <Box sx={{ mb: "50px" }}>
+            {openAdminEditModal && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "15px", justifyContent: "center" }}>
+                <TextField
+                  label="Add your code here."
+                  variant="outlined"
+                  value={code}
+                  multiline
+                  rows={4}
+                  sx={{ width: "45%", m: 0.5 }}
+                  onChange={event => setCode(event.target.value)}
+                />
+                <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "15px", justifyContent: "center" }}>
+                  <Select value={category} onChange={handleChange} label="category" id="category">
+                    {categories.map(category => (
+                      <MenuItem key={category} value={category}>
+                        {category}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <TextField
+                    label="New Category"
+                    value={newCategory}
+                    onChange={handleInputChange}
+                    onBlur={handleNewCategory}
+                    onKeyDown={event => {
+                      if (event.key === "Enter") {
+                        handleNewCategory();
+                      }
+                    }}
+                  />
+                  <LoadingButton
+                    loading={submittingUpdate}
+                    disabled={submittingUpdate}
+                    onClick={handleAdminEdit}
+                    loadingPosition="start"
+                    variant="outlined"
+                  >
+                    {submittingUpdate ? `Updating...` : `Update`}
+                  </LoadingButton>
+
+                  <Button
+                    onClick={() => {
+                      setCode("");
+                      handleCloseAdminEditModal();
+                    }}
+                  >
+                    cancel
+                  </Button>
+                </Box>
+              </Box>
+            )}
             <Paper>
               <DataGrid
                 rows={adminCodes}
