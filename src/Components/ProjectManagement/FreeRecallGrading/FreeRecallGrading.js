@@ -154,38 +154,42 @@ const FreeRecallGrading = props => {
   // Retrieve a free-recall response that is not evaluated by four
   // researchers yet.
   const loadedRecallGrades = async () => {
-    setProcessing(true);
-    const recentParticipants = await fetchRecentParticipants(fullname, project);
-    setRecentParticipants(recentParticipants);
-    let response = await axios.post("/lodRecallGrades", {
-      fullname
-    });
-    let _recallGrades = response.data;
-    setAllRecallGrades(_recallGrades);
-    let __recallGrades = [];
-    if (project === "Autograding") {
-      for (let project in _recallGrades) {
-        __recallGrades = __recallGrades.concat(_recallGrades[project]);
-      }
-    } else {
-      __recallGrades = _recallGrades[project] || [];
-    }
-    if (Object.keys(recentParticipants).length > 0) {
-      __recallGrades.sort((g1, g2) => {
-        const p1 =
-          Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
-        const p2 =
-          Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
-        if (p1 && p2) return 0;
-        return p1 && !p2 ? -1 : 1;
+    try {
+      setProcessing(true);
+      const recentParticipants = await fetchRecentParticipants(fullname, project);
+      setRecentParticipants(recentParticipants);
+      let response = await axios.post("/loadRecallGrades", {
+        fullname
       });
-    } else {
-      __recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
+      let _recallGrades = response.data;
+      setAllRecallGrades(_recallGrades);
+      let __recallGrades = [];
+      if (project === "Autograding") {
+        for (let project in _recallGrades) {
+          __recallGrades = __recallGrades.concat(_recallGrades[project]);
+        }
+      } else {
+        __recallGrades = _recallGrades[project] || [];
+      }
+      if (Object.keys(recentParticipants).length > 0) {
+        __recallGrades.sort((g1, g2) => {
+          const p1 =
+            Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
+          const p2 =
+            Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
+          if (p1 && p2) return 0;
+          return p1 && !p2 ? -1 : 1;
+        });
+      } else {
+        __recallGrades.sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
+      }
+      setRecallGrades(__recallGrades);
+      setSelectedGrade(__recallGrades[0] || null);
+      setSubmitting(false);
+      setProcessing(false);
+    } catch (error) {
+      console.log(error);
     }
-    setRecallGrades(__recallGrades);
-    setSelectedGrade(__recallGrades[0] || null);
-    setSubmitting(false);
-    setProcessing(false);
   };
 
   useEffect(() => {

@@ -1529,12 +1529,28 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname) => {
   }
   return recallGrades;
 };
-exports.lodRecallGrades = async (req, res) => {
+exports.loadRecallGrades = async (req, res) => {
   try {
     const { fullname } = req.body;
-    console.log("fullname", fullname);
+    console.log("fullname",fullname)
+    const recentParticipants = await fetchRecentParticipants(fullname);
     let recallGradesDocs = await db.collection("recallGradesV2").get();
     let _recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
+    for (let project in _recallGrades) {
+      if (Object.keys(recentParticipants).length > 0) {
+        _recallGrades[project].sort((g1, g2) => {
+          const p1 =
+            Object.keys(recentParticipants).includes(g1.user) && recentParticipants[g1?.user].includes(g1.session);
+          const p2 =
+            Object.keys(recentParticipants).includes(g2.user) && recentParticipants[g2?.user].includes(g2.session);
+          if (p1 && p2) return 0;
+          return p1 && !p2 ? -1 : 1;
+        });
+      } else {
+        _recallGrades[project].sort((g1, g2) => (g1.researchers.length > g2.researchers.length ? -1 : 1));
+      }
+      _recallGrades[project] = _recallGrades[project].slice(0, 200);
+    }
     res.status(200).send(_recallGrades);
   } catch (error) {
     res.status(500).send({ message: "error", data: error });
