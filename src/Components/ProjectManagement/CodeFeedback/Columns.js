@@ -1,9 +1,7 @@
 import GridCellToolTip from "../../GridCellToolTip";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 
-export const codesColumn = [
+
+export const _codesColumn = [
   {
     field: "code",
     headerName: "Code",
@@ -62,42 +60,6 @@ export const codesColumn = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
-
-  {
-    field: "action",
-    headerName: "Action",
-    renderCell: cellValues => {
-      return (
-        <>
-          <IconButton
-            sx={{ mR: "10px" }}
-            edge="end"
-            aria-label="edit"
-            onClick={() => {
-              console.log("first");
-              /*  setCode(cellValues.row.code);
-                setCategory(cellValues.row.category || "");
-                setAdminCodeData(cellValues.row);
-                handleOpenAdminEditModal(); */
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            edge="end"
-            aria-label="delete"
-            onClick={() => {
-              console.log("first");
-              /*     setAdminCodeData(cellValues.row);
-                handleOpenDeleteModalAdmin(); */
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </>
-      );
-    }
-  }
 ];
 
 export const feedBackCodesColumns = [
