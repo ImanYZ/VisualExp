@@ -98,7 +98,7 @@ const CodeFeedback = props => {
   const [category, setCategory] = useState("");
   const online = project === "OnlineCommunities";
   const projectRef = useRef(project);
-
+  const editor = email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu";
   const codesColumn = [
     ..._codesColumn,
     {
@@ -1224,7 +1224,7 @@ const CodeFeedback = props => {
         </Paper>
       </Box>
 
-      {email === "oneweb@umich.edu" && (
+      {editor && (
         <Box sx={{ mb: "50px" }}>
           <Paper>
             <Button className="Button" variant="contained" onClick={handleOpenAdminAddModal}>
