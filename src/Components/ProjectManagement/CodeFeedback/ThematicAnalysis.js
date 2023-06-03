@@ -83,7 +83,7 @@ const ThematicAnalysis = props => {
   const [previousTranscipt, setPreviousTranscipt] = useState([]);
 
   const [nextIndex, setNextIndex] = useState(0);
-
+  const editor = email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu";
   const codesColumn = [
     ..._codesColumn,
     {
@@ -722,7 +722,7 @@ const ThematicAnalysis = props => {
             />
           </Paper>
         </Box>
-        {email === "oneweb@umich.edu" && (
+        {editor && (
           <Box sx={{ mb: "50px" }}>
             {openAdminEditModal && (
               <Box sx={{ display: "flex", alignItems: "center", gap: "10px", mb: "15px", justifyContent: "center" }}>
