@@ -500,10 +500,12 @@ exports.inviteInstructors = async context => {
 
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
+      const upvotes = instructorData?.upVotes || 0;
+      const downvotes = instructorData?.downVotes || 0;
 
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
-        (instructorData?.upVotes || 0) - (instructorData?.downVotes || 0) >= 3 &&
+        (upvotes - downvotes >= 3 || instructorData.scraped) &&
         // We have not sent them any emails or less than 4 reminders
         (!instructorData.reminders || instructorData.reminders < 4) &&
         // Their next reminder is not scheduled yet, or it should have been sent before now.
