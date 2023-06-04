@@ -131,13 +131,10 @@ const ScheduleInstructorPage = props => {
 
         // date time already booked by participants
       }
-      console.log(Object.values(researchers));
-      console.log(availSessions);
       // We need to retrieve all the currently scheduled events to figure
       // out which sessions are already taken and exclude them from availSessions.
       // Retieve all the Calendar events from last month to the end of time.
       const responseObj = await axios.post("/allEvents", {});
-      console.log(responseObj);
       errorAlert(responseObj.data);
       const events = responseObj.data.events;
       for (let event of events) {
@@ -231,11 +228,9 @@ const ScheduleInstructorPage = props => {
   const submitData = async () => {
     try {
       setIsSubmitting(true);
-      console.log("sessions", selectedSession);
       const sessions = selectedSession.map(s => {
         return moment(s).utcOffset(-4).format("YYYY-MM-DD HH:mm");
       });
-      console.log(selectedSession);
       const responseObj = await axios.post("/scheduleInstructors", {
         sessions,
         project: "OnlineCommunities",
