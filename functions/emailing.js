@@ -603,8 +603,8 @@ exports.inviteInstructors = async context => {
 exports.instructorYes = async (req, res) => {
   try {
     // This is a get request and we should retrieve the data from req.params
-    if ("id" in req.params && req.params.id) {
-      const instructorId = req.params.id;
+    if ("id" in req.body && req.body.id) {
+      const instructorId = req.body.id;
       const instructorDoc = db.collection("instructors").doc(instructorId);
       await instructorDoc.update({
         yes: true,
