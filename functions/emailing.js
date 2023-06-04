@@ -523,7 +523,7 @@ exports.inviteInstructors = async context => {
       ) {
         const mailOptions = {
           from: process.env.EMAIL,
-          to: "ouhraalia30@gmail.com",
+          to: instructorData.email,
           subject: `Boosting Learning Through Nonprofit and Open-Source 1Cademy for ${instructorData.interestedTopic}`,
           html: `
             <p>Hello ${instructorData.prefix + ". " + capitalizeFirstLetter(instructorData.lastname)},</p>
