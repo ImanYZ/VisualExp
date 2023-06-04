@@ -613,9 +613,7 @@ exports.instructorYes = async (req, res) => {
         later: false,
         updatedAt: Timestamp.fromDate(new Date())
       });
-      return res.redirect(
-        "https://calendar.google.com/calendar/selfsched?sstoken=UU9xYXhzOXBOcXZYfGRlZmF1bHR8MzA2ZTdkMTE1MDBhMWI0NzJiMDg0YmExYTU2NWJmMWI"
-      );
+      return res.status(200).json({ success: true });
     }
   } catch (err) {
     console.log({ err });
