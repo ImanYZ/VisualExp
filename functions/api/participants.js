@@ -13,19 +13,41 @@ const participantsRouter = express.Router();
 participantsRouter.use(firebaseAuth);
 participantsRouter.use(isParticipant);
 
+const getAvailableFullname = async fullname => {
+  const userCollections = ["users", "usersSurvey"];
+
+  let _fullname = fullname;
+  while (true) {
+    let found = false;
+
+    for (const userCollection of userCollections) {
+      const docRef = await db.collection(userCollection).doc(_fullname).get();
+      if (docRef.exists) {
+        found = true;
+      }
+    }
+
+    if (!found) {
+      break;
+    }
+
+    _fullname += " ";
+  }
+
+  return _fullname;
+};
 // POST /api/participants/schedule
 participantsRouter.post("/schedule", async (req, res) => {
   try {
-    let { sessions, project} = req.body;
+    let { sessions, project, surveyType, instructorId } = req.body;
 
-
-    const { email , surveyType} = req.userData;
+    const { email } = req.userData;
     const batch = db.batch();
-    
-    sessions.sort((a, b) => a < b ? -1 : 1); // asc sorting
 
-    if(!sessions || !project) {
-      throw new Error("invalid request")
+    sessions.sort((a, b) => (a < b ? -1 : 1)); // asc sorting
+
+    if (!sessions || !project) {
+      throw new Error("invalid request");
     }
 
     const researchers = {};
@@ -37,7 +59,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         project in researcherData.projects &&
         researcherData.projects[project].active
       ) {
-      researchers[researcherData.email] = researcherDoc.id;
+        researchers[researcherData.email] = researcherDoc.id;
       }
     }
 
@@ -52,15 +74,17 @@ participantsRouter.post("/schedule", async (req, res) => {
     const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
     const scheduleMonths = [moment().utcOffset(-4).startOf("month").format("YYYY-MM-DD")];
-    const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD")
-    if(!scheduleMonths.includes(scheduleEnd)) {
+    const scheduleEnd = moment().utcOffset(-4).startOf("day").add(16, "days").startOf("month").format("YYYY-MM-DD");
+    if (!scheduleMonths.includes(scheduleEnd)) {
       scheduleMonths.push(scheduleEnd);
     }
 
     // Retrieve all the researchers' avaialbilities in this project.
-    const resScheduleDocs = await db.collection("resSchedule")
+    const resScheduleDocs = await db
+      .collection("resSchedule")
       .where("month", "in", scheduleMonths)
-      .where("project", "==", project).get();
+      .where("project", "==", project)
+      .get();
 
     let availSessions = {};
     for (let resScheduleDoc of resScheduleDocs.docs) {
@@ -69,18 +93,18 @@ participantsRouter.post("/schedule", async (req, res) => {
       // date time flagged by researchers as available by them
       let _schedules = resScheduleData.schedules || {};
       for (const researcherFullname in _schedules) {
-        for(const scheduleSlot of _schedules[researcherFullname]) {
+        for (const scheduleSlot of _schedules[researcherFullname]) {
           const slotDT = moment(scheduleSlot).utcOffset(-4, true).toDate();
           // if availability is expired already
-          if(slotDT.getTime() < new Date().getTime()) {
+          if (slotDT.getTime() < new Date().getTime()) {
             continue;
           }
           const _scheduleSlot = slotDT.toLocaleString();
-          if(!availSessions[_scheduleSlot]) {
+          if (!availSessions[_scheduleSlot]) {
             availSessions[_scheduleSlot] = [];
           }
-          if(Object.values(researchers).includes(researcherFullname)){
-            availSessions[_scheduleSlot].push(researcherFullname)
+          if (Object.values(researchers).includes(researcherFullname)) {
+            availSessions[_scheduleSlot].push(researcherFullname);
           }
         }
       }
@@ -117,18 +141,8 @@ participantsRouter.post("/schedule", async (req, res) => {
       ) {
         for (let attendee of event.attendees) {
           if (!researchers[attendee.email]) continue;
-          if(availSessions.hasOwnProperty(startTime)){
+          if (availSessions.hasOwnProperty(startTime)) {
             availSessions[startTime] = availSessions[startTime].filter(resea => resea !== researchers[attendee.email]);
-          }
-          if (project === "OnlineCommunities") {
-            let _endTime = new Date(new Date(event.end.dateTime) - 30 * 60 * 1000).toLocaleString();
-            if(availSessions.hasOwnProperty(_endTime)){
-              availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
-            }
-            _endTime = new Date(new Date(event.end.dateTime) - 15 * 60 * 1000).toLocaleString();
-            if(availSessions.hasOwnProperty(_endTime)){
-              availSessions[_endTime] = availSessions[_endTime].filter(resea => resea !== researchers[attendee.email]);
-            }
           }
           if (duration >= 60 * 60 * 1000 && availSessions.hasOwnProperty(endTime)) {
             availSessions[endTime] = availSessions[endTime].filter(resea => resea !== researchers[attendee.email]);
@@ -143,8 +157,8 @@ participantsRouter.post("/schedule", async (req, res) => {
       const scheduleData = scheduleDoc.data();
       if (scheduleData?.id) {
         await deleteEvent(scheduleData.id);
-      const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
-      batch.delete(scheduleRef);
+        const scheduleRef = db.collection("schedule").doc(scheduleDoc.id);
+        batch.delete(scheduleRef);
       }
     }
 
@@ -153,25 +167,27 @@ participantsRouter.post("/schedule", async (req, res) => {
     for (let i = 0; i < sessions.length; ++i) {
       const start = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();
       let availableResearchers = availSessions[start] || [];
-      const sessionDuration = (projectSpecsData.sessionDuration?.[i] || 2); //[2,1,1]
-      for(let j = 0; j < sessionDuration; j++) {
-       const  availableSlot = moment(sessions[i]).add(j * 60/projectSpecsData.hourlyChunks, "minutes").utcOffset(-4, true).toDate().toLocaleString();
-        availableResearchers = availableResearchers.filter((availableResearcher) => (availSessions[availableSlot] || []).includes(availableResearcher))
+      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2; //[2,1,1]
+      for (let j = 0; j < sessionDuration; j++) {
+        const availableSlot = moment(sessions[i])
+          .add((j * 60) / projectSpecsData.hourlyChunks, "minutes")
+          .utcOffset(-4, true)
+          .toDate()
+          .toLocaleString();
+        availableResearchers = availableResearchers.filter(availableResearcher =>
+          (availSessions[availableSlot] || []).includes(availableResearcher)
+        );
       }
       researchersBySession[start] = availableResearchers;
     }
 
-  
     const selectedResearchers = {};
 
-
-    for(const session in researchersBySession) {
+    for (const session in researchersBySession) {
       const availableResearchers = researchersBySession[session];
-      const researcher = availableResearchers[
-        Math.floor(Math.random() * availableResearchers.length)
-      ];
+      const researcher = availableResearchers[Math.floor(Math.random() * availableResearchers.length)];
 
-      if(!researcher) {
+      if (!researcher) {
         throw new Error("No researcher is available in given schedule");
       }
 
@@ -194,7 +210,7 @@ participantsRouter.post("/schedule", async (req, res) => {
         toOrdinal(i + 1),
         start,
         end,
-        projectSpecsData, 
+        projectSpecsData,
         surveyType
       );
       events.push(eventCreated);
@@ -210,14 +226,31 @@ participantsRouter.post("/schedule", async (req, res) => {
 
       if (project === "OnlineCommunities") {
         const instructorsDocs = await db.collection("instructors").where("email", "==", email).get();
+        const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
         if (instructorsDocs.docs.length > 0) {
           batch.update(instructorsDocs.docs[0].ref, {
             scheduled: true
           });
+          if (usersServeyDocs.docs.length === 0) {
+            const instuctorsData = instructorsDocs.docs[0].data();
+            const fullName = await getAvailableFullname(`${instuctorsData.firstnam} ${instuctorsData.lastname}`);
+            const userSurevyRef = db.collection("usersSurvey").doc(fullName);
+            batch.set(userSurevyRef, {
+              email: email,
+              project,
+              scheduled: true,
+              institution: instuctorsData.institution,
+              instructorId: instructorId,
+              firstname: instuctorsData.ƒfirstname,
+              uid: "",
+              surveyType: "instructor",
+              lastname: instuctorsData.lastname,
+              noRetaineData: false
+            });
+          }
         }
-        const usersServeyDocs = await db.collection("usersSurvey").where("email", "==", email).get();
 
-        if (usersServeyDocs.docs.length === 0) {
+        if (usersServeyDocs.docs.length === 0 && instructorsDocs.docs.length === 0) {
           const usersDocs = await db.collection("users").where("email", "==", email).get();
           if (usersDocs.docs.length > 0) {
             const userSurevyRef = db.collection("usersSurvey").doc(usersDocs.docs[0].id);
