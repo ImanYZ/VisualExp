@@ -62,7 +62,7 @@ const ScheduleInstructorPage = props => {
       id: instructorId
     });
   }, []);
-  console.log("email", email);
+
 
   useEffect(() => {
     const loadSchedule = async () => {
