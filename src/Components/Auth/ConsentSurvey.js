@@ -51,7 +51,7 @@ const ConsentDocument = props => {
           <strong>Who can see my data?</strong>
         </p>
 
-        <p>
+        <>
           <p>
             · We (the researchers) will analyze your responses to all of the questions in this interview, and the
             academic records provided for researchers in the LARC database.
@@ -75,7 +75,7 @@ const ConsentDocument = props => {
             · If you wish to exclude your data from being used for further research, you may still participate in this
             study by informing one of the contacts below.
           </p>
-        </p>
+        </>
         <h2>Contact Information</h2>
 
         <p>
@@ -83,18 +83,20 @@ const ConsentDocument = props => {
           problems you may have as a study subject, you may contact the researchers at StudyStrategies@umich.edu
         </p>
         <table>
-          <tr>
-            <td>Faculty Advisor</td>
-            <td>Paul Resnick</td>
-            <td>presnick@umich.edu</td>
-            <td>(734) 647-9458</td>
-          </tr>
-          <tr>
-            <td>Principal Investigator</td>
-            <td>Iman YeckehZaare</td>
-            <td>oneweb@umich.edu</td>
-            <td>(734) 556-5922</td>
-          </tr>
+          <tbody>
+            <tr>
+              <td>Faculty Advisor</td>
+              <td>Paul Resnick</td>
+              <td>presnick@umich.edu</td>
+              <td>(734) 647-9458</td>
+            </tr>
+            <tr>
+              <td>Principal Investigator</td>
+              <td>Iman YeckehZaare</td>
+              <td>oneweb@umich.edu</td>
+              <td>(734) 556-5922</td>
+            </tr>
+          </tbody>
         </table>
 
         <p>
