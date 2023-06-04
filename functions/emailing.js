@@ -1,7 +1,7 @@
 const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
 
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
-
+const { delay } = require("./helpers/common");
 const nodemailer = require("nodemailer");
 
 const { deleteEvent } = require("./GoogleCalendar");
@@ -11,6 +11,8 @@ const { getFullname, generateUID, nextWeek, capitalizeFirstLetter, capitalizeSen
 const { signatureHTML } = require("./emailSignature");
 const cityTimezones = require("city-timezones");
 const moment = require("moment-timezone");
+const { ca, da } = require("date-fns/locale");
+
 require("dotenv").config();
 
 const getNameFormatted = async (email, firstname) => {
@@ -519,35 +521,11 @@ exports.inviteInstructors = async context => {
         !instructorData.inviteStudents &&
         isTimeToSendEmail(instructorData.city, instructorData.stateInfo, instructorData.country)
       ) {
-        // let minCondition,
-        //   minCondNum = -1;
-        // if (instructorData.condition) {
-        //   minCondition = instructorData.condition;
-        // } else {
-        //   // To assign an experimental condition to this instructor, we have to find
-        //   // the condition that is assigned to the fewest number of instructors so far.
-        //   let instructorConditionsDocs = await db.collection("instructorConditions").get();
-        //   instructorConditionsDocs = instructorConditionsDocs.docs;
-        //   minCondNum = instructorConditionsDocs[0].data().num;
-        //   minCondition = instructorConditionsDocs[0].id;
-        //   for (let instructorConditionDoc of instructorConditionsDocs) {
-        //     let instructorConditionData = instructorConditionDoc.data();
-        //     if (instructorConditionData.num < minCondNum) {
-        //       minCondNum = instructorConditionData.num;
-        //       minCondition = instructorConditionDoc.id;
-        //     }
-        //   }
-        // }
-
-        // We don't want to send many emails at once, because it may drive Gmail crazy.
-        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
-        // postpones sending the next email until the next waitTime.
-        setTimeout(async () => {
-          const mailOptions = {
-            from: process.env.EMAIL,
-            to: instructorData.email,
-            subject: `Boosting Learning Through Nonprofit and Open-Source 1Cademy for ${instructorData.interestedTopic}`,
-            html: `
+        const mailOptions = {
+          from: process.env.EMAIL,
+          to: "ouhraalia30@gmail.com",
+          subject: `Boosting Learning Through Nonprofit and Open-Source 1Cademy for ${instructorData.interestedTopic}`,
+          html: `
             <p>Hello ${instructorData.prefix + ". " + capitalizeFirstLetter(instructorData.lastname)},</p>
             <p>We are a research group at the University of Michigan, School of Information who have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and study.</p>
               <p>Through integrating a knowledge graph, AI assistance, and personalized practice, 1Cademy helps instructors in engaging their students and improving their learning. Over the past two years, our platform has garnered participation from 1,612 students representing 194 institutions.</p>
@@ -555,11 +533,11 @@ exports.inviteInstructors = async context => {
               <p>Along with offering a demo of 1Cademy we would like to have an interview with you to discuss your teaching experiences and the challenges you face. This information would be used to further improve 1Cademy features.</P>
               <p>If this is of interest to you, we'd be delighted to have a meeting with you to interview you and learn about your course needs. To schedule an appointment, please click one of the following links or directly reply to this email.</p>
               <ul>
-                <li><a href="https://1cademy.us/survey/${
+                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank">Yes, let's schedule.</a></li>
-                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
+                <li><a href="https://1cademy.us/notInterestedFaculty/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank"> No, do not contact me again.</a></li>
@@ -579,36 +557,38 @@ exports.inviteInstructors = async context => {
               }"
               data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
               width="420" height="37"><br></div></div></div>`
-          };
-          return transporter.sendMail(mailOptions, async (error, data) => {
-            if (error) {
-              console.log({ error });
-            } else {
-              // // minCondNum === -1 signals that we had previously assigned a condition to
-              // // the instructor and we do not need to assign any experimental conditions again.
-              // if (minCondNum !== -1) {
-              //   // If the email is successfully sent:
-              //   // 1) Update the num value in the corresponding instructorConditions document;
-              //   const instructorConditionRef = db.collection("instructorConditions").doc(minCondition);
-              //   await instructorConditionRef.update({
-              //     num: admin.firestore.FieldValue.increment(1)
-              //   });
-              // }
-              // 2) Update the corresponding instructor document.
-              const instructorRef = db.collection("instructors").doc(instructorDoc.id);
-              await instructorRef.update({
-                // condition: minCondition,
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                // The next reminder should be sent one week later.
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date())
-              });
-            }
-          });
-        }, waitTime);
+        };
+
+        let sendingEmail = false;
+        while (!sendingEmail) {
+          try {
+            transporter.sendMail(mailOptions, async (error, data) => {
+              if (error) {
+                console.log("sendMail", { error });
+              } else {
+                const instructorRef = db.collection("instructors").doc(instructorDoc.id);
+                await instructorRef.update({
+                  // condition: minCondition,
+                  emailedAt: Timestamp.fromDate(new Date()),
+                  reminders: FieldValue.increment(1),
+                  // The next reminder should be sent one week later.
+                  nextReminder: Timestamp.fromDate(nextWeek()),
+                  updatedAt: Timestamp.fromDate(new Date())
+                });
+              }
+            });
+            sendingEmail = true;
+          } catch (e) {
+            sendingEmail = false;
+          }
+          await delay(6000);
+        }
+        // We don't want to send many emails at once, because it may drive Gmail crazy.
+        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
+        // postpones sending the next email until the next waitTime.
         // Increase waitTime by a random integer between 1 to 4 seconds.
-        waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+        waitTime = 1000 * (1 + Math.floor(Math.random() * 3));
+        await delay(waitTime);
       }
     }
   } catch (err) {
