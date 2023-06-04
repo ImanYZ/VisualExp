@@ -52,7 +52,8 @@ const {
   scheduleLifeLog,
   getOngoingResearcherEvent,
   ongoingEvents,
-  markAttended
+  markAttended,
+  scheduleInstructors
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
@@ -89,7 +90,7 @@ app.get("/administratorYes", administratorYes);
 app.post("/administratorLater", administratorLater);
 app.post("/administratorNo", administratorNo);
 app.get("/inviteInstructors", inviteInstructors);
-app.get("/instructorYes", instructorYes);
+app.post("/instructorYes", instructorYes);
 app.post("/instructorLater", instructorLater);
 app.post("/instructorNo", instructorNo);
 app.post("/trackStudentInvite", trackStudentInvite);
@@ -136,6 +137,7 @@ app.post("/lodResponses", lodResponses);
 app.post("/voteOnSingleRecall", voteOnSingleRecall);
 app.use("/admin", adminRouter);
 app.post("/loadRecallGrades", loadRecallGrades);
+app.post("/scheduleInstructors", scheduleInstructors);
 // Knowledge endpoints
 
 // Misinformation Experiment

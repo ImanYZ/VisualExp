@@ -27,7 +27,6 @@ import { isEmail } from "../../utils";
 
 import "./SchedulePage.css";
 import AppConfig from "../../AppConfig";
-import { gridPreferencePanelStateSelector } from "@mui/x-data-grid";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -340,7 +339,8 @@ const SchedulePage = props => {
         await firebase.idToken();
         responseObj = await axios.post("/participants/schedule", {
           sessions,
-          project: project
+          project: project,
+          surveyType: userData.surveyType
         });
         errorAlert(responseObj.data);
 

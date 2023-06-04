@@ -559,7 +559,7 @@ exports.inviteInstructors = async context => {
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank">Yes, let's schedule.</a></li>
-                <li><a href="https://1cademy.us/notInterestedFaculty/${
+                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
                   // These are all sending requests to the client side.
                   instructorDoc.id
                 }" target="_blank"> No, do not contact me again.</a></li>
