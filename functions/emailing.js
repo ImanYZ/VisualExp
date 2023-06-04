@@ -11,7 +11,6 @@ const { getFullname, generateUID, nextWeek, capitalizeFirstLetter, capitalizeSen
 const { signatureHTML } = require("./emailSignature");
 const cityTimezones = require("city-timezones");
 const moment = require("moment-timezone");
-const { ca, da } = require("date-fns/locale");
 
 require("dotenv").config();
 
