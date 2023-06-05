@@ -556,35 +556,27 @@ exports.inviteInstructors = async context => {
               width="420" height="37"><br></div></div></div>`
         };
 
-        let sendingEmail = false;
-        while (!sendingEmail) {
-          try {
-            transporter.sendMail(mailOptions, async (error, data) => {
-              if (error) {
-                console.log("sendMail", { error });
-              } else {
-                const instructorRef = db.collection("instructors").doc(instructorDoc.id);
-                await instructorRef.update({
-                  // condition: minCondition,
-                  emailedAt: Timestamp.fromDate(new Date()),
-                  reminders: FieldValue.increment(1),
-                  // The next reminder should be sent one week later.
-                  nextReminder: Timestamp.fromDate(nextWeek()),
-                  updatedAt: Timestamp.fromDate(new Date())
-                });
-              }
+        transporter.sendMail(mailOptions, async (error, data) => {
+          if (error) {
+            console.log("sendMail", { error });
+          } else {
+            const instructorRef = db.collection("instructors").doc(instructorDoc.id);
+            await instructorRef.update({
+              // condition: minCondition,
+              emailedAt: Timestamp.fromDate(new Date()),
+              reminders: FieldValue.increment(1),
+              // The next reminder should be sent one week later.
+              nextReminder: Timestamp.fromDate(nextWeek()),
+              updatedAt: Timestamp.fromDate(new Date())
             });
-            sendingEmail = true;
-          } catch (e) {
-            sendingEmail = false;
           }
-          await delay(6000);
-        }
+        });
+
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
         // postpones sending the next email until the next waitTime.
         // Increase waitTime by a random integer between 1 to 4 seconds.
-        waitTime = 1000 * (1 + Math.floor(Math.random() * 3));
+        waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
         await delay(waitTime);
       }
     }
