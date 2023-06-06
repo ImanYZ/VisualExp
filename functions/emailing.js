@@ -523,7 +523,7 @@ exports.inviteInstructors = async context => {
         const mailOptions = {
           from: process.env.EMAIL,
           to: instructorData.email,
-          subject: `Optimizing Your Teaching Time and Improving Students’ Learning and Satisfaction for ${instructorData.interestedTopic}`,
+          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for ${instructorData.interestedTopic}`,
           html: `
             <p>Hello ${instructorData.prefix + ". " + capitalizeFirstLetter(instructorData.lastname)},</p>
               <p>We are a research group at the University of Michigan, School of Information that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction.We have developed <a href="https://1cademy.com">1Cademy.com, </a>an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
