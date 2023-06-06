@@ -212,8 +212,9 @@ const CommunityApplications = props => {
   useEffect(() => {
     const getUsers = async () => {
       const userDocs = await firebase.db.collection("users").get();
+      const usersSurveyDocs = await firebase.db.collection("usersSurvey").get();
       const users = {};
-      userDocs.docs.forEach(doc => {
+      [...userDocs.docs, ...usersSurveyDocs.docs].forEach(doc => {
         users[doc.id] = doc.data();
       });
       setUsersHashMap(users);
@@ -258,7 +259,7 @@ const CommunityApplications = props => {
     ];
     setApplicationsColumns(_applicationsColms);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applications,fullname]);
+  }, [applications, fullname]);
 
   useEffect(() => {
     if (firebase && props.communiIds && props.communiIds.length > 0) {
