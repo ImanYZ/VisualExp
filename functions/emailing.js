@@ -250,7 +250,9 @@ const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) 
   if (ignore) return true;
   state = state.split(";")[1] || "";
   country = country.split(";")[1] || "";
-
+  if (!cityTimezones.lookupViaCity(city) || cityTimezones.lookupViaCity(city).length === 0){
+    city = "Ann Arbor";
+  }
   const cityDetails = (cityTimezones.lookupViaCity(city) || []).find(detail => {
     return (
       (detail.hasOwnProperty("state_ansi") && detail.state_ansi.toLowerCase() === state.toLowerCase()) ||
@@ -1285,6 +1287,7 @@ exports.sendingEmails = async context => {
       const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
       await delay(waitTime);
     }
+    console.log("Done");
   } catch (error) {
     console.log(error);
   }
