@@ -12,7 +12,7 @@ const {
   applicationReminder
 } = require("./users");
 
-const { inviteAdministrators , inviteInstructors} = require("./emailing");
+const { inviteAdministrators , inviteInstructors, sendingEmails} = require("./emailing");
 const app = require("./app");
 
 
@@ -84,6 +84,14 @@ exports.passagesNumberCorrection = functions
   .pubsub.schedule("every 25 hours")
   .onRun(passagesNumberCorrection);
 
+  exports.sendingEmails = functions
+  .runWith({
+    memory: "1GB",
+    timeoutSeconds: 520
+  })
+  .pubsub.schedule("*/20 * * * *")
+  .timeZone(EST_TIMEZONE)
+  .onRun(sendingEmails);
 // Knowledge
 // exports.assignNodeContributorsInstitutionsStats = functions
 //   .runWith({

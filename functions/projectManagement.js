@@ -920,7 +920,6 @@ exports.remindCalendarInvitations = async context => {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
     const _futureEvents = await futureEvents(40);
     const currentTime = new Date().getTime();
     // Each Google Calendar event has {start, end, attendees}.
@@ -945,7 +944,6 @@ exports.remindCalendarInvitations = async context => {
               // Send a reminder email to a researcher that they have not accepted
               // or even declined the Google Calendar invitation and asks them to
               // accept it or ask someone else to take it.
-              setTimeout(() => {
                 researcherEventNotificationEmail(
                   attendee.email.toLowerCase(),
                   researchers[attendee.email.toLowerCase()],
@@ -955,9 +953,6 @@ exports.remindCalendarInvitations = async context => {
                   attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
                   schedule[ev.id].project
                 );
-              }, waitTime);
-              // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
             }
             // Find the attendee who corresponds to this participant:
             else if (attendee.email.toLowerCase() === participant.email) {
@@ -996,31 +991,20 @@ exports.remindCalendarInvitations = async context => {
                   } else {
                     participant.thirdDone = false;
                   }
-                  const participantAttendedFirstSession =
-                    participant.project === "OnlineCommunities" ? schedule[ev.id].attended : participant.firstDone;
                   // We consider "declined" and "tentative" responses as declined.
                   if (attendee.responseStatus === "declined" || attendee.responseStatus === "tentative") {
                     // If they have declined the 1st session, but they are not done
                     // with the 1st session:
-                    if (order === "1st" && !participantAttendedFirstSession) {
+                    if (order === "1st" && attendee.responseStatus === "declined") {
                       // Then, we delete all their sessions from Google Calendar and
                       // schedule them, send them an email asking them to reschedule
                       // all their sessions.
-                      setTimeout(() => {
-                        reschEventNotificationEmail(
-                          participant.email,
-                          participant.firstname,
-                          false,
-                          participant.courseName,
-                          hoursLeft,
-                          false,
-                          true,
-                          true,
-                          null
-                        );
-                      }, waitTime);
-                      // Increase waitTime by a random integer between 1 to 4 seconds.
-                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                      reschEventNotificationEmail(
+                        participant.email,
+                        participant.firstname,
+                        hoursLeft,
+                        attendee.responseStatus === "declined"
+                      );
                     } else if (
                       (order === "2nd" && !participant.secondDone) ||
                       (order === "3rd" && !participant.thirdDone)
@@ -1030,23 +1014,19 @@ exports.remindCalendarInvitations = async context => {
                       // Then, we send them an email asking them to reschedule
                       // their 2nd/3rd session on the same day, otherwise their
                       // application would be withdrawn.
-                      setTimeout(() => {
-                        eventNotificationEmail(
-                          participant.email,
-                          participant.firstname,
-                          false,
-                          participant.courseName,
-                          hoursLeft,
-                          false,
-                          "",
-                          order,
-                          false,
-                          true,
-                          userData.project
-                        );
-                      }, waitTime);
-                      // Increase waitTime by a random integer between 1 to 4 seconds.
-                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                      eventNotificationEmail(
+                        participant.email,
+                        participant.firstname,
+                        false,
+                        participant.courseName,
+                        hoursLeft,
+                        false,
+                        "",
+                        order,
+                        false,
+                        true,
+                        userData.project
+                      );
                     }
                   } else if (
                     // If they have not declined, but did not accept either, and
@@ -1065,24 +1045,20 @@ exports.remindCalendarInvitations = async context => {
                         order: FieldValue.delete()
                       });
                     } else {
-                      setTimeout(() => {
-                        // Email every four hours to remind them that they need to accept the
-                        // Google Calendar invite for whichever session they have not accepted yet.
-                        eventNotificationEmail(
-                          participant.email,
-                          participant.firstname,
-                          false,
-                          participant.courseName,
-                          hoursLeft,
-                          false,
-                          "",
-                          order,
-                          false,
-                          false
-                        );
-                      }, waitTime);
-                      // Increase waitTime by a random integer between 1 to 4 seconds.
-                      waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                      // Email every four hours to remind them that they need to accept the
+                      // Google Calendar invite for whichever session they have not accepted yet.
+                      eventNotificationEmail(
+                        participant.email,
+                        participant.firstname,
+                        false,
+                        participant.courseName,
+                        hoursLeft,
+                        false,
+                        "",
+                        order,
+                        false,
+                        false
+                      );
                     }
                   }
                 }
@@ -1156,19 +1132,13 @@ exports.remindCalendarInvitations = async context => {
                   // Then, we delete all their sessions from Google Calendar and
                   // schedule then, send them an email asking them to reschedule
                   // all their sessions.
-                  setTimeout(() => {
-                    reschEventNotificationEmail(
-                      participant.email,
-                      participant.firstname,
-                      false,
-                      participant.courseName,
-                      hoursLeft,
-                      false,
-                      attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
-                      null
-                    );
-                  }, waitTime);
-                  waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+
+                  reschEventNotificationEmail(
+                    participant.email,
+                    participant.firstname,
+                    hoursLeft,
+                    attendee.responseStatus === "declined" || attendee.responseStatus === "tentative"
+                  );
                 } else if (order === "3rd" && !participant.secondDone) {
                   // If it's their 3rd session, but they did not complete their 2nd session:
                   // Delete the 3rd session, because logically they should not go through
@@ -1185,10 +1155,7 @@ exports.remindCalendarInvitations = async context => {
                   // missed it, we email them to reschedule their session on the same day;
                   // otherwise, we will withdraw their application.
                   if ((order === "2nd" && !participant.secondDone) || (order === "3rd" && !participant.thirdDone)) {
-                    setTimeout(() => {
-                      notAttendedEmail(participant.email, participant.firstname, false, participant.courseName, order);
-                    }, waitTime);
-                    waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
+                    notAttendedEmail(participant.email, participant.firstname, false, participant.courseName, order);
                   }
                 }
               }
@@ -1532,7 +1499,7 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname) => {
 exports.loadRecallGrades = async (req, res) => {
   try {
     const { fullname } = req.body;
-    console.log("fullname",fullname)
+    console.log("fullname", fullname);
     const recentParticipants = await fetchRecentParticipants(fullname);
     let recallGradesDocs = await db.collection("recallGradesV2").get();
     let _recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
