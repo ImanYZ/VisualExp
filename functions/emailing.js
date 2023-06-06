@@ -1,4 +1,4 @@
-const { admin, db, storage, batchUpdate, commitBatch } = require("./admin");
+const { admin, db, storage, batchUpdate, batchSet, commitBatch } = require("./admin");
 
 const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 const { delay } = require("./helpers/common");
@@ -131,8 +131,6 @@ exports.loadImageAdministrator = (req, res) => {
 
 // Deprecated
 // This function was used to invite 1Cademy interns to paricipate in our experiments.
-// The basic algoritm is very similar to inviteInstructors, but instead of the
-// instructors collection, it reads from contacts.
 exports.sendPersonalInvitations = async (req, res) => {
   try {
     const contactDocs = await db.collection("contacts").get();
@@ -248,7 +246,8 @@ const communityTitles = {
   Liaison_Librarians: "Liaison Librarians"
 };
 
-const isTimeToSendEmail = (city = "", state = "", country = "") => {
+const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) => {
+  if (ignore) return true;
   state = state.split(";")[1] || "";
   country = country.split(";")[1] || "";
 
@@ -280,10 +279,12 @@ exports.inviteAdministrators = async context => {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
     const administratorDocs = await db.collection("administrators").get();
+    const emailsDocs = await db.collection("emails").get();
+    const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
     for (let administratorDoc of administratorDocs.docs) {
       const administratorData = administratorDoc.data();
+      const { email, city, stateInfo, country } = administratorData;
       if (
         // Only those administrators whose information is verified by at least 3 other researchers.
         (administratorData?.upVotes || 0) - (administratorData?.downVotes || 0) >= 3 &&
@@ -297,21 +298,20 @@ exports.inviteAdministrators = async context => {
         !administratorData.alreadyTalked &&
         !administratorData.inviteStudents &&
         administratorData.howToAddress &&
-        isTimeToSendEmail(administratorData.city, administratorData.stateInfo, administratorData.country) &&
-        !administratorData.explanation.includes("This is ")
+        !administratorData.explanation.includes("This is ") &&
+        !emails.includes(email)
       ) {
         // We don't want to send many emails at once, because it may drive Gmail crazy.
         // WaitTime keeps increasing for every email that should be sent and in a setTimeout
         // postpones sending the next email until the next waitTime.
-        setTimeout(async () => {
-          const mailOptions = {
-            from: process.env.EMAIL,
-            to: administratorData.email,
-            subject: `Offering Student Internships for Large-scale Collaborative Learning/Research`,
-            html: `<p>Hello ${(administratorData.howToAddress || "")
-              .split(" ")
-              .map(s => capitalizeFirstLetter(s))
-              .join(" ")},</p>
+        const mailOptions = {
+          from: process.env.EMAIL,
+          to: email,
+          subject: `Offering Student Internships for Large-scale Collaborative Learning/Research`,
+          html: `<p>Hello ${(administratorData.howToAddress || "")
+            .split(" ")
+            .map(s => capitalizeFirstLetter(s))
+            .join(" ")},</p>
               <p></p>
               <p>We are a research group at the University of Michigan, School of Information. We would like to invite your students to join our online research communities and collaborate with us on research literature review on their desired topics.</p>
               <p></p>
@@ -327,12 +327,12 @@ exports.inviteAdministrators = async context => {
                 <li><a href="https://1cademy.us/inviteStudents/administrators/${
                   administratorDoc.id
                 }" target="_blank">I'd like to invite students to apply.</a></li>${
-              // '<li><a href="https://1cademy.us/administratorYes/' +
-              // administratorDoc.id +
-              // '" target="_blank">' +
-              // "I'd like to schedule a meeting with you.</a></li>" +
-              ""
-            }
+            // '<li><a href="https://1cademy.us/administratorYes/' +
+            // administratorDoc.id +
+            // '" target="_blank">' +
+            // "I'd like to schedule a meeting with you.</a></li>" +
+            ""
+          }
                 <li><a href="https://1cademy.us/interestedAdministratorLater/${
                   // These are all sending requests to the client side.
                   administratorDoc.id
@@ -354,38 +354,22 @@ exports.inviteAdministrators = async context => {
               }"
               data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download" 
               width="420" height="37"><br></div></div></div>`
-          };
-          return transporter.sendMail(mailOptions, async (error, data) => {
-            if (error) {
-              console.log({ error });
-            } else {
-              // // minCondNum === -1 signals that we had previously assigned a condition to
-              // // the administrator and we do not need to assign any experimental conditions again.
-              // if (minCondNum !== -1) {
-              //   // If the email is successfully sent:
-              //   // 1) Update the num value in the corresponding administratorConditions document;
-              //   const administratorConditionRef = db.collection("administratorConditions").doc(minCondition);
-              //   await administratorConditionRef.update({
-              //     num: admin.firestore.FieldValue.increment(1)
-              //   });
-              // }
-              // 2) Update the corresponding administrator document.
-              const administratorRef = db.collection("administrators").doc(administratorDoc.id);
-              await administratorRef.update({
-                // condition: minCondition,
-                emailedAt: Timestamp.fromDate(new Date()),
-                reminders: FieldValue.increment(1),
-                // The next reminder should be sent one week later.
-                nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date())
-              });
-            }
-          });
-        }, waitTime);
-        // Increase waitTime by a random integer between 1 to 4 seconds.
-        waitTime += 1000 * (1 + Math.floor(Math.random() * 3));
+        };
+        const emailRef = db.collection("emails").doc();
+        await batchSet(emailRef, {
+          mailOptions,
+          reason: "administrator",
+          createdAt: Timestamp.fromDate(new Date()),
+          documentId: administratorDoc.id,
+          city,
+          email,
+          stateInfo,
+          country,
+          urgent: false
+        });
       }
     }
+    await commitBatch();
   } catch (err) {
     console.log({ err });
   }
@@ -496,11 +480,12 @@ exports.inviteInstructors = async context => {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
     const instructorDocs = await db.collection("instructors").get();
-
+    const emailsDocs = await db.collection("emails").get();
+    const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
     for (let instructorDoc of instructorDocs.docs) {
       const instructorData = instructorDoc.data();
+      const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructorData;
       const upvotes = instructorData?.upVotes || 0;
       const downvotes = instructorData?.downVotes || 0;
 
@@ -518,14 +503,14 @@ exports.inviteInstructors = async context => {
         !instructorData.alreadyTalked &&
         instructorData.interestedTopic &&
         !instructorData.inviteStudents &&
-        isTimeToSendEmail(instructorData.city, instructorData.stateInfo, instructorData.country)
+        !emails.includes(email)
       ) {
         const mailOptions = {
           from: process.env.EMAIL,
-          to: instructorData.email,
-          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for ${instructorData.interestedTopic}`,
+          to: email,
+          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for ${interestedTopic}`,
           html: `
-            <p>Hello ${instructorData.prefix + ". " + capitalizeFirstLetter(instructorData.lastname)},</p>
+            <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
               <p>We are a research group at the University of Michigan, School of Information that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction.We have developed <a href="https://1cademy.com">1Cademy.com, </a>an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
               <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
               <p>To schedule an appointment, please click one of the following links or directly reply to this email.</p>
@@ -555,31 +540,21 @@ exports.inviteInstructors = async context => {
               data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
               width="420" height="37"><br></div></div></div>`
         };
-
-        transporter.sendMail(mailOptions, async (error, data) => {
-          if (error) {
-            console.log("sendMail", { error });
-          } else {
-            const instructorRef = db.collection("instructors").doc(instructorDoc.id);
-            await instructorRef.update({
-              // condition: minCondition,
-              emailedAt: Timestamp.fromDate(new Date()),
-              reminders: FieldValue.increment(1),
-              // The next reminder should be sent one week later.
-              nextReminder: Timestamp.fromDate(nextWeek()),
-              updatedAt: Timestamp.fromDate(new Date())
-            });
-          }
+        const emailRef = db.collection("emails").doc();
+        await batchSet(emailRef, {
+          mailOptions,
+          reason: "instructor",
+          createdAt: Timestamp.fromDate(new Date()),
+          email,
+          city,
+          stateInfo,
+          country,
+          urgent: false,
+          documentId: instructorDoc.id
         });
-
-        // We don't want to send many emails at once, because it may drive Gmail crazy.
-        // WaitTime keeps increasing for every email that should be sent and in a setTimeout
-        // postpones sending the next email until the next waitTime.
-        // Increase waitTime by a random integer between 1 to 4 seconds.
-        waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
-        await delay(waitTime);
       }
     }
+    await commitBatch();
   } catch (err) {
     console.log({ err });
   }
@@ -810,11 +785,13 @@ const eventNotificationEmail = async (
       <p>Best regards,</p>
       ` + signatureHTML
     };
-
-    return transporter.sendMail(mailOptions, (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "researcherEventNotificationEmail",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -887,10 +864,13 @@ exports.researcherEventNotificationEmail = async (
       <p>Best regards,</p>
       ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "researcherEventNotificationEmail",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -924,10 +904,13 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
 <p>Best regards,</p>
 ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "notAttendedEmail",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -983,16 +966,7 @@ exports.sendEventNotificationEmail = (req, res) => {
   }
 };
 
-const reschEventNotificationEmail = async (
-  email,
-  firstname,
-  from1Cademy,
-  courseName,
-  hoursLeft,
-  httpReq,
-  declined,
-  res
-) => {
+const reschEventNotificationEmail = async (email, firstname, hoursLeft, declined) => {
   try {
     hoursLeft = hoursToDaysHoursStr(hoursLeft);
     const scheduleDocs = await db.collection("schedule").where("email", "==", email).get();
@@ -1037,48 +1011,55 @@ ${
 <p>Best regards,</p>
 ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, (error, data) => {
-      if (error) {
-        console.log({ error });
-        if (httpReq) {
-          return res.status(500).json({ error });
-        }
-      }
-      if (httpReq) {
-        return res.status(200).json({ done: true });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "reschEventNotificationEmail",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
-    if (httpReq) {
-      return res.status(500).json({ err });
-    }
+    return err;
   }
 };
 exports.reschEventNotificationEmail = reschEventNotificationEmail;
 
 exports.rescheduleEventNotificationEmail = (req, res) => {
-  if ("email" in req.body && "firstname" in req.body) {
-    const email = req.body.email;
-    const firstname = req.body.firstname;
-    let from1Cademy = false;
-    if ("from1Cademy" in req.body) {
-      from1Cademy = req.body.from1Cademy;
+  try {
+    if ("email" in req.body && "firstname" in req.body) {
+      const email = req.body.email;
+      const firstname = req.body.firstname;
+      let from1Cademy = false;
+      if ("from1Cademy" in req.body) {
+        from1Cademy = req.body.from1Cademy;
+      }
+      let courseName = "";
+      if ("courseName" in req.body) {
+        courseName = req.body.courseName;
+      }
+      let hoursLeft = 0;
+      if ("hoursLeft" in req.body) {
+        hoursLeft = req.body.hoursLeft;
+      }
+      reschEventNotificationEmail(email, firstname, hoursLeft, true);
     }
-    let courseName = "";
-    if ("courseName" in req.body) {
-      courseName = req.body.courseName;
-    }
-    let hoursLeft = 0;
-    if ("hoursLeft" in req.body) {
-      hoursLeft = req.body.hoursLeft;
-    }
-    reschEventNotificationEmail(email, firstname, from1Cademy, courseName, hoursLeft, true, true, res);
+    return res.status(200).json({ message: "Email Sent" });
+  } catch (err) {
+    console.log({ err });
+    return res.status(500).json({ err });
   }
 };
 
 exports.emailCommunityLeader = async (email, firstname, communiId, applicants) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("reason", "==", "emailCommunityLeader")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, firstname);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -1114,10 +1095,13 @@ exports.emailCommunityLeader = async (email, firstname, communiId, applicants) =
         <p>Best regards,</p>
         ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, async (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "emailCommunityLeader",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -1149,10 +1133,13 @@ exports.emailImanToInviteApplicants = async needInvite => {
         <p>Best regards,</p>
         ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, async (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email: "oneweb@umich.edu",
+      reason: "emailImanToInviteApplicants",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -1161,6 +1148,12 @@ exports.emailImanToInviteApplicants = async needInvite => {
 
 exports.emailApplicationStatus = async (email, firstname, fullname, reminders, subject, content, hyperlink) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("reason", "==", "emailApplicationStatus")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, firstname);
     const nWeek = nextWeek();
     const mailOptions = {
@@ -1182,22 +1175,13 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
 <p>Best regards,</p>
 ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, async (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
-      const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
-      let userDoc = await userQuery.get();
-      if (!userDoc.docs.length) {
-        const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
-        userDoc = await userQuery.get();
-      }
-      if (userDoc.docs.length > 0) {
-        await userDoc.docs[0].ref.update({
-          reminders: reminders + 1,
-          reminder: Timestamp.fromDate(nWeek)
-        });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "emailApplicationStatus",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
@@ -1206,6 +1190,12 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
 
 exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, project) => {
   try {
+    const emailOnProgress = await db
+      .collection("emails")
+      .where("email", "==", email)
+      .where("reason", "==", "remindResearcherToSpecifyAvailability")
+      .get();
+    if (emailOnProgress.docs.length > 0) return;
     const nameString = await getNameFormatted(email, fullname);
     const mailOptions = {
       from: "onecademy@umich.edu",
@@ -1226,12 +1216,76 @@ exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, pr
         <p>Best regards,</p>
         ` + signatureHTML
     };
-    return transporter.sendMail(mailOptions, async (error, data) => {
-      if (error) {
-        console.log({ error });
-      }
+    const urgetEmail = db.collection("emails").doc();
+    await urgetEmail.set({
+      mailOptions,
+      createdAt: Timestamp.fromDate(new Date()),
+      email,
+      reason: "remindResearcherToSpecifyAvailability",
+      urgent: true
     });
   } catch (err) {
     console.log({ err });
+  }
+};
+
+exports.sendingEmails = async context => {
+  try {
+    const emailsDocs = await db.collection("emails").get();
+    let emails = emailsDocs.docs.map(doc => {
+      return { ...doc.data(), id: doc.id };
+    });
+    emails = [...emails.filter(e => e.urgent), ...emails.filter(e => !e.urgent)];
+    console.log(emails);
+    for (let emailData of emails) {
+      const { documentId, mailOptions, reason, city, stateInfo, country, id, email } = emailData;
+      const isInstAdmin = reason === "instructor" || reason === "administrator";
+      if (isTimeToSendEmail(city, stateInfo, country, !isInstAdmin)) {
+        transporter.sendMail(mailOptions, async (error, data) => {
+          if (error) {
+            console.log("sendMail", { error });
+          } else {
+            const emailRef = db.collection("emails").doc(id);
+            if (reason === "instructor") {
+              const instructorRef = db.collection("instructors").doc(documentId);
+              await instructorRef.update({
+                emailedAt: Timestamp.fromDate(new Date()),
+                reminders: FieldValue.increment(1),
+                nextReminder: Timestamp.fromDate(nextWeek()),
+                updatedAt: Timestamp.fromDate(new Date())
+              });
+            } else if (reason === "administrator") {
+              const administratorRef = db.collection("administrators").doc(documentId);
+              await administratorRef.update({
+                emailedAt: Timestamp.fromDate(new Date()),
+                reminders: FieldValue.increment(1),
+                nextReminder: Timestamp.fromDate(nextWeek()),
+                updatedAt: Timestamp.fromDate(new Date())
+              });
+            } else if (reason === "emailApplicationStatus") {
+              const userQuery = db.collection("users").where("email", "==", email.toLowerCase());
+              let userDoc = await userQuery.get();
+              if (!userDoc.docs.length) {
+                const userQuery = db.collection("usersSurvey").where("email", "==", email.toLowerCase());
+                userDoc = await userQuery.get();
+              }
+              if (userDoc.docs.length > 0) {
+                await userDoc.docs[0].ref.update({
+                  reminders: FieldValue.increment(1),
+                  reminder: Timestamp.fromDate(nextWeek())
+                });
+              }
+            }
+            await emailRef.delete();
+          }
+        });
+      }
+      // We don't want to send many emails at once, because it may drive Gmail crazy.
+      // we have  waitTime by a random integer between 10 to 40 seconds.
+      const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
+      await delay(waitTime);
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
