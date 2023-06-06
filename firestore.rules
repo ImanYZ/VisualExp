@@ -268,5 +268,9 @@ service cloud.firestore {
        allow read: if  true;
        allow write: if true;
     }
+    match /emails/{emailId} {
+       allow read: if  false;
+       allow write: if false;
+    }
   }
 }
