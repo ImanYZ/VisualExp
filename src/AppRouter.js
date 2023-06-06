@@ -545,6 +545,7 @@ const AppRouter = props => {
                     )
                   }
                 />
+                <Route path="ScheduleInstructorSurvey/:instructorId" element={<ScheduleInstructorPage />} />
               </>
             </>
           )}
