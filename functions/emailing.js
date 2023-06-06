@@ -250,7 +250,7 @@ const isTimeToSendEmail = (city = "", state = "", country = "", ignore = false) 
   if (ignore) return true;
   state = state.split(";")[1] || "";
   country = country.split(";")[1] || "";
-  if (!cityTimezones.lookupViaCity(city) || cityTimezones.lookupViaCity(city).length === 0){
+  if (!cityTimezones.lookupViaCity(city) || cityTimezones.lookupViaCity(city).length === 0) {
     city = "Ann Arbor";
   }
   const cityDetails = (cityTimezones.lookupViaCity(city) || []).find(detail => {
@@ -367,7 +367,8 @@ exports.inviteAdministrators = async context => {
           email,
           stateInfo,
           country,
-          urgent: false
+          urgent: false,
+          sent: false
         });
       }
     }
@@ -490,7 +491,10 @@ exports.inviteInstructors = async context => {
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructorData;
       const upvotes = instructorData?.upVotes || 0;
       const downvotes = instructorData?.downVotes || 0;
-
+      const topic = interestedTopic
+        .split(" ")
+        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+        .join(" ");
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
         (upvotes - downvotes >= 3 || instructorData.scraped) &&
@@ -510,12 +514,19 @@ exports.inviteInstructors = async context => {
         const mailOptions = {
           from: process.env.EMAIL,
           to: email,
-          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for ${interestedTopic}`,
+          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for  ${topic}`,
           html: `
             <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-              <p>We are a research group at the University of Michigan, School of Information that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction.We have developed <a href="https://1cademy.com">1Cademy.com, </a>an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
+              <p>We are a research group at the University of Michigan, School of Information that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction. We have developed 1Cademy.com, an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
               <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
-              <p>To schedule an appointment, please click one of the following links or directly reply to this email.</p>
+              <p>We would like to partner with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
+              <ul>
+              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
+              <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
+              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Voice-based Practice</a></li>
+              </ul>
+              
+              <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
               <ul>
                 <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
                   // These are all sending requests to the client side.
@@ -552,8 +563,10 @@ exports.inviteInstructors = async context => {
           stateInfo,
           country,
           urgent: false,
-          documentId: instructorDoc.id
+          documentId: instructorDoc.id,
+          sent: false
         });
+        break;
       }
     }
     await commitBatch();
@@ -793,7 +806,8 @@ const eventNotificationEmail = async (
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "researcherEventNotificationEmail",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -872,7 +886,8 @@ exports.researcherEventNotificationEmail = async (
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "researcherEventNotificationEmail",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -912,7 +927,8 @@ exports.notAttendedEmail = async (email, firstname, from1Cademy, courseName, ord
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "notAttendedEmail",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -1019,7 +1035,8 @@ ${
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "reschEventNotificationEmail",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -1103,7 +1120,8 @@ exports.emailCommunityLeader = async (email, firstname, communiId, applicants) =
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "emailCommunityLeader",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -1141,7 +1159,8 @@ exports.emailImanToInviteApplicants = async needInvite => {
       createdAt: Timestamp.fromDate(new Date()),
       email: "oneweb@umich.edu",
       reason: "emailImanToInviteApplicants",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -1183,7 +1202,8 @@ exports.emailApplicationStatus = async (email, firstname, fullname, reminders, s
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "emailApplicationStatus",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
@@ -1224,7 +1244,8 @@ exports.remindResearcherToSpecifyAvailability = async (email, fullname, days, pr
       createdAt: Timestamp.fromDate(new Date()),
       email,
       reason: "remindResearcherToSpecifyAvailability",
-      urgent: true
+      urgent: true,
+      sent: false
     });
   } catch (err) {
     console.log({ err });
