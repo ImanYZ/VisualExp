@@ -21,9 +21,6 @@ import RouterNav from "../../Components/RouterNav/RouterNav";
 import SelectSessions from "./SelectSessions";
 import sessionFormatter from "./sessionFormatter";
 import ConsentSurvey from "../Auth/ConsentSurvey";
-
-import { isEmail } from "../../utils";
-
 import "./SchedulePage.css";
 import AppConfig from "../../AppConfig";
 
