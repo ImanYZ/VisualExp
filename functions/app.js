@@ -42,7 +42,8 @@ const {
   instructorNo,
   instructorLater,
   trackStudentInvite,
-  trackStudentEmailTemplateCopy
+  trackStudentEmailTemplateCopy,
+  sendingEmails
 } = require("./emailing");
 const {
   schedule,
@@ -138,6 +139,7 @@ app.post("/voteOnSingleRecall", voteOnSingleRecall);
 app.use("/admin", adminRouter);
 app.post("/loadRecallGrades", loadRecallGrades);
 app.post("/scheduleInstructors", scheduleInstructors);
+app.get("/sendingEmails", sendingEmails);
 // Knowledge endpoints
 
 // Misinformation Experiment

@@ -1238,7 +1238,6 @@ exports.sendingEmails = async context => {
       return { ...doc.data(), id: doc.id };
     });
     emails = [...emails.filter(e => e.urgent), ...emails.filter(e => !e.urgent)];
-    console.log(emails);
     for (let emailData of emails) {
       const { documentId, mailOptions, reason, city, stateInfo, country, id, email } = emailData;
       const isInstAdmin = reason === "instructor" || reason === "administrator";
