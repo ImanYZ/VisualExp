@@ -920,7 +920,6 @@ exports.remindCalendarInvitations = async context => {
     // We don't want to send many emails at once, because it may drive Gmail crazy.
     // waitTime keeps increasing for every email that should be sent and in a setTimeout
     // postpones sending the next email until the next waitTime.
-    let waitTime = 0;
     const _futureEvents = await futureEvents(40);
     const currentTime = new Date().getTime();
     // Each Google Calendar event has {start, end, attendees}.
@@ -945,7 +944,6 @@ exports.remindCalendarInvitations = async context => {
               // Send a reminder email to a researcher that they have not accepted
               // or even declined the Google Calendar invitation and asks them to
               // accept it or ask someone else to take it.
-              setTimeout(() => {
                 researcherEventNotificationEmail(
                   attendee.email.toLowerCase(),
                   researchers[attendee.email.toLowerCase()],
@@ -955,9 +953,6 @@ exports.remindCalendarInvitations = async context => {
                   attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
                   schedule[ev.id].project
                 );
-              }, waitTime);
-              // Increase waitTime by a random integer between 1 to 4 seconds.
-              waitTime += 1000 * (1 + Math.floor(Math.random() * 4));
             }
             // Find the attendee who corresponds to this participant:
             else if (attendee.email.toLowerCase() === participant.email) {
