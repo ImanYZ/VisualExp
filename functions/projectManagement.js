@@ -1499,7 +1499,6 @@ const consumeRecallGradesChanges = (recallGradesDocs, fullname) => {
 exports.loadRecallGrades = async (req, res) => {
   try {
     const { fullname } = req.body;
-    console.log("fullname", fullname);
     const recentParticipants = await fetchRecentParticipants(fullname);
     let recallGradesDocs = await db.collection("recallGradesV2").get();
     let _recallGrades = consumeRecallGradesChanges(recallGradesDocs.docs, fullname);
