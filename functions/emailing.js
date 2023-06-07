@@ -566,7 +566,6 @@ exports.inviteInstructors = async context => {
           documentId: instructorDoc.id,
           sent: false
         });
-        break;
       }
     }
     await commitBatch();
@@ -1258,7 +1257,11 @@ exports.sendingEmails = async context => {
     let emails = emailsDocs.docs.map(doc => {
       return { ...doc.data(), id: doc.id };
     });
-    emails = [...emails.filter(e => e.urgent), ...emails.filter(e => !e.urgent)];
+    emails = [
+      ...emails.filter(e => e.urgent),
+      ...emails.filter(e => e.reason === "instructor"),
+      ...emails.filter(e => e.reason === "administrator")
+    ];
     for (let emailData of emails) {
       const { documentId, mailOptions, reason, city, stateInfo, country, id, email } = emailData;
       const isInstAdmin = reason === "instructor" || reason === "administrator";

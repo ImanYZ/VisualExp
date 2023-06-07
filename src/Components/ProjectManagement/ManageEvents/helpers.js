@@ -402,16 +402,16 @@ export const istructorsColumns = [
     }
   },
   {
-    field: "scheduled",
-    headerName: "Scheduled the Session",
+    field: "yes",
+    headerName: "Clicked Yes",
     width: 190,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
   {
-    field: "inviteStudents",
-    headerName: "Invited Students",
+    field: "scheduled",
+    headerName: "Scheduled the Session",
     width: 190,
     renderCell: cellValues => {
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
