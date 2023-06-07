@@ -89,7 +89,7 @@ exports.passagesNumberCorrection = functions
     memory: "1GB",
     timeoutSeconds: 520
   })
-  .pubsub.schedule("*/20 * * * *")
+  .pubsub.schedule("*/10 * * * *")
   .timeZone(EST_TIMEZONE)
   .onRun(sendingEmails);
 // Knowledge
