@@ -61,14 +61,16 @@ const ManageEvents = props => {
   const [selectedSession, setSelectedSession] = useState([]);
   const [invitesInstructors, setInvitesInstructors] = useState([]);
   const [invitesAdminstartors, setInvitesAdminstartors] = useState([]);
+  const [loadingInstructors, setLoadingInstructors] = useState(true);
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
 
   useEffect(() => {
     const loadLoadInstructors = async () => {
-      const invitedInstructorsDocs = await firebase.db.collection("instructors").where("upVotes", ">=", 3).get();
-      const invitedAdministratorsDocs = await firebase.db.collection("administrators").where("upVotes", ">=", 3).get();
+      setLoadingInstructors(true);
+      const invitedInstructorsDocs = await firebase.db.collection("instructors").get();
+      const invitedAdministratorsDocs = await firebase.db.collection("administrators").get();
       const invitedInstructors = [];
       const invitedAdministrators = [];
       for (let adminstratorDoc of invitedAdministratorsDocs.docs) {
@@ -92,24 +94,27 @@ const ManageEvents = props => {
       }
       for (let instructorDoc of invitedInstructorsDocs.docs) {
         const instructorData = instructorDoc.data();
-        const inst = {
-          instructor: instructorData.firstname + " " + instructorData.lastname,
-          email: instructorData.email,
-          reminders: instructorData.reminders ? instructorData.reminders : 0,
-          nextReminder: instructorData.nextReminder ? instructorData.nextReminder.toDate() : "",
-          id: instructorDoc.id,
-          votes: instructorData.upVotes - instructorData.downVotes,
-          interestedTopic: instructorData.interestedTopic,
-          scheduled: instructorData.yes ? "✅ " : "NO RESPONSE",
-          inviteStudents: instructorData.inviteStudents ? "✅ " : "NO RESPONSE",
-          emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",
-          rescheduled: instructorData.later ? "✅ " : "NO RESPONSE",
-          notIntersted: instructorData.no ? "❌" : "NO RESPONSE"
-        };
-        invitedInstructors.push(inst);
+        if (instructorData.hasOwnProperty("nextReminder")) {
+          const inst = {
+            instructor: instructorData.firstname + " " + instructorData.lastname,
+            email: instructorData.email,
+            reminders: instructorData.reminders ? instructorData.reminders : 0,
+            nextReminder: instructorData.nextReminder ? instructorData.nextReminder.toDate() : "",
+            id: instructorDoc.id,
+            votes: instructorData?.upVotes || 0 - instructorData?.downVotes || 0,
+            interestedTopic: instructorData.interestedTopic,
+            yes: instructorData.yes ? "✅ " : "NO RESPONSE",
+            scheduled: instructorData?.scheduled ? "✅ " : "NO RESPONSE",
+            emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",
+            rescheduled: instructorData.later ? "✅ " : "NO RESPONSE",
+            notIntersted: instructorData.no ? "❌" : "NO RESPONSE"
+          };
+          invitedInstructors.push(inst);
+        }
       }
       setInvitesAdminstartors(invitedAdministrators);
       setInvitesInstructors(invitedInstructors);
+      setLoadingInstructors(false);
     };
     if (firebase) {
       loadLoadInstructors();
@@ -302,7 +307,6 @@ const ManageEvents = props => {
     const theRow = clickedRow.row;
     try {
       if (theRow.participant) {
-
         const email = theRow.participant;
         setParticipant(email);
         setScheduleLoaded(false);
@@ -500,10 +504,10 @@ const ManageEvents = props => {
         selectedSession,
         availableSessions,
         currentProject,
-        events,
+        events
       });
       // errorAlert(responseObj.data);
-      // alert("sessions updated seccessufly  ..."); 
+      // alert("sessions updated seccessufly  ...");
       setSubmitted(true);
     } catch (error) {
       setIsSubmitting(false);
@@ -516,7 +520,7 @@ const ManageEvents = props => {
 
   return (
     <div>
-      <h3>Invited instructors : </h3>
+      <h3 style={{ marginLeft: "45px" }}>Invited instructors : </h3>
       <div className="dataGridTable">
         <DataGrid
           rows={invitesInstructors}
@@ -525,10 +529,10 @@ const ManageEvents = props => {
           rowsPerPageOptions={[10]}
           autoPageSize
           autoHeight
-          // loading={!ongoingEventsLoaded}
+          loading={loadingInstructors}
         />
       </div>
-      <h3>Invited adminstrators : </h3>
+      <h3 style={{ marginLeft: "45px" }}>Invited adminstrators : </h3>
       <div className="dataGridTable">
         <DataGrid
           rows={invitesAdminstartors}
@@ -537,7 +541,7 @@ const ManageEvents = props => {
           rowsPerPageOptions={[10]}
           autoPageSize
           autoHeight
-          // loading={!ongoingEventsLoaded}
+          loading={loadingInstructors}
         />
       </div>
       <div className="dataGridTable">
