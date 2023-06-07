@@ -491,10 +491,6 @@ exports.inviteInstructors = async context => {
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructorData;
       const upvotes = instructorData?.upVotes || 0;
       const downvotes = instructorData?.downVotes || 0;
-      const topic = interestedTopic
-        .split(" ")
-        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
-        .join(" ");
       if (
         // Only those instructors whose information is verified by at least 3 other researchers.
         (upvotes - downvotes >= 3 || instructorData.scraped) &&
@@ -511,6 +507,10 @@ exports.inviteInstructors = async context => {
         !instructorData.inviteStudents &&
         !emails.includes(email)
       ) {
+        const topic = interestedTopic
+          .split(" ")
+          .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+          .join(" ");
         const mailOptions = {
           from: process.env.EMAIL,
           to: email,
