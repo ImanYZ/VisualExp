@@ -1,7 +1,7 @@
 const { generateUID, capitalizeFirstLetter } = require("./utils");
 const { signatureHTML } = require("./emailSignature");
 
-exports.mailOptions = (email, topic, prefix, lastname, instructorId, random) => {
+exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random) => {
   if (random === 0) {
     return {
       from: process.env.EMAIL,

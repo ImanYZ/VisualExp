@@ -14,7 +14,6 @@ const moment = require("moment-timezone");
 
 const { instMailOptions } = require("./instructorsMailOptions");
 
-
 require("dotenv").config();
 
 const getNameFormatted = async (email, firstname) => {
@@ -498,8 +497,8 @@ exports.inviteInstructors = async context => {
           inst.interestedTopic &&
           inst.reminders < 4
       );
-    console.log(instructors);
     for (let instructor of instructors) {
+      console.log(instructor.email);
       const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
       const topic = interestedTopic
         .split(" ")
@@ -1238,7 +1237,7 @@ exports.sendingEmails = async context => {
                 reminders: FieldValue.increment(1),
                 nextReminder: Timestamp.fromDate(nextWeek()),
                 updatedAt: Timestamp.fromDate(new Date()),
-                emailNumber: mailOptions.emailNumber
+                emailNumber: emailData.emailNumber
               });
             } else if (reason === "administrator") {
               const administratorRef = db.collection("administrators").doc(documentId);
@@ -1265,11 +1264,11 @@ exports.sendingEmails = async context => {
             await emailRef.delete();
           }
         });
+        // We don't want to send many emails at once, because it may drive Gmail crazy.
+        // we have  waitTime by a random integer between 10 to 40 seconds.
+        const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
+        await delay(waitTime);
       }
-      // We don't want to send many emails at once, because it may drive Gmail crazy.
-      // we have  waitTime by a random integer between 10 to 40 seconds.
-      const waitTime = 1000 * Math.floor(Math.random() * 31) + 10;
-      await delay(waitTime);
     }
     console.log("Done");
   } catch (error) {
