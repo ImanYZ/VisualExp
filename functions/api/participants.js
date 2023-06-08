@@ -233,7 +233,7 @@ participantsRouter.post("/schedule", async (req, res) => {
           });
           if (usersServeyDocs.docs.length === 0) {
             const instuctorsData = instructorsDocs.docs[0].data();
-            const fullName = await getAvailableFullname(`${instuctorsData.firstnam} ${instuctorsData.lastname}`);
+            const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
             const userSurevyRef = db.collection("usersSurvey").doc(fullName);
             batch.set(userSurevyRef, {
               email: email,
