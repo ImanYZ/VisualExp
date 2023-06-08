@@ -678,7 +678,7 @@ const ThematicAnalysis = props => {
               </Box>
             </Box>
           </Grid>
-          <Grid item xs={12} style={{ display: "flex", justifyContent: "center" }}>
+          <Grid item xs={12} style={{ display: "flex", justifyContent: "left" }}>
             <Button
               variant="contained"
               onClick={handleSubmit}
