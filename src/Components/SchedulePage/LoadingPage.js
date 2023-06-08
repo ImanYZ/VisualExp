@@ -14,7 +14,7 @@ const LoadingPage = ({ project }) => {
       }}
     >
       <Typography align="center" variant="h5">
-        Please Wait! we are scheduling your {project === "OnlineCommunities" ? "sessions" : "session"}...
+        Please Wait! we are scheduling your {project === "OnlineCommunities" ? "session" : "sessions"}...
       </Typography>
     </div>
   );
