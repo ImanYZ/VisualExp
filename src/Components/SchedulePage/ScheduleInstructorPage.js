@@ -23,6 +23,7 @@ import sessionFormatter from "./sessionFormatter";
 import ConsentSurvey from "../Auth/ConsentSurvey";
 import "./SchedulePage.css";
 import AppConfig from "../../AppConfig";
+import LoadingPage from "./LoadingPage";
 
 let tomorrow = new Date();
 tomorrow = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
@@ -59,23 +60,25 @@ const ScheduleInstructorPage = props => {
       id: instructorId
     });
   }, []);
-
+  
 
   useEffect(() => {
     const loadSchedule = async () => {
       // Set the flag that we're loading data.
       setScheduleLoaded(false);
-      let userDoc = await firebase.db.collection("instructors").doc(instructorId).get();
-      const userData = userDoc.data();
+      let instructorDoc = await firebase.db.collection("instructors").doc(instructorId).get();
+      const instructorData = instructorDoc.data();
+      console.log(instructorData);
       const project = "OnlineCommunities";
       setProject(project);
-      setEmail(userData.email);
+      setEmail(instructorData.email);
+      const _email = instructorData.email;
       const projSp = await firebase.db.collection("projectSpecs").doc(project).get();
       setProjectSpecs(projSp.data());
       const researchers = {};
       const researcherDocs = await firebase.db.collection("researchers").get();
       for (let researcherDoc of researcherDocs.docs) {
-        if (researcherDoc.id === userDoc.id) {
+        if (researcherDoc.id === instructorDoc.id) {
           navigate("/Activities/Experiments");
           return;
         }
@@ -141,7 +144,7 @@ const ScheduleInstructorPage = props => {
           if (
             event.attendees &&
             event.attendees.length > 0 &&
-            event.attendees.findIndex(attendee => attendee.email === email) !== -1
+            event.attendees.findIndex(attendee => attendee.email === _email) !== -1
           ) {
             if (
               (project === "OnlineCommunities" && event.colorId === "5") ||
@@ -161,12 +164,12 @@ const ScheduleInstructorPage = props => {
           event.attendees &&
           event.attendees.length > 0 &&
           startTime in availSessions &&
-          event.attendees.findIndex(attendee => attendee.email === email) === -1 &&
+          event.attendees.findIndex(attendee => attendee.email === _email) === -1 &&
           events.findIndex(
             eve =>
               new Date(eve.start.dateTime).getTime() === startMinus30Min.getTime() &&
               new Date(eve.start.dateTime).getTime() + 60 * 60 * 1000 === new Date(eve.end.dateTime).getTime() &&
-              eve.attendees.includes(email)
+              eve.attendees.includes(_email)
           ) === -1
         ) {
           for (let attendee of event.attendees) {
@@ -183,7 +186,7 @@ const ScheduleInstructorPage = props => {
         }
       }
       setAvailableSessions(availSessions);
-      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", email.toLowerCase()).get();
+      const scheduleDocs = await firebase.db.collection("schedule").where("email", "==", _email.toLowerCase()).get();
       const sch = [];
       for (let scheduleDoc of scheduleDocs.docs) {
         const scheduleData = scheduleDoc.data();
@@ -232,8 +235,8 @@ const ScheduleInstructorPage = props => {
         sessions,
         project: "OnlineCommunities",
         surveyType: "instructor",
-        instructorId, 
-        email,
+        instructorId,
+        email
       });
       errorAlert(responseObj.data);
 
@@ -313,26 +316,26 @@ const ScheduleInstructorPage = props => {
     return str;
   };
 
+  if (isSubmitting) return <LoadingPage project={project} />;
   return (
     <>
       <RouterNav />
       <Box id="SchedulePageContainer">
         {submitted ? (
           <Box className="DateDescription">
-            {/* <p>
-              Based on your specified availability, we just matched you with one of our UX researchers and sent you a
-              Google Calendar invitation. Please accept it as soon as possible. If the session does not work for you,
-              you can return to this page to reschedule it.
+            <p>
+              Based on your specified availability, we just matched you with one of our researchers for the session and
+              sent you a Google Calendar invitation Please accept it as soon as possible. If it doesn't work for you,
+              you can return to this page to reschedule the session.
             </p>
             <p>
-              For accepting the Google Calendar invites, please open your Google Calendar, open our scheduled meeting
-              event, and click "Yes."
+              For accepting the Google Calendar invitation please open the invitation email ,scroll all the way down to
+              find the options to respond to the Calendar invite, and click "Yes."
             </p>
             <p>
               Note that accepting/declining the invitation through Outlook does not work. You should only accept/reject
-              the invitation through the Yes/No links at the bottom of the Google Calendar invitation email, or directly
-              through Google Calendar.
-            </p> */}
+              the invitation through the Yes/No links at the bottom of the Google Calendar invitation email.
+            </p>
           </Box>
         ) : participatedBefore ? (
           <Alert severity="error">
@@ -384,9 +387,9 @@ const ScheduleInstructorPage = props => {
                     setSelectedSession={setSelectedSession}
                     availableSessions={availableSessions}
                     setSubmitable={setSubmitable}
-                    numberOfSessions={projectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+                    numberOfSessions={1}
                     hourlyChunks={projectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
-                    sessionDuration={projectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+                    sessionDuration={[1]}
                     daysLater={projectSpecs.daysLater || AppConfig.daysLater}
                   />
                 </Box>

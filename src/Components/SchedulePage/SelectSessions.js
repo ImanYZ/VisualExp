@@ -34,7 +34,7 @@ const SelectSessions = props => {
   // Checks whether each of the selected sessions satisfies the 1st, 2nd,
   // or 3rd session criteria.
   useEffect(() => {
-    if (props.schedule && props.schedule.length > 0) {
+    if (props.schedule) {
       const orderedSch = [...props.schedule];
       // Before checking whether a session satisfies the 1st, 2nd, or 3rd
       // session criteria, we should sort all the selected sessions in
@@ -62,6 +62,7 @@ const SelectSessions = props => {
           const slotDate = moment(scheduleItem).utcOffset(-4).add(addDays, "days").format("YYYY-MM-DD");
           requiredSlots[slotDate] = duration;
         }
+        console.log(":: :: requiredSlots :: :: ",props.sessionDuration,requiredSlots);
 
         for(const requiredSlotDate in requiredSlots) {
           // checking first slot
@@ -116,7 +117,7 @@ const SelectSessions = props => {
         props.setSelectedSession([]);
       }
     }
-  }, [props.schedule]);
+  }, [props, props.schedule]);
 
   // ScheduleSelector calls this function for every cell that changes,
   // every time the user makes any changes to the schedule.

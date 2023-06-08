@@ -433,6 +433,14 @@ export const istructorsColumns = [
       return <GridCellToolTip isLink={false} cellValues={cellValues} />;
     }
   },
+  {
+    field: "emailtype",
+    headerName: "Email Type",
+    width: 190,
+    renderCell: cellValues => {
+      return <GridCellToolTip isLink={false} cellValues={cellValues} />;
+    }
+  },
   { field: "nextReminder", headerName: "Next Reminder", type: "dateTime", width: 190 }
 ];
 

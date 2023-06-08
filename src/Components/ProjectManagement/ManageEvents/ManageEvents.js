@@ -106,6 +106,7 @@ const ManageEvents = props => {
             yes: instructorData.yes ? "✅ " : "NO RESPONSE",
             scheduled: instructorData?.scheduled ? "✅ " : "NO RESPONSE",
             emailstatus: instructorData.openedEmail ? "Opened" : "Not Opened",
+            emailtype: instructorData?.emailNumber === 0 ? "First" : "Second",
             rescheduled: instructorData.later ? "✅ " : "NO RESPONSE",
             notIntersted: instructorData.no ? "❌" : "NO RESPONSE"
           };
