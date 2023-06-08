@@ -13,7 +13,7 @@ const cityTimezones = require("city-timezones");
 const moment = require("moment-timezone");
 
 const { instMailOptions } = require("./instructorsMailOptions");
-const { id } = require("date-fns/locale");
+
 
 require("dotenv").config();
 
