@@ -12,6 +12,9 @@ const { signatureHTML } = require("./emailSignature");
 const cityTimezones = require("city-timezones");
 const moment = require("moment-timezone");
 
+const { instMailOptions } = require("./instructorsMailOptions");
+const { id } = require("date-fns/locale");
+
 require("dotenv").config();
 
 const getNameFormatted = async (email, firstname) => {
@@ -472,101 +475,57 @@ exports.administratorLater = async (req, res) => {
   }
 };
 
-// This should be called by a pubsub scheduler every 25 hours.
-// It reads all the documents from the instructors collection.
-// For each of them that meet the criteria, randomizes them into one of
-// our experimental conditions and sends them personalized invitation
-// and reminder emails.
-// The algorithm is explained at emailing.drawio
 exports.inviteInstructors = async context => {
   try {
-    // We don't want to send many emails at once, because it may drive Gmail crazy.
-    // waitTime keeps increasing for every email that should be sent and in a setTimeout
-    // postpones sending the next email until the next waitTime.
-    const instructorDocs = await db.collection("instructors").get();
+    const instructorDocs = await db
+      .collection("instructors")
+      .where("no", "==", false)
+      .where("yes", "==", false)
+      .where("scheduled", "==", false)
+      .where("deleted", "==", false)
+      .get();
     const emailsDocs = await db.collection("emails").get();
     const emails = emailsDocs.docs.map(emailDoc => emailDoc.data().email);
-    for (let instructorDoc of instructorDocs.docs) {
-      const instructorData = instructorDoc.data();
-      const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructorData;
-      const upvotes = instructorData?.upVotes || 0;
-      const downvotes = instructorData?.downVotes || 0;
-      if (
-        // Only those instructors whose information is verified by at least 3 other researchers.
-        (upvotes - downvotes >= 3 || instructorData.scraped) &&
-        // We have not sent them any emails or less than 4 reminders
-        (!instructorData.reminders || instructorData.reminders < 4) &&
-        // Their next reminder is not scheduled yet, or it should have been sent before now.
-        (!instructorData.nextReminder || instructorData.nextReminder.toDate().getTime() < new Date().getTime()) &&
-        // They have not already clicked any of the options in their email.
-        !instructorData.yes &&
-        !instructorData.no &&
-        !instructorData.scheduled &&
-        !instructorData.alreadyTalked &&
-        instructorData.interestedTopic &&
-        !instructorData.inviteStudents &&
-        !emails.includes(email)
-      ) {
-        const topic = interestedTopic
-          .split(" ")
-          .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
-          .join(" ");
-        const mailOptions = {
-          from: process.env.EMAIL,
-          to: email,
-          subject: `We'd Like to Partner With You to Optimize Teaching and Improve Students’ Learning and Satisfaction for  ${topic}`,
-          html: `
-            <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
-              <p>We are a research group at the University of Michigan, School of Information that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction. We have developed <a href="https://1cademy.com">1Cademy.com, </a> an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.</p>
-              <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule an hour-long interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
-              <p>We would like to partner with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
-              <ul>
-              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
-              <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
-              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Voice-based Practice</a></li>
-              </ul>
-              
-              <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
-              <ul>
-                <li><a href="https://1cademy.us/ScheduleInstructorSurvey/${
-                  // These are all sending requests to the client side.
-                  instructorDoc.id
-                }" target="_blank">Yes, let's schedule.</a></li>
-                <li><a href="https://1cademy.us/notInterestedFaculty/${
-                  // These are all sending requests to the client side.
-                  instructorDoc.id
-                }" target="_blank"> No, do not contact me again.</a></li>
-                <li><a href="https://1cademy.us/interestedFacultyLater/${
-                  // These are all sending requests to the client side.
-                  instructorDoc.id
-                }" target="_blank">Not at this point, contact me in a few weeks.</a></li>
-              </ul>
-              <p></p>
-              <p>Best regards,</p>
-              ${signatureHTML}
-              <img src="https://1cademy.us/api/loadImage/professor/${
-                // For tracking when they open their email.
-                // Note that the email clients that cache emails like those on iPad or Outlook open the content
-                // of the emails without the user's knowlege, so those would be false positives for us.
-                instructorDoc.id + "/" + generateUID()
-              }"
-              data-os="https://drive.google.com/uc?id=1H4mlCx7BCxIvewNtUwz5GmdVcLnqIr8L&amp;export=download"
-              width="420" height="37"><br></div></div></div>`
-        };
-        const emailRef = db.collection("emails").doc();
-        await batchSet(emailRef, {
-          mailOptions,
-          reason: "instructor",
-          createdAt: Timestamp.fromDate(new Date()),
-          email,
-          city,
-          stateInfo,
-          country,
-          urgent: false,
-          documentId: instructorDoc.id,
-          sent: false
-        });
+    const instructors = instructorDocs.docs
+      .map(instructorDoc => {
+        return { ...instructorDoc.data(), id: instructorDoc.id };
+      })
+      .filter(
+        inst =>
+          ((inst?.upVotes || 0) - (inst?.downVotes || 0) >= 3 || inst.scraped) &&
+          (!inst.nextReminder || inst.nextReminder.toDate().getTime() < new Date().getTime()) &&
+          !emails.includes(inst.email) &&
+          inst.interestedTopic &&
+          inst.reminders < 4
+      );
+    console.log(instructors);
+    for (let instructor of instructors) {
+      const { email, prefix, lastname, interestedTopic, city, stateInfo, country } = instructor;
+      const topic = interestedTopic
+        .split(" ")
+        .map(word => (word.length > 4 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+        .join(" ");
+      let randomNumber = 0;
+      if (instructor.hasOwnProperty("emailNumber")) {
+        randomNumber = instructor.emailNumber;
+      } else {
+        randomNumber = Math.floor(Math.random() * 2);
       }
+      const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, randomNumber);
+      const emailRef = db.collection("emails").doc();
+      await batchSet(emailRef, {
+        mailOptions,
+        reason: "instructor",
+        createdAt: Timestamp.fromDate(new Date()),
+        email,
+        city,
+        stateInfo,
+        country,
+        urgent: false,
+        documentId: instructor.id,
+        sent: false,
+        emailNumber: randomNumber
+      });
     }
     await commitBatch();
   } catch (err) {
@@ -1278,7 +1237,8 @@ exports.sendingEmails = async context => {
                 emailedAt: Timestamp.fromDate(new Date()),
                 reminders: FieldValue.increment(1),
                 nextReminder: Timestamp.fromDate(nextWeek()),
-                updatedAt: Timestamp.fromDate(new Date())
+                updatedAt: Timestamp.fromDate(new Date()),
+                emailNumber: mailOptions.emailNumber
               });
             } else if (reason === "administrator") {
               const administratorRef = db.collection("administrators").doc(documentId);
