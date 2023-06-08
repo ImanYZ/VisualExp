@@ -241,11 +241,12 @@ participantsRouter.post("/schedule", async (req, res) => {
               scheduled: true,
               institution: instuctorsData.institution,
               instructorId: instructorId,
-              firstname: instuctorsData.ƒfirstname,
+              firstname: instuctorsData.firstname,
               uid: "",
               surveyType: "instructor",
               lastname: instuctorsData.lastname,
-              noRetaineData: false
+              noRetaineData: false,
+              createdAt: Timestamp.fromDate(new Date())
             });
           }
         }
@@ -265,7 +266,8 @@ participantsRouter.post("/schedule", async (req, res) => {
               uid: userData.uid,
               surveyType: "student",
               lastname: userData.lastname,
-              noRetaineData: false
+              noRetaineData: false,
+              createdAt: Timestamp.fromDate(new Date())
             });
           }
         }
@@ -281,4 +283,3 @@ participantsRouter.post("/schedule", async (req, res) => {
 });
 
 module.exports = participantsRouter;
-
