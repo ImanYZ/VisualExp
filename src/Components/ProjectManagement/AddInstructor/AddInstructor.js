@@ -1110,6 +1110,11 @@ const AddInstructor = props => {
               gotUpdated = true;
             } else {
               instructorData.createdAt = currentTime;
+              instructorData.no = false;
+              instructorData.yes = false;
+              instructorData.deleted = false;
+              instructorData.scheduled = false;
+              instructorData.reminders = 0;
               transaction.set(instructorRef, instructorData);
             }
             const instructorLogRef = firebase.db.collection("instructorsLogs").doc();
