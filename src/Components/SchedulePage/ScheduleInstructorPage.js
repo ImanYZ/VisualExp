@@ -68,7 +68,6 @@ const ScheduleInstructorPage = props => {
       setScheduleLoaded(false);
       let instructorDoc = await firebase.db.collection("instructors").doc(instructorId).get();
       const instructorData = instructorDoc.data();
-      console.log(instructorData);
       const project = "OnlineCommunities";
       setProject(project);
       setEmail(instructorData.email);

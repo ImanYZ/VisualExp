@@ -62,7 +62,7 @@ const SelectSessions = props => {
           const slotDate = moment(scheduleItem).utcOffset(-4).add(addDays, "days").format("YYYY-MM-DD");
           requiredSlots[slotDate] = duration;
         }
-        console.log(":: :: requiredSlots :: :: ",props.sessionDuration,requiredSlots);
+
 
         for(const requiredSlotDate in requiredSlots) {
           // checking first slot
