@@ -355,7 +355,7 @@ const ScheduleInstructorPage = props => {
                 <li>
                   {" "}
                   Please specify your availability{" "}
-                  {formatSlotTime(projectSpecs.hourlyChunks, projectSpecs?.sessionDuration?.[0], 0)} introduction and
+                  {formatSlotTime(projectSpecs.hourlyChunks, 1, 0)} introduction and
                   interview session
                 </li>
                 <li>
