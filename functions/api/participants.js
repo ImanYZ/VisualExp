@@ -200,7 +200,10 @@ participantsRouter.post("/schedule", async (req, res) => {
       const rUserData = rUser.data();
 
       const start = moment(sessions[i]).utcOffset(-4, true);
-      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
+      let sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
+      if (project === "OnlineCommunities" && surveyType === "instructor") {
+        sessionDuration = 1;
+      }
       // adding slotDuration * number of slots for the session
       const end = moment(start).add(slotDuration * sessionDuration, "minutes");
       // const eventCreated = await insertEvent(start, end, summary, description, [{ email }, { email: researcher }], colorId);
