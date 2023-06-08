@@ -167,7 +167,10 @@ participantsRouter.post("/schedule", async (req, res) => {
     for (let i = 0; i < sessions.length; ++i) {
       const start = moment(sessions[i]).utcOffset(-4, true).toDate().toLocaleString();
       let availableResearchers = availSessions[start] || [];
-      const sessionDuration = projectSpecsData.sessionDuration?.[i] || 2; //[2,1,1]
+      let sessionDuration = projectSpecsData.sessionDuration?.[i] || 2;
+      if (project === "OnlineCommunities" && surveyType === "instructor") {
+        sessionDuration = 1;
+      }
       for (let j = 0; j < sessionDuration; j++) {
         const availableSlot = moment(sessions[i])
           .add((j * 60) / projectSpecsData.hourlyChunks, "minutes")

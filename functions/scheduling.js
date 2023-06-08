@@ -505,6 +505,7 @@ exports.scheduleInstructors = async (req, res) => {
     }
 
     const projectSpecsData = projectSpecs.data();
+    projectSpecsData.sessionDuration = [1];
     // 1 hour / 2 = 30 mins
     const slotDuration = 60 / (projectSpecsData.hourlyChunks || 2);
 
@@ -668,7 +669,7 @@ exports.scheduleInstructors = async (req, res) => {
           });
           if (usersServeyDocs.docs.length === 0) {
             const instuctorsData = instructorsDocs.docs[0].data();
-            const fullName = await getAvailableFullname(`${instuctorsData.firstnam} ${instuctorsData.lastname}`);
+            const fullName = await getAvailableFullname(`${instuctorsData.firstname} ${instuctorsData.lastname}`);
             const userSurevyRef = db.collection("usersSurvey").doc(fullName);
             batch.set(userSurevyRef, {
               email: email,
@@ -680,7 +681,8 @@ exports.scheduleInstructors = async (req, res) => {
               uid: "",
               surveyType: "instructor",
               lastname: instuctorsData.lastname,
-              noRetaineData: false
+              noRetaineData: false,
+              createdAt: Timestamp.fromDate(new Date())
             });
           }
         }
@@ -699,7 +701,8 @@ exports.scheduleInstructors = async (req, res) => {
               uid: userData.uid,
               surveyType: "student",
               lastname: userData.lastname,
-              noRetaineData: false
+              noRetaineData: false,
+              createdAt: Timestamp.fromDate(new Date())
             });
           }
         }
