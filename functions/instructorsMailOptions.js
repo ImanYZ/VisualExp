@@ -16,7 +16,7 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random)
               <ul>
               <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
-              <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Voice-based Practice</a></li>
+              <li><a href="https://youtu.be/Un6s1rtfZVA" rel="nofollow">Introducing 1Cademy Assistant - Voice-based Practice</a></li>
               </ul>
               
               <p>To schedule an appointment, please click the first link or directly reply to this email.</p>
