@@ -67,7 +67,7 @@ const ThematicAnalysis = props => {
   const [deleting, setDeleting] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [mergeCode, setMergeCode] = useState(null);
-
+  const [editor, setEditor] = useState(false);
   const [listOfTranscript, setListOfTranscript] = useState([]);
 
   const [transcriptId, setTranscriptId] = useState(null);
@@ -75,8 +75,6 @@ const ThematicAnalysis = props => {
   const [codesBook, setCodesBook] = useState({});
   const [previousTranscipt, setPreviousTranscipt] = useState([]);
 
-  const editor =
-    email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu" || email === "lilydibartolomeo@gmail.com";
   const codesColumn = [
     ..._codesColumn,
     {
@@ -113,6 +111,18 @@ const ThematicAnalysis = props => {
       }
     }
   ];
+  useEffect(() => {
+    const getResearcher = async () => {
+      const researcher = await firebase.db.collection("researchers").doc(fullname).get();
+      const data = researcher.data();
+      console.log(data);
+      setEditor(data?.isEditor);
+    };
+    if (firebase && fullname) {
+      getResearcher();
+    }
+  }, [firebase, fullname]);
+
   useEffect(() => {
     const getTranscript = async () => {
       const _listOfTranscript = [];
