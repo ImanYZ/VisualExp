@@ -251,7 +251,7 @@ const ExperimentPoints = props => {
         }
       }
       setIsSubmitting(false);
-      if(true || moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
+      if(moment(lastSession).utcOffset(-4).isBefore(moment().utcOffset(-4).startOf("day").add(8, "day"))) {
         setScheduleError(true);
         setSnackbarMessage(
           `Please specify your availability for at least the next 10 days, otherwise there will not be enough available sessions for the participants to schedule their ${project ==="OnlineCommunities" ? "interview session" : "3rd session"}`
@@ -260,12 +260,12 @@ const ExperimentPoints = props => {
         setScheduleError(false);
         setSnackbarMessage("Your availability is successfully saved in the database!");
       }
-      // await firebase.idToken()
-      // await axios.post("/researchers/schedule", {
-      //   fullname,
-      //   project,
-      //   schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD HH:mm"))
-      // });
+      await firebase.idToken()
+      await axios.post("/researchers/schedule", {
+        fullname,
+        project,
+        schedule: schedule.map(dt => moment(dt).utcOffset(-4).format("YYYY-MM-DD HH:mm"))
+      });
     } catch (error) {
       console.log(error);
     }
