@@ -33,7 +33,7 @@ const scheduleSingleSession = async object => {
     const end = new Date(
       start.getTime() + slotDuration * (projectSpecsData.sessionDuration?.[sessionIndex] || 1) * 60000
     );
-    const eventCreated = await createExperimentEvent(email, researcherData.email, order, start, end, projectSpecsData);
+    const eventCreated = await createExperimentEvent(email, researcherData.email, order, start, end, projectSpecsData, surveyType);
     return eventCreated;
   } catch (err) {
     console.log({ err });
