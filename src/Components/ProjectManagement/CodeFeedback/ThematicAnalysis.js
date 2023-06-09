@@ -75,7 +75,8 @@ const ThematicAnalysis = props => {
   const [codesBook, setCodesBook] = useState({});
   const [previousTranscipt, setPreviousTranscipt] = useState([]);
 
-  const editor = email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu";
+  const editor =
+    email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu" || email === "lilydibartolomeo@gmail.com";
   const codesColumn = [
     ..._codesColumn,
     {
