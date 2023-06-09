@@ -1,15 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useRecoilValue } from "recoil";
 import { DataGrid } from "@mui/x-data-grid";
-import { Grid, Box, Scrollbar } from "@mui/material";
+import { Grid, Box } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
 import axios from "axios";
-import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
-import Sheet from "@mui/joy/Sheet";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -18,28 +15,23 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
-import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
-import { _codesColumn, feedBackCodesColumns } from "./Columns";
+import { _codesColumn } from "./Columns";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
-import BookmarkIcon from "@mui/icons-material/Bookmark";
 import Paper from "@mui/material/Paper";
 import LoadingButton from "@mui/lab/LoadingButton";
 import orderBy from "lodash.orderby";
 import { firebaseState, fullnameState, emailState } from "../../../store/AuthAtoms";
 import { projectState } from "../../../store/ProjectAtoms";
 import SnackbarComp from "../../SnackbarComp";
+import FormControl from "@mui/material/FormControl";
 
-import arrayToChunks from "../../../utils/arrayToChunks";
-import { fetchRecentParticipants } from "../../../utils/researcher";
 import Select from "@mui/material/Select";
-import Tooltip from "@mui/material/Tooltip";
 import { Card, CardHeader, CardContent } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
-import { set } from "lodash";
 
 const culumns = [{ field: "participant", headerName: "Participant", width: 300 }];
 const ThematicAnalysis = props => {
@@ -72,8 +64,9 @@ const ThematicAnalysis = props => {
   const handleOpenDeleteModalAdmin = () => setOpenDeleteModalAdmin(true);
   const handleCloseDeleteModalAdmin = () => setOpenDeleteModalAdmin(false);
   const [code, setCode] = useState("");
-  const [submittingDelete, setSubmittingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const [mergeCode, setMergeCode] = useState(null);
 
   const [listOfTranscript, setListOfTranscript] = useState([]);
 
@@ -82,7 +75,6 @@ const ThematicAnalysis = props => {
   const [codesBook, setCodesBook] = useState({});
   const [previousTranscipt, setPreviousTranscipt] = useState([]);
 
-  const [nextIndex, setNextIndex] = useState(0);
   const editor = email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu";
   const codesColumn = [
     ..._codesColumn,
@@ -143,8 +135,8 @@ const ThematicAnalysis = props => {
       }
       setListOfTranscript(_listOfTranscript);
       setPreviousTranscipt(_previousTranscipt);
-      setTranscriptId(_listOfTranscript[nextIndex].id);
-      setConversation(_listOfTranscript[nextIndex].conversation);
+      setTranscriptId(_listOfTranscript[0].id);
+      setConversation(_listOfTranscript[0].conversation);
     };
     getTranscript();
   }, [firebase]);
@@ -451,7 +443,6 @@ const ThematicAnalysis = props => {
     }
 
     await researcherRef.update(researcherUpdates);
-
     setNewCode("");
     setCreating(false);
   };
@@ -528,52 +519,23 @@ const ThematicAnalysis = props => {
       setCodesBook({});
     }
   };
-  const handlChange = event => {
-    setCategory(event.target.value);
-  };
   const handleAdminEdit = async () => {
     try {
       setSubmittingUpdate(true);
-      if (adminCodeData?.code && adminCodeData?.title) {
-        const experimentCodes = [...allExperimentCodes];
-        const updatefeedbackCodeBooksDoc = await firebase.db
-          .collection("feedbackCodeBooks")
-          .where("code", "==", adminCodeData.code)
-          .where("project", "==", project)
-          .get();
-        // check if the code already exists in approvedCode or unapprovedCode
-        const codes = experimentCodes.filter(elem => elem.code === code);
-        if (codes.length >= 1) {
-          const codeUpdate = {
-            category
-          };
-          const ref = updatefeedbackCodeBooksDoc.docs[0].ref;
-          await ref.update(codeUpdate);
-          setSnackbarMessage("Uptaded successful!");
-          setCode("");
-          setCategory("");
-          setAdminCodeData({});
-          handleCloseAdminEditModal();
-          setOpenEditAdminModal(false);
-          setSubmittingUpdate(false);
-          return;
-        }
-        for (let feedbackCodeDoc of updatefeedbackCodeBooksDoc.docs) {
-          const codeData = feedbackCodeDoc.data();
-          const codeUpdate = {
-            ...codeData,
-            code: code,
-            category
-          };
-          await feedbackCodeDoc.ref.update(codeUpdate);
-        }
-        setSnackbarMessage(`Code updated !`);
-        setCode("");
-        setAdminCodeData({});
-        handleCloseAdminEditModal();
-        setOpenEditAdminModal(false);
-        setSubmittingUpdate(false);
-      }
+      await axios.post("/updateThematicCode", {
+        oldCodeId: adminCodeData.id,
+        newCode: code,
+        mergeCode,
+        category
+      });
+      setCode("");
+      setCategory("");
+      setAdminCodeData({});
+      handleCloseAdminEditModal();
+      setOpenEditAdminModal(false);
+      setSubmittingUpdate(false);
+      setMergeCode(null);
+      setSnackbarMessage("Uptaded successful!");
     } catch (err) {
       setSnackbarMessage("There is some error while updating your code, please try after some time!");
     } finally {
@@ -583,26 +545,18 @@ const ThematicAnalysis = props => {
 
   const handleAdminDelete = async () => {
     try {
-      setSubmittingDelete(true);
-      let _allExperimentCodes = [...allExperimentCodes];
-      _allExperimentCodes = _allExperimentCodes.filter(code => code.code !== adminCodeData.code);
-      const updatefeedbackCodeBooksDoc = await firebase.db
-        .collection("feedbackCodeBooks")
-        .where("code", "==", adminCodeData.code)
-        .get();
-      for (let feedbackCodebookDoc of updatefeedbackCodeBooksDoc.docs) {
-        await feedbackCodebookDoc.ref.delete();
-      }
-      setSnackbarMessage("code successfully deleted!");
+      setDeleting(true);
+      axios.post("/deleteThematicCode", {
+        deleteCode: adminCodeData
+      });
       setCode("");
       setAdminCodeData({});
       handleCloseDeleteModalAdmin();
-      setAllExperimentCodes(_allExperimentCodes);
+      setSnackbarMessage("code successfully deleted!");
+      setDeleting(false);
     } catch (err) {
       console.error(err);
       setSnackbarMessage("There is some error while deleting your code, please try after some time!");
-    } finally {
-      setSubmittingDelete(false);
     }
   };
   let categories = useMemo(() => {
@@ -630,6 +584,10 @@ const ThematicAnalysis = props => {
       setCategory(_newCategory);
     }
     setNewCategory("");
+  };
+
+  const handleMerge = event => {
+    setMergeCode(event.target.value);
   };
 
   return (
@@ -722,6 +680,13 @@ const ThematicAnalysis = props => {
             />
           </Paper>
         </Box>
+
+        {mergeCode && (
+          <Alert severity="error" className="VoteActivityAlert">
+            This code <strong>{code}</strong> will be merged into this code <strong>{mergeCode}</strong>!<br></br>
+            The new code will be <strong>{mergeCode}</strong>!
+          </Alert>
+        )}
         {editor && (
           <Box sx={{ mb: "50px" }}>
             {openAdminEditModal && (
@@ -754,6 +719,21 @@ const ThematicAnalysis = props => {
                       }
                     }}
                   />
+                  <FormControl className="select" variant="outlined" style={{ width: "160px" }}>
+                    <InputLabel>Merge Code</InputLabel>
+                    <Select label="New Category" value={mergeCode} onChange={handleMerge} id="merge-code">
+                      <MenuItem key={null} value={null}>
+                        {"Ignore merging"}
+                      </MenuItem>
+                      {approvedCodes
+                        .filter(c => c.code !== code)
+                        .map(c => (
+                          <MenuItem key={c.id} value={c.code}>
+                            {c.code}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
                   <LoadingButton
                     loading={submittingUpdate}
                     disabled={submittingUpdate}
@@ -768,6 +748,7 @@ const ThematicAnalysis = props => {
                     onClick={() => {
                       setCode("");
                       handleCloseAdminEditModal();
+                      setMergeCode(null);
                     }}
                   >
                     cancel
@@ -791,14 +772,12 @@ const ThematicAnalysis = props => {
           </Box>
         )}
         <Dialog open={openDeleteModalAdmin} onClose={handleCloseDeleteModalAdmin}>
-          <DialogTitle sx={{ fontSize: "15px" }}>Are you sure, you want to delete?</DialogTitle>
-          <DialogContent>
-            <Typography variant="h7" margin-bottom="20px">
-              {adminCodeData.code}
-            </Typography>
-          </DialogContent>
+          <DialogTitle sx={{ fontSize: "15px" }}></DialogTitle>
+          <DialogContent>Are you sure, you want to delete?</DialogContent>
           <DialogActions>
-            <Button onClick={handleAdminDelete}>Delete</Button>
+            <Button disabled={deleting} onClick={handleAdminDelete}>
+              Yes
+            </Button>
             <Button
               onClick={() => {
                 setAdminCodeData({});
