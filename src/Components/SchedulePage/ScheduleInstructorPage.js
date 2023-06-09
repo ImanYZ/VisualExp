@@ -40,7 +40,6 @@ const ScheduleInstructorPage = props => {
 
   const firebase = useRecoilValue(firebaseState);
   const [email, setEmail] = useRecoilState(emailState);
-  const fullname = useRecoilValue(fullnameState);
 
   const [availableSessions, setAvailableSessions] = useState({});
   const [participatedBefore, setParticipatedBefore] = useState(false);
@@ -60,7 +59,6 @@ const ScheduleInstructorPage = props => {
       id: instructorId
     });
   }, []);
-  
 
   useEffect(() => {
     const loadSchedule = async () => {
@@ -86,7 +84,10 @@ const ScheduleInstructorPage = props => {
         if (
           "projects" in researcherData &&
           project in researcherData.projects &&
-          researcherData.projects[project].active
+          researcherData.projects[project].active &&
+          (researcherData.email === "oneweb@umich.edu" ||
+            researcherData.email === "benjamin.brown@sjsu.edu" ||
+            researcherData.email === "lilydibartolomeo@gmail.com")
         ) {
           researchers[researcherData.email] = researcherDoc.id;
         }
@@ -127,9 +128,15 @@ const ScheduleInstructorPage = props => {
             }
           }
         }
-
-        // date time already booked by participants
       }
+
+      for (let session in availSessions) {
+        if (!availSessions[session].includes("Iman YeckehZaare")) {
+          delete availSessions[session];
+        }
+      }
+      console.log(availSessions);
+
       // We need to retrieve all the currently scheduled events to figure
       // out which sessions are already taken and exclude them from availSessions.
       // Retieve all the Calendar events from last month to the end of time.
@@ -353,8 +360,7 @@ const ScheduleInstructorPage = props => {
               <ul id="WarningPoints">
                 <li>
                   {" "}
-                  Please specify your availability{" "}
-                  {formatSlotTime(projectSpecs.hourlyChunks, 1, 0)} introduction and
+                  Please specify your availability {formatSlotTime(projectSpecs.hourlyChunks, 1, 0)} introduction and
                   interview session
                 </li>
                 <li>
