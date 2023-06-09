@@ -5,7 +5,7 @@ import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { formatPoints } from "../../../../utils";
-import { firebaseState } from "../../../../store/AuthAtoms";
+import { firebaseState, emailState } from "../../../../store/AuthAtoms";
 import { useRecoilValue } from "recoil";
 import axios from "axios";
 import moment from "moment";
@@ -13,6 +13,7 @@ import { projectState } from "../../../../store/ProjectAtoms";
 import { chunk } from "lodash";
 import { Box } from "@mui/system";
 import { useNavigate } from "react-router-dom";
+import { fi } from "date-fns/locale";
 
 export const LeaderBoard = ({
   fullname,
@@ -29,6 +30,7 @@ export const LeaderBoard = ({
   const [currentTime, setCurrentTime] = useState(new Date().getTime());
   const [hasRecentParticipantRecalls, setHasRecentParticipantRecalls] = useState(false);
   const project = useRecoilValue(projectState);
+  const email = useRecoilValue(emailState);
 
   const firebase = useRecoilValue(firebaseState);
 
@@ -75,7 +77,8 @@ export const LeaderBoard = ({
       setStarting(true);
       await axios.post("/markAttended", {
         ev,
-        fullname
+        fullname,
+        email
       });
       const evs = [...onGoingEvents];
       evs[index] = { ...ev, schedule: { ...ev.schedule, attended: true } };
@@ -210,7 +213,6 @@ export const LeaderBoard = ({
         <span />
       )}
       {(onGoingEvents || []).map((ev, index) => {
-        const now = new Date().getTime();
         const isHappening =
           new Date(ev.event.start.dateTime).getTime() <= currentTime &&
           new Date(ev.event.end.dateTime).getTime() >= currentTime;
@@ -248,7 +250,7 @@ export const LeaderBoard = ({
                     label="Mark Attended"
                     color={color}
                     style={{ margin: "5px" }}
-                    disabled={ev?.schedule?.attended}
+                    disabled={ev?.schedule?.attended || starting}
                     onClick={() => markAttended(ev, index)}
                   />
                 )}
