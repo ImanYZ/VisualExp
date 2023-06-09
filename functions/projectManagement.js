@@ -944,15 +944,15 @@ exports.remindCalendarInvitations = async context => {
               // Send a reminder email to a researcher that they have not accepted
               // or even declined the Google Calendar invitation and asks them to
               // accept it or ask someone else to take it.
-                researcherEventNotificationEmail(
-                  attendee.email.toLowerCase(),
-                  researchers[attendee.email.toLowerCase()],
-                  participant.email,
-                  hoursLeft,
-                  order,
-                  attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
-                  schedule[ev.id].project
-                );
+              researcherEventNotificationEmail(
+                attendee.email.toLowerCase(),
+                researchers[attendee.email.toLowerCase()],
+                participant.email,
+                hoursLeft,
+                order,
+                attendee.responseStatus === "declined" || attendee.responseStatus === "tentative",
+                schedule[ev.id].project
+              );
             }
             // Find the attendee who corresponds to this participant:
             else if (attendee.email.toLowerCase() === participant.email) {
@@ -1522,4 +1522,68 @@ exports.loadRecallGrades = async (req, res) => {
     res.status(500).send({ message: "error", data: error });
     console.log(error);
   }
+};
+
+exports.updateThematicCode = async (req, res) => {
+  try {
+    await db.runTransaction(async t => {
+      let { oldCodeId, newCode, mergeCode, category } = req.body;
+      const codeRef = db.collection("feedbackCodeBooks").doc(oldCodeId);
+      const thematicAnalysisDocs = await t.get(db.collection("thematicAnalysis"));
+      const codeDoc = await t.get(codeRef);
+      const codeData = codeDoc.data();
+      if (newCode === codeData.code && !mergeCode && category === codeData.category) return;
+      if (mergeCode) {
+        newCode = mergeCode;
+        const mergeCodeDoc = await t.get(
+          db.collection("feedbackCodeBooks").where("project", "==", "OnlineCommunities").where("code", "==", mergeCode)
+        );
+        if (mergeCodeDoc.docs.length > 0) {
+          t.delete(mergeCodeDoc.docs[0].ref);
+        }
+      }
+      for (let thematicAnalysisDoc of thematicAnalysisDocs.docs) {
+        const thematicAnalysisData = thematicAnalysisDoc.data();
+        const updateCBook = thematicAnalysisData.codesBook;
+        Object.keys(updateCBook).forEach(sentence => {
+          const index = updateCBook[sentence].indexOf(codeData.code.trim());
+          console.log(updateCBook[sentence], index);
+          if (index !== -1) {
+            updateCBook[sentence][index] = newCode;
+          }
+          console.log("after", updateCBook[sentence]);
+        });
+        console.log(updateCBook);
+        t.update(db.collection("thematicAnalysis").doc(thematicAnalysisDoc.id), { codesBook: updateCBook });
+      }
+      t.update(codeRef, { code: newCode, category });
+    });
+    return res.status(200).send({ message: "success" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "error", data: error });
+  }
+};
+
+exports.deleteThematicCode = async (req, res) => {
+  await db.runTransaction(async t => {
+    const { deleteCode } = req.body;
+    const codeRef = db.collection("feedbackCodeBooks").doc(deleteCode.id);
+    const thematicAnalysisDocs = await t.get(db.collection("thematicAnalysis"));
+    for (let thematicAnalysisDoc of thematicAnalysisDocs.docs) {
+      const thematicAnalysisData = thematicAnalysisDoc.data();
+      const updateCBook = thematicAnalysisData.codesBook;
+      Object.keys(updateCBook).forEach(sentence => {
+        const index = updateCBook[sentence].indexOf(deleteCode.code.trim());
+        console.log(updateCBook[sentence], index);
+        if (index !== -1) {
+          updateCBook[sentence].splice(index, 1);
+          if (updateCBook[sentence].length === 0) delete updateCBook[sentence];
+        }
+      });
+      console.log(updateCBook);
+      t.update(db.collection("thematicAnalysis").doc(thematicAnalysisDoc.id), { codesBook: updateCBook });
+    }
+    t.delete(codeRef);
+  });
 };
