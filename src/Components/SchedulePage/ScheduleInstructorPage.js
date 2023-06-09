@@ -131,12 +131,13 @@ const ScheduleInstructorPage = props => {
       }
 
       for (let session in availSessions) {
-        if (!availSessions[session].includes("Iman YeckehZaare")) {
+        const index = availSessions[session].indexOf("Iman YeckehZaare");
+        if (index === -1) {
           delete availSessions[session];
+        } else {
+          availSessions[session].splice(index, 1);
         }
       }
-      console.log(availSessions);
-
       // We need to retrieve all the currently scheduled events to figure
       // out which sessions are already taken and exclude them from availSessions.
       // Retieve all the Calendar events from last month to the end of time.
