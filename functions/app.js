@@ -25,7 +25,9 @@ const {
   retreiveFeedbackcodes,
   lodResponses,
   voteOnSingleRecall,
-  loadRecallGrades
+  loadRecallGrades,
+  updateThematicCode,
+  deleteThematicCode
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -140,6 +142,9 @@ app.use("/admin", adminRouter);
 app.post("/loadRecallGrades", loadRecallGrades);
 app.post("/scheduleInstructors", scheduleInstructors);
 app.get("/sendingEmails", sendingEmails);
+
+app.post("/updateThematicCode", updateThematicCode);
+app.post("/deleteThematicCode", deleteThematicCode);
 // Knowledge endpoints
 
 // Misinformation Experiment
