@@ -507,7 +507,8 @@ exports.scheduleInstructors = async (req, res) => {
       if (
         "projects" in researcherData &&
         project in researcherData.projects &&
-        researcherData.projects[project].active
+        researcherData.projects[project].active &&
+        researcherData.projects[project].scheduleAllowed
       ) {
         researchers[researcherData.email] = researcherDoc.id;
       }
