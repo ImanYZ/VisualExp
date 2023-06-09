@@ -510,7 +510,10 @@ exports.scheduleInstructors = async (req, res) => {
       if (
         "projects" in researcherData &&
         project in researcherData.projects &&
-        researcherData.projects[project].active
+        researcherData.projects[project].active &&
+        (researcherData.email === "oneweb@umich.edu" ||
+          researcherData.email === "benjamin.brown@sjsu.edu" ||
+          researcherData.email === "lilydibartolomeo@gmail.com")
       ) {
         researchers[researcherData.email] = researcherDoc.id;
       }
@@ -563,6 +566,11 @@ exports.scheduleInstructors = async (req, res) => {
         }
       }
       // date time already booked by participants
+    }
+    for (let session in availSessions) {
+      if (!availSessions[session].includes("Iman YeckehZaare")) {
+        delete availSessions[session];
+      }
     }
     for (let event of events) {
       // First, we should figure out whether the user participated in the past:
