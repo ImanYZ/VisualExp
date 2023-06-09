@@ -34,7 +34,7 @@ const SelectSessions = props => {
   // Checks whether each of the selected sessions satisfies the 1st, 2nd,
   // or 3rd session criteria.
   useEffect(() => {
-    if (props.schedule) {
+    // if (props.schedule) {
       const orderedSch = [...props.schedule];
       // Before checking whether a session satisfies the 1st, 2nd, or 3rd
       // session criteria, we should sort all the selected sessions in
@@ -81,6 +81,7 @@ const SelectSessions = props => {
                 const availableSession = props.availableSessions[new Date(schedule).toLocaleString()];
                 const r = idx > scheduleIdx &&
                 moment(schedule).utcOffset(-4).format("YYYY-MM-DD HH:mm") === moment(orderedSch[scheduleIdx]).utcOffset(-4).add((60 / props.hourlyChunks) * i, "minutes").format("YYYY-MM-DD HH:mm") &&
+                availableSession &&
                 availableSession.filter((researcher) => researchers.indexOf(researcher) !== -1).length;
 
                 // only calculate intersaction if current slot coming up consectively and has common researcher
@@ -116,7 +117,7 @@ const SelectSessions = props => {
         props.setSubmitable(false);
         props.setSelectedSession([]);
       }
-    }
+    // }
   }, [props, props.schedule]);
 
   // ScheduleSelector calls this function for every cell that changes,
