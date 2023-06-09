@@ -84,10 +84,7 @@ const ScheduleInstructorPage = props => {
         if (
           "projects" in researcherData &&
           project in researcherData.projects &&
-          researcherData.projects[project].active &&
-          (researcherData.email === "oneweb@umich.edu" ||
-            researcherData.email === "benjamin.brown@sjsu.edu" ||
-            researcherData.email === "lilydibartolomeo@gmail.com")
+          researcherData.projects[project].active
         ) {
           researchers[researcherData.email] = researcherDoc.id;
         }
@@ -129,7 +126,6 @@ const ScheduleInstructorPage = props => {
           }
         }
       }
-
       for (let session in availSessions) {
         const index = availSessions[session].indexOf("Iman YeckehZaare");
         if (index === -1) {
