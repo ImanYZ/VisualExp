@@ -98,7 +98,8 @@ const CodeFeedback = props => {
   const [category, setCategory] = useState("");
   const online = project === "OnlineCommunities";
   const projectRef = useRef(project);
-  const editor = email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu";
+  const editor =
+    email === "oneweb@umich.edu" || email === "benjamin.brown@sjsu.edu" || email === "lilydibartolomeo@gmail.com";
   const codesColumn = [
     ..._codesColumn,
     {
