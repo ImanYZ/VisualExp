@@ -8,13 +8,12 @@ import { DataGrid } from "@mui/x-data-grid";
 import SelectSessions from "../../SchedulePage/SelectSessions";
 import { firebaseState, fullnameState } from "../../../store/AuthAtoms";
 import AppConfig from "../../../AppConfig";
-import {
-  retrieveEvents,
-  expSessionsColumns,
-  applicantsColumns,
-  istructorsColumns,
-  adminstratorsColumns
-} from "./helpers";
+import { Box } from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import CircularProgress from "@mui/material/CircularProgress";
+import { expSessionsColumns, applicantsColumns, istructorsColumns, adminstratorsColumns } from "./helpers";
 import "./ManageEvents.css";
 
 const errorAlert = data => {
@@ -28,9 +27,6 @@ const errorAlert = data => {
 const ManageEvents = props => {
   const firebase = useRecoilValue(firebaseState);
   const fullname = useRecoilValue(fullnameState);
-  // const firebaseOne = useRecoilValue(firebaseOneState);
-  const [availabilities, setAvailabilities] = useState([]);
-  const [availabilitiesLoaded, setAvailabilitiesLoaded] = useState(false);
   const [availableSessions, setAvailableSessions] = useState({});
   const [events, setEvents] = useState([]);
   const [ongoingEvents, setOngoingEvents] = useState([]);
@@ -62,6 +58,7 @@ const ManageEvents = props => {
   const [invitesInstructors, setInvitesInstructors] = useState([]);
   const [invitesAdminstartors, setInvitesAdminstartors] = useState([]);
   const [loadingInstructors, setLoadingInstructors] = useState(true);
+  const [modelOpen, setModelOpen] = useState(false);
   // Retrieves all the available timeslots specified by all the
   // participnats so far that are associated with Google Calendar
   // events.
@@ -121,22 +118,6 @@ const ManageEvents = props => {
       loadLoadInstructors();
     }
   }, [firebase]);
-
-  useEffect(() => {
-    const loadAvailabilities = async () => {
-      const scheduleDocs = await firebase.db.collection("schedule").orderBy("id").get();
-      const sched = [];
-      for (let scheduleDoc of scheduleDocs.docs) {
-        sched.push(scheduleDoc.data());
-      }
-      setAvailabilities(sched);
-      setAvailabilitiesLoaded(true);
-    };
-    if (firebase) {
-      loadAvailabilities();
-    }
-  }, [firebase]);
-
   // get all Project SPecs so that we don't have to that again and again.
   useEffect(() => {
     const loadProjectSpecs = async () => {
@@ -153,149 +134,61 @@ const ManageEvents = props => {
     }
   }, [firebase]);
 
-  // If availabilitiesLoaded, retrieve the ongoing events.
   useEffect(() => {
     const loadOngoingEvents = async () => {
-      const evs = await retrieveEvents("/ongoingEvents", firebase, availabilities);
-      setOngoingEvents(evs);
+      const response = await axios.post("/retrieveEvents", {
+        relativeURL: "ongoingEvents"
+      });
+      setOngoingEvents(response.data.events);
       setOngoingEventsLoaded(true);
     };
-    if (firebase && availabilitiesLoaded && availabilities) {
-      loadOngoingEvents();
-    }
-  }, [firebase, availabilitiesLoaded, availabilities]);
 
-  // If ongoingEventsLoaded, retrieve allEvents.
-  // I first retieved the ongoingEvents, which was obviously a subset
-  // of this because it would load much faster and we can see the
-  // complete table on top while waiting for the tables below the
-  // page to be loaded.
+    loadOngoingEvents();
+  }, []);
   useEffect(() => {
     const loadEvents = async () => {
-      const evs = await retrieveEvents("/allEvents", firebase, availabilities);
-      setEvents(evs);
+      const response = await axios.post("/retrieveEvents", {
+        relativeURL: "allEvents"
+      });
+      setEvents(response.data.events);
       setExpSessionsLoaded(true);
     };
-    if (firebase && availabilities) {
+    if (ongoingEventsLoaded) {
       loadEvents();
     }
-  }, [firebase, availabilities]);
+  }, [ongoingEventsLoaded]);
 
   // Load data from applications to populate the content of the
   // application statuses table.
   useEffect(() => {
     const notifyApplicationStatus = async () => {
-      const appls = [];
-      let registered = 0;
-      let completedFirst = 0;
-      let completedSecond = 0;
-      let completedThird = 0;
-      let recallFirst = 0;
-      let recallSecond = 0;
-      let recallThird = 0;
-      let recallFirstRatio = 0;
-      let recallSecondRatio = 0;
-      let recallThirdRatio = 0;
-      const applicationsHash = {};
-
-      const applicationsDocs = await firebase.db.collection("applications").get();
-      applicationsDocs.forEach(doc => {
-        const application = doc.data();
-        if (applicationsHash.hasOwnProperty(application.fullname)) {
-          applicationsHash[application.fullname].push(application);
-        } else {
-          applicationsHash[application.fullname] = [application];
-        }
-      });
-
-      const tutorialHash = {};
-      const tutorialsDocs = await firebase.db.collection("tutorial").get();
-      tutorialsDocs.forEach(doc => {
-        const tutorial = doc.data();
-        tutorialHash[doc.id] = tutorial;
-      });
-
-      const userDocs = await firebase.db.collection("users").get();
-      const surveyInstructors = await firebase.db.collection("instructors").get();
-      const surveyUsers = await firebase.db.collection("usersSurvey").get();
-      for (let userDoc of [...surveyInstructors.docs, ...surveyUsers.docs, ...userDocs.docs]) {
-        const userData = userDoc.data();
-        if ("createdAt" in userData && userData.createdAt.toDate() > new Date("1-14-2022")) {
-          registered += 1;
-          if ("postQ2Choice" in userData) {
-            completedFirst += 1;
-            if ("pConditions" in userData && userData.pConditions.length === 2) {
-              recallFirst += userData.pConditions[0].recallScore + userData.pConditions[1].recallScore;
-              recallFirstRatio += userData.pConditions[0].recallScoreRatio + userData.pConditions[1].recallScoreRatio;
-            }
-          }
-          if ("post3DaysQ2Choice" in userData) {
-            completedSecond += 1;
-            if ("pConditions" in userData && userData.pConditions.length === 2) {
-              recallSecond += userData.pConditions[0].recall3DaysScore + userData.pConditions[1].recall3DaysScore;
-              recallSecondRatio +=
-                userData.pConditions[0].recall3DaysScoreRatio + userData.pConditions[1].recall3DaysScoreRatio;
-            }
-          }
-          if ("projectDone" in userData && userData.projectDone) {
-            completedThird += 1;
-            if ("pConditions" in userData && userData.pConditions.length === 2) {
-              recallThird += userData.pConditions[0].recall1WeekScore
-                ? userData.pConditions[0].recall1WeekScore
-                : 0 + userData.pConditions[1].recall1WeekScore
-                ? userData.pConditions[1].recall1WeekScore
-                : 0;
-              recallThirdRatio +=
-                userData.pConditions[0].recall1WeekScoreRatio + userData.pConditions[1].recall1WeekScoreRatio;
-            }
-            const appl = {
-              id: userDoc.id,
-              createdAt: userData.createdAt.toDate(),
-              user: userDoc.id,
-              email: userData.email,
-              tutStarted: false,
-              tutorial: false,
-              applicationsStarted: [],
-              applications: [],
-              withdrew: "withdrew" in userData && userData.withdrew,
-              withdrawExp: "withdrawExp" in userData && userData.withdrawExp,
-              reminder: "reminder" in userData && userData.reminder ? userData.reminder.toDate() : null
-            };
-            if (tutorialHash.hasOwnProperty(userDoc.id)) {
-              appl.tutStarted = true;
-              const tutorialData = tutorialHash[userDoc.id];
-              if ("ended" in tutorialData && tutorialData.ended) {
-                appl.tutorial = true;
-                // let submittedOne = false;
-
-                const applicationDocs = applicationsHash[userDoc.id] || [];
-                for (let applicationData of applicationDocs) {
-                  appl.applicationsStarted.push(applicationData.communiId);
-                  if ("ended" in applicationData && applicationData.ended) {
-                    // submittedOne = true;
-                    appl.applications.push(
-                      applicationData.communiId + ": " + applicationData.corrects + " - " + applicationData.wrongs
-                    );
-                  }
-                }
-              }
-            }
-            appls.push(appl);
-          }
-        }
+      try {
+        const response = await axios.get("/notifyApplicationStatus");
+        let registered = response.data.registered;
+        let completedFirst = response.data.completedFirst;
+        let completedSecond = response.data.completedSecond;
+        let completedThird = response.data.completedThird;
+        let recallFirst = response.data.recallFirst;
+        let recallSecond = response.data.recallSecond;
+        let recallThird = response.data.recallThird;
+        let recallFirstRatio = response.data.recallFirstRatio;
+        let recallSecondRatio = response.data.recallSecondRatio;
+        let recallThirdRatio = response.data.recallThirdRatio;
+        setRecall1st(Math.floor(recallFirst / completedFirst));
+        setRecall2nd(Math.floor(recallSecond / completedSecond));
+        setRecall3rd(Math.floor(recallThird / completedThird));
+        setRecall1stRatio(Math.floor(recallFirstRatio / completedFirst));
+        setRecall2ndRatio(Math.floor(recallSecondRatio / completedSecond));
+        setRecall3rdRatio(Math.floor(recallThirdRatio / completedThird));
+        setTotalRegistered(registered);
+        setCompleted1st(completedFirst);
+        setCompleted2nd(completedSecond);
+        setCompleted3rd(completedThird);
+        setApplicants(response.data.applications);
+        setApplicantsLoaded(true);
+      } catch (error) {
+        console.log(error);
       }
-      setRecall1st(Math.floor(recallFirst / completedFirst));
-      setRecall2nd(Math.floor(recallSecond / completedSecond));
-      setRecall3rd(Math.floor(recallThird / completedThird));
-      setRecall1stRatio(Math.floor(recallFirstRatio / completedFirst));
-      setRecall2ndRatio(Math.floor(recallSecondRatio / completedSecond));
-      setRecall3rdRatio(Math.floor(recallThirdRatio / completedThird));
-      setTotalRegistered(registered);
-      setCompleted1st(completedFirst);
-      setCompleted2nd(completedSecond);
-      setCompleted3rd(completedThird);
-      setApplicants(appls);
-      setApplicantsLoaded(true);
     };
     if (firebase && fullname) {
       notifyApplicationStatus();
@@ -310,12 +203,10 @@ const ManageEvents = props => {
       if (theRow.participant) {
         const email = theRow.participant;
         setParticipant(email);
+        setModelOpen(true);
         setScheduleLoaded(false);
         // We need to first retrieve which project this user belongs to.
         let userDoc = await firebase.db.collection("users").doc(theRow.fullname).get();
-        if (!userDoc.exists) {
-          userDoc = await firebase.db.collection("instructors").doc(theRow.fullname).get();
-        }
         if (!userDoc.exists) {
           userDoc = await firebase.db.collection("usersSurvey").doc(theRow.fullname).get();
         }
@@ -323,6 +214,9 @@ const ManageEvents = props => {
         const userData = userDoc.data();
         const project = userData.project;
         const projectSpecs = allProjectSpecs[project];
+        if (userData.surveyType === "instructor") {
+          projectSpecs.sessionDuration = [1];
+        }
         setCurrentProject(project);
         setCurrentProjectSpecs(projectSpecs);
         // researchers = an object of fullnames as keys and the corresponding email addresses as values.
@@ -336,7 +230,15 @@ const ManageEvents = props => {
             project in researcherData.projects &&
             researcherData.projects[project].active
           ) {
-            researchers[researcherDoc.id] = researcherData.email;
+            if (project === "OnlineCommunities" && userData.surveyType === "instructor") {
+              if (researcherData.projects[project]?.scheduleAllowed) {
+                researchers[researcherDoc.id] = researcherData.email;
+              }
+            } else {
+              if (researcherData.email !== "oneweb@umich.edu") {
+                researchers[researcherDoc.id] = researcherData.email;
+              }
+            }
           }
         }
         // availSessions = a placeholder to accumulate values that we will eventually put in availableSessions.
@@ -372,8 +274,17 @@ const ManageEvents = props => {
               availSessions[_scheduleSlot].push(researcherFullname);
             }
           }
-
           // date time already booked by participants
+        }
+        if (project === "OnlineCommunities") {
+          for (let session in availSessions) {
+            const index = availSessions[session].indexOf("Iman YeckehZaare");
+            if (index === -1) {
+              delete availSessions[session];
+            } else {
+              availSessions[session].splice(index, 1);
+            }
+          }
         }
         // We need to retrieve all the currently scheduled events to figure
         // out which sessions are already taken and exclude them from availSessions.
@@ -480,6 +391,8 @@ const ManageEvents = props => {
           }
           availSessions = filteredObj;
         }
+
+
         setAvailableSessions(availSessions);
         if (sch.length > 0) {
           setSchedule(sch);
@@ -508,21 +421,34 @@ const ManageEvents = props => {
         events
       });
       // errorAlert(responseObj.data);
-      // alert("sessions updated seccessufly  ...");
+      alert("sessions updated seccessufly  ...");
       setSubmitted(true);
+      handleCloseSchedule();
+      setScheduleLoaded(false);
+      setAvailableSessions({});
+      setSchedule([]);
     } catch (error) {
       setIsSubmitting(false);
       console.log("error => ", error);
       alert("Error submitting new sessions try again ...");
     }
-
     setIsSubmitting(false);
   };
 
+  const cancel = () => {
+    handleCloseSchedule();
+    setScheduleLoaded(false);
+    setAvailableSessions({});
+    setSchedule([]);
+  };
+  const handleCloseSchedule = () => {
+    setModelOpen(false);
+  };
+
   return (
-    <div>
+    <Box>
       <h3 style={{ marginLeft: "45px" }}>Invited instructors : </h3>
-      <div className="dataGridTable">
+      <Box className="dataGridTable">
         <DataGrid
           rows={invitesInstructors}
           columns={istructorsColumns}
@@ -532,9 +458,9 @@ const ManageEvents = props => {
           autoHeight
           loading={loadingInstructors}
         />
-      </div>
+      </Box>
       <h3 style={{ marginLeft: "45px" }}>Invited adminstrators : </h3>
-      <div className="dataGridTable">
+      <Box className="dataGridTable">
         <DataGrid
           rows={invitesAdminstartors}
           columns={adminstratorsColumns}
@@ -544,8 +470,8 @@ const ManageEvents = props => {
           autoHeight
           loading={loadingInstructors}
         />
-      </div>
-      <div className="dataGridTable">
+      </Box>
+      <Box className="dataGridTable">
         <DataGrid
           rows={ongoingEvents}
           columns={expSessionsColumns}
@@ -557,7 +483,7 @@ const ManageEvents = props => {
           loading={!ongoingEventsLoaded}
           onRowClick={gridRowClick}
         />
-      </div>
+      </Box>
       <Paper style={{ margin: "19px", padding: "4px" }}>
         <p>{totalRegistered} total registered since 01/14/2022!</p>
         <p>
@@ -582,7 +508,7 @@ const ManageEvents = props => {
         <p>{recall2ndRatio} Free recall score ratio average in 2nd session!</p>
         <p>{recall3rdRatio} Free recall score ratio average in 3rd session!</p>
       </Paper>
-      <div className="dataGridTable">
+      <Box className="dataGridTable">
         <DataGrid
           rows={applicants}
           columns={applicantsColumns}
@@ -593,9 +519,9 @@ const ManageEvents = props => {
           hideFooterSelectedRowCount
           loading={!applicantsLoaded}
         />
-      </div>
+      </Box>
 
-      <div className="dataGridTable" style={{ marginBottom: "700px" }}>
+      <Box className="dataGridTable" style={{ marginBottom: "700px" }}>
         <DataGrid
           rows={events}
           columns={expSessionsColumns}
@@ -607,36 +533,62 @@ const ManageEvents = props => {
           loading={!expSessionsLoaded}
           onRowClick={gridRowClick}
         />
-        {scheduleLoaded && (
-          <div style={{ height: "1300px" }}>
-            <SelectSessions
-              startDate={scheduleStart}
-              numDays={16}
-              schedule={schedule}
-              setSchedule={setSchedule}
-              selectedSession={selectedSession}
-              setSelectedSession={setSelectedSession}
-              availableSessions={availableSessions}
-              setSubmitable={setSubmitable}
-              numberOfSessions={currentProjectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
-              hourlyChunks={currentProjectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
-              sessionDuration={currentProjectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
-              daysLater={currentProjectSpecs.daysLater || AppConfig.daysLater}
-            />
-          </div>
-        )}
-      </div>
-      <div id="SignBtnContainer">
-        <Button
-          onClick={submitNewSessions}
-          className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
-          variant="contained"
-          disabled={submitable && !isSubmitting ? null : true}
-        >
-          Schedule
-        </Button>
-      </div>
-    </div>
+      </Box>
+      <Dialog
+        open={modelOpen}
+        sx={{ width: "100vw", height: "100vh" }}
+        fullWidth
+        maxWidth="xl"
+        onClose={handleCloseSchedule}
+      >
+        <DialogContent>
+          {!scheduleLoaded ? (
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "50vh"
+              }}
+            >
+              <CircularProgress color="warning" sx={{ margin: "0" }} size="50px" />
+            </Box>
+          ) : (
+            <Box>
+              <SelectSessions
+                startDate={scheduleStart}
+                numDays={16}
+                schedule={schedule}
+                setSchedule={setSchedule}
+                selectedSession={selectedSession}
+                setSelectedSession={setSelectedSession}
+                availableSessions={availableSessions}
+                setSubmitable={setSubmitable}
+                numberOfSessions={currentProjectSpecs?.numberOfSessions || AppConfig.defaultNumberOfSessions}
+                hourlyChunks={currentProjectSpecs?.hourlyChunks || AppConfig.defaultHourlyChunks}
+                sessionDuration={currentProjectSpecs?.sessionDuration || AppConfig.defaultSessionDuration}
+                daysLater={currentProjectSpecs.daysLater || AppConfig.daysLater}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions style={{ display: "flex", justifyContent: "space-between" }}>
+          <Box>
+            <Button
+              onClick={submitNewSessions}
+              className={submitable && !isSubmitting ? "Button SubmitButton" : "Button SubmitButton Disabled"}
+              variant="contained"
+              disabled={submitable && !isSubmitting ? null : true}
+            >
+              Schedule
+            </Button>
+            <Button onClick={cancel} className={"Button SubmitButton"} variant="contained">
+              Cancel
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

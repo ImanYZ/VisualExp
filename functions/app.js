@@ -27,7 +27,8 @@ const {
   voteOnSingleRecall,
   loadRecallGrades,
   updateThematicCode,
-  deleteThematicCode
+  deleteThematicCode,
+  notifyApplicationStatus
 } = require("./projectManagement");
 const {
   loadImageIndividual,
@@ -56,7 +57,8 @@ const {
   getOngoingResearcherEvent,
   ongoingEvents,
   markAttended,
-  scheduleInstructors
+  scheduleInstructors,
+  retrieveEvents
 } = require("./scheduling");
 const { assignNodeContributorsInstitutionsStats, checkEmailInstitution, getInstitutions } = require("./knowledge");
 
@@ -145,6 +147,8 @@ app.get("/sendingEmails", sendingEmails);
 
 app.post("/updateThematicCode", updateThematicCode);
 app.post("/deleteThematicCode", deleteThematicCode);
+app.get("/notifyApplicationStatus", notifyApplicationStatus);
+app.post("/retrieveEvents", retrieveEvents);
 // Knowledge endpoints
 
 // Misinformation Experiment
