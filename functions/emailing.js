@@ -507,8 +507,6 @@ exports.inviteInstructors = async context => {
       let randomNumber = 0;
       if (instructor.hasOwnProperty("emailNumber")) {
         randomNumber = instructor.emailNumber;
-      } else {
-        randomNumber = Math.floor(Math.random() * 2);
       }
       const mailOptions = instMailOptions(email, topic, prefix, lastname, instructor.id, randomNumber);
       const emailRef = db.collection("emails").doc();
