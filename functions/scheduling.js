@@ -235,7 +235,7 @@ exports.getOngoingResearcherEvent = async (req, res) => {
     const events = await getEvents(start, end, "UTC");
 
     const filteredEvents = (events || []).filter(event => {
-      return event.attendees.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
+      return event?.attendees?.some(attendee => attendee.email.toLowerCase() === email.toLowerCase());
     });
 
     const responseData = [];
@@ -507,10 +507,7 @@ exports.scheduleInstructors = async (req, res) => {
       if (
         "projects" in researcherData &&
         project in researcherData.projects &&
-        researcherData.projects[project].active &&
-        (researcherData.email === "oneweb@umich.edu" ||
-          researcherData.email === "benjamin.brown@sjsu.edu" ||
-          researcherData.email === "lilydibartolomeo@gmail.com")
+        researcherData.projects[project].active
       ) {
         researchers[researcherData.email] = researcherDoc.id;
       }
