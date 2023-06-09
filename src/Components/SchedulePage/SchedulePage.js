@@ -125,7 +125,8 @@ const SchedulePage = props => {
         if (
           "projects" in researcherData &&
           project in researcherData.projects &&
-          researcherData.projects[project].active
+          researcherData.projects[project].active &&
+          researcherData.email !== "oneweb@umich.edu"
         ) {
           researchers[researcherData.email] = researcherDoc.id;
         }
