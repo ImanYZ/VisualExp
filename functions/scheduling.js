@@ -45,14 +45,11 @@ const createExperimentEvent = async (email, researcher, order, start, end, proje
   if (isAnnotating && surveyType) {
     colorId = surveyType === "student" ? "5" : surveyType === "instructor" ? "6" : "4";
   }
-  const eventCreated = await insertEvent(
-    start,
-    end,
-    summary,
-    description,
-    [{ email }, { email: researcher }, { email: "ouhrac@gmail.com" }],
-    colorId
-  );
+  const attendees = [{ email }, { email: researcher }, { email: "ouhrac@gmail.com" }];
+  if (isAnnotating && surveyType === "instructor") {
+    attendees.push({ email: "oneweb@umich.edu" });
+  }
+  const eventCreated = await insertEvent(start, end, summary, description, [...attendees], colorId);
   return eventCreated;
 };
 exports.createExperimentEvent = createExperimentEvent;
@@ -568,8 +565,11 @@ exports.scheduleInstructors = async (req, res) => {
       // date time already booked by participants
     }
     for (let session in availSessions) {
-      if (!availSessions[session].includes("Iman YeckehZaare")) {
+      const index = availSessions[session].indexOf("Iman YeckehZaare");
+      if (index === -1) {
         delete availSessions[session];
+      } else {
+        availSessions[session].splice(index, 1);
       }
     }
     for (let event of events) {
