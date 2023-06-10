@@ -6,13 +6,13 @@ exports.instMailOptions = (email, topic, prefix, lastname, instructorId, random)
     return {
       from: process.env.EMAIL,
       to: email,
-      subject: `Partner with an NSF I-Corps Research Team to Optimize Teaching and Learning  ${topic}`,
+      subject: `Collaborate with an NSF I-Corps Research Team to Optimize Teaching and Learning  ${topic}`,
       html: `
             <p>Hello ${prefix + ". " + capitalizeFirstLetter(lastname)},</p>
               <p>We are a research group at the University of Michigan, School of Information, in an NSF I-Corps program that is committed to developing learning and research technologies. Our goal is to help instructors like you by saving your time and improving your student learning outcomes and satisfaction. We have developed <a href="https://1cademy.com">1Cademy.com, </a>, an online platform for collaborative learning and studying. Over the past two years, 1Cademy has garnered participation from 1,612 students, representing 194 institutions.
               </p>
               <p>To learn about your specific challenges, needs, and objectives in depth, we would highly appreciate the opportunity to schedule a 30-minute interview at your earliest convenience. Your valuable insights will empower us to tailor 1Cademy to your unique needs, thereby enhancing your teaching efficacy and creating a more impactful learning environment.</p>
-              <p>We would like to partner with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
+              <p>We would like to collaborate with you to provide your courses with 1Cademy Assistant. You can learn about some of its functionalities in the following videos:</p>
               <ul>
               <li><a href="https://youtu.be/Z8aVR459Kks" rel="nofollow">Introducing 1Cademy Assistant - Question Answering</a></li>
               <li><a href="https://youtu.be/kU6ppO_WLC0" rel="nofollow">Introducing 1Cademy Assistant - Practice Tool</a></li>
