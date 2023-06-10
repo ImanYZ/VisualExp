@@ -880,8 +880,8 @@ exports.markEntreviewAttended = async (req, res) => {
         researchersHash[researcherDoc.data().email] = { fullname: researcherDoc.id, ...researcherDoc.data() };
       });
       const now = new Date().getTime();
-      const start = new Date(now - 60 * 60 * 1000);
-      let end = new Date(now + 60 * 60 * 1000);
+      const start = new Date(now - 4 * 60 * 60 * 1000);
+      let end = new Date(now + 4 * 60 * 60 * 1000);
       const allEvents = await getEvents(start, end, "America/Detroit");
       const eventIdx = allEvents.findIndex(ev => meetingURL.includes(ev.hangoutLink));
       if (eventIdx === -1) {
@@ -896,10 +896,16 @@ exports.markEntreviewAttended = async (req, res) => {
         const scheduleId = scheduleDoc.docs[0].id;
         t.update(db.collection("schedule").doc(scheduleId), { started: true, attended: true });
         if (userDoc.docs.length > 0 && transcriptDoc.docs.length === 0) {
+          let meetingId = "";
+          const regex = /[a-z]{3}-[a-z]{4}-[a-z]{3}/;
+          const matchResult = meetingURL.match(regex);
+          if (matchResult) {
+            meetingId = matchResult[0];
+          }
           const data = userDoc.docs[0].data();
           const transcriptRef = db.collection("transcript").doc();
           t.set(transcriptRef, {
-            mettingUrl: meetingURL,
+            mettingUrl: meetingId,
             participant: userDoc.docs[0].id,
             surveyType: data.surveyType,
             createdAt: new Date()
@@ -951,8 +957,8 @@ exports.markEntreviewAttended = async (req, res) => {
 exports.checkEntreviewStatus = async (req, res) => {
   try {
     const now = new Date().getTime();
-    const start = new Date(now - 60 * 60 * 1000);
-    let end = new Date(now + 60 * 60 * 1000);
+    const start = new Date(now - 4 * 60 * 60 * 1000);
+    let end = new Date(now + 4 * 60 * 60 * 1000);
     const allEvents = await getEvents(start, end, "America/Detroit");
     const eventIdx = allEvents.findIndex(ev => req.body.meetingURL.includes(ev.hangoutLink));
     if (eventIdx === -1) {
